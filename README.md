@@ -6,10 +6,10 @@ The SA Digital ID Wallet allows South African citizens to securely store and pre
 ## Team Members
 | Name | Student Number | GitHub | LinkedIn |
 |------|---------------|--------|----------|
-| Unathi Tshakalisa | u[number] | [babychucks](https://github.com/babychucks) | [LinkedIn](https://linkedin.com/in/unathi-tshakalisa-702a582a4) |
-| Nathan Chisadza | u[number] | [TINODIWA](https://github.com/TINODIWA) | [LinkedIn](https://linkedin.com/in/nathaniel-paul-chisadza) |
-| Ryan Liao | u[number] | [Ryan-Liao-Code](https://github.com/Ryan-Liao-Code) | [LinkedIn](https://linkedin.com/in/huai-en-ryan-liao) |
-| Dominiqu Nigatu | u[number] | [Domy05](https://github.com/Domy05) | [LinkedIn](https://linkedin.com/in/dominiqu-nigatu) |
+| Unathi Tshakalisa | u24730841 | [babychucks](https://github.com/babychucks) | [LinkedIn](https://linkedin.com/in/unathi-tshakalisa-702a582a4) |
+| Nathan Chisadza | u24825532 | [TINODIWA](https://github.com/TINODIWA) | [LinkedIn](https://linkedin.com/in/nathaniel-paul-chisadza) |
+| Ryan Liao | u24573699 | [Ryan-Liao-Code](https://github.com/Ryan-Liao-Code) | [LinkedIn](https://linkedin.com/in/huai-en-ryan-liao) |
+| Dominiqu Nigatu | u24580482 | [Domy05](https://github.com/Domy05) | [LinkedIn](https://linkedin.com/in/dominiqu-nigatu) |
 | Zaynab Samir | u22506099 | [infamouszay](https://github.com/infamouszay) | [LinkedIn](https://linkedin.com/in/zaynab-samir-168b7532a) |
 
 ## Documentation
