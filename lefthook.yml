@@ -1,0 +1,12 @@
+pre-commit:
+  parallel: false
+  commands:
+    web-lint:
+      root: "web/main/"
+      run: yarn --cwd web/main lint
+    web-format:
+      root: "web/main/"
+      run: yarn --cwd web/main prettier --check .
+    web-build:
+      root: "web/main/"
+      run: yarn --cwd web/main build
