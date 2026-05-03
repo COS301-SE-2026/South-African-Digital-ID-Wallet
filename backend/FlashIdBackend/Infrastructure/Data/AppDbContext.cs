@@ -1,0 +1,30 @@
+using Domain.Entities;
+using Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using System.Reflaction;
+
+namespace Infrastructure.Data;
+
+//DbContext is the bridge between backend C# & the db. Everything db related goes through here.
+public class AppDbContext : IdentityDbContext<ApplicationUser>
+{
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+    public DbSet<Citizen> Citizens => Set<Citizen>();
+    public DbSet<Credential> Credentials => Set<Credential>();
+    public DbSet<DriversLicense> DriversLicenses => Set<DriversLicense>();
+    public DbSet<GovernmentAdministrator> GovernmentAdministrators => Set<GovernmentAdministrator>();
+    public DbSet<IdentityDocument> IdentityDocuments => Set<IdentityDocument>();
+    public DbSet<Institution> Institutions => Set<Institution>();
+    public DbSet<Official> Officials => Set<Official>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<UserPreference> UserPreferences => Set<UserPreference>();
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+    }
+}
