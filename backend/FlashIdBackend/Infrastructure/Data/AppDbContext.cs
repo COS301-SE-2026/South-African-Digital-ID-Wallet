@@ -11,6 +11,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
+    //DbSet<T> represents a table in the database.
     public DbSet<Citizen> Citizens => Set<Citizen>();
     public DbSet<Credential> Credentials => Set<Credential>();
     public DbSet<DriversLicense> DriversLicenses => Set<DriversLicense>();
@@ -23,8 +24,10 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        //this lets IdentityDbContext set up its own tables
         base.OnModelCreating(builder);
 
+        //scan the Infrastructure assembly and automatically find every class that implements IEntityTypeConfiguration<T>
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }
