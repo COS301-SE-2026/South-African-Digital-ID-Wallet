@@ -36,17 +36,17 @@ public class CredentialConfiguration : IEntityTypeConfiguration<Credential>
         
         builder.Property(c => c.CitizenId)
             .IsRequired();
-        
+
         builder.HasOne(c => c.Citizen)
             .WithMany(citizen => citizen.Credentials)
             .HasForeignKey(c => c.CitizenId)
-            .OnDelete(DeleteBehavior.Cascade);
-        
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasOne(c => c.IdentityDocument)
             .WithOne(id => id.Credential)
             .HasForeignKey<IdentityDocument>(id => id.CredentialId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         builder.HasOne(c => c.DriversLicense)
             .WithOne(dl => dl.Credential)
             .HasForeignKey<DriversLicense>(dl => dl.CredentialId)
