@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@import 'tw-animate-css';
 
 :root {
   --background: #f7f4ea;
@@ -15,7 +14,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-   --color-primary-green: #007a4d;
+  --color-primary-green: #007a4d;
   --color-deep-green: #053b2c;
   --color-accent-gold: #ffb81c;
   --color-danger-red: #de3831;
@@ -38,6 +37,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family:var(--font-inter), Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
 }
-
