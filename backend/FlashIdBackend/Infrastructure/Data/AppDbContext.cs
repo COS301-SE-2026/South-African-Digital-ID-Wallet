@@ -2,7 +2,7 @@ using Domain.Entities;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Reflaction;
+using System.Reflection;
 
 namespace Infrastructure.Data;
 
@@ -20,7 +20,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Institution> Institutions => Set<Institution>();
     public DbSet<Official> Officials => Set<Official>();
     public DbSet<User> Users => Set<User>();
-    public DbSet<UserPreference> UserPreferences => Set<UserPreference>();
+    public DbSet<UserPreferences> UserPreferences => Set<UserPreferences>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
