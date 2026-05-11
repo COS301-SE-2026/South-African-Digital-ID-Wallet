@@ -12,6 +12,8 @@ public class Credential
     
     public string IssuedBy { get; set; } = string.Empty;
     
+    public DateTime DateOfBirth { get; set; }
+    
     public DateTime CreatedAt { get; set; }
     
     public DateTime UpdatedAt { get; set; }
