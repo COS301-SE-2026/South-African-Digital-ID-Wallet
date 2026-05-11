@@ -2,11 +2,11 @@ pre-commit:
   parallel: false
   commands:
     web-lint:
-      root: "web/main/"
-      run: yarn --cwd web/main lint
+      root: "web"
+      run: pnpm lint
     web-format:
-      root: "web/main/"
-      run: yarn --cwd web/main prettier --check .
+      root: "web"
+      run: pnpm prettier --check .
     web-build:
-      root: "web/main/"
-      run: yarn --cwd web/main build
+      root: "web"
+      run: pnpm build
