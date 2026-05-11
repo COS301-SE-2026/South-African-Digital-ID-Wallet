@@ -24,21 +24,21 @@ public class BiometricsConfiguration : IEntityTypeConfiguration<Biometrics>
             .IsRequired()
             .HasColumnType("datetime2")
             .HasDefaultValueSql("GETUTCDATE()")
-            .ValueGeneratedOnAdd()
+            .ValueGeneratedOnAdd();
 
         builder.Property(b => b.UpdatedAt)
             .IsRequired()
             .HasColumnType("datetime2")
-            .ValueGeneratedOnAddOrUpdate()
+            .ValueGeneratedOnAddOrUpdate();
 
         builder.Property(b => b.CredentialId)
-            .IsRequired()
+            .IsRequired();
 
         builder.HasOne(b => b.Credential)
             .WithOne(c => c.Biometrics)
             .HasForeignKey<Biometrics>(b => b.CredentialId)
-            .OnDelete(DeleteBehavior.Cascade)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(b => b.CredentialId).IsUnique()
+        builder.HasIndex(b => b.CredentialId).IsUnique();
     }
 }

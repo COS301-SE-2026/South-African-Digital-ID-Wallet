@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,13 +11,22 @@ public class IdentityDocumentConfiguration : IEntityTypeConfiguration<IdentityDo
 	{
 		builder.HasKey(i => i.Id);
 
-		builder.Property(i => i.Gender)
-			.IsRequired()
-			.HasMaxLength(20);
-
 		builder.Property(i => i.Citizenship)
 			.IsRequired()
 			.HasMaxLength(50);
+
+		builder.Property(i => i.CountryOfBirth)
+			.IsRequired()
+			.HasMaxLength(100);
+
+		builder.Property(i => i.Status)
+			.IsRequired()
+			.HasConversion<string>()
+			.HasMaxLength(20);
+
+		builder.Property(i => i.Nationality)
+			.IsRequired()
+			.HasMaxLength(100);
 
 		builder.Property(i => i.DateOfBirth)
 			.IsRequired()

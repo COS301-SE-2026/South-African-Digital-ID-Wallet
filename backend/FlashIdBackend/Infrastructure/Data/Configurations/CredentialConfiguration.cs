@@ -11,6 +11,10 @@ public class CredentialConfiguration : IEntityTypeConfiguration<Credential>
     {
         builder.HasKey(c => c.Id);
 
+        builder.Property(c => c.Gender)
+            .IsRequired()
+            .HasMaxLength(20);
+
         builder.Property(c => c.Status)
             .IsRequired()
             .HasConversion<string>();
@@ -55,8 +59,7 @@ public class CredentialConfiguration : IEntityTypeConfiguration<Credential>
         builder.HasOne(c => c.Biometrics)
             .WithOne(b => b.Credential)
             .HasForeignKey<Biometrics>(b => b.CredentialId)
-            .OnDelete(DeleteBehavior.Cascade)
-            .HasComment("Credential has optional biometrics; cascades to biometrics when credential is deleted");
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 

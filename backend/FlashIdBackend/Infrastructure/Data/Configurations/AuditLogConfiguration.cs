@@ -14,38 +14,38 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
         builder.Property(a => a.EventType)
             .IsRequired()
             .HasConversion<string>()
-            .HasMaxLength(50)
+            .HasMaxLength(50);
 
         builder.Property(a => a.Details)
             .IsRequired()
-            .HasColumnType("nvarchar(max)")
+            .HasColumnType("nvarchar(max)");
 
         builder.Property(a => a.IpAddress)
             .IsRequired()
-            .HasMaxLength(45)
+            .HasMaxLength(45);
 
         builder.Property(a => a.CreatedAt)
             .IsRequired()
             .HasColumnType("datetime2")
             .HasDefaultValueSql("GETUTCDATE()")
-            .ValueGeneratedOnAdd()
+            .ValueGeneratedOnAdd();
 
         builder.Property(a => a.ActorId)
-            .IsRequired()
+            .IsRequired();
 
         builder.HasOne(a => a.Actor)
             .WithMany(u => u.AuditLogs)
             .HasForeignKey(a => a.ActorId)
-            .OnDelete(DeleteBehavior.Restrict)
+            .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasIndex(a => a.ActorId)
-
-        builder.HasIndex(a => a.EventType)
-
-        builder.HasIndex(a => a.CreatedAt)
-
-        builder.HasIndex(a => new { a.ActorId, a.CreatedAt })
-
-        builder.HasIndex(a => new { a.EventType, a.CreatedAt })
+        builder.HasIndex(a => a.ActorId);
+        
+        builder.HasIndex(a => a.EventType);
+        
+        builder.HasIndex(a => a.CreatedAt);
+        
+        builder.HasIndex(a => new { a.ActorId, a.CreatedAt });
+        
+        builder.HasIndex(a => new { a.EventType, a.CreatedAt });
     }
 }
