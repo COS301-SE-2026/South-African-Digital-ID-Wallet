@@ -51,5 +51,12 @@ public class CredentialConfiguration : IEntityTypeConfiguration<Credential>
             .WithOne(dl => dl.Credential)
             .HasForeignKey<DriversLicense>(dl => dl.CredentialId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(c => c.Biometrics)
+            .WithOne(b => b.Credential)
+            .HasForeignKey<Biometrics>(b => b.CredentialId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasComment("Credential has optional biometrics; cascades to biometrics when credential is deleted");
     }
 }
+

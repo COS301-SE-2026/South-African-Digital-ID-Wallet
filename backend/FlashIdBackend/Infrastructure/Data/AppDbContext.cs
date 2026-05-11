@@ -12,6 +12,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     //DbSet<T> represents a table in the database.
+    public DbSet<Biometrics> Biometrics => Set<Biometrics>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<Citizen> Citizens => Set<Citizen>();
     public DbSet<Credential> Credentials => Set<Credential>();
     public DbSet<DriversLicense> DriversLicenses => Set<DriversLicense>();
