@@ -30,5 +30,6 @@ public class User
     
     //navigation properties 
     public UserPreferences? Preference { get; set; }
+    public ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
 
 }
