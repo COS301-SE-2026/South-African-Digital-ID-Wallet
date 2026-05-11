@@ -12,7 +12,7 @@ public class Biometrics
     
     public DateTime UpdatedAt { get; set; }
     
-    // navigation property back to Citizen
-    public Guid CitizenId { get; set; }
-    public Citizen Citizen { get; set; } = null!;
+    // navigation property back to Credential
+    public Guid CredentialId { get; set; }
+    public Credential Credential { get; set; } = null!;
 }
