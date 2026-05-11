@@ -21,7 +21,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<IdentityDocument> IdentityDocuments => Set<IdentityDocument>();
     public DbSet<Institution> Institutions => Set<Institution>();
     public DbSet<Official> Officials => Set<Official>();
-    public DbSet<User> Users => Set<User>();
+    public DbSet<User> DomainUsers => Set<User>();
     public DbSet<UserPreferences> UserPreferences => Set<UserPreferences>();
 
     protected override void OnModelCreating(ModelBuilder builder)

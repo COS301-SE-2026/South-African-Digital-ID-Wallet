@@ -6,6 +6,8 @@ public class Credential
 {
     public Guid Id { get; set; }
     
+    public string Gender { get; set; } = string.Empty;
+
     public CredentialStatus Status { get; set; }
     
     public string Signature { get; set; } = string.Empty;
