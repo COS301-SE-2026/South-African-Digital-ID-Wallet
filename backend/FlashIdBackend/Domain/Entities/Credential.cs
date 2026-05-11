@@ -23,4 +23,5 @@ public class Credential
     // one credential is either an IdentityDocument or a DriversLicense
     public IdentityDocument? IdentityDocument { get; set; }
     public DriversLicense? DriversLicense { get; set; }
+    public Biometrics? Biometrics { get; set; }
 }
