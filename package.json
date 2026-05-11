@@ -1,0 +1,27 @@
+{
+  "name": "south-african-digital-id-wallet",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "install:all": "pnpm install",
+    
+    "dev:backend": "pnpm --filter flashid-backend-presentation run dev",
+    "dev:frontend": "pnpm --filter web run dev",
+    "dev": "pnpm install && concurrently \"pnpm --filter flashid-backend-presentation run dev\" \"pnpm --filter web run dev\"",
+    
+    "build:backend": "pnpm --filter flashid-backend-presentation run build",
+    "build:frontend": "pnpm --filter web run build",
+    "build": "pnpm install && pnpm run build:backend && pnpm run build:frontend",
+
+    "test:backend": "pnpm --filter flashid-backend-presentation run test",
+    "test:frontend": "pnpm --filter web run test",
+    "test": "pnpm install && pnpm run test:backend && pnpm run test:frontend",
+    
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.1"
+  }
+}

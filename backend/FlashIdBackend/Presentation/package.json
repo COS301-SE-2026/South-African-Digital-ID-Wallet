@@ -1,0 +1,11 @@
+{
+  "name": "flashid-backend-presentation",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "dotnet watch run --project Presentation.csproj",
+    "start": "dotnet run --project Presentation.csproj",
+    "build": "dotnet build Presentation.csproj"
+  }
+}
+

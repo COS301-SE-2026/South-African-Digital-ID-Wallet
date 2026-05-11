@@ -1,0 +1,4 @@
+packages:
+  - "web"
+  - "backend/FlashIdBackend/Presentation"
+
