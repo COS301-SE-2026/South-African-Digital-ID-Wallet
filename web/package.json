@@ -6,10 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
+    "lint": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "postinstall": "lefthook install"
+    "lint:check": "eslint .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@hookform/error-message": "2.0.1",
@@ -52,7 +52,6 @@
     "eslint-config-next": "16.2.4",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.5",
-    "lefthook": "2.1.6",
     "prettier": "3.8.3",
     "tailwindcss": "4",
     "typescript": "5"
