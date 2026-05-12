@@ -1,0 +1,21 @@
+pre-commit:
+  parallel: false
+  commands:
+    web-lint:
+      glob: "web/**/*.{ts,tsx,js,jsx}"
+      root: "web"
+      run: pnpm lint
+      stage_fixed: true
+    web-format:
+      glob: "web/**/*.{ts,tsx,js,jsx,json,md}"
+      root: "web"
+      run: pnpm format
+      stage_fixed: true
+    web-build:
+      glob: "web/src/**/*.{ts,tsx,js,jsx}"
+      root: "web"
+      run: pnpm build
+      skip:
+      - merge
+      - rebase
+      - cherry-pick
