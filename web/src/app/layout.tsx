@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 
+import { AppSidebar } from '@/components/organisms/app-sidebar'
+
 const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
@@ -19,7 +21,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable}>
-      <body>{children}</body>
+      <body>
+        <div className="flex min-h-screen bg-background">
+          <AppSidebar />
+
+          <div className="min-h-screen flex-1">
+            <main>{children}</main>
+          </div>
+        </div>
+      </body>
     </html>
   )
 }
