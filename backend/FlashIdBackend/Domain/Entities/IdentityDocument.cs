@@ -1,12 +1,18 @@
+using Domain.Enums;
+
 namespace Domain.Entities;
 
 public class IdentityDocument
 {
     public Guid Id { get; set; }
     
-    public string Gender { get; set; } = string.Empty;
-    
     public string Citizenship { get; set; } = string.Empty;
+
+    public string CountryOfBirth { get; set; } = string.Empty;
+
+    public IdentityDocumentStatus Status { get; set; }
+
+    public string Nationality { get; set; } = string.Empty;
     
     public DateTime DateOfBirth { get; set; }
     
