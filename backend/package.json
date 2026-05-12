@@ -1,0 +1,15 @@
+{
+  "name": "flashid-backend",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "dotnet watch run --project FlashIdBackend/Presentation/Presentation.csproj",
+    "start": "dotnet run --project FlashIdBackend/Presentation/Presentation.csproj",
+    "build": "dotnet build FlashIdBackend/Presentation/Presentation.csproj",
+    "type-check": "dotnet build FlashIdBackend/FlashIdBackend.sln",
+    "test": "dotnet test FlashIdBackend/FlashIdBackend.sln",
+    "format": "dotnet format FlashIdBackend/",
+    "lint": "dotnet format --verify-no-changes FlashIdBackend/"
+  }
+}
+
