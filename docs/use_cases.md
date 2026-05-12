@@ -1,6 +1,14 @@
 # SA Digital ID Wallet — Use Case Overview  
 **Tech Titans · COS 301 Capstone 2026**
 
+## UC-01 — Register User
+**Actor:** User  
+
+---
+
+## UC-01 — Login 
+**Actor:** User  
+
 ---
 
 ## UC-01 — Upload an Institution (Hospital, Bank, Police, etc.)
