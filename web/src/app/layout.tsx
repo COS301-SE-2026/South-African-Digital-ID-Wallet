@@ -4,6 +4,7 @@ import './globals.css'
 
 import { AppSidebar } from '@/components/organisms/app-sidebar'
 import { citizenNavSections } from '@/config/navigation'
+import { AppTopBar } from '@/components/organisms/app-top-bar'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -30,7 +31,19 @@ export default function RootLayout({
       <body>
         <div className="flex min-h-screen bg-background">
           <AppSidebar navSections={citizenNavSections} user={mockUser} />
-          <div className="flex-1">{children}</div>
+
+          <div className="flex-1">
+            <AppTopBar
+              title="Citizen Dashboard"
+              description="Manage your digital identity, credentials, sharing permissions and verification activity."
+              user={{
+                name: mockUser.name,
+                initials: mockUser.initials,
+              }}
+              showNotifications={false}
+            />
+            {children}
+          </div>
         </div>
       </body>
     </html>
