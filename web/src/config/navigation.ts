@@ -35,3 +35,30 @@ export const citizenNavSections: SidebarNavSection[] = [
     ],
   },
 ]
+
+{
+  /* TODO: add government and officials nav bar items */
+}
+export const governmentAdminNavSections: SidebarNavSection[] = [
+  {
+    title: 'Government Admin',
+    items: [],
+  },
+
+  {
+    title: 'Security',
+    items: [],
+  },
+]
+
+export const officialsNavSections: SidebarNavSection[] = [
+  {
+    title: 'Officials',
+    items: [],
+  },
+
+  {
+    title: 'Security',
+    items: [],
+  },
+]
