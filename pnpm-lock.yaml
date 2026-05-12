@@ -6,7 +6,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    devDependencies:
+      lefthook:
+        specifier: 2.1.6
+        version: 2.1.6
 
   web:
     dependencies:
@@ -125,9 +129,6 @@ importers:
       eslint-plugin-prettier:
         specifier: 5.5.5
         version: 5.5.5(eslint-config-prettier@10.1.8(eslint@9.39.4(jiti@2.7.0)))(eslint@9.39.4(jiti@2.7.0))(prettier@3.8.3)
-      lefthook:
-        specifier: 2.1.6
-        version: 2.1.6
       prettier:
         specifier: 3.8.3
         version: 3.8.3
