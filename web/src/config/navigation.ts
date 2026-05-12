@@ -1,7 +1,7 @@
 import type { SidebarNavSection } from '@/types/navigation'
 
 {
-  /*TODO: Untub hrefs */
+  /*TODO: Unstub hrefs */
 }
 
 export const citizenNavSections: SidebarNavSection[] = [

@@ -2,7 +2,6 @@
 import {
   ChevronLeft,
   ChevronRight,
-  Section,
   Bell,
   History,
   LayoutDashboard,
@@ -15,6 +14,8 @@ import {
 } from 'lucide-react'
 
 import { useState } from 'react'
+
+import { usePathname } from 'next/navigation'
 
 import Image from 'next/image'
 import Link from 'next/link'
@@ -45,6 +46,7 @@ type AppSidebarProps = {
 
 export function AppSidebar({ navSections, user }: Readonly<AppSidebarProps>) {
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const pathname = usePathname()
 
   return (
     <aside
@@ -100,7 +102,12 @@ export function AppSidebar({ navSections, user }: Readonly<AppSidebarProps>) {
             <div className="space-y-2">
               {section.items.map((item, index) => {
                 const Icon = sidebarIcons[item.icon]
-                const isActive = index === 0
+
+                {
+                  /*TODO: Update isActive when app routing implemented */
+                }
+                const isActive = 0
+                //item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
 
                 return (
                   <Link
