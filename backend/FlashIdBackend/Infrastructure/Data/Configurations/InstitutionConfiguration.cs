@@ -19,9 +19,9 @@ public class InstitutionConfiguration : IEntityTypeConfiguration<Institution>
             .IsRequired()
             .HasConversion<string>();
 
-        builder.Property(i => i.ApiKey)
-            .IsRequired()
-            .HasMaxLength(256);
+        // KeyVault stores secrets; we persist a GUID reference to the secret
+        builder.Property(i => i.ApiKeyReference)
+            .IsRequired();
 
         builder.Property(i => i.VerificationNumber)
             .IsRequired()
@@ -41,7 +41,7 @@ public class InstitutionConfiguration : IEntityTypeConfiguration<Institution>
         builder.Property(i => i.RegisteredById)
             .IsRequired();
 
-        builder.HasIndex(i => i.ApiKey).IsUnique();
+        builder.HasIndex(i => i.ApiKeyReference).IsUnique();
         
         builder.HasIndex(i => i.VerificationNumber).IsUnique();
         

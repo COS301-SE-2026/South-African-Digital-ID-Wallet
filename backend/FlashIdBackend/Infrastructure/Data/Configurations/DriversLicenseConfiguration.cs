@@ -16,6 +16,7 @@ public class DriversLicenseConfiguration : IEntityTypeConfiguration<DriversLicen
 
 		builder.Property(d => d.LicenseCode)
 			.IsRequired()
+			.HasConversion<string>()
 			.HasMaxLength(3);
 
 		builder.Property(d => d.Restrictions)

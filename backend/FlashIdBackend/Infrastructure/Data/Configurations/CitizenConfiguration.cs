@@ -20,6 +20,9 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
         builder.Property(c => c.ActivationCode)
             .IsRequired()
             .HasMaxLength(256);
+
+        builder.Property(c => c.ActivationCodeExpiresAt)
+            .HasColumnType("datetime2");
         
         builder.Property(c => c.IsActivated)
             .IsRequired()

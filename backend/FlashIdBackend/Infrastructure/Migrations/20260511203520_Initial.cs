@@ -67,6 +67,9 @@ namespace Infrastructure.Migrations
                     PasswordHash = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     FailedLoginAttempts = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    IsEmailVerified = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    LockoutUntil = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastLoginAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -211,6 +214,7 @@ namespace Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SaId = table.Column<string>(type: "varchar(13)", unicode: false, maxLength: 13, nullable: false),
                     ActivationCode = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    ActivationCodeExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsActivated = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -303,7 +307,7 @@ namespace Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ApiKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    ApiKeyReference = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     VerificationNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -543,9 +547,9 @@ namespace Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Institutions_ApiKey",
+                name: "IX_Institutions_ApiKeyReference",
                 table: "Institutions",
-                column: "ApiKey",
+                column: "ApiKeyReference",
                 unique: true);
 
             migrationBuilder.CreateIndex(

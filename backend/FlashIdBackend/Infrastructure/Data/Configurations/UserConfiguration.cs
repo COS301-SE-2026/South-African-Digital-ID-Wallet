@@ -43,6 +43,16 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasDefaultValue(false);
 
+        builder.Property(u => u.IsEmailVerified)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.Property(u => u.LockoutUntil)
+            .HasColumnType("datetime2");
+
+        builder.Property(u => u.LastLoginAt)
+            .HasColumnType("datetime2");
+
         builder.Property(u => u.Role)
             .IsRequired()
             .HasConversion<string>();

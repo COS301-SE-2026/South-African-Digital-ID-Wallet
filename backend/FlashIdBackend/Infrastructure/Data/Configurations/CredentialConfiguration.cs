@@ -13,6 +13,7 @@ public class CredentialConfiguration : IEntityTypeConfiguration<Credential>
 
         builder.Property(c => c.Gender)
             .IsRequired()
+            .HasConversion<string>()
             .HasMaxLength(20);
 
         builder.Property(c => c.Status)

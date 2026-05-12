@@ -16,6 +16,7 @@ public class UserPreferencesConfiguration : IEntityTypeConfiguration<UserPrefere
 
         builder.Property(up => up.Theme)
             .IsRequired()
+            .HasConversion<string>()
             .HasMaxLength(50);
 
         builder.Property(up => up.PreferredDisclosure)
