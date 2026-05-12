@@ -50,12 +50,12 @@ export function AppSidebar({ navSections, user }: Readonly<AppSidebarProps>) {
 
   return (
     <aside
-      className={`flex min-h-screen flex-col bg-deep-green px-4 py-5 text-clean-white transition-all duration-300 ${
+      className={`flex h-screen overflow-hidden flex-col bg-deep-green px-4 py-5 text-clean-white transition-all duration-300 ${
         isCollapsed ? 'w-24' : 'w-64'
       }`}
     >
       <div
-        className={`mb-8 flex items-center ${
+        className={`mb-5 flex items-center ${
           isCollapsed ? 'justify-center' : 'justify-between'
         }`}
       >
@@ -90,7 +90,7 @@ export function AppSidebar({ navSections, user }: Readonly<AppSidebarProps>) {
         </button>
       </div>
 
-      <nav className="space-y-6">
+      <nav className="space-y-4">
         {navSections.map((section) => (
           <div key={section.title}>
             {!isCollapsed && (
@@ -133,7 +133,7 @@ export function AppSidebar({ navSections, user }: Readonly<AppSidebarProps>) {
       </nav>
 
       {!isCollapsed && (
-        <div className="mt-auto rounded-3xl border border-clean-white/10 bg-clean-white/10 p-4">
+        <div className="mt-auto rounded-3xl border border-clean-white/10 bg-clean-white/10 p-3">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white">
               {user.initials}

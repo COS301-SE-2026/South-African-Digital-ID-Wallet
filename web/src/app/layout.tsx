@@ -21,6 +21,12 @@ const mockUser = {
   idLabel: 'ID: •••••••084',
 }
 
+const mockTopBar = {
+  title: 'Citizen Dashboard',
+  description:
+    'Manage your digital identity, credentials, sharing permissions and verification activity.',
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,13 +35,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body>
-        <div className="flex min-h-screen bg-background">
+        <div className="flex h-screen overflow-hidden bg-background">
           <AppSidebar navSections={citizenNavSections} user={mockUser} />
 
           <div className="flex-1">
             <AppTopBar
-              title="Citizen Dashboard"
-              description="Manage your digital identity, credentials, sharing permissions and verification activity."
+              title={mockTopBar.title}
+              description={mockTopBar.description}
               user={{
                 name: mockUser.name,
                 initials: mockUser.initials,
