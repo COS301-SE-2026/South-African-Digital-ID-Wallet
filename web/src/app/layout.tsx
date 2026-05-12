@@ -24,10 +24,7 @@ export default function RootLayout({
       <body>
         <div className="flex min-h-screen bg-background">
           <CitizenSidebar />
-
-          <div className="min-h-screen flex-1">
-            <main>{children}</main>
-          </div>
+          <div className="flex-1">{children}</div>
         </div>
       </body>
     </html>
