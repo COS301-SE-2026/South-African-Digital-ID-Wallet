@@ -1,9 +1,20 @@
 import type { LucideIcon } from 'lucide-react'
 
+export type SidebarIconName =
+  | 'dashboard'
+  | 'credentials'
+  | 'qr'
+  | 'notifications'
+  | 'biometrics'
+  | 'history'
+  | 'settings'
+  | 'users'
+  | 'shield'
+
 export type SidebarNavItem = {
   label: string
   href: string
-  icon: LucideIcon
+  icon: SidebarIconName
 }
 
 export type SidebarNavSection = {

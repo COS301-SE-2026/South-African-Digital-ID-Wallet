@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 
-import { CitizenSidebar } from '@/components/organisms/citizen-sidebar'
+import { AppSidebar } from '@/components/organisms/app-sidebar'
+import { citizenNavSections } from '@/config/navigation'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -12,6 +13,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'FlashID',
   description: 'South African Digital ID Wallet',
+}
+const mockUser = {
+  name: 'Unathi Tshakalisa',
+  initials: 'UT',
+  idLabel: 'ID: •••••••084',
 }
 
 export default function RootLayout({
@@ -23,7 +29,7 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body>
         <div className="flex min-h-screen bg-background">
-          <CitizenSidebar />
+          <AppSidebar navSections={citizenNavSections} user={mockUser} />
           <div className="flex-1">{children}</div>
         </div>
       </body>
