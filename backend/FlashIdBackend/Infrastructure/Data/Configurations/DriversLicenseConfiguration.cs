@@ -40,6 +40,7 @@ public class DriversLicenseConfiguration : IEntityTypeConfiguration<DriversLicen
 		builder.Property(d => d.UpdatedAt)
 			.IsRequired()
 			.HasColumnType("datetime2")
+			.HasDefaultValueSql("GETUTCDATE()")
 			.ValueGeneratedOnAddOrUpdate();
 
 		builder.Property(d => d.CredentialId)

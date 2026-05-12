@@ -41,6 +41,7 @@ public class IdentityDocumentConfiguration : IEntityTypeConfiguration<IdentityDo
 		builder.Property(i => i.UpdatedAt)
 			.IsRequired()
 			.HasColumnType("datetime2")
+			.HasDefaultValueSql("GETUTCDATE()")
 			.ValueGeneratedOnAddOrUpdate();
 
 		builder.Property(i => i.CredentialId)
