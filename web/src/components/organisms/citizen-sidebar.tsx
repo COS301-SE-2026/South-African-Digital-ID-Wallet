@@ -5,10 +5,8 @@ import {
   ChevronRight,
   History,
   LayoutDashboard,
-  LockKeyhole,
   QrCode,
   Settings,
-  ShieldCheck,
   WalletCards,
 } from 'lucide-react'
 
@@ -137,19 +135,20 @@ export function CitizenSidebar() {
       </nav>
 
       {!isCollapsed && (
-        <div className="mt-auto rounded-3xl bg-clean-white/10 p-5">
-          <p className="mb-2 text-xs font-bold text-clean-white/60">
-            Wallet Protection
-          </p>
+        <div className="mt-auto rounded-3xl border border-clean-white/10 bg-clean-white/10 p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white">
+              UT
+            </div>
 
-          <p className="mb-4 text-sm font-bold leading-snug">
-            Your identity wallet is secured with biometric access and signed
-            credentials.
-          </p>
-
-          <div className="inline-flex items-center gap-2 rounded-full bg-clean-white/10 px-3 py-2 text-xs font-bold">
-            <ShieldCheck className="h-3 w-3" />
-            Secure mode active
+            <div className="min-w-0">
+              <p className="truncate text-sm font-extrabold text-clean-white">
+                Unathi Tshakalisa
+              </p>
+              <p className="text-xs font-semibold text-accent-gold/80">
+                ID: •••••••084
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -157,10 +156,10 @@ export function CitizenSidebar() {
       {isCollapsed && (
         <div className="mt-auto flex justify-center">
           <div
-            title="Secure mode active"
-            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-clean-white/10"
+            title="Unathi Tshakalisa"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/30 bg-clean-white/10 text-sm font-extrabold text-clean-white"
           >
-            <ShieldCheck className="h-5 w-5" />
+            UT
           </div>
         </div>
       )}
