@@ -1,6 +1,6 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -23,7 +23,6 @@
   --warning-amber: #d97706;
   --danger-red: #dc2626;
 
-  
   /* shadcn semantic tokens */
   --background: var(--cream-background);
   --foreground: var(--text-primary);
