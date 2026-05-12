@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 
-import { AppSidebar } from '@/components/organisms/citizen-sidebar'
+import { CitizenSidebar } from '@/components/organisms/citizen-sidebar'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body>
         <div className="flex min-h-screen bg-background">
-          <AppSidebar />
+          <CitizenSidebar />
 
           <div className="min-h-screen flex-1">
             <main>{children}</main>
