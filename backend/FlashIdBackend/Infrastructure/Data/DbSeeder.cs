@@ -23,6 +23,7 @@ public static class DbSeeder
         // Government administrators must exist before creating institutions or officials
         await SeedGovernmentAdministratorUsersAsync(context, usedEmails, usedUsernames, usedPhones);
         await SeedOfficialUsersAsync(context, usedEmails, usedUsernames, usedPhones);
+        await SeedCredentialsAsync(context);
     }
 
     private static async Task SeedCitizenUsersAsync(AppDbContext context, HashSet<string> usedEmails, HashSet<string> usedUsernames, HashSet<string> usedPhones)
@@ -354,4 +355,9 @@ public static class DbSeeder
             created++;
         }
     }
+
+    private static async Task SeedCredentialsAsync(AppDbContext context)
+{
+    // seed credentials for citizens
+}
 }
