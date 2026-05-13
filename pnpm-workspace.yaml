@@ -1,4 +1,10 @@
 packages:
   - 'web'
-  - 'mobile'
-  - 'backend'
+  #- 'mobile'
+  #- 'backend'
+
+onlyBuiltDependencies:
+  - cypress
+  - lefthook
+  - sharp
+  - unrs-resolver
