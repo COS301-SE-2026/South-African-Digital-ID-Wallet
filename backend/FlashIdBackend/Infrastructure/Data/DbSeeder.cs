@@ -431,7 +431,6 @@ public static class DbSeeder
             CountryOfBirth = countries[rnd.Next(countries.Length)],
             Nationality = nationalities[rnd.Next(nationalities.Length)],
             Status = idStatuses[rnd.Next(idStatuses.Length)],
-            DateOfBirth = dob,
             CredentialId = credential.Id,
             CreatedAt = now,
             UpdatedAt = now
