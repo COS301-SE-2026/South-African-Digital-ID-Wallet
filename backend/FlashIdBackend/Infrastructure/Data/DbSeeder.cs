@@ -9,6 +9,17 @@ namespace Infrastructure.Data;
 //   2. Seeded Citizens (140)
 //   3. Seeded Officials (40)
 //   4. Seeded Government Administrators (20)
+//   5. Seeded Credentials + IdentityDocuments for all Citizens (age 16+)
+//   6. Seeded DriversLicenses for Citizens aged 18+
+//   7. Seeded UserPreferences for all Users
+//   8. Seeded AuditLogs for all Users (2-5 entries each)
+//
+// NOTE: Biometrics seeding is intentionally skipped.
+// Biometrics stores cryptographic hashes (FaceHash, FingerprintHash) of real
+// biometric data. Seeding fake hashes would be misleading and could cause
+// issues when the actual biometric hashing feature is implemented.
+// Biometrics will be seeded once the facial recognition and fingerprint
+// scanning features are built out.
 public static class DbSeeder
 {
     public static async Task SeedAsync(AppDbContext context)
