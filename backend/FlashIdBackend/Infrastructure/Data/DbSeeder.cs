@@ -6,13 +6,14 @@ namespace Infrastructure.Data;
 
 // DbSeeder runs at startup to ensure the database has:
 //   1. Migrations applied
-//   2. Seeded Citizens (140)
-//   3. Seeded Officials (40)
-//   4. Seeded Government Administrators (20)
-//   5. Seeded Credentials + IdentityDocuments for all Citizens (age 16+)
-//   6. Seeded DriversLicenses for Citizens aged 18+
-//   7. Seeded UserPreferences for all Users
-//   8. Seeded AuditLogs for all Users (2-5 entries each)
+//   2. Seeded Domain Users (200 total: 140 Citizens, 40 Officials, 20 GovernmentAdministrators)
+//   3. Seeded Citizen records (140)
+//   4. Seeded Official records (40) assigned to 5 Institutions
+//   5. Seeded GovernmentAdministrator records (20) with 5 registered Institutions
+//   6. Seeded Credentials + IdentityDocuments for all 140 Citizens
+//   7. Seeded DriversLicenses for Citizens aged 18+ (approximately 132)
+//   8. Seeded UserPreferences for all 200 Users
+//   9. Seeded AuditLogs for all 200 Users (2-5 entries each, approximately 703 total)
 //
 // NOTE: Biometrics seeding is intentionally skipped.
 // Biometrics stores cryptographic hashes (FaceHash, FingerprintHash) of real
