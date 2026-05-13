@@ -6,9 +6,21 @@ namespace Infrastructure.Data;
 
 // DbSeeder runs at startup to ensure the database has:
 //   1. Migrations applied
-//   2. Seeded Citizens (140)
-//   3. Seeded Officials (40)
-//   4. Seeded Government Administrators (20)
+//   2. Seeded Domain Users (200 total: 140 Citizens, 40 Officials, 20 GovernmentAdministrators)
+//   3. Seeded Citizen records (140)
+//   4. Seeded Official records (40) assigned to 5 Institutions
+//   5. Seeded GovernmentAdministrator records (20) with 5 registered Institutions
+//   6. Seeded Credentials + IdentityDocuments for all 140 Citizens
+//   7. Seeded DriversLicenses for Citizens aged 18+ (approximately 132)
+//   8. Seeded UserPreferences for all 200 Users
+//   9. Seeded AuditLogs for all 200 Users (2-5 entries each, approximately 703 total)
+//
+// NOTE: Biometrics seeding is intentionally skipped.
+// Biometrics stores cryptographic hashes (FaceHash, FingerprintHash) of real
+// biometric data. Seeding fake hashes would be misleading and could cause
+// issues when the actual biometric hashing feature is implemented.
+// Biometrics will be seeded once the facial recognition and fingerprint
+// scanning features are built out.
 public static class DbSeeder
 {
     public static async Task SeedAsync(AppDbContext context)
@@ -23,6 +35,9 @@ public static class DbSeeder
         // Government administrators must exist before creating institutions or officials
         await SeedGovernmentAdministratorUsersAsync(context, usedEmails, usedUsernames, usedPhones);
         await SeedOfficialUsersAsync(context, usedEmails, usedUsernames, usedPhones);
+        await SeedCredentialsAsync(context);
+        await SeedUserPreferencesAsync(context);
+        await SeedAuditLogsAsync(context);
     }
 
     private static async Task SeedCitizenUsersAsync(AppDbContext context, HashSet<string> usedEmails, HashSet<string> usedUsernames, HashSet<string> usedPhones)
@@ -354,4 +369,197 @@ public static class DbSeeder
             created++;
         }
     }
+
+    private static async Task SeedCredentialsAsync(AppDbContext context)
+{
+    var now = DateTime.UtcNow;
+    var rnd = new Random(99999);
+
+    // get all citizens that don't have a credential yet
+    var citizensWithoutCredentials = await context.Citizens
+        .Where(c => !context.Credentials.Any(cr => cr.CitizenId == c.Id))
+        .ToListAsync();
+
+    if (citizensWithoutCredentials.Count == 0) return;
+
+    // get an official to use as IssuedBy
+    var official = await context.Officials.FirstOrDefaultAsync();
+    var issuedBy = official?.Id.ToString() ?? "SYSTEM";
+
+    var genders = new[] { Gender.Male, Gender.Female, Gender.Other };
+    var citizenships = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
+    var nationalities = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
+    var countries = new[] { "South Africa", "Zimbabwe", "Mozambique", "Namibia" };
+    var idStatuses = new[] { IdentityDocumentStatus.Citizen, IdentityDocumentStatus.PermanentResident };
+    var licenseCodes = new[] { LicenseCode.B, LicenseCode.EB };
+
+    var credentialsToAdd = new List<Credential>();
+    var identityDocsToAdd = new List<IdentityDocument>();
+    var driversLicensesToAdd = new List<DriversLicense>();
+
+    foreach (var citizen in citizensWithoutCredentials)
+    {
+        // age between 16 and 70
+        var dob = now.AddYears(-rnd.Next(16, 70)).AddDays(-rnd.Next(0, 365));
+        var gender = genders[rnd.Next(genders.Length)];
+
+        // calculate exact age
+        var age = now.Year - dob.Year;
+        if (dob > now.AddYears(-age)) age--;
+
+        var credential = new Credential
+        {
+            Id = Guid.NewGuid(),
+            Gender = gender,
+            Status = CredentialStatus.Active,
+            // Signature max 1024 - use a guid based string
+            Signature = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"),
+            // IssuedBy max 256
+            IssuedBy = issuedBy,
+            DateOfBirth = dob,
+            CitizenId = citizen.Id,
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+        credentialsToAdd.Add(credential);
+
+        // every citizen 16+ gets an identity document
+        identityDocsToAdd.Add(new IdentityDocument
+        {
+            Id = Guid.NewGuid(),
+            Citizenship = citizenships[rnd.Next(citizenships.Length)],
+            CountryOfBirth = countries[rnd.Next(countries.Length)],
+            Nationality = nationalities[rnd.Next(nationalities.Length)],
+            Status = idStatuses[rnd.Next(idStatuses.Length)],
+            CredentialId = credential.Id,
+            CreatedAt = now,
+            UpdatedAt = now
+        });
+
+        // only citizens 18+ get a drivers license
+        if (age >= 18)
+        {
+            var startDate = now.AddYears(-rnd.Next(1, 10));
+            driversLicensesToAdd.Add(new DriversLicense
+            {
+                Id = Guid.NewGuid(),
+                // LicenseNumber max 13 chars
+                LicenseNumber = Guid.NewGuid().ToString("N").Substring(0, 13).ToUpper(),
+                // LicenseCode max 3 chars - B or EB from enum
+                LicenseCode = licenseCodes[rnd.Next(licenseCodes.Length)],
+                // Restrictions max 2 chars
+                Restrictions = "00",
+                StartDate = startDate,
+                ExpiryDate = startDate.AddYears(5),
+                CredentialId = credential.Id,
+                CreatedAt = now,
+                UpdatedAt = now
+            });
+        }
+    }
+
+    await context.Credentials.AddRangeAsync(credentialsToAdd);
+    await context.SaveChangesAsync();
+
+    await context.IdentityDocuments.AddRangeAsync(identityDocsToAdd);
+    await context.SaveChangesAsync();
+
+    if (driversLicensesToAdd.Count > 0)
+    {
+        await context.DriversLicenses.AddRangeAsync(driversLicensesToAdd);
+        await context.SaveChangesAsync();
+    }
+}
+    private static async Task SeedUserPreferencesAsync(AppDbContext context)
+{
+    var now = DateTime.UtcNow;
+    var rnd = new Random(11111);
+
+    // get all users that don't have preferences yet
+    // UserPreferences has unique index on UserId so one per user only
+    var usersWithoutPreferences = await context.DomainUsers
+        .Where(u => !context.UserPreferences.Any(up => up.UserId == u.Id))
+        .ToListAsync();
+
+    if (usersWithoutPreferences.Count == 0) return;
+
+    var themes = new[] { Theme.Light, Theme.Dark, Theme.System };
+
+    var preferencesToAdd = usersWithoutPreferences.Select(u => new UserPreferences
+    {
+        Id = Guid.NewGuid(),
+        // PreferredName max 100 chars
+        PreferredName = u.Names,
+        Theme = themes[rnd.Next(themes.Length)],
+        PreferredDisclosure = rnd.Next(2) == 0,
+        UserId = u.Id,
+        CreatedAt = now,
+        UpdatedAt = now
+    }).ToList();
+
+    await context.UserPreferences.AddRangeAsync(preferencesToAdd);
+    await context.SaveChangesAsync();
+}
+
+private static async Task SeedAuditLogsAsync(AppDbContext context)
+{
+    var now = DateTime.UtcNow;
+    var rnd = new Random(22222);
+
+    // only seed if no audit logs exist yet
+    if (await context.AuditLogs.AnyAsync()) return;
+
+    var allUsers = await context.DomainUsers.ToListAsync();
+    if (allUsers.Count == 0) return;
+
+    // sample IP addresses
+    var ipAddresses = new[]
+    {
+        "102.130.10.1", "196.11.240.5", "41.21.100.3",
+        "154.0.5.22", "196.25.200.8", "41.113.10.14",
+        "102.65.30.9", "196.15.45.7", "41.205.20.11"
+    };
+
+    // sample details per event type
+    var eventDetails = new Dictionary<AuditEventType, string[]>
+    {
+        { AuditEventType.UserRegistered, new[] { "User registered via web portal", "User registered via mobile app" } },
+        { AuditEventType.UserLoggedIn, new[] { "Successful login via web", "Successful login via mobile" } },
+        { AuditEventType.FailedLoginAttempt, new[] { "Invalid password entered", "Account temporarily locked" } },
+        { AuditEventType.CredentialIssued, new[] { "Identity document issued", "Drivers license issued" } },
+        { AuditEventType.CredentialVerified, new[] { "Credential verified by official", "QR code scanned and verified" } },
+        { AuditEventType.CredentialRevoked, new[] { "Credential revoked by administrator", "Credential revoked due to fraud" } },
+        { AuditEventType.AccountDeleted, new[] { "Account deleted by user", "Account deleted by administrator" } }
+    };
+
+    var eventTypes = eventDetails.Keys.ToArray();
+    var auditLogsToAdd = new List<AuditLog>();
+
+    foreach (var user in allUsers)
+    {
+        // give each user 2-5 audit log entries
+        var count = rnd.Next(2, 6);
+        for (int i = 0; i < count; i++)
+        {
+            var eventType = eventTypes[rnd.Next(eventTypes.Length)];
+            var details = eventDetails[eventType];
+
+            auditLogsToAdd.Add(new AuditLog
+            {
+                Id = Guid.NewGuid(),
+                EventType = eventType,
+                // Details is nvarchar(max) so no length limit
+                Details = details[rnd.Next(details.Length)],
+                // IpAddress max 45 chars
+                IpAddress = ipAddresses[rnd.Next(ipAddresses.Length)],
+                ActorId = user.Id,
+                CreatedAt = now.AddDays(-rnd.Next(0, 30))
+            });
+        }
+    }
+
+    await context.AuditLogs.AddRangeAsync(auditLogsToAdd);
+    await context.SaveChangesAsync();
+}
+
 }
