@@ -469,7 +469,7 @@ public static class DbSeeder
         await context.DriversLicenses.AddRangeAsync(driversLicensesToAdd);
         await context.SaveChangesAsync();
     }
-
+}
     private static async Task SeedUserPreferencesAsync(AppDbContext context)
 {
     var now = DateTime.UtcNow;
