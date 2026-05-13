@@ -358,6 +358,102 @@ public static class DbSeeder
 
     private static async Task SeedCredentialsAsync(AppDbContext context)
 {
-    // seed credentials for citizens
-}
+    var now = DateTime.UtcNow;
+    var rnd = new Random(99999);
+
+    // get all citizens that don't have a credential yet
+    var citizensWithoutCredentials = await context.Citizens
+        .Where(c => !context.Credentials.Any(cr => cr.CitizenId == c.Id))
+        .ToListAsync();
+
+    if (citizensWithoutCredentials.Count == 0) return;
+
+    // get an official to use as IssuedBy
+    var official = await context.Officials.FirstOrDefaultAsync();
+    var issuedBy = official?.Id.ToString() ?? "SYSTEM";
+
+    var genders = new[] { Gender.Male, Gender.Female, Gender.Other };
+    var citizenships = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
+    var nationalities = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
+    var countries = new[] { "South Africa", "Zimbabwe", "Mozambique", "Namibia" };
+    var idStatuses = new[] { IdentityDocumentStatus.Citizen, IdentityDocumentStatus.PermanentResident };
+    var licenseCodes = new[] { LicenseCode.B, LicenseCode.EB };
+
+    var credentialsToAdd = new List<Credential>();
+    var identityDocsToAdd = new List<IdentityDocument>();
+    var driversLicensesToAdd = new List<DriversLicense>();
+
+    foreach (var citizen in citizensWithoutCredentials)
+    {
+        // age between 16 and 70
+        var dob = now.AddYears(-rnd.Next(16, 70)).AddDays(-rnd.Next(0, 365));
+        var gender = genders[rnd.Next(genders.Length)];
+
+        // calculate exact age
+        var age = now.Year - dob.Year;
+        if (dob > now.AddYears(-age)) age--;
+
+        var credential = new Credential
+        {
+            Id = Guid.NewGuid(),
+            Gender = gender,
+            Status = CredentialStatus.Active,
+            // Signature max 1024 - use a guid based string
+            Signature = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"),
+            // IssuedBy max 256
+            IssuedBy = issuedBy,
+            DateOfBirth = dob,
+            CitizenId = citizen.Id,
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+        credentialsToAdd.Add(credential);
+
+        // every citizen 16+ gets an identity document
+        identityDocsToAdd.Add(new IdentityDocument
+        {
+            Id = Guid.NewGuid(),
+            Citizenship = citizenships[rnd.Next(citizenships.Length)],
+            CountryOfBirth = countries[rnd.Next(countries.Length)],
+            Nationality = nationalities[rnd.Next(nationalities.Length)],
+            Status = idStatuses[rnd.Next(idStatuses.Length)],
+            DateOfBirth = dob,
+            CredentialId = credential.Id,
+            CreatedAt = now,
+            UpdatedAt = now
+        });
+
+        // only citizens 18+ get a drivers license
+        if (age >= 18)
+        {
+            var startDate = now.AddYears(-rnd.Next(1, 10));
+            driversLicensesToAdd.Add(new DriversLicense
+            {
+                Id = Guid.NewGuid(),
+                // LicenseNumber max 13 chars
+                LicenseNumber = Guid.NewGuid().ToString("N").Substring(0, 13).ToUpper(),
+                // LicenseCode max 3 chars - B or EB from enum
+                LicenseCode = licenseCodes[rnd.Next(licenseCodes.Length)],
+                // Restrictions max 2 chars
+                Restrictions = "00",
+                StartDate = startDate,
+                ExpiryDate = startDate.AddYears(5),
+                CredentialId = credential.Id,
+                CreatedAt = now,
+                UpdatedAt = now
+            });
+        }
+    }
+
+    await context.Credentials.AddRangeAsync(credentialsToAdd);
+    await context.SaveChangesAsync();
+
+    await context.IdentityDocuments.AddRangeAsync(identityDocsToAdd);
+    await context.SaveChangesAsync();
+
+    if (driversLicensesToAdd.Count > 0)
+    {
+        await context.DriversLicenses.AddRangeAsync(driversLicensesToAdd);
+        await context.SaveChangesAsync();
+    }
 }
