@@ -24,6 +24,7 @@ public static class DbSeeder
         await SeedGovernmentAdministratorUsersAsync(context, usedEmails, usedUsernames, usedPhones);
         await SeedOfficialUsersAsync(context, usedEmails, usedUsernames, usedPhones);
         await SeedCredentialsAsync(context);
+        await SeedUserPreferencesAsync(context);
     }
 
     private static async Task SeedCitizenUsersAsync(AppDbContext context, HashSet<string> usedEmails, HashSet<string> usedUsernames, HashSet<string> usedPhones)
@@ -456,4 +457,36 @@ public static class DbSeeder
         await context.DriversLicenses.AddRangeAsync(driversLicensesToAdd);
         await context.SaveChangesAsync();
     }
+
+    private static async Task SeedUserPreferencesAsync(AppDbContext context)
+{
+    var now = DateTime.UtcNow;
+    var rnd = new Random(11111);
+
+    // get all users that don't have preferences yet
+    // UserPreferences has unique index on UserId so one per user only
+    var usersWithoutPreferences = await context.DomainUsers
+        .Where(u => !context.UserPreferences.Any(up => up.UserId == u.Id))
+        .ToListAsync();
+
+    if (usersWithoutPreferences.Count == 0) return;
+
+    var themes = new[] { Theme.Light, Theme.Dark, Theme.System };
+
+    var preferencesToAdd = usersWithoutPreferences.Select(u => new UserPreferences
+    {
+        Id = Guid.NewGuid(),
+        // PreferredName max 100 chars
+        PreferredName = u.Names,
+        Theme = themes[rnd.Next(themes.Length)],
+        PreferredDisclosure = rnd.Next(2) == 0,
+        UserId = u.Id,
+        CreatedAt = now,
+        UpdatedAt = now
+    }).ToList();
+
+    await context.UserPreferences.AddRangeAsync(preferencesToAdd);
+    await context.SaveChangesAsync();
+}
+
 }
