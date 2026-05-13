@@ -25,6 +25,7 @@ public static class DbSeeder
         await SeedOfficialUsersAsync(context, usedEmails, usedUsernames, usedPhones);
         await SeedCredentialsAsync(context);
         await SeedUserPreferencesAsync(context);
+        await SeedAuditLogsAsync(context);
     }
 
     private static async Task SeedCitizenUsersAsync(AppDbContext context, HashSet<string> usedEmails, HashSet<string> usedUsernames, HashSet<string> usedPhones)
@@ -486,6 +487,67 @@ public static class DbSeeder
     }).ToList();
 
     await context.UserPreferences.AddRangeAsync(preferencesToAdd);
+    await context.SaveChangesAsync();
+}
+
+private static async Task SeedAuditLogsAsync(AppDbContext context)
+{
+    var now = DateTime.UtcNow;
+    var rnd = new Random(22222);
+
+    // only seed if no audit logs exist yet
+    if (await context.AuditLogs.AnyAsync()) return;
+
+    var allUsers = await context.DomainUsers.ToListAsync();
+    if (allUsers.Count == 0) return;
+
+    // sample IP addresses
+    var ipAddresses = new[]
+    {
+        "102.130.10.1", "196.11.240.5", "41.21.100.3",
+        "154.0.5.22", "196.25.200.8", "41.113.10.14",
+        "102.65.30.9", "196.15.45.7", "41.205.20.11"
+    };
+
+    // sample details per event type
+    var eventDetails = new Dictionary<AuditEventType, string[]>
+    {
+        { AuditEventType.UserRegistered, new[] { "User registered via web portal", "User registered via mobile app" } },
+        { AuditEventType.UserLoggedIn, new[] { "Successful login via web", "Successful login via mobile" } },
+        { AuditEventType.FailedLoginAttempt, new[] { "Invalid password entered", "Account temporarily locked" } },
+        { AuditEventType.CredentialIssued, new[] { "Identity document issued", "Drivers license issued" } },
+        { AuditEventType.CredentialVerified, new[] { "Credential verified by official", "QR code scanned and verified" } },
+        { AuditEventType.CredentialRevoked, new[] { "Credential revoked by administrator", "Credential revoked due to fraud" } },
+        { AuditEventType.AccountDeleted, new[] { "Account deleted by user", "Account deleted by administrator" } }
+    };
+
+    var eventTypes = eventDetails.Keys.ToArray();
+    var auditLogsToAdd = new List<AuditLog>();
+
+    foreach (var user in allUsers)
+    {
+        // give each user 2-5 audit log entries
+        var count = rnd.Next(2, 6);
+        for (int i = 0; i < count; i++)
+        {
+            var eventType = eventTypes[rnd.Next(eventTypes.Length)];
+            var details = eventDetails[eventType];
+
+            auditLogsToAdd.Add(new AuditLog
+            {
+                Id = Guid.NewGuid(),
+                EventType = eventType,
+                // Details is nvarchar(max) so no length limit
+                Details = details[rnd.Next(details.Length)],
+                // IpAddress max 45 chars
+                IpAddress = ipAddresses[rnd.Next(ipAddresses.Length)],
+                ActorId = user.Id,
+                CreatedAt = now.AddDays(-rnd.Next(0, 30))
+            });
+        }
+    }
+
+    await context.AuditLogs.AddRangeAsync(auditLogsToAdd);
     await context.SaveChangesAsync();
 }
 
