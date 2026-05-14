@@ -38,7 +38,7 @@ public class UserPreferencesConfiguration : IEntityTypeConfiguration<UserPrefere
             .IsRequired();
 
         builder.HasIndex(up => up.UserId).IsUnique();
-        
+
         builder.HasOne(up => up.User)
             .WithOne(u => u.Preference)
             .HasForeignKey<UserPreferences>(up => up.UserId)
