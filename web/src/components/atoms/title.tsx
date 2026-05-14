@@ -10,7 +10,7 @@ const titleSizeClasses: Record<NonNullable<TitleProps['titleSize']>, string> = {
   h2: 'text-2xl md:text-3xl',
   h3: 'text-xl md:text-2xl',
   h4: 'text-lg md:text-xl',
-} //maps each heading level to their size there
+}
 
 export function Title({
   titleSize = 'h1',
@@ -29,9 +29,7 @@ export function Title({
       )}
       {...props}
     >
-      {/*cn combines  the 3 class strings together*/}
       {children}
-      {/*its whats put between the title tags. ex) <Title></Title>*/}
     </Comp>
   )
 }
