@@ -23,7 +23,7 @@ export function Title({
   return (
     <Comp
       className={cn(
-        'font-bold tracking-tight text-[#173F2A]',
+        'font-bold tracking-tight text-deep-green',
         titleSizeClasses[titleSize],
         className
       )}

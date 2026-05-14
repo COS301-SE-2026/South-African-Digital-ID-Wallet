@@ -4,9 +4,9 @@ import * as React from 'react'
 import { User } from 'lucide-react'
 
 export function LoginForm({
-  onSubmit,
+  onSubmitAction,
 }: {
-  onSubmit?: (data: { email: string; password: string }) => void
+  onSubmitAction?: (data: { email: string; password: string }) => void
 }) {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
@@ -14,47 +14,50 @@ export function LoginForm({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const data = { email, password }
-    onSubmit?.(data)
+    onSubmitAction?.(data)
     console.log('LoginForm submit', data)
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-base font-bold text-[#173F2A]">
+        <label className="block text-lg font-bold text-primary-green md:text-xl">
           Email:
         </label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full rounded-md border px-4 py-3"
+          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
       </div>
 
       <div>
-        <label className="block text-base font-bold text-[#173F2A]">
+        <label className="block text-lg font-bold text-primary-green md:text-xl">
           Password:
         </label>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-md border px-4 py-3"
+          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
       </div>
 
       <div className="flex items-center justify-between">
         <button
-          className="flex items-center gap-2 text-base rounded-md bg-[#1F5B3D] px-4 py-2 text-white hover:bg-[#1a4630] transition-colors"
+          className="flex items-center gap-2 rounded-md bg-primary-green px-4 py-2 text-base text-clean-white transition-colors hover:bg-deep-green"
           type="submit"
         >
           <User className="h-5 w-5" />
           Login
         </button>
-        <a className="text-base text-slate-600 hover:underline" href="#">
+        <a
+          className="text-base text-primary-green hover:text-deep-green hover:underline"
+          href="#"
+        >
           Forgot password?
         </a>
       </div>
