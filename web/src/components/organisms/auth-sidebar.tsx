@@ -1,12 +1,15 @@
 import * as React from 'react'
+import Image from 'next/image'
+import { LockKeyhole, Zap, Shield, Share2 } from 'lucide-react'
+import FlashIdWhite from '@/assets/images/FlashID-white.png'
 
 export function AuthSidebar() {
   return (
-    <div className="hidden lg:flex w-1/3 bg-gradient-to-b from-[#0E2B1D] to-[#18452E] text-white p-10 flex-col justify-between min-h-screen">
+    <div className="hidden lg:flex w-2/5 bg-gradient-to-b from-[#0E2B1D] to-[#18452E] text-white p-10 flex-col justify-between min-h-screen rounded-tr-3xl rounded-br-3xl">
       <div>
         <div className="flex items-center gap-4 mb-8">
-          <div className="bg-[#F4D35E] text-[#173F2A] font-bold rounded-2xl w-14 h-14 flex items-center justify-center text-2xl shadow-lg">
-            FI
+          <div className="rounded-2xl w-14 h-14 overflow-hidden shadow-lg">
+            <Image src={FlashIdWhite} alt="Flash ID" width={56} height={56} />
           </div>
 
           <div>
@@ -17,48 +20,63 @@ export function AuthSidebar() {
           </div>
         </div>
 
-        <h2 className="text-3xl font-bold leading-tight mb-4">
-          Fast.
-          <br />
-          Secure.
+        <h2 className="text-5xl font-bold leading-tight mb-4">
+          Fast. Secured.
           <br />
           Verified.
         </h2>
 
-        <p className="text-base text-gray-300 leading-relaxed max-w-md">
-          Access your secure digital identity, verify credentials instantly, and
-          safely share personal information with trusted institutions.
+        <p className="text-2xl text-gray-300 leading-relaxed max-w-md">
+          Create your FlashID account and take control of your digital identity.
         </p>
       </div>
 
-      <div className="space-y-4">
-        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-4 border border-white/10">
-          <h3 className="font-semibold text-lg mb-1">
-            Biometric Authentication
-          </h3>
-
-          <p className="text-gray-300 text-sm leading-relaxed">
-            Secure login using fingerprint and facial recognition technology.
-          </p>
-        </div>
-
-        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-4 border border-white/10">
-          <h3 className="font-semibold text-lg mb-1">Government Verified</h3>
-
-          <p className="text-gray-300 text-sm leading-relaxed">
-            Trusted identity verification backed by official institutions.
-          </p>
-        </div>
-
-        <div className="bg-[#4C8B64] rounded-3xl p-4 flex items-center justify-between">
+      <div className="space-y-3">
+        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-3 border border-white/10 flex items-start gap-3">
+          <Zap className="h-10 w-6 text-green-200 mt-1 shrink-0" />
           <div>
-            <p className="font-semibold text-base">Security Status</p>
-            <p className="text-sm text-green-100">
-              asdf;lkajsdf;kads;fkjas;dfkjasdf
+            <h3 className="font-semibold text-base mb-0.5">
+              Instant Verification
+            </h3>
+            <p className="text-gray-300 text-xs leading-relaxed">
+              Verify your identity in seconds with government-backed
+              credentials.
             </p>
           </div>
+        </div>
 
-          <div className="w-3 h-3 bg-green-300 rounded-full animate-pulse" />
+        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-3 border border-white/10 flex items-start gap-3">
+          <Shield className="h-10 w-6 text-green-200 mt-1 shrink-0" />
+          <div>
+            <h3 className="font-semibold text-base mb-0.5">
+              Government Verified
+            </h3>
+            <p className="text-gray-300 text-xs leading-relaxed">
+              Trusted identity verification backed by official institutions.
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-3 border border-white/10 flex items-start gap-3">
+          <Share2 className="h-10 w-6 text-green-200 mt-1 shrink-0" />
+          <div>
+            <h3 className="font-semibold text-base mb-0.5">
+              Secure Credential Sharing
+            </h3>
+            <p className="text-gray-300 text-xs leading-relaxed">
+              Share your credentials safely with trusted banks and institutions.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 flex items-start gap-3">
+          <LockKeyhole className="h-10 w-6 text-green-200 mt-1 shrink-0" />
+          <div className="text-sm text-gray-200">
+            <div>Trusted by citizens. Secured for you.</div>
+            <div className="text-xs text-gray-300 mt-1">
+              Proudly South African
+            </div>
+          </div>
         </div>
       </div>
     </div>
