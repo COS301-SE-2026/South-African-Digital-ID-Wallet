@@ -43,14 +43,14 @@ public class InstitutionConfiguration : IEntityTypeConfiguration<Institution>
             .IsRequired();
 
         builder.HasIndex(i => i.ApiKeyReference).IsUnique();
-        
+
         builder.HasIndex(i => i.VerificationNumber).IsUnique();
-        
+
         builder.HasOne(i => i.RegisteredBy)
             .WithMany(g => g.RegisteredInstitutions)
             .HasForeignKey(i => i.RegisteredById)
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         builder.HasMany(i => i.Officials)
             .WithOne(o => o.Institution)
             .HasForeignKey(o => o.InstitutionId)

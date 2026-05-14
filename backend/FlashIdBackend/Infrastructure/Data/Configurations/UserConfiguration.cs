@@ -70,14 +70,14 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .ValueGeneratedOnAddOrUpdate();
 
         builder.HasIndex(u => u.Email).IsUnique();
-        
+
         builder.HasIndex(u => u.Username).IsUnique();
-        
+
         builder.HasOne(u => u.Preference)
             .WithOne(up => up.User)
             .HasForeignKey<UserPreferences>(up => up.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         builder.HasQueryFilter(u => !u.IsDeleted);
     }
 }

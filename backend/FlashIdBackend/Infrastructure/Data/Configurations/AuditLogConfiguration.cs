@@ -39,13 +39,13 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(a => a.ActorId);
-        
+
         builder.HasIndex(a => a.EventType);
-        
+
         builder.HasIndex(a => a.CreatedAt);
-        
+
         builder.HasIndex(a => new { a.ActorId, a.CreatedAt });
-        
+
         builder.HasIndex(a => new { a.EventType, a.CreatedAt });
     }
 }

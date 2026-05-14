@@ -19,15 +19,15 @@ public class CredentialConfiguration : IEntityTypeConfiguration<Credential>
         builder.Property(c => c.Status)
             .IsRequired()
             .HasConversion<string>();
-        
+
         builder.Property(c => c.Signature)
             .IsRequired()
             .HasMaxLength(1024);
-        
+
         builder.Property(c => c.IssuedBy)
             .IsRequired()
             .HasMaxLength(256);
-        
+
         builder.Property(c => c.CreatedAt)
             .IsRequired()
             .HasColumnType("datetime2")
@@ -39,7 +39,7 @@ public class CredentialConfiguration : IEntityTypeConfiguration<Credential>
             .HasColumnType("datetime2")
             .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAddOrUpdate();
-        
+
         builder.Property(c => c.CitizenId)
             .IsRequired();
 
