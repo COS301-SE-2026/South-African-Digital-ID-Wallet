@@ -1,9 +1,6 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
-
-type SubtitleProps = React.HTMLAttributes<HTMLParagraphElement> & {
-  subtitleSize?: 'sm' | 'md' | 'lg'
-}
+import type { SubtitleProps } from '@/types/subtitle.types'
 
 const subtitleSizeClasses: Record<
   NonNullable<SubtitleProps['subtitleSize']>,

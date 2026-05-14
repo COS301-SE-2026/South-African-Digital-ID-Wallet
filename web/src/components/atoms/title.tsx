@@ -1,9 +1,6 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
-
-type TitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
-  titleSize?: 'h1' | 'h2' | 'h3' | 'h4'
-}
+import type { TitleProps } from '@/types/title.types'
 
 const titleSizeClasses: Record<NonNullable<TitleProps['titleSize']>, string> = {
   h1: 'text-3xl md:text-4xl',
