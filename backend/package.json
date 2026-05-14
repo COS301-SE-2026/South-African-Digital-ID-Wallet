@@ -10,7 +10,7 @@
     "type-check": "dotnet build FlashIdBackend/FlashIdBackend.sln",
     "test": "dotnet test FlashIdBackend/FlashIdBackend.sln",
     "format": "dotnet format FlashIdBackend/",
-    "lint": "dotnet format FlashIdBackend/"
+    "lint": "dotnet format --verify-no-changes FlashIdBackend/"
   }
 }
 

@@ -19,15 +19,15 @@ pre-commit:
       - merge
       - rebase
       - cherry-pick
-    backend-lint:
-      glob: "backend/FlashIdBackend/**/*.cs"
-      root: "backend"
-      run: pnpm lint
-      stage_fixed: true
     backend-format:
       glob: "backend/FlashIdBackend/**/*.cs"
       root: "backend"
       run: pnpm format
+      stage_fixed: true
+    backend-lint:
+      glob: "backend/FlashIdBackend/**/*.cs"
+      root: "backend"
+      run: pnpm lint
       stage_fixed: true
     backend-build:
       glob: "backend/FlashIdBackend/**/*.cs"
