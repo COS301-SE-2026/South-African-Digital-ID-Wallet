@@ -3,11 +3,11 @@ import { Subtitle, Title } from '@/components/atoms'
 import { LoginForm } from '@/components/molecules'
 import type { LoginCardProps } from '@/types/login-card.types'
 
-export function LoginCard({
+export const LoginCard = ({
   className,
   title = 'Welcome back',
   subtitle = 'Log into your FlashID account.',
-}: Readonly<LoginCardProps>) {
+}: Readonly<LoginCardProps>) => {
   return (
     <Card className={className}>
       <CardHeader className="space-y-3 pt-8 text-center">

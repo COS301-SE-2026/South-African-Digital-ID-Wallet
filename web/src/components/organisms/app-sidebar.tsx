@@ -44,7 +44,10 @@ type AppSidebarProps = {
   user: SidebarUser
 }
 
-export function AppSidebar({ navSections, user }: Readonly<AppSidebarProps>) {
+export const AppSidebar = ({
+  navSections,
+  user,
+}: Readonly<AppSidebarProps>) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const pathname = usePathname()
 

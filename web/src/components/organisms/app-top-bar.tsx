@@ -14,13 +14,13 @@ type AppTopBarProps = {
   notificationCount?: number
 }
 
-export function AppTopBar({
+export const AppTopBar = ({
   title,
   description,
   user,
   showNotifications = true,
   notificationCount = 0,
-}: Readonly<AppTopBarProps>) {
+}: Readonly<AppTopBarProps>) => {
   return (
     <header className="flex items-center justify-between px-5 py-5">
       <div>

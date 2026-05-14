@@ -2,8 +2,9 @@ import * as React from 'react'
 import Image from 'next/image'
 import { LockKeyhole, Zap, Shield, Share2 } from 'lucide-react'
 import FlashIdWhite from '@/assets/images/FlashID-white.png'
+import { Title, Subtitle } from '@/components/atoms'
 
-export function AuthSidebar() {
+export const AuthSidebar = () => {
   return (
     <div className="hidden lg:flex w-2/5 bg-linear-to-b from-secure-night to-deep-green text-clean-white p-10 flex-col justify-between min-h-screen rounded-tr-3xl rounded-br-3xl">
       <div>
@@ -13,69 +14,73 @@ export function AuthSidebar() {
           </div>
 
           <div>
-            <h1 className="text-4xl font-bold">Flash ID</h1>
-            <p className="text-primary-green mt-1">
+            <Title titleSize="h1" className="text-clean-white">
+              Flash ID
+            </Title>
+            <Subtitle subtitleSize="md" className="text-primary-green">
               Secure Digital Identity Platform
-            </p>
+            </Subtitle>
           </div>
         </div>
 
-        <h2 className="text-5xl font-bold leading-tight mb-4">
+        <Title titleSize="h2" className="text-clean-white leading-tight mb-4">
           Fast. Secured.
           <br />
           Verified.
-        </h2>
+        </Title>
 
-        <p className="text-2xl text-clean-white/80 leading-relaxed max-w-md">
+        <Subtitle subtitleSize="lg" className="text-clean-white/80 max-w-md">
           Create your FlashID account and take control of your digital identity.
-        </p>
+        </Subtitle>
       </div>
 
       <div className="space-y-3">
         <div className="bg-clean-white/10 backdrop-blur-md rounded-3xl p-3 border border-clean-white/10 flex items-start gap-3">
           <Zap className="h-10 w-6 text-primary-green mt-1 shrink-0" />
           <div>
-            <h3 className="font-semibold text-base mb-0.5">
+            <Title titleSize="h4" className="text-clean-white mb-0.5">
               Instant Verification
-            </h3>
-            <p className="text-clean-white/70 text-xs leading-relaxed">
+            </Title>
+            <Subtitle subtitleSize="sm" className="text-clean-white/70">
               Verify your identity in seconds with government-backed
               credentials.
-            </p>
+            </Subtitle>
           </div>
         </div>
 
         <div className="bg-clean-white/10 backdrop-blur-md rounded-3xl p-3 border border-clean-white/10 flex items-start gap-3">
           <Shield className="h-10 w-6 text-primary-green mt-1 shrink-0" />
           <div>
-            <h3 className="font-semibold text-base mb-0.5">
+            <Title titleSize="h4" className="text-clean-white mb-0.5">
               Government Verified
-            </h3>
-            <p className="text-clean-white/70 text-xs leading-relaxed">
+            </Title>
+            <Subtitle subtitleSize="sm" className="text-clean-white/70">
               Trusted identity verification backed by official institutions.
-            </p>
+            </Subtitle>
           </div>
         </div>
 
         <div className="bg-clean-white/10 backdrop-blur-md rounded-3xl p-3 border border-clean-white/10 flex items-start gap-3">
           <Share2 className="h-10 w-6 text-primary-green mt-1 shrink-0" />
           <div>
-            <h3 className="font-semibold text-base mb-0.5">
+            <Title titleSize="h4" className="text-clean-white mb-0.5">
               Secure Credential Sharing
-            </h3>
-            <p className="text-clean-white/70 text-xs leading-relaxed">
+            </Title>
+            <Subtitle subtitleSize="sm" className="text-clean-white/70">
               Share your credentials safely with trusted banks and institutions.
-            </p>
+            </Subtitle>
           </div>
         </div>
 
         <div className="mt-6 flex items-start gap-3">
           <LockKeyhole className="h-10 w-6 text-primary-green mt-1 shrink-0" />
           <div className="text-sm text-clean-white/90">
-            <div>Trusted by citizens. Secured for you.</div>
-            <div className="text-xs text-clean-white/70 mt-1">
+            <Subtitle subtitleSize="sm" className="text-clean-white/90">
+              Trusted by citizens. Secured for you.
+            </Subtitle>
+            <Subtitle subtitleSize="sm" className="text-clean-white/70 mt-1">
               Proudly South African
-            </div>
+            </Subtitle>
           </div>
         </div>
       </div>
