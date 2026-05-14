@@ -12,7 +12,6 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
     e.preventDefault()
     const data = { email, password }
     onSubmitAction?.(data)
-    console.log('LoginForm submit', data)
   }
 
   return (
