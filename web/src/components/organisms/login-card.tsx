@@ -15,9 +15,13 @@ export function LoginCard({
 }: Readonly<LoginCardProps>) {
   return (
     <Card className={className}>
-      <CardHeader className="space-y-2">
-        <Title titleSize="h2">{title}</Title>
-        <Subtitle subtitleSize="md">{subtitle}</Subtitle>
+      <CardHeader className="space-y-2 text-center">
+        <Title titleSize="h2" className="text-center">
+          {title}
+        </Title>
+        <Subtitle subtitleSize="md" className="text-center">
+          {subtitle}
+        </Subtitle>
       </CardHeader>
 
       <CardContent className="space-y-6">

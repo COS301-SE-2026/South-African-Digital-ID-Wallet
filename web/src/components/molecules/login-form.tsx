@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 
 export function LoginForm({
@@ -45,7 +47,7 @@ export function LoginForm({
 
       <div className="flex items-center justify-between">
         <button
-          className="rounded-md bg-[#1F5B3D] text-white px-4 py-2"
+          className="rounded-md bg-[#1F5B3D] px-4 py-2 text-white"
           type="submit"
         >
           Sign in
