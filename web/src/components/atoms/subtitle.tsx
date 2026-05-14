@@ -11,12 +11,12 @@ const subtitleSizeClasses: Record<
   lg: 'text-lg md:text-xl',
 }
 
-export function Subtitle({
+export const Subtitle = ({
   subtitleSize = 'md',
   className,
   children,
   ...props
-}: SubtitleProps) {
+}: SubtitleProps) => {
   return (
     <p
       className={cn(

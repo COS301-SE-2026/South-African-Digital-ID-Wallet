@@ -9,12 +9,12 @@ const titleSizeClasses: Record<NonNullable<TitleProps['titleSize']>, string> = {
   h4: 'text-lg md:text-xl',
 }
 
-export function Title({
+export const Title = ({
   titleSize = 'h1',
   className,
   children,
   ...props
-}: TitleProps) {
+}: TitleProps) => {
   const Comp = titleSize
 
   return (
