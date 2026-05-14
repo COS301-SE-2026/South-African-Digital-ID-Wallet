@@ -1,7 +1,5 @@
+import { LoginPage } from '@/components/pages'
+
 export default function Home() {
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-background text-foreground">
-      <h1 className="text-4xl font-bold text-primary-green"></h1>
-    </main>
-  )
+  return <LoginPage />
 }
