@@ -29,6 +29,7 @@ public class BiometricsConfiguration : IEntityTypeConfiguration<Biometrics>
         builder.Property(b => b.UpdatedAt)
             .IsRequired()
             .HasColumnType("datetime2")
+            .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAddOrUpdate();
 
         builder.Property(b => b.CredentialId)

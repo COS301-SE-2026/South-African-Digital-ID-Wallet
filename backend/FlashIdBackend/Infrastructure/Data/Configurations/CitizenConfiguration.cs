@@ -37,6 +37,7 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
         builder.Property(c => c.UpdatedAt)
             .IsRequired()
             .HasColumnType("datetime2")
+            .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAddOrUpdate();
 
         builder.Property(c => c.UserId)

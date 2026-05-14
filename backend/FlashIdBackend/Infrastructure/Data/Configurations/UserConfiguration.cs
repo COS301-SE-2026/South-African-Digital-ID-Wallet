@@ -66,6 +66,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.UpdatedAt)
             .IsRequired()
             .HasColumnType("datetime2")
+            .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAddOrUpdate();
 
         builder.HasIndex(u => u.Email).IsUnique();

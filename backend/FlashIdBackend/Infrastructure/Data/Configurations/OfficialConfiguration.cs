@@ -23,6 +23,7 @@ public class OfficialConfiguration : IEntityTypeConfiguration<Official>
         builder.Property(o => o.UpdatedAt)
             .IsRequired()
             .HasColumnType("datetime2")
+            .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAddOrUpdate();
 
         builder.Property(o => o.UserId)
