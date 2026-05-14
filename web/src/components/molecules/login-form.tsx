@@ -2,12 +2,9 @@
 
 import * as React from 'react'
 import { User } from 'lucide-react'
+import type { LoginFormProps } from '@/types/login-form.types'
 
-export function LoginForm({
-  onSubmitAction,
-}: {
-  onSubmitAction?: (data: { email: string; password: string }) => void
-}) {
+export function LoginForm({ onSubmitAction }: Readonly<LoginFormProps>) {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
 
