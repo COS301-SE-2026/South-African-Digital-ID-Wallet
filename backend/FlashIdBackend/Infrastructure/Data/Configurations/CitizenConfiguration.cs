@@ -23,11 +23,11 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
 
         builder.Property(c => c.ActivationCodeExpiresAt)
             .HasColumnType("datetime2");
-        
+
         builder.Property(c => c.IsActivated)
             .IsRequired()
             .HasDefaultValue(false);
-        
+
         builder.Property(c => c.CreatedAt)
             .IsRequired()
             .HasColumnType("datetime2")
@@ -38,7 +38,7 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
             .IsRequired()
             .HasColumnType("datetime2")
             .ValueGeneratedOnAddOrUpdate();
-        
+
         builder.Property(c => c.UserId)
             .IsRequired();
 
@@ -46,7 +46,7 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
             .WithMany()
             .HasForeignKey(c => c.UserId)
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         builder.HasMany(b => b.Credentials)
             .WithOne(credential => credential.Citizen)
             .HasForeignKey(credential => credential.CitizenId)

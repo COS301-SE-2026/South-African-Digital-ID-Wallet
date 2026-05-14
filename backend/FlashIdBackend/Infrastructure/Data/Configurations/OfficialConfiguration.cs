@@ -32,12 +32,12 @@ public class OfficialConfiguration : IEntityTypeConfiguration<Official>
             .IsRequired();
 
         builder.HasIndex(o => o.OfficialId).IsUnique();
-        
+
         builder.HasOne(o => o.User)
             .WithOne()
             .HasForeignKey<Official>(o => o.UserId)
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         builder.HasOne(o => o.Institution)
             .WithMany(i => i.Officials)
             .HasForeignKey(o => o.InstitutionId)
