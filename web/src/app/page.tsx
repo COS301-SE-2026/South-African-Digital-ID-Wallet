@@ -1,7 +1,15 @@
+import { AuthSidebar, LoginCard } from '@/components/organisms'
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background text-foreground">
-      <h1 className="text-4xl font-bold text-primary-green"></h1>
+    <main className="min-h-screen bg-[#F5F3EC] text-[#173F2A]">
+      <div className="flex min-h-screen flex-col lg:flex-row">
+        <AuthSidebar />
+
+        <div className="flex flex-1 items-center justify-center px-6 py-10 sm:px-8 lg:px-10 xl:px-14">
+          <LoginCard className="w-full max-w-xl min-h-[34rem] lg:min-h-[38rem]" />
+        </div>
+      </div>
     </main>
   )
 }
