@@ -23,7 +23,7 @@ export function Subtitle({
   return (
     <p
       className={cn(
-        'leading-relaxed text-slate-600',
+        'leading-relaxed text-muted-text',
         subtitleSizeClasses[subtitleSize],
         className
       )}
