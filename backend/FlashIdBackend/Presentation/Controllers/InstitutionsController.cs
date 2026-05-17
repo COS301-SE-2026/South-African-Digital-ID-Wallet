@@ -47,4 +47,37 @@ public class InstitutionsController : ControllerBase
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllInstitutions()
+    {
+        try
+        {
+            var result = await _institutionService.GetAllInstitutionsAsync();
+            return Ok(result);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    [HttpGet("{institutionId}")]
+    public async Task<IActionResult> GetInstitutionById(Guid institutionId)
+    {
+        try
+        {
+            var result = await _institutionService.GetInstitutionByIdAsync(institutionId);
+            return Ok(result);
+        }
+        catch (InvalidInstitutionRequestException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
 }
