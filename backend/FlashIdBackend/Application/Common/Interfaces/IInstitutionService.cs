@@ -7,4 +7,10 @@ public interface IInstitutionService
     Task<RegisterInstitutionResponseDto> RegisterInstitutionAsync(
         RegisterInstitutionRequestDto request
     );
+
+    Task<IEnumerable<GetInstitutionResponseDto>> GetAllInstitutionsAsync();
+
+    Task<GetInstitutionResponseDto> GetInstitutionByIdAsync(Guid institutionId);
+
+
 }

@@ -88,7 +88,42 @@ public class InstitutionService : IInstitutionService
             CreatedAt = institution.CreatedAt,
         };
     }
+    public async Task<IEnumerable<GetInstitutionResponseDto>> GetAllInstitutionsAsync()
+    {
+        var institutions = await _context.Institutions.ToListAsync();
 
+        return institutions.Select(i => new GetInstitutionResponseDto
+        {
+            InstitutionId = i.Id,
+            Name = i.Name,
+            Type = i.Type.ToString(),
+            VerificationNumber = i.VerificationNumber,
+            RegisteredById = i.RegisteredById,
+            CreatedAt = i.CreatedAt,
+        });
+    }
+
+    public async Task<GetInstitutionResponseDto> GetInstitutionByIdAsync(Guid institutionId)
+    {
+        var institution = await _context.Institutions.FirstOrDefaultAsync(i =>
+            i.Id == institutionId
+        );
+
+        if (institution == null)
+            throw new InvalidInstitutionRequestException(
+                $"Institution with ID '{institutionId}' was not found."
+            );
+
+        return new GetInstitutionResponseDto
+        {
+            InstitutionId = institution.Id,
+            Name = institution.Name,
+            Type = institution.Type.ToString(),
+            VerificationNumber = institution.VerificationNumber,
+            RegisteredById = institution.RegisteredById,
+            CreatedAt = institution.CreatedAt,
+        };
+    }
     // generates a secure random API key in the format flashid_live_<32 hex chars>
     private static string GenerateApiKey()
     {
