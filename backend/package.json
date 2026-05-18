@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "install": "dotnet restore FlashIdBackend/FlashIdBackend.sln",
+    "restore": "dotnet restore FlashIdBackend/FlashIdBackend.sln",
     "dev": "dotnet watch run --project FlashIdBackend/Presentation/Presentation.csproj",
     "start": "dotnet run --project FlashIdBackend/Presentation/Presentation.csproj",
     "build": "dotnet build FlashIdBackend/Presentation/Presentation.csproj",
