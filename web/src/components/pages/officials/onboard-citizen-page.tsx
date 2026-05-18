@@ -23,5 +23,25 @@ type IdentityRecord = {
 }
 
 export default function OnboardCitizenPage() {
+  const [idNumber, setIdNumber] = useState('')
+  const [record, setRecord] = useState<IdentityRecord | null>(null)
+  const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
+  const [consent, setConsent] = useState(false)
+  const [accountCreated, setAccountCreated] = useState(false)
+  const [activationSent, setActivationSent] = useState(false)
+  const [registrationMethod, setRegistrationMethod] = useState<
+    'activation' | 'physical' | null
+  >(null)
+
+  function retrieveIdentityRecord() {
+    setRecord({
+      idNumber,
+      fullName: 'Thando Mokoena',
+      dateOfBirth: '1998-04-12',
+      status: 'Verified',
+    })
+  }
+
   return <div></div>
 }
