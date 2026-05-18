@@ -28,8 +28,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className=" flex h-screen overflow-hidden">
+      {/* TODO: Update navSections to work with loggeed in user role :)*/}
       <AppSidebar navSections={officialsNavSections} user={mockUser} />
-      <div className="flex-1">
+      <div className="flex h-screen flex-1 flex-col overflow-hidden">
         <AppTopBar
           title={header.title}
           description={header.description}
@@ -39,7 +40,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           }}
           showNotifications={false}
         />
-        {children}
+        <div className="flex-1 overflow-y-auto">{children}</div>
       </div>
     </div>
   )

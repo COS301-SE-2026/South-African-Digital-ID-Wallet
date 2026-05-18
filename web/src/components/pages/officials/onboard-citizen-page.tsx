@@ -56,16 +56,14 @@ export default function OnboardCitizenPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background p-6">
+    <main className="min-h-full bg-background p-6 pb-10">
       <div className="mx-auto max-w-6xl space-y-6">
         <div className="grid gap-6 lg:grid-cols-3">
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Search className="h-5 w-5 text-muted-text" />
-                <p className="font-medium text-muted-text">
-                  Retrieve Identity Record
-                </p>
+                <Search className="h-5 w-5" />
+                <p className="font-medium ">Retrieve Identity Record</p>
               </CardTitle>
             </CardHeader>
 
@@ -80,7 +78,24 @@ export default function OnboardCitizenPage() {
                   onChange={(event) => setIdNumber(event.target.value)}
                 />
 
-                <Button onClick={retrieveIdentityRecord} disabled={!idNumber}>
+                <label className="flex items-start gap-3 rounded-xl border p-4">
+                  <input
+                    type="checkbox"
+                    checked={consent}
+                    onChange={(event) => setConsent(event.target.checked)}
+                    className="mt-1"
+                  />
+                  <span className="text-sm">
+                    Citizen has provided explicit consent to retrieve Identity
+                    Record.
+                  </span>
+                </label>
+
+                <Button
+                  className="bg-deep-green text-clean-white hover:bg-deep-green/70"
+                  onClick={retrieveIdentityRecord}
+                  disabled={!idNumber}
+                >
                   Retrieve from Government Registry
                 </Button>
 
@@ -133,6 +148,61 @@ export default function OnboardCitizenPage() {
             </CardContent>
           </Card>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              {' '}
+              <ClipboardCheck className="h-5 w-5" /> Capture Contact
+              Details{' '}
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  placeholder="+27..."
+                  value={phone}
+                  onChange={(event) => setPhone(event.target.value)}
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input
+                  id="email"
+                  placeholder="citizen@example.com"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                />
+              </div>
+            </div>
+
+            <label className="flex items-start gap-3 rounded-xl border p-4">
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={(event) => setConsent(event.target.checked)}
+                className="mt-1"
+              />
+              <span className="text-sm">
+                Citizen has provided explicit consent to create a FlashID
+                account and receive an activation code.
+              </span>
+            </label>
+
+            <Button
+              className="w-full bg-deep-green text-clean-white hover:bg-deep-green/70"
+              onClick={createPendingAccount}
+              disabled={!record || !consent || (!phone && !email)}
+            >
+              Create Pending FlashID Account
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </main>
   )
