@@ -17,7 +17,7 @@ export const AuthSidebar = () => {
             <Title titleSize="h1" className="text-clean-white">
               Flash ID
             </Title>
-            <Subtitle subtitleSize="md" className="text-primary-green">
+            <Subtitle subtitleSize="md" className="text-clean-white">
               Secure Digital Identity Platform
             </Subtitle>
           </div>

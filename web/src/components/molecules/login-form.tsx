@@ -42,19 +42,25 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
         />
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="space-y-3">
         <button
-          className="flex items-center gap-2 rounded-md bg-primary-green px-4 py-2 text-base text-clean-white transition-colors hover:bg-deep-green"
+          className="flex w-full items-center justify-center gap-2 rounded-md bg-primary-green px-4 py-3 text-base text-clean-white transition-colors hover:bg-deep-green"
           type="submit"
         >
           <User className="h-5 w-5" />
           Login
         </button>
         <a
-          className="text-base text-primary-green hover:text-deep-green hover:underline"
+          className="block text-center text-base text-primary-green hover:text-deep-green hover:underline"
           href="#"
         >
           Forgot password?
+        </a>
+        <a
+          className="block text-center text-base text-primary-green hover:text-deep-green hover:underline"
+          href="#"
+        >
+          Don&apos;t have an account? Register here.
         </a>
       </div>
     </form>
