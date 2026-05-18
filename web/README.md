@@ -399,6 +399,44 @@ src/components/pages/
 ```
 
 ---
+# Export Convention
+
+Use named exports for reusable utilities, hooks, types, constants, and components. This keeps imports explicit and easier to refactor.
+
+Use a default export only for Next.js route entry files such as `page.tsx` and `layout.tsx`, because Next.js requires the route component to be exported as the default function.
+
+Example:
+
+```tsx
+export const metadata = { title: 'Credentials' };
+export const revalidate = 60;
+
+export const formatCredential = (raw) => {
+  return raw;
+};
+
+export function CredentialCard({ data }) {
+  return <div>{data.name}</div>;
+}
+
+export default function CitizenCredentialsPage() {
+  return <CredentialCard data={{ name: 'ID Document' }} />;
+}
+```
+
+
+>Tiny note: I would **not** usually put hooks/components/utilities inside `page.tsx` long-term. Better pattern:
+
+```text
+credentials/
+  page.tsx
+  components/
+    credential-card.tsx
+  hooks/
+    use-credentials.ts
+  utils/
+    format-credential.ts
+---
 
 # Layout Rules
 
@@ -465,6 +503,32 @@ bg-accent-gold
 text-primary-green
 ```
 
+---
+
+# Using shadcn/ui Components
+
+Import components directly from the `@/components/ui` directory.
+
+Example:
+
+```tsx
+import { Button } from "@/components/ui/button";
+
+export default function ExamplePage() {
+  return <Button>Click Me</Button>;
+}
+```
+
+Multiple exports from a component can be imported together:
+
+```tsx
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
+```
 ---
 
 # Component Creation Rules
