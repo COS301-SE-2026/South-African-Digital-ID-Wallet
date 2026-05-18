@@ -22,7 +22,6 @@
     "format:backend": "pnpm --filter ./backend run format",
     "type-check:backend": "pnpm --filter ./backend run type-check",
 
-    "install": "pnpm install",
     "dev": "concurrently --kill-others-on-fail \"pnpm --filter ./web dev\" \"pnpm --filter ./backend run dev\"",
     "build": "pnpm install && pnpm --filter ./backend run build && pnpm --filter ./web build",
     "test": "pnpm --filter ./backend run test",

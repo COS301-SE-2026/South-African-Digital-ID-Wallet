@@ -1,4 +1,5 @@
 import { AuthSidebar, LoginCard } from '@/components/organisms'
+
 export const LoginPage = () => {
   return (
     <main className="min-h-screen bg-cream-background text-deep-green">

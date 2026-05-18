@@ -107,10 +107,8 @@ export const AppSidebar = ({
                 const Icon = sidebarIcons[item.icon]
 
                 {
-                  /*TODO: Update isActive when app routing implemented */
                 }
                 const isActive = 0
-                //item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
 
                 return (
                   <Link
