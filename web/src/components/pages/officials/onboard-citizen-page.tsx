@@ -34,6 +34,10 @@ export default function OnboardCitizenPage() {
     'activation' | 'physical' | null
   >(null)
 
+  {
+    /* TODO: Retrieve actual record !!!!*/
+  }
+
   function retrieveIdentityRecord() {
     setRecord({
       idNumber,
@@ -105,8 +109,54 @@ export default function OnboardCitizenPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5" />
+                Onboarding Status
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="space-y-3 text-sm">
+              <StatusItem label="Identity record retrieved" done={!!record} />
+              <StatusItem label="Consent captured" done={consent} />
+              <StatusItem
+                label="Contact details captured"
+                done={!!phone || !!email}
+              />
+              <StatusItem
+                label="Pending account created"
+                done={accountCreated}
+              />
+              <StatusItem label="Activation code sent" done={activationSent} />
+            </CardContent>
+          </Card>
         </div>
       </div>
     </main>
+  )
+}
+
+type StatusItemProps = {
+  label: string
+  done: boolean
+}
+
+function StatusItem({ label, done }: Readonly<StatusItemProps>) {
+  return (
+    <div className="flex items-center gap-2">
+      <CheckCircle2
+        className={`h-4 w-4 ${done ? 'text-success-green' : 'text-muted-text'}`}
+      />
+
+      <span
+        className={`text-sm ${
+          done ? 'font-semibold text-text-primary' : 'text-muted-text'
+        }`}
+      >
+        {label}
+      </span>
+    </div>
   )
 }
