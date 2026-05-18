@@ -105,7 +105,15 @@ export default function OnboardCitizenPage() {
                       <h3 className="font-semibold">
                         Verified Identity Record
                       </h3>
-                      <Badge>{record.status}</Badge>
+                      <Badge
+                        className={
+                          record.status === 'Verified'
+                            ? 'bg-success-green text-clean-white'
+                            : 'bg-danger-red text-clean-white'
+                        }
+                      >
+                        {record.status}
+                      </Badge>
                     </div>
 
                     <div className="grid gap-2 text-sm md:grid-cols-3">
