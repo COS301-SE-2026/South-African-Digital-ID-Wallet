@@ -33,21 +33,21 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 The web portal is designed to support multiple role-based experiences, including:
 
-* Citizen Portal
-* Officials Portal
-* Government Administrator Portal
+- Citizen Portal
+- Officials Portal
+- Government Administrator Portal
 
 ---
 
 # Tech Stack
 
-* Next.js
-* React
-* TypeScript
-* Tailwind CSS
-* shadcn/ui
-* Lucide React icons
-* pnpm
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Lucide React icons
+- pnpm
 
 ---
 
@@ -131,8 +131,8 @@ src/assets/images/FlashID-white.png
 Images should be imported through Next.js where possible:
 
 ```tsx
-import Image from "next/image";
-import FlashIdLogo from "@/assets/images/FlashID-white.png";
+import Image from 'next/image'
+import FlashIdLogo from '@/assets/images/FlashID-white.png'
 ```
 
 ---
@@ -154,10 +154,10 @@ sheet.tsx
 
 ### Rules
 
-* Do not add business logic here.
-* Do not make page-specific components here.
-* Treat these as generic reusable UI building blocks.
-* Prefer using these before creating custom components.
+- Do not add business logic here.
+- Do not make page-specific components here.
+- Treat these as generic reusable UI building blocks.
+- Prefer using these before creating custom components.
 
 ---
 
@@ -260,10 +260,10 @@ Use config for values that control how the app behaves but are not UI components
 
 Examples:
 
-* sidebar navigation items
-* portal titles
-* role-based route definitions
-* supported credential types
+- sidebar navigation items
+- portal titles
+- role-based route definitions
+- supported credential types
 
 ---
 
@@ -286,10 +286,10 @@ Example:
 
 ```ts
 export type SidebarNavItem = {
-  label: string;
-  href: string;
-  icon: string;
-};
+  label: string
+  href: string
+  icon: string
+}
 ```
 
 ---
@@ -362,7 +362,7 @@ export default function CitizenCredentialsPage() {
         My Credentials
       </h1>
     </main>
-  );
+  )
 }
 ```
 
@@ -375,10 +375,10 @@ Route files should stay simple.
 Good:
 
 ```tsx
-import { CitizenDashboardPage } from "@/components/pages/citizen-dashboard-page";
+import { CitizenDashboardPage } from '@/components/pages/citizen-dashboard-page'
 
 export default function Page() {
-  return <CitizenDashboardPage />;
+  return <CitizenDashboardPage />
 }
 ```
 
@@ -399,6 +399,7 @@ src/components/pages/
 ```
 
 ---
+
 # Export Convention
 
 Use named exports for reusable utilities, hooks, types, constants, and components. This keeps imports explicit and easier to refactor.
@@ -408,26 +409,25 @@ Use a default export only for Next.js route entry files such as `page.tsx` and `
 Example:
 
 ```tsx
-export const metadata = { title: 'Credentials' };
-export const revalidate = 60;
+export const metadata = { title: 'Credentials' }
+export const revalidate = 60
 
 export const formatCredential = (raw) => {
-  return raw;
-};
+  return raw
+}
 
 export function CredentialCard({ data }) {
-  return <div>{data.name}</div>;
+  return <div>{data.name}</div>
 }
 
 export default function CitizenCredentialsPage() {
-  return <CredentialCard data={{ name: 'ID Document' }} />;
+  return <CredentialCard data={{ name: 'ID Document' }} />
 }
 ```
 
+> Tiny note: I would **not** usually put hooks/components/utilities inside `page.tsx` long-term. Better pattern:
 
->Tiny note: I would **not** usually put hooks/components/utilities inside `page.tsx` long-term. Better pattern:
-
-```text
+````text
 credentials/
   page.tsx
   components/
@@ -444,15 +444,15 @@ The global shell lives in:
 
 ```txt
 src/app/layout.tsx
-```
+````
 
 It should contain shared app structure such as:
 
-* sidebar
-* top bar
-* main content area
-* global fonts
-* global theme styling
+- sidebar
+- top bar
+- main content area
+- global fonts
+- global theme styling
 
 Example layout structure:
 
@@ -476,14 +476,14 @@ FlashID uses Tailwind CSS with semantic design tokens.
 Prefer semantic classes:
 
 ```tsx
-bg-background
-text-foreground
-bg-card
-text-card-foreground
-text-muted-foreground
-border-border
-bg-primary
-text-primary-foreground
+bg - background
+text - foreground
+bg - card
+text - card - foreground
+text - muted - foreground
+border - border
+bg - primary
+text - primary - foreground
 ```
 
 Avoid hardcoded one-off colours:
@@ -497,10 +497,10 @@ border-[#E5E7EB]
 Brand-specific colours may be used only when intentional:
 
 ```tsx
-bg-deep-green
-text-clean-white
-bg-accent-gold
-text-primary-green
+bg - deep - green
+text - clean - white
+bg - accent - gold
+text - primary - green
 ```
 
 ---
@@ -512,23 +512,19 @@ Import components directly from the `@/components/ui` directory.
 Example:
 
 ```tsx
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 
 export default function ExamplePage() {
-  return <Button>Click Me</Button>;
+  return <Button>Click Me</Button>
 }
 ```
 
 Multiple exports from a component can be imported together:
 
 ```tsx
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 ```
+
 ---
 
 # Component Creation Rules
@@ -553,8 +549,9 @@ To add a new shadcn component, run the command from inside the `web/` folder:
 ````md
 ```bash
 pnpm dlx shadcn@latest add component-name
-
+```
 ````
+
 ---
 
 # Navigation Rules
@@ -573,9 +570,9 @@ The sidebar should receive navigation data as props.
 
 This allows the same sidebar component to support:
 
-* Citizen Portal
-* Official Portal
-* Government Administrator Portal
+- Citizen Portal
+- Official Portal
+- Government Administrator Portal
 
 ---
 
@@ -588,10 +585,10 @@ Mock data should be clearly marked:
 ```ts
 // TODO: Replace with authenticated session data once login is implemented.
 const mockUser = {
-  name: "Unathi Tshakalisa",
-  initials: "UT",
-  idLabel: "ID: •••••••084",
-};
+  name: 'Unathi Tshakalisa',
+  initials: 'UT',
+  idLabel: 'ID: •••••••084',
+}
 ```
 
 Do not spread mock data randomly across many components. Keep it near the layout or page using it.
@@ -642,7 +639,7 @@ FlashID uses Lucide React icons.
 Import icons from:
 
 ```tsx
-import { Bell, LayoutDashboard } from "lucide-react";
+import { Bell, LayoutDashboard } from 'lucide-react'
 ```
 
 Do not mix icon libraries unless the team agrees to update the design system.
@@ -665,11 +662,11 @@ git status
 
 PRs should include:
 
-* what changed
-* why it changed
-* screenshots for UI changes
-* notes about mock data or future TODOs
-* confirmation that the build passes
+- what changed
+- why it changed
+- screenshots for UI changes
+- notes about mock data or future TODOs
+- confirmation that the build passes
 
 ---
 
@@ -677,14 +674,13 @@ PRs should include:
 
 The current frontend foundation includes:
 
-* shadcn/ui setup
-* FlashID design tokens
-* Inter typography
-* reusable sidebar
-* reusable top bar
-* route-ready portal structure
-* mock user/session placeholders
-* dark mode token support
+- shadcn/ui setup
+- FlashID design tokens
+- Inter typography
+- reusable sidebar
+- reusable top bar
+- route-ready portal structure
+- mock user/session placeholders
+- dark mode token support
 
 Future work will connect the layout to authentication, session management, and role-based portal selection.
-

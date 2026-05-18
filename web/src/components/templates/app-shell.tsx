@@ -16,11 +16,6 @@ const mockUser = {
   idLabel: 'ID: •••••••084',
 }
 
-const mockTopBar = {
-  title: 'Officials Dashboard',
-  description: 'Upload and Manage citizen digital credentials.',
-}
-
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
@@ -30,13 +25,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   const header = pageHeaders[pathname] ?? defaultPageHeader
+
   return (
     <div className=" flex h-screen overflow-hidden">
       <AppSidebar navSections={officialsNavSections} user={mockUser} />
       <div className="flex-1">
         <AppTopBar
-          title={mockTopBar.title}
-          description={mockTopBar.description}
+          title={header.title}
+          description={header.description}
           user={{
             name: mockUser.name,
             initials: mockUser.initials,
