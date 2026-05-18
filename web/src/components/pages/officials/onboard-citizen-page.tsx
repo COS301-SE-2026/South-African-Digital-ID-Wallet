@@ -43,5 +43,19 @@ export default function OnboardCitizenPage() {
     })
   }
 
-  return <div></div>
+  function createPendingAccount() {
+    setAccountCreated(true)
+  }
+
+  function sendActivationCode() {
+    setActivationSent(true)
+  }
+
+  return (
+    <main className="min-h-screen bg-background p-6">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <div></div>
+      </div>
+    </main>
+  )
 }
