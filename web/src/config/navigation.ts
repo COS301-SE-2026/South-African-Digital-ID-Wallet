@@ -42,11 +42,18 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
 export const officialsNavSections: SidebarNavSection[] = [
   {
     title: 'Officials',
-    items: [],
+    items: [
+      { label: 'Dashboard', href: '/', icon: 'dashboard' },
+      { label: 'Onboard Citizen', href: '/', icon: 'onboard' },
+      { label: 'Notifications', href: '/', icon: 'notifications' },
+    ],
   },
 
   {
     title: 'Security',
-    items: [],
+    items: [
+      { label: 'Onboarding History', href: '/', icon: 'history' },
+      { label: 'Privacy Settings', href: '/', icon: 'settings' },
+    ],
   },
 ]
