@@ -1,7 +1,10 @@
 'use client'
 
 import { forwardRef, useId } from 'react'
+
 import { cn } from '@/lib/utils'
+import { Text } from '@/components/atoms'
+
 import { TextFieldProps } from './types'
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
@@ -12,9 +15,9 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
     return (
       <div className="flex w-full flex-col gap-1.5">
         {label && (
-          <label htmlFor={inputId} className="text-sm font-medium">
+          <Text as="label" variant="label" htmlFor={inputId}>
             {label}
-          </label>
+          </Text>
         )}
 
         <input

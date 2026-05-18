@@ -4,6 +4,7 @@ import { Search } from 'lucide-react'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { Controller, FieldValues, useFormContext } from 'react-hook-form'
 import { twMerge } from 'tailwind-merge'
+import { Text } from '@/components/atoms'
 import {
   FormDropdownProps,
   DropdownOption,
@@ -81,10 +82,10 @@ const DropdownInner = ({
       className={twMerge('flex flex-col gap-1', className)}
     >
       {label && (
-        <label className="text-sm font-medium text-gray-900">
+        <Text as="label" variant="label">
           {label}
           {required && <span className="text-red-500"> *</span>}
-        </label>
+        </Text>
       )}
 
       <div className="relative">

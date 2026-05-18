@@ -14,6 +14,7 @@ const TEXT_VARIANT_CLASSNAMES: Record<TextProps['variant'], string> = {
   'sub-sm': 'leading-relaxed text-muted-text text-sm md:text-base',
   'sub-md': 'leading-relaxed text-muted-text text-base md:text-lg',
   'sub-lg': 'leading-relaxed text-muted-text text-lg md:text-xl',
+  label: 'block font-bold text-primary-green text-lg md:text-xl',
 }
 
 export const Text: FC<TextProps> = ({
