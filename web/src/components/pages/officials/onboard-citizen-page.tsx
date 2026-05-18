@@ -27,7 +27,8 @@ export default function OnboardCitizenPage() {
   const [record, setRecord] = useState<IdentityRecord | null>(null)
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
-  const [consent, setConsent] = useState(false)
+  const [idConsent, setConsent] = useState(false)
+  const [contactDetailsConsent, setContactConsent] = useState(false)
   const [accountCreated, setAccountCreated] = useState(false)
   const [activationSent, setActivationSent] = useState(false)
   const [registrationMethod, setRegistrationMethod] = useState<
@@ -81,7 +82,7 @@ export default function OnboardCitizenPage() {
                 <label className="flex items-start gap-3 rounded-xl border p-4">
                   <input
                     type="checkbox"
-                    checked={consent}
+                    checked={idConsent}
                     onChange={(event) => setConsent(event.target.checked)}
                     className="mt-1"
                   />
@@ -143,7 +144,10 @@ export default function OnboardCitizenPage() {
 
             <CardContent className="space-y-3 text-sm">
               <StatusItem label="Identity record retrieved" done={!!record} />
-              <StatusItem label="Consent captured" done={consent} />
+              <StatusItem
+                label="Consent captured"
+                done={idConsent && contactDetailsConsent}
+              />
               <StatusItem
                 label="Contact details captured"
                 done={!!phone || !!email}
@@ -192,8 +196,8 @@ export default function OnboardCitizenPage() {
             <label className="flex items-start gap-3 rounded-xl border p-4">
               <input
                 type="checkbox"
-                checked={consent}
-                onChange={(event) => setConsent(event.target.checked)}
+                checked={contactDetailsConsent}
+                onChange={(event) => setContactConsent(event.target.checked)}
                 className="mt-1"
               />
               <span className="text-sm">
@@ -205,7 +209,12 @@ export default function OnboardCitizenPage() {
             <Button
               className="w-full bg-deep-green text-clean-white hover:bg-deep-green/70"
               onClick={createPendingAccount}
-              disabled={!record || !consent || (!phone && !email)}
+              disabled={
+                !record ||
+                !idConsent ||
+                !contactDetailsConsent ||
+                (!phone && !email)
+              }
             >
               Create Pending FlashID Account
             </Button>
