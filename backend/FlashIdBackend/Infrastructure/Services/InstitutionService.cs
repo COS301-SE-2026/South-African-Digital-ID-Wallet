@@ -22,10 +22,10 @@ public class InstitutionService : IInstitutionService
         RegisterInstitutionRequestDto request
     )
     {
-        // step 1 - validate the request
+
         InstitutionValidator.Validate(request);
 
-        // step 2 - check the admin exists
+
         var admin = await _context.GovernmentAdministrators.FirstOrDefaultAsync(a =>
             a.Id == request.AdminId
         );
@@ -33,7 +33,7 @@ public class InstitutionService : IInstitutionService
         if (admin == null)
             throw new AdminNotFoundException(request.AdminId);
 
-        // step 3 - check no duplicate verification number
+
         var exists = await _context.Institutions.AnyAsync(i =>
             i.VerificationNumber == request.VerificationNumber
         );
@@ -41,11 +41,11 @@ public class InstitutionService : IInstitutionService
         if (exists)
             throw new InstitutionAlreadyExistsException(request.VerificationNumber);
 
-        // step 4 - generate API key and key vault reference
+
         var apiKey = GenerateApiKey();
         var apiKeyReference = Guid.NewGuid();
 
-        // step 5 - create the institution record
+
         var institution = new Institution
         {
             Id = Guid.NewGuid(),
@@ -60,7 +60,7 @@ public class InstitutionService : IInstitutionService
 
         _context.Institutions.Add(institution);
 
-        // step 6 - write audit log
+
         var auditLog = new AuditLog
         {
             Id = Guid.NewGuid(),
@@ -76,7 +76,7 @@ public class InstitutionService : IInstitutionService
 
         await _context.SaveChangesAsync();
 
-        // step 7 - return the response
+
         return new RegisterInstitutionResponseDto
         {
             InstitutionId = institution.Id,
@@ -124,7 +124,7 @@ public class InstitutionService : IInstitutionService
             CreatedAt = institution.CreatedAt,
         };
     }
-    // generates a secure random API key in the format flashid_live_<32 hex chars>
+
     private static string GenerateApiKey()
     {
         var bytes = new byte[16];

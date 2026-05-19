@@ -2,7 +2,7 @@ using Domain.Enums;
 
 namespace Application.Features.Institutions.DTOs;
 
-// what the frontend sends to us
+
 public class RegisterInstitutionRequestDto
 {
     public string Name { get; set; } = string.Empty;
@@ -11,7 +11,7 @@ public class RegisterInstitutionRequestDto
     public Guid AdminId { get; set; }
 }
 
-// what we send back to the frontend
+
 public class RegisterInstitutionResponseDto
 {
     public Guid InstitutionId { get; set; }
