@@ -4,6 +4,7 @@ public enum AuditEventType
 {
     UserRegistered,
     UserLoggedIn,
+    UserLoggedOut,
     FailedLoginAttempt,
     CredentialIssued,
     CredentialRevoked,
