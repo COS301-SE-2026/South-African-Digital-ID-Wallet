@@ -11,23 +11,68 @@ export const RegistrationForm = ({
   const [password, setPassword] = React.useState('')
   const [confirmPassword, setConfirmPassword] = React.useState('')
   const [username, setUsername] = React.useState('')
-  const [passwordError, setPasswordError] = React.useState('')
+
   const [idError, setIdError] = React.useState('')
+  const [passwordError, setPasswordError] = React.useState('')
+  const [usernameError, setUsernameError] = React.useState('')
+
+  const validateUsername = (
+    value: string
+  ): { isValid: boolean; errors: string[] } => {
+    const errors: string[] = []
+    if (value.length < 10) {
+      errors.push('• At least 10 characters')
+    }
+    if (!/[A-Z]/.test(value)) {
+      errors.push('• At least one capital letter (A-Z)')
+    }
+    if (!/[a-z]/.test(value)) {
+      errors.push('• At least one lowercase letter (a-z)')
+    }
+    if (!/[0-9]/.test(value)) {
+      errors.push('• At least one numerical digit (0-9)')
+    }
+    if (!/[!@#$%^&*_+\-=.<>?~]/.test(value)) {
+      errors.push('• At least one special character: !@#$%^&*_-+=.<>?~')
+    }
+    return {
+      isValid: errors.length === 0,
+      errors: errors,
+    }
+  }
 
   const handleSubmit: NonNullable<React.ComponentProps<'form'>['onSubmit']> = (
     e
   ) => {
     e.preventDefault()
+    let hasError = false
+
     if (idnumber.length !== 13) {
       setIdError('ID number must be exactly 13 characters')
-      return
+      hasError = true
+    } else {
+      setIdError('')
     }
-    setIdError('')
+
+    const usernameValidation = validateUsername(username)
+    if (!usernameValidation.isValid) {
+      setUsernameError(usernameValidation.errors.join('\n'))
+      hasError = true
+    } else {
+      setUsernameError('')
+    }
+
     if (password !== confirmPassword) {
       setPasswordError('Passwords do not match')
+      hasError = true
+    } else {
+      setPasswordError('')
+    }
+
+    if (hasError) {
       return
     }
-    setPasswordError('')
+
     const data = { idnumber, password, username }
     onSubmitAction?.(data)
   }
@@ -60,10 +105,18 @@ export const RegistrationForm = ({
         <input
           type="text"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => {
+            setUsername(e.target.value)
+            setUsernameError('')
+          }}
           className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
+        {usernameError && (
+          <div className="mt-2 text-sm text-red-600 font-medium whitespace-pre-line">
+            {usernameError}
+          </div>
+        )}
       </div>
 
       <div>
