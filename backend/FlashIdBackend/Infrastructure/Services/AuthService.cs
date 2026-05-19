@@ -34,7 +34,7 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Password is required.");
 
         var user = await _context.DomainUsers.FirstOrDefaultAsync(u =>
-            u.Email == request.Email
+            u.Email.ToLower() == request.Email.ToLower()
         );
 
         if (user == null)
@@ -89,8 +89,7 @@ public class AuthService : IAuthService
         _context.AuditLogs.Add(auditLog);
         await _context.SaveChangesAsync();
 
-        var token = GenerateJwtToken(user);
-        var expiresAt = DateTime.UtcNow.AddHours(8);
+        var (token, expiresAt) = GenerateJwtToken(user);
 
         return new LoginResponseDto
         {
@@ -112,7 +111,7 @@ public class AuthService : IAuthService
             var auditLog = new Domain.Entities.AuditLog
             {
                 Id = Guid.NewGuid(),
-                EventType = AuditEventType.UserLoggedIn,
+                EventType = AuditEventType.UserLoggedOut,
                 Details = $"User {user.Email} logged out.",
                 IpAddress = ipAddress,
                 ActorId = user.Id,
@@ -125,7 +124,7 @@ public class AuthService : IAuthService
         return new LogoutResponseDto { Message = "Logged out successfully." };
     }
 
-    private string GenerateJwtToken(Domain.Entities.User user)
+    private (string token, DateTime expiresAt) GenerateJwtToken(Domain.Entities.User user)
     {
         var jwtKey =
             _configuration["Jwt:Key"]
@@ -133,6 +132,7 @@ public class AuthService : IAuthService
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var expiresAt = DateTime.UtcNow.AddHours(8);
 
         var claims = new[]
         {
@@ -147,10 +147,10 @@ public class AuthService : IAuthService
             issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(8),
+            expires: expiresAt,
             signingCredentials: credentials
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        return (new JwtSecurityTokenHandler().WriteToken(token), expiresAt);
     }
 }
