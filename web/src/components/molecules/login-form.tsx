@@ -8,7 +8,9 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
 
-  function handleSubmit(e: React.FormEvent) {
+  const handleSubmit: NonNullable<React.ComponentProps<'form'>['onSubmit']> = (
+    e
+  ) => {
     e.preventDefault()
     const data = { email, password }
     onSubmitAction?.(data)
