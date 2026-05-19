@@ -12,11 +12,17 @@ export const RegistrationForm = ({
   const [confirmPassword, setConfirmPassword] = React.useState('')
   const [username, setUsername] = React.useState('')
   const [passwordError, setPasswordError] = React.useState('')
+  const [idError, setIdError] = React.useState('')
 
   const handleSubmit: NonNullable<React.ComponentProps<'form'>['onSubmit']> = (
     e
   ) => {
     e.preventDefault()
+    if (idnumber.length !== 13) {
+      setIdError('ID number must be exactly 13 characters')
+      return
+    }
+    setIdError('')
     if (password !== confirmPassword) {
       setPasswordError('Passwords do not match')
       return
@@ -35,10 +41,16 @@ export const RegistrationForm = ({
         <input
           type="text"
           value={idnumber}
-          onChange={(e) => setIdnumber(e.target.value)}
+          onChange={(e) => {
+            setIdnumber(e.target.value)
+            setIdError('')
+          }}
           className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
+        {idError && (
+          <p className="mt-2 text-sm text-red-600 font-medium">{idError}</p>
+        )}
       </div>
 
       <div>
