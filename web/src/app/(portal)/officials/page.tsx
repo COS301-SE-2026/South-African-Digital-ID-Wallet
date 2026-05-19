@@ -1,5 +1,5 @@
-import OnboardCitizen from '@/components/pages/officials/onboard-citizen-page'
-//change to officials dashboard....
-export default function OfficialsHome() {
-  return <OnboardCitizen />
+import { UnderConstructionPage } from '@/components/pages/under-construction-page'
+
+export default function Page() {
+  return <UnderConstructionPage />
 }

@@ -1,5 +1,5 @@
-import { LoginPage } from '@/components/pages'
+import { UnderConstructionPage } from '@/components/pages/under-construction-page'
 
-export default function Home() {
-  return <LoginPage />
+export default function Page() {
+  return <UnderConstructionPage />
 }
