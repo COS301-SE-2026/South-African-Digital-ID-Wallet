@@ -84,20 +84,20 @@ const DropdownInner = ({
       {label && (
         <Text as="label" variant="label">
           {label}
-          {required && <span className="text-red-500"> *</span>}
+          {required && <span className="text-destructive"> *</span>}
         </Text>
       )}
 
       <div className="relative">
         <div
           className={twMerge(
-            'flex items-center gap-2 rounded-md border bg-white px-3 py-2',
-            'focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-1',
-            hasError ? 'border-red-500' : 'border-gray-300',
-            disabled && 'cursor-not-allowed bg-gray-100 opacity-60'
+            'flex items-center gap-2 rounded-md border bg-card px-3 py-2',
+            'focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1',
+            hasError ? 'border-destructive' : 'border-border',
+            disabled && 'cursor-not-allowed bg-muted opacity-60'
           )}
         >
-          <Search className="h-4 w-4 shrink-0 text-gray-400" />
+          <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
           <input
             type="text"
             name={name}
@@ -108,7 +108,7 @@ const DropdownInner = ({
             onFocus={handleInputFocus}
             onBlur={onBlur}
             autoComplete="off"
-            className="w-full bg-transparent text-sm outline-none placeholder:text-gray-400 disabled:cursor-not-allowed"
+            className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed"
           />
         </div>
 
@@ -116,12 +116,12 @@ const DropdownInner = ({
           <ul
             role="listbox"
             className={twMerge(
-              'absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-200',
-              'bg-white shadow-lg'
+              'absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-border',
+              'bg-popover text-popover-foreground shadow-lg'
             )}
           >
             {filteredOptions.length === 0 ? (
-              <li className="px-3 py-2 text-sm text-gray-500">
+              <li className="px-3 py-2 text-sm text-muted-foreground">
                 No results found
               </li>
             ) : (
@@ -137,8 +137,8 @@ const DropdownInner = ({
                       handleOptionSelect(option)
                     }}
                     className={twMerge(
-                      'cursor-pointer px-3 py-2 text-sm hover:bg-gray-100',
-                      isSelected && 'bg-blue-50 font-medium text-blue-700'
+                      'cursor-pointer px-3 py-2 text-sm hover:bg-secondary hover:text-secondary-foreground',
+                      isSelected && 'bg-primary/10 font-medium text-primary'
                     )}
                   >
                     {option.label}
@@ -151,7 +151,7 @@ const DropdownInner = ({
       </div>
 
       {hasError && errorMessage && (
-        <p className="text-xs text-red-500">{errorMessage}</p>
+        <p className="text-xs text-destructive">{errorMessage}</p>
       )}
     </div>
   )

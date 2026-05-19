@@ -17,8 +17,8 @@ export type BaseProps = {
 export type ControlledProps = BaseProps & {
   useFormContext?: false
   name?: string
-  value?: string
-  onChange?: (value: string) => void
+  value: string
+  onChange: (value: string) => void
   hasError?: boolean
 }
 
