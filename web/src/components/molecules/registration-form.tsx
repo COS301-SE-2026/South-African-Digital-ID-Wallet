@@ -9,12 +9,19 @@ export const RegistrationForm = ({
 }: Readonly<RegistrationFormProps>) => {
   const [idnumber, setIdnumber] = React.useState('')
   const [password, setPassword] = React.useState('')
+  const [confirmPassword, setConfirmPassword] = React.useState('')
   const [username, setUsername] = React.useState('')
+  const [passwordError, setPasswordError] = React.useState('')
 
   const handleSubmit: NonNullable<React.ComponentProps<'form'>['onSubmit']> = (
     e
   ) => {
     e.preventDefault()
+    if (password !== confirmPassword) {
+      setPasswordError('Passwords do not match')
+      return
+    }
+    setPasswordError('')
     const data = { idnumber, password, username }
     onSubmitAction?.(data)
   }
@@ -58,6 +65,27 @@ export const RegistrationForm = ({
           className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
+      </div>
+
+      <div>
+        <label className="block text-lg font-bold text-primary-green md:text-xl">
+          Re-enter Password:
+        </label>
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => {
+            setConfirmPassword(e.target.value)
+            setPasswordError('')
+          }}
+          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
+          required
+        />
+        {passwordError && (
+          <p className="mt-2 text-sm text-red-600 font-medium">
+            {passwordError}
+          </p>
+        )}
       </div>
 
       <div className="flex items-center justify-between">
