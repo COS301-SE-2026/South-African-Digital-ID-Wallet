@@ -1,2 +1,6 @@
 export * from './login-card'
 export * from './auth-sidebar'
+export * from './app-sidebar'
+export * from './app-top-bar'
+export * from './manage-user-account'
+export * from './security-recovery-page'
