@@ -218,6 +218,49 @@ export default function OnboardCitizenPage() {
             >
               Create Pending FlashID Account
             </Button>
+            <Button
+              className="w-full"
+              onClick={sendActivationCode}
+              disabled={!accountCreated}
+            >
+              <Send className="mr-2 h-4 w-4" />
+              Send Activation Code
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Audit Log Preview</CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <div className="rounded-xl border bg-muted/40 p-4 text-sm">
+              {accountCreated ? (
+                <div className="space-y-2">
+                  <p>
+                    <strong>Action:</strong> Citizen onboarding initiated
+                  </p>
+                  <p>
+                    <strong>Actor:</strong> Home Affairs Official
+                  </p>
+                  <p>
+                    <strong>Citizen:</strong> {record?.fullName}
+                  </p>
+                  <p>
+                    <strong>Status:</strong> Pending activation
+                  </p>
+                  <p>
+                    <strong>Timestamp:</strong> {new Date().toLocaleString()}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-muted-foreground">
+                  Audit log will appear once a pending FlashID account is
+                  created.
+                </p>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
