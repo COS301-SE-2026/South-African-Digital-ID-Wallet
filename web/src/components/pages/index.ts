@@ -1,2 +1,2 @@
 export * from './login-page'
-export * from './registration-page'
+export * from './citizen/citizen-registration-page'

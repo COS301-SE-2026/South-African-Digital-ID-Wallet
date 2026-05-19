@@ -16,8 +16,6 @@ import {
 
 import { useState } from 'react'
 
-import { usePathname } from 'next/navigation'
-
 import Image from 'next/image'
 import Link from 'next/link'
 import FlashIdWhite from '@/assets/images/FlashID-white.png'
@@ -51,7 +49,6 @@ export const AppSidebar = ({
   user,
 }: Readonly<AppSidebarProps>) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const pathname = usePathname()
 
   return (
     <aside
@@ -105,7 +102,7 @@ export const AppSidebar = ({
             )}
 
             <div className="space-y-2">
-              {section.items.map((item, index) => {
+              {section.items.map((item) => {
                 const Icon = sidebarIcons[item.icon]
 
                 {
