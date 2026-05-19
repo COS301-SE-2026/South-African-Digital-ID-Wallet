@@ -39,6 +39,14 @@ export const RegisterInstitutionForm = () => {
       </div>
       <div className="w-full">
         <TextField
+          name="verificationNumber"
+          label="Verification Number"
+          placeholder="Enter verification number"
+          required
+        />
+      </div>
+      <div className="w-full">
+        <TextField
           name="adminId"
           label="Admin ID"
           placeholder="Enter admin ID"
