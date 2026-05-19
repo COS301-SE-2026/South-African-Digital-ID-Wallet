@@ -56,7 +56,7 @@ export function RegistrationSidebar() {
               High-grade security
             </Title>
             <Subtitle subtitleSize="sm" className="text-clean-white/70">
-              Your data is encrypted and protected.
+              Your registration details stay encrypted and safe.
             </Subtitle>
           </div>
         </div>
@@ -68,7 +68,7 @@ export function RegistrationSidebar() {
               Biometric access
             </Title>
             <Subtitle subtitleSize="sm" className="text-clean-white/70">
-              Your data is encrypted and protected.
+              Sign in faster with secure identity verification.
             </Subtitle>
           </div>
         </div>
@@ -80,7 +80,7 @@ export function RegistrationSidebar() {
               You&apos;re in control
             </Title>
             <Subtitle subtitleSize="sm" className="text-clean-white/70">
-              Your data is encrypted and protected.
+              Choose when and where your credentials are shared.
             </Subtitle>
           </div>
         </div>
