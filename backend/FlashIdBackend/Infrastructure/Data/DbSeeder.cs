@@ -355,7 +355,7 @@ public static class DbSeeder
                 Email = email,
                 PhoneNumber = phone,
                 Username = username,
-                PasswordHash = "password123",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
                 FailedLoginAttempts = 0,
                 LockoutUntil = null,
                 LastLoginAt = null,
