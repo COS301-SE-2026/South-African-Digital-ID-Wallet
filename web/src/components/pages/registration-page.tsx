@@ -1,10 +1,10 @@
-import { AuthSidebar, RegistrationCard } from '@/components/organisms'
+import { RegistrationSidebar, RegistrationCard } from '@/components/organisms'
 
 export const RegistrationPage = () => {
   return (
     <main className={'min-h-screen bg-cream-background text-deep-green'}>
       <div className={'flex min-h-screen flex-col lg:flex-row'}>
-        <AuthSidebar />
+        <RegistrationSidebar />
         <div
           className={
             'flex flex-1 items-center justify-center px-6 py-10 sm:px-8 lg:px-10 xl:px-14'

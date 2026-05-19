@@ -12,49 +12,8 @@ export const RegistrationForm = ({
   const [confirmPassword, setConfirmPassword] = React.useState('')
   const [username, setUsername] = React.useState('')
 
-  const validateUsername = (
-    value: string
-  ): { isValid: boolean; errors: string[] } => {
-    const errors: string[] = []
-    if (value.length < 10) {
-      errors.push('• At least 10 characters')
-    }
-    if (!/[A-Z]/.test(value)) {
-      errors.push('• At least one capital letter (A-Z)')
-    }
-    if (!/[a-z]/.test(value)) {
-      errors.push('• At least one lowercase letter (a-z)')
-    }
-    if (!/[0-9]/.test(value)) {
-      errors.push('• At least one numerical digit (0-9)')
-    }
-    if (!/[!@#$%^&*_+\-=.<>?~]/.test(value)) {
-      errors.push('• At least one special character: !@#$%^&*_-+=.<>?~')
-    }
-    return {
-      isValid: errors.length === 0,
-      errors: errors,
-    }
-  }
-
   const usernameRequirementStatuses = [
-    { label: 'At least 10 characters', met: username.length >= 10 },
-    {
-      label: 'At least one capital letter (A-Z)',
-      met: /[A-Z]/.test(username),
-    },
-    {
-      label: 'At least one lowercase letter (a-z)',
-      met: /[a-z]/.test(username),
-    },
-    {
-      label: 'At least one numerical digit (0-9)',
-      met: /[0-9]/.test(username),
-    },
-    {
-      label: 'At least one special character: !@#$%^&*_-+=.<>?~',
-      met: /[!@#$%^&*_+\-=.<>?~]/.test(username),
-    },
+    { label: 'At least 8 characters', met: username.length >= 8 },
   ]
 
   const passwordRequirementStatuses = [
@@ -92,10 +51,9 @@ export const RegistrationForm = ({
     e
   ) => {
     e.preventDefault()
-    const usernameValidation = validateUsername(username)
     const isFormValid =
       idRequirementStatuses.every((item) => item.met) &&
-      usernameValidation.isValid &&
+      usernameRequirementStatuses.every((item) => item.met) &&
       passwordRequirementStatuses.every((item) => item.met) &&
       confirmPasswordRequirementStatuses.every((item) => item.met)
 
@@ -111,40 +69,18 @@ export const RegistrationForm = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-lg font-bold text-primary-green md:text-xl">
-          ID Number:
+          ID number:
         </label>
         <input
           type="text"
           value={idnumber}
           onChange={(e) => setIdnumber(e.target.value)}
+          placeholder="Enter your ID number"
           className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
         <div className="mt-2 space-y-1 text-sm">
           {idRequirementStatuses.map((item) => (
-            <div
-              key={item.label}
-              className={item.met ? 'text-success-green' : 'text-red-600'}
-            >
-              • {item.label}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-lg font-bold text-primary-green md:text-xl">
-          Username:
-        </label>
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
-          required
-        />
-        <div className="mt-2 space-y-1 text-sm">
-          {usernameRequirementStatuses.map((item) => (
             <div
               key={item.label}
               className={item.met ? 'text-success-green' : 'text-red-600'}
@@ -163,6 +99,7 @@ export const RegistrationForm = ({
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter your password"
           className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
@@ -180,17 +117,42 @@ export const RegistrationForm = ({
 
       <div>
         <label className="block text-lg font-bold text-primary-green md:text-xl">
-          Re-enter Password:
+          Verify password:
         </label>
         <input
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="Re-enter your password"
           className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
         <div className="mt-2 space-y-1 text-sm">
           {confirmPasswordRequirementStatuses.map((item) => (
+            <div
+              key={item.label}
+              className={item.met ? 'text-success-green' : 'text-red-600'}
+            >
+              • {item.label}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-lg font-bold text-primary-green md:text-xl">
+          Username:
+        </label>
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Enter your username"
+          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
+          required
+        />
+        <div className="mt-2 space-y-1 text-sm">
+          {usernameRequirementStatuses.map((item) => (
             <div
               key={item.label}
               className={item.met ? 'text-success-green' : 'text-red-600'}
@@ -207,7 +169,7 @@ export const RegistrationForm = ({
           type="submit"
         >
           <User className="h-5 w-5" />
-          Register
+          Create account
         </button>
       </div>
     </form>
