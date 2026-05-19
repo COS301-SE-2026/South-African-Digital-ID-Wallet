@@ -13,6 +13,8 @@ export const RegistrationForm = ({
   const [confirmPassword, setConfirmPassword] = React.useState('')
   const [username, setUsername] = React.useState('')
 
+  const stripSpaces = (value: string) => value.replace(/\s+/g, '')
+
   const usernameRequirementStatuses = [
     { label: 'At least 8 characters', met: username.length >= 8 },
   ]
@@ -77,7 +79,10 @@ export const RegistrationForm = ({
           <input
             type="text"
             value={idnumber}
-            onChange={(e) => setIdnumber(e.target.value)}
+            onChange={(e) => setIdnumber(stripSpaces(e.target.value))}
+            onKeyDown={(e) => {
+              if (e.key === ' ') e.preventDefault()
+            }}
             placeholder="Enter your ID number"
             className="w-full rounded-md border border-border-grey py-3 pl-11 pr-4 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
             required
@@ -104,7 +109,10 @@ export const RegistrationForm = ({
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setPassword(stripSpaces(e.target.value))}
+            onKeyDown={(e) => {
+              if (e.key === ' ') e.preventDefault()
+            }}
             placeholder="Enter your password"
             className="w-full rounded-md border border-border-grey py-3 pl-11 pr-4 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
             required
@@ -131,7 +139,10 @@ export const RegistrationForm = ({
           <input
             type="password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) => setConfirmPassword(stripSpaces(e.target.value))}
+            onKeyDown={(e) => {
+              if (e.key === ' ') e.preventDefault()
+            }}
             placeholder="Re-enter your password"
             className="w-full rounded-md border border-border-grey py-3 pl-11 pr-4 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
             required
@@ -158,7 +169,10 @@ export const RegistrationForm = ({
           <input
             type="text"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => setUsername(stripSpaces(e.target.value))}
+            onKeyDown={(e) => {
+              if (e.key === ' ') e.preventDefault()
+            }}
             placeholder="Enter your username"
             className="w-full rounded-md border border-border-grey py-3 pl-11 pr-4 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
             required
