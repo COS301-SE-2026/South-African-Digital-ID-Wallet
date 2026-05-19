@@ -8,18 +8,34 @@ export const citizenNavSections: SidebarNavSection[] = [
   {
     title: 'Citizen Portal',
     items: [
-      { label: 'Dashboard', href: '/', icon: 'dashboard' },
-      { label: 'My Credentials', href: '/', icon: 'credentials' },
-      { label: 'Share QR Code', href: '/', icon: 'qr' },
-      { label: 'Notifications', href: '/', icon: 'notifications' },
+      { label: 'Dashboard', href: '/citizen', icon: 'dashboard' },
+      {
+        label: 'My Credentials',
+        href: '/under-construction',
+        icon: 'credentials',
+      },
+      { label: 'Share QR Code', href: '/under-construction', icon: 'qr' },
+      {
+        label: 'Notifications',
+        href: '/under-construction',
+        icon: 'notifications',
+      },
     ],
   },
 
   {
     title: 'Security',
     items: [
-      { label: 'Verification History', href: '/', icon: 'history' },
-      { label: 'Privacy Settings', href: '/', icon: 'settings' },
+      {
+        label: 'Verification History',
+        href: '/under-construction',
+        icon: 'history',
+      },
+      {
+        label: 'Privacy Settings',
+        href: '/under-construction',
+        icon: 'settings',
+      },
     ],
   },
 ]
@@ -42,11 +58,34 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
 export const officialsNavSections: SidebarNavSection[] = [
   {
     title: 'Officials',
-    items: [],
+    items: [
+      { label: 'Dashboard', href: '/officials', icon: 'dashboard' },
+      {
+        label: 'Onboard Citizen',
+        href: '/officials/onboard-citizen',
+        icon: 'onboard',
+      },
+      {
+        label: 'Notifications',
+        href: '/under-construction',
+        icon: 'notifications',
+      },
+    ],
   },
 
   {
     title: 'Security',
-    items: [],
+    items: [
+      {
+        label: 'Onboarding History',
+        href: '/under-construction',
+        icon: 'history',
+      },
+      {
+        label: 'Privacy Settings',
+        href: '/under-construction',
+        icon: 'settings',
+      },
+    ],
   },
 ]

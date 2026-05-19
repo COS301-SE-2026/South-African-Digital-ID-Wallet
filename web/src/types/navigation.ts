@@ -8,6 +8,7 @@ export type SidebarIconName =
   | 'settings'
   | 'users'
   | 'shield'
+  | 'onboard'
 
 export type SidebarNavItem = {
   label: string
