@@ -12,10 +12,6 @@ export const RegistrationForm = ({
   const [confirmPassword, setConfirmPassword] = React.useState('')
   const [username, setUsername] = React.useState('')
 
-  const [idError, setIdError] = React.useState('')
-  const [passwordError, setPasswordError] = React.useState('')
-  const [usernameError, setUsernameError] = React.useState('')
-
   const validateUsername = (
     value: string
   ): { isValid: boolean; errors: string[] } => {
@@ -41,35 +37,69 @@ export const RegistrationForm = ({
     }
   }
 
+  const usernameRequirementStatuses = [
+    { label: 'At least 10 characters', met: username.length >= 10 },
+    {
+      label: 'At least one capital letter (A-Z)',
+      met: /[A-Z]/.test(username),
+    },
+    {
+      label: 'At least one lowercase letter (a-z)',
+      met: /[a-z]/.test(username),
+    },
+    {
+      label: 'At least one numerical digit (0-9)',
+      met: /[0-9]/.test(username),
+    },
+    {
+      label: 'At least one special character: !@#$%^&*_-+=.<>?~',
+      met: /[!@#$%^&*_+\-=.<>?~]/.test(username),
+    },
+  ]
+
+  const passwordRequirementStatuses = [
+    { label: 'At least 10 characters', met: password.length >= 10 },
+    {
+      label: 'At least one capital letter (A-Z)',
+      met: /[A-Z]/.test(password),
+    },
+    {
+      label: 'At least one lowercase letter (a-z)',
+      met: /[a-z]/.test(password),
+    },
+    {
+      label: 'At least one numerical digit (0-9)',
+      met: /[0-9]/.test(password),
+    },
+    {
+      label: 'At least one special character: !@#$%^&*_-+=.<>?~',
+      met: /[!@#$%^&*_+\-=.<>?~]/.test(password),
+    },
+  ]
+
+  const idRequirementStatuses = [
+    { label: 'Exactly 13 characters', met: idnumber.length === 13 },
+  ]
+
+  const confirmPasswordRequirementStatuses = [
+    {
+      label: 'Must match the password above',
+      met: confirmPassword.length > 0 && confirmPassword === password,
+    },
+  ]
+
   const handleSubmit: NonNullable<React.ComponentProps<'form'>['onSubmit']> = (
     e
   ) => {
     e.preventDefault()
-    let hasError = false
-
-    if (idnumber.length !== 13) {
-      setIdError('ID number must be exactly 13 characters')
-      hasError = true
-    } else {
-      setIdError('')
-    }
-
     const usernameValidation = validateUsername(username)
-    if (!usernameValidation.isValid) {
-      setUsernameError(usernameValidation.errors.join('\n'))
-      hasError = true
-    } else {
-      setUsernameError('')
-    }
+    const isFormValid =
+      idRequirementStatuses.every((item) => item.met) &&
+      usernameValidation.isValid &&
+      passwordRequirementStatuses.every((item) => item.met) &&
+      confirmPasswordRequirementStatuses.every((item) => item.met)
 
-    if (password !== confirmPassword) {
-      setPasswordError('Passwords do not match')
-      hasError = true
-    } else {
-      setPasswordError('')
-    }
-
-    if (hasError) {
+    if (!isFormValid) {
       return
     }
 
@@ -86,16 +116,20 @@ export const RegistrationForm = ({
         <input
           type="text"
           value={idnumber}
-          onChange={(e) => {
-            setIdnumber(e.target.value)
-            setIdError('')
-          }}
+          onChange={(e) => setIdnumber(e.target.value)}
           className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
-        {idError && (
-          <p className="mt-2 text-sm text-red-600 font-medium">{idError}</p>
-        )}
+        <div className="mt-2 space-y-1 text-sm">
+          {idRequirementStatuses.map((item) => (
+            <div
+              key={item.label}
+              className={item.met ? 'text-success-green' : 'text-red-600'}
+            >
+              • {item.label}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div>
@@ -105,18 +139,20 @@ export const RegistrationForm = ({
         <input
           type="text"
           value={username}
-          onChange={(e) => {
-            setUsername(e.target.value)
-            setUsernameError('')
-          }}
+          onChange={(e) => setUsername(e.target.value)}
           className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
-        {usernameError && (
-          <div className="mt-2 text-sm text-red-600 font-medium whitespace-pre-line">
-            {usernameError}
-          </div>
-        )}
+        <div className="mt-2 space-y-1 text-sm">
+          {usernameRequirementStatuses.map((item) => (
+            <div
+              key={item.label}
+              className={item.met ? 'text-success-green' : 'text-red-600'}
+            >
+              • {item.label}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div>
@@ -130,6 +166,16 @@ export const RegistrationForm = ({
           className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
+        <div className="mt-2 space-y-1 text-sm">
+          {passwordRequirementStatuses.map((item) => (
+            <div
+              key={item.label}
+              className={item.met ? 'text-success-green' : 'text-red-600'}
+            >
+              • {item.label}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div>
@@ -139,18 +185,20 @@ export const RegistrationForm = ({
         <input
           type="password"
           value={confirmPassword}
-          onChange={(e) => {
-            setConfirmPassword(e.target.value)
-            setPasswordError('')
-          }}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
-        {passwordError && (
-          <p className="mt-2 text-sm text-red-600 font-medium">
-            {passwordError}
-          </p>
-        )}
+        <div className="mt-2 space-y-1 text-sm">
+          {confirmPasswordRequirementStatuses.map((item) => (
+            <div
+              key={item.label}
+              className={item.met ? 'text-success-green' : 'text-red-600'}
+            >
+              • {item.label}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="flex items-center justify-between">
