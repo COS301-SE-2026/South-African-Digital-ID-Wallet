@@ -5,7 +5,7 @@ import FlashIdWhite from '@/assets/images/FlashID-white.png'
 
 export function RegistrationSidebar() {
   return (
-    <div className="hidden lg:flex w-2/5 min-h-screen flex-col justify-between rounded-tr-3xl rounded-br-3xl bg-linear-to-b from-secure-night to-deep-green p-10 text-clean-white">
+    <div className="hidden lg:flex w-2/5 min-h-screen flex-col rounded-tr-3xl rounded-br-3xl bg-linear-to-b from-secure-night to-deep-green p-10 text-clean-white">
       <div>
         <div className="mb-8 flex items-center gap-4">
           <div className="rounded-2xl w-14 h-14 overflow-hidden shadow-lg">
@@ -34,7 +34,21 @@ export function RegistrationSidebar() {
         </Subtitle>
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-1 items-center justify-center py-8">
+        <div className="w-full max-w-md rounded-4xl border border-clean-white/10 bg-clean-white/8 p-6 text-center shadow-xl shadow-black/10 backdrop-blur-sm">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent-gold/15 ring-1 ring-accent-gold/30">
+            <LockKeyhole className="h-8 w-8 text-accent-gold" />
+          </div>
+          <Title titleSize="h4" className="mb-2 text-clean-white">
+            Fast & Secure registration
+          </Title>
+          <Subtitle subtitleSize="sm" className="text-clean-white/75">
+            Fast, protected registration for South African digital identity.
+          </Subtitle>
+        </div>
+      </div>
+
+      <div className="space-y-3 pt-2">
         <div className="flex items-start gap-3 rounded-3xl border border-clean-white/10 bg-clean-white/10 p-3 backdrop-blur-md">
           <Zap className="mt-1 h-10 w-6 shrink-0 text-accent-gold" />
           <div>
@@ -71,7 +85,7 @@ export function RegistrationSidebar() {
           </div>
         </div>
 
-        <div className="mt-6 flex items-start gap-3">
+        <div className="mt-6 flex items-start gap-3 pt-2">
           <LockKeyhole className="mt-1 h-10 w-6 shrink-0 text-accent-gold" />
           <div className="text-sm text-clean-white/90">
             <Subtitle subtitleSize="sm" className="text-clean-white/90">
