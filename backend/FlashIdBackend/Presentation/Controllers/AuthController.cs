@@ -1,5 +1,6 @@
 using Application.Common.Interfaces;
 using Application.Features.Auth.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
@@ -35,6 +36,7 @@ public class AuthController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
