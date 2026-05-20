@@ -28,9 +28,21 @@ public class CitizensController : ControllerBase
         {
             return BadRequest(new { error = ex.Message });
         }
-        catch (CitizenAlreadyRegisteredException ex)
+        catch (CitizenNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (CitizenAlreadyActivatedException ex)
         {
             return Conflict(new { error = ex.Message });
+        }
+        catch (InvalidActivationCodeException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (ActivationCodeExpiredException ex)
+        {
+            return BadRequest(new { error = ex.Message });
         }
         catch (UsernameTakenException ex)
         {

@@ -24,62 +24,57 @@ public class CitizenService : ICitizenService
     public async Task<RegisterCitizenResponseDto> RegisterCitizenAsync(
         RegisterCitizenRequestDto request)
     {
+        // Step 1: validate all input fields before touching the DB
         CitizenRegistrationValidator.Validate(request);
 
-        var saIdTaken = await _context.Citizens.AnyAsync(c => c.SaId == request.SaId);
-        if (saIdTaken)
-            throw new CitizenAlreadyRegisteredException(request.SaId);
+        // Step 2: find the pre-onboarded citizen record by SA ID
+        var citizen = await _context.Citizens
+            .Include(c => c.User)
+            .FirstOrDefaultAsync(c => c.SaId == request.SaId);
 
-        var usernameTaken = await _context.DomainUsers.AnyAsync(u => u.Username == request.Username);
+        if (citizen == null)
+            throw new CitizenNotFoundException(request.SaId);
+
+        // Step 3: block if already activated — prevents re-registration
+        if (citizen.IsActivated)
+            throw new CitizenAlreadyActivatedException(request.SaId);
+
+        // Step 4: check activation code is not expired before comparing value
+        if (citizen.ActivationCodeExpiresAt.HasValue &&
+            citizen.ActivationCodeExpiresAt.Value < DateTime.UtcNow)
+            throw new ActivationCodeExpiredException();
+
+        // Step 5: compare activation codes
+        if (citizen.ActivationCode != request.ActivationCode)
+            throw new InvalidActivationCodeException();
+
+        // Step 6: ensure username is not taken by a different user
+        var usernameTaken = await _context.DomainUsers
+            .AnyAsync(u => u.Username == request.Username && u.Id != citizen.UserId);
+
         if (usernameTaken)
             throw new UsernameTakenException(request.Username);
 
-        var now = DateTime.UtcNow;
-
-        var user = new User
-        {
-            Id = Guid.NewGuid(),
-            Names = string.Empty,
-            Surname = string.Empty,
-            // Unique placeholder — will be updated once the citizen's credentials are linked.
-            // SA ID is unique so this email is guaranteed unique.
-            Email = $"pending.{request.SaId}@flashid.local",
-            PhoneNumber = string.Empty,
-            Username = request.Username,
-            PasswordHash = string.Empty,
-            Role = UserRole.Citizen,
-            IsDeleted = false,
-            IsEmailVerified = false,
-            FailedLoginAttempts = 0,
-            CreatedAt = now,
-            UpdatedAt = now,
-        };
-
+        // Step 7: update the pre-existing User record with credentials
+        var user = citizen.User;
+        user.Username = request.Username;
         user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
+        user.UpdatedAt = DateTime.UtcNow;
 
-        _context.DomainUsers.Add(user);
+        // Step 8: activate the citizen and clear the used activation code
+        citizen.IsActivated = true;
+        citizen.ActivationCode = string.Empty;
+        citizen.UpdatedAt = DateTime.UtcNow;
 
-        var citizen = new Citizen
-        {
-            Id = Guid.NewGuid(),
-            SaId = request.SaId,
-            ActivationCode = string.Empty,
-            IsActivated = true,
-            UserId = user.Id,
-            CreatedAt = now,
-            UpdatedAt = now,
-        };
-
-        _context.Citizens.Add(citizen);
-
+        // Step 9: write audit log
         var auditLog = new AuditLog
         {
             Id = Guid.NewGuid(),
             EventType = AuditEventType.UserRegistered,
-            Details = $"Citizen self-registered with SA ID '{request.SaId}'.",
+            Details = $"Citizen with SA ID '{request.SaId}' completed registration via activation code.",
             IpAddress = "system",
             ActorId = user.Id,
-            CreatedAt = now,
+            CreatedAt = DateTime.UtcNow,
         };
 
         _context.AuditLogs.Add(auditLog);
