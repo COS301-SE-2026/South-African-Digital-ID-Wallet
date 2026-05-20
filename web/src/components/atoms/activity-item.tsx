@@ -1,8 +1,4 @@
-type ActivityItemProps = {
-  title: string
-  subtitle?: string
-  time?: string
-}
+import type { ActivityItemProps } from '@/types/activity-item'
 
 export const ActivityItem = ({
   title,

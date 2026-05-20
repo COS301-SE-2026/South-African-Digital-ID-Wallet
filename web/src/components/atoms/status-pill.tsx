@@ -1,9 +1,4 @@
-import type { ReactNode } from 'react'
-
-type StatusPillProps = {
-  children: ReactNode
-  intent?: 'active' | 'inactive'
-}
+import type { StatusPillProps } from '@/types/status-pill'
 
 export function StatusPill({
   children,

@@ -1,8 +1,4 @@
-type ConnectedAppItemProps = {
-  name: string
-  subtitle?: string
-  status?: 'active' | 'inactive'
-}
+import type { ConnectedAppItemProps } from '@/types/connected-app-item'
 
 export const ConnectedAppItem = ({
   name,

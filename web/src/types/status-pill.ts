@@ -1,1 +1,6 @@
-import type * as React from 'react'
+import type { ReactNode } from 'react'
+
+export type StatusPillProps = {
+  children: ReactNode
+  intent?: 'active' | 'inactive'
+}
