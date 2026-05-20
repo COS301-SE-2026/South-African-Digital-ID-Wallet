@@ -8,45 +8,7 @@ import {
   ChangePasswordModal,
   AccountTerminationModal,
 } from '@/components/molecules'
-import type { SidebarNavSection } from '@/types/navigation'
-
-const navSections: SidebarNavSection[] = [
-  {
-    title: 'Citizen Portal',
-    items: [
-      { label: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
-      { label: 'My Credentials', href: '/credentials', icon: 'credentials' },
-      { label: 'Share QR Code', href: '/share-qr', icon: 'qr' },
-      { label: 'Verifications', href: '/verifications', icon: 'users' },
-      { label: 'Notifications', href: '/notifications', icon: 'notifications' },
-    ],
-  },
-  {
-    title: 'Security',
-    items: [
-      {
-        label: 'Login & Biometrics',
-        href: '/login-biometrics',
-        icon: 'biometrics',
-      },
-      {
-        label: 'Verification History',
-        href: '/verification-history',
-        icon: 'history',
-      },
-      {
-        label: 'Privacy Settings',
-        href: '/privacy-settings',
-        icon: 'settings',
-      },
-      {
-        label: 'Security & Recovery',
-        href: '/security-recovery',
-        icon: 'shield',
-      },
-    ],
-  },
-]
+import { manageUserAccountNavSections } from '@/config/navigation'
 
 const user = {
   name: 'Unathi Tshakalisa',
@@ -60,7 +22,7 @@ export function ManageUserAccount() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <AppSidebar navSections={navSections} user={user} />
+      <AppSidebar navSections={manageUserAccountNavSections} user={user} />
 
       <main className="flex-1 p-4 flex flex-col min-h-0">
         <AppTopBar
