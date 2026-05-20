@@ -9,8 +9,9 @@ export const RegistrationCard = ({
   subtitle = 'Register for your FlashID account',
 }: Readonly<RegistrationCardProps>) => {
   return (
-    <Card className={className}>
-      <CardHeader className="space-y-2 pt-10 text-center">
+    <Card className={`flex flex-col ${className}`}>
+      {/* Header is fixed — does not scroll */}
+      <CardHeader className="shrink-0 space-y-2 pt-10 text-center">
         <Title titleSize="h1" className="text-center text-3xl md:text-4xl">
           {title}
         </Title>
@@ -19,7 +20,8 @@ export const RegistrationCard = ({
         </Subtitle>
       </CardHeader>
 
-      <CardContent className="flex flex-1 flex-col gap-6 pb-8">
+      {/* Content scrolls independently inside the fixed card */}
+      <CardContent className="flex-1 overflow-y-auto pb-8">
         <RegistrationForm />
       </CardContent>
     </Card>

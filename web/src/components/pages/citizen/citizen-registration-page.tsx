@@ -2,11 +2,12 @@ import { RegistrationSidebar, RegistrationCard } from '@/components/organisms'
 
 export const CitizenRegistrationPage = () => {
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <div className="flex min-h-screen flex-col lg:flex-row">
+    <main className="h-screen overflow-hidden bg-background text-foreground">
+      <div className="flex h-full flex-col lg:flex-row">
         <RegistrationSidebar />
-        <div className="flex flex-1 items-center justify-center px-6 py-10 sm:px-8 lg:px-10 xl:px-14">
-          <RegistrationCard className="w-full max-w-xl min-h-136 lg:min-h-152" />
+        {/* Right panel — fixed, no scroll. Card fills the padded area. */}
+        <div className="flex h-full flex-1 items-center justify-center px-6 py-8 sm:px-8 lg:px-10 xl:px-14">
+          <RegistrationCard className="h-full w-full max-w-xl" />
         </div>
       </div>
     </main>
