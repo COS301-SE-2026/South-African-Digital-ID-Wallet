@@ -14,3 +14,12 @@ export type RegisterInstitutionResponse = {
   verificationNumber: string
   createdAt: string
 }
+
+export type GetInstitutionResponse = {
+  institutionId: string
+  name: string
+  type: string
+  verificationNumber: string
+  registeredById: string
+  createdAt: string
+}
