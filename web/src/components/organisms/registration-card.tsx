@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Subtitle, Title } from '@/components/atoms'
+import { Text } from '@/components/atoms'
 import { RegistrationForm } from '@/components/molecules'
 import type { RegistrationCardProps } from '@/types/registration-card.types'
 
@@ -10,14 +10,14 @@ export const RegistrationCard = ({
 }: Readonly<RegistrationCardProps>) => {
   return (
     <Card className={`flex flex-col ${className}`}>
-      {/* Header is fixed — does not scroll */}
+      {/* Header is fixed, does not scroll */}
       <CardHeader className="shrink-0 space-y-2 pt-10 text-center">
-        <Title titleSize="h1" className="text-center text-3xl md:text-4xl">
+        <Text variant="h1" className="text-center text-3xl md:text-4xl">
           {title}
-        </Title>
-        <Subtitle subtitleSize="lg" className="text-center text-lg md:text-xl">
+        </Text>
+        <Text variant="sub-lg" className="text-center text-lg md:text-xl">
           {subtitle}
-        </Subtitle>
+        </Text>
       </CardHeader>
 
       {/* Content scrolls independently inside the fixed card */}
