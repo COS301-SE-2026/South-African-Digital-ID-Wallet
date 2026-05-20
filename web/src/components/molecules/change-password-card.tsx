@@ -14,7 +14,7 @@ export const ChangePasswordCard = () => {
       return
     }
 
-    alert('Password updated (demo)')
+    alert('Password updated demo')
   }
 
   return (
