@@ -11,6 +11,8 @@ import {
   ShieldCheck,
   Users,
   WalletCards,
+  UserRoundPen,
+  Landmark,
 } from 'lucide-react'
 
 import { useState } from 'react'
@@ -34,6 +36,8 @@ const sidebarIcons: Record<SidebarIconName, React.ElementType> = {
   settings: Settings,
   users: Users,
   shield: ShieldCheck,
+  onboard: UserRoundPen,
+  institutions: Landmark,
 }
 
 export const AppSidebar = ({
@@ -97,10 +101,10 @@ export const AppSidebar = ({
             <div className="space-y-2">
               {section.items.map((item) => {
                 const Icon = sidebarIcons[item.icon]
-                const isActive =
-                  item.href === '/'
-                    ? pathname === '/'
-                    : pathname.startsWith(item.href)
+
+                {
+                }
+                const isActive = 0
 
                 return (
                   <Link

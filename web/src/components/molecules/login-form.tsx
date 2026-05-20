@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import { User } from 'lucide-react'
+import { Button } from '@/components/atoms'
 import type { LoginFormProps } from '@/types/login-form'
 
 export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
@@ -42,14 +43,11 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
         />
       </div>
 
-      <div className="space-y-3">
-        <button
-          className="flex w-full items-center justify-center gap-2 rounded-md bg-primary-green px-4 py-3 text-base text-clean-white transition-colors hover:bg-deep-green"
-          type="submit"
-        >
+      <div className="flex items-center justify-between">
+        <Button variant="primary" type="submit">
           <User className="h-5 w-5" />
           Login
-        </button>
+        </Button>
         <a
           className="block text-center text-base text-primary-green hover:text-deep-green hover:underline"
           href="#"
