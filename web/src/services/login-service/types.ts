@@ -4,6 +4,5 @@ export type LoginFormValues = {
 }
 
 export type LoginResponse = {
-  token: string
   userId?: number
 }
