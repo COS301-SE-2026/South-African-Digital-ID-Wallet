@@ -1,6 +1,6 @@
 import { AppSidebar, RegisterInstitutionForm } from '@/components/organisms'
-import { Card, CardContent } from '@/components/ui/card'
 import { citizenNavSections } from '@/config/navigation'
+import { Card, CardContent } from '@/components/ui/card'
 
 const SIDEBAR_USER = {
   name: 'Institution',
@@ -13,9 +13,9 @@ export const RegisterInstitutionPage = () => {
     <main className="min-h-screen bg-cream-background text-deep-green">
       <div className="flex min-h-screen flex-col lg:flex-row">
         <AppSidebar navSections={citizenNavSections} user={SIDEBAR_USER} />
-        <div className="flex flex-1 items-center justify-center px-6 py-10 sm:px-8 lg:px-10 xl:px-14">
-          <Card className="w-full max-w-md">
-            <CardContent>
+        <div className="flex flex-1 p-6 sm:p-5 lg:p-5">
+          <Card className="flex w-full flex-1 items-center justify-center rounded-2xl">
+            <CardContent className="w-full max-w-xl">
               <RegisterInstitutionForm />
             </CardContent>
           </Card>
