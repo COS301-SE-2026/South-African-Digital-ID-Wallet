@@ -20,6 +20,7 @@ export type ControlledProps = BaseProps & {
   value: string
   onChange: (value: string) => void
   hasError?: boolean
+  errorMessage?: string
 }
 
 export type FormProps<T extends FieldValues> = BaseProps & {
