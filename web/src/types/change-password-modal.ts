@@ -1,1 +1,4 @@
-import type * as React from 'react'
+export type ChangePasswordModalProps = {
+  open: boolean
+  onCloseAction: () => void
+}

@@ -2,13 +2,12 @@
 
 import * as React from 'react'
 import { ChangePasswordCard } from './change-password-card'
+import type { ChangePasswordModalProps } from '@/types/change-password-modal'
 
-type Props = {
-  open: boolean
-  onCloseAction: () => void
-}
-
-export const ChangePasswordModal = ({ open, onCloseAction }: Props) => {
+export const ChangePasswordModal = ({
+  open,
+  onCloseAction,
+}: ChangePasswordModalProps) => {
   if (!open) return null
 
   return (

@@ -21,11 +21,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import FlashIdWhite from '@/assets/images/FlashID-white.png'
 
-import type {
-  SidebarNavSection,
-  SidebarUser,
-  SidebarIconName,
-} from '@/types/navigation'
+import type { SidebarNavSection, SidebarIconName } from '@/types/navigation'
+import type { AppSidebarProps } from '@/types/app-sidebar'
 
 const sidebarIcons: Record<SidebarIconName, React.ElementType> = {
   dashboard: LayoutDashboard,
@@ -37,11 +34,6 @@ const sidebarIcons: Record<SidebarIconName, React.ElementType> = {
   settings: Settings,
   users: Users,
   shield: ShieldCheck,
-}
-
-type AppSidebarProps = {
-  navSections: SidebarNavSection[]
-  user: SidebarUser
 }
 
 export const AppSidebar = ({
