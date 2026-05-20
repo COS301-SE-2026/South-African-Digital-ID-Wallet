@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Subtitle, Title } from '@/components/atoms'
 import { LoginForm } from '@/components/molecules'
-import type { LoginCardProps } from '@/types/login-card.types'
+import type { LoginCardProps } from '@/types/login-card'
 
 export const LoginCard = ({
   className,

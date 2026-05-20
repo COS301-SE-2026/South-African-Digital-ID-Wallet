@@ -1,18 +1,13 @@
 'use client'
 
 import * as React from 'react'
-
-type Props = {
-  open: boolean
-  onCloseAction: () => void
-  onConfirmAction: () => void
-}
+import type { AccountTerminationModalProps } from '@/types/account-termination-modal'
 
 export const AccountTerminationModal = ({
   open,
   onCloseAction,
   onConfirmAction,
-}: Props) => {
+}: AccountTerminationModalProps) => {
   if (!open) return null
 
   return (

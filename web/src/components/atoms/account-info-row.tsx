@@ -1,8 +1,4 @@
-type AccountInfoRowProps = {
-  label: string
-  value: React.ReactNode
-  border?: boolean
-}
+import type { AccountInfoRowProps } from '@/types/account-info-row'
 
 export const AccountInfoRow = ({
   label,

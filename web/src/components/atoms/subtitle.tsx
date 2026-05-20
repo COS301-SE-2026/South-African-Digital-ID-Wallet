@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
-import type { SubtitleProps } from '@/types/subtitle.types'
+import type { SubtitleProps } from '@/types/subtitle'
 
 const subtitleSizeClasses: Record<
   NonNullable<SubtitleProps['subtitleSize']>,

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
-import type { TitleProps } from '@/types/title.types'
+import type { TitleProps } from '@/types/title'
 
 const titleSizeClasses: Record<NonNullable<TitleProps['titleSize']>, string> = {
   h1: 'text-3xl md:text-4xl',
