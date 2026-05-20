@@ -1,10 +1,13 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { AppSidebar } from '../organisms/app-sidebar'
-import { AppTopBar } from '../organisms/app-top-bar'
-import { officialsNavSections } from '@/config/navigation'
-import { defaultPageHeader, pageHeaders } from '@/config/page-headers'
+import { AppSidebar } from '../../organisms/app-sidebar/app-sidebar'
+import { AppTopBar } from '../../organisms/app-top-bar/app-top-bar'
+import { officialsNavSections } from '@/config/navigation/navigation'
+import {
+  defaultPageHeader,
+  pageHeaders,
+} from '@/config/page-headers/page-headers'
 
 {
   /* TODO : Update navbar collection and mock user data as login implemented and session management added :) */
