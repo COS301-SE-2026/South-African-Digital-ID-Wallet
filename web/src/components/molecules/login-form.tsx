@@ -4,15 +4,36 @@ import * as React from 'react'
 import { User } from 'lucide-react'
 import { Button } from '@/components/atoms'
 import type { LoginFormProps } from '@/types/login-form.types'
+import { useMutation } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
+import { useRouter } from 'next/navigation'
+import { loginService } from '@/services/login-service'
 
 export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
 
+  const router = useRouter()
+
+  const loginMutation = useMutation({
+    mutationFn: (formValues: { email: string; password: string }) =>
+      loginService.login(formValues),
+    onSuccess: (data) => {
+      toast.success('Logged in')
+      router.push('/citizen')
+    },
+    onError: () => {
+      toast.error('Login failed')
+    },
+  })
+
+  const isLoading = loginMutation.status === 'pending'
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const data = { email, password }
     onSubmitAction?.(data)
+    loginMutation.mutate(data)
   }
 
   return (
@@ -44,8 +65,12 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
       </div>
 
       <div className="flex items-center justify-between">
-        <Button variant="primary" type="submit">
-          <User className="h-5 w-5" />
+        <Button
+          variant="primary"
+          type="submit"
+          LeftIcon={User}
+          isLoading={isLoading}
+        >
           Login
         </Button>
         <a
