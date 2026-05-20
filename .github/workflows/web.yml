@@ -35,9 +35,8 @@ jobs:
         run: pnpm run build
         working-directory: ./web
 
-      - name: Run tests with coverage
-        run: pnpm test -- --coverage
-        working-directory: ./web
+      - name: Run web tests with coverage
+        run: pnpm -w run test:web -- --coverage
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

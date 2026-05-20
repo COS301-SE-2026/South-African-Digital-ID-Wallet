@@ -12,6 +12,7 @@
     "lint:web": "pnpm --filter ./web lint",
     "format:web": "pnpm --filter ./web format",
     "type-check:web": "pnpm --filter ./web type-check",
+    "test:web": "pnpm --filter ./web run test",
     "postinstall": "lefthook install",
 
     "install:backend": "pnpm --filter ./backend install",
