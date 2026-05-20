@@ -12,6 +12,7 @@ import {
   Users,
   WalletCards,
   UserRoundPen,
+  Landmark,
 } from 'lucide-react'
 
 import { useState } from 'react'
@@ -39,6 +40,7 @@ const sidebarIcons: Record<SidebarIconName, React.ElementType> = {
   users: Users,
   shield: ShieldCheck,
   onboard: UserRoundPen,
+  institutions: Landmark,
 }
 
 type AppSidebarProps = {

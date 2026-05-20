@@ -1,7 +1,7 @@
 'use client'
 
 import { type SyntheticEvent, useState } from 'react'
-import { User } from 'lucide-react'
+import { Landmark } from 'lucide-react'
 import { Button, Text } from '@/components/atoms'
 import { TextField, Dropdown } from '@/components/molecules'
 
@@ -53,7 +53,7 @@ export const RegisterInstitutionForm = () => {
       <Button
         type="submit"
         variant="primary"
-        LeftIcon={User}
+        LeftIcon={Landmark}
         iconClassName="h-5 w-5"
         className="w-full lg:w-full"
       >

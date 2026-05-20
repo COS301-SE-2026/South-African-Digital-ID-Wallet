@@ -51,7 +51,7 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
       {
         label: 'Upload Institution',
         href: '/gov-admin/upload-institution',
-        icon: 'users',
+        icon: 'institutions',
       },
       {
         label: 'Notifications',
