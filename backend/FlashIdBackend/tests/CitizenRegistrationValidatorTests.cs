@@ -9,9 +9,9 @@ public class CitizenRegistrationValidatorTests
     // mock data
     private static RegisterCitizenRequestDto ValidRequest() => new()
     {                                      // registration requirements
-        SaId           = "0001015009087",  // 13 digits
-        Username       = "testuser",       // 8+ chars
-        Password       = "SecureP@ss1",   // 10+ chars, upper, lower, digit, special
+        SaId = "0001015009087",  // 13 digits
+        Username = "testuser",       // 8+ chars
+        Password = "SecureP@ss1",   // 10+ chars, upper, lower, digit, special
         ActivationCode = "abc12345",       // non-empty
     };
 
