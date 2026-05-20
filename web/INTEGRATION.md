@@ -1,6 +1,6 @@
 # Frontend ↔ Backend Integration Guide
 
-This will explain how the frontend communicate to the backend API. Follow this pattern for every new feature so the team's code stays consistent.
+This explains how the Next.js frontend talks to the backend API. Follow this pattern for every new feature so the team's code stays consistent.
 
 The integration layer lives under `src/services/` and is organised by feature. Each feature gets its own folder with five small files.
 
@@ -8,9 +8,71 @@ The integration layer lives under `src/services/` and is organised by feature. E
 
 # Tech Stack
 
+- Next.js 16 (App Router)
+- React 19
 - Axios — HTTP client
 - TanStack React Query — data fetching and caching
+- React Hot Toast — success and error notifications
 - TypeScript
+
+All dependencies are already installed in the project. No setup steps needed beyond the provider files below.
+
+---
+
+# One-Time Setup
+
+## React Query Provider
+
+React Query needs a `QueryClientProvider` wrapping the app. Because it uses hooks, this must be a client component.
+
+Create `src/app/providers.tsx`:
+
+```tsx
+'use client'
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { Toaster } from 'react-hot-toast'
+import { useState } from 'react'
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient())
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <Toaster position="top-right" />
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  )
+}
+```
+
+Then wrap the app in `src/app/layout.tsx`:
+
+```tsx
+import { Providers } from './providers'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  )
+}
+```
+
+## Environment Variables
+
+Add the API URL to `.env.local`:
+
+```txt
+NEXT_PUBLIC_API_URL=http://localhost:8080
+```
+
+The `NEXT_PUBLIC_` prefix is required so the variable is available in the browser.
 
 ---
 
@@ -50,7 +112,7 @@ src/services/
 The shape the backend sends is usually different from the shape the form wants. So we put a small translation layer in the middle.
 
 Component -> Service -> Backend
-Component <- Service <- Backend 
+Component <- Service <- Backend
 
 - The component only knows about form values.
 - The service translates and makes the HTTP call.
@@ -97,9 +159,7 @@ Stores every endpoint for the feature in one place.
 Example:
 
 ```ts
-import appConfig from '@project/config'
-
-const { apiUrl } = appConfig
+const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
 export default {
   login: (): string => `${apiUrl}/auth/login`,
@@ -242,19 +302,28 @@ Steps:
 
 # Using the Service in a Component
 
-Components should never import axios directly. They should only import from the service's `index.ts`.
+Components that use `useQuery` or `useMutation` must be **client components** because React Query relies on hooks.
+
+Add `'use client'` at the top of the file.
 
 Example:
 
 ```tsx
+'use client'
+
 import { useMutation } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
+
 import { loginService, LoginFormValues } from '@/services/login-service'
 
-export default function LoginPage() {
+export function LoginForm() {
   const { mutate: doLogin, isPending } = useMutation({
     mutationFn: (formValues: LoginFormValues) => loginService.login(formValues),
-    onSuccess: (data) => {
-      console.log('Logged in!', data)
+    onSuccess: () => {
+      toast.success('Logged in')
+    },
+    onError: () => {
+      toast.error('Login failed')
     },
   })
 
@@ -268,6 +337,23 @@ export default function LoginPage() {
 }
 ```
 
+Then import the client component into a route page:
+
+```tsx
+// src/app/login/page.tsx
+import { LoginForm } from '@/components/pages/login-form'
+
+export default function LoginPage() {
+  return <LoginForm />
+}
+```
+
+### Rules
+
+- Any component using `useQuery` or `useMutation` needs `'use client'`.
+- Keep route files (`page.tsx`) as server components when possible.
+- Move client-side logic into a client component under `src/components/pages/`.
+
 ---
 
 # `useQuery` — Reading Data
@@ -276,11 +362,22 @@ Use `useQuery` when the component needs to **read** data and show it.
 
 Example:
 
-```ts
-const { data, isLoading } = useQuery({
-  queryKey: ['userList', page, pageSize],
-  queryFn: () => userService.getUserList(page, pageSize),
-})
+```tsx
+'use client'
+
+import { useQuery } from '@tanstack/react-query'
+import { userService } from '@/services/user-service'
+
+export function UserList({ page, pageSize }: { page: number; pageSize: number }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['userList', page, pageSize],
+    queryFn: () => userService.getUserList(page, pageSize),
+  })
+
+  if (isLoading) return <p>Loading...</p>
+
+  return <div>{/* render data */}</div>
+}
 ```
 
 ## What the parts mean
@@ -325,13 +422,15 @@ Unlike `useQuery`, it does not run automatically. You call `mutate()` when you w
 Example:
 
 ```ts
+import toast from 'react-hot-toast'
+
 const { mutate, isPending } = useMutation({
   mutationFn: (formValues: LoginFormValues) => loginService.login(formValues),
-  onSuccess: (data) => {
-    console.log('Success!', data)
+  onSuccess: () => {
+    toast.success('Logged in')
   },
-  onError: (err) => {
-    console.log('Failed', err)
+  onError: () => {
+    toast.error('Login failed')
   },
 })
 
@@ -352,12 +451,14 @@ When you create or update something, the cached list is out of date. Tell React 
 
 ```ts
 import { useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 const queryClient = useQueryClient()
 
 const { mutate } = useMutation({
   mutationFn: (formValues) => productService.createProduct(formValues),
   onSuccess: () => {
+    toast.success('Product created')
     queryClient.invalidateQueries({ queryKey: ['productList'] })
   },
 })
@@ -383,6 +484,19 @@ Every response is wrapped in an object. The real data is at `response.data`. Str
 ```ts
 return axios.post(url, dto).then((res) => res.data)
 ```
+
+---
+
+# React Query Devtools
+
+The devtools are already installed and mounted in the `Providers` component. A small floating icon appears at the bottom of the screen in development.
+
+Use it to:
+
+- See which queries are active.
+- Inspect cached data.
+- Manually trigger refetches.
+- Debug why a query is or is not refetching.
 
 ---
 
@@ -453,6 +567,7 @@ Only create a new service folder if the feature is genuinely separate.
 - Always return `res.data` from service functions.
 - Use `useQuery` for reads, `useMutation` for writes.
 - After a successful mutation, invalidate the related queries.
+- Any component using `useQuery` or `useMutation` needs `'use client'`.
 
 ---
 
@@ -464,6 +579,6 @@ Only create a new service folder if the feature is genuinely separate.
 4. Write `*-dto.ts` and `*-model.ts`.
 5. Write `*-service.ts`.
 6. Export everything from `index.ts`.
-7. In the component, use `useQuery` to read and `useMutation` to write.
+7. In the component, add `'use client'` and use `useQuery` to read or `useMutation` to write.
 
 Same pattern every time.
