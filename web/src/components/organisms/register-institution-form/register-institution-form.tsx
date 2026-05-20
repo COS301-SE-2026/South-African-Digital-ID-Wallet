@@ -14,7 +14,7 @@ export const RegisterInstitutionForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      <Text variant="h1" className="mb-6 text-center">
+      <Text as="h1" variant="h1" className="mb-6 text-center">
         Register Institution
       </Text>
 
