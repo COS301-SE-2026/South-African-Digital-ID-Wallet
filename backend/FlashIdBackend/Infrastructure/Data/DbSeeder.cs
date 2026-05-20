@@ -355,7 +355,7 @@ public static class DbSeeder
                 Email = email,
                 PhoneNumber = phone,
                 Username = username,
-                PasswordHash = "password123",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
                 FailedLoginAttempts = 0,
                 LockoutUntil = null,
                 LastLoginAt = null,
@@ -371,157 +371,157 @@ public static class DbSeeder
     }
 
     private static async Task SeedCredentialsAsync(AppDbContext context)
-{
-    var now = DateTime.UtcNow;
-    var rnd = new Random(99999);
-
-    // get all citizens that don't have a credential yet
-    var citizensWithoutCredentials = await context.Citizens
-        .Where(c => !context.Credentials.Any(cr => cr.CitizenId == c.Id))
-        .ToListAsync();
-
-    if (citizensWithoutCredentials.Count == 0) return;
-
-    // get an official to use as IssuedBy
-    var official = await context.Officials.FirstOrDefaultAsync();
-    var issuedBy = official?.Id.ToString() ?? "SYSTEM";
-
-    var genders = new[] { Gender.Male, Gender.Female, Gender.Other };
-    var citizenships = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
-    var nationalities = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
-    var countries = new[] { "South Africa", "Zimbabwe", "Mozambique", "Namibia" };
-    var idStatuses = new[] { IdentityDocumentStatus.Citizen, IdentityDocumentStatus.PermanentResident };
-    var licenseCodes = new[] { LicenseCode.B, LicenseCode.EB };
-
-    var credentialsToAdd = new List<Credential>();
-    var identityDocsToAdd = new List<IdentityDocument>();
-    var driversLicensesToAdd = new List<DriversLicense>();
-
-    foreach (var citizen in citizensWithoutCredentials)
     {
-        // age between 16 and 70
-        var dob = now.AddYears(-rnd.Next(16, 70)).AddDays(-rnd.Next(0, 365));
-        var gender = genders[rnd.Next(genders.Length)];
+        var now = DateTime.UtcNow;
+        var rnd = new Random(99999);
 
-        // calculate exact age
-        var age = now.Year - dob.Year;
-        if (dob > now.AddYears(-age)) age--;
+        // get all citizens that don't have a credential yet
+        var citizensWithoutCredentials = await context.Citizens
+            .Where(c => !context.Credentials.Any(cr => cr.CitizenId == c.Id))
+            .ToListAsync();
 
-        var credential = new Credential
+        if (citizensWithoutCredentials.Count == 0) return;
+
+        // get an official to use as IssuedBy
+        var official = await context.Officials.FirstOrDefaultAsync();
+        var issuedBy = official?.Id.ToString() ?? "SYSTEM";
+
+        var genders = new[] { Gender.Male, Gender.Female, Gender.Other };
+        var citizenships = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
+        var nationalities = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
+        var countries = new[] { "South Africa", "Zimbabwe", "Mozambique", "Namibia" };
+        var idStatuses = new[] { IdentityDocumentStatus.Citizen, IdentityDocumentStatus.PermanentResident };
+        var licenseCodes = new[] { LicenseCode.B, LicenseCode.EB };
+
+        var credentialsToAdd = new List<Credential>();
+        var identityDocsToAdd = new List<IdentityDocument>();
+        var driversLicensesToAdd = new List<DriversLicense>();
+
+        foreach (var citizen in citizensWithoutCredentials)
         {
-            Id = Guid.NewGuid(),
-            Gender = gender,
-            Status = CredentialStatus.Active,
-            // Signature max 1024 - use a guid based string
-            Signature = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"),
-            // IssuedBy max 256
-            IssuedBy = issuedBy,
-            DateOfBirth = dob,
-            CitizenId = citizen.Id,
-            CreatedAt = now,
-            UpdatedAt = now
-        };
-        credentialsToAdd.Add(credential);
+            // age between 16 and 70
+            var dob = now.AddYears(-rnd.Next(16, 70)).AddDays(-rnd.Next(0, 365));
+            var gender = genders[rnd.Next(genders.Length)];
 
-        // every citizen 16+ gets an identity document
-        identityDocsToAdd.Add(new IdentityDocument
-        {
-            Id = Guid.NewGuid(),
-            Citizenship = citizenships[rnd.Next(citizenships.Length)],
-            CountryOfBirth = countries[rnd.Next(countries.Length)],
-            Nationality = nationalities[rnd.Next(nationalities.Length)],
-            Status = idStatuses[rnd.Next(idStatuses.Length)],
-            CredentialId = credential.Id,
-            CreatedAt = now,
-            UpdatedAt = now
-        });
+            // calculate exact age
+            var age = now.Year - dob.Year;
+            if (dob > now.AddYears(-age)) age--;
 
-        // only citizens 18+ get a drivers license
-        if (age >= 18)
-        {
-            var startDate = now.AddYears(-rnd.Next(1, 10));
-            driversLicensesToAdd.Add(new DriversLicense
+            var credential = new Credential
             {
                 Id = Guid.NewGuid(),
-                // LicenseNumber max 13 chars
-                LicenseNumber = Guid.NewGuid().ToString("N").Substring(0, 13).ToUpper(),
-                // LicenseCode max 3 chars - B or EB from enum
-                LicenseCode = licenseCodes[rnd.Next(licenseCodes.Length)],
-                // Restrictions max 2 chars
-                Restrictions = "00",
-                StartDate = startDate,
-                ExpiryDate = startDate.AddYears(5),
+                Gender = gender,
+                Status = CredentialStatus.Active,
+                // Signature max 1024 - use a guid based string
+                Signature = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"),
+                // IssuedBy max 256
+                IssuedBy = issuedBy,
+                DateOfBirth = dob,
+                CitizenId = citizen.Id,
+                CreatedAt = now,
+                UpdatedAt = now
+            };
+            credentialsToAdd.Add(credential);
+
+            // every citizen 16+ gets an identity document
+            identityDocsToAdd.Add(new IdentityDocument
+            {
+                Id = Guid.NewGuid(),
+                Citizenship = citizenships[rnd.Next(citizenships.Length)],
+                CountryOfBirth = countries[rnd.Next(countries.Length)],
+                Nationality = nationalities[rnd.Next(nationalities.Length)],
+                Status = idStatuses[rnd.Next(idStatuses.Length)],
                 CredentialId = credential.Id,
                 CreatedAt = now,
                 UpdatedAt = now
             });
+
+            // only citizens 18+ get a drivers license
+            if (age >= 18)
+            {
+                var startDate = now.AddYears(-rnd.Next(1, 10));
+                driversLicensesToAdd.Add(new DriversLicense
+                {
+                    Id = Guid.NewGuid(),
+                    // LicenseNumber max 13 chars
+                    LicenseNumber = Guid.NewGuid().ToString("N").Substring(0, 13).ToUpper(),
+                    // LicenseCode max 3 chars - B or EB from enum
+                    LicenseCode = licenseCodes[rnd.Next(licenseCodes.Length)],
+                    // Restrictions max 2 chars
+                    Restrictions = "00",
+                    StartDate = startDate,
+                    ExpiryDate = startDate.AddYears(5),
+                    CredentialId = credential.Id,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                });
+            }
+        }
+
+        await context.Credentials.AddRangeAsync(credentialsToAdd);
+        await context.SaveChangesAsync();
+
+        await context.IdentityDocuments.AddRangeAsync(identityDocsToAdd);
+        await context.SaveChangesAsync();
+
+        if (driversLicensesToAdd.Count > 0)
+        {
+            await context.DriversLicenses.AddRangeAsync(driversLicensesToAdd);
+            await context.SaveChangesAsync();
         }
     }
-
-    await context.Credentials.AddRangeAsync(credentialsToAdd);
-    await context.SaveChangesAsync();
-
-    await context.IdentityDocuments.AddRangeAsync(identityDocsToAdd);
-    await context.SaveChangesAsync();
-
-    if (driversLicensesToAdd.Count > 0)
+    private static async Task SeedUserPreferencesAsync(AppDbContext context)
     {
-        await context.DriversLicenses.AddRangeAsync(driversLicensesToAdd);
+        var now = DateTime.UtcNow;
+        var rnd = new Random(11111);
+
+        // get all users that don't have preferences yet
+        // UserPreferences has unique index on UserId so one per user only
+        var usersWithoutPreferences = await context.DomainUsers
+            .Where(u => !context.UserPreferences.Any(up => up.UserId == u.Id))
+            .ToListAsync();
+
+        if (usersWithoutPreferences.Count == 0) return;
+
+        var themes = new[] { Theme.Light, Theme.Dark, Theme.System };
+
+        var preferencesToAdd = usersWithoutPreferences.Select(u => new UserPreferences
+        {
+            Id = Guid.NewGuid(),
+            // PreferredName max 100 chars
+            PreferredName = u.Names,
+            Theme = themes[rnd.Next(themes.Length)],
+            PreferredDisclosure = rnd.Next(2) == 0,
+            UserId = u.Id,
+            CreatedAt = now,
+            UpdatedAt = now
+        }).ToList();
+
+        await context.UserPreferences.AddRangeAsync(preferencesToAdd);
         await context.SaveChangesAsync();
     }
-}
-    private static async Task SeedUserPreferencesAsync(AppDbContext context)
-{
-    var now = DateTime.UtcNow;
-    var rnd = new Random(11111);
 
-    // get all users that don't have preferences yet
-    // UserPreferences has unique index on UserId so one per user only
-    var usersWithoutPreferences = await context.DomainUsers
-        .Where(u => !context.UserPreferences.Any(up => up.UserId == u.Id))
-        .ToListAsync();
-
-    if (usersWithoutPreferences.Count == 0) return;
-
-    var themes = new[] { Theme.Light, Theme.Dark, Theme.System };
-
-    var preferencesToAdd = usersWithoutPreferences.Select(u => new UserPreferences
+    private static async Task SeedAuditLogsAsync(AppDbContext context)
     {
-        Id = Guid.NewGuid(),
-        // PreferredName max 100 chars
-        PreferredName = u.Names,
-        Theme = themes[rnd.Next(themes.Length)],
-        PreferredDisclosure = rnd.Next(2) == 0,
-        UserId = u.Id,
-        CreatedAt = now,
-        UpdatedAt = now
-    }).ToList();
+        var now = DateTime.UtcNow;
+        var rnd = new Random(22222);
 
-    await context.UserPreferences.AddRangeAsync(preferencesToAdd);
-    await context.SaveChangesAsync();
-}
+        // only seed if no audit logs exist yet
+        if (await context.AuditLogs.AnyAsync()) return;
 
-private static async Task SeedAuditLogsAsync(AppDbContext context)
-{
-    var now = DateTime.UtcNow;
-    var rnd = new Random(22222);
+        var allUsers = await context.DomainUsers.ToListAsync();
+        if (allUsers.Count == 0) return;
 
-    // only seed if no audit logs exist yet
-    if (await context.AuditLogs.AnyAsync()) return;
-
-    var allUsers = await context.DomainUsers.ToListAsync();
-    if (allUsers.Count == 0) return;
-
-    // sample IP addresses
-    var ipAddresses = new[]
-    {
+        // sample IP addresses
+        var ipAddresses = new[]
+        {
         "102.130.10.1", "196.11.240.5", "41.21.100.3",
         "154.0.5.22", "196.25.200.8", "41.113.10.14",
         "102.65.30.9", "196.15.45.7", "41.205.20.11"
     };
 
-    // sample details per event type
-    var eventDetails = new Dictionary<AuditEventType, string[]>
+        // sample details per event type
+        var eventDetails = new Dictionary<AuditEventType, string[]>
     {
         { AuditEventType.UserRegistered, new[] { "User registered via web portal", "User registered via mobile app" } },
         { AuditEventType.UserLoggedIn, new[] { "Successful login via web", "Successful login via mobile" } },
@@ -532,34 +532,34 @@ private static async Task SeedAuditLogsAsync(AppDbContext context)
         { AuditEventType.AccountDeleted, new[] { "Account deleted by user", "Account deleted by administrator" } }
     };
 
-    var eventTypes = eventDetails.Keys.ToArray();
-    var auditLogsToAdd = new List<AuditLog>();
+        var eventTypes = eventDetails.Keys.ToArray();
+        var auditLogsToAdd = new List<AuditLog>();
 
-    foreach (var user in allUsers)
-    {
-        // give each user 2-5 audit log entries
-        var count = rnd.Next(2, 6);
-        for (int i = 0; i < count; i++)
+        foreach (var user in allUsers)
         {
-            var eventType = eventTypes[rnd.Next(eventTypes.Length)];
-            var details = eventDetails[eventType];
-
-            auditLogsToAdd.Add(new AuditLog
+            // give each user 2-5 audit log entries
+            var count = rnd.Next(2, 6);
+            for (int i = 0; i < count; i++)
             {
-                Id = Guid.NewGuid(),
-                EventType = eventType,
-                // Details is nvarchar(max) so no length limit
-                Details = details[rnd.Next(details.Length)],
-                // IpAddress max 45 chars
-                IpAddress = ipAddresses[rnd.Next(ipAddresses.Length)],
-                ActorId = user.Id,
-                CreatedAt = now.AddDays(-rnd.Next(0, 30))
-            });
-        }
-    }
+                var eventType = eventTypes[rnd.Next(eventTypes.Length)];
+                var details = eventDetails[eventType];
 
-    await context.AuditLogs.AddRangeAsync(auditLogsToAdd);
-    await context.SaveChangesAsync();
-}
+                auditLogsToAdd.Add(new AuditLog
+                {
+                    Id = Guid.NewGuid(),
+                    EventType = eventType,
+                    // Details is nvarchar(max) so no length limit
+                    Details = details[rnd.Next(details.Length)],
+                    // IpAddress max 45 chars
+                    IpAddress = ipAddresses[rnd.Next(ipAddresses.Length)],
+                    ActorId = user.Id,
+                    CreatedAt = now.AddDays(-rnd.Next(0, 30))
+                });
+            }
+        }
+
+        await context.AuditLogs.AddRangeAsync(auditLogsToAdd);
+        await context.SaveChangesAsync();
+    }
 
 }

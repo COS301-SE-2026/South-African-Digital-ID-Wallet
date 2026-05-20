@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   Users,
   WalletCards,
+  UserRoundPen,
 } from 'lucide-react'
 
 import { useState } from 'react'
@@ -37,6 +38,7 @@ const sidebarIcons: Record<SidebarIconName, React.ElementType> = {
   settings: Settings,
   users: Users,
   shield: ShieldCheck,
+  onboard: UserRoundPen,
 }
 
 type AppSidebarProps = {
