@@ -12,6 +12,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IInstitutionService, InstitutionService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<MockGovernmentRegistryService>();
 
         return services;
     }

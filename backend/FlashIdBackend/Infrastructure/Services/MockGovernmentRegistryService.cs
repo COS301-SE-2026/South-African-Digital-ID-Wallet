@@ -47,4 +47,9 @@ public class MockGovernmentRegistryService
             Status = "Active"
         }
     ];
+
+    public MockIdentityRecordDto? GetBySaId(string idNumber)
+    {
+        return MockRecords.FirstOrDefault(record => record.SaId == idNumber);
+    }
 }
