@@ -89,7 +89,7 @@ export const RegisterInstitutionForm = () => {
         <Button
           type="button"
           variant="primary"
-          className="w-full"
+          className="w-full lg:w-full"
           onClick={() => setRegisteredInstitution(null)}
         >
           Register Another Institution
