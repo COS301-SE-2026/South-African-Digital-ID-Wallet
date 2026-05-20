@@ -53,7 +53,11 @@ Then wrap the app in `src/app/layout.tsx`:
 ```tsx
 import { Providers } from './providers'
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
       <body>
@@ -368,7 +372,13 @@ Example:
 import { useQuery } from '@tanstack/react-query'
 import { userService } from '@/services/user-service'
 
-export function UserList({ page, pageSize }: { page: number; pageSize: number }) {
+export function UserList({
+  page,
+  pageSize,
+}: {
+  page: number
+  pageSize: number
+}) {
   const { data, isLoading } = useQuery({
     queryKey: ['userList', page, pageSize],
     queryFn: () => userService.getUserList(page, pageSize),
@@ -473,10 +483,10 @@ const { mutate } = useMutation({
 Axios is the HTTP client. Four methods cover almost everything:
 
 ```ts
-axios.get(url)          // read
-axios.post(url, body)   // create
-axios.put(url, body)    // update
-axios.delete(url)       // delete
+axios.get(url) // read
+axios.post(url, body) // create
+axios.put(url, body) // update
+axios.delete(url) // delete
 ```
 
 Every response is wrapped in an object. The real data is at `response.data`. Strip the wrapper at the service layer:
@@ -539,9 +549,9 @@ getProductList()
 Use camelCase strings and include every value that affects the result:
 
 ```ts
-['userList', page, pageSize]
-['productList', page, pageSize, filters]
-['userById', id]
+;['userList', page, pageSize][('productList', page, pageSize, filters)][
+  ('userById', id)
+]
 ```
 
 ---
