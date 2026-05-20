@@ -24,6 +24,11 @@ export const pageHeaders: Record<string, PageHeader> = {
     title: 'Government Admin Dashboard',
     description: 'Manage credentials, users, and platform oversight.',
   },
+
+  '/gov-admin/upload-institution': {
+    title: 'Upload Institution',
+    description: 'Register or upload an institution to the FlashID platform.',
+  },
 }
 
 export const defaultPageHeader: PageHeader = {
