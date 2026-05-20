@@ -16,46 +16,50 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label className="block text-lg font-bold text-primary-green md:text-xl">
+        <label className="block text-base font-bold text-primary-green sm:text-lg md:text-xl">
           Email:
         </label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
+          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 text-base focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
       </div>
 
       <div>
-        <label className="block text-lg font-bold text-primary-green md:text-xl">
+        <label className="block text-base font-bold text-primary-green sm:text-lg md:text-xl">
           Password:
         </label>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
+          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 text-base focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
       </div>
 
-      <div className="flex items-center justify-between">
-        <Button variant="primary" type="submit">
-          <User className="h-5 w-5" />
+      <div className="flex flex-col gap-3 pt-2">
+        <Button
+          variant="primary"
+          type="submit"
+          className="w-full lg:w-full"
+          LeftIcon={User}
+        >
           Login
         </Button>
         <a
-          className="block text-center text-base text-primary-green hover:text-deep-green hover:underline"
+          className="text-center text-sm font-medium text-primary-green hover:text-deep-green hover:underline sm:text-base"
           href="#"
         >
           Forgot password?
         </a>
         <a
-          className="block text-center text-base text-primary-green hover:text-deep-green hover:underline"
+          className="text-center text-sm font-medium text-primary-green hover:text-deep-green hover:underline sm:text-base"
           href="#"
         >
           Don&apos;t have an account? Register here.
