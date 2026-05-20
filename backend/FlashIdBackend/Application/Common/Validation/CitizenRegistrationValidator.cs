@@ -50,5 +50,8 @@ public static class CitizenRegistrationValidator
         if (!request.Password.Any(c => AllowedSpecialChars.Contains(c)))
             throw new InvalidCitizenRegistrationRequestException(
                 "Password must contain at least one special character (!@#$%^&*_-+=.<>?~).");
+
+        if (string.IsNullOrWhiteSpace(request.ActivationCode))
+            throw new InvalidCitizenRegistrationRequestException("Activation code is required.");
     }
 }
