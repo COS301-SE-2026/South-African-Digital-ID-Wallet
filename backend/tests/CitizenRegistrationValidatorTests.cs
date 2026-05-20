@@ -83,4 +83,74 @@ public class CitizenRegistrationValidatorTests
         Assert.Throws<InvalidCitizenRegistrationRequestException>(
             () => CitizenRegistrationValidator.Validate(req));
     }
+
+    // password is only 7 chars, checks that the validator rejects passwords shorter than 10, mentions "10" in the message
+    [Fact]
+    public void Validate_PasswordTooShort_ThrowsInvalidRequest()
+    {
+        var req = ValidRequest();
+        req.Password = "Short@1";   // only 7 chars
+
+        var ex = Assert.Throws<InvalidCitizenRegistrationRequestException>(
+            () => CitizenRegistrationValidator.Validate(req));
+
+        Assert.Contains("10", ex.Message);
+    }
+
+    // password has no uppercase letter, checks that the validator enforces the uppercase requirement
+    [Fact]
+    public void Validate_PasswordNoUppercase_ThrowsInvalidRequest()
+    {
+        var req = ValidRequest();
+        req.Password = "nouppercase@1";
+
+        Assert.Throws<InvalidCitizenRegistrationRequestException>(
+            () => CitizenRegistrationValidator.Validate(req));
+    }
+
+    // password has no lowercase letter, checks that the validator enforces the lowercase requirement
+    [Fact]
+    public void Validate_PasswordNoLowercase_ThrowsInvalidRequest()
+    {
+        var req = ValidRequest();
+        req.Password = "NOLOWERCASE@1";
+
+        Assert.Throws<InvalidCitizenRegistrationRequestException>(
+            () => CitizenRegistrationValidator.Validate(req));
+    }
+
+    // password has no digit, checks that the validator enforces the digit requirement
+    [Fact]
+    public void Validate_PasswordNoDigit_ThrowsInvalidRequest()
+    {
+        var req = ValidRequest();
+        req.Password = "NoDigitHere@";
+
+        Assert.Throws<InvalidCitizenRegistrationRequestException>(
+            () => CitizenRegistrationValidator.Validate(req));
+    }
+
+    // password has no special character, checks that the validator enforces the special character requirement
+    [Fact]
+    public void Validate_PasswordNoSpecialChar_ThrowsInvalidRequest()
+    {
+        var req = ValidRequest();
+        req.Password = "NoSpecialChar1";
+
+        Assert.Throws<InvalidCitizenRegistrationRequestException>(
+            () => CitizenRegistrationValidator.Validate(req));
+    }
+
+    // activation code is empty, checks that the validator requires a non-empty activation code
+    [Fact]
+    public void Validate_ActivationCodeEmpty_ThrowsInvalidRequest()
+    {
+        var req = ValidRequest();
+        req.ActivationCode = "";
+
+        var ex = Assert.Throws<InvalidCitizenRegistrationRequestException>(
+            () => CitizenRegistrationValidator.Validate(req));
+
+        Assert.Contains("Activation code", ex.Message);
+    }
 }
