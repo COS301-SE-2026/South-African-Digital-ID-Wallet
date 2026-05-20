@@ -1,7 +1,5 @@
 export * from './login-card'
-export * from './registration-card'
 export * from './auth-sidebar'
-export * from './registration-sidebar'
 export * from './app-sidebar'
 export * from './app-top-bar'
 export * from './register-institution-form/register-institution-form'
