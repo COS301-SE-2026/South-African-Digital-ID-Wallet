@@ -103,14 +103,12 @@ export const AppSidebar = ({
             )}
 
             <div className="space-y-2">
-              {section.items.map((item, index) => {
+              {section.items.map((item) => {
                 const Icon = sidebarIcons[item.icon]
-
-                {
-                  /*TODO: Update isActive when app routing implemented */
-                }
-                const isActive = 0
-                //item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+                const isActive =
+                  item.href === '/'
+                    ? pathname === '/'
+                    : pathname.startsWith(item.href)
 
                 return (
                   <Link
