@@ -8,19 +8,35 @@ import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 import { loginService } from '@/services/login-service'
+import { useUser } from '@/context/user-context'
 
 export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
 
   const router = useRouter()
+  const { setUser } = useUser()
 
   const loginMutation = useMutation({
     mutationFn: (formValues: { email: string; password: string }) =>
       loginService.login(formValues),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success('Logged in')
-      router.push('/citizen')
+      setUser({
+        userId: data.userId,
+        email,
+        role: data.role,
+        names: data.names,
+        surname: data.surname,
+      })
+      const route =
+        data.role === 'Official'
+          ? '/officials'
+          : data.role === 'GovernmentAdministrator'
+            ? '/gov-admin'
+            : '/citizen'
+
+      router.push(route)
     },
     onError: () => {
       toast.error('Login failed')

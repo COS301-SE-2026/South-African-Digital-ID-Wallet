@@ -71,7 +71,7 @@ public class AuthController : ControllerBase
             {
                 HttpOnly = true,
                 Secure = !_environment.IsDevelopment(),
-                SameSite = SameSiteMode.Lax,
+                SameSite = SameSiteMode.None,
                 Expires = result.ExpiresAt
             };
 

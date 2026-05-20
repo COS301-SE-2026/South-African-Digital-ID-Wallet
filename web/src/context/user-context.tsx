@@ -15,12 +15,14 @@ type ContextValue = {
   user: User
   loading: boolean
   refresh: () => Promise<void>
+  setUser: React.Dispatch<React.SetStateAction<User>>
 }
 
 const UserContext = createContext<ContextValue>({
   user: null,
   loading: true,
   refresh: async () => {},
+  setUser: () => {},
 })
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
@@ -61,7 +63,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, [])
 
   return (
-    <UserContext.Provider value={{ user, loading, refresh: fetchMe }}>
+    <UserContext.Provider value={{ user, loading, refresh: fetchMe, setUser }}>
       {children}
     </UserContext.Provider>
   )

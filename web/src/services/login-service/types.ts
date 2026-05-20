@@ -4,5 +4,10 @@ export type LoginFormValues = {
 }
 
 export type LoginResponse = {
-  userId?: number
+  userId: string
+  role: string
+  names: string
+  surname: string
+  token: string
+  expiresAt: string
 }

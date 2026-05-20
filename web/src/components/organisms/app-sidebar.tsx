@@ -107,12 +107,9 @@ export const AppSidebar = ({
             )}
 
             <div className="space-y-2">
-              {section.items.map((item, index) => {
+              {section.items.map((item) => {
                 const Icon = sidebarIcons[item.icon]
-
-                {
-                }
-                const isActive = 0
+                const isActive = pathname === item.href
 
                 return (
                   <Link
