@@ -66,8 +66,18 @@ const DropdownInner = ({
 
   const handleInputFocus = () => {
     if (disabled) return
-    setIsOpen(true)
-    setSearchTerm('')
+    if (!isOpen) {
+      setIsOpen(true)
+      setSearchTerm('')
+    }
+  }
+
+  const handleInputMouseDown = () => {
+    if (disabled) return
+    if (!isOpen) {
+      setIsOpen(true)
+      setSearchTerm('')
+    }
   }
 
   const handleOptionSelect = (option: DropdownOption) => {
@@ -105,6 +115,7 @@ const DropdownInner = ({
             placeholder={placeholder}
             disabled={disabled}
             onChange={handleInputChange}
+            onMouseDown={handleInputMouseDown}
             onFocus={handleInputFocus}
             onBlur={onBlur}
             autoComplete="off"
