@@ -46,12 +46,27 @@ export const citizenNavSections: SidebarNavSection[] = [
 export const governmentAdminNavSections: SidebarNavSection[] = [
   {
     title: 'Government Admin',
-    items: [],
+    items: [
+      { label: 'Dashboard', href: '/gov-admin', icon: 'dashboard' },
+      {
+        label: 'Upload Institution',
+        href: '/gov-admin/upload-institution',
+        icon: 'institutions',
+      },
+      {
+        label: 'Notifications',
+        href: '/under-construction',
+        icon: 'notifications',
+      },
+    ],
   },
 
   {
     title: 'Security',
-    items: [],
+    items: [
+      { label: 'Audit Logs', href: '/under-construction', icon: 'history' },
+      { label: 'Settings', href: '/under-construction', icon: 'settings' },
+    ],
   },
 ]
 

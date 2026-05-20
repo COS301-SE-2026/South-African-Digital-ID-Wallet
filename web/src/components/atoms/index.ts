@@ -1,2 +1,2 @@
-export * from './title'
-export * from './subtitle'
+export * from './button/button'
+export * from './text/text'
