@@ -13,16 +13,49 @@ public class AuthController : ControllerBase
     private readonly IAuthService _authService;
     private readonly ILogger<AuthController> _logger;
     private readonly IHostEnvironment _environment;
+    private readonly Infrastructure.Data.AppDbContext _db;
 
     public AuthController(
         IAuthService authService,
         ILogger<AuthController> logger,
-        IHostEnvironment environment
+        IHostEnvironment environment,
+        Infrastructure.Data.AppDbContext db
     )
     {
         _authService = authService;
         _logger = logger;
         _environment = environment;
+        _db = db;
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> Me()
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
+
+            var userId = Guid.Parse(userIdClaim);
+
+            var user = await _db.DomainUsers.FindAsync(userId);
+            if (user == null) return NotFound(new { error = "User not found." });
+
+            return Ok(new
+            {
+                userId = user.Id,
+                email = user.Email,
+                role = user.Role.ToString(),
+                names = user.Names,
+                surname = user.Surname
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error in Me endpoint");
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
     }
 
     [HttpPost("login")]
