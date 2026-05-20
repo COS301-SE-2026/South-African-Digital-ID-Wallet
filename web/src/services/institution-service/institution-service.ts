@@ -9,6 +9,11 @@ const register = (formData: RegisterInstitutionFormValues) => {
   return axios.post(url, dto).then((res: AxiosResponse) => res.data)
 }
 
-const institutionService = { register }
+const getAll = () => {
+  const url = institutionUrls.getAll()
+  return axios.get(url).then((res: AxiosResponse) => res.data)
+}
+
+const institutionService = { register, getAll }
 
 export default institutionService
