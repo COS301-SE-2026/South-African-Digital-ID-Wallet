@@ -18,7 +18,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
   const header = pageHeaders[pathname] ?? defaultPageHeader
-  const { user } = useUser()
+  const { user, loading } = useUser()
 
   const navSections =
     loading && !user
