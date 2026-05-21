@@ -22,9 +22,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import FlashIdWhite from '@/assets/images/FlashID-white.png'
+import { Button } from '@/components/atoms'
 
 import type { SidebarIconName } from '@/types/navigation'
-import type { AppSidebarProps } from '@/types/app-sidebar'
+import type { AppSidebarProps } from './types'
 
 const sidebarIcons: Record<SidebarIconName, React.ElementType> = {
   dashboard: LayoutDashboard,
@@ -67,7 +68,14 @@ export const AppSidebar = ({
                 title={user.name}
                 aria-label={`${user.name} avatar`}
               >
-                {user.initials}
+                <Image
+                  src={FlashIdWhite}
+                  alt="Flash ID logo"
+                  width={48}
+                  height={48}
+                  className="h-12 w-12 object-contain"
+                  priority
+                />
               </div>
             ) : (
               <Image
@@ -154,31 +162,20 @@ export const AppSidebar = ({
                 </p>
               </div>
             </div>
-
-            <button
-              type="button"
-              onClick={onLogout}
-              className="inline-flex items-center gap-2 rounded-full border border-clean-white/20 bg-clean-white/10 px-3 py-2 text-xs font-semibold text-clean-white transition hover:bg-clean-white/20"
-              aria-label="Logout"
-            >
-              <LogOut className="h-4 w-4" />
-              <span>Logout</span>
-            </button>
+          </div>
+          <div className="mt-2">
+            <Button onClick={onLogout} LeftIcon={LogOut}>
+              Logout
+            </Button>
           </div>
         </div>
       )}
 
       {isCollapsed && (
         <div className="mt-auto flex justify-center">
-          <button
-            type="button"
-            onClick={onLogout}
-            title="Logout"
-            aria-label="Logout"
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/30 bg-clean-white/10 text-clean-white transition hover:bg-clean-white/20"
-          >
-            <LogOut className="h-5 w-5" />
-          </button>
+          <Button onClick={onLogout} LeftIcon={LogOut}>
+            Logout
+          </Button>
         </div>
       )}
     </aside>

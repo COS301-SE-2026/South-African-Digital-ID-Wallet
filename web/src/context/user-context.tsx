@@ -77,7 +77,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await loginService.logout()
     } catch {
-      // Ignore network issues and clear local auth state anyway.
     } finally {
       if (typeof window !== 'undefined') {
         window.localStorage.clear()
