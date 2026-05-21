@@ -7,3 +7,11 @@ public class IdentityRecordNotFoundException : Exception
     {
     }
 }
+
+public class CitizenConsentRequiredException : Exception
+{
+    public CitizenConsentRequiredException()
+        : base("Citizen consent is required before onboarding.")
+    {
+    }
+}
