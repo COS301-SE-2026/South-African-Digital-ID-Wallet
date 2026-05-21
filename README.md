@@ -19,7 +19,7 @@ Smart Digital ID Wallet (SDIW) is a secure national-scale digital identity platf
 <code><img width="50" src="https://skillicons.dev/icons?i=azure" alt="Azure" title="Azure"/></code>
 </div>
 
-## 📄 Table of Contents
+## Table of Contents
 
 - [Table of Contents](#-table-of-contents)
 - [Demo Videos](#-demo-videos)
@@ -33,7 +33,7 @@ Smart Digital ID Wallet (SDIW) is a secure national-scale digital identity platf
 ---
 
 
-## 🎥 Demo Videos
+## Demo Videos
 
 - [Demo 1 Video](#)
 
@@ -45,18 +45,18 @@ Smart Digital ID Wallet (SDIW) is a secure national-scale digital identity platf
 
 ---
 
-## 📞 Contact Us
+## Contact Us
 
 Want to contact us or learn more about the project?
 
-📧 t3chtitansgo@gmail.com
+t3chtitansgo@gmail.com
 
 ---
 
-## 📑 Documentation
+## Documentation
 
 <details>
-<summary><strong>📋 Demo 1 Documentation</strong></summary>
+<summary><strong>Demo 1 Documentation</strong></summary>
 
 🔗 [SRS](docs/documentation/demo_1/srs.md) <br>
 🔗 [Brand style guide](docs/Branding_Document_v1.0.pdf) <br>
@@ -66,21 +66,21 @@ Want to contact us or learn more about the project?
 </details>
 
 <details>
-<summary><strong>📋 Demo 2 Documentation</strong></summary>
+<summary><strong>Demo 2 Documentation</strong></summary>
 
 
 
 </details>
 
 <details>
-<summary><strong>📋 Demo 3 Documentation</strong></summary>
+<summary><strong>Demo 3 Documentation</strong></summary>
 
 
 
 </details>
 
 <details>
-<summary><strong>📋 Demo 4 Documentation</strong></summary>
+<summary><strong>Demo 4 Documentation</strong></summary>
 
 
 
@@ -89,7 +89,7 @@ Want to contact us or learn more about the project?
 ---
 
 
-## 🤝 Team Profiles
+## Team Profiles
 
 <table>
   <tr>
@@ -187,7 +187,7 @@ Want to contact us or learn more about the project?
 
 ---
 
-## 📁 Git Structure
+## Git Structure
 
 Our repository follows a modular monorepo structure where different components are organised into dedicated directories.
 
@@ -210,7 +210,7 @@ Our repository follows a modular monorepo structure where different components a
 
 ---
 
-## 🌳 Branching Strategy
+## Branching Strategy
 
 We follow a structured GitFlow branching model to ensure efficient collaboration and stable releases.
 
