@@ -5,11 +5,14 @@ import { onboardCitizenDto } from './onboarding-dto'
 import { OnboardCitizenFormValues, OnboardCitizenResponse } from './types'
 
 import { IdentityRecord } from '@/types'
+import { identityRecordModel } from './onboarding-model'
 
 const retrieveIdentityRecord = (idNumber: string): Promise<IdentityRecord> => {
   const url = onboardingUrls.retrieveIdentityRecord(idNumber)
 
-  return axios.get(url).then((res: AxiosResponse<IdentityRecord>) => res.data)
+  return axios
+    .get(url)
+    .then((res: AxiosResponse) => identityRecordModel(res.data))
 }
 
 const onboardCitizen = (
