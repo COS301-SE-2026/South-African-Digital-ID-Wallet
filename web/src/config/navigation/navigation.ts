@@ -109,3 +109,41 @@ export const officialsNavSections: SidebarNavSection[] = [
     ],
   },
 ]
+
+export const manageUserAccountNavSections: SidebarNavSection[] = [
+  {
+    title: 'Citizen Portal',
+    items: [
+      { label: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
+      { label: 'My Credentials', href: '/credentials', icon: 'credentials' },
+      { label: 'Share QR Code', href: '/share-qr', icon: 'qr' },
+      { label: 'Verifications', href: '/verifications', icon: 'users' },
+      { label: 'Notifications', href: '/notifications', icon: 'notifications' },
+    ],
+  },
+  {
+    title: 'Security',
+    items: [
+      {
+        label: 'Login & Biometrics',
+        href: '/login-biometrics',
+        icon: 'biometrics',
+      },
+      {
+        label: 'Verification History',
+        href: '/verification-history',
+        icon: 'history',
+      },
+      {
+        label: 'Privacy Settings',
+        href: '/privacy-settings',
+        icon: 'settings',
+      },
+      {
+        label: 'Security & Recovery',
+        href: '/security-recovery',
+        icon: 'shield',
+      },
+    ],
+  },
+]
