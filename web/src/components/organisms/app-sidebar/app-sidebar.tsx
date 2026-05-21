@@ -68,15 +68,14 @@ export const AppSidebar = ({
                 title={user.name}
                 aria-label={`${user.name} avatar`}
               >
-                {/* <Image
+                <Image
                   src={FlashIdWhite}
                   alt="Flash ID logo"
                   width={48}
                   height={48}
                   className="h-12 w-12 object-contain"
                   priority
-                /> */}
-                {user.initials}
+                />
               </div>
             ) : (
               <Image
@@ -173,7 +172,15 @@ export const AppSidebar = ({
       )}
 
       {isCollapsed && (
-        <div className="mt-auto flex justify-center">
+        <div className="mt-auto flex flex-col items-center gap-2">
+          <div
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white"
+            title={user.name}
+            aria-label={`${user.name} avatar`}
+          >
+            {user.initials}
+          </div>
+
           <Button onClick={onLogout} LeftIcon={LogOut}>
             Logout
           </Button>
