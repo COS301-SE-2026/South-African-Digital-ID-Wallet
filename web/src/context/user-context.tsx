@@ -2,23 +2,9 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import api from '@/lib/api'
+import type { User, UserContextValue } from '@/types/user-context.types'
 
-type User = {
-  userId: string
-  email: string
-  role: string
-  names?: string
-  surname?: string
-} | null
-
-type ContextValue = {
-  user: User
-  loading: boolean
-  refresh: () => Promise<void>
-  setUser: React.Dispatch<React.SetStateAction<User>>
-}
-
-const UserContext = createContext<ContextValue>({
+const UserContext = createContext<UserContextValue>({
   user: null,
   loading: true,
   refresh: async () => {},
