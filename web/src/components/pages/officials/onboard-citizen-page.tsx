@@ -57,16 +57,30 @@ export default function OnboardCitizenPage() {
   })
 
   function retrieveIdentityRecord() {
-    setRecord({
-      idNumber,
-      fullName: 'Thando Mokoena',
-      dateOfBirth: '1998-04-12',
-      status: 'Verified',
-    })
+    if (!idNumber.trim()) {
+      toast.error('Enter an ID number first')
+      return
+    }
+
+    retrieveRecord(idNumber.trim())
   }
 
   function createPendingAccount() {
-    setAccountCreated(true)
+    if (!record) {
+      toast.error('Retrieve the citizen record first')
+      return
+    }
+
+    const nameParts = record.fullName.trim().split(' ')
+    const firstName = nameParts[0] ?? ''
+    const lastName = nameParts.slice(1).join(' ') || 'Unknown'
+
+    onboardCitizen({
+      idNumber: record.idNumber,
+      email,
+      phoneNumber: phone,
+      consentProvided: contactDetailsConsent,
+    })
   }
 
   function sendActivationCode() {
