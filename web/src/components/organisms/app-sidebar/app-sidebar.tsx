@@ -17,10 +17,9 @@ import {
 
 import { useState } from 'react'
 
-import { usePathname } from 'next/navigation'
-
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import FlashIdWhite from '@/assets/images/FlashID-white.png'
 
 import type { SidebarNavSection, SidebarIconName } from '@/types/navigation'
@@ -101,10 +100,7 @@ export const AppSidebar = ({
             <div className="space-y-2">
               {section.items.map((item) => {
                 const Icon = sidebarIcons[item.icon]
-
-                {
-                }
-                const isActive = 0
+                const isActive = pathname === item.href
 
                 return (
                   <Link

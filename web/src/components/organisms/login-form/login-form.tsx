@@ -4,15 +4,69 @@ import * as React from 'react'
 import { User } from 'lucide-react'
 import { Button } from '@/components/atoms'
 import type { LoginFormProps } from '@/types/login-form'
+import type { LoginFormProps } from '@/types/login-form.types'
+import { useMutation } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import loginService from '@/services/login-service/login-service'
+import { useUser } from '@/context/user-context'
+
+const DASHBOARD_ROUTES: Record<string, string> = {
+  citizen: '/citizen',
+  official: '/officials',
+  governmentadministrator: '/gov-admin',
+  govadmin: '/gov-admin',
+}
+
+const getDashboardRoute = (role: string) => {
+  const normalizedRole = role
+    .trim()
+    .toLowerCase()
+    .replace(/[_\s-]+/g, '')
+
+  return DASHBOARD_ROUTES[normalizedRole] ?? '/citizen'
+}
 
 export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
 
-  function handleSubmit(e: React.FormEvent) {
+  const router = useRouter()
+  const { setUser } = useUser()
+
+  const loginMutation = useMutation<
+    Awaited<ReturnType<typeof loginService.login>>,
+    Error,
+    { email: string; password: string }
+  >({
+    mutationFn: (formValues: { email: string; password: string }) =>
+      loginService.login(formValues),
+    onSuccess: async (data) => {
+      toast.success('Logged in')
+      setUser({
+        userId: data.userId,
+        email,
+        role: data.role,
+        names: data.names,
+        surname: data.surname,
+      })
+      router.push(getDashboardRoute(data.role))
+    },
+    onError: () => {
+      toast.error('Login failed')
+    },
+  })
+
+  const isLoading = loginMutation.status === 'pending'
+
+  const handleSubmit: NonNullable<React.ComponentProps<'form'>['onSubmit']> = (
+    e
+  ) => {
     e.preventDefault()
     const data = { email, password }
     onSubmitAction?.(data)
+    loginMutation.mutate(data)
   }
 
   return (
@@ -51,27 +105,32 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
         />
       </div>
 
-      <div className="flex flex-col gap-3 pt-2">
+      <div className="flex flex-col gap-3">
         <Button
           variant="primary"
           type="submit"
-          className="w-full lg:w-full"
           LeftIcon={User}
+          isLoading={isLoading}
+          className="w-full lg:w-full"
         >
           Login
         </Button>
-        <a
-          className="text-center text-sm font-medium text-primary-green hover:text-deep-green hover:underline sm:text-base"
-          href="#"
-        >
-          Forgot password?
-        </a>
-        <a
-          className="text-center text-sm font-medium text-primary-green hover:text-deep-green hover:underline sm:text-base"
-          href="#"
-        >
-          Don&apos;t have an account? Register here.
-        </a>
+
+        <div className="space-y-1 text-center text-base text-primary-green">
+          <a className="block hover:text-deep-green hover:underline" href="#">
+            Forgot password?
+          </a>
+
+          <p>
+            Don&apos;t have an account?{' '}
+            <Link
+              className="font-semibold hover:text-deep-green hover:underline"
+              href="/register"
+            >
+              Register
+            </Link>
+          </p>
+        </div>
       </div>
     </form>
   )
