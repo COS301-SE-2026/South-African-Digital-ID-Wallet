@@ -15,3 +15,11 @@ public class CitizenConsentRequiredException : Exception
     {
     }
 }
+
+public class DuplicateIdRegisteredException : Exception
+{
+    public DuplicateIdRegisteredException()
+        : base("Citizen consent is required before onboarding.")
+    {
+    }
+}
