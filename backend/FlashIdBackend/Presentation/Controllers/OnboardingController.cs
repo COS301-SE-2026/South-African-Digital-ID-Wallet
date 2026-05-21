@@ -26,8 +26,6 @@ public class OnboardingController : ControllerBase
             throw new IdentityRecordNotFoundException();
         }
 
-
-
         return Ok(record);
     }
 }
