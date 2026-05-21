@@ -1,17 +1,21 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
+import loginService from '@/services/login-service/login-service'
 import type { User, UserContextValue } from '@/types/user-context.types'
 
 const UserContext = createContext<UserContextValue>({
   user: null,
   loading: true,
   refresh: async () => {},
+  logout: async () => {},
   setUser: () => {},
 })
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
+  const router = useRouter()
   const [user, setUser] = useState<User>(null)
   const [loading, setLoading] = useState(true)
 
@@ -23,6 +27,25 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     } catch {
       setUser(null)
     } finally {
+      setLoading(false)
+    }
+  }
+
+  const logout = async () => {
+    setLoading(true)
+
+    try {
+      await loginService.logout()
+    } catch {
+      // Ignore network issues and clear local auth state anyway.
+    } finally {
+      if (typeof window !== 'undefined') {
+        window.localStorage.clear()
+        window.sessionStorage.clear()
+      }
+
+      setUser(null)
+      router.replace('/')
       setLoading(false)
     }
   }
@@ -46,10 +69,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       mounted = false
     }
-  }, [])
+  }, [setUser])
 
   return (
-    <UserContext.Provider value={{ user, loading, refresh: fetchMe, setUser }}>
+    <UserContext.Provider
+      value={{ user, loading, refresh: fetchMe, logout, setUser }}
+    >
       {children}
     </UserContext.Provider>
   )

@@ -27,15 +27,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   const header = pageHeaders[pathname] ?? defaultPageHeader
-  const { user, loading } = useUser()
+  const { user, loading, logout } = useUser()
 
-  const navSections = user
-    ? user.role === 'Official'
-      ? officialsNavSections
-      : user.role === 'GovernmentAdministrator'
-        ? governmentAdminNavSections
-        : citizenNavSections
-    : citizenNavSections
+  const navSections =
+    loading && !user
+      ? pathname.startsWith('/officials')
+        ? officialsNavSections
+        : pathname.startsWith('/gov-admin')
+          ? governmentAdminNavSections
+          : citizenNavSections
+      : user?.role === 'Official'
+        ? officialsNavSections
+        : user?.role === 'GovernmentAdministrator'
+          ? governmentAdminNavSections
+          : pathname.startsWith('/officials')
+            ? officialsNavSections
+            : pathname.startsWith('/gov-admin')
+              ? governmentAdminNavSections
+              : citizenNavSections
 
   const displayName = user
     ? `${user.names ?? ''} ${user.surname ?? ''}`.trim() || user.email
@@ -53,6 +62,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <AppSidebar
         navSections={navSections}
         user={{ name: displayName, initials, idLabel }}
+        onLogout={logout}
       />
       <div className="flex h-screen flex-1 flex-col overflow-hidden">
         <AppTopBar
