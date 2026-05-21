@@ -43,6 +43,14 @@ public class OnboardingServiceTest
 
         var citizen = context.Citizens.FirstOrDefault(c => c.SaId == request.SaId);
         var user = context.DomainUsers.FirstOrDefault(u => u.Email == request.Email);
+
+        Assert.NotNull(citizen);
+        Assert.NotNull(user);
+        Assert.Equal(request.SaId,result.SaId);
+        Assert.Equal("Pending",result.Status);
+        Assert.False(citizen!.IsActivated);
+        Assert.False(string.IsNullOrWhiteSpace(citizen.ActivationCode));
+        Assert.NotEqual(Guid.Empty, citizen.UserId);      
     }
     
 }
