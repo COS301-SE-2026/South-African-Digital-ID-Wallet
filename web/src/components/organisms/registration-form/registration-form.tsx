@@ -43,7 +43,7 @@ export const RegistrationForm = ({
   const stripSpaces = (value: string) => value.replace(/\s+/g, '')
 
   const idRequirements = [
-    { label: 'Exactly 13 digits', met: idnumber.length === 13 },
+    { label: 'Exactly 13 digits', met: /^\d{13}$/.test(idnumber) },
   ]
 
   const usernameRequirements = [
