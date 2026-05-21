@@ -14,9 +14,14 @@ const getUser = (id: number) => {
   return api.get(url).then((res) => res.data)
 }
 
+const logout = () => {
+  return api.post('/api/auth/logout').then((res) => res.data)
+}
+
 const loginService = {
   login,
   getUser,
+  logout,
 }
 
 export default loginService

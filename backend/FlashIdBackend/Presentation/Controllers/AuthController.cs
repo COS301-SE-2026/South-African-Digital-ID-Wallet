@@ -71,7 +71,10 @@ public class AuthController : ControllerBase
             {
                 HttpOnly = true,
                 Secure = !_environment.IsDevelopment(),
-                SameSite = SameSiteMode.None,
+                SameSite = _environment.IsDevelopment()
+                    ? SameSiteMode.Lax
+                    : SameSiteMode.None,
+                Path = "/",
                 Expires = result.ExpiresAt
             };
 
@@ -117,7 +120,17 @@ public class AuthController : ControllerBase
                 HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
             var result = await _authService.LogoutAsync(userId, ipAddress);
 
-            Response.Cookies.Delete("access_token");
+            Response.Cookies.Delete(
+                "access_token",
+                new CookieOptions
+                {
+                    Path = "/",
+                    Secure = !_environment.IsDevelopment(),
+                    SameSite = _environment.IsDevelopment()
+                        ? SameSiteMode.Lax
+                        : SameSiteMode.None,
+                }
+            );
             return Ok(result);
         }
         catch (Exception ex)

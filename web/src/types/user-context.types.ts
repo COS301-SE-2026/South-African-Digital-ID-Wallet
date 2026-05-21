@@ -12,5 +12,6 @@ export type UserContextValue = {
   user: User
   loading: boolean
   refresh: () => Promise<void>
+  logout: () => Promise<void>
   setUser: React.Dispatch<React.SetStateAction<User>>
 }
