@@ -14,20 +14,11 @@ import {
   pageHeaders,
 } from '@/config/page-headers/page-headers'
 
-{
-  /* TODO : Update navbar collection and mock user data as login implemented and session management added :) */
-}
-
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
-  {
-    /* This section uses the URL to determine the headers (Title and description) necessary for the page
-    Add more page titles and descriptions to config/page-headers */
-  }
-
   const header = pageHeaders[pathname] ?? defaultPageHeader
-  const { user, loading } = useUser()
+  const { user } = useUser()
 
   const navSections = user
     ? user.role === 'Official'

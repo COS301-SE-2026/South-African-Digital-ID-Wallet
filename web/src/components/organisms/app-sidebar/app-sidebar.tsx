@@ -22,7 +22,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import FlashIdWhite from '@/assets/images/FlashID-white.png'
 
-import type { SidebarNavSection, SidebarIconName } from '@/types/navigation'
+import type { SidebarIconName } from '@/types/navigation'
 import type { AppSidebarProps } from '@/types/app-sidebar'
 
 const sidebarIcons: Record<SidebarIconName, React.ElementType> = {

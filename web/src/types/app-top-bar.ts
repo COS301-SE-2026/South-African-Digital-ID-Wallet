@@ -1,5 +1,3 @@
-import type * as React from 'react'
-
 export type TopBarUser = {
   name: string
   initials: string

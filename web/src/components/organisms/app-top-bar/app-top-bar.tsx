@@ -1,5 +1,5 @@
 import { Bell, ChevronDown } from 'lucide-react'
-import type { TopBarUser, AppTopBarProps } from '@/types/app-top-bar'
+import type { AppTopBarProps } from '@/types/app-top-bar'
 
 export const AppTopBar = ({
   title,
