@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Search } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import {
   institutionService,
   GetInstitutionResponse,
 } from '@/services/institution-service'
 import { Text } from '@/components/atoms'
+import { TextField } from '@/components/molecules'
 import { Card, CardContent } from '@/components/ui/card'
 
 export const ViewInstitutionsPage = () => {
@@ -33,17 +33,13 @@ export const ViewInstitutionsPage = () => {
         Registered Institutions
       </Text>
 
-      <div className="relative w-full mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-        <input
-          type="text"
+      <div className="w-full mb-6">
+        <TextField
           placeholder="Search by name, type or verification number..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-xl border border-gray-300 pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-deep-green"
         />
       </div>
-
       {isLoading && <Text variant="sub-md">Loading institutions...</Text>}
 
       {isError && (
