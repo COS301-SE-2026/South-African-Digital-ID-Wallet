@@ -1,8 +1,15 @@
 'use client'
 
 import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 import { IdentityRecord } from '@/types'
+import {
+  OnboardCitizenFormValues,
+  onboardingService,
+} from '@/services/onboarding-service'
+
 import {
   AuditLogPreview,
   CaptureContactDetails,
@@ -20,17 +27,60 @@ export default function OnboardCitizenPage() {
   const [accountCreated, setAccountCreated] = useState(false)
   const [activationSent, setActivationSent] = useState(false)
 
+  const { mutate: retrieveRecord, isPending: isRetrievingRecord } = useMutation(
+    {
+      mutationFn: (citizenIdNumber: string) =>
+        onboardingService.retrieveIdentityRecord(citizenIdNumber),
+      onSuccess: (data) => {
+        setRecord(data)
+        setAccountCreated(false)
+        setActivationSent(false)
+        toast.success('Identity record retrieved')
+      },
+      onError: () => {
+        setRecord(null)
+        toast.error('Could not retrieve identity record')
+      },
+    }
+  )
+
+  const { mutate: onboardCitizen, isPending: isCreatingAccount } = useMutation({
+    mutationFn: (formValues: OnboardCitizenFormValues) =>
+      onboardingService.onboardCitizen(formValues),
+    onSuccess: () => {
+      setAccountCreated(true)
+      toast.success('Pending FlashID account created')
+    },
+    onError: () => {
+      toast.error('Could not create pending FlashID account')
+    },
+  })
+
   function retrieveIdentityRecord() {
-    setRecord({
-      idNumber,
-      fullName: 'Thando Mokoena',
-      dateOfBirth: '1998-04-12',
-      status: 'Verified',
-    })
+    if (!idNumber.trim()) {
+      toast.error('Enter an ID number first')
+      return
+    }
+
+    retrieveRecord(idNumber.trim())
   }
 
   function createPendingAccount() {
-    setAccountCreated(true)
+    if (!record) {
+      toast.error('Retrieve the citizen record first')
+      return
+    }
+
+    const nameParts = record.fullName.trim().split(' ')
+    const firstName = nameParts[0] ?? ''
+    const lastName = nameParts.slice(1).join(' ') || 'Unknown'
+
+    onboardCitizen({
+      idNumber: record.idNumber,
+      email,
+      phoneNumber: phone,
+      consentProvided: contactDetailsConsent,
+    })
   }
 
   function sendActivationCode() {
