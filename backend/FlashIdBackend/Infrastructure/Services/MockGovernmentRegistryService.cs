@@ -45,7 +45,28 @@ public class MockGovernmentRegistryService
             Gender = "Male",
             Nationality = "South African",
 
+        },
+        new()
+        {
+            SaId = "0000007590723",
+            Names = "Master",
+            Surname = "Oogway",
+            DateOfBirth = new DateTime(1959, 07, 23),
+            Gender = "Male",
+            Nationality = "South African",
+
+        },
+        new()
+        {
+            SaId = "0000007010603",
+            Names = "Tigress",
+            Surname = "Feline",
+            DateOfBirth = new DateTime(2001, 06, 03),
+            Gender = "Male",
+            Nationality = "South African",
+
         }
+
     ];
 
     public MockIdentityRecordDto? GetBySaId(string idNumber)
