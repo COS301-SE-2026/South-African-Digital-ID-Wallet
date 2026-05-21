@@ -56,6 +56,22 @@ public class OnboardingService : IOnboardingService
 
         var activationCode = Random.Shared.Next(100000, 999999).ToString();
 
+        var citizen = new Citizen
+        {
+            Id = Guid.NewGuid(),
+            SaId = identityRecord.SaId,
+            UserId = user.Id,
+            IsActivated = false,
+            ActivationCode = activationCode,
+            ActivationCodeExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        _context.DomainUsers.Add(user);
+        _context.Citizens.Add(citizen);
+        _context.SaveChanges();
+
         return new OnboardCitizenResponse
         {
             CitizenId = Guid.NewGuid(),
