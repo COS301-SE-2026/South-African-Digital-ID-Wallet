@@ -26,7 +26,7 @@ public class OnboardingServiceTest
     }
 
     [Fact]
-    public void OnboardCitizen_WithValidRequest_CreatesPendingCitizen()
+    public async Task OnboardCitizen_WithValidRequest_CreatesPendingCitizen()
     {
         using var context = CreateContext();
         var service = CreateService(context);
@@ -39,10 +39,10 @@ public class OnboardingServiceTest
             ConsentGiven = true
         };
 
-        var result = service.OnboardCitizen(request);
+        var result = await service.OnboardCitizenAsync(request);
 
-        var citizen = context.Citizens.FirstOrDefault(c => c.SaId == request.SaId);
-        var user = context.DomainUsers.FirstOrDefault(u => u.Email == request.Email);
+        var citizen = await context.Citizens.FirstOrDefaultAsync(c => c.SaId == request.SaId);
+        var user = await context.DomainUsers.FirstOrDefaultAsync(u => u.Email == request.Email);
 
         Assert.NotNull(citizen);
         Assert.NotNull(user);
@@ -54,7 +54,7 @@ public class OnboardingServiceTest
     }
 
     [Fact]
-    public void OnboardCitizen_WithoutConsent_ThrowsCitizenConsentRequiredException()
+    public async Task OnboardCitizen_WithoutConsent_ThrowsCitizenConsentRequiredException()
     {
         using var context = CreateContext();
         var service = CreateService(context);
@@ -67,12 +67,12 @@ public class OnboardingServiceTest
             ConsentGiven = false
         };
 
-        Assert.Throws<CitizenConsentRequiredException>(() =>
-            service.OnboardCitizen(request));
+        await Assert.ThrowsAsync<CitizenConsentRequiredException>(() =>
+    service.OnboardCitizenAsync(request));
     }
 
     [Fact]
-    public void OnboardCitizen_WithUnknownSaId_ThrowsIdentityRecordNotFoundException()
+    public async Task OnboardCitizen_WithUnknownSaId_ThrowsIdentityRecordNotFoundException()
     {
         using var context = CreateContext();
         var service = CreateService(context);
@@ -85,12 +85,12 @@ public class OnboardingServiceTest
             ConsentGiven = true
         };
 
-        Assert.Throws<IdentityRecordNotFoundException>(() =>
-            service.OnboardCitizen(request));
+        await Assert.ThrowsAsync<IdentityRecordNotFoundException>(() =>
+    service.OnboardCitizenAsync(request));
     }
 
     [Fact]
-    public void OnboardCitizen_WithDuplicateSaId_ThrowsException()
+    public async Task OnboardCitizen_WithDuplicateSaId_ThrowsException()
     {
         using var context = CreateContext();
         var service = CreateService(context);
@@ -103,10 +103,10 @@ public class OnboardingServiceTest
             ConsentGiven = true
         };
 
-        service.OnboardCitizen(request);
+        await service.OnboardCitizenAsync(request);
 
-        Assert.Throws<DuplicateIdRegisteredException>(() =>
-            service.OnboardCitizen(request));
+        await Assert.ThrowsAsync<DuplicateIdRegisteredException>(() =>
+            service.OnboardCitizenAsync(request));
     }
 
     [Fact]
