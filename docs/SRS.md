@@ -552,6 +552,7 @@ The system shall allow administrators to export reports.
 
 # 6. API Service Contracts
 
+See [API.md](./API.md) for preliminary API contracts and payloads supporting these use cases.
 ---
 # 7. Domain Model
 
@@ -559,7 +560,7 @@ The system shall allow administrators to export reports.
 ---
 
 # 8. Architectural Requirements
-
+See [architecture.md](./architecture.md) for the overarching architectural approach, quality requirements, design patterns, and constraints guiding Demo 1 implementation. 
 ---
 # 9. Technology Requirements
 
