@@ -1,7 +1,8 @@
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Application.Features.Citizens.DTOs;
 using Application.Features.Citizens.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Presentation.Controllers;
 
@@ -17,6 +18,7 @@ public class CitizensController : ControllerBase
     }
 
     [HttpPost("register")]
+    [EnableRateLimiting("register")]
     public async Task<IActionResult> Register([FromBody] RegisterCitizenRequestDto request)
     {
         try
@@ -37,10 +39,6 @@ public class CitizensController : ControllerBase
             return Conflict(new { error = ex.Message });
         }
         catch (InvalidActivationCodeException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-        catch (ActivationCodeExpiredException ex)
         {
             return BadRequest(new { error = ex.Message });
         }

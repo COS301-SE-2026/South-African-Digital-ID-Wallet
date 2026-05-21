@@ -1,3 +1,5 @@
+﻿using System.Security.Cryptography;
+using System.Text;
 using Application.Common.Interfaces;
 using Application.Common.Validation;
 using Application.Features.Citizens.DTOs;
@@ -39,13 +41,16 @@ public class CitizenService : ICitizenService
         if (citizen.IsActivated)
             throw new CitizenAlreadyActivatedException(request.SaId);
 
-        // Step 4: check activation code is not expired before comparing value
+        // Step 4: check activation code validity — expired and wrong code both throw the
+        // same exception so attackers cannot distinguish between the two states.
         if (citizen.ActivationCodeExpiresAt.HasValue &&
             citizen.ActivationCodeExpiresAt.Value < DateTime.UtcNow)
-            throw new ActivationCodeExpiredException();
+            throw new InvalidActivationCodeException();
 
-        // Step 5: compare activation codes
-        if (citizen.ActivationCode != request.ActivationCode)
+        // Step 5: constant-time comparison prevents timing side-channel attacks
+        var storedBytes = Encoding.UTF8.GetBytes(citizen.ActivationCode);
+        var providedBytes = Encoding.UTF8.GetBytes(request.ActivationCode);
+        if (!CryptographicOperations.FixedTimeEquals(storedBytes, providedBytes))
             throw new InvalidActivationCodeException();
 
         // Step 6: ensure username is not taken by a different user
