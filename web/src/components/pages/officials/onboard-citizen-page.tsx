@@ -44,6 +44,18 @@ export default function OnboardCitizenPage() {
     }
   )
 
+  const { mutate: onboardCitizen, isPending: isCreatingAccount } = useMutation({
+    mutationFn: (formValues: OnboardCitizenFormValues) =>
+      onboardingService.onboardCitizen(formValues),
+    onSuccess: () => {
+      setAccountCreated(true)
+      toast.success('Pending FlashID account created')
+    },
+    onError: () => {
+      toast.error('Could not create pending FlashID account')
+    },
+  })
+
   function retrieveIdentityRecord() {
     setRecord({
       idNumber,
