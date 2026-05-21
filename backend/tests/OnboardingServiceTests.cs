@@ -52,5 +52,23 @@ public class OnboardingServiceTest
         Assert.False(string.IsNullOrWhiteSpace(citizen.ActivationCode));
         Assert.NotEqual(Guid.Empty, citizen.UserId);      
     }
+
+    [Fact]
+    public void OnboardCitizen_WithoutConsent_ThrowsCitizenConsentRequiredException()
+    {
+        using var context = CreateContext();
+        var service = CreateService(context);
+
+        var request = new OnboardCitizenRequest
+        {
+            SaId = "0000001971025",
+            PhoneNumber = "0813456789",
+            Email = "tiana@local.com",
+            ConsentGiven = false
+        };
+
+        Assert.Throws<CitizenConsentRequiredException>(() =>
+            service.OnboardCitizen(request));
+    }
     
 }
