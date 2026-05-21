@@ -7,7 +7,7 @@ export const GovAdminRegisterAdminPage = () => {
       <div className="flex h-full flex-col lg:flex-row">
         <div className="flex flex-1 overflow-hidden p-6">
           <Card className="flex w-full flex-1 items-center justify-center rounded-2xl">
-            <CardContent className="w-full max-w-3xl">
+            <CardContent className="w-full max-w-5xl px-16 py-10">
               <GovAdminRegistrationForm />
             </CardContent>
           </Card>
