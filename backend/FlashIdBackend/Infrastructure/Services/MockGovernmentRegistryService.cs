@@ -14,7 +14,7 @@ public class MockGovernmentRegistryService
             DateOfBirth = new DateTime(1997, 10, 25),
             Gender = "Female",
             Nationality = "South African",
-            Status = "Active"
+
         },
         new()
         {
@@ -24,7 +24,7 @@ public class MockGovernmentRegistryService
             DateOfBirth = new DateTime(1996, 6, 15),
             Gender = "Male",
             Nationality = "South African",
-            Status = "Active"
+
         },
         new()
         {
@@ -34,17 +34,17 @@ public class MockGovernmentRegistryService
             DateOfBirth = new DateTime(2001, 3, 2),
             Gender = "Male",
             Nationality = "South African",
-            Status = "Inactive"
+
         },
         new()
         {
             SaId = "0000002740723",
-            Names = "Po",
-            Surname = "Ping",
+            Names = "Master",
+            Surname = "Shifu",
             DateOfBirth = new DateTime(1974, 07, 23),
             Gender = "Male",
             Nationality = "South African",
-            Status = "Active"
+
         }
     ];
 
