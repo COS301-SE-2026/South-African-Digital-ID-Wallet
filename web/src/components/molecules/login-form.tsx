@@ -7,8 +7,24 @@ import type { LoginFormProps } from '@/types/login-form.types'
 import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
-import { loginService } from '@/services/login-service'
+import loginService from '@/services/login-service/login-service'
 import { useUser } from '@/context/user-context'
+
+const DASHBOARD_ROUTES: Record<string, string> = {
+  citizen: '/citizen',
+  official: '/officials',
+  governmentadministrator: '/gov-admin',
+  govadmin: '/gov-admin',
+}
+
+const getDashboardRoute = (role: string) => {
+  const normalizedRole = role
+    .trim()
+    .toLowerCase()
+    .replace(/[_\s-]+/g, '')
+
+  return DASHBOARD_ROUTES[normalizedRole] ?? '/citizen'
+}
 
 export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const [email, setEmail] = React.useState('')
@@ -17,7 +33,11 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const router = useRouter()
   const { setUser } = useUser()
 
-  const loginMutation = useMutation({
+  const loginMutation = useMutation<
+    Awaited<ReturnType<typeof loginService.login>>,
+    Error,
+    { email: string; password: string }
+  >({
     mutationFn: (formValues: { email: string; password: string }) =>
       loginService.login(formValues),
     onSuccess: async (data) => {
@@ -29,14 +49,7 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
         names: data.names,
         surname: data.surname,
       })
-      const route =
-        data.role === 'Official'
-          ? '/officials'
-          : data.role === 'GovernmentAdministrator'
-            ? '/gov-admin'
-            : '/citizen'
-
-      router.push(route)
+      router.push(getDashboardRoute(data.role))
     },
     onError: () => {
       toast.error('Login failed')
