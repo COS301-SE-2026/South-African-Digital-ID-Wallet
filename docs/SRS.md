@@ -151,77 +151,150 @@ As a Home Affairs official, I want to capture a citizen's contact detaisl (phone
 #### US - 1.4
 As a Home Affairs official, I want to send an activation link or OTP to the citizen after onboarding, so that the citizen can securely activate their wallet at their own convenience before the activation code expires.
 
-#### US - 2.1
+#### US - 1.5
 As a citizen, I want to register on FlashID using my physical ID document and a selfie, so that I can activate my digital wallet without visiting a Home Affairs office.
 
-#### US - 2.2
+#### US - 1.6
 As a citizen, I want to provide explicit consent before my identity data is processed during self-registration, so that I understand and agree to how my personal information will be used.
 
-#### US - 2.3
+#### US - 1.7
 As a citizen, I want to receive feedback when my identity verification fails during registration, so that I know what went wrong and can take corrective action.
 
-#### US - 3.1
+#### US - 1.8
 As a citizen, I want to set up biometric authentication (fingerprint or face) when activating my wallet, so that I can log in securely without typing a password each time.
 
-#### US - 3.2
+#### US - 1.9
 As a citizen, I want to provide explicit consent before my identity data is processed during registration with an activation code, so that I understand and agree to how my personal information will be used.
 
-#### US - 3.3
+#### US - 1.10
 As a citizen, I want to request a new activation link if mine has expired, so that I am not permanently locked out of activating my account.
 
 ---
 
 ## 3.2.2 Epic 2: Authentication & Role Based Access Control (RBAC)
 
-#### US - 4.1
+#### US - 2.1
 As a citizen, I want to log into my account and see the citizen's portal, so that I have no access to another user's portal.
 
-#### US - 4.2
+#### US - 2.2
 As a citizen, I want to be able to register with a username, ID, and password, so that my account can be uniquely identified.
 
 ---
 
 ## 3.2.3 Epic 3: Institution Registration & API Key Management
 
-#### US - 5.1
+#### US - 3.1
 As a government administrator, I want to register an institution (bank, hospital, police station, insurance agency) with the system, so that verified institutions can integrate with FlashID and perform credential verification.
 
-#### US - 5.2
+#### US - 3.2
 As a government administrator, I want to view all registered institutions and their status, so that I can manage which institutions are authorised to access the system.
 
-#### US - 5.3
+#### US - 3.3
 As a government administrator, I want to regenerate an institution's API key, so that I can revoke access if a key is compromised without removing the institution.
 
-#### US - 5.4
+#### US - 3.4
 As a government administrator, I want to view and search for institutions that have been registered by institution name, institution type, institution verification number, or the government admin that registered the institution.
 
 ---
 
 ## 3.2.4 Epic 4: Digital Credential Issuance
 
-#### US-05.1
-**As a** government administrator, I want to issue a digital National ID credential to a registered citizen,
-**so that** the citizen can use their digital ID for secure identity verification.
+#### US - 4.1
+As a government administrator, I want to issue a digital National ID credential to a registered citizen, so that the citizen can use their digital ID for secure identity verification.
+
+#### US - 4.2
+As a government administrator, I want to search for a citizen by ID number or name before issuing a credential, so that I can confirm I am issuing to the correct person.
+
+#### US - 4.3
+As a registered institution, I want to submit a credential issuance request via the API after a citizen passes their driving test, so that the citizen's digital driver's licence is automatically issued to their wallet.
+
+#### US - 4.4 ########################################### COME BACK
+
+
+#### US - 4.5
+As a citizen, I want to receive a push notification when a new credential is issued to my wallet, so that I am aware of all credentials issued in my name.
 
 ---
 
 ## 3.2.5 Epic 5: Credential Wallet & Viewing
 
+#### US - 5.1
+As a citizen, I want to view all credentials stored in my digital wallet, so that I can see what digital documents I have and their current status.
+
+#### US - 5.2
+As a citizen, I want to view the full details of an individual credential, so that I can confirm the information on my digital document is correct.
+
+#### US - 5.3
+As a citizen, I want to access my stored credentials when I have no internet connection, so that I can still present my identity in areas with poor connectivity.
+
 ---
 
 ## 3.2.6 Epic 6: QR Code Generation & Selective Disclosure
 
+#### US - 6.1
+As a citizen, I want to generate a one-time QR code for a selected credential, so that an official can verify my identity without seeing my raw personal data.
+
+#### US - 6.2
+As a citizen, I want to see a clear expiry countdown and be notified when my QR code expires, so that I know when to regenerate it during a verification interaction.	
+
+#### US - 6.3
+As a citizen, I want to choose which fields from my credential are disclosed when I generate a QR code, so that I share only the minimum personal information needed for each verification.
+
+#### US - 6.4
+
+As a citizen, I want to see exactly which of my fields will be visible to the verifier before confirming QR generation, so that I can make an informed disclosure decision.	
+
+#### US - 6.5
+As a citizen, I want to save my preferred disclosure settings per credential type, so that I don't have to manually select fields every time I generate a QR code.
+
+#### US - 6.6
+As a citizen, I want to save my preferred disclosure settings per verifier type (hospital, police, home affairs, DLTC), so that I don't have to manually select fields every time I generate a QR code.
+
 ---
 
-## 3.2.7 Epic 7: Cryptographic Security * Key Management
+## 3.2.7 Epic 7: Cryptographic Security & Key Management
+
+#### US - 7.1
+As a government administrator, issuing a credential must result in it being signed with Ed25519 at the point of issuance, so that any tampering is mathematically detectable.
+
+#### US - 7.2
+As a registered institution, an API Key credential must be cryptogrpahically signed on creation, so authenticity and integrity of the API key is guarenteed.
+
+#### US - 7.3
+As an official, the system must perform a live signature verification on every QR scan, so that I can trust the result is based on the current state of the credential.
+
+#### US - 7.4
+As a government administrator, a credential must be re-signed after every update, so that the updated credential carries a fresh, valid signature.
 
 ---
 
 ## 3.2.8 Epic 8: Credential Verification
 
+#### US - 8.1
+As an official, I want to scan a citizen's QR code to verify their credential in real time, so that I can confirm their identity instantly without requiring a physical document.
+
+#### US - 8.2
+As an official, I want to manually enter a credential token when QR scanning is not possible, so that I can still verify credentials if the camera is unavailable.
+
+#### US - 8.3
+As an official, I want to see a clear 'VALID' or 'INVALID' result with the reason for failure, so that I can take the correct action and inform the citizen appropriately.
+
+#### US - 8.4
+As an official, I want to request additional credential fields from a citizen during verification, so that I can access information needed for my specific use case beyond the default disclosure.
+
+#### US - 8.5
+As a citizen, I want to approve or deny an official's request for additional credential information, so that I remain in control of what personal data I share during verification.
+
 ---
 
 ## 3.2.9 Epic 9: Credential Lifecycle Management
+
+#### US - 9.1
+#### US - 9.2
+#### US - 9.3
+#### US - 9.4
+#### US - 9.5
+#### US - 9.6
 
 ---
 
