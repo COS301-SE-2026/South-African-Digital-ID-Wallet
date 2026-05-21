@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { ChangePasswordModal } from '../change-password-modal'
 
-jest.mock('../change-password-card', () => ({
+jest.mock('@/components/molecules/change-password-card', () => ({
   ChangePasswordCard: () => <div data-testid="change-password-card" />,
 }))
 

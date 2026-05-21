@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { ManageUserAccount } from '../manage-user-account'
 
 jest.mock('@/components/organisms/app-sidebar', () => ({
@@ -31,7 +32,6 @@ describe('ManageUserAccount', () => {
   })
 
   it('opens the change password modal', async () => {
-    const { default: userEvent } = await import('@testing-library/user-event')
     const user = userEvent.setup()
 
     render(<ManageUserAccount />)
@@ -42,7 +42,6 @@ describe('ManageUserAccount', () => {
   })
 
   it('opens the terminate account modal', async () => {
-    const { default: userEvent } = await import('@testing-library/user-event')
     const user = userEvent.setup()
 
     render(<ManageUserAccount />)

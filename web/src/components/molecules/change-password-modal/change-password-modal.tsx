@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { ChangePasswordCard } from '../change-password-card'
+import { ChangePasswordCard } from '@/components/molecules/change-password-card'
 
 import type { ChangePasswordModalProps } from './types'
 

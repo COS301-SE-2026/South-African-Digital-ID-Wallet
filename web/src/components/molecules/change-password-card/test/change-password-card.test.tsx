@@ -18,9 +18,13 @@ describe('ChangePasswordCard', () => {
 
     render(<ChangePasswordCard />)
 
-    await user.type(screen.getByPlaceholderText(/new password/i), 'Password1!')
     await user.type(
-      screen.getByPlaceholderText(/confirm new password/i),
+      screen.getByPlaceholderText('Current Password'),
+      'Password0!'
+    )
+    await user.type(screen.getByPlaceholderText('New Password'), 'Password1!')
+    await user.type(
+      screen.getByPlaceholderText('Confirm New Password'),
       'Password2!'
     )
     await user.click(screen.getByRole('button', { name: /update password/i }))
