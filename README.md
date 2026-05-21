@@ -1,50 +1,202 @@
-# Tech Titans - South African Digital ID Wallet - A cryptographically secure, nationally scalable digital identity wallet for South African citizens.
+<p align="center">
+  <img src="docs/logo.png" alt="banner" style="width: 100%; height: auto; display: block;"/>
+</p>
 
-## Project Description
-The SA Digital ID Wallet allows South African citizens to securely store and present government-issued credentials (ID, driver's licence) via QR code, eliminating reliance on physical documents for banks, hospitals, government services, and law enforcement.
+<p align="center">
+Smart Digital ID Wallet (SDIW) is a secure national-scale digital identity platform that enables citizens to store, manage, and verify official identity credentials digitally. Citizens can securely store cryptographically signed credentials such as national IDs and driver's licences, then present them through QR codes for instant real-time verification.
+</p>
 
+<div align="center">
+<code><img width="50" src="https://skillicons.dev/icons?i=git" alt="Git" title="Git"/></code>
+<code><img width="50" src="https://skillicons.dev/icons?i=github" alt="GitHub" title="GitHub"/></code>
+<code><img width="50" src="https://skillicons.dev/icons?i=figma" alt="Figma" title="Figma"/></code>
+<code><img width="50" src="https://skillicons.dev/icons?i=react" alt="React" title="React"/></code>
+<code><img width="50" src="https://skillicons.dev/icons?i=nextjs" alt="NextJS" title="NextJS"/></code>
+<code><img width="50" src="https://skillicons.dev/icons?i=typescript" alt="TypeScript" title="TypeScript"/></code>
+<code><img width="50" src="https://skillicons.dev/icons?i=cs" alt="C#" title="C#"/></code>
+<code><img width="50" src="https://skillicons.dev/icons?i=dotnet" alt=".NET" title=".NET"/></code>
+<code><img width="50" src="https://skillicons.dev/icons?i=docker" alt="Docker" title="Docker"/></code>
+<code><img width="50" src="https://skillicons.dev/icons?i=azure" alt="Azure" title="Azure"/></code>
+</div>
 
-## Documentation
-- [Functional Requirements (SRS)](docs/SRS.md)
-- [GitHub Project Board](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/projects)
+## 📄 Table of Contents
 
+- [Table of Contents](#-table-of-contents)
+- [Demo Videos](#-demo-videos)
+- [Contact Us](#-contact-us)
+- [Documentation](#-documentation)
+- [Team Profiles](#-team-profiles)
+- [Git Structure](#-git-structure)
+- [Branching Strategy](#-branching-strategy)
+- [Quality Badges](#️-quality-badges)
 
-## Team Members
-
-| Name | Student Number | GitHub | LinkedIn |
-|------|---------------|--------|----------|
-| Unathi Tshakalisa | u24730841 | [babychucks](https://github.com/babychucks) | [LinkedIn](https://linkedin.com/in/unathi-tshakalisa-702a582a4) |
-| Nathan Chisadza | u24825532 | [TINODIWA](https://github.com/TINODIWA) | [LinkedIn](https://linkedin.com/in/nathaniel-paul-chisadza) |
-| Ryan Liao | u24573699 | [Ryan-Liao-Code](https://github.com/Ryan-Liao-Code) | [LinkedIn](https://linkedin.com/in/huai-en-ryan-liao) |
-| Dominiqu Nigatu | u24580482 | [Domy05](https://github.com/Domy05) | [LinkedIn](https://linkedin.com/in/dominiqu-nigatu) |
-| Zaynab Samir | u22506099 | [infamouszay](https://github.com/infamouszay) | [LinkedIn](https://linkedin.com/in/zaynab-samir-168b7532a) |
-
-**Unathi Tshakalisa** — Team Lead. Passionate about building practical, accessible technology. Strong in UI engineering and integration, focused on simplifying complex problems into intuitive solutions.
-
-**Nathan Chisadza** — Mathematics Tutor and Teaching Assistant for Data Structures & Algorithms. Combines a strong algorithmic foundation with full-stack skills in React and C#, thriving in collaborative high-pressure environments.
-
-**Ryan Liao** — Junior Software Engineer at Codehesion, shipping production web and mobile applications while completing his degree. A natural full-stack builder grounded in systems programming and real delivery discipline.
-
-**Dominiqu Nigatu** — Delivery-focused full-stack engineer with a strong interest in clean architecture and collaborative problem-solving. Comfortable across the entire stack from frontend to backend integration.
-
-**Zaynab Samir** — Final-year CS student passionate about cybersecurity, testing, and systems. Skilled across a broad technical range from systems-level C++ to frontend development and backend services engineering.
-
-
-## Repository Structure
-
-This project follows a **monorepo** structure — all platforms (backend, web, mobile) live in a single repository for unified version control, shared CI/CD pipelines, and consistent branching strategy.
-
-South-African-Digital-ID-Wallet/
-├── backend/          # ASP.NET Core Web API (.NET 10)
-├── web/              # Next.js + React web portal
-├── mobile/           # React Native Expo mobile app
-├── docs/             # Project documentation
-└── .github/          # GitHub Actions CI/CD workflows
+---
 
 
-## Branching Strategy
+## 🎥 Demo Videos
 
-We follow a **feature branch workflow** with the following branch types:
+- [Demo 1 Video](#)
+
+- [Demo 2 Video](#)
+
+- [Demo 3 Video](#)
+
+- [Demo 4 Video](#)
+
+---
+
+## 📞 Contact Us
+
+Want to contact us or learn more about the project?
+
+📧 t3chtitansgo@gmail.com
+
+---
+
+## 📑 Documentation
+
+<details>
+<summary><strong>📋 Demo 1 Documentation</strong></summary>
+
+🔗 [SRS](docs/documentation/demo_1/srs.md) <br>
+🔗 [Brand style guide](docs/Branding_Document_v1.0.pdf) <br>
+🔗 [Wireframes](docs/documentation/demo_1/coding_standards.md) <br>
+🔗 [Research Document](docs/research-doc.md) <br>
+
+</details>
+
+<details>
+<summary><strong>📋 Demo 2 Documentation</strong></summary>
+
+
+
+</details>
+
+<details>
+<summary><strong>📋 Demo 3 Documentation</strong></summary>
+
+
+
+</details>
+
+<details>
+<summary><strong>📋 Demo 4 Documentation</strong></summary>
+
+
+
+</details>
+
+---
+
+
+## 🤝 Team Profiles
+
+<table>
+  <tr>
+    <th width="30%">Name</th>
+    <th width="20%">Role & LinkedIn</th>
+    <th width="50%">Description</th>
+  </tr>
+
+  <tr>
+    <td width="30%">
+      <strong>Unathi Tshakalisa</strong><br>
+      <img src="docs/images/unathi.jpeg" alt="Unathi Tshakalisa" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+    </td>
+    <td width="20%">
+      <code>Team Leader</code><br>
+      <code>Full Stack</code><br>
+      <a href="linkedin.com/in/unathi-tshakalisa-702a582a4">
+        <img src="https://custom-icon-badges.demolab.com/badge/LinkedIn-0A66C2?logo=linkedin-white&logoColor=fff" alt="LinkedIn">
+      </a>
+    </td>
+    <td width="50%">
+      Passionate about building practical and accessible technology solutions with a strong focus on UI/UX, collaboration, and problem solving.
+    </td>
+  </tr>
+
+  <tr>
+    <td width="30%">
+      <strong>Zaynab Samir</strong><br>
+      <img src="docs/images/zaynab.jpeg" alt="Zaynab Samir" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+    </td>
+    <td width="20%">
+      <code>Cybersecurity</code><br>
+      <code>Full Stack</code><br>
+      <a href="linkedin.com/in/zaynab-samir-168b7532a">
+        <img src="https://custom-icon-badges.demolab.com/badge/LinkedIn-0A66C2?logo=linkedin-white&logoColor=fff" alt="LinkedIn">
+      </a>
+    </td>
+    <td width="50%">
+      Skilled across frontend and backend development with strong interests in cybersecurity, simulations, and software testing.
+    </td>
+  </tr>
+
+  <tr>
+    <td width="30%">
+      <strong>Nathan Chisadza</strong><br>
+      <img src="docs/images/nathan.jpeg" alt="Nathan Chisadza" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+    </td>
+    <td width="20%">
+      <code>Algorithms</code><br>
+      <code>Full Stack</code><br>
+      <a href="linkedin.com/in/nathaniel-paul-chisadza">
+        <img src="https://custom-icon-badges.demolab.com/badge/LinkedIn-0A66C2?logo=linkedin-white&logoColor=fff" alt="LinkedIn">
+      </a>
+    </td>
+    <td width="50%">
+      Strong algorithmic and systems background with experience in React, C#, and collaborative software engineering.
+    </td>
+  </tr>
+
+  <tr>
+    <td width="30%">
+      <strong>Ryan Liao</strong><br>
+      <img src="docs/images/ryan.jpeg" alt="Ryan Liao" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+    </td>
+    <td width="20%">
+      <code>Mobile Systems</code><br>
+      <code>Frontend Engineering</code><br>
+      <a href="linkedin.com/in/huai-en-ryan-liao">
+        <img src="https://custom-icon-badges.demolab.com/badge/LinkedIn-0A66C2?logo=linkedin-white&logoColor=fff" alt="LinkedIn">
+      </a>
+    </td>
+    <td width="50%">
+      Junior Software Engineer experienced in production web and mobile applications with strong frontend engineering skills.
+    </td>
+  </tr>
+
+  <tr>
+    <td width="30%">
+      <strong>Dominiqu Nigatu</strong><br>
+      <img src="docs/images/dom.png" alt="Dominiqu Nigatu" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+    </td>
+    <td width="20%">
+      <code>Integration Systems</code><br>
+      <code>UI Engineering</code><br>
+      <a href="linkedin.com/in/dominiqu-nigatu">
+        <img src="https://custom-icon-badges.demolab.com/badge/LinkedIn-0A66C2?logo=linkedin-white&logoColor=fff" alt="LinkedIn">
+      </a>
+    </td>
+    <td width="50%">
+      Delivery-focused developer interested in scalable systems, dependable software, and clean architecture.
+    </td>
+  </tr>
+
+</table>
+
+---
+
+## 📁 Git Structure
+
+Our repository follows a modular monorepo structure where different components are organised into dedicated directories.
+
+- **frontend/** → Next.js web portals for administrators and verifiers.
+- **mobile/** → React Native citizen wallet application.
+- **backend/** → ASP.NET Core APIs and business logic.
+- **database/** → SQL schemas, migrations, and database configuration.
+- **infrastructure/** → Azure deployment and Docker configuration files.
+- **docs/** → Project documentation, reports, and assets.
 
 | Branch | Purpose |
 |---|---|
@@ -55,14 +207,28 @@ We follow a **feature branch workflow** with the following branch types:
 | `docs/` | Documentation updates e.g. `docs/architectural-requirements` |
 | `tests/` | Testing additions e.g. `tests/institution-validator` |
 
-**Rules:**
-- No direct commits to `main` or `dev`
-- All PRs require at least 1 approving review before merging into dev and 2 before merging into main.
-- All PRs must pass CI checks (build, lint, format, test) before merging
-- Branch names must be lowercase kebab-case
 
+---
 
-## Badges
+## 🌳 Branching Strategy
+
+We follow a structured GitFlow branching model to ensure efficient collaboration and stable releases.
+
+### Main Branches
+
+- **`main`** → Stable production-ready branch.
+- **`dev`** → Primary development and integration branch.
+
+### Workflow
+
+- Feature branches are created from `dev`
+- Pull requests require peer review before merge
+- Completed features are merged back into `dev`
+- Stable milestones are merged into `main`
+
+---
+
+##  Badges
 
 ### Code Coverage
 [![codecov](https://codecov.io/gh/COS301-SE-2026/South-African-Digital-ID-Wallet/branch/dev/graph/badge.svg)](https://codecov.io/gh/COS301-SE-2026/South-African-Digital-ID-Wallet)
@@ -86,14 +252,3 @@ We follow a **feature branch workflow** with the following branch types:
 ![GitHub contributors](https://img.shields.io/github/contributors/COS301-SE-2026/South-African-Digital-ID-Wallet)
 
 [![Monitoring](https://img.shields.io/badge/monitoring-UptimeRobot-green)](https://stats.uptimerobot.com/xDz6ZNXIFp)
-
-
-## Our Tech Stack
-- **Backend:** ASP.NET Core Web API (.NET 10)
-- **Web:** Next.js + React (TypeScript)
-- **Mobile:** React Native (Expo, TypeScript)
-- **Database:** Azure SQL + Cosmos DB
-- **Auth:** ASP.NET Core Identity + JWT
-- **Crypto:** Ed25519
-- **CI/CD:** GitHub Actions
-- **Hosting:** Azure App Services
