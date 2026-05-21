@@ -139,40 +139,101 @@ Officials may:
 # 3.2 Epics and User Stories
 
 ## 3.2.1 Epic 1: Identity Onboarding & Citizen Registration
-### US - 1.1
+#### US - 1.1
 As a Home Affairs official, I want to retrieve a citizen's verified identity record from the government registry, so that I can onboard them into FlashID using authoritative data.
 
-### US - 1.2
+#### US - 1.2
 As a Home Affairs official, I want to capture a citizen's explicit consent before creating their FlashID account, so that their data is processed lawfully under POPIA Section 11.
 
-### US - 1.3
+#### US - 1.3
 As a Home Affairs official, I want to capture a citizen's contact detaisl (phone and/or email) during onboarding, so that the citizen can receive their activation link and future notifications
 
-### US - 1.4
+#### US - 1.4
 As a Home Affairs official, I want to send an activation link or OTP to the citizen after onboarding, so that the citizen can securely activate their wallet at their own convenience before the activation code expires.
 
-### US - 2.1
+#### US - 2.1
 As a citizen, I want to register on FlashID using my physical ID document and a selfie, so that I can activate my digital wallet without visiting a Home Affairs office.
 
-### US - 2.2
+#### US - 2.2
 As a citizen, I want to provide explicit consent before my identity data is processed during self-registration, so that I understand and agree to how my personal information will be used.
 
-**Acceptance Criteria:**
-- Institution name, type, registration number, and government id are required fields.
-- System generates a unique, secure API key on successful registration.
-- API key is displayed once and cannot be retrieved again — admin must store it securely.
-- Duplicate institution names are rejected.
-- Registration event is written to the audit log with admin ID and timestamp.
+#### US - 2.3
+As a citizen, I want to receive feedback when my identity verification fails during registration, so that I know what went wrong and can take corrective action.
+
+#### US - 3.1
+As a citizen, I want to set up biometric authentication (fingerprint or face) when activating my wallet, so that I can log in securely without typing a password each time.
+
+#### US - 3.2
+As a citizen, I want to provide explicit consent before my identity data is processed during registration with an activation code, so that I understand and agree to how my personal information will be used.
+
+#### US - 3.3
+As a citizen, I want to request a new activation link if mine has expired, so that I am not permanently locked out of activating my account.
 
 ---
 
-## 3.2.2 Epic 2: Credential Management
+## 3.2.2 Epic 2: Authentication & Role Based Access Control (RBAC)
 
-## 3.2.3 Epic 3: Institution Management 
+#### US - 4.1
+As a citizen, I want to log into my account and see the citizen's portal, so that I have no access to another user's portal.
 
-## 3.2.4 Epic 4: Authentication and User Management
+#### US - 4.2
+As a citizen, I want to be able to register with a username, ID, and password, so that my account can be uniquely identified.
 
-## 3.2.5 Epic 5: Authentication and User Management
+---
+
+## 3.2.3 Epic 3: Institution Registration & API Key Management
+
+#### US - 5.1
+As a government administrator, I want to register an institution (bank, hospital, police station, insurance agency) with the system, so that verified institutions can integrate with FlashID and perform credential verification.
+
+#### US - 5.2
+As a government administrator, I want to view all registered institutions and their status, so that I can manage which institutions are authorised to access the system.
+
+#### US - 5.3
+As a government administrator, I want to regenerate an institution's API key, so that I can revoke access if a key is compromised without removing the institution.
+
+#### US - 5.4
+As a government administrator, I want to view and search for institutions that have been registered by institution name, institution type, institution verification number, or the government admin that registered the institution.
+
+---
+
+## 3.2.4 Epic 4: Digital Credential Issuance
+
+#### US-05.1
+**As a** government administrator, I want to issue a digital National ID credential to a registered citizen,
+**so that** the citizen can use their digital ID for secure identity verification.
+
+---
+
+## 3.2.5 Epic 5: Credential Wallet & Viewing
+
+---
+
+## 3.2.6 Epic 6: QR Code Generation & Selective Disclosure
+
+---
+
+## 3.2.7 Epic 7: Cryptographic Security * Key Management
+
+---
+
+## 3.2.8 Epic 8: Credential Verification
+
+---
+
+## 3.2.9 Epic 9: Credential Lifecycle Management
+
+---
+
+## 3.2.10 Epic 10: Audit Logging & POPIA Compliance
+
+---
+
+## 3.2.11 Epic 11: Account Management & Device Security
+
+---
+
+## 3.2.12 Epic 12: Advanced Features & Certified Documents
 
 ---
 
