@@ -155,7 +155,7 @@ As a Home Affairs official, I want to send an activation link or OTP to the citi
 As a citizen, I want to register on FlashID using my physical ID document and a selfie, so that I can activate my digital wallet without visiting a Home Affairs office.
 
 #### US - 1.6
-As a citizen, I want to provide explicit consent before my identity data is processed during self-registration, so that I understand and agree to how my personal information will be used.
+As a citizen, I want to provide explicit consent before my identity data is processed during registration by physical ID (photo of back and front of the ID and the citizen's face), so that I understand and agree to how my personal information will be used.
 
 #### US - 1.7
 As a citizen, I want to receive feedback when my identity verification fails during registration, so that I know what went wrong and can take corrective action.
@@ -290,23 +290,82 @@ As a citizen, I want to approve or deny an official's request for additional cre
 ## 3.2.9 Epic 9: Credential Lifecycle Management
 
 #### US - 9.1
+As a citizen, I want to my digital credential to automatically update when my ID details change, so that my digital credential remains accurate and legally valid at all times.
+
 #### US - 9.2
+As a registered institution, I want the system to update the credential via the API when relevant information changes, so that citizen credentials reflect up-to-date, authoritative data.
+
 #### US - 9.3
+As a citizen, I want the system to automatically update the status of my credentials that have reached their expiry date to 'Expired', so that expired credentials can no longer be used for verification.
+
 #### US - 9.4
+As the government admin, I want the system to send advance expiry warning notifications to citizens before their credential expires, so that citizens can take action before losing access to a valid credential.
+
 #### US - 9.5
+As a government administrator, I want to revoke a citizen's credential due to fraud, forgery, or investigation, so that the compromised credential is immediately invalidated and can no longer be used for verification.
+
 #### US - 9.6
+As a government administrator, I want to place a credential 'Under Investigation' as a temporary status, so that I can flag suspicious activity without permanently revoking a credential before an investigation concludes.
 
 ---
 
 ## 3.2.10 Epic 10: Audit Logging & POPIA Compliance
 
+#### US - 10.1
+As a government administrator, I want the registering of an institution to be logged to the audit trail, so that there is a traceable record of every institution onboarded into the system.
+
+#### US - 10.2
+As a Home Affairs official, I want a citizen's consent to be captured and logged with timestamp and official ID, so that there is a verifiable record of consent for POPIA compliance.
+
+#### US - 10.3
+As a citizen, changing my password must be logged to the audit trail, so that any security-relevant account changes are traceable.
+
+#### US - 10.4
+As the government administrator, I want every verification attempt to be logged regardless of result, so that there is a complete record of all credential verification events.
+
+#### US - 10.5
+As a government administrator, every revocation must be logged with reason, admin ID, and timestamp, so that there is a fully accountable record of every credential revocation.
+
 ---
 
 ## 3.2.11 Epic 11: Account Management & Device Security
 
+#### US - 11.1
+As a citizen, I want to change my password from account settings, so that I can keep my account secure if I believe my credentials have been compromised.
+
+#### US - 11.2
+As a citizen, I want to reset my forgotten password via email or phone, so that I can regain access to my wallet without contacting support.
+
+#### US - 11.3
+As a citizen, I want to update my contact details (email and phone number), so that notifications and security alerts are sent to my current contact information.
+
+#### US - 11.4	
+As a citizen, I want to delete my FlashID account, so that I can exercise my right to erasure under POPIA if I no longer wish to use the service.
+
+#### US - 11.5
+As a citizen, I want to view all devices that are currently trusted to access my FlashID wallet, so that I can identify any devices I no longer authorise.
+
+#### US - 11.6
+As a citizen, I want to mark a device as lost or stolen to immediately revoke its access to my wallet, so that my credentials cannot be accessed from a compromised device.
+
+#### US - 11.7
+As a citizen, I want to set up a duress PIN that opens a restricted safe-mode view of my wallet, so that I can protect my real credentials if I am ever forced to unlock the app under coercion.
+
+#### US - 11.8
+As a citizen, I want the system to silently alert security when my duress PIN is used, so that a possible coercion or fraud event is flagged for investigation without alerting the attacker.
+
 ---
 
 ## 3.2.12 Epic 12: Advanced Features & Certified Documents
+
+#### US - 12.1
+As a citizen, I want to generate a digitally certified copy of my credential as a downloadable document, so that I can use it for formal submissions that require a certified copy of my ID or licence.	
+
+#### US - 12.2
+As an emergency official (paramedic, firefighter, police), I want to scan a citizen's emergency QR code to retrieve critical identity and medical information, so that I can identify the citizen and provide appropriate emergency care when they cannot speak for themselves.
+
+#### US - 12.3
+As a citizen, I want to configure which information is included in my emergency QR, so that I control what emergency responders can access about me.
 
 ---
 
