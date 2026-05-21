@@ -29,6 +29,12 @@ export const pageHeaders: Record<string, PageHeader> = {
     title: 'Upload Institution',
     description: 'Register or upload an institution to the FlashID platform.',
   },
+
+  '/gov-admin/view-institutions': {
+    title: 'View Institutions',
+    description:
+      'Browse and search all registered institutions on the FlashID platform.',
+  },
 }
 
 export const defaultPageHeader: PageHeader = {

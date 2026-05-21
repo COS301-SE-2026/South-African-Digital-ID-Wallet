@@ -1,15 +1,18 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { AppSidebar } from '../organisms/app-sidebar'
-import { AppTopBar } from '../organisms/app-top-bar'
+import { useUser } from '@/context/user-context'
+import { AppSidebar } from '../../organisms/app-sidebar/app-sidebar'
+import { AppTopBar } from '../../organisms/app-top-bar/app-top-bar'
 import {
   officialsNavSections,
   citizenNavSections,
   governmentAdminNavSections,
-} from '@/config/navigation'
-import { defaultPageHeader, pageHeaders } from '@/config/page-headers'
-import { useUser } from '@/context/user-context'
+} from '@/config/navigation/navigation'
+import {
+  defaultPageHeader,
+  pageHeaders,
+} from '@/config/page-headers/page-headers'
 
 {
   /* TODO : Update navbar collection and mock user data as login implemented and session management added :) */
@@ -24,7 +27,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   const header = pageHeaders[pathname] ?? defaultPageHeader
-  const { user } = useUser()
+  const { user, loading } = useUser()
 
   const navSections = user
     ? user.role === 'Official'
@@ -36,11 +39,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const displayName = user
     ? `${user.names ?? ''} ${user.surname ?? ''}`.trim() || user.email
-    : 'Guest'
+    : ''
 
   const initials = user
     ? (user.names?.[0] ?? user.email?.[0] ?? 'U') + (user.surname?.[0] ?? '')
-    : 'G'
+    : ''
 
   const idLabel = user ? `ID: ••••••${String(user.userId).slice(-3)}` : ''
 

@@ -7,6 +7,7 @@ import type { LoginFormProps } from '@/types/login-form.types'
 import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import loginService from '@/services/login-service/login-service'
 import { useUser } from '@/context/user-context'
 
@@ -58,7 +59,9 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
 
   const isLoading = loginMutation.status === 'pending'
 
-  function handleSubmit(e: React.FormEvent) {
+  const handleSubmit: NonNullable<React.ComponentProps<'form'>['onSubmit']> = (
+    e
+  ) => {
     e.preventDefault()
     const data = { email, password }
     onSubmitAction?.(data)
@@ -68,10 +71,14 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-lg font-bold text-primary-green md:text-xl">
+        <label
+          htmlFor="email"
+          className="block text-lg font-bold text-primary-green md:text-xl"
+        >
           Email:
         </label>
         <input
+          id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -81,10 +88,14 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
       </div>
 
       <div>
-        <label className="block text-lg font-bold text-primary-green md:text-xl">
+        <label
+          htmlFor="password"
+          className="block text-lg font-bold text-primary-green md:text-xl"
+        >
           Password:
         </label>
         <input
+          id="password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -93,21 +104,32 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
         />
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3">
         <Button
           variant="primary"
           type="submit"
           LeftIcon={User}
           isLoading={isLoading}
+          className="w-full lg:w-full"
         >
           Login
         </Button>
-        <a
-          className="text-base text-primary-green hover:text-deep-green hover:underline"
-          href="#"
-        >
-          Forgot password?
-        </a>
+
+        <div className="space-y-1 text-center text-base text-primary-green">
+          <a className="block hover:text-deep-green hover:underline" href="#">
+            Forgot password?
+          </a>
+
+          <p>
+            Don&apos;t have an account?{' '}
+            <Link
+              className="font-semibold hover:text-deep-green hover:underline"
+              href="/register"
+            >
+              Register
+            </Link>
+          </p>
+        </div>
       </div>
     </form>
   )

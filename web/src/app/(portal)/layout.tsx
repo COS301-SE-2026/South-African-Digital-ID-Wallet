@@ -1,4 +1,4 @@
-import { AppShell } from '@/components/templates/app-shell'
+import { AppShell } from '@/components/templates/app-shell/app-shell'
 
 export default function PortalLayout({
   children,

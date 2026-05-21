@@ -53,7 +53,11 @@ Then wrap the app in `src/app/layout.tsx`:
 ```tsx
 import { Providers } from './providers'
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
       <body>
@@ -69,7 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 Add the API URL to `.env.local`:
 
 ```txt
-NEXT_PUBLIC_API_URL=http://localhost:8080
+NEXT_PUBLIC_API_URL=http://localhost:5118
 ```
 
 The `NEXT_PUBLIC_` prefix is required so the variable is available in the browser.
@@ -145,8 +149,12 @@ export type LoginFormValues = {
 }
 
 export type LoginResponse = {
-  userId: number
   token: string
+  expiresAt: string
+  userId: string
+  role: string
+  names: string
+  surname: string
 }
 ```
 
@@ -368,7 +376,13 @@ Example:
 import { useQuery } from '@tanstack/react-query'
 import { userService } from '@/services/user-service'
 
-export function UserList({ page, pageSize }: { page: number; pageSize: number }) {
+export function UserList({
+  page,
+  pageSize,
+}: {
+  page: number
+  pageSize: number
+}) {
   const { data, isLoading } = useQuery({
     queryKey: ['userList', page, pageSize],
     queryFn: () => userService.getUserList(page, pageSize),
@@ -473,10 +487,10 @@ const { mutate } = useMutation({
 Axios is the HTTP client. Four methods cover almost everything:
 
 ```ts
-axios.get(url)          // read
-axios.post(url, body)   // create
-axios.put(url, body)    // update
-axios.delete(url)       // delete
+axios.get(url) // read
+axios.post(url, body) // create
+axios.put(url, body) // update
+axios.delete(url) // delete
 ```
 
 Every response is wrapped in an object. The real data is at `response.data`. Strip the wrapper at the service layer:
@@ -486,6 +500,16 @@ return axios.post(url, dto).then((res) => res.data)
 ```
 
 ---
+
+## JWT Token
+
+After login, store the token and send it with every protected request:
+
+Authorization: Bearer <token>
+
+Set this up as an axios default after login:
+
+axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
 # React Query Devtools
 
@@ -539,9 +563,9 @@ getProductList()
 Use camelCase strings and include every value that affects the result:
 
 ```ts
-['userList', page, pageSize]
-['productList', page, pageSize, filters]
-['userById', id]
+;['userList', page, pageSize][('productList', page, pageSize, filters)][
+  ('userById', id)
+]
 ```
 
 ---
