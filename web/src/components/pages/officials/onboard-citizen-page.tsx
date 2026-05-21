@@ -1,8 +1,15 @@
 'use client'
 
 import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 import { IdentityRecord } from '@/types'
+import {
+  OnboardCitizenFormValues,
+  onboardingService,
+} from '@/services/onboarding-service'
+
 import {
   AuditLogPreview,
   CaptureContactDetails,
@@ -19,6 +26,23 @@ export default function OnboardCitizenPage() {
   const [contactDetailsConsent, setContactConsent] = useState(false)
   const [accountCreated, setAccountCreated] = useState(false)
   const [activationSent, setActivationSent] = useState(false)
+
+  const { mutate: retrieveRecord, isPending: isRetrievingRecord } = useMutation(
+    {
+      mutationFn: (citizenIdNumber: string) =>
+        onboardingService.retrieveIdentityRecord(citizenIdNumber),
+      onSuccess: (data) => {
+        setRecord(data)
+        setAccountCreated(false)
+        setActivationSent(false)
+        toast.success('Identity record retrieved')
+      },
+      onError: () => {
+        setRecord(null)
+        toast.error('Could not retrieve identity record')
+      },
+    }
+  )
 
   function retrieveIdentityRecord() {
     setRecord({
