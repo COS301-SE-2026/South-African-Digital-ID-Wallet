@@ -74,10 +74,10 @@ public class OnboardingService : IOnboardingService
 
         return new OnboardCitizenResponse
         {
-            CitizenId = Guid.NewGuid(),
+            CitizenId = citizen.Id,
             SaId = identityRecord.SaId,
             ActivationCode = activationCode,
-            ActivationCodeExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            ActivationCodeExpiresAt = citizen.ActivationCodeExpiresAt,
             Status = "Pending"
         };
     }
