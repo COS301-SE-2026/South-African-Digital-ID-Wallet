@@ -35,9 +35,35 @@ public static class DbSeeder
         // Government administrators must exist before creating institutions or officials
         await SeedGovernmentAdministratorUsersAsync(context, usedEmails, usedUsernames, usedPhones);
         await SeedOfficialUsersAsync(context, usedEmails, usedUsernames, usedPhones);
+        await RepairInvalidPasswordHashesAsync(context);
         await SeedCredentialsAsync(context);
         await SeedUserPreferencesAsync(context);
         await SeedAuditLogsAsync(context);
+    }
+
+    private static async Task RepairInvalidPasswordHashesAsync(AppDbContext context)
+    {
+        var allUsers = await context.DomainUsers.ToListAsync();
+        var usersWithInvalidHashes = allUsers
+            .Where(u =>
+                string.IsNullOrWhiteSpace(u.PasswordHash)
+                || !u.PasswordHash.StartsWith("$2", StringComparison.Ordinal)
+                || u.PasswordHash.Length < 40
+            )
+            .ToList();
+
+        if (usersWithInvalidHashes.Count == 0)
+            return;
+
+        var now = DateTime.UtcNow;
+
+        foreach (var user in usersWithInvalidHashes)
+        {
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123");
+            user.UpdatedAt = now;
+        }
+
+        await context.SaveChangesAsync();
     }
 
     private static async Task SeedCitizenUsersAsync(AppDbContext context, HashSet<string> usedEmails, HashSet<string> usedUsernames, HashSet<string> usedPhones)

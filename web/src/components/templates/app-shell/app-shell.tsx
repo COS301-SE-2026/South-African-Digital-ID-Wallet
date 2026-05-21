@@ -1,9 +1,14 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import { useUser } from '@/context/user-context'
 import { AppSidebar } from '../../organisms/app-sidebar/app-sidebar'
 import { AppTopBar } from '../../organisms/app-top-bar/app-top-bar'
-import { officialsNavSections } from '@/config/navigation/navigation'
+import {
+  officialsNavSections,
+  citizenNavSections,
+  governmentAdminNavSections,
+} from '@/config/navigation/navigation'
 import {
   defaultPageHeader,
   pageHeaders,
@@ -11,12 +16,6 @@ import {
 
 {
   /* TODO : Update navbar collection and mock user data as login implemented and session management added :) */
-}
-
-const mockUser = {
-  name: 'Unathi Tshakalisa',
-  initials: 'UT',
-  idLabel: 'ID: •••••••084',
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -28,19 +27,38 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   const header = pageHeaders[pathname] ?? defaultPageHeader
+  const { user, loading } = useUser()
+
+  const navSections = user
+    ? user.role === 'Official'
+      ? officialsNavSections
+      : user.role === 'GovernmentAdministrator'
+        ? governmentAdminNavSections
+        : citizenNavSections
+    : citizenNavSections
+
+  const displayName = user
+    ? `${user.names ?? ''} ${user.surname ?? ''}`.trim() || user.email
+    : ''
+
+  const initials = user
+    ? (user.names?.[0] ?? user.email?.[0] ?? 'U') + (user.surname?.[0] ?? '')
+    : ''
+
+  const idLabel = user ? `ID: ••••••${String(user.userId).slice(-3)}` : ''
 
   return (
     <div className=" flex h-screen overflow-hidden">
       {/* TODO: Update navSections to work with loggeed in user role :)*/}
-      <AppSidebar navSections={officialsNavSections} user={mockUser} />
+      <AppSidebar
+        navSections={navSections}
+        user={{ name: displayName, initials, idLabel }}
+      />
       <div className="flex h-screen flex-1 flex-col overflow-hidden">
         <AppTopBar
           title={header.title}
           description={header.description}
-          user={{
-            name: mockUser.name,
-            initials: mockUser.initials,
-          }}
+          user={{ name: displayName, initials }}
           showNotifications={false}
         />
         <div className="flex-1 overflow-y-auto">{children}</div>

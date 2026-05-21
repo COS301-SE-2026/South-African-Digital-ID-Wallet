@@ -9,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+const string FrontendCorsPolicy = "FrontendCorsPolicy";
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -26,6 +28,17 @@ builder.Services.AddInfrastructure();
 
 builder.Services.AddControllers();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(FrontendCorsPolicy, policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -44,6 +57,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
             ),
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                if (context.Request.Cookies.ContainsKey("access_token"))
+                {
+                    context.Token = context.Request.Cookies["access_token"];
+                }
+                return Task.CompletedTask;
+            }
         };
     });
 
@@ -76,8 +100,8 @@ using (var scope = app.Services.CreateScope())
     await DbSeeder.SeedAsync(db);
 }
 
-app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
+app.UseCors(FrontendCorsPolicy);
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();

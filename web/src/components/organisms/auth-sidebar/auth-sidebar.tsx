@@ -17,7 +17,7 @@ export const AuthSidebar = () => {
             <Text variant="h1" className="text-clean-white">
               Flash ID
             </Text>
-            <Text variant="sub-md" className="text-primary-green">
+            <Text variant="sub-md" className="text-primary-white">
               Secure Digital Identity Platform
             </Text>
           </div>
