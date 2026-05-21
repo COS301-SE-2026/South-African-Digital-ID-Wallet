@@ -68,14 +68,15 @@ export const AppSidebar = ({
                 title={user.name}
                 aria-label={`${user.name} avatar`}
               >
-                <Image
+                {/* <Image
                   src={FlashIdWhite}
                   alt="Flash ID logo"
                   width={48}
                   height={48}
                   className="h-12 w-12 object-contain"
                   priority
-                />
+                /> */}
+                {user.initials}
               </div>
             ) : (
               <Image
