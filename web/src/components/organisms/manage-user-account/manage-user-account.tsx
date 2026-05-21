@@ -1,16 +1,19 @@
 'use client'
 
 import * as React from 'react'
-import { AppSidebar } from '@/components/organisms/app-sidebar'
-import { AppTopBar } from '@/components/organisms/app-top-bar'
+
 import { AccountCard, ActivityOverviewCard } from '@/components/molecules'
 import {
   ChangePasswordModal,
   AccountTerminationModal,
 } from '@/components/molecules'
+import { AppSidebar } from '@/components/organisms/app-sidebar'
+import { AppTopBar } from '@/components/organisms/app-top-bar'
 import { manageUserAccountNavSections } from '@/config/navigation'
 
-const user = {
+import type { ManageUserAccountUser } from './types'
+
+const user: ManageUserAccountUser = {
   name: 'Unathi Tshakalisa',
   initials: 'UT',
   idLabel: '••••084',
