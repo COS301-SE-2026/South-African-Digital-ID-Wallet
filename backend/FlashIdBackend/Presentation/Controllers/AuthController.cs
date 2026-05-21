@@ -71,7 +71,9 @@ public class AuthController : ControllerBase
             {
                 HttpOnly = true,
                 Secure = !_environment.IsDevelopment(),
-                SameSite = SameSiteMode.None,
+                SameSite = _environment.IsDevelopment()
+                    ? SameSiteMode.Lax
+                    : SameSiteMode.None,
                 Path = "/",
                 Expires = result.ExpiresAt
             };
@@ -124,7 +126,9 @@ public class AuthController : ControllerBase
                 {
                     Path = "/",
                     Secure = !_environment.IsDevelopment(),
-                    SameSite = SameSiteMode.None,
+                    SameSite = _environment.IsDevelopment()
+                        ? SameSiteMode.Lax
+                        : SameSiteMode.None,
                 }
             );
             return Ok(result);
