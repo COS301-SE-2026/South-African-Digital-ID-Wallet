@@ -13,6 +13,7 @@ import {
   WalletCards,
   UserRoundPen,
   Landmark,
+  LogOut,
 } from 'lucide-react'
 
 import { useState } from 'react'
@@ -45,11 +46,13 @@ const sidebarIcons: Record<SidebarIconName, React.ElementType> = {
 type AppSidebarProps = {
   navSections: SidebarNavSection[]
   user: SidebarUser
+  onLogout: () => void | Promise<void>
 }
 
 export const AppSidebar = ({
   navSections,
   user,
+  onLogout,
 }: Readonly<AppSidebarProps>) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const pathname = usePathname()
@@ -135,31 +138,46 @@ export const AppSidebar = ({
 
       {!isCollapsed && (
         <div className="mt-auto rounded-3xl border border-clean-white/10 bg-clean-white/10 p-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white">
-              {user.initials}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white">
+                {user.initials}
+              </div>
+
+              <div className="min-w-0">
+                <p className="truncate text-sm font-extrabold text-clean-white">
+                  {user.name}
+                </p>
+                <p className="truncate text-xs font-semibold text-accent-gold/80">
+                  {user.idLabel}
+                </p>
+              </div>
             </div>
 
-            <div className="min-w-0">
-              <p className="truncate text-sm font-extrabold text-clean-white">
-                {user.name}
-              </p>
-              <p className="text-xs font-semibold text-accent-gold/80">
-                {user.idLabel}
-              </p>
-            </div>
+            <button
+              type="button"
+              onClick={onLogout}
+              className="inline-flex items-center gap-2 rounded-full border border-clean-white/20 bg-clean-white/10 px-3 py-2 text-xs font-semibold text-clean-white transition hover:bg-clean-white/20"
+              aria-label="Logout"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </button>
           </div>
         </div>
       )}
 
       {isCollapsed && (
         <div className="mt-auto flex justify-center">
-          <div
-            title={` ${user.name} `}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/30 bg-clean-white/10 text-sm font-extrabold text-clean-white"
+          <button
+            type="button"
+            onClick={onLogout}
+            title="Logout"
+            aria-label="Logout"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/30 bg-clean-white/10 text-clean-white transition hover:bg-clean-white/20"
           >
-            {user.initials}
-          </div>
+            <LogOut className="h-5 w-5" />
+          </button>
         </div>
       )}
     </aside>
