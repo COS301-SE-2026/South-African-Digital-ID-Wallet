@@ -21,25 +21,38 @@ const DEFAULT_NAV_SECTIONS = [
 ]
 
 const DEFAULT_USER = { name: 'John Doe', initials: 'JD', idLabel: 'ID: 123456' }
+const mockLogout = jest.fn()
 
 describe('AppSidebar', () => {
   it('renders the Flash ID logo', () => {
     render(
-      <AppSidebar navSections={DEFAULT_NAV_SECTIONS} user={DEFAULT_USER} />
+      <AppSidebar
+        navSections={DEFAULT_NAV_SECTIONS}
+        user={DEFAULT_USER}
+        onLogout={mockLogout}
+      />
     )
     expect(screen.getByAltText('Flash ID logo')).toBeInTheDocument()
   })
 
   it('renders nav section titles when expanded', () => {
     render(
-      <AppSidebar navSections={DEFAULT_NAV_SECTIONS} user={DEFAULT_USER} />
+      <AppSidebar
+        navSections={DEFAULT_NAV_SECTIONS}
+        user={DEFAULT_USER}
+        onLogout={mockLogout}
+      />
     )
     expect(screen.getByText('Citizen Portal')).toBeInTheDocument()
   })
 
   it('renders nav links', () => {
     render(
-      <AppSidebar navSections={DEFAULT_NAV_SECTIONS} user={DEFAULT_USER} />
+      <AppSidebar
+        navSections={DEFAULT_NAV_SECTIONS}
+        user={DEFAULT_USER}
+        onLogout={mockLogout}
+      />
     )
     expect(screen.getByRole('link', { name: /dashboard/i })).toBeInTheDocument()
     expect(
@@ -49,7 +62,11 @@ describe('AppSidebar', () => {
 
   it('renders user name and idLabel when expanded', () => {
     render(
-      <AppSidebar navSections={DEFAULT_NAV_SECTIONS} user={DEFAULT_USER} />
+      <AppSidebar
+        navSections={DEFAULT_NAV_SECTIONS}
+        user={DEFAULT_USER}
+        onLogout={mockLogout}
+      />
     )
     expect(screen.getByText('John Doe')).toBeInTheDocument()
     expect(screen.getByText('ID: 123456')).toBeInTheDocument()
@@ -58,7 +75,11 @@ describe('AppSidebar', () => {
   it('collapses when the toggle button is clicked', async () => {
     const userEvent_ = userEvent.setup()
     render(
-      <AppSidebar navSections={DEFAULT_NAV_SECTIONS} user={DEFAULT_USER} />
+      <AppSidebar
+        navSections={DEFAULT_NAV_SECTIONS}
+        user={DEFAULT_USER}
+        onLogout={mockLogout}
+      />
     )
     await userEvent_.click(
       screen.getByRole('button', { name: 'Collapse sidebar' })
@@ -70,7 +91,11 @@ describe('AppSidebar', () => {
   it('expands again after collapsing', async () => {
     const userEvent_ = userEvent.setup()
     render(
-      <AppSidebar navSections={DEFAULT_NAV_SECTIONS} user={DEFAULT_USER} />
+      <AppSidebar
+        navSections={DEFAULT_NAV_SECTIONS}
+        user={DEFAULT_USER}
+        onLogout={mockLogout}
+      />
     )
     await userEvent_.click(
       screen.getByRole('button', { name: 'Collapse sidebar' })
@@ -85,11 +110,30 @@ describe('AppSidebar', () => {
   it('still shows user initials when collapsed', async () => {
     const userEvent_ = userEvent.setup()
     render(
-      <AppSidebar navSections={DEFAULT_NAV_SECTIONS} user={DEFAULT_USER} />
+      <AppSidebar
+        navSections={DEFAULT_NAV_SECTIONS}
+        user={DEFAULT_USER}
+        onLogout={mockLogout}
+      />
     )
     await userEvent_.click(
       screen.getByRole('button', { name: 'Collapse sidebar' })
     )
     expect(screen.getByText('JD')).toBeInTheDocument()
+  })
+
+  it('calls logout when the logout button is clicked', async () => {
+    const userEvent_ = userEvent.setup()
+    render(
+      <AppSidebar
+        navSections={DEFAULT_NAV_SECTIONS}
+        user={DEFAULT_USER}
+        onLogout={mockLogout}
+      />
+    )
+
+    await userEvent_.click(screen.getByRole('button', { name: /logout/i }))
+
+    expect(mockLogout).toHaveBeenCalled()
   })
 })
