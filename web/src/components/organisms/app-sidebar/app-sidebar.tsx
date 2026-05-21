@@ -40,12 +40,6 @@ const sidebarIcons: Record<SidebarIconName, React.ElementType> = {
   institutions: Landmark,
 }
 
-type AppSidebarProps = {
-  navSections: SidebarNavSection[]
-  user: SidebarUser
-  onLogout: () => void | Promise<void>
-}
-
 export const AppSidebar = ({
   navSections,
   user,

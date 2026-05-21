@@ -1,7 +1,5 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import React, {
   createContext,
   useCallback,
@@ -9,6 +7,7 @@ import React, {
   useEffect,
   useState,
 } from 'react'
+import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
 import loginService from '@/services/login-service/login-service'
 import type { User, UserContextValue } from '@/types/user-context.types'
@@ -17,10 +16,8 @@ const USER_STORAGE_KEY = 'flashid-user'
 
 const readStoredUser = (): User => {
   if (typeof window === 'undefined') return null
-
   const storedUser = window.localStorage.getItem(USER_STORAGE_KEY)
   if (!storedUser) return null
-
   try {
     return JSON.parse(storedUser) as User
   } catch {
@@ -31,12 +28,10 @@ const readStoredUser = (): User => {
 
 const writeStoredUser = (nextUser: User) => {
   if (typeof window === 'undefined') return
-
   if (nextUser) {
     window.localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(nextUser))
     return
   }
-
   window.localStorage.removeItem(USER_STORAGE_KEY)
 }
 
@@ -50,7 +45,6 @@ const UserContext = createContext<UserContextValue>({
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter()
-  const [user, setUser] = useState<User>(null)
   const [user, setUserState] = useState<User>(null)
   const [loading, setLoading] = useState(true)
 
@@ -59,7 +53,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       setUserState((currentUser) => {
         const resolvedUser =
           typeof nextUser === 'function' ? nextUser(currentUser) : nextUser
-
         writeStoredUser(resolvedUser)
         return resolvedUser
       })
@@ -81,7 +74,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     setLoading(true)
-
     try {
       await loginService.logout()
     } catch {
@@ -91,7 +83,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         window.localStorage.clear()
         window.sessionStorage.clear()
       }
-
       setUser(null)
       router.replace('/')
       setLoading(false)
@@ -102,11 +93,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     let mounted = true
     const load = async () => {
       const storedUser = readStoredUser()
-
-      if (storedUser && mounted) {
-        setUser(storedUser)
-      }
-
+      if (storedUser && mounted) setUser(storedUser)
       try {
         setLoading(true)
         const res = await api.get('/api/auth/me')
@@ -121,9 +108,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         if (mounted) setLoading(false)
       }
     }
-
     void load()
-
     return () => {
       mounted = false
     }

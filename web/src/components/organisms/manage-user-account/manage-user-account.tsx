@@ -9,6 +9,7 @@ import {
 } from '@/components/molecules'
 import { AppSidebar } from '@/components/organisms/app-sidebar'
 import { AppTopBar } from '@/components/organisms/app-top-bar'
+import { useUser } from '@/context/user-context'
 import { manageUserAccountNavSections } from '@/config/navigation'
 
 import type { ManageUserAccountUser } from './types'
@@ -22,10 +23,15 @@ const user: ManageUserAccountUser = {
 export function ManageUserAccount() {
   const [showModal, setShowModal] = React.useState(false)
   const [showTerminate, setShowTerminate] = React.useState(false)
+  const { logout } = useUser()
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <AppSidebar navSections={manageUserAccountNavSections} user={user} />
+      <AppSidebar
+        navSections={manageUserAccountNavSections}
+        user={user}
+        onLogout={logout}
+      />
 
       <main className="flex-1 p-4 flex flex-col min-h-0">
         <AppTopBar
