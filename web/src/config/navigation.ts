@@ -54,6 +54,11 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
         icon: 'institutions',
       },
       {
+        label: 'View Institutions',
+        href: '/gov-admin/view-institutions',
+        icon: 'institutions',
+      },
+      {
         label: 'Notifications',
         href: '/under-construction',
         icon: 'notifications',
