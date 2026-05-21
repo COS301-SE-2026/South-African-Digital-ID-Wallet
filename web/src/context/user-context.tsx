@@ -102,7 +102,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       mounted = false
     }
-  }, [])
+  }, [setUser])
 
   return (
     <UserContext.Provider value={{ user, loading, refresh: fetchMe, setUser }}>
