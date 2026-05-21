@@ -61,14 +61,24 @@ export const AppSidebar = ({
       >
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full">
-            <Image
-              src={FlashIdWhite}
-              alt="Flash ID logo"
-              width={48}
-              height={48}
-              className="h-12 w-12 object-contain"
-              priority
-            />
+            {isCollapsed ? (
+              <div
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white"
+                title={user.name}
+                aria-label={`${user.name} avatar`}
+              >
+                {user.initials}
+              </div>
+            ) : (
+              <Image
+                src={FlashIdWhite}
+                alt="Flash ID logo"
+                width={48}
+                height={48}
+                className="h-12 w-12 object-contain"
+                priority
+              />
+            )}
           </div>
 
           {!isCollapsed && (
