@@ -1,3 +1,4 @@
+export * from './manage-user-account'
 export * from './login-form/login-form'
 export * from './auth-sidebar/auth-sidebar'
 export * from './app-sidebar/app-sidebar'

@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { User } from 'lucide-react'
 import { Button } from '@/components/atoms'
-import type { LoginFormProps } from '@/types/login-form.types'
+import type { LoginFormProps } from '@/types/login-form'
 import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
@@ -69,7 +69,7 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div>
         <label
           htmlFor="email"
@@ -82,7 +82,7 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
+          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 text-base focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
       </div>
@@ -99,7 +99,7 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
+          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 text-base focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
       </div>
