@@ -24,5 +24,25 @@ public class OnboardingServiceTest
             context
         );
     }
+
+    [Fact]
+    public void OnboardCitizen_WithValidRequest_CreatesPendingCitizen()
+    {
+        using var context = CreateContext();
+        var service = CreateService(context);
+
+        var request = new OnboardCitizenRequest
+        {
+            SaId = "0000001971025",
+            PhoneNumber = "0813456789",
+            Email = "tiana@local.com",
+            ConsentGiven = true
+        };
+
+         var result = service.OnboardCitizen(request);
+
+        var citizen = context.Citizens.FirstOrDefault(c => c.SaId == request.SaId);
+        var user = context.DomainUsers.FirstOrDefault(u => u.Email == request.Email);
+    }
     
 }
