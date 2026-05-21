@@ -1,6 +1,8 @@
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Onboarding.Exceptions;
+using Application.Common.Interfaces;
+using Application.Features.Onboarding.Dtos;
 
 namespace Presentation.Controllers;
 
@@ -10,10 +12,14 @@ namespace Presentation.Controllers;
 public class OnboardingController : ControllerBase
 {
     private readonly MockGovernmentRegistryService _registryService;
+    private readonly IOnboardingService _onboardingService;
 
-    public OnboardingController(MockGovernmentRegistryService registryService)
+    public OnboardingController(
+       MockGovernmentRegistryService registryService,
+       IOnboardingService onboardingService)
     {
         _registryService = registryService;
+        _onboardingService = onboardingService;
     }
 
     [HttpGet("verify/{idNumber}")]
@@ -27,5 +33,13 @@ public class OnboardingController : ControllerBase
         }
 
         return Ok(record);
+    }
+
+    [HttpPost("citizen")]
+    public IActionResult OnboardCitizen([FromBody] OnboardCitizenRequest request)
+    {
+        var response = _onboardingService.OnboardCitizen(request);
+
+        return Ok(response);
     }
 }
