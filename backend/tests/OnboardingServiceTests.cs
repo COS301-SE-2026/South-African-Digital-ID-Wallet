@@ -105,8 +105,21 @@ public class OnboardingServiceTest
 
         service.OnboardCitizen(request);
 
-        Assert.Throws<Exception>(() =>
+        Assert.Throws<DuplicateIdRegisteredException>(() =>
             service.OnboardCitizen(request));
+    }
+
+    [Fact]
+    public void MockGovernmentRegistry_WithKnownSaId_ReturnsIdentityRecord()
+    {
+        var registryService = new MockGovernmentRegistryService();
+
+        var record = registryService.GetBySaId("0000001971025");
+
+        Assert.NotNull(record);
+        Assert.Equal("0000001971025", record!.SaId);
+        Assert.Equal("Tiana", record.Names);
+        Assert.Equal("Rogers", record.Surname);
     }
 
 }

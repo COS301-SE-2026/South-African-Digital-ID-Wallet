@@ -36,7 +36,7 @@ public class OnboardingService : IOnboardingService
 
         if (existingCitizen is not null)
         {
-            throw new Exception("Citizen already exists in FlashID.");
+            throw new DuplicateIdRegisteredException();
         }
 
         var user = new User
