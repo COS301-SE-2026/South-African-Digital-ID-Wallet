@@ -13,6 +13,7 @@
     "format:web": "pnpm --filter ./web format",
     "type-check:web": "pnpm --filter ./web type-check",
     "test:web": "pnpm --filter ./web run test",
+    "test:web:coverage": "pnpm --filter ./web run test:coverage",
     "postinstall": "lefthook install",
 
     "install:backend": "pnpm --filter ./backend install",

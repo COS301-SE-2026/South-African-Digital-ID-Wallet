@@ -18,10 +18,14 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-lg font-bold text-primary-green md:text-xl">
+        <label
+          htmlFor="email"
+          className="block text-lg font-bold text-primary-green md:text-xl"
+        >
           Email:
         </label>
         <input
+          id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -31,10 +35,14 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
       </div>
 
       <div>
-        <label className="block text-lg font-bold text-primary-green md:text-xl">
+        <label
+          htmlFor="password"
+          className="block text-lg font-bold text-primary-green md:text-xl"
+        >
           Password:
         </label>
         <input
+          id="password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
