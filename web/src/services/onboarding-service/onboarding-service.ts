@@ -2,7 +2,21 @@ import axios, { AxiosResponse } from 'axios'
 
 import onboardingUrls from './onboarding-urls'
 import { onboardCitizenDto } from './onboarding-dto'
-import { OnboardCitizenFormValues, OnboardCitizenResponse } from './types'
+import {
+  IdentityRecordResponse,
+  OnboardCitizenFormValues,
+  OnboardCitizenResponse,
+} from './types'
+
+const retrieveIdentityRecord = (
+  idNumber: string
+): Promise<IdentityRecordResponse> => {
+  const url = onboardingUrls.retrieveIdentityRecord(idNumber)
+
+  return axios
+    .get(url)
+    .then((res: AxiosResponse<IdentityRecordResponse>) => res.data)
+}
 
 const onboardCitizen = (
   formData: OnboardCitizenFormValues
@@ -16,5 +30,6 @@ const onboardCitizen = (
 }
 
 export default {
+  retrieveIdentityRecord,
   onboardCitizen,
 }

@@ -14,3 +14,10 @@ export type OnboardCitizenResponse = {
   status: string
   message: string
 }
+
+export type IdentityRecordResponse = {
+  idNumber: string
+  fullName: string
+  dateOfBirth: string
+  status: string
+}
