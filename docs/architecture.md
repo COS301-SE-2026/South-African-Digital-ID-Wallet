@@ -178,21 +178,3 @@ During the prototype phase, external government registry integrations are simula
 | Version Control | All contributions must be tracked via Git with meaningful commit messages |
 
 ---
-
-## 5. Technology Stack
-
-| Category | Technology | Version |
-|---|---|---|
-| Backend | ASP.NET Core Web API | .NET 10 |
-| Web Frontend | Next.js + React | 16.x + 19.x |
-| Mobile | React Native + Expo | Latest |
-| Relational DB | Azure SQL (SQL Server) | Latest |
-| Document DB | Azure Cosmos DB | Latest |
-| ORM | Entity Framework Core | Latest |
-| Authentication | ASP.NET Identity + JWT Bearer | Latest |
-| Frontend State | React Query (@tanstack) | 5.x |
-| Styling | Tailwind CSS + shadcn/ui | Latest |
-| Testing (Backend) | xUnit v3 | 3.x |
-| Testing (Frontend) | Jest + React Testing Library | Latest |
-| CI/CD | GitHub Actions | Latest |
-| Coverage | Codecov | Latest |
