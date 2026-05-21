@@ -3,16 +3,14 @@
 import * as React from 'react'
 import Link from 'next/link'
 import { User, CircleUserRound, LockKeyhole, KeyRound } from 'lucide-react'
-import { Text } from '@/components/atoms'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Text } from '@/components/atoms'
+import { TextField } from '@/components/molecules'
 import type {
   RegistrationFormProps,
   VerificationMethod,
 } from '@/types/registration-form.types'
-
-const inputClass =
-  'mt-1 w-full rounded-md border border-border-grey px-4 py-3 focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20 text-sm'
 
 const RequirementList = ({
   items,
@@ -25,7 +23,7 @@ const RequirementList = ({
         key={item.label}
         className={`text-xs leading-snug ${item.met ? 'text-success-green' : 'text-muted-foreground'}`}
       >
-        â€¢ {item.label}
+        • {item.label}
       </p>
     ))}
   </div>
@@ -95,12 +93,10 @@ export const RegistrationForm = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* ID Number */}
       <div>
-        <Text variant="label" as="label">
-          ID number:
-        </Text>
         <div className="relative">
-          <CircleUserRound className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-          <input
+          <CircleUserRound className="pointer-events-none absolute left-3 top-[54px] h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <TextField
+            label="ID number:"
             type="text"
             value={idnumber}
             onChange={(e) => setIdnumber(stripSpaces(e.target.value))}
@@ -108,7 +104,7 @@ export const RegistrationForm = ({
               if (e.key === ' ') e.preventDefault()
             }}
             placeholder="Enter your 13-digit ID number"
-            className={`${inputClass} pl-11`}
+            className="pl-11"
             required
           />
         </div>
@@ -117,12 +113,10 @@ export const RegistrationForm = ({
 
       {/* Username */}
       <div>
-        <Text variant="label" as="label">
-          Username:
-        </Text>
         <div className="relative">
-          <User className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-          <input
+          <User className="pointer-events-none absolute left-3 top-[54px] h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <TextField
+            label="Username:"
             type="text"
             value={username}
             onChange={(e) => setUsername(stripSpaces(e.target.value))}
@@ -130,7 +124,7 @@ export const RegistrationForm = ({
               if (e.key === ' ') e.preventDefault()
             }}
             placeholder="Choose a username"
-            className={`${inputClass} pl-11`}
+            className="pl-11"
             required
           />
         </div>
@@ -139,12 +133,10 @@ export const RegistrationForm = ({
 
       {/* Password */}
       <div>
-        <Text variant="label" as="label">
-          Password:
-        </Text>
         <div className="relative">
-          <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-          <input
+          <LockKeyhole className="pointer-events-none absolute left-3 top-[54px] h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <TextField
+            label="Password:"
             type="password"
             value={password}
             onChange={(e) => setPassword(stripSpaces(e.target.value))}
@@ -152,7 +144,7 @@ export const RegistrationForm = ({
               if (e.key === ' ') e.preventDefault()
             }}
             placeholder="Enter your password"
-            className={`${inputClass} pl-11`}
+            className="pl-11"
             required
           />
         </div>
@@ -161,12 +153,10 @@ export const RegistrationForm = ({
 
       {/* Verify Password */}
       <div>
-        <Text variant="label" as="label">
-          Verify password:
-        </Text>
         <div className="relative">
-          <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-          <input
+          <LockKeyhole className="pointer-events-none absolute left-3 top-[54px] h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <TextField
+            label="Verify password:"
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(stripSpaces(e.target.value))}
@@ -174,7 +164,7 @@ export const RegistrationForm = ({
               if (e.key === ' ') e.preventDefault()
             }}
             placeholder="Re-enter your password"
-            className={`${inputClass} pl-11`}
+            className="pl-11"
             required
           />
         </div>
@@ -212,22 +202,18 @@ export const RegistrationForm = ({
         </div>
 
         {verificationMethod === 'activation' && (
-          <div className="mt-3">
-            <Text variant="sub-sm" className="mb-1.5">
-              Enter the activation code sent to you by your Home Affairs
-              official.
-            </Text>
-            <div className="relative">
-              <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="text"
-                value={activationCode}
-                onChange={(e) => setActivationCode(e.target.value.trim())}
-                placeholder="Enter your activation code"
-                className={`${inputClass} pl-11`}
-                required
-              />
-            </div>
+          <div className="relative mt-3">
+            <KeyRound className="pointer-events-none absolute left-3 top-[54px] h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+            <TextField
+              label="Activation code:"
+              type="text"
+              value={activationCode}
+              onChange={(e) => setActivationCode(e.target.value.trim())}
+              placeholder="Enter your activation code"
+              className="pl-11"
+              helperText="Enter the activation code sent to you by your Home Affairs official."
+              required
+            />
           </div>
         )}
       </div>
