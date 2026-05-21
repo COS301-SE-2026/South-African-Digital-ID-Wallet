@@ -1,7 +1,9 @@
-using System.Text;
+﻿using System.Text;
+using System.Threading.RateLimiting;
 using Infrastructure;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -37,6 +39,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+// 5 registration attempts per minute per client — prevents brute-forcing activation codes
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("register", opt =>
+    {
+        opt.PermitLimit = 5;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 0;
+    });
+    options.RejectionStatusCode = 429;
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -52,6 +67,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseHttpsRedirection();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
