@@ -12,7 +12,7 @@
 
 1. Introduction  
 2. System Overview  
-3. User Characteristics and Actors  
+3. User Characteristics / Stories and Actors  
 4. Functional Requirements  
 5. Use Cases  
 6. API Service Contracts  
@@ -93,9 +93,9 @@ The system follows CLEAN Architecture principles to separate:
 
 ---
 
-# 3. User Characteristics and Actors
+# 3.1 User Characteristics and Actors
 
-## 3.1 Citizen
+## 3.1.1 Citizen
 
 A South African citizen who:
 - Registers for FlashID
@@ -107,7 +107,7 @@ A South African citizen who:
 
 ---
 
-## 3.2 Government Administrator
+## 3.1.2 Government Administrator
 
 Authorized personnel who:
 - Issue credentials
@@ -118,7 +118,7 @@ Authorized personnel who:
 
 ---
 
-## 3.3 Official
+## 3.1.3 Official
 
 External authorized entities such as:
 - Banks
@@ -126,12 +126,53 @@ External authorized entities such as:
 - Police officers
 - Insurance agencies
 - DLTC
+- Home Affairs
 
 Officials may:
 - Verify credentials
 - Receive limited verification data
 - Validate authenticity in real time
 - Communicate with FlashID to send citizen data to the system
+
+---
+
+# 3.2 Epics and User Stories
+
+## 3.2.1 Epic 1: Identity Onboarding & Citizen Registration
+### US - 1.1
+As a Home Affairs official, I want to retrieve a citizen's verified identity record from the government registry, so that I can onboard them into FlashID using authoritative data.
+
+### US - 1.2
+As a Home Affairs official, I want to capture a citizen's explicit consent before creating their FlashID account, so that their data is processed lawfully under POPIA Section 11.
+
+### US - 1.3
+As a Home Affairs official, I want to capture a citizen's contact detaisl (phone and/or email) during onboarding, so that the citizen can receive their activation link and future notifications
+
+### US - 1.4
+As a Home Affairs official, I want to send an activation link or OTP to the citizen after onboarding, so that the citizen can securely activate their wallet at their own convenience before the activation code expires.
+
+### US - 2.1
+As a citizen, I want to register on FlashID using my physical ID document and a selfie, so that I can activate my digital wallet without visiting a Home Affairs office.
+
+### US - 2.2
+As a citizen, I want to provide explicit consent before my identity data is processed during self-registration, so that I understand and agree to how my personal information will be used.
+
+**Acceptance Criteria:**
+- Institution name, type, registration number, and government id are required fields.
+- System generates a unique, secure API key on successful registration.
+- API key is displayed once and cannot be retrieved again — admin must store it securely.
+- Duplicate institution names are rejected.
+- Registration event is written to the audit log with admin ID and timestamp.
+
+---
+
+## 3.2.2 Epic 2: Credential Management
+
+## 3.2.3 Epic 3: Institution Management 
+
+## 3.2.4 Epic 4: Authentication and User Management
+
+## 3.2.5 Epic 5: Authentication and User Management
 
 ---
 
