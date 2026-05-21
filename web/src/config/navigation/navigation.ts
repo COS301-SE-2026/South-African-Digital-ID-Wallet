@@ -16,13 +16,17 @@ export const citizenNavSections: SidebarNavSection[] = [
       },
       { label: 'Share QR Code', href: '/under-construction', icon: 'qr' },
       {
+        label: 'Register Admin',
+        href: '/gov-admin/register-admin',
+        icon: 'users',
+      },
+      {
         label: 'Notifications',
         href: '/under-construction',
         icon: 'notifications',
       },
     ],
   },
-
   {
     title: 'Security',
     items: [
@@ -54,13 +58,17 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
         icon: 'institutions',
       },
       {
+        label: 'Register Admin',
+        href: '/gov-admin/register-admin',
+        icon: 'users',
+      },
+      {
         label: 'Notifications',
         href: '/under-construction',
         icon: 'notifications',
       },
     ],
   },
-
   {
     title: 'Security',
     items: [
@@ -81,13 +89,17 @@ export const officialsNavSections: SidebarNavSection[] = [
         icon: 'onboard',
       },
       {
+        label: 'Register Admin',
+        href: '/gov-admin/register-admin',
+        icon: 'users',
+      },
+      {
         label: 'Notifications',
         href: '/under-construction',
         icon: 'notifications',
       },
     ],
   },
-
   {
     title: 'Security',
     items: [

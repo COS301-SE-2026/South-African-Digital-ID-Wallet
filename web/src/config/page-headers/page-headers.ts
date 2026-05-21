@@ -29,6 +29,11 @@ export const pageHeaders: Record<string, PageHeader> = {
     title: 'Upload Institution',
     description: 'Register or upload an institution to the FlashID platform.',
   },
+
+  '/gov-admin/register-admin': {
+    title: 'Register Administrator',
+    description: 'Create a new government administrator account.',
+  },
 }
 
 export const defaultPageHeader: PageHeader = {
