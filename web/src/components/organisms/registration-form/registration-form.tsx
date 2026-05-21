@@ -1,9 +1,9 @@
-'use client'
+﻿'use client'
 
 import * as React from 'react'
 import Link from 'next/link'
 import { User, CircleUserRound, LockKeyhole, KeyRound } from 'lucide-react'
-import { Label } from '@/components/ui/label'
+import { Text } from '@/components/atoms'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import type {
@@ -25,7 +25,7 @@ const RequirementList = ({
         key={item.label}
         className={`text-xs leading-snug ${item.met ? 'text-success-green' : 'text-muted-foreground'}`}
       >
-        • {item.label}
+        â€¢ {item.label}
       </p>
     ))}
   </div>
@@ -95,9 +95,9 @@ export const RegistrationForm = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* ID Number */}
       <div>
-        <Label className="text-lg font-bold text-primary-green md:text-xl">
+        <Text variant="label" as="label">
           ID number:
-        </Label>
+        </Text>
         <div className="relative">
           <CircleUserRound className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -117,9 +117,9 @@ export const RegistrationForm = ({
 
       {/* Username */}
       <div>
-        <Label className="text-lg font-bold text-primary-green md:text-xl">
+        <Text variant="label" as="label">
           Username:
-        </Label>
+        </Text>
         <div className="relative">
           <User className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -139,9 +139,9 @@ export const RegistrationForm = ({
 
       {/* Password */}
       <div>
-        <Label className="text-lg font-bold text-primary-green md:text-xl">
+        <Text variant="label" as="label">
           Password:
-        </Label>
+        </Text>
         <div className="relative">
           <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -161,9 +161,9 @@ export const RegistrationForm = ({
 
       {/* Verify Password */}
       <div>
-        <Label className="text-lg font-bold text-primary-green md:text-xl">
+        <Text variant="label" as="label">
           Verify password:
-        </Label>
+        </Text>
         <div className="relative">
           <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -183,9 +183,9 @@ export const RegistrationForm = ({
 
       {/* Verification Method */}
       <div>
-        <Label className="text-lg font-bold text-primary-green md:text-xl">
+        <Text variant="label" as="label">
           Verification method:
-        </Label>
+        </Text>
         <div className="mt-2 grid grid-cols-2 gap-3">
           <Button
             type="button"
@@ -213,10 +213,10 @@ export const RegistrationForm = ({
 
         {verificationMethod === 'activation' && (
           <div className="mt-3">
-            <p className="mb-1.5 text-xs text-muted-foreground">
+            <Text variant="sub-sm" className="mb-1.5">
               Enter the activation code sent to you by your Home Affairs
               official.
-            </p>
+            </Text>
             <div className="relative">
               <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
               <input
@@ -238,7 +238,7 @@ export const RegistrationForm = ({
           <User className="h-5 w-5" />
           Create account
         </Button>
-        <p className="text-center text-sm text-muted-foreground">
+        <Text variant="sub-sm" className="text-center">
           Already have an account?{' '}
           <Link
             href="/"
@@ -246,7 +246,7 @@ export const RegistrationForm = ({
           >
             Log in
           </Link>
-        </p>
+        </Text>
       </div>
     </form>
   )
