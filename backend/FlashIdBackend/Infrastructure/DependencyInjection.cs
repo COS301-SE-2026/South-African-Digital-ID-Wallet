@@ -15,6 +15,8 @@ public static class DependencyInjection
         services.AddScoped<IInstitutionService, InstitutionService>();
         services.AddScoped<ICitizenService, CitizenService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<MockGovernmentRegistryService>();
+        services.AddScoped<IOnboardingService, OnboardingService>();
 
         return services;
     }
