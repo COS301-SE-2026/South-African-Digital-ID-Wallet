@@ -31,9 +31,6 @@ export default function OnboardCitizenPage() {
   const [contactDetailsConsent, setContactConsent] = useState(false)
   const [accountCreated, setAccountCreated] = useState(false)
   const [activationSent, setActivationSent] = useState(false)
-  const [registrationMethod, setRegistrationMethod] = useState<
-    'activation' | 'physical' | null
-  >(null)
 
   {
     /* TODO: Retrieve actual record !!!!*/
