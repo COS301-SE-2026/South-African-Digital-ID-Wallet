@@ -1,6 +1,5 @@
-import { LoginPage, ManageUserAccountPage } from '@/components/pages'
+import { LoginPage } from '@/components/pages'
 
 export default function Home() {
   return <LoginPage />
-  // return <ManageUserAccountPage />
 }

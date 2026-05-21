@@ -187,6 +187,7 @@ export const Dropdown = <T extends FieldValues = FieldValues>(
       onChange={props.onChange ?? (() => {})}
       className={props.className}
       hasError={props.hasError}
+      errorMessage={props.errorMessage}
       disabled={props.disabled}
       name={props.name}
     />
