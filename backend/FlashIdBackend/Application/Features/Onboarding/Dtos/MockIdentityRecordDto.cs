@@ -2,7 +2,7 @@ namespace Application.Features.Onboarding.Dtos;
 
 public class MockIdentityRecordDto
 {
-    public string? SaId { get; set; } = string.Empty;
+    public string SaId { get; set; } = string.Empty;
     public string Names { get; set; } = string.Empty;
     public string Surname { get; set; } = string.Empty;
     public string Fullname => $"{Names} {Surname}";

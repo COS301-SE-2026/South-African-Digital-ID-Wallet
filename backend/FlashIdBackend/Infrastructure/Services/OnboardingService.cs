@@ -4,6 +4,7 @@ using Application.Common.Interfaces;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services;
 
@@ -17,7 +18,7 @@ public class OnboardingService : IOnboardingService
         _context = context;
     }
 
-    public OnboardCitizenResponse OnboardCitizen(OnboardCitizenRequest request)
+    public async Task<OnboardCitizenResponse> OnboardCitizenAsync(OnboardCitizenRequest request)
     {
         if (!request.ConsentGiven)
         {
@@ -29,6 +30,11 @@ public class OnboardingService : IOnboardingService
         if (identityRecord is null)
         {
             throw new IdentityRecordNotFoundException();
+        }
+
+        if (identityRecord.SaId is null)
+        {
+            throw new Exception("Id field is empty");
         }
 
         var existingCitizen = _context.Citizens
@@ -70,7 +76,7 @@ public class OnboardingService : IOnboardingService
 
         _context.DomainUsers.Add(user);
         _context.Citizens.Add(citizen);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
         return new OnboardCitizenResponse
         {
