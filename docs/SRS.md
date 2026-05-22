@@ -1,5 +1,5 @@
-﻿# Software Requirements Specification (SRS)
-# FlashID — South African Digital ID Wallet
+# Software Requirements Specification (SRS)
+## FlashID - South African Digital ID Wallet
 
 > COS 301 Capstone Project 2026  
 > Team: Tech Titans  
@@ -8,7 +8,7 @@
 
 ---
 
-# Table of Contents
+## Table of Contents
 
 1. [Introduction](#1-introduction)
 2. [System Overview](#2-system-overview)
@@ -36,9 +36,9 @@
 
 ---
 
-# 1. Introduction
+## 1. Introduction
 
-## 1.1 Purpose
+### 1.1 Purpose
 
 FlashID is a secure South African Digital Identity Wallet system that enables citizens to digitally store, manage, and present government-issued credentials such as South African IDs and driver's licences.
 
@@ -60,7 +60,7 @@ The system consists of:
 
 ---
 
-## 1.2 Business Problem
+### 1.2 Business Problem
 
 In South Africa, identity verification still heavily depends on physical documentation. Lost, stolen, or forged identity documents create major risks for citizens, government institutions, banks, hospitals, and law enforcement agencies.
 
@@ -73,7 +73,7 @@ FlashID addresses these issues through:
 
 ---
 
-## 1.3 Scope
+### 1.3 Scope
 
 The FlashID prototype will:
 - Allow citizens to onboard and access a digital identity wallet
@@ -86,7 +86,7 @@ The prototype will simulate institutional integrations using mock or controlled 
 
 ---
 
-# 2. System Overview
+## 2. System Overview
 
 FlashID is a multi-platform digital identity ecosystem consisting of:
 
@@ -175,7 +175,7 @@ The full epics and user stories — including acceptance criteria and definition
 
 ---
 
-# 4. Functional Requirements
+## 4. Functional Requirements
 
 The complete functional requirements — subsystems R1 through R10 — are documented in:
 
@@ -198,17 +198,20 @@ The complete functional requirements — subsystems R1 through R10 — are docum
 
 ---
 
-# 5. Use Cases
+## 5. Use Cases
 
 See [use_cases](./use_cases.md) for the Use Cases and their Use Case Diagrams.
 
 ---
 
-# 6. API Service Contracts
+## 6. API Service Contracts
 
 See [API.md](./API.md) for preliminary API contracts and payloads supporting these use cases.
 
 ---
+## 7. Domain Model
+
+![Domain Model Diagram](images/Domain_Modeling.svg)
 
 # 7. Domain Model
 
@@ -240,22 +243,22 @@ See [architecture.md](./architecture.md) for the overarching architectural appro
 
 ---
 
-# 10. Constraints and Assumptions
+## 10. Constraints and Assumptions
 
-## Constraints
+### Constraints
 - No live government integrations during prototype phase
 - POPIA compliance required
 - Must support mobile and web platforms
 - Must use Azure infrastructure
 
-## Assumptions
+### Assumptions
 - Citizens possess smartphones
 - Institutions have internet access
 - Mock integrations represent real-world systems
 
 ---
 
-# 11. Future Enhancements
+## 11. Future Enhancements
 
 Potential future features include:
 - Passport credentials
