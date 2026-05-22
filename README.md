@@ -58,7 +58,7 @@ t3chtitansgo@gmail.com
 <details>
 <summary><strong>Demo 1 Documentation</strong></summary>
 
-🔗 [SRS](docs/documentation/demo_1/srs.md) <br>
+🔗 [SRS](docs/srs.md) <br>
 🔗 [Brand style guide](docs/Branding_Document_v1.0.pdf) <br>
 🔗 [Wireframes](docs/documentation/demo_1/coding_standards.md) <br>
 🔗 [Research Document](docs/research-doc.md) <br>
