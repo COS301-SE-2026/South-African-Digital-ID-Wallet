@@ -1,0 +1,6 @@
+@FlashIdBackend_HostAddress = http://localhost:5118
+
+GET {{FlashIdBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

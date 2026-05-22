@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+.pnpm/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+
+*.swp
+*.swo
