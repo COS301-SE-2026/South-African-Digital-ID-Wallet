@@ -158,8 +158,8 @@ The full epics and user stories — including acceptance criteria and definition
 
 ### Epic Summary
 
-| Epic | Title | Milestone |
-|---|---|---|
+| Epic | Title |
+|---|---|
 | E01 | Identity Onboarding & Citizen Registration |
 | E02 | Authentication & Role-Based Access Control |
 | E03 | Institution Registration & API Key Management |
