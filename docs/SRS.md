@@ -1,5 +1,5 @@
 # Software Requirements Specification (SRS)
-# FlashID — South African Digital ID Wallet
+## FlashID - South African Digital ID Wallet
 
 > COS 301 Capstone Project 2026  
 > Team: Tech Titans  
@@ -8,7 +8,7 @@
 
 ---
 
-# Table of Contents
+## Table of Contents
 
 1. Introduction  
 2. System Overview  
@@ -24,9 +24,9 @@
 
 ---
 
-# 1. Introduction
+## 1. Introduction
 
-## 1.1 Purpose
+### 1.1 Purpose
 
 FlashID is a secure South African Digital Identity Wallet system that enables citizens to digitally store, manage, and present government-issued credentials such as South African IDs and driver's licences.
 
@@ -48,7 +48,7 @@ The system consists of:
 
 ---
 
-## 1.2 Business Problem
+### 1.2 Business Problem
 
 In South Africa, identity verification still heavily depends on physical documentation. Lost, stolen, or forged identity documents create major risks for citizens, government institutions, banks, hospitals, and law enforcement agencies.
 
@@ -61,7 +61,7 @@ FlashID addresses these issues through:
 
 ---
 
-## 1.3 Scope
+### 1.3 Scope
 
 The FlashID prototype will:
 - Allow citizens to onboard and access a digital identity wallet
@@ -74,7 +74,7 @@ The prototype will simulate institutional integrations using mock or controlled 
 
 ---
 
-# 2. System Overview
+## 2. System Overview
 
 FlashID is a multi-platform digital identity ecosystem consisting of:
 
@@ -92,9 +92,9 @@ The system follows CLEAN Architecture principles to separate:
 
 ---
 
-# 3. User Characteristics and Actors
+## 3. User Characteristics and Actors
 
-## 3.1 Citizen
+### 3.1 Citizen
 
 A South African citizen who:
 - Registers for FlashID
@@ -106,7 +106,7 @@ A South African citizen who:
 
 ---
 
-## 3.2 Government Administrator
+### 3.2 Government Administrator
 
 Authorized personnel who:
 - Issue credentials
@@ -117,7 +117,7 @@ Authorized personnel who:
 
 ---
 
-## 3.3 Official
+### 3.3 Official
 
 External authorized entities such as:
 - Banks
@@ -134,30 +134,32 @@ Officials may:
 
 ---
 
-# 4. Functional Requirements
+## 4. Functional Requirements
 
 See [functional_requirements.md](./functional_requirements.md) for the full functional requirements specification.
 ---
 
-# 5. Use Cases
+## 5. Use Cases
 
 
 ---
 
-# 6. API Service Contracts
+## 6. API Service Contracts
 
 See [API.md](./API.md) for preliminary API contracts and payloads supporting these use cases.
 
 ---
-# 7. Domain Model
+## 7. Domain Model
+
+![Domain Model Diagram](images/Domain_Modeling.svg)
 
 
 ---
 
-# 8. Architectural Requirements
+## 8. Architectural Requirements
 See [architecture.md](./architecture.md) for the overarching architectural approach, quality requirements, design patterns, and constraints guiding Demo 1 implementation. 
 ---
-# 9. Technology Requirements
+## 9. Technology Requirements
 
 | Category | Technology | Version |
 |---|---|---|
@@ -177,22 +179,22 @@ See [architecture.md](./architecture.md) for the overarching architectural appro
 
 ---
 
-# 10. Constraints and Assumptions
+## 10. Constraints and Assumptions
 
-## Constraints
+### Constraints
 - No live government integrations during prototype phase
 - POPIA compliance required
 - Must support mobile and web platforms
 - Must use Azure infrastructure
 
-## Assumptions
+### Assumptions
 - Citizens possess smartphones
 - Institutions have internet access
 - Mock integrations represent real-world systems
 
 ---
 
-# 11. Future Enhancements
+## 11. Future Enhancements
 
 Potential future features include:
 - Passport credentials
