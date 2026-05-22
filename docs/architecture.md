@@ -1,4 +1,4 @@
-# FlashID — Architectural Requirements
+﻿# FlashID — Architectural Requirements
 **Tech Titans · COS 301 Capstone 2026**
 
 ---
@@ -6,6 +6,8 @@
 ## Overview
 
 FlashID is a multi-platform digital identity ecosystem built on Clean Architecture principles. The system separates business logic, infrastructure concerns, presentation logic, and data persistence into distinct layers, ensuring maintainability, testability, and scalability.
+
+![FlashID Architecture Diagram](./images/Architecture_Diagram.svg)
 
 ---
 
