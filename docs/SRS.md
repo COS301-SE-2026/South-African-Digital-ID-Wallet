@@ -152,7 +152,7 @@ Officials may:
 ---
 ## 3.2 Epics and User Stories
 
-The full epics and user stories — including acceptance criteria and definitions of done for all 12 epics and 60+ user stories — are documented in:
+The full epics and user stories, including acceptance criteria and definitions of done for all 12 epics and 49 user stories are documented in:
 
  **[epics_and_user_stories.md](./epics_and_user_stories.md)**
 
@@ -177,7 +177,7 @@ The full epics and user stories — including acceptance criteria and definition
 
 ## 4. Functional Requirements
 
-The complete functional requirements — subsystems R1 through R10 — are documented in:
+The complete functional requirements, subsystems R1 through R10 are documented in:
 
  **[functional_requirements.md](./functional_requirements.md)**
 
