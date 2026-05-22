@@ -157,7 +157,7 @@ t3chtitansgo@gmail.com
     <td width="20%">
       <code>Mobile Systems</code><br>
       <code>Frontend Engineering</code><br>
-      <a href="https://www.linkedin.com/in/huai-en-ryan-liao">
+      <a href="https://www.linkedin.com/in/huai-en-ryan-liao-252303336">
         <img src="https://custom-icon-badges.demolab.com/badge/LinkedIn-0A66C2?logo=linkedin-white&logoColor=fff" alt="LinkedIn">
       </a>
     </td>
@@ -174,7 +174,7 @@ t3chtitansgo@gmail.com
     <td width="20%">
       <code>Integration Systems</code><br>
       <code>UI Engineering</code><br>
-      <a href="https://www.linkedin.com/in/dominiqu-nigatu">
+      <a href="https://www.linkedin.com/in/dominiqu-nigatu-564791359">
         <img src="https://custom-icon-badges.demolab.com/badge/LinkedIn-0A66C2?logo=linkedin-white&logoColor=fff" alt="LinkedIn">
       </a>
     </td>
