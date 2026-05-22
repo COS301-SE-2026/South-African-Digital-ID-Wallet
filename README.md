@@ -60,7 +60,7 @@ t3chtitansgo@gmail.com
 
 🔗 [SRS](docs/srs.md) <br>
 🔗 [Brand style guide](docs/Branding_Document_v1.0.pdf) <br>
-🔗 [Wireframes](docs/documentation/demo_1/coding_standards.md) <br>
+🔗 [Wireframes](docs/wireframes.md) <br>
 🔗 [Research Document](docs/research-doc.md) <br>
 
 </details>
