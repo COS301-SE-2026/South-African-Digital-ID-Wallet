@@ -1,9 +1,9 @@
-<p align="center">
+﻿<p align="center">
   <img src="docs/logo.png" alt="banner" style="width: 100%; height: auto; display: block;"/>
 </p>
 
 <p align="center">
-Smart Digital ID Wallet (SDIW) is a secure national-scale digital identity platform that enables citizens to store, manage, and verify official identity credentials digitally. Citizens can securely store cryptographically signed credentials such as national IDs and driver's licences, then present them through QR codes for instant real-time verification.
+South African Digital ID Wallet - FlashID, is a secure national-scale digital identity platform that enables citizens to store, manage, and verify official identity credentials digitally. Citizens can securely store cryptographically signed credentials such as national IDs and driver's licences, then present them through QR codes for instant real-time verification.
 </p>
 
 <div align="center">
@@ -21,14 +21,14 @@ Smart Digital ID Wallet (SDIW) is a secure national-scale digital identity platf
 
 ## Table of Contents
 
-- [Table of Contents](#-table-of-contents)
-- [Demo Videos](#-demo-videos)
-- [Contact Us](#-contact-us)
-- [Documentation](#-documentation)
-- [Team Profiles](#-team-profiles)
-- [Git Structure](#-git-structure)
-- [Branching Strategy](#-branching-strategy)
-- [Quality Badges](#️-quality-badges)
+- [Table of Contents](#table-of-contents)
+- [Demo Videos](#demo-videos)
+- [Contact Us](#contact-us)
+- [Documentation](#documentation)
+- [Team Profiles](#team-profiles)
+- [Git Structure](#git-structure)
+- [Branching Strategy](#branching-strategy)
+- [Badges](#badges)
 
 ---
 
@@ -58,9 +58,9 @@ t3chtitansgo@gmail.com
 <details>
 <summary><strong>Demo 1 Documentation</strong></summary>
 
-🔗 [SRS](docs/srs.md) <br>
+🔗 [SRS](docs/SRS.md) <br>
 🔗 [Brand style guide](docs/Branding_Document_v1.0.pdf) <br>
-🔗 [Wireframes](docs/documentation/demo_1/coding_standards.md) <br>
+🔗 [Wireframes](docs/wireframes.md) <br>
 🔗 [Research Document](docs/research-doc.md) <br>
 
 </details>
@@ -101,12 +101,12 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Unathi Tshakalisa</strong><br>
-      <img src="docs/images/unathi.jpeg" alt="Unathi Tshakalisa" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+      <img src="docs/images/unathi.JPEG" alt="Unathi Tshakalisa" style="width: 100%; height: 300px; object-fit: cover; display: block;">
     </td>
     <td width="20%">
       <code>Team Leader</code><br>
       <code>Full Stack</code><br>
-      <a href="linkedin.com/in/unathi-tshakalisa-702a582a4">
+      <a href="https://www.linkedin.com/in/unathi-tshakalisa-702a582a4">
         <img src="https://custom-icon-badges.demolab.com/badge/LinkedIn-0A66C2?logo=linkedin-white&logoColor=fff" alt="LinkedIn">
       </a>
     </td>
@@ -118,12 +118,12 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Zaynab Samir</strong><br>
-      <img src="docs/images/zaynab.jpeg" alt="Zaynab Samir" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+      <img src="docs/images/zaynab.JPEG" alt="Zaynab Samir" style="width: 100%; height: 300px; object-fit: cover; display: block;">
     </td>
     <td width="20%">
       <code>Cybersecurity</code><br>
       <code>Full Stack</code><br>
-      <a href="linkedin.com/in/zaynab-samir-168b7532a">
+      <a href="https://www.linkedin.com/in/zaynab-samir-168b7532a">
         <img src="https://custom-icon-badges.demolab.com/badge/LinkedIn-0A66C2?logo=linkedin-white&logoColor=fff" alt="LinkedIn">
       </a>
     </td>
@@ -135,12 +135,12 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Nathan Chisadza</strong><br>
-      <img src="docs/images/nathan.jpeg" alt="Nathan Chisadza" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+      <img src="docs/images/nathan.JPEG" alt="Nathan Chisadza" style="width: 100%; height: 300px; object-fit: cover; display: block;">
     </td>
     <td width="20%">
       <code>Algorithms</code><br>
       <code>Full Stack</code><br>
-      <a href="linkedin.com/in/nathaniel-paul-chisadza">
+      <a href="https://www.linkedin.com/in/nathaniel-paul-chisadza">
         <img src="https://custom-icon-badges.demolab.com/badge/LinkedIn-0A66C2?logo=linkedin-white&logoColor=fff" alt="LinkedIn">
       </a>
     </td>
@@ -152,12 +152,12 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Ryan Liao</strong><br>
-      <img src="docs/images/ryan.jpeg" alt="Ryan Liao" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+      <img src="docs/images/ryan.JPEG" alt="Ryan Liao" style="width: 100%; height: 300px; object-fit: cover; display: block;">
     </td>
     <td width="20%">
       <code>Mobile Systems</code><br>
       <code>Frontend Engineering</code><br>
-      <a href="linkedin.com/in/huai-en-ryan-liao">
+      <a href="https://www.linkedin.com/in/huai-en-ryan-liao-252303336">
         <img src="https://custom-icon-badges.demolab.com/badge/LinkedIn-0A66C2?logo=linkedin-white&logoColor=fff" alt="LinkedIn">
       </a>
     </td>
@@ -169,12 +169,12 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Dominiqu Nigatu</strong><br>
-      <img src="docs/images/dom.png" alt="Dominiqu Nigatu" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+      <img src="docs/images/dom.PNG" alt="Dominiqu Nigatu" style="width: 100%; height: 300px; object-fit: cover; display: block;">
     </td>
     <td width="20%">
       <code>Integration Systems</code><br>
       <code>UI Engineering</code><br>
-      <a href="linkedin.com/in/dominiqu-nigatu">
+      <a href="https://www.linkedin.com/in/dominiqu-nigatu-564791359">
         <img src="https://custom-icon-badges.demolab.com/badge/LinkedIn-0A66C2?logo=linkedin-white&logoColor=fff" alt="LinkedIn">
       </a>
     </td>
@@ -194,8 +194,6 @@ Our repository follows a modular monorepo structure where different components a
 - **frontend/** → Next.js web portals for administrators and verifiers.
 - **mobile/** → React Native citizen wallet application.
 - **backend/** → ASP.NET Core APIs and business logic.
-- **database/** → SQL schemas, migrations, and database configuration.
-- **infrastructure/** → Azure deployment and Docker configuration files.
 - **docs/** → Project documentation, reports, and assets.
 
 | Branch | Purpose |
