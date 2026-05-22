@@ -1,7 +1,7 @@
 ﻿# Functional Requirements — FlashID
 **Tech Titans · COS 301 Capstone 2026**
 
-> This document contains the complete functional requirements for the FlashID system (R1–R10).
+> This document contains the complete functional requirements for the FlashID system (R1-R10).
 > See [SRS.md](./SRS.md) for the full Software Requirements Specification.
 
 ---
@@ -586,4 +586,4 @@ Entering the duress PIN shall open a safe-mode view of the wallet displaying onl
 The system shall generate a silent security alert when the duress PIN is used, with no visible indication to the person observing. The alert shall be logged to the audit trail with citizen ID, device ID, and timestamp.
 
 ---
-
+

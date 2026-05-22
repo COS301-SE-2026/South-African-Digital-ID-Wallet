@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-Smart Digital ID Wallet (SDIW) is a secure national-scale digital identity platform that enables citizens to store, manage, and verify official identity credentials digitally. Citizens can securely store cryptographically signed credentials such as national IDs and driver's licences, then present them through QR codes for instant real-time verification.
+South African Digital ID Wallet - FlashID, is a secure national-scale digital identity platform that enables citizens to store, manage, and verify official identity credentials digitally. Citizens can securely store cryptographically signed credentials such as national IDs and driver's licences, then present them through QR codes for instant real-time verification.
 </p>
 
 <div align="center">
@@ -58,7 +58,7 @@ t3chtitansgo@gmail.com
 <details>
 <summary><strong>Demo 1 Documentation</strong></summary>
 
-🔗 [SRS](docs/srs.md) <br>
+🔗 [SRS](docs/SRS.md) <br>
 🔗 [Brand style guide](docs/Branding_Document_v1.0.pdf) <br>
 🔗 [Wireframes](docs/wireframes.md) <br>
 🔗 [Research Document](docs/research-doc.md) <br>
@@ -101,7 +101,7 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Unathi Tshakalisa</strong><br>
-      <img src="docs/images/unathi.jpeg" alt="Unathi Tshakalisa" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+      <img src="docs/images/unathi.JPEG" alt="Unathi Tshakalisa" style="width: 100%; height: 300px; object-fit: cover; display: block;">
     </td>
     <td width="20%">
       <code>Team Leader</code><br>
@@ -118,7 +118,7 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Zaynab Samir</strong><br>
-      <img src="docs/images/zaynab.jpeg" alt="Zaynab Samir" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+      <img src="docs/images/zaynab.JPEG" alt="Zaynab Samir" style="width: 100%; height: 300px; object-fit: cover; display: block;">
     </td>
     <td width="20%">
       <code>Cybersecurity</code><br>
@@ -135,7 +135,7 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Nathan Chisadza</strong><br>
-      <img src="docs/images/nathan.jpeg" alt="Nathan Chisadza" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+      <img src="docs/images/nathan.JPEG" alt="Nathan Chisadza" style="width: 100%; height: 300px; object-fit: cover; display: block;">
     </td>
     <td width="20%">
       <code>Algorithms</code><br>
@@ -152,7 +152,7 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Ryan Liao</strong><br>
-      <img src="docs/images/ryan.jpeg" alt="Ryan Liao" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+      <img src="docs/images/ryan.JPEG" alt="Ryan Liao" style="width: 100%; height: 300px; object-fit: cover; display: block;">
     </td>
     <td width="20%">
       <code>Mobile Systems</code><br>
@@ -169,7 +169,7 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Dominiqu Nigatu</strong><br>
-      <img src="docs/images/dom.png" alt="Dominiqu Nigatu" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+      <img src="docs/images/dom.PNG" alt="Dominiqu Nigatu" style="width: 100%; height: 300px; object-fit: cover; display: block;">
     </td>
     <td width="20%">
       <code>Integration Systems</code><br>
@@ -194,8 +194,6 @@ Our repository follows a modular monorepo structure where different components a
 - **frontend/** → Next.js web portals for administrators and verifiers.
 - **mobile/** → React Native citizen wallet application.
 - **backend/** → ASP.NET Core APIs and business logic.
-- **database/** → SQL schemas, migrations, and database configuration.
-- **infrastructure/** → Azure deployment and Docker configuration files.
 - **docs/** → Project documentation, reports, and assets.
 
 | Branch | Purpose |
