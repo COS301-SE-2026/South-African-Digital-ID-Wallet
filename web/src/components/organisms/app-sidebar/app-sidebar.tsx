@@ -13,19 +13,19 @@ import {
   WalletCards,
   UserRoundPen,
   Landmark,
+  LogOut,
 } from 'lucide-react'
 
 import { useState } from 'react'
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import FlashIdWhite from '@/assets/images/FlashID-white.png'
+import { Button } from '@/components/atoms'
 
-import type {
-  SidebarNavSection,
-  SidebarUser,
-  SidebarIconName,
-} from '@/types/navigation'
+import type { SidebarIconName } from '@/types/navigation'
+import type { AppSidebarProps } from './types'
 
 const sidebarIcons: Record<SidebarIconName, React.ElementType> = {
   dashboard: LayoutDashboard,
@@ -41,16 +41,13 @@ const sidebarIcons: Record<SidebarIconName, React.ElementType> = {
   institutions: Landmark,
 }
 
-type AppSidebarProps = {
-  navSections: SidebarNavSection[]
-  user: SidebarUser
-}
-
 export const AppSidebar = ({
   navSections,
   user,
+  onLogout,
 }: Readonly<AppSidebarProps>) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const pathname = usePathname()
 
   return (
     <aside
@@ -65,14 +62,31 @@ export const AppSidebar = ({
       >
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full">
-            <Image
-              src={FlashIdWhite}
-              alt="Flash ID logo"
-              width={48}
-              height={48}
-              className="h-12 w-12 object-contain"
-              priority
-            />
+            {isCollapsed ? (
+              <div
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white"
+                title={user.name}
+                aria-label={`${user.name} avatar`}
+              >
+                <Image
+                  src={FlashIdWhite}
+                  alt="Flash ID logo"
+                  width={48}
+                  height={48}
+                  className="h-12 w-12 object-contain"
+                  priority
+                />
+              </div>
+            ) : (
+              <Image
+                src={FlashIdWhite}
+                alt="Flash ID logo"
+                width={48}
+                height={48}
+                className="h-12 w-12 object-contain"
+                priority
+              />
+            )}
           </div>
 
           {!isCollapsed && (
@@ -106,10 +120,7 @@ export const AppSidebar = ({
             <div className="space-y-2">
               {section.items.map((item) => {
                 const Icon = sidebarIcons[item.icon]
-
-                {
-                }
-                const isActive = 0
+                const isActive = pathname === item.href
 
                 return (
                   <Link
@@ -136,31 +147,43 @@ export const AppSidebar = ({
 
       {!isCollapsed && (
         <div className="mt-auto rounded-3xl border border-clean-white/10 bg-clean-white/10 p-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white">
-              {user.initials}
-            </div>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white">
+                {user.initials}
+              </div>
 
-            <div className="min-w-0">
-              <p className="truncate text-sm font-extrabold text-clean-white">
-                {user.name}
-              </p>
-              <p className="text-xs font-semibold text-accent-gold/80">
-                {user.idLabel}
-              </p>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-extrabold text-clean-white">
+                  {user.name}
+                </p>
+                <p className="truncate text-xs font-semibold text-accent-gold/80">
+                  {user.idLabel}
+                </p>
+              </div>
             </div>
+          </div>
+          <div className="mt-2">
+            <Button onClick={onLogout} LeftIcon={LogOut}>
+              Logout
+            </Button>
           </div>
         </div>
       )}
 
       {isCollapsed && (
-        <div className="mt-auto flex justify-center">
+        <div className="mt-auto flex flex-col items-center gap-2">
           <div
-            title={` ${user.name} `}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/30 bg-clean-white/10 text-sm font-extrabold text-clean-white"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white"
+            title={user.name}
+            aria-label={`${user.name} avatar`}
           >
             {user.initials}
           </div>
+
+          <Button onClick={onLogout} LeftIcon={LogOut}>
+            Logout
+          </Button>
         </div>
       )}
     </aside>

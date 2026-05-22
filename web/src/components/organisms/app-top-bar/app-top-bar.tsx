@@ -1,18 +1,5 @@
 import { Bell, ChevronDown } from 'lucide-react'
-
-type TopBarUser = {
-  name: string
-  initials: string
-  subtitle?: string
-}
-
-type AppTopBarProps = {
-  title: string
-  description: string
-  user: TopBarUser
-  showNotifications?: boolean
-  notificationCount?: number
-}
+import type { AppTopBarProps } from '@/types/app-top-bar'
 
 export const AppTopBar = ({
   title,
