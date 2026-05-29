@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Domain\Domain.csproj" />
+        <PackageReference Include="Riok.Mapperly" Version="3.6.0" PrivateAssets="all" />
     </ItemGroup>
 
 </Project>
