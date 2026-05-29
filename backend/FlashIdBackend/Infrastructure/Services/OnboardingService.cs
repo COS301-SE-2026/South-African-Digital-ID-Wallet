@@ -18,14 +18,14 @@ public class OnboardingService : IOnboardingService
         _context = context;
     }
 
-    public async Task<OnboardCitizenResponseDto> OnboardCitizenAsync(OnboardCitizenRequestDto requestDto)
+    public async Task<OnboardCitizenResponseDto> OnboardCitizenAsync(OnboardCitizenRequestDto request)
     {
-        if (!requestDto.ConsentGiven)
+        if (!request.ConsentGiven)
         {
             throw new CitizenConsentRequiredException();
         }
 
-        var identityRecord = _registryService.GetBySaId(requestDto.SaId);
+        var identityRecord = _registryService.GetBySaId(request.SaId);
 
         if (identityRecord is null)
         {
@@ -38,7 +38,7 @@ public class OnboardingService : IOnboardingService
         }
 
         var existingCitizen = _context.Citizens
-            .FirstOrDefault(citizen => citizen.SaId == requestDto.SaId);
+            .FirstOrDefault(citizen => citizen.SaId == request.SaId);
 
         if (existingCitizen is not null)
         {
@@ -50,9 +50,9 @@ public class OnboardingService : IOnboardingService
             Id = Guid.NewGuid(),
             Names = identityRecord.Names,
             Surname = identityRecord.Surname,
-            Email = requestDto.Email,
-            PhoneNumber = requestDto.PhoneNumber,
-            Username = requestDto.Email,
+            Email = request.Email,
+            PhoneNumber = request.PhoneNumber,
+            Username = request.Email,
             Role = UserRole.Citizen,
             IsEmailVerified = false,
             IsDeleted = false,
