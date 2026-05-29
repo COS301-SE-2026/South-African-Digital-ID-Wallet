@@ -2,7 +2,7 @@ using Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Onboarding.Exceptions;
 using Application.Common.Interfaces;
-using Application.Features.Onboarding.Dtos;
+using Application.Features.Onboarding.DTOs;
 
 namespace Presentation.Controllers;
 

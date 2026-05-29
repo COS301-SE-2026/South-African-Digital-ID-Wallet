@@ -1,4 +1,4 @@
-using Application.Features.Onboarding.Dtos;
+using Application.Features.Onboarding.DTOs;
 
 namespace Infrastructure.Services;
 
