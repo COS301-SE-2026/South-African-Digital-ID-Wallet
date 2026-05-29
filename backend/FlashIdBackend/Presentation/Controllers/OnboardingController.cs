@@ -36,9 +36,9 @@ public class OnboardingController : ControllerBase
     }
 
     [HttpPost("citizen")]
-    public async Task<IActionResult> OnboardCitizen([FromBody] OnboardCitizenRequest request)
+    public async Task<IActionResult> OnboardCitizen([FromBody] OnboardCitizenRequestDto requestDto)
     {
-        var response = await _onboardingService.OnboardCitizenAsync(request);
+        var response = await _onboardingService.OnboardCitizenAsync(requestDto);
 
         return Ok(response);
     }
