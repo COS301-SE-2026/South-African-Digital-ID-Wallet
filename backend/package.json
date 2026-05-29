@@ -3,14 +3,14 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "restore": "dotnet restore FlashIdBackend/FlashIdBackend.sln",
+    "restore": "dotnet restore FlashIdBackend/FlashIdBackend.sln && dotnet tool restore --tool-manifest FlashIdBackend/.config/dotnet-tools.json",
     "dev": "dotnet watch run --project FlashIdBackend/Presentation/Presentation.csproj",
     "start": "dotnet run --project FlashIdBackend/Presentation/Presentation.csproj",
     "clean": "dotnet clean FlashIdBackend/FlashIdBackend.sln",
     "build": "dotnet build FlashIdBackend/Presentation/Presentation.csproj",
     "type-check": "dotnet build FlashIdBackend/FlashIdBackend.sln",
     "test": "dotnet test --solution FlashIdBackend/FlashIdBackend.sln",
-    "test:coverage": "dotnet test --solution FlashIdBackend/FlashIdBackend.sln --coverage --coverage-output-format cobertura --results-directory ./TestResults",
+    "test:coverage": "dotnet test --solution FlashIdBackend/FlashIdBackend.sln --coverage --coverage-output-format cobertura --results-directory ./TestResults && reportgenerator -reports:\"./TestResults/**/*.cobertura.xml\" -targetdir:\"./CoverageReport\" -reporttypes:\"Html;TextSummary\"",
     "format": "dotnet format FlashIdBackend/",
     "lint": "dotnet format --verify-no-changes FlashIdBackend/"
   }
