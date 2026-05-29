@@ -24,20 +24,12 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore ./backend/FlashIdBackend
-
+          
       - name: Build
         run: dotnet build ./backend/FlashIdBackend --no-restore --configuration Release
 
-      - name: Restore dependencies
-        run: |
-          dotnet restore ./backend/FlashIdBackend
-          dotnet tool restore --tool-manifest ./backend/FlashIdBackend/.config/dotnet-tools.json
-
       - name: Run tests with coverage
-        run: |
-         dotnet tool restore --tool-manifest ./backend/FlashIdBackend/.config/dotnet-tools.json
-         dotnet test ./backend/FlashIdBackend --no-build --configuration Release --coverage --coverage-output-format cobertura --results-directory ./backend/TestResults
-         dotnet tool run reportgenerator -reports:"./backend/TestResults/**/*.cobertura.xml" -targetdir:"./backend/CoverageReport" -reporttypes:"Html;TextSummary"
+        run: dotnet test ./backend/FlashIdBackend --no-build --configuration Release --coverage --coverage-output-format cobertura --results-directory ./backend/TestResults
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
