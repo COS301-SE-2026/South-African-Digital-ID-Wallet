@@ -28,12 +28,12 @@ jobs:
       - name: Build
         run: dotnet build ./backend/FlashIdBackend --no-restore --configuration Release
 
-      - name: Run tests
-        run: dotnet test ./backend/FlashIdBackend --no-build --configuration Release --results-directory ./coverage
+      - name: Run tests with coverage
+        run: dotnet test ./backend/FlashIdBackend --no-build --configuration Release --coverage --coverage-output-format cobertura
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          directory: ./coverage
+          files: ./backend/TestResults/**/*.cobertura.xml
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
