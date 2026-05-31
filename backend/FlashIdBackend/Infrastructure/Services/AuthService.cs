@@ -8,6 +8,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Application.Mappers;
 
 namespace Infrastructure.Services;
 
@@ -15,11 +16,13 @@ public class AuthService : IAuthService
 {
     private readonly AppDbContext _context;
     private readonly IConfiguration _configuration;
+    private readonly AuthMapper _mapper;
 
-    public AuthService(AppDbContext context, IConfiguration configuration)
+    public AuthService(AppDbContext context, IConfiguration configuration, AuthMapper mapper)
     {
         _context = context;
         _configuration = configuration;
+        _mapper = mapper;
     }
 
     public async Task<LoginResponseDto> LoginAsync(
@@ -91,15 +94,11 @@ public class AuthService : IAuthService
 
         var (token, expiresAt) = GenerateJwtToken(user);
 
-        return new LoginResponseDto
-        {
-            Token = token,
-            ExpiresAt = expiresAt,
-            UserId = user.Id,
-            Role = user.Role.ToString(),
-            Names = user.Names,
-            Surname = user.Surname,
-        };
+        var response = _mapper.ToDto(user);
+        response.Token = token;
+        response.ExpiresAt = expiresAt;
+
+        return response;
     }
 
     public async Task<LogoutResponseDto> LogoutAsync(Guid userId, string ipAddress)

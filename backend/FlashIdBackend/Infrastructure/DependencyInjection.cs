@@ -17,6 +17,7 @@ public static class DependencyInjection
         services.AddScoped<ICitizenService, CitizenService>();
         services.AddScoped<CitizenMapper>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<AuthMapper>();
         services.AddScoped<MockGovernmentRegistryService>();
         services.AddScoped<IOnboardingService, OnboardingService>();
 
