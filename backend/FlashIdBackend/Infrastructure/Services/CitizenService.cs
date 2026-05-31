@@ -16,11 +16,13 @@ public class CitizenService : ICitizenService
 {
     private readonly AppDbContext _context;
     private readonly IPasswordHasher<User> _passwordHasher;
+    private readonly CitizenMapper _mapper;
 
-    public CitizenService(AppDbContext context, IPasswordHasher<User> passwordHasher)
+    public CitizenService(AppDbContext context, IPasswordHasher<User> passwordHasher, CitizenMapper mapper)
     {
         _context = context;
         _passwordHasher = passwordHasher;
+        _mapper = mapper;
     }
 
     public async Task<RegisterCitizenResponseDto> RegisterCitizenAsync(
@@ -86,13 +88,6 @@ public class CitizenService : ICitizenService
 
         await _context.SaveChangesAsync();
 
-        return new RegisterCitizenResponseDto
-        {
-            CitizenId = citizen.Id,
-            UserId = user.Id,
-            SaId = citizen.SaId,
-            Username = user.Username,
-            CreatedAt = citizen.CreatedAt,
-        };
+        return _mapper.ToDto(citizen, user);
     }
 }
