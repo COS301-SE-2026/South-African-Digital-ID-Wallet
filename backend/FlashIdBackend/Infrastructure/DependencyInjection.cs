@@ -3,6 +3,7 @@ using Domain.Entities;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Application.Mappers;
 
 namespace Infrastructure;
 

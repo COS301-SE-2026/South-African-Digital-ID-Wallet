@@ -9,6 +9,7 @@ using Domain.Enums;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Application.Mappers;
 
 namespace Infrastructure.Services;
 
