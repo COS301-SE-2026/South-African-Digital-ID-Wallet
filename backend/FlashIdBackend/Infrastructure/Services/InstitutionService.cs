@@ -73,26 +73,14 @@ public class InstitutionService : IInstitutionService
 
         await _context.SaveChangesAsync();
 
-        var response = _mapper.ToRegisterDto(institution, apiKey, apiKeyReference);
-        response.ApiKey = apiKey;
-        response.ApiKeyReference = apiKeyReference;
-
-        return response;
+        return _mapper.ToRegisterDto(institution, apiKey, apiKeyReference);
     }
 
     public async Task<IEnumerable<GetInstitutionResponseDto>> GetAllInstitutionsAsync()
     {
         var institutions = await _context.Institutions.ToListAsync();
 
-        return institutions.Select(i => new GetInstitutionResponseDto
-        {
-            InstitutionId = i.Id,
-            Name = i.Name,
-            Type = i.Type.ToString(),
-            VerificationNumber = i.VerificationNumber,
-            RegisteredById = i.RegisteredById,
-            CreatedAt = i.CreatedAt,
-        });
+        return institutions.Select(_mapper.ToGetDto);
     }
 
     public async Task<GetInstitutionResponseDto> GetInstitutionByIdAsync(Guid institutionId)
@@ -106,15 +94,7 @@ public class InstitutionService : IInstitutionService
                 $"Institution with ID '{institutionId}' was not found."
             );
 
-        return new GetInstitutionResponseDto
-        {
-            InstitutionId = institution.Id,
-            Name = institution.Name,
-            Type = institution.Type.ToString(),
-            VerificationNumber = institution.VerificationNumber,
-            RegisteredById = institution.RegisteredById,
-            CreatedAt = institution.CreatedAt,
-        };
+        return _mapper.ToGetDto(institution);
     }
 
     private static string GenerateApiKey()

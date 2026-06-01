@@ -17,4 +17,6 @@ public partial class InstitutionMapper
         VerificationNumber = institution.VerificationNumber,
         CreatedAt = institution.CreatedAt,
     };
+
+    public partial GetInstitutionResponseDto ToGetDto(Institution institution);
 }
