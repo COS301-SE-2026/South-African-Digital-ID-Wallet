@@ -15,11 +15,13 @@ public static class DependencyInjection
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         services.AddScoped<IInstitutionService, InstitutionService>();
         services.AddScoped<ICitizenService, CitizenService>();
-        services.AddScoped<CitizenMapper>();
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<AuthMapper>();
         services.AddScoped<MockGovernmentRegistryService>();
         services.AddScoped<IOnboardingService, OnboardingService>();
+
+        services.AddSingleton<CitizenMapper>();
+        services.AddSingleton<AuthMapper>();
+        services.AddSingleton<InstitutionMapper>();
 
         return services;
     }

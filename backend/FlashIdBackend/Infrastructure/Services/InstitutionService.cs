@@ -6,25 +6,26 @@ using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Application.Mappers;
 
 namespace Infrastructure.Services;
 
 public class InstitutionService : IInstitutionService
 {
     private readonly AppDbContext _context;
+    private readonly InstitutionMapper _mapper;
 
-    public InstitutionService(AppDbContext context)
+    public InstitutionService(AppDbContext context, InstitutionMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
     public async Task<RegisterInstitutionResponseDto> RegisterInstitutionAsync(
         RegisterInstitutionRequestDto request
     )
     {
-
         InstitutionValidator.Validate(request);
-
 
         var admin = await _context.GovernmentAdministrators.FirstOrDefaultAsync(a =>
             a.Id == request.AdminId
@@ -33,7 +34,6 @@ public class InstitutionService : IInstitutionService
         if (admin == null)
             throw new AdminNotFoundException(request.AdminId);
 
-
         var exists = await _context.Institutions.AnyAsync(i =>
             i.VerificationNumber == request.VerificationNumber
         );
@@ -41,10 +41,8 @@ public class InstitutionService : IInstitutionService
         if (exists)
             throw new InstitutionAlreadyExistsException(request.VerificationNumber);
 
-
         var apiKey = GenerateApiKey();
         var apiKeyReference = Guid.NewGuid();
-
 
         var institution = new Institution
         {
@@ -59,7 +57,6 @@ public class InstitutionService : IInstitutionService
         };
 
         _context.Institutions.Add(institution);
-
 
         var auditLog = new AuditLog
         {
@@ -76,18 +73,13 @@ public class InstitutionService : IInstitutionService
 
         await _context.SaveChangesAsync();
 
+        var response = _mapper.ToRegisterDto(institution, apiKey, apiKeyReference);
+        response.ApiKey = apiKey;
+        response.ApiKeyReference = apiKeyReference;
 
-        return new RegisterInstitutionResponseDto
-        {
-            InstitutionId = institution.Id,
-            Name = institution.Name,
-            Type = institution.Type.ToString(),
-            ApiKey = apiKey,
-            ApiKeyReference = apiKeyReference,
-            VerificationNumber = institution.VerificationNumber,
-            CreatedAt = institution.CreatedAt,
-        };
+        return response;
     }
+
     public async Task<IEnumerable<GetInstitutionResponseDto>> GetAllInstitutionsAsync()
     {
         var institutions = await _context.Institutions.ToListAsync();
