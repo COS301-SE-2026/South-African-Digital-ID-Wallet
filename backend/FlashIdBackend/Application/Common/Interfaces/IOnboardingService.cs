@@ -1,8 +1,8 @@
-using Application.Features.Onboarding.Dtos;
+using Application.Features.Onboarding.DTOs;
 
 namespace Application.Common.Interfaces;
 
 public interface IOnboardingService
 {
-    Task<OnboardCitizenResponseDto> OnboardCitizenAsync(OnboardCitizenRequest request);
+    Task<OnboardCitizenResponseDto> OnboardCitizenAsync(OnboardCitizenRequestDto request);
 }

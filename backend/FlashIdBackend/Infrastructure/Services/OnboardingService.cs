@@ -1,4 +1,4 @@
-using Application.Features.Onboarding.Dtos;
+using Application.Features.Onboarding.DTOs;
 using Application.Features.Onboarding.Exceptions;
 using Application.Common.Interfaces;
 using Domain.Entities;
@@ -22,7 +22,7 @@ public class OnboardingService : IOnboardingService
         _mapper = mapper;
     }
 
-    public async Task<OnboardCitizenResponseDto> OnboardCitizenAsync(OnboardCitizenRequest request)
+    public async Task<OnboardCitizenResponseDto> OnboardCitizenAsync(OnboardCitizenRequestDto request)
     {
         if (!request.ConsentGiven)
         {

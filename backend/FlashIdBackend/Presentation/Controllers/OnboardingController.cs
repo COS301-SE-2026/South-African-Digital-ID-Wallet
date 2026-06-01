@@ -2,7 +2,7 @@ using Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Onboarding.Exceptions;
 using Application.Common.Interfaces;
-using Application.Features.Onboarding.Dtos;
+using Application.Features.Onboarding.DTOs;
 
 namespace Presentation.Controllers;
 
@@ -36,7 +36,7 @@ public class OnboardingController : ControllerBase
     }
 
     [HttpPost("citizen")]
-    public async Task<IActionResult> OnboardCitizen([FromBody] OnboardCitizenRequest request)
+    public async Task<IActionResult> OnboardCitizen([FromBody] OnboardCitizenRequestDto request)
     {
         var response = await _onboardingService.OnboardCitizenAsync(request);
 

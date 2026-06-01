@@ -1,6 +1,6 @@
-namespace Application.Features.Onboarding.Dtos;
+namespace Application.Features.Onboarding.DTOs;
 
-public class OnboardCitizenRequest
+public class OnboardCitizenRequestDto
 {
     public string SaId { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;

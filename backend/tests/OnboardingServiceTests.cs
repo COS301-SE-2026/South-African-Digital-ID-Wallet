@@ -1,4 +1,4 @@
-using Application.Features.Onboarding.Dtos;
+using Application.Features.Onboarding.DTOs;
 using Application.Features.Onboarding.Exceptions;
 using Infrastructure.Data;
 using Infrastructure.Services;

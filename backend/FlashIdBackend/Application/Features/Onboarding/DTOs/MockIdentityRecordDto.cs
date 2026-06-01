@@ -1,4 +1,4 @@
-namespace Application.Features.Onboarding.Dtos;
+namespace Application.Features.Onboarding.DTOs;
 
 public class MockIdentityRecordDto
 {
