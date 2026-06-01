@@ -22,6 +22,7 @@ public static class DependencyInjection
         services.AddSingleton<CitizenMapper>();
         services.AddSingleton<AuthMapper>();
         services.AddSingleton<InstitutionMapper>();
+        services.AddSingleton<OnboardingMapper>();
 
         return services;
     }

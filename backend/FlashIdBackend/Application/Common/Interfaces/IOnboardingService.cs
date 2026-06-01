@@ -4,5 +4,5 @@ namespace Application.Common.Interfaces;
 
 public interface IOnboardingService
 {
-    Task<OnboardCitizenResponse> OnboardCitizenAsync(OnboardCitizenRequest request);
+    Task<OnboardCitizenResponseDto> OnboardCitizenAsync(OnboardCitizenRequest request);
 }

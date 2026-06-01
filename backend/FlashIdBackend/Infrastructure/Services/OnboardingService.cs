@@ -5,6 +5,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Application.Mappers;
 
 namespace Infrastructure.Services;
 
@@ -12,13 +13,16 @@ public class OnboardingService : IOnboardingService
 {
     private readonly MockGovernmentRegistryService _registryService;
     private readonly AppDbContext _context;
-    public OnboardingService(MockGovernmentRegistryService registryService, AppDbContext context)
+    private readonly OnboardingMapper _mapper;
+
+    public OnboardingService(MockGovernmentRegistryService registryService, AppDbContext context, OnboardingMapper mapper)
     {
         _registryService = registryService;
         _context = context;
+        _mapper = mapper;
     }
 
-    public async Task<OnboardCitizenResponse> OnboardCitizenAsync(OnboardCitizenRequest request)
+    public async Task<OnboardCitizenResponseDto> OnboardCitizenAsync(OnboardCitizenRequest request)
     {
         if (!request.ConsentGiven)
         {
@@ -78,14 +82,7 @@ public class OnboardingService : IOnboardingService
         _context.Citizens.Add(citizen);
         await _context.SaveChangesAsync();
 
-        return new OnboardCitizenResponse
-        {
-            CitizenId = citizen.Id,
-            SaId = identityRecord.SaId,
-            ActivationCode = activationCode,
-            ActivationCodeExpiresAt = citizen.ActivationCodeExpiresAt,
-            Status = "Pending"
-        };
+        return _mapper.ToDto(citizen, identityRecord, activationCode);
     }
 
 }

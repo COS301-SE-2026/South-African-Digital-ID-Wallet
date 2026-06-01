@@ -1,6 +1,6 @@
 namespace Application.Features.Onboarding.Dtos;
 
-public class OnboardCitizenResponse
+public class OnboardCitizenResponseDto
 {
     public Guid CitizenId { get; set; }
     public string SaId { get; set; } = string.Empty;
