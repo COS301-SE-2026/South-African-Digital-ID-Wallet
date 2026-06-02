@@ -9,14 +9,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        // Application services — contain business logic
-
         services.AddScoped<ICitizenService, CitizenService>();
 
-
-        // Mapperly mappers — source-generated, no runtime reflection
         services.AddSingleton<CitizenMapper>();
-
 
         return services;
     }
