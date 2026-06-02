@@ -100,7 +100,12 @@ if (app.Environment.IsDevelopment())
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await DbSeeder.SeedAsync(db);
+    if (!await db.DomainUsers.AnyAsync())
+    {
+        Console.WriteLine("[SEED] Database is empty, seeding sample data ...");
+        await DbSeeder.SeedAsync(db);
+        Console.WriteLine("[SEED] Database seeded successfully!");
+    }
 }
 
 app.UseHttpsRedirection();
