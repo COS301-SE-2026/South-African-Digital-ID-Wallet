@@ -12,16 +12,7 @@
 
     <ItemGroup>
       <PackageReference Include="Riok.Mapperly" Version="4.0.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Riok.Mapperly" Version="4.0.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-        <HintPath>..\..\..\..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\10.0.7\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
-      </Reference>
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
     </ItemGroup>
 
 </Project>
