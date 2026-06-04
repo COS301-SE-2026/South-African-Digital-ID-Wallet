@@ -1,12 +1,14 @@
 using Application.Common.Interfaces;
 using Application.Features.Institutions.DTOs;
 using Application.Features.Institutions.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
 
 [ApiController]
 [Route("api/institutions")]
+[Authorize(Roles = "GovernmentAdministrator")]
 public class InstitutionsController : ControllerBase
 {
     private readonly IInstitutionService _institutionService;
