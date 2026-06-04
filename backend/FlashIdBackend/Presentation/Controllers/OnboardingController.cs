@@ -1,4 +1,4 @@
-using Infrastructure.Services;
+using Application.Common.Interfaces.ServiceInterfaces;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Onboarding.Exceptions;
 using Application.Common.Interfaces;
@@ -11,11 +11,11 @@ namespace Presentation.Controllers;
 /*TODO: Implement retrieval of credential data once moch-gov db set up :)*/
 public class OnboardingController : ControllerBase
 {
-    private readonly MockGovernmentRegistryService _registryService;
+    private readonly IMockGovernmentRegistryService _registryService;
     private readonly IOnboardingService _onboardingService;
 
     public OnboardingController(
-       MockGovernmentRegistryService registryService,
+       IMockGovernmentRegistryService registryService,
        IOnboardingService onboardingService)
     {
         _registryService = registryService;
