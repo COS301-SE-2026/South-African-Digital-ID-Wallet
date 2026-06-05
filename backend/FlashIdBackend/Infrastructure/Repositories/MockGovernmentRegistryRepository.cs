@@ -3,7 +3,7 @@ using Application.Features.Onboarding.Dtos;
 
 namespace Infrastructure.Services;
 
-public class MockGovernmentRegistryService : IMockGovernmentRegistryService
+public class MockGovernmentRegistryRepository : IMockGovernmentRegistryRepository
 {
     private static readonly List<MockIdentityRecordDto> MockRecords =
     [

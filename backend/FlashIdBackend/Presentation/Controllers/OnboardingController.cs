@@ -13,21 +13,21 @@ namespace Presentation.Controllers;
 /*TODO: Implement retrieval of credential data once moch-gov db set up :)*/
 public class OnboardingController : ControllerBase
 {
-    private readonly IMockGovernmentRegistryService _registryService;
+    private readonly IMockGovernmentRegistryRepository _registryRepository;
     private readonly IOnboardingService _onboardingService;
 
     public OnboardingController(
-       IMockGovernmentRegistryService registryService,
+       IMockGovernmentRegistryRepository registryRepository,
        IOnboardingService onboardingService)
     {
-        _registryService = registryService;
+        _registryRepository = registryRepository;
         _onboardingService = onboardingService;
     }
 
     [HttpGet("verify/{idNumber}")]
     public IActionResult VerifyCitizenIdentity(string idNumber)
     {
-        var record = _registryService.GetBySaId(idNumber);
+        var record = _registryRepository.GetBySaId(idNumber);
 
         if (record is null)
         {

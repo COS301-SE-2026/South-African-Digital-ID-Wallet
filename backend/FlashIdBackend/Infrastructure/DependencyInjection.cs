@@ -4,6 +4,7 @@ using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Domain.Entities;
 using Infrastructure.Providers;
+using Infrastructure.Repositories;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,8 +21,9 @@ public static class DependencyInjection
         services.AddScoped<IInstitutionService, InstitutionService>();
         services.AddScoped<ICitizenRepository, CitizenRepository>();
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IMockGovernmentRegistryService, MockGovernmentRegistryService>();
-        services.AddScoped<IOnboardingService, OnboardingService>();
+        services.AddScoped<IMockGovernmentRegistryRepository, MockGovernmentRegistryRepository>();
+        services.AddScoped<IOnboardingRepository, OnboardingRepository>();
+
 
         return services;
     }
