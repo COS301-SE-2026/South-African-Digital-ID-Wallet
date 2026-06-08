@@ -1,4 +1,3 @@
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Institutions.DTOs;
 using Application.Features.Institutions.Exceptions;

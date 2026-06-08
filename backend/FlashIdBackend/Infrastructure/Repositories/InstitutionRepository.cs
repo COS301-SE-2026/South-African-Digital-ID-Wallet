@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services;
 
-public class InstitutionRepository : IInstitutionRepository //IMPLEMENTS Application's interface
+public class InstitutionRepository : IInstitutionRepository
 {
     private readonly AppDbContext _context;
 
@@ -42,8 +42,7 @@ public class InstitutionRepository : IInstitutionRepository //IMPLEMENTS Applica
 
     public async Task<List<Institution>> GetAllInstitutionsAsync()
     {
-        // ToListAsync materialises the entire table into memory.
-        // In production you would add pagination here.
+        // In production add pagination here.
         return await _context.Institutions.ToListAsync();
     }
 

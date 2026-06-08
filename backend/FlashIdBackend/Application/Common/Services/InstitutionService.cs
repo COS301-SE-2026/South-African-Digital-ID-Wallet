@@ -7,15 +7,9 @@ using Application.Features.Institutions.DTOs;
 using Application.Features.Institutions.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
-// using Infrastructure.Data;
-// using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services;
 
-// InstitutionService manages institution registration and querying.
-// Only a GovernmentAdministrator may register institutions — the [Authorize] attribute
-// on the controller enforces this at the HTTP level, but the service also verifies
-// that the supplied AdminId exists in the database (defense in depth).
 public class InstitutionService : IInstitutionService
 {
     private readonly IInstitutionRepository _institutionRepository;
@@ -40,9 +34,6 @@ public class InstitutionService : IInstitutionService
                 request.VerificationNumber))
             throw new InstitutionAlreadyExistsException(request.VerificationNumber);
 
-        // Generate a secure random API key.  The raw key is returned once to the caller
-        // and never stored.  Only the ApiKeyReference (a GUID) is persisted, so the DB
-        // cannot be used to recover the key if compromised.
         var apiKey = GenerateApiKey();
         var apiKeyReference = Guid.NewGuid();
 
@@ -72,8 +63,6 @@ public class InstitutionService : IInstitutionService
         await _institutionRepository.AddAuditLogAsync(auditLog);
         await _institutionRepository.SaveChangesAsync();
 
-        // Mapperly maps the entity fields; we set ApiKey manually because it is
-        // generated above and is not a property on the Institution entity.
         var dto = _mapper.InstitutionToRegisterResponseDto(institution);
         dto.ApiKey = apiKey;
         dto.ApiKeyReference = apiKeyReference;
