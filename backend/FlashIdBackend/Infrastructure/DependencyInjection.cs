@@ -24,7 +24,6 @@ public static class DependencyInjection
         services.AddScoped<IOnboardingRepository, OnboardingRepository>();
 
         services.AddScoped<IOnboardingService, OnboardingService>();
-        services.AddScoped<MockGovernmentRegistryService>();
 
         services.AddScoped<ICitizenRepository, CitizenRepository>();
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
@@ -32,3 +31,5 @@ public static class DependencyInjection
         return services;
     }
 }
+
+
