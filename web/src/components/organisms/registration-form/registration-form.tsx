@@ -10,19 +10,27 @@ import type { RegistrationFormProps } from '@/types/registration-form.types'
 
 const RequirementList = ({
   items,
+  show,
 }: {
   items: { label: string; met: boolean }[]
+  show: boolean
 }) => {
-  const errors = items.filter((item) => !item.met)
-  if (errors.length === 0) return null
-
   return (
-    <div className="mt-1.5 grid grid-cols-3 gap-x-3 gap-y-0.5">
-      {errors.map((item) => (
-        <p key={item.label} className="text-xs leading-snug text-destructive">
-          • {item.label}
-        </p>
-      ))}
+    <div className="mt-1.5 grid grid-cols-3 gap-x-3 gap-y-1" aria-live="polite">
+      {items.map((item) => {
+        const visible = show && !item.met
+        return (
+          <p
+            key={item.label}
+            aria-hidden={!visible}
+            className={`text-xs leading-snug text-destructive ${
+              visible ? 'visible' : 'invisible'
+            }`}
+          >
+            {item.label}
+          </p>
+        )
+      })}
     </div>
   )
 }
@@ -34,10 +42,15 @@ export const RegistrationForm = ({
   const [username, setUsername] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [confirmPassword, setConfirmPassword] = React.useState('')
-  const [activationCode, setActivationCode] = React.useState('')
   const [submitted, setSubmitted] = React.useState(false)
+  const [dirtyFields, setDirtyFields] = React.useState<Set<string>>(new Set())
 
   const stripSpaces = (value: string) => value.replace(/\s+/g, '')
+
+  const markDirty = (field: string) =>
+    setDirtyFields((prev) => new Set(prev).add(field))
+
+  const showErrors = (field: string) => submitted && !dirtyFields.has(field)
 
   const idRequirements = [
     { label: 'Invalid South African ID', met: /^\d{13}$/.test(idnumber) },
@@ -76,17 +89,13 @@ export const RegistrationForm = ({
   ) => {
     e.preventDefault()
     setSubmitted(true)
+    setDirtyFields(new Set())
     if (!isFormValid) return
-    onSubmitAction?.({
-      idnumber,
-      username,
-      password,
-      activationCode,
-    })
+    onSubmitAction?.({ idnumber, username, password })
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {/* ID Number */}
       <div>
         <div className="relative">
@@ -95,7 +104,10 @@ export const RegistrationForm = ({
             label="ID number:"
             type="text"
             value={idnumber}
-            onChange={(e) => setIdnumber(stripSpaces(e.target.value))}
+            onChange={(e) => {
+              setIdnumber(stripSpaces(e.target.value))
+              markDirty('idnumber')
+            }}
             onKeyDown={(e) => {
               if (e.key === ' ') e.preventDefault()
             }}
@@ -104,7 +116,7 @@ export const RegistrationForm = ({
             required
           />
         </div>
-        {submitted && <RequirementList items={idRequirements} />}
+        <RequirementList items={idRequirements} show={showErrors('idnumber')} />
       </div>
 
       {/* Username */}
@@ -115,7 +127,10 @@ export const RegistrationForm = ({
             label="Username:"
             type="text"
             value={username}
-            onChange={(e) => setUsername(stripSpaces(e.target.value))}
+            onChange={(e) => {
+              setUsername(stripSpaces(e.target.value))
+              markDirty('username')
+            }}
             onKeyDown={(e) => {
               if (e.key === ' ') e.preventDefault()
             }}
@@ -124,7 +139,10 @@ export const RegistrationForm = ({
             required
           />
         </div>
-        {submitted && <RequirementList items={usernameRequirements} />}
+        <RequirementList
+          items={usernameRequirements}
+          show={showErrors('username')}
+        />
       </div>
 
       {/* Password */}
@@ -135,7 +153,10 @@ export const RegistrationForm = ({
             label="Password:"
             type="password"
             value={password}
-            onChange={(e) => setPassword(stripSpaces(e.target.value))}
+            onChange={(e) => {
+              setPassword(stripSpaces(e.target.value))
+              markDirty('password')
+            }}
             onKeyDown={(e) => {
               if (e.key === ' ') e.preventDefault()
             }}
@@ -144,18 +165,24 @@ export const RegistrationForm = ({
             required
           />
         </div>
-        {submitted && <RequirementList items={passwordRequirements} />}
+        <RequirementList
+          items={passwordRequirements}
+          show={showErrors('password')}
+        />
       </div>
 
       {/* Verify Password */}
-      <div>
+      <div className="relative">
         <div className="relative">
           <LockKeyhole className="pointer-events-none absolute left-3 top-[54px] h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           <TextField
             label="Verify password:"
             type="password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(stripSpaces(e.target.value))}
+            onChange={(e) => {
+              setConfirmPassword(stripSpaces(e.target.value))
+              markDirty('confirmPassword')
+            }}
             onKeyDown={(e) => {
               if (e.key === ' ') e.preventDefault()
             }}
@@ -164,7 +191,10 @@ export const RegistrationForm = ({
             required
           />
         </div>
-        {submitted && <RequirementList items={confirmRequirements} />}
+        <RequirementList
+          items={confirmRequirements}
+          show={showErrors('confirmPassword')}
+        />
       </div>
 
       {/* Submit */}
