@@ -1,6 +1,6 @@
 using Application.Features.Institutions.DTOs;
 
-namespace Application.Common.Interfaces;
+namespace Application.Common.Interfaces.ServiceInterfaces;
 
 public interface IInstitutionService
 {
@@ -11,6 +11,4 @@ public interface IInstitutionService
     Task<IEnumerable<GetInstitutionResponseDto>> GetAllInstitutionsAsync();
 
     Task<GetInstitutionResponseDto> GetInstitutionByIdAsync(Guid institutionId);
-
-
 }

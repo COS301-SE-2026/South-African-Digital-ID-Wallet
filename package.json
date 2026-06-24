@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "packageManager": "pnpm@9.15.9",
   "scripts": {
-    "install:all": "pnpm install && pnpm --filter ./web install && pnpm --filter ./backend install",
+    "install:all": "pnpm install && pnpm --filter ./web install && pnpm --filter ./backend restore",
     "install:web": "pnpm --filter ./web install",
     "start:web": "pnpm --filter ./web start",
     "build:web": "pnpm --filter ./web build",
@@ -16,17 +16,21 @@
     "test:web:coverage": "pnpm --filter ./web run test:coverage",
     "postinstall": "lefthook install",
 
-    "install:backend": "pnpm --filter ./backend install",
+    "install:backend": "pnpm --filter ./backend restore",
     "start:backend": "pnpm --filter ./backend start",
+    "clean:backend": "pnpm --filter ./backend run clean",
     "build:backend": "pnpm --filter ./backend run build",
     "dev:backend": "pnpm --filter ./backend run dev",
     "lint:backend": "pnpm --filter ./backend run lint",
     "format:backend": "pnpm --filter ./backend run format",
     "type-check:backend": "pnpm --filter ./backend run type-check",
+    "test:backend": "pnpm --filter ./backend run test",
+    "test:backend:coverage": "pnpm --filter ./backend run test:coverage",
     
     "dev": "concurrently --kill-others-on-fail \"pnpm --filter ./web dev\" \"pnpm --filter ./backend run dev\"",
     "build": "pnpm install && pnpm --filter ./backend run build && pnpm --filter ./web build",
-    "test": "pnpm --filter ./backend run test",
+    "test": "pnpm --filter ./web run test && pnpm --filter ./backend run test",
+    "test:coverage": "pnpm --filter ./web run test:coverage && pnpm --filter ./backend run test:coverage",
     "format": "pnpm --filter ./backend run format && pnpm --filter ./web format",
     "lint": "pnpm --filter ./backend run lint && pnpm --filter ./web lint",
     "type-check": "pnpm --filter ./backend run type-check && pnpm --filter ./web type-check"

@@ -1,5 +1,6 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Mapping;
 using Application.Common.Services;
 using Infrastructure.Services;
@@ -14,8 +15,10 @@ public static class DependencyInjection
         services.AddScoped<ICitizenService, CitizenService>();
         services.AddScoped<IOnboardingService, OnboardingService>();
 
+        services.AddScoped<IInstitutionService, InstitutionService>();
 
         services.AddSingleton<CitizenMapper>();
+        services.AddSingleton<InstitutionMapper>();
 
         return services;
     }
