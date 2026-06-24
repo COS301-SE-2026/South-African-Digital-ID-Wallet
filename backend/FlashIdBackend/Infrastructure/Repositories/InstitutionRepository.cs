@@ -28,8 +28,6 @@ public class InstitutionRepository : IInstitutionRepository
 
     public Task AddInstitutionAsync(Institution institution)
     {
-        // YOUR method: AddInstitution (domain language)
-        // EF Core method inside: .Add() (framework language)
         _context.Institutions.Add(institution);
         return Task.CompletedTask;
     }
@@ -42,7 +40,7 @@ public class InstitutionRepository : IInstitutionRepository
 
     public async Task<List<Institution>> GetAllInstitutionsAsync()
     {
-        // In production add pagination here.
+        //in production add pagination here
         return await _context.Institutions.ToListAsync();
     }
 
