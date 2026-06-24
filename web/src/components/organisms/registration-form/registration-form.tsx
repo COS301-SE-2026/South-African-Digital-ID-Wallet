@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import Link from 'next/link'
-import { User, CircleUserRound, LockKeyhole, KeyRound } from 'lucide-react'
+import { User, CircleUserRound, LockKeyhole } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Text } from '@/components/atoms'
 import { TextField } from '@/components/molecules'
