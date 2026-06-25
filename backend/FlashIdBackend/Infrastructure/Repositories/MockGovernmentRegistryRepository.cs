@@ -1,8 +1,9 @@
+using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Onboarding.Dtos;
 
 namespace Infrastructure.Services;
 
-public class MockGovernmentRegistryService
+public class MockGovernmentRegistryRepository : IMockGovernmentRegistryRepository
 {
     private static readonly List<MockIdentityRecordDto> MockRecords =
     [

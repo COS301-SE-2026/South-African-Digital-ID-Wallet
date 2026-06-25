@@ -8,6 +8,7 @@ namespace Presentation.Controllers;
 
 [ApiController]
 [Route("api/institutions")]
+[Authorize(Roles = "GovernmentAdministrator")]
 public class InstitutionsController : ControllerBase
 {
     private readonly IInstitutionService _institutionService;

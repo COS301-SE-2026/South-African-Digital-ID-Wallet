@@ -1,49 +1,41 @@
 using Application.Features.Onboarding.Dtos;
 using Application.Features.Onboarding.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.RepositoryInterfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
 using Domain.Entities;
 using Domain.Enums;
-using Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services;
 
 public class OnboardingService : IOnboardingService
 {
-    private readonly MockGovernmentRegistryService _registryService;
-    private readonly AppDbContext _context;
-    public OnboardingService(MockGovernmentRegistryService registryService, AppDbContext context)
+    private readonly IOnboardingRepository _onboardingRepository;
+    private readonly IMockGovernmentRegistryRepository _mockGovernmentRegistryRepository;
+    public OnboardingService(IOnboardingRepository registryService, IMockGovernmentRegistryRepository mockGovernmentRegistryRepository)
     {
-        _registryService = registryService;
-        _context = context;
+        _onboardingRepository = registryService;
+        _mockGovernmentRegistryRepository = mockGovernmentRegistryRepository;
     }
 
     public async Task<OnboardCitizenResponse> OnboardCitizenAsync(OnboardCitizenRequest request)
     {
         if (!request.ConsentGiven)
-        {
             throw new CitizenConsentRequiredException();
-        }
 
-        var identityRecord = _registryService.GetBySaId(request.SaId);
+        //Check if the user already exists... business logic
+        var identityRecord = _mockGovernmentRegistryRepository.GetBySaId(request.SaId);
 
         if (identityRecord is null)
-        {
             throw new IdentityRecordNotFoundException();
-        }
 
-        if (identityRecord.SaId is null)
-        {
-            throw new Exception("Id field is empty");
-        }
-
-        var existingCitizen = _context.Citizens
-            .FirstOrDefault(citizen => citizen.SaId == request.SaId);
-
+        var existingCitizen = await _onboardingRepository.GetCitizenBySaIdAsync(request.SaId);
         if (existingCitizen is not null)
-        {
             throw new DuplicateIdRegisteredException();
-        }
+
+        // The activation code is a 6-digit number sent to the citizen out-of-band.
+        // In production this would be sent via SMS or email, not returned in the response.
+        var activationCode = Random.Shared.Next(100000, 999999).ToString();
 
         var user = new User
         {
@@ -57,10 +49,8 @@ public class OnboardingService : IOnboardingService
             IsEmailVerified = false,
             IsDeleted = false,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
-
-        var activationCode = Random.Shared.Next(100000, 999999).ToString();
 
         var citizen = new Citizen
         {
@@ -71,12 +61,13 @@ public class OnboardingService : IOnboardingService
             ActivationCode = activationCode,
             ActivationCodeExpiresAt = DateTime.UtcNow.AddMinutes(15),
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
-        _context.DomainUsers.Add(user);
-        _context.Citizens.Add(citizen);
-        await _context.SaveChangesAsync();
+        // Repository handles all persistence — the service never touches AppDbContext directly.
+        await _onboardingRepository.AddUserAsync(user);
+        await _onboardingRepository.AddCitizenAsync(citizen);
+        await _onboardingRepository.SaveChangesAsync();
 
         return new OnboardCitizenResponse
         {
@@ -84,7 +75,7 @@ public class OnboardingService : IOnboardingService
             SaId = identityRecord.SaId,
             ActivationCode = activationCode,
             ActivationCodeExpiresAt = citizen.ActivationCodeExpiresAt,
-            Status = "Pending"
+            Status = "Pending",
         };
     }
 
