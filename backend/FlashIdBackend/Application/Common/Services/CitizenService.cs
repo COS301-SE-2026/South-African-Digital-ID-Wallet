@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Mapping;
@@ -33,59 +31,45 @@ public class CitizenService : ICitizenService
 
         CitizenRegistrationValidator.Validate(request);
 
+        if (await _citizenRepository.IsEmailTakenAsync(request.Email, Guid.Empty))
+            throw new EmailTakenException(request.Email);
 
-        var citizen = await _citizenRepository.GetCitizenBySaIdWithUserAsync(request.SaId);
-
-        if (citizen == null)
-            throw new CitizenNotFoundException(request.SaId);
-
-
-        if (citizen.IsActivated)
-            throw new CitizenAlreadyActivatedException(request.SaId);
-
-
-        if (citizen.ActivationCodeExpiresAt.HasValue &&
-            citizen.ActivationCodeExpiresAt.Value < DateTime.UtcNow)
-            throw new InvalidActivationCodeException();
-
-
-        var storedBytes = Encoding.UTF8.GetBytes(citizen.ActivationCode);
-        var providedBytes = Encoding.UTF8.GetBytes(request.ActivationCode);
-        if (!CryptographicOperations.FixedTimeEquals(storedBytes, providedBytes))
-            throw new InvalidActivationCodeException();
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = request.Email.Trim(),
+            PasswordHash = _passwordHashingProvider.HashPassword(request.Password),
+            FailedLoginAttempts = 0,
+            LockoutUntil = null,
+            LastLoginAt = null,
+            IsDeleted = false,
+            IsEmailVerified = true,
+            Role = UserRole.Citizen,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
 
 
-        if (await _citizenRepository.IsUsernameTakenAsync(request.Username, citizen.UserId))
-            throw new UsernameTakenException(request.Username);
-
-
-        var user = citizen.User;
-        user.Username = request.Username;
-        user.PasswordHash = _passwordHashingProvider.HashPassword(request.Password);
-        user.UpdatedAt = DateTime.UtcNow;
-
-
-        citizen.IsActivated = true;
-        citizen.ActivationCode = string.Empty;
-        citizen.UpdatedAt = DateTime.UtcNow;
-
+        // var user = citizen.User;
+        // user.PasswordHash = _passwordHashingProvider.HashPassword(request.Password);
+        // user.UpdatedAt = DateTime.UtcNow;
 
         var auditLog = new AuditLog
         {
             Id = Guid.NewGuid(),
             EventType = AuditEventType.UserRegistered,
-            Details = $"Citizen with SA ID '{request.SaId}' completed registration.",
+            Details = $"Citizen account registered with email '{request.Email}'.",
             IpAddress = "system",
             ActorId = user.Id,
             CreatedAt = DateTime.UtcNow,
         };
 
-        await _citizenRepository.UpdateUserAsync(user);
-        await _citizenRepository.UpdateCitizenAsync(citizen);
+        await _citizenRepository.AddUserAync(user);
+        // await _citizenRepository.UpdateCitizenAsync(citizen);
         await _citizenRepository.AddAuditLogAsync(auditLog);
         await _citizenRepository.SaveChangesAsync();
 
 
-        return _mapper.CitizenToRegisterResponseDto(citizen);
+        return _mapper.CitizenToRegisterResponseDto(user);
     }
 }

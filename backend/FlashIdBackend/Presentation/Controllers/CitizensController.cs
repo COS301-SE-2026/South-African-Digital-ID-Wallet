@@ -24,28 +24,30 @@ public class CitizensController : ControllerBase
         try
         {
             var result = await _citizenService.RegisterCitizenAsync(request);
-            return CreatedAtAction(nameof(Register), new { id = result.CitizenId }, result);
+            // return Ok(result);
+            // return CreatedAtAction(nameof(Register), new { id = result.UserId }, result);
+            return StatusCode(StatusCodes.Status201Created, result);
         }
         catch (InvalidCitizenRegistrationRequestException ex)
         {
             return BadRequest(new { error = ex.Message });
         }
-        catch (CitizenNotFoundException ex)
+        catch (EmailTakenException ete)
         {
-            return NotFound(new { error = ex.Message });
+            return Conflict(new { error = ete.Message });
         }
-        catch (CitizenAlreadyActivatedException ex)
-        {
-            return Conflict(new { error = ex.Message });
-        }
-        catch (InvalidActivationCodeException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-        catch (UsernameTakenException ex)
-        {
-            return Conflict(new { error = ex.Message });
-        }
+        // catch (CitizenNotFoundException ex)
+        // {
+        //     return NotFound(new { error = ex.Message });
+        // }
+        // catch (CitizenAlreadyActivatedException ex)
+        // {
+        //     return Conflict(new { error = ex.Message });
+        // }
+        // catch (InvalidActivationCodeException ex)
+        // {
+        //     return BadRequest(new { error = ex.Message });
+        // }
         catch (Exception)
         {
             return StatusCode(500, new { error = "An unexpected error occurred." });

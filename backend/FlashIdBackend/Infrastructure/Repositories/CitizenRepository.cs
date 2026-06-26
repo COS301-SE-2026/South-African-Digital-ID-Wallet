@@ -18,23 +18,15 @@ public class CitizenRepository : ICitizenRepository
         _context = context;
     }
 
-    public async Task<Citizen?> GetCitizenBySaIdWithUserAsync(string saId)
-    {
-
-        return await _context.Citizens
-            .Include(c => c.User)
-            .FirstOrDefaultAsync(c => c.SaId == saId);
-    }
-
-    public async Task<bool> IsUsernameTakenAsync(string username, Guid excludeUserId)
+    public async Task<bool> IsEmailTakenAsync(string email, Guid excludeUserId)
     {
         return await _context.DomainUsers
-            .AnyAsync(u => u.Username == username && u.Id != excludeUserId);
+            .AnyAsync(u => u.Email == email && u.Id != excludeUserId);
     }
 
-    public Task UpdateCitizenAsync(Citizen citizen)
+    public Task AddUserAync(User user)
     {
-        _context.Citizens.Update(citizen);
+        _context.DomainUsers.Add(user);
         return Task.CompletedTask;
     }
 
