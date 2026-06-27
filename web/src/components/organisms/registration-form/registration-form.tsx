@@ -2,11 +2,17 @@
 
 import * as React from 'react'
 import Link from 'next/link'
-import { User, CircleUserRound, LockKeyhole } from 'lucide-react'
+import { User, CircleUserRound, LockKeyhole, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Text } from '@/components/atoms'
 import { TextField } from '@/components/molecules'
 import type { RegistrationFormProps } from '@/types/registration-form.types'
+
+import toast from 'react-hot-toast'
+import axios from 'axios'
+import { useMutation } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
+import { registerService } from '@/services/citizen-register-service'
 
 const RequirementList = ({
   items,
@@ -99,6 +105,25 @@ export const RegistrationForm = ({
     passwordRequirements.every((r) => r.met) &&
     confirmRequirements.every((r) => r.met)
 
+  const router = useRouter()
+
+  const registerMutation = useMutation({
+    mutationFn: registerService.register,
+    onSuccess: () => {
+      toast.success(
+        'Account created successfully. Please check your email to verify your account.'
+      )
+      router.push('/')
+    },
+    onError: (err) => {
+      const message =
+        axios.isAxiosError(err) && err.response?.data?.error
+          ? err.response.data.error
+          : 'Registration failed. Please try again.'
+      toast.error(message)
+    },
+  })
+
   const handleSubmit: NonNullable<React.ComponentProps<'form'>['onSubmit']> = (
     e
   ) => {
@@ -107,6 +132,10 @@ export const RegistrationForm = ({
     setDirtyFields(new Set())
     if (!isFormValid) return
     onSubmitAction?.({
+      email,
+      password,
+    })
+    registerMutation.mutate({
       email,
       password,
     })
@@ -192,9 +221,19 @@ export const RegistrationForm = ({
 
       {/* Submit */}
       <div className="space-y-4 pt-1">
-        <Button type="submit" className="w-full gap-2">
-          <User className="h-5 w-5" />
-          Create account
+        <Button
+          type="submit"
+          className="w-full gap-2"
+          disabled={registerMutation.isPending}
+        >
+          {registerMutation.isPending ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <User className="h-5 w-5" />
+          )}
+          {registerMutation.isPending
+            ? 'Creating account...'
+            : 'Create account'}
         </Button>
         <Text variant="sub-sm" className="text-center">
           Already have an account?{' '}
