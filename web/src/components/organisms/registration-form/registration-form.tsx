@@ -15,22 +15,23 @@ const RequirementList = ({
   items: { label: string; met: boolean }[]
   show: boolean
 }) => {
+  const allMet = items.every((item) => item.met)
+  const shouldShow = show && !allMet
+
+  if (!shouldShow) return null
+
   return (
-    <div className="mt-1.5 grid grid-cols-3 gap-x-3 gap-y-1" aria-live="polite">
-      {items.map((item) => {
-        const visible = show && !item.met
-        return (
-          <p
-            key={item.label}
-            aria-hidden={!visible}
-            className={`text-xs leading-snug text-destructive ${
-              visible ? 'visible' : 'invisible'
-            }`}
-          >
-            {item.label}
-          </p>
-        )
-      })}
+    <div className="mt-1.5 flex flex-col gap-1" aria-live="polite">
+      {items.map((item) => (
+        <p
+          key={item.label}
+          className={`text-xs leading-snug ${
+            item.met ? 'text-muted-foreground line-through' : 'text-destructive'
+          }`}
+        >
+          {item.label}
+        </p>
+      ))}
     </div>
   )
 }
@@ -38,8 +39,7 @@ const RequirementList = ({
 export const RegistrationForm = ({
   onSubmitAction,
 }: Readonly<RegistrationFormProps>) => {
-  const [idnumber, setIdnumber] = React.useState('')
-  const [username, setUsername] = React.useState('')
+  const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [confirmPassword, setConfirmPassword] = React.useState('')
   const [submitted, setSubmitted] = React.useState(false)
@@ -52,21 +52,37 @@ export const RegistrationForm = ({
 
   const showErrors = (field: string) => submitted && !dirtyFields.has(field)
 
-  const idRequirements = [
-    { label: 'Invalid South African ID', met: /^\d{13}$/.test(idnumber) },
-  ]
+  const isValidEmail = (value: string) => {
+    const email = value.trim()
 
-  const usernameRequirements = [
-    { label: 'At least 8 characters', met: username.length >= 8 },
+    if (!email) return false
+    if (/\s/.test(email)) return false
+
+    return /^(?!\.)(?!.*\.\.)([a-zA-Z0-9_'+\-\.]*)[a-zA-Z0-9_+\-]@([a-zA-Z0-9][a-zA-Z0-9\-]*\.)+[a-zA-Z]{2,}$/.test(
+      email
+    )
+  }
+
+  const emailRequirements = [
+    { label: 'Must be a valid email address', met: isValidEmail(email) },
   ]
 
   const passwordRequirements = [
-    { label: 'At least 10 characters', met: password.length >= 10 },
-    { label: 'At least 1 capital letter (A-Z)', met: /[A-Z]/.test(password) },
-    { label: 'At least 1 digit (0-9)', met: /[0-9]/.test(password) },
-    { label: 'At least 1 lowercase letter (a-z)', met: /[a-z]/.test(password) },
+    { label: 'Must be at least 10 characters', met: password.length >= 10 },
     {
-      label: 'At least 1 special character (!@#$%^&*)',
+      label: 'Must contain at least 1 capital letter (A-Z)',
+      met: /[A-Z]/.test(password),
+    },
+    {
+      label: 'Must contain at least 1 digit (0-9)',
+      met: /[0-9]/.test(password),
+    },
+    {
+      label: 'Must contain at least 1 lowercase letter (a-z)',
+      met: /[a-z]/.test(password),
+    },
+    {
+      label: 'Must conatain at least 1 special character (!@#$%^&*)',
       met: /[!@#$%^&*_+\-=.<>?~]/.test(password),
     },
   ]
@@ -79,8 +95,7 @@ export const RegistrationForm = ({
   ]
 
   const isFormValid =
-    idRequirements.every((r) => r.met) &&
-    usernameRequirements.every((r) => r.met) &&
+    emailRequirements.every((r) => r.met) &&
     passwordRequirements.every((r) => r.met) &&
     confirmRequirements.every((r) => r.met)
 
@@ -91,58 +106,38 @@ export const RegistrationForm = ({
     setSubmitted(true)
     setDirtyFields(new Set())
     if (!isFormValid) return
-    onSubmitAction?.({ idnumber, username, password })
+    onSubmitAction?.({
+      email,
+      password,
+    })
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      {/* ID Number */}
+    <form
+      onSubmit={handleSubmit}
+      noValidate
+      className="flex h-full flex-col justify-evenly gap-5"
+    >
+      {/* Email */}
       <div>
         <div className="relative">
-          <CircleUserRound className="pointer-events-none absolute left-3 top-[54px] h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <CircleUserRound className="pointer-events-non absolute left-3 top-[54px] h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           <TextField
-            label="ID number:"
-            type="text"
-            value={idnumber}
+            label="Email:"
+            type="email"
+            value={email}
             onChange={(e) => {
-              setIdnumber(stripSpaces(e.target.value))
-              markDirty('idnumber')
+              setEmail(stripSpaces(e.target.value))
+              markDirty('email')
             }}
             onKeyDown={(e) => {
               if (e.key === ' ') e.preventDefault()
             }}
-            placeholder="Enter your 13-digit ID number"
+            placeholder="Enter your email address"
             className="pl-11"
-            required
           />
         </div>
-        <RequirementList items={idRequirements} show={showErrors('idnumber')} />
-      </div>
-
-      {/* Username */}
-      <div>
-        <div className="relative">
-          <User className="pointer-events-none absolute left-3 top-[54px] h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-          <TextField
-            label="Username:"
-            type="text"
-            value={username}
-            onChange={(e) => {
-              setUsername(stripSpaces(e.target.value))
-              markDirty('username')
-            }}
-            onKeyDown={(e) => {
-              if (e.key === ' ') e.preventDefault()
-            }}
-            placeholder="Choose a username"
-            className="pl-11"
-            required
-          />
-        </div>
-        <RequirementList
-          items={usernameRequirements}
-          show={showErrors('username')}
-        />
+        <RequirementList items={emailRequirements} show={showErrors('email')} />
       </div>
 
       {/* Password */}
@@ -162,7 +157,6 @@ export const RegistrationForm = ({
             }}
             placeholder="Enter your password"
             className="pl-11"
-            required
           />
         </div>
         <RequirementList
@@ -188,7 +182,6 @@ export const RegistrationForm = ({
             }}
             placeholder="Re-enter your password"
             className="pl-11"
-            required
           />
         </div>
         <RequirementList

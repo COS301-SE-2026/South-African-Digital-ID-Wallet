@@ -1,6 +1,5 @@
 export type RegistrationCredentials = {
-  idnumber: string
-  username: string
+  email: string
   password: string
 }
 
