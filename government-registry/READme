@@ -1,0 +1,33 @@
+# Government Registry API
+
+This service is a simulated version of the external Government Registry service that FlashID would integrate with to retrieve verified citizen records and identity information.
+
+In a real-world deployment, FlashID would not own or directly access government identity records. Instead, it would communicate with an authorised government system through a secure API. This project recreates that external integration boundary so that FlashID can verify citizens through HTTP-based communication rather than direct database access.
+
+## Purpose
+
+The Government Registry API is a simulated external government service that acts as the authoritative source of verified citizen, credential, and institution records.
+
+Within the FlashID system, it is responsible for exposing trusted government records through a secure REST API. FlashID consumes this service during onboarding and credential activation to retrieve and verify information before allowing users to proceed.
+
+The Government Registry API is used to:
+
+* retrieve verified citizen records using a South African ID number;
+* retrieve government-issued credentials, such as National Identity Documents and Driver's Licences;
+* verify registered institutions;
+* ensure that only verified government records are used within FlashID.
+
+This service is intentionally implemented as a separate application to simulate a real-world external government integration. FlashID communicates with the Government Registry exclusively through its API and has no direct access to its database.
+
+
+## Architecture Role
+
+This service is intentionally separate from the main FlashID backend.
+
+```text
+FlashID Backend
+        ↓ HTTP
+Government Registry API
+        ↓
+Government Registry Database
+```
