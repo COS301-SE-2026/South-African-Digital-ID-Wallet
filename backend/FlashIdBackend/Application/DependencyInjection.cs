@@ -16,10 +16,10 @@ public static class DependencyInjection
         services.AddScoped<IOnboardingService, OnboardingService>();
 
         services.AddScoped<IInstitutionService, InstitutionService>();
-
+        services.AddScoped<IAuthService, AuthService>();
         services.AddSingleton<CitizenMapper>();
         services.AddSingleton<InstitutionMapper>();
-
+        services.AddSingleton<AuthMapper>();
         return services;
     }
 }
