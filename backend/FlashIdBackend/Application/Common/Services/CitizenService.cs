@@ -70,6 +70,9 @@ public class CitizenService : ICitizenService
         await _citizenRepository.SaveChangesAsync();
 
 
-        return _mapper.CitizenToRegisterResponseDto(user);
+        var response = _mapper.CitizenToRegisterResponseDto(user);
+        response.Message = "Account created successfully. Please check your email to verify your account.";
+
+        return response;
     }
 }

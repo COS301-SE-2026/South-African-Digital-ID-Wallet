@@ -1,8 +1,7 @@
 import { RegisterFormValues } from './types'
 
 export type RegisterBackendRow = {
-  SaId: string
-  Username: string
+  Email: string
   Password: string
 }
 
@@ -10,8 +9,7 @@ export const registerFormModel = (
   row: RegisterBackendRow
 ): RegisterFormValues => {
   return {
-    id: row.SaId,
-    username: row.Username,
+    email: row.Email,
     password: row.Password,
   }
 }
