@@ -14,6 +14,6 @@ public class CitizenRecords
     
     public Gender Gender { get; set; }
     
-    public DateTime DateOfBirth { get; set; }
+    public DateOnly DateOfBirth { get; set; }
     
 }
