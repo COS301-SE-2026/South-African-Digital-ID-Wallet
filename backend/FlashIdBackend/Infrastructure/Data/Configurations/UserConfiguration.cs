@@ -79,5 +79,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasQueryFilter(u => !u.IsDeleted);
+
+        builder.Property(u => u.EmailOTPHash)
+            .HasMaxLength(256);
+
+        builder.Property(u => u.EmailOTPExpiresAt)
+            .HasColumnType("datetime2");
     }
 }

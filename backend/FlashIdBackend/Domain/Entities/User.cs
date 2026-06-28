@@ -31,4 +31,7 @@ public class User : BaseEntity
     public UserPreferences? Preference { get; set; }
     public ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
 
+    //for otp
+    public string? EmailOTPHash { get; set; }
+    public DateTime? EmailOTPExpiresAt { get; set; }
 }
