@@ -28,6 +28,8 @@ public static class DependencyInjection
         services.AddScoped<ICitizenRepository, CitizenRepository>();
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
 
+        services.AddHttpClient<IEmailSenderProvider, ResendEmailSender>();
+
         return services;
     }
 }
