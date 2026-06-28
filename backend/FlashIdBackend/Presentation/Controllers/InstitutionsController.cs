@@ -1,12 +1,14 @@
-using Application.Common.Interfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Institutions.DTOs;
 using Application.Features.Institutions.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
 
 [ApiController]
 [Route("api/institutions")]
+[Authorize(Roles = "GovernmentAdministrator")]
 public class InstitutionsController : ControllerBase
 {
     private readonly IInstitutionService _institutionService;
@@ -16,19 +18,15 @@ public class InstitutionsController : ControllerBase
         _institutionService = institutionService;
     }
 
+    [Authorize(Roles = "GovernmentAdministrator")]
     [HttpPost("register")]
     public async Task<IActionResult> RegisterInstitution(
-        [FromBody] RegisterInstitutionRequestDto request
-    )
+        [FromBody] RegisterInstitutionRequestDto request)
     {
         try
         {
             var result = await _institutionService.RegisterInstitutionAsync(request);
-            return CreatedAtAction(
-                nameof(RegisterInstitution),
-                new { id = result.InstitutionId },
-                result
-            );
+            return CreatedAtAction(nameof(RegisterInstitution), new { id = result.InstitutionId }, result);
         }
         catch (InvalidInstitutionRequestException ex)
         {
@@ -48,6 +46,7 @@ public class InstitutionsController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAllInstitutions()
     {
@@ -62,6 +61,7 @@ public class InstitutionsController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpGet("{institutionId}")]
     public async Task<IActionResult> GetInstitutionById(Guid institutionId)
     {
@@ -79,5 +79,4 @@ public class InstitutionsController : ControllerBase
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
-
 }

@@ -1,7 +1,4 @@
-using Domain.Enums;
-
 namespace Application.Features.Institutions.DTOs;
-
 
 public class RegisterInstitutionResponseDto
 {
