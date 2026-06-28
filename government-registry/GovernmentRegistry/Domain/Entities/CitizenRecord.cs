@@ -2,7 +2,7 @@ using System.Runtime.InteropServices.JavaScript;
 using Domain.Enums;
 namespace Domain.Entities;
 
-public class CitizenRecords
+public class CitizenRecord
 {
     public Guid Id { get; set; }
     
@@ -15,5 +15,7 @@ public class CitizenRecords
     public Gender Gender { get; set; }
     
     public DateOnly DateOfBirth { get; set; }
+    
+    public ICollection<Credential> Credentials { get; set; } = [];
     
 }

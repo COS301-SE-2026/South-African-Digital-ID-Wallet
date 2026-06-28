@@ -12,6 +12,6 @@ public abstract class Credential
     
     public Guid CitizenId { get; set; }
     
-    public CitizenRecords Citizen { get; set; } = null!;
+    public CitizenRecord Citizen { get; set; } = null!;
     
 }

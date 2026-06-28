@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Infrastructure.Data.Configurations;
 
-public class CitizenRecordsConfiguration : IEntityTypeConfiguration<CitizenRecords>
+public class CitizenRecordConfiguration : IEntityTypeConfiguration<CitizenRecord>
 {
-    public void Configure(EntityTypeBuilder<CitizenRecords> builder)
+    public void Configure(EntityTypeBuilder<CitizenRecord> builder)
     {
         builder.ToTable("CitizenRecords");
         
@@ -29,5 +29,10 @@ public class CitizenRecordsConfiguration : IEntityTypeConfiguration<CitizenRecor
             .HasMaxLength(20);
 
         builder.Property(c => c.DateOfBirth).IsRequired();
+        
+        builder.HasMany(c => c.Credentials)
+            .WithOne(c => c.Citizen)
+            .HasForeignKey(c => c.CitizenId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
