@@ -7,12 +7,22 @@ public class CitizenRecordsConfiguration : IEntityTypeConfiguration<CitizenRecor
 {
     public void Configure(EntityTypeBuilder<CitizenRecords> builder)
     {
+        builder.ToTable("CitizenRecords");
+        
         builder.HasKey(c => c.Id);
+        
         builder.HasIndex(c => c.SaId).IsUnique();
+        
+        builder.Property(c => c.SaId)
+            .IsRequired()
+            .HasMaxLength(13);
+        
         builder.Property(c=> c.Names).IsRequired().HasMaxLength(100);
-        builder.Property(u => u.Surname)
+        
+        builder.Property(c => c.Surname)
             .IsRequired()
             .HasMaxLength(100);
+        
         builder.Property(c => c.Gender)
             .IsRequired()
             .HasConversion<string>()
