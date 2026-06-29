@@ -26,5 +26,8 @@ public class DriversLicenseConfigurations: IEntityTypeConfiguration<DriversLicen
        builder.Property(d=> d.StartDate).IsRequired();
 
        builder.Property(d => d.ExpiryDate).IsRequired();
+       
+       builder.Property(i => i.PhotoHash)
+           .HasConversion<string>();
     }
 }
