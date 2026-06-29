@@ -13,19 +13,15 @@ public class AuthController : ControllerBase
     private readonly IAuthService _authService;
     private readonly ILogger<AuthController> _logger;
     private readonly IHostEnvironment _environment;
-    private readonly Infrastructure.Data.AppDbContext _db;
 
     public AuthController(
         IAuthService authService,
         ILogger<AuthController> logger,
-        IHostEnvironment environment,
-        Infrastructure.Data.AppDbContext db
-    )
+        IHostEnvironment environment)
     {
         _authService = authService;
         _logger = logger;
         _environment = environment;
-        _db = db;
     }
 
     [Authorize]
@@ -38,18 +34,10 @@ public class AuthController : ControllerBase
             if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
 
             var userId = Guid.Parse(userIdClaim);
+            var profile = await _authService.GetCurrentUserAsync(userId);
 
-            var user = await _db.DomainUsers.FindAsync(userId);
-            if (user == null) return NotFound(new { error = "User not found." });
-
-            return Ok(new
-            {
-                userId = user.Id,
-                email = user.Email,
-                role = user.Role.ToString(),
-                names = user.Names,
-                surname = user.Surname
-            });
+            if (profile == null) return NotFound(new { error = "User not found." });
+            return Ok(profile);
         }
         catch (Exception ex)
         {
@@ -58,28 +46,27 @@ public class AuthController : ControllerBase
         }
     }
 
+    // Login is anonymous — no [Authorize] needed because the user does not have a token yet.
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
     {
         try
         {
-            var ipAddress =
-                HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
             var result = await _authService.LoginAsync(request, ipAddress);
 
+            // The token is set in an HttpOnly cookie so JavaScript cannot read it.
+            // Secure = true in production forces HTTPS; in development HTTP is allowed.
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
                 Secure = !_environment.IsDevelopment(),
-                SameSite = _environment.IsDevelopment()
-                    ? SameSiteMode.Lax
-                    : SameSiteMode.None,
+                SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
                 Path = "/",
-                Expires = result.ExpiresAt
+                Expires = result.ExpiresAt,
             };
 
             Response.Cookies.Append("access_token", result.Token, cookieOptions);
-
             result.Token = string.Empty;
 
             return Ok(result);
@@ -93,19 +80,13 @@ public class AuthController : ControllerBase
             _logger.LogError(ex, "Unexpected error during login for {Email}", request.Email);
 
             if (_environment.IsDevelopment())
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        error = ex.Message,
-                        detail = ex.ToString(),
-                    }
-                );
+                return StatusCode(500, new { error = ex.Message, detail = ex.ToString() });
 
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
 
+    // [Authorize] — must be authenticated (any role) to log out.
     [Authorize]
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
@@ -113,24 +94,19 @@ public class AuthController : ControllerBase
         try
         {
             var userIdClaim = User.FindFirst("userId")?.Value;
-            if (userIdClaim == null)
-                return Unauthorized(new { error = "Invalid token." });
+            if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
+
             var userId = Guid.Parse(userIdClaim);
-            var ipAddress =
-                HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
             var result = await _authService.LogoutAsync(userId, ipAddress);
 
-            Response.Cookies.Delete(
-                "access_token",
-                new CookieOptions
-                {
-                    Path = "/",
-                    Secure = !_environment.IsDevelopment(),
-                    SameSite = _environment.IsDevelopment()
-                        ? SameSiteMode.Lax
-                        : SameSiteMode.None,
-                }
-            );
+            Response.Cookies.Delete("access_token", new CookieOptions
+            {
+                Path = "/",
+                Secure = !_environment.IsDevelopment(),
+                SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
+            });
+
             return Ok(result);
         }
         catch (Exception ex)
