@@ -32,6 +32,31 @@ public class User : BaseEntity
     public ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
 
     //for otp
-    public string? EmailOTPHash { get; set; }
-    public DateTime? EmailOTPExpiresAt { get; set; }
+    public string? EmailOTPHash { get; private set; }
+    public DateTime? EmailOTPExpiresAt { get; private set; }
+    public int OTPAttemptCount { get; private set; }
+
+    public void SetOTP(string otpHash, int expiryMinutes = 10)
+    {
+        EmailOTPHash = otpHash;
+        EmailOTPExpiresAt = DateTime.UtcNow.AddMinutes(expiryMinutes);
+        OTPAttemptCount = 0;
+    }
+
+    public void ClearOTP()
+    {
+        EmailOTPHash = null;
+        EmailOTPExpiresAt = null;
+        OTPAttemptCount = 0;
+    }
+
+    public void MarkEmailVerified()
+    {
+        IsEmailVerified = true;
+        ClearOTP();
+    }
+
+    public void IncrementOTPAttempt() => OTPAttemptCount++;
+
+    public bool IsOTPExpired() => EmailOTPExpiresAt is null || DateTime.UtcNow > EmailOTPExpiresAt;
 }

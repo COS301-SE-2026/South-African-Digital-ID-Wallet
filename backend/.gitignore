@@ -56,3 +56,5 @@ secrets.json
 
 # VS Code
 .vscode/
+
+appsettings.*.json

@@ -85,5 +85,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.EmailOTPExpiresAt)
             .HasColumnType("datetime2");
+
+        builder.Property(u => u.OTPAttemptCount)
+        .IsRequired()
+        .HasDefaultValue(0);
     }
 }
