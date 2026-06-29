@@ -36,8 +36,8 @@
 
     "dev": "concurrently --kill-others-on-fail \"pnpm --filter ./web dev\" \"pnpm --filter ./backend run dev\"",
     "build": "pnpm install && pnpm --filter ./backend run build && pnpm --filter ./web build",
-    "test": "pnpm --filter ./web run test && pnpm --filter ./backend run test",
-    "test:coverage": "pnpm --filter ./web run test:coverage && pnpm --filter ./backend run test:coverage",
+    "test": "pnpm --filter ./web run test && pnpm --filter ./backend run test && pnpm --filter ./mobile run test",
+    "test:coverage": "pnpm --filter ./web run test:coverage && pnpm --filter ./backend run test:coverage && pnpm --filter ./mobile run test:coverage",
     "format": "pnpm --filter ./backend run format && pnpm --filter ./web format",
     "lint": "pnpm --filter ./backend run lint && pnpm --filter ./web lint",
     "type-check": "pnpm --filter ./backend run type-check && pnpm --filter ./web type-check"

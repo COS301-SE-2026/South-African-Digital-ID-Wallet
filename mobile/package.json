@@ -25,11 +25,15 @@
     "zustand": "5.0.12"
   },
   "devDependencies": {
+    "@types/jest": "30.0.0",
     "@types/react": "~19.2.2",
     "eslint": "9",
     "eslint-config-expo": "~56.0.4",
     "eslint-config-prettier": "10.1.8",
+    "jest": "30.4.2",
+    "jest-expo": "56.0.5",
     "prettier": "3.8.3",
+    "react-test-renderer": "19.2.7",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -41,7 +45,13 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "type-check": "tsc --noEmit",
-    "build": "expo export --platform ios --platform android"
+    "build": "expo export --platform ios --platform android",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "passWithNoTests": true
   },
   "private": true
 }
