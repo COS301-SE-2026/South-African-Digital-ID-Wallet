@@ -36,14 +36,14 @@ public class User : BaseEntity
     public DateTime? EmailOTPExpiresAt { get; private set; }
     public int OTPAttemptCount { get; private set; }
 
-    public void SetOTP(string otpHash, int expiryMinutes = 10)
+    public void SetOtp(string otpHash, int expiryMinutes = 10)
     {
         EmailOTPHash = otpHash;
         EmailOTPExpiresAt = DateTime.UtcNow.AddMinutes(expiryMinutes);
         OTPAttemptCount = 0;
     }
 
-    public void ClearOTP()
+    public void ClearOtp()
     {
         EmailOTPHash = null;
         EmailOTPExpiresAt = null;
@@ -53,10 +53,10 @@ public class User : BaseEntity
     public void MarkEmailVerified()
     {
         IsEmailVerified = true;
-        ClearOTP();
+        ClearOtp();
     }
 
-    public void IncrementOTPAttempt() => OTPAttemptCount++;
+    public void IncrementOtpAttempt() => OTPAttemptCount++;
 
-    public bool IsOTPExpired() => EmailOTPExpiresAt is null || DateTime.UtcNow > EmailOTPExpiresAt;
+    public bool IsOtpExpired() => EmailOTPExpiresAt is null || DateTime.UtcNow > EmailOTPExpiresAt;
 }

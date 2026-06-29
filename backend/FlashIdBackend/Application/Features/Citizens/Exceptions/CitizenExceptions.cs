@@ -36,26 +36,26 @@ public class InvalidCitizenRegistrationRequestException : Exception
         : base(message) { }
 }
 
-public class InvalidOTPException : Exception
+public class InvalidOtpException : Exception
 {
-    public InvalidOTPException()
+    public InvalidOtpException()
         : base("The verification code is incorrect") { }
 }
 
-public class OTPExpiredException : Exception
+public class OtpExpiredException : Exception
 {
-    public OTPExpiredException()
+    public OtpExpiredException()
         : base("The verification code has expired. Please request a new code.") { }
 }
 
-public class TooManyOTPAttemptsException : Exception
+public class TooManyOtpAttemptsException : Exception
 {
-    public TooManyOTPAttemptsException()
+    public TooManyOtpAttemptsException()
         : base("Too many incorrect attempts. Please request a new code.") { }
 }
 
-public class EmailAlreadyVerified : Exception
+public class EmailAlreadyVerifiedException : Exception
 {
-    public EmailAlreadyVerified()
+    public EmailAlreadyVerifiedException()
         : base("Email is already verified.") { }
 }

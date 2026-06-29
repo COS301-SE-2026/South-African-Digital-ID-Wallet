@@ -53,4 +53,57 @@ public class CitizensController : ControllerBase
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
+
+    [HttpPost("verify-email")]
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequestDto request)
+    {
+        try
+        {
+            await _citizenService.VerifyEmailAsync(request);
+            return Ok(new { message = "Email verified successfully." });
+        }
+        catch (InvalidOtpException ioe)
+        {
+            return BadRequest(new { error = ioe.Message });
+        }
+        catch (OtpExpiredException oee)
+        {
+            return BadRequest(new { error = oee.Message });
+        }
+        catch (TooManyOtpAttemptsException tmoae)
+        {
+            return BadRequest(new { error = tmoae.Message });
+        }
+        catch (EmailAlreadyVerifiedException eave)
+        {
+            return BadRequest(new { error = eave.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occured." });
+        }
+    }
+
+    [HttpPost("resend-otp")]
+    [EnableRateLimiting("resend-otp")]
+    public async Task<IActionResult> ResendOtp([FromBody] ResendOtpRequestDto request)
+    {
+        try
+        {
+            await _citizenService.ResendOtpAsync(request);
+            return Ok(new { message = "Verificaiton code has been resent." });
+        }
+        catch (EmailAlreadyVerifiedException eave)
+        {
+            return BadRequest(new { error = eave.Message });
+        }
+        catch (InvalidCitizenRegistrationRequestException icrre)
+        {
+            return BadRequest(new { error = icrre.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occured." });
+        }
+    }
 }
