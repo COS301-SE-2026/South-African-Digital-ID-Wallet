@@ -37,3 +37,25 @@ pre-commit:
       - merge
       - rebase
       - cherry-pick
+    mobile-lint:
+      glob: "mobile/**/*.{ts,tsx,js,jsx}"
+      root: "mobile"
+      run: pnpm lint
+      stage_fixed: true
+    mobile-format:
+      glob: "mobile/**/*.{ts,tsx,js,jsx,json,md}"
+      root: "mobile"
+      run: pnpm format
+      stage_fixed: true
+    mobile-type-check:
+      glob: "mobile/**/*.{ts,tsx,js,jsx}"
+      root: "mobile"
+      run: pnpm type-check
+    mobile-build:
+      glob: "mobile/**/*.{ts,tsx,js,jsx}"
+      root: "mobile"
+      run: pnpm build
+      skip:
+      - merge
+      - rebase
+      - cherry-pick
