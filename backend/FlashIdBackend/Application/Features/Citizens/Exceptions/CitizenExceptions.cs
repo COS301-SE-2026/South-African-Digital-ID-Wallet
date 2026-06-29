@@ -35,3 +35,27 @@ public class InvalidCitizenRegistrationRequestException : Exception
     public InvalidCitizenRegistrationRequestException(string message)
         : base(message) { }
 }
+
+public class InvalidOTPException : Exception
+{
+    public InvalidOTPException()
+        : base("The verification code is incorrect") { }
+}
+
+public class OTPExpiredException : Exception
+{
+    public OTPExpiredException()
+        : base("The verification code has expired. Please request a new code.") { }
+}
+
+public class TooManyOTPAttemptsException : Exception
+{
+    public TooManyOTPAttemptsException()
+        : base("Too many incorrect attempts. Please request a new code.") { }
+}
+
+public class EmailAlreadyVerified : Exception
+{
+    public EmailAlreadyVerified()
+        : base("Email is already verified.") { }
+}

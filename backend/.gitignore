@@ -57,4 +57,7 @@ secrets.json
 # VS Code
 .vscode/
 
-appsettings.*.json
+#Secrets
+appsettings.Development.json
+appsettings.Staging.json
+appsettings.Production.json
