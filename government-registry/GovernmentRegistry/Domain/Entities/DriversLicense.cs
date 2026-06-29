@@ -4,9 +4,9 @@ namespace Domain.Entities;
 
 public class DriversLicense
 {
+    public Guid Id { get; set; }
+    
     public string LicenseNumber { get; set; } = string.Empty;
-
-    public string VehicleClass { get; set; } = string.Empty;
 
     public LicenseCode LicenseCode { get; set; } = LicenseCode.Unspecified;
 
