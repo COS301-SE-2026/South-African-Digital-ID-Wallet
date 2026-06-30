@@ -1,4 +1,6 @@
 using Infrastructure;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,18 @@ builder.Services.AddOpenApi();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    
+    if (!await context.CitizenRecords.AnyAsync())
+    {
+        Console.WriteLine("[SEED] Database is empty, seeding sample data...");
+        await DbSeeder.SeedAsync(context);
+        Console.WriteLine("[SEED] Database seeded successfully!");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
