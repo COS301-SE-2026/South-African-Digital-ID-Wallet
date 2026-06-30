@@ -8,6 +8,8 @@ public class CredentialsConfigurations: IEntityTypeConfiguration<Credential>
 {
     public void Configure(EntityTypeBuilder<Credential> builder)
     {
+        builder.ToTable("Credentials");
+        
         builder.HasKey(c => c.Id);
 
         builder.Property(c => c.Signature)
@@ -16,6 +18,9 @@ public class CredentialsConfigurations: IEntityTypeConfiguration<Credential>
         builder.Property(c => c.IssuedBy)
             .IsRequired()
             .HasMaxLength(100);
+        
+        builder.Property(c => c.IssueDate)
+            .IsRequired();
 
         builder.HasOne(c => c.Citizen)
             .WithMany(c => c.Credentials)

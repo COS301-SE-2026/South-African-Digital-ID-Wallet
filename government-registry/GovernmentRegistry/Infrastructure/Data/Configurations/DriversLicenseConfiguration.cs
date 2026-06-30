@@ -9,8 +9,6 @@ public class DriversLicenseConfigurations: IEntityTypeConfiguration<DriversLicen
     public void Configure(EntityTypeBuilder<DriversLicense> builder)
     {
        builder.ToTable("DriversLicense");
-       
-       builder.HasKey(d => d.Id);
 
        builder.HasIndex(d => d.LicenseNumber)
            .IsUnique();
@@ -22,8 +20,6 @@ public class DriversLicenseConfigurations: IEntityTypeConfiguration<DriversLicen
        builder.Property(d => d.LicenseCode).IsRequired().HasConversion<string>();;
        
        builder.Property(d => d.Restrictions).HasMaxLength(250);
-       
-       builder.Property(d=> d.StartDate).IsRequired();
 
        builder.Property(d => d.ExpiryDate).IsRequired();
        

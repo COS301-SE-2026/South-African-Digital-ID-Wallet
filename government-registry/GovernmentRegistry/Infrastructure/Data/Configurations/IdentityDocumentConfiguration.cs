@@ -10,7 +10,6 @@ public class IdentityDocumentConfiguration : IEntityTypeConfiguration<IdentityDo
     public void Configure(EntityTypeBuilder<IdentityDocument> builder)
     {
         builder.ToTable("IdentityDocuments");
-        builder.HasKey(i => i.Id);
         
         builder.HasIndex(i => i.IdNumber).IsUnique();
         

@@ -12,8 +12,6 @@ public class DriversLicense
 
     public string? Restrictions { get; set; } = string.Empty;
 
-    public DateOnly StartDate { get; set; }
-
     public DateOnly ExpiryDate { get; set; }
 
     public string PhotoHash { get; set; } = string.Empty;
