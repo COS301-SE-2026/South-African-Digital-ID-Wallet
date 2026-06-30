@@ -43,6 +43,12 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
       loginService.login(formValues),
     onSuccess: async (data) => {
       toast.success('Logged in')
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(
+          'flashid-session-expires-at',
+          data.expiresAt
+        )
+      }
       setUser({
         userId: data.userId,
         email,
