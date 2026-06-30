@@ -18,8 +18,9 @@ public static class DependencyInjection
     {
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         services.AddScoped<IPasswordHashingProvider, PasswordHashingProvider>();
+        services.AddScoped<IJwtTokenProvider, JwtTokenProvider>();
 
-        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAuthRepository, AuthRepository>();
         services.AddScoped<IMockGovernmentRegistryRepository, MockGovernmentRegistryRepository>();
         services.AddScoped<IOnboardingRepository, OnboardingRepository>();
 
@@ -33,5 +34,3 @@ public static class DependencyInjection
         return services;
     }
 }
-
-
