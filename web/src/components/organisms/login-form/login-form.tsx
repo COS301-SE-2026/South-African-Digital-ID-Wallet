@@ -30,6 +30,7 @@ const getDashboardRoute = (role: string) => {
 export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
+  const [rememberMe, setRememberMe] = React.useState(false)
 
   const router = useRouter()
   const { setUser } = useUser()
@@ -37,10 +38,13 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const loginMutation = useMutation<
     Awaited<ReturnType<typeof loginService.login>>,
     Error,
-    { email: string; password: string }
+    { email: string; password: string; rememberMe: boolean }
   >({
-    mutationFn: (formValues: { email: string; password: string }) =>
-      loginService.login(formValues),
+    mutationFn: (formValues: {
+      email: string
+      password: string
+      rememberMe: boolean
+    }) => loginService.login(formValues),
     onSuccess: async (data) => {
       toast.success('Logged in')
       if (typeof window !== 'undefined') {
@@ -69,7 +73,7 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
     e
   ) => {
     e.preventDefault()
-    const data = { email, password }
+    const data = { email, password, rememberMe }
     onSubmitAction?.(data)
     loginMutation.mutate(data)
   }
@@ -108,6 +112,19 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
           className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 text-base focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
         />
+      </div>
+
+      <div className="flex items-center gap-2">
+        <input
+          id="rememberMe"
+          type="checkbox"
+          checked={rememberMe}
+          onChange={(e) => setRememberMe(e.target.checked)}
+          className="h-4 w-4 rounded border-border-grey"
+        />
+        <label htmlFor="rememberMe" className="text-base text-primary-green">
+          Remember me
+        </label>
       </div>
 
       <div className="flex flex-col gap-3">
