@@ -8,7 +8,7 @@ public class DriversLicenseConfigurations: IEntityTypeConfiguration<DriversLicen
 {
     public void Configure(EntityTypeBuilder<DriversLicense> builder)
     {
-       builder.ToTable("DriversLicense");
+       builder.ToTable("DriversLicenses");
 
        builder.HasIndex(d => d.LicenseNumber)
            .IsUnique();
@@ -23,7 +23,7 @@ public class DriversLicenseConfigurations: IEntityTypeConfiguration<DriversLicen
 
        builder.Property(d => d.ExpiryDate).IsRequired();
        
-       builder.Property(i => i.PhotoHash)
-           .HasConversion<string>();
+       builder.Property(i => i.PhotoBlob).IsRequired();
+           
     }
 }

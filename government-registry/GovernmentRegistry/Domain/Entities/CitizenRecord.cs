@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices.JavaScript;
 using Domain.Enums;
 namespace Domain.Entities;
 

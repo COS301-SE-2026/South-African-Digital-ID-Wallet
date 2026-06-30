@@ -11,28 +11,19 @@ public class IdentityDocumentConfiguration : IEntityTypeConfiguration<IdentityDo
     {
         builder.ToTable("IdentityDocuments");
         
-        builder.HasIndex(i => i.IdNumber).IsUnique();
-        
-        builder.Property(i => i.IdNumber)
-            .IsRequired()
-            .HasMaxLength(13);
-
-        builder.Property(i => i.Citizenship)
-            .IsRequired();
-        
         builder.Property(i => i.CountryOfBirth)
-            .IsRequired();
+            .IsRequired().HasMaxLength(100);
         
-        builder.Property(i => i.Status)
+        builder.Property(i => i.CitizenshipStatus)
             .IsRequired()
             .HasConversion<string>();
         
         builder.Property(i => i.Nationality )
             .IsRequired()
-            .HasConversion<string>();
+            .HasMaxLength(150);
         
-        builder.Property(i => i.PhotoHash)
-            .HasConversion<string>();
+        builder.Property(i => i.PhotoBlob)
+            .IsRequired();
         
     }
 }

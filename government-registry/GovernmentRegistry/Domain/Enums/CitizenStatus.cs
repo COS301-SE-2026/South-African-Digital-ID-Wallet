@@ -2,6 +2,9 @@ namespace Domain.Enums;
 
 public enum CitizenStatus
 {
-    Citizen,
+    CitizenByBirth,
+    CitizenByDescent,
+    Naturalised,
     PermanentResident,
+    Refugee
 }

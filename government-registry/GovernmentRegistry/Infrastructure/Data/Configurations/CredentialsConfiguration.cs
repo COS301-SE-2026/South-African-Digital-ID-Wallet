@@ -4,11 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Data.Configurations;
 
-public class CredentialsConfigurations: IEntityTypeConfiguration<Credential>
+public class CredentialsConfiguration: IEntityTypeConfiguration<Credential>
 {
     public void Configure(EntityTypeBuilder<Credential> builder)
     {
         builder.ToTable("Credentials");
+        
+        builder.UseTptMappingStrategy();
         
         builder.HasKey(c => c.Id);
 
