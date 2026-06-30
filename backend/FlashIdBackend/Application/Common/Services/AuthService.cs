@@ -3,6 +3,8 @@ using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Mapping;
 using Application.Features.Auth.DTOs;
+using Application.Features.Auth.DTOs.Exceptions;
+using Application.Features.Citizens.DTOs;
 using Domain.Entities;
 using Domain.Enums;
 
@@ -13,17 +15,20 @@ public class AuthService : IAuthService
     private readonly IAuthRepository _authRepository;
     private readonly IJwtTokenProvider _jwtTokenProvider;
     private readonly IPasswordHashingProvider _passwordHashingProvider;
+    private readonly ICitizenService _citizenService;
     private readonly AuthMapper _mapper;
 
     public AuthService(
         IAuthRepository authRepository,
         IJwtTokenProvider jwtTokenProvider,
         IPasswordHashingProvider passwordHashingProvider,
+        ICitizenService citizenService,
         AuthMapper mapper)
     {
         _authRepository = authRepository;
         _jwtTokenProvider = jwtTokenProvider;
         _passwordHashingProvider = passwordHashingProvider;
+        _citizenService = citizenService;
         _mapper = mapper;
     }
 
@@ -70,6 +75,17 @@ public class AuthService : IAuthService
             await _authRepository.SaveChangesAsync();
 
             throw new UnauthorizedAccessException("Invalid email or password.");
+        }
+
+        if (!user.IsEmailVerified)
+        {
+            try
+            {
+                await _citizenService.ResendOtpAsync(new ResendOtpRequestDto { Email = user.Email });
+            }
+            catch { }
+
+            throw new EmailNotVerifiedException(user.Email);
         }
 
         user.FailedLoginAttempts = 0;

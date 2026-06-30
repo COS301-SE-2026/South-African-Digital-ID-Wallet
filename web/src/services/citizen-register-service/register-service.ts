@@ -21,7 +21,7 @@ const verifyEmail = async (values: VerifyEmailValues) => {
   const res = await api
     .post(registerUrls.verifyEmail(), {
       Email: values.email,
-      Code: values.code,
+      OTP: values.code,
     })
     .then((res) => res.data)
   return res
