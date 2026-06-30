@@ -1,6 +1,11 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+
+import { type UserRole, DEFAULT_USER_ROLE_DASHBOARD } from '@/types/roles'
+import { getAllowedRoles } from '@/config/roles/route-permissions'
 import { useUser } from '@/context/user-context'
 import { AppSidebar } from '../../organisms/app-sidebar/app-sidebar'
 import { AppTopBar } from '../../organisms/app-top-bar/app-top-bar'
@@ -19,23 +24,35 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const header = pageHeaders[pathname] ?? defaultPageHeader
   const { user, loading, logout } = useUser()
+  const router = useRouter()
 
-  const navSections =
-    loading && !user
-      ? pathname.startsWith('/officials')
-        ? officialsNavSections
-        : pathname.startsWith('/gov-admin')
-          ? governmentAdminNavSections
-          : citizenNavSections
-      : user?.role === 'Official'
-        ? officialsNavSections
-        : user?.role === 'GovernmentAdministrator'
-          ? governmentAdminNavSections
-          : pathname.startsWith('/officials')
-            ? officialsNavSections
-            : pathname.startsWith('/gov-admin')
-              ? governmentAdminNavSections
-              : citizenNavSections
+  useEffect(() => {
+    if (loading) {
+      return
+    }
+    if (!user) {
+      router.replace('/')
+      return
+    }
+    const allowed = getAllowedRoles(pathname)
+    if (allowed && !allowed.includes(user.role as UserRole)) {
+      router.replace(DEFAULT_USER_ROLE_DASHBOARD[user.role as UserRole] ?? '/')
+    }
+  }, [user, loading, pathname, router])
+
+  if (!loading && !user) {
+    return null
+  }
+
+  let navSections = citizenNavSections
+
+  if (user?.role === 'Official') {
+    navSections = officialsNavSections
+  } else if (user?.role === 'GovernmentAdministrator') {
+    navSections = governmentAdminNavSections
+  } else if (user?.role === 'Citizen') {
+    navSections = citizenNavSections
+  }
 
   const displayName = user
     ? `${user.names ?? ''} ${user.surname ?? ''}`.trim() || user.email
