@@ -3,6 +3,10 @@ import { AppShell } from '../app-shell'
 
 jest.mock('next/navigation', () => ({
   usePathname: jest.fn().mockReturnValue('/officials'),
+  useRouter: jest.fn().mockReturnValue({
+    replace: jest.fn(),
+    push: jest.fn(),
+  }),
 }))
 
 describe('AppShell', () => {
