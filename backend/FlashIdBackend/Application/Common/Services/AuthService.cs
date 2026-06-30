@@ -90,7 +90,7 @@ public class AuthService : IAuthService
         await _authRepository.SaveChangesAsync();
 
         // Token generation is an Infrastructure concern — the service just calls the provider.
-        var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user);
+        var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user, request.RememberMe);
 
         return new LoginResponseDto
         {
