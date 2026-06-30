@@ -113,7 +113,7 @@ export const RegistrationForm = ({
       toast.success(
         'Account created successfully. Please check your email to verify your account.'
       )
-      router.push('/')
+      router.push(`/verify-email?email=${encodeURIComponent(email)}`)
     },
     onError: (err) => {
       const message =

@@ -2,14 +2,40 @@
 import api from '@/lib/api'
 import registerUrls from './register-urls'
 import { registerDto } from './register-dto'
-import type { RegisterFormValues, RegisterResponse } from './types'
+import type {
+  RegisterFormValues,
+  RegisterResponse,
+  VerifyEmailValues,
+} from './types'
 
-const register = (formData: RegisterFormValues): Promise<RegisterResponse> => {
+const register = async (
+  formData: RegisterFormValues
+): Promise<RegisterResponse> => {
   const url = registerUrls.citizenRegistration()
   const dto = registerDto(formData)
-  return api.post(url, dto).then((res) => res.data as RegisterResponse)
+  const res = await api.post(url, dto)
+  return res.data as RegisterResponse
+}
+
+const verifyEmail = async (values: VerifyEmailValues) => {
+  const res = await api
+    .post(registerUrls.verifyEmail(), {
+      Email: values.email,
+      Code: values.code,
+    })
+    .then((res) => res.data)
+  return res
+}
+
+const resendOtp = async (email: string) => {
+  const res = await api
+    .post(registerUrls.resendOtp(), { Email: email })
+    .then((res) => res.data)
+  return res
 }
 
 export default {
   register,
+  verifyEmail,
+  resendOtp,
 }

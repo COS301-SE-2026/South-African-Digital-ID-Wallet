@@ -1,4 +1,4 @@
-import { RegisterFormValues } from './types'
+import { RegisterFormValues, VerifyEmailValues } from './types'
 
 export const registerDto = (formData: RegisterFormValues) => {
   return {

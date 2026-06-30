@@ -36,18 +36,6 @@ public class CitizensController : ControllerBase
         {
             return Conflict(new { error = ete.Message });
         }
-        // catch (CitizenNotFoundException ex)
-        // {
-        //     return NotFound(new { error = ex.Message });
-        // }
-        // catch (CitizenAlreadyActivatedException ex)
-        // {
-        //     return Conflict(new { error = ex.Message });
-        // }
-        // catch (InvalidActivationCodeException ex)
-        // {
-        //     return BadRequest(new { error = ex.Message });
-        // }
         catch (Exception)
         {
             return StatusCode(500, new { error = "An unexpected error occurred." });

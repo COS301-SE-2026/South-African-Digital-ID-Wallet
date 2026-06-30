@@ -9,3 +9,8 @@ export type RegisterResponse = {
   createdAt: string
   message: string
 }
+
+export type VerifyEmailValues = {
+  email: string
+  code: string
+}
