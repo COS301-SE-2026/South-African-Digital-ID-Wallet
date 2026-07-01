@@ -1,5 +1,6 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
+using Application.Common.Mapping;
 using Application.Features.Citizens.Dtos;
 
 namespace Application.Common.Services;
@@ -20,13 +21,8 @@ public class CitizenRecordService : ICitizenRecordService
         if (citizenRecord is null)
             return null;
 
-        return new CitizenRecordResponseDto
-        {
-            SaId = citizenRecord.SaId,
-            Names = citizenRecord.Names,
-            Surname = citizenRecord.Surname,
-            Gender = citizenRecord.Gender.ToString(),
-            DateOfBirth = citizenRecord.DateOfBirth,
-        };
+        var mapper = new CitizenMapper();
+        var response = mapper.ToResponse(citizenRecord);
+        return response;
     }
 }
