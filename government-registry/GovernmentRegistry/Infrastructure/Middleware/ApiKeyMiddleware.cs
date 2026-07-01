@@ -25,7 +25,7 @@ public class ApiKeyMiddleware
         }
         
         var configuredKey = _configuration["Security:ApiKeyGov"];
-        if(!string.Equals(configuredKey, apiKey, StringComparison.Ordinal)
+        if(!string.Equals(configuredKey, apiKey, StringComparison.Ordinal))
         {
             context.Response.StatusCode = 401;
             await context.Response.WriteAsync("Invalid API Key.");
