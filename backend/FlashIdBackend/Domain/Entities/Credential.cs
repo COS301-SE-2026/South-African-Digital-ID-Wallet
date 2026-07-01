@@ -12,8 +12,6 @@ public class Credential : BaseEntity
 
     public string IssuedBy { get; set; } = string.Empty;
 
-    public DateTime DateOfBirth { get; set; }
-
     // navigation properties
     public Guid CitizenId { get; set; }
     public Citizen Citizen { get; set; } = null!;

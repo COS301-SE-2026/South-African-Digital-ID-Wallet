@@ -8,7 +8,7 @@ using Application.Features.Institutions.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
 
-namespace Infrastructure.Services;
+namespace Application.Common.Services;
 
 public class InstitutionService : IInstitutionService
 {

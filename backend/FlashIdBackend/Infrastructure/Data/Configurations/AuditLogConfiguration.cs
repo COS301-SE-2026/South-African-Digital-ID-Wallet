@@ -47,5 +47,8 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
         builder.HasIndex(a => new { a.ActorId, a.CreatedAt });
 
         builder.HasIndex(a => new { a.EventType, a.CreatedAt });
+
+        //for soft deletion
+        builder.HasQueryFilter(a => !a.Actor.IsDeleted);
     }
 }

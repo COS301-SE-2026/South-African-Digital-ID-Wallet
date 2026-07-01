@@ -1,4 +1,6 @@
+using Application.Common.Services;
 using Domain.Entities;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,16 +19,29 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
             .HasMaxLength(13)
             .IsUnicode(false);
 
-        builder.Property(c => c.ActivationCode)
+        builder.Property(c => c.Names)
             .IsRequired()
+            .HasMaxLength(256);
+
+        builder.Property(c => c.Surname)
+            .IsRequired()
+            .HasMaxLength(256);
+
+        builder.Property(c => c.DateOfBirth)
+            .IsRequired()
+            .HasColumnType("datetime2");
+
+        builder.Property(c => c.ActivationCode)
             .HasMaxLength(256);
 
         builder.Property(c => c.ActivationCodeExpiresAt)
             .HasColumnType("datetime2");
 
-        builder.Property(c => c.IsActivated)
+        builder.Property(c => c.Status)
             .IsRequired()
-            .HasDefaultValue(false);
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .HasDefaultValue(CitizenStatus.Pending);
 
         builder.Property(c => c.CreatedAt)
             .IsRequired()
@@ -40,6 +55,15 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
             .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAddOrUpdate();
 
+        builder.Property(c => c.IdFrontImagePath)
+            .HasMaxLength(512);
+
+        builder.Property(c => c.IdBackImagePath)
+            .HasMaxLength(512);
+
+        builder.Property(c => c.SelfieImagePath)
+            .HasMaxLength(512);
+
         builder.Property(c => c.UserId)
             .IsRequired();
 
@@ -52,5 +76,7 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
             .WithOne(credential => credential.Citizen)
             .HasForeignKey(credential => credential.CitizenId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasQueryFilter(c => !c.User.IsDeleted);
     }
 }

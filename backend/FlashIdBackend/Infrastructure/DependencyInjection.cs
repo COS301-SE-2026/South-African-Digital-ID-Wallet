@@ -2,6 +2,7 @@ using Application.Common.Interfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
+// using Application.Common.Services;
 using Domain.Entities;
 using Infrastructure.Providers;
 using Infrastructure.Repositories;
@@ -24,7 +25,7 @@ public static class DependencyInjection
         services.AddScoped<IMockGovernmentRegistryRepository, MockGovernmentRegistryRepository>();
         services.AddScoped<IOnboardingRepository, OnboardingRepository>();
 
-        services.AddScoped<IOnboardingService, OnboardingService>();
+        // services.AddScoped<IOnboardingService, OnboardingService>();
 
         services.AddScoped<ICitizenRepository, CitizenRepository>();
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();

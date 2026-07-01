@@ -14,6 +14,14 @@ public class GovernmentAdministratorConfiguration : IEntityTypeConfiguration<Gov
             .IsRequired()
             .HasMaxLength(20);
 
+        builder.Property(g => g.Names)
+            .IsRequired()
+            .HasMaxLength(256);
+
+        builder.Property(g => g.Surname)
+            .IsRequired()
+            .HasMaxLength(256);
+
         builder.Property(g => g.CreatedAt)
             .IsRequired()
             .HasColumnType("datetime2")
@@ -41,5 +49,7 @@ public class GovernmentAdministratorConfiguration : IEntityTypeConfiguration<Gov
             .WithOne(i => i.RegisteredBy)
             .HasForeignKey(i => i.RegisteredById)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasQueryFilter(g => !g.User.IsDeleted);
     }
 }

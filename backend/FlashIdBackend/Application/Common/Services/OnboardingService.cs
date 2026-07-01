@@ -6,7 +6,7 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Domain.Entities;
 using Domain.Enums;
 
-namespace Infrastructure.Services;
+namespace Application.Common.Services;
 
 public class OnboardingService : IOnboardingService
 {
@@ -40,11 +40,8 @@ public class OnboardingService : IOnboardingService
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Names = identityRecord.Names,
-            Surname = identityRecord.Surname,
             Email = request.Email,
             PhoneNumber = request.PhoneNumber,
-            Username = request.Email,
             Role = UserRole.Citizen,
             IsEmailVerified = false,
             IsDeleted = false,
@@ -56,8 +53,10 @@ public class OnboardingService : IOnboardingService
         {
             Id = Guid.NewGuid(),
             SaId = identityRecord.SaId,
+            Names = identityRecord.Names,
+            Surname = identityRecord.Surname,
             UserId = user.Id,
-            IsActivated = false,
+            Status = CitizenStatus.Pending,
             ActivationCode = activationCode,
             ActivationCodeExpiresAt = DateTime.UtcNow.AddMinutes(15),
             CreatedAt = DateTime.UtcNow,

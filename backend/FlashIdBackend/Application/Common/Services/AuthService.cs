@@ -114,8 +114,8 @@ public class AuthService : IAuthService
             ExpiresAt = expiresAt,
             UserId = user.Id,
             Role = user.Role.ToString(),
-            Names = user.Names,
-            Surname = user.Surname,
+            // Names = user.Names,
+            // Surname = user.Surname,
         };
     }
 
