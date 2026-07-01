@@ -56,8 +56,3 @@ secrets.json
 
 # VS Code
 .vscode/
-
-# Environment-specific settings
-Presentation/appsettings.Development.json
-Presentation/appsettings.Production.json
-Presentation/appsettings.Local.json
