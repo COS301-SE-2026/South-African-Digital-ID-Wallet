@@ -1,7 +1,5 @@
-// import { ViewInstitutionsPage } from '@/components/pages/gov-admin/view-institutions-page'
-import { UnderConstructionPage } from '@/components/pages/under-construction-page'
+import CitizenDashboardPage from '@/components/pages/citizen/citizen-dashboard-page'
 
 export default function Page() {
-  //   return <ViewInstitutionsPage />
-  return <UnderConstructionPage />
+  return <CitizenDashboardPage />
 }
