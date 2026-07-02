@@ -2,7 +2,7 @@ using Application.Features.Onboarding.Dtos;
 
 namespace Application.Common.Interfaces.ServiceInterfaces;
 
-public interface IMockGovernmentRegistryRepository
+public interface IGovernmentRegistryGateway
 {
-    CitizenRecordDto? GetBySaId(string idNumber);
+    Task<CitizenRecordDto?> GetCitizenBySaIdAsync(string saId);
 }

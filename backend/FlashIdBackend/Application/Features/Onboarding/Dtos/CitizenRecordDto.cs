@@ -1,6 +1,6 @@
 namespace Application.Features.Onboarding.Dtos;
 
-public class MockIdentityRecordDto
+public class CitizenRecordDto
 {
     public string SaId { get; set; } = string.Empty;
     public string Names { get; set; } = string.Empty;

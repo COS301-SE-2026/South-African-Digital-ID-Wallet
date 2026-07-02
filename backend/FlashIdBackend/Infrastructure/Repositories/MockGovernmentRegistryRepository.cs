@@ -5,7 +5,7 @@ namespace Infrastructure.Services;
 
 public class MockGovernmentRegistryRepository : IMockGovernmentRegistryRepository
 {
-    private static readonly List<MockIdentityRecordDto> MockRecords =
+    private static readonly List<CitizenRecordDto> MockRecords =
     [
         new()
         {
@@ -70,7 +70,7 @@ public class MockGovernmentRegistryRepository : IMockGovernmentRegistryRepositor
 
     ];
 
-    public MockIdentityRecordDto? GetBySaId(string idNumber)
+    public CitizenRecordDto? GetBySaId(string idNumber)
     {
         return MockRecords.FirstOrDefault(record => record.SaId == idNumber);
     }
