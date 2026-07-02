@@ -10,7 +10,7 @@ public class CitizenRegistrationValidatorTests
     private static RegisterCitizenRequestDto ValidRequest() => new()
     {
         Email = "natethebait@gmail.com",
-        Password = "P@ssword123"
+        Password = "P@ssword123"  // NOSONAR - test credential, not a real secret
     };
 
     // sends valid request through the validator, checks that no exception was thrown at all
@@ -139,7 +139,6 @@ public class CitizenRegistrationValidatorTests
             () => CitizenRegistrationValidator.Validate(req));
     }
 
-    // activation code is empty, checks that the validator requires a non-empty activation code
     [Fact]
     public void Validate_PasswordOnlyAllowedSpecialChars_DoesNotThrow()
     {
@@ -157,7 +156,7 @@ public class CitizenRegistrationValidatorTests
     public void Validate_PasswordWithDisallowedSpecialChar_ThrowsInvalidRequest()
     {
         var req = ValidRequest();
-        req.Password = "P@ssword123";
+        req.Password = "Password(23";
 
         Assert.Throws<InvalidCitizenRegistrationRequestException>(
             () => CitizenRegistrationValidator.Validate(req));

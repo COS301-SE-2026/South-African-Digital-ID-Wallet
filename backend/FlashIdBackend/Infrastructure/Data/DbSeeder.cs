@@ -111,7 +111,7 @@ public static class DbSeeder
         long saIdBase = 9000000000000; // large starting number
         var existingSaIds = new HashSet<string>(await context.Citizens.Select(c => c.SaId).ToListAsync());
 
-        var nameRnd = new Random(54321);
+        var nameRnd = new Random(54321); // NOSONAR
 
         var genders = new[] { Gender.Male, Gender.Female, Gender.Other };
 
@@ -197,7 +197,7 @@ public static class DbSeeder
             institutions = await context.Institutions.ToListAsync();
         }
 
-        var nameRnd = new Random(67890);
+        var nameRnd = new Random(67890); // NOSONAR
 
         var officialsToAdd = new List<Official>();
         int offSeq = 1;
@@ -260,7 +260,7 @@ public static class DbSeeder
         var existingGovUserIds = new HashSet<Guid>(await context.GovernmentAdministrators.Select(g => g.UserId).ToListAsync());
         var existingGovernmentIds = new HashSet<string>(await context.GovernmentAdministrators.Select(g => g.GovernmentId).ToListAsync());
 
-        var nameRnd = new Random(11223);
+        var nameRnd = new Random(11223); // NOSONAR
 
         var govAdminsToAdd = new List<GovernmentAdministrator>();
         int govSeq = 1;
@@ -332,7 +332,7 @@ public static class DbSeeder
         HashSet<string> usedPhones,
         DateTime now)
     {
-        var rnd = new Random(12345);
+        var rnd = new Random(12345); // NOSONAR
         var phoneBase = 710000000; // will increment for unique numbers
 
         var created = 0;
@@ -384,7 +384,7 @@ public static class DbSeeder
     private static async Task SeedCredentialsAsync(AppDbContext context)
     {
         var now = DateTime.UtcNow;
-        var rnd = new Random(99999);
+        var rnd = new Random(99999); // NOSONAR
 
         // get all citizens that don't have a credential yet
         var citizensWithoutCredentials = await context.Citizens
@@ -478,7 +478,7 @@ public static class DbSeeder
     private static async Task SeedUserPreferencesAsync(AppDbContext context)
     {
         var now = DateTime.UtcNow;
-        var rnd = new Random(11111);
+        var rnd = new Random(11111); // NOSONAR
 
         // get all users that don't have preferences yet
         // UserPreferences has unique index on UserId so one per user only
@@ -525,7 +525,7 @@ public static class DbSeeder
     private static async Task SeedAuditLogsAsync(AppDbContext context)
     {
         var now = DateTime.UtcNow;
-        var rnd = new Random(22222);
+        var rnd = new Random(22222); // NOSONAR
 
         // only seed if no audit logs exist yet
         if (await context.AuditLogs.AnyAsync()) return;
