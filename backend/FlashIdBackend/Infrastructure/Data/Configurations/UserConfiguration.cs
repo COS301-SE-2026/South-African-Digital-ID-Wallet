@@ -23,7 +23,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(256);
 
-        builder.Property(u => u.passwordSet)
+        builder.Property(u => u.PasswordSet)
             .IsRequired()
             .HasDefaultValue(false);
 

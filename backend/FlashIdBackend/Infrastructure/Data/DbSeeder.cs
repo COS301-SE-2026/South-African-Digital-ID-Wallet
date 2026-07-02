@@ -73,7 +73,7 @@ public static class DbSeeder
         if (!await context.DomainUsers.AnyAsync(u => u.Role == UserRole.Citizen))
         {
             var citizens = CreateUsers(
-                count: 140,
+                count: 10,
                 role: UserRole.Citizen,
                 usedEmails: usedEmails,
                 usedPhones: usedPhones,
@@ -156,7 +156,7 @@ public static class DbSeeder
         if (!await context.DomainUsers.AnyAsync(u => u.Role == UserRole.Official))
         {
             var officials = CreateUsers(
-                count: 40,
+                count: 5,
                 role: UserRole.Official,
                 usedEmails: usedEmails,
                 // usedUsernames: usedUsernames,
@@ -260,7 +260,7 @@ public static class DbSeeder
         if (!await context.DomainUsers.AnyAsync(u => u.Role == UserRole.GovernmentAdministrator))
         {
             var govAdmins = CreateUsers(
-                count: 20,
+                count: 5,
                 role: UserRole.GovernmentAdministrator,
                 usedEmails: usedEmails,
                 // usedUsernames: usedUsernames,
@@ -476,7 +476,7 @@ public static class DbSeeder
         var official = await context.Officials.FirstOrDefaultAsync();
         var issuedBy = official?.Id.ToString() ?? "SYSTEM";
 
-        var genders = new[] { Gender.Male, Gender.Female, Gender.Other };
+        // var genders = new[] { Gender.Male, Gender.Female, Gender.Other };
         var citizenships = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
         var nationalities = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
         var countries = new[] { "South Africa", "Zimbabwe", "Mozambique", "Namibia" };
@@ -571,7 +571,8 @@ public static class DbSeeder
         var themes = new[] { Theme.Light, Theme.Dark, Theme.System };
 
         var citizenNames = await context.Citizens
-            .ToDictionaryAsync(c => c.UserId, c => c.Names);
+            .Where(c => c.UserId.HasValue)
+            .ToDictionaryAsync(c => c.UserId!.Value, c => c.Names);
 
         var officialNames = await context.Officials
             .ToDictionaryAsync(o => o.UserId, o => o.Names);

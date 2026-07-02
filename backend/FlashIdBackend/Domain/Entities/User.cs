@@ -10,7 +10,7 @@ public class User : BaseEntity
 
     public string PasswordHash { get; set; } = string.Empty;
 
-    public bool passwordSet { get; set; }
+    public bool PasswordSet { get; set; }
 
     public int FailedLoginAttempts { get; set; }
 

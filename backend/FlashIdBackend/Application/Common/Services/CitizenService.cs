@@ -42,6 +42,7 @@ public class CitizenService : ICitizenService
             Id = Guid.NewGuid(),
             Email = request.Email.Trim(),
             PasswordHash = _passwordHashingProvider.HashPassword(request.Password),
+            PasswordSet = true,
             FailedLoginAttempts = 0,
             LockoutUntil = null,
             LastLoginAt = null,

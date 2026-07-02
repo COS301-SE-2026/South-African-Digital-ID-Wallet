@@ -24,8 +24,6 @@ public class CitizensController : ControllerBase
         try
         {
             var result = await _citizenService.RegisterCitizenAsync(request);
-            // return Ok(result);
-            // return CreatedAtAction(nameof(Register), new { id = result.UserId }, result);
             return StatusCode(StatusCodes.Status201Created, result);
         }
         catch (InvalidCitizenRegistrationRequestException ex)
