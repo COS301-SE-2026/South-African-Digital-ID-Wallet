@@ -81,7 +81,7 @@ export const RegistrationForm = ({
     },
     {
       label: 'Must contain at least 1 digit (0-9)',
-      met: /[0-9]/.test(password),
+      met: /\d/.test(password),
     },
     {
       label: 'Must contain at least 1 lowercase letter (a-z)',

@@ -23,6 +23,26 @@ namespace Infrastructure.Data;
 // scanning features are built out.
 public static class DbSeeder
 {
+    private static readonly string[] FirstNames = new[]
+    {
+        "Liam","Noah","Ethan","Mason","Logan","James","Oliver","Benjamin","Elijah","Lucas",
+        "Mia","Emma","Olivia","Ava","Isabella","Sophia","Charlotte","Amelia","Harper","Evelyn",
+        "Thabo","Sipho","Nkosi","Sizwe","Lungelo","Bongani","Kgosi","Kayla","Zanele","Nomsa",
+        "Amogelang","Tshepo","Kagiso","Lesedi","Palesa","Neo","Mpho","Tendai","Kabelo","Sibusiso",
+        "Zinhle","Mandla","Andile","Zuko","Nosipho","Lerato","Mbali","Nokuthula","Xolani","Sizweleo",
+        "Daniel","Samuel","Jacob","Michael","William","Alexander","Henry","Sebastian","Levi","Mateo",
+        "Anele","Fikile","Yandiswa","Nokwanda","Sanele","Khanya","Thandolwethu","Busi","Karabo","Pule"
+    };
+
+    private static readonly string[] LastNames = new[]
+    {
+        "Ngata","Chisadza","Mokoena","Dlamini","Naidoo","Sithole","Botha","VanDerMerwe","Nkosi","Khumalo",
+        "Mafolo","Mabena","Mkhize","Maseko","Mabuza","Matsheka","Morrell","Meyer","VanWyk","Kruger",
+        "Smith","Johnson","Brown","Williams","Jones","Miller","Wilson","Anderson","Thomas","Taylor",
+        "Patel","Khan","Singh","Naidoo","Pillay","Govender","Perumal","Singh","Mahlangu","Radebe",
+        "Swanepoel","Botha","VanHeerden","Gumede","Mthembu","Mabuyi","Magubane","Mabutho","Mntambo","Mdluli"
+    };
+
     public static async Task SeedAsync(AppDbContext context)
     {
         await context.Database.MigrateAsync();
@@ -92,23 +112,6 @@ public static class DbSeeder
         var existingSaIds = new HashSet<string>(await context.Citizens.Select(c => c.SaId).ToListAsync());
 
         var nameRnd = new Random(54321);
-        var firstNames = new[] {
-            "Liam","Noah","Ethan","Mason","Logan","James","Oliver","Benjamin","Elijah","Lucas",
-            "Mia","Emma","Olivia","Ava","Isabella","Sophia","Charlotte","Amelia","Harper","Evelyn",
-            "Thabo","Sipho","Nkosi","Sizwe","Lungelo","Bongani","Kgosi","Kayla","Zanele","Nomsa",
-            "Amogelang","Tshepo","Kagiso","Lesedi","Palesa","Neo","Mpho","Tendai","Kabelo","Sibusiso",
-            "Zinhle","Mandla","Andile","Zuko","Nosipho","Lerato","Mbali","Nokuthula","Xolani","Sizweleo",
-            "Daniel","Samuel","Jacob","Michael","William","Alexander","Henry","Sebastian","Levi","Mateo",
-            "Anele","Fikile","Yandiswa","Nokwanda","Sanele","Khanya","Thandolwethu","Busi","Karabo","Pule"
-        };
-
-        var lastNames = new[] {
-            "Ngata","Chisadza","Mokoena","Dlamini","Naidoo","Sithole","Botha","VanDerMerwe","Nkosi","Khumalo",
-            "Mafolo","Mabena","Mkhize","Maseko","Mabuza","Matsheka","Morrell","Meyer","VanWyk","Kruger",
-            "Smith","Johnson","Brown","Williams","Jones","Miller","Wilson","Anderson","Thomas","Taylor",
-            "Patel","Khan","Singh","Naidoo","Pillay","Govender","Perumal","Singh","Mahlangu","Radebe",
-            "Swanepoel","Botha","VanHeerden","Gumede","Mthembu","Mabuyi","Magubane","Mabutho","Mntambo","Mdluli"
-        };
 
         var genders = new[] { Gender.Male, Gender.Female, Gender.Other };
 
@@ -120,7 +123,7 @@ public static class DbSeeder
             string saId;
             do
             {
-                saId = (saIdBase++).ToString();
+                saId = saIdBase++.ToString();
             } while (existingSaIds.Contains(saId));
             existingSaIds.Add(saId);
 
@@ -128,8 +131,8 @@ public static class DbSeeder
             {
                 Id = Guid.NewGuid(),
                 SaId = saId,
-                Names = firstNames[nameRnd.Next(firstNames.Length)],
-                Surname = lastNames[nameRnd.Next(lastNames.Length)],
+                Names = FirstNames[nameRnd.Next(FirstNames.Length)],
+                Surname = LastNames[nameRnd.Next(LastNames.Length)],
                 DateOfBirth = now.AddYears(-nameRnd.Next(16, 70)).AddDays(-nameRnd.Next(0, 365)),
                 Gender = genders[nameRnd.Next(genders.Length)],
                 CredentialActivationCode = null,
@@ -196,23 +199,6 @@ public static class DbSeeder
         }
 
         var nameRnd = new Random(67890);
-        var firstNames = new[] {
-            "Liam","Noah","Ethan","Mason","Logan","James","Oliver","Benjamin","Elijah","Lucas",
-            "Mia","Emma","Olivia","Ava","Isabella","Sophia","Charlotte","Amelia","Harper","Evelyn",
-            "Thabo","Sipho","Nkosi","Sizwe","Lungelo","Bongani","Kgosi","Kayla","Zanele","Nomsa",
-            "Amogelang","Tshepo","Kagiso","Lesedi","Palesa","Neo","Mpho","Tendai","Kabelo","Sibusiso",
-            "Zinhle","Mandla","Andile","Zuko","Nosipho","Lerato","Mbali","Nokuthula","Xolani","Sizweleo",
-            "Daniel","Samuel","Jacob","Michael","William","Alexander","Henry","Sebastian","Levi","Mateo",
-            "Anele","Fikile","Yandiswa","Nokwanda","Sanele","Khanya","Thandolwethu","Busi","Karabo","Pule"
-        };
-
-        var lastNames = new[] {
-            "Ngata","Chisadza","Mokoena","Dlamini","Naidoo","Sithole","Botha","VanDerMerwe","Nkosi","Khumalo",
-            "Mafolo","Mabena","Mkhize","Maseko","Mabuza","Matsheka","Morrell","Meyer","VanWyk","Kruger",
-            "Smith","Johnson","Brown","Williams","Jones","Miller","Wilson","Anderson","Thomas","Taylor",
-            "Patel","Khan","Singh","Naidoo","Pillay","Govender","Perumal","Singh","Mahlangu","Radebe",
-            "Swanepoel","Botha","VanHeerden","Gumede","Mthembu","Mabuyi","Magubane","Mabutho","Mntambo","Mdluli"
-        };
 
         var officialsToAdd = new List<Official>();
         int offSeq = 1;
@@ -236,8 +222,8 @@ public static class DbSeeder
             {
                 Id = Guid.NewGuid(),
                 OfficialId = officialId,
-                Names = firstNames[nameRnd.Next(firstNames.Length)],
-                Surname = lastNames[nameRnd.Next(lastNames.Length)],
+                Names = FirstNames[nameRnd.Next(FirstNames.Length)],
+                Surname = LastNames[nameRnd.Next(LastNames.Length)],
                 CreatedAt = now,
                 UpdatedAt = now,
                 UserId = u.Id,
@@ -277,23 +263,6 @@ public static class DbSeeder
         var existingGovernmentIds = new HashSet<string>(await context.GovernmentAdministrators.Select(g => g.GovernmentId).ToListAsync());
 
         var nameRnd = new Random(11223);
-        var firstNames = new[] {
-            "Liam","Noah","Ethan","Mason","Logan","James","Oliver","Benjamin","Elijah","Lucas",
-            "Mia","Emma","Olivia","Ava","Isabella","Sophia","Charlotte","Amelia","Harper","Evelyn",
-            "Thabo","Sipho","Nkosi","Sizwe","Lungelo","Bongani","Kgosi","Kayla","Zanele","Nomsa",
-            "Amogelang","Tshepo","Kagiso","Lesedi","Palesa","Neo","Mpho","Tendai","Kabelo","Sibusiso",
-            "Zinhle","Mandla","Andile","Zuko","Nosipho","Lerato","Mbali","Nokuthula","Xolani","Sizweleo",
-            "Daniel","Samuel","Jacob","Michael","William","Alexander","Henry","Sebastian","Levi","Mateo",
-            "Anele","Fikile","Yandiswa","Nokwanda","Sanele","Khanya","Thandolwethu","Busi","Karabo","Pule"
-        };
-
-        var lastNames = new[] {
-            "Ngata","Chisadza","Mokoena","Dlamini","Naidoo","Sithole","Botha","VanDerMerwe","Nkosi","Khumalo",
-            "Mafolo","Mabena","Mkhize","Maseko","Mabuza","Matsheka","Morrell","Meyer","VanWyk","Kruger",
-            "Smith","Johnson","Brown","Williams","Jones","Miller","Wilson","Anderson","Thomas","Taylor",
-            "Patel","Khan","Singh","Naidoo","Pillay","Govender","Perumal","Singh","Mahlangu","Radebe",
-            "Swanepoel","Botha","VanHeerden","Gumede","Mthembu","Mabuyi","Magubane","Mabutho","Mntambo","Mdluli"
-        };
 
         var govAdminsToAdd = new List<GovernmentAdministrator>();
         int govSeq = 1;
@@ -313,8 +282,8 @@ public static class DbSeeder
             {
                 Id = Guid.NewGuid(),
                 GovernmentId = governmentId,
-                Names = firstNames[nameRnd.Next(firstNames.Length)],
-                Surname = lastNames[nameRnd.Next(lastNames.Length)],
+                Names = FirstNames[nameRnd.Next(FirstNames.Length)],
+                Surname = LastNames[nameRnd.Next(LastNames.Length)],
                 CreatedAt = now,
                 UpdatedAt = now,
                 UserId = u.Id
@@ -365,32 +334,14 @@ public static class DbSeeder
         HashSet<string> usedPhones,
         DateTime now)
     {
-        var firstNames = new[] {
-            "Liam","Noah","Ethan","Mason","Logan","James","Oliver","Benjamin","Elijah","Lucas",
-            "Mia","Emma","Olivia","Ava","Isabella","Sophia","Charlotte","Amelia","Harper","Evelyn",
-            "Thabo","Sipho","Nkosi","Sizwe","Lungelo","Bongani","Kgosi","Kayla","Zanele","Nomsa",
-            "Amogelang","Tshepo","Kagiso","Lesedi","Palesa","Neo","Mpho","Tendai","Kabelo","Sibusiso",
-            "Zinhle","Mandla","Andile","Zuko","Nosipho","Lerato","Mbali","Nokuthula","Xolani","Sizweleo",
-            "Daniel","Samuel","Jacob","Michael","William","Alexander","Henry","Sebastian","Levi","Mateo",
-            "Anele","Fikile","Yandiswa","Nokwanda","Sanele","Khanya","Thandolwethu","Busi","Karabo","Pule"
-        };
-
-        var lastNames = new[] {
-            "Ngata","Chisadza","Mokoena","Dlamini","Naidoo","Sithole","Botha","VanDerMerwe","Nkosi","Khumalo",
-            "Mafolo","Mabena","Mkhize","Maseko","Mabuza","Matsheka","Morrell","Meyer","VanWyk","Kruger",
-            "Smith","Johnson","Brown","Williams","Jones","Miller","Wilson","Anderson","Thomas","Taylor",
-            "Patel","Khan","Singh","Naidoo","Pillay","Govender","Perumal","Singh","Mahlangu","Radebe",
-            "Swanepoel","Botha","VanHeerden","Gumede","Mthembu","Mabuyi","Magubane","Mabutho","Mntambo","Mdluli"
-        };
-
         var rnd = new Random(12345);
         var phoneBase = 710000000; // will increment for unique numbers
 
         var created = 0;
         while (created < count)
         {
-            var first = firstNames[rnd.Next(firstNames.Length)];
-            var last = lastNames[rnd.Next(lastNames.Length)];
+            var first = FirstNames[rnd.Next(FirstNames.Length)];
+            var last = LastNames[rnd.Next(LastNames.Length)];
 
             // email: name.surname@flashid.local (lowercase)
             var emailBase = $"{first}.{last}".ToLowerInvariant();
