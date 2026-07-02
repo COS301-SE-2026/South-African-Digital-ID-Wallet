@@ -20,4 +20,61 @@ export default function CitizenDashboardPage() {
     { label: 'Verifications This Month', value: 8 },
     { label: 'Security Score', value: '92%' },
   ]
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      <main className="flex-1 p-6 flex flex-col min-h-0">
+        <div className="grid grid-cols-12 gap-6 mt-6 flex-1 min-h-0 overflow-auto pr-2">
+          <section className="col-span-8 space-y-6 min-h-0 flex flex-col">
+            <div className="bg-card rounded-3xl border p-6 flex items-center justify-between gap-6">
+              <div>
+                <StatusPill intent="active">Identity verified</StatusPill>
+                <h1 className="text-3xl font-bold mt-3">
+                  Your Flash ID wallet is active.
+                </h1>
+                <p className="text-muted-text mt-2">
+                  Present a secure QR code when a bank, hospital, police officer
+                  or authorised service provider needs to verify your identity.
+                </p>
+                <div className="mt-4 flex gap-3">
+                  <button className="bg-primary text-primary-foreground px-4 py-2 rounded-2xl font-semibold">
+                    Generate QR Code
+                  </button>
+                  <button className="bg-muted px-4 py-2 rounded-2xl">
+                    Request New Credential
+                  </button>
+                </div>
+              </div>
+
+              <div className="w-36 h-36 bg-gradient-to-br from-green-600 to-green-400 rounded-2xl flex items-center justify-center text-white font-bold">
+                QR
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              {stats.map((s) => (
+                <div key={s.label} className="bg-card rounded-2xl border p-4">
+                  <div className="text-muted-text text-sm">{s.label}</div>
+                  <div className="text-2xl font-bold mt-2">{s.value}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 flex-1 min-h-0">
+              <div className="min-h-0 flex flex-col">
+                <AccountCard />
+                <div className="mt-4">
+                  <CredentialsList />
+                </div>
+              </div>
+
+              <div className="space-y-4 min-h-0 flex flex-col">
+                <ActivityOverviewCard />
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  )
 }
