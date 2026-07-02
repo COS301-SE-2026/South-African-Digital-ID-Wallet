@@ -10,6 +10,8 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
 {
     public void Configure(EntityTypeBuilder<Citizen> builder)
     {
+        const string dateFormat = "datetime2";
+
         builder.HasKey(c => c.Id);
 
         builder.HasIndex(c => c.SaId).IsUnique();
@@ -29,7 +31,7 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
 
         builder.Property(c => c.DateOfBirth)
             .IsRequired()
-            .HasColumnType("datetime2");
+            .HasColumnType(dateFormat);
 
         builder.Property(c => c.Gender)
             .IsRequired()
@@ -40,7 +42,7 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
             .HasMaxLength(256);
 
         builder.Property(c => c.CredentialActivationCodeExpiresAt)
-            .HasColumnType("datetime2");
+            .HasColumnType(dateFormat);
 
         builder.Property(c => c.Status)
             .IsRequired()
@@ -50,13 +52,13 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
 
         builder.Property(c => c.CreatedAt)
             .IsRequired()
-            .HasColumnType("datetime2")
+            .HasColumnType(dateFormat)
             .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAdd();
 
         builder.Property(c => c.UpdatedAt)
             .IsRequired()
-            .HasColumnType("datetime2")
+            .HasColumnType(dateFormat)
             .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAddOrUpdate();
 

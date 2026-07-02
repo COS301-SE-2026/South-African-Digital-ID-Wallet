@@ -162,7 +162,6 @@ public static class DbSeeder
                 count: 5,
                 role: UserRole.Official,
                 usedEmails: usedEmails,
-                // usedUsernames: usedUsernames,
                 usedPhones: usedPhones,
                 now: now);
 
@@ -249,7 +248,6 @@ public static class DbSeeder
                 count: 5,
                 role: UserRole.GovernmentAdministrator,
                 usedEmails: usedEmails,
-                // usedUsernames: usedUsernames,
                 usedPhones: usedPhones,
                 now: now);
 
@@ -361,17 +359,13 @@ public static class DbSeeder
             } while (usedPhones.Contains(phone));
 
             usedEmails.Add(email);
-            // usedUsernames.Add(username);
             usedPhones.Add(phone);
 
             yield return new User
             {
                 Id = Guid.NewGuid(),
-                // Names = first,
-                // Surname = last,
                 Email = email,
                 PhoneNumber = phone,
-                // Username = username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
                 FailedLoginAttempts = 0,
                 LockoutUntil = null,
@@ -403,7 +397,6 @@ public static class DbSeeder
         var official = await context.Officials.FirstOrDefaultAsync();
         var issuedBy = official?.Id.ToString() ?? "SYSTEM";
 
-        // var genders = new[] { Gender.Male, Gender.Female, Gender.Other };
         var citizenships = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
         var nationalities = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
         var countries = new[] { "South Africa", "Zimbabwe", "Mozambique", "Namibia" };

@@ -83,7 +83,7 @@ public class AuthService : IAuthService
             {
                 await _citizenService.ResendOtpAsync(new ResendOtpRequestDto { Email = user.Email });
             }
-            catch { }
+            catch { /* Ignore errors during otp resend */}
 
             throw new EmailNotVerifiedException(user.Email);
         }
