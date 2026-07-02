@@ -10,6 +10,8 @@ public class User : BaseEntity
 
     public string PasswordHash { get; set; } = string.Empty;
 
+    public bool passwordSet { get; set; }
+
     public int FailedLoginAttempts { get; set; }
 
     // account lockout and audit fields

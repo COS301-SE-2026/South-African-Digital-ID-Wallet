@@ -10,9 +10,9 @@ public class DriversLicense : BaseEntity
 
     public string Restrictions { get; set; } = string.Empty;
 
-    public DateTime StartDate { get; set; }
-
     public DateTime ExpiryDate { get; set; }
+
+    public string PhotoPath { get; set; } = string.Empty;
 
 
     // Navigation property back to Credential

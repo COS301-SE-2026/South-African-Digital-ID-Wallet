@@ -57,8 +57,8 @@ public class OnboardingService : IOnboardingService
             Surname = identityRecord.Surname,
             UserId = user.Id,
             Status = CitizenStatus.Pending,
-            ActivationCode = activationCode,
-            ActivationCodeExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            CredentialActivationCode = activationCode,
+            CredentialActivationCodeExpiresAt = DateTime.UtcNow.AddMinutes(15),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
@@ -73,7 +73,7 @@ public class OnboardingService : IOnboardingService
             CitizenId = citizen.Id,
             SaId = identityRecord.SaId,
             ActivationCode = activationCode,
-            ActivationCodeExpiresAt = citizen.ActivationCodeExpiresAt,
+            ActivationCodeExpiresAt = citizen.CredentialActivationCodeExpiresAt,
             Status = "Pending",
         };
     }

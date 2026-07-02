@@ -31,10 +31,15 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
             .IsRequired()
             .HasColumnType("datetime2");
 
-        builder.Property(c => c.ActivationCode)
+        builder.Property(c => c.Gender)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(20);
+
+        builder.Property(c => c.CredentialActivationCode)
             .HasMaxLength(256);
 
-        builder.Property(c => c.ActivationCodeExpiresAt)
+        builder.Property(c => c.CredentialActivationCodeExpiresAt)
             .HasColumnType("datetime2");
 
         builder.Property(c => c.Status)
@@ -55,28 +60,17 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
             .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAddOrUpdate();
 
-        builder.Property(c => c.IdFrontImagePath)
-            .HasMaxLength(512);
-
-        builder.Property(c => c.IdBackImagePath)
-            .HasMaxLength(512);
-
-        builder.Property(c => c.SelfieImagePath)
-            .HasMaxLength(512);
-
-        builder.Property(c => c.UserId)
-            .IsRequired();
-
         builder.HasOne(c => c.User)
             .WithMany()
             .HasForeignKey(c => c.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false);
 
         builder.HasMany(b => b.Credentials)
             .WithOne(credential => credential.Citizen)
             .HasForeignKey(credential => credential.CitizenId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasQueryFilter(c => !c.User.IsDeleted);
+        builder.HasQueryFilter(c => c.User == null || !c.User.IsDeleted);
     }
 }

@@ -85,7 +85,7 @@ public static class DbSeeder
 
         // Create Citizen records for any User with Role == Citizen that does not yet have a Citizen row.
         var citizenUsers = await context.DomainUsers.Where(u => u.Role == UserRole.Citizen).ToListAsync();
-        var existingCitizenUserIds = new HashSet<Guid>(await context.Citizens.Select(c => c.UserId).ToListAsync());
+        var existingCitizenUserIds = new HashSet<Guid?>(await context.Citizens.Select(c => c.UserId).ToListAsync());
 
         // SA ID generator base (13 digits)
         long saIdBase = 9000000000000; // large starting number
@@ -110,6 +110,8 @@ public static class DbSeeder
             "Swanepoel","Botha","VanHeerden","Gumede","Mthembu","Mabuyi","Magubane","Mabutho","Mntambo","Mdluli"
         };
 
+        var genders = new[] { Gender.Male, Gender.Female, Gender.Other };
+
         var citizensToAdd = new List<Citizen>();
         foreach (var u in citizenUsers)
         {
@@ -129,8 +131,9 @@ public static class DbSeeder
                 Names = firstNames[nameRnd.Next(firstNames.Length)],
                 Surname = lastNames[nameRnd.Next(lastNames.Length)],
                 DateOfBirth = now.AddYears(-nameRnd.Next(16, 70)).AddDays(-nameRnd.Next(0, 365)),
-                ActivationCode = null,
-                ActivationCodeExpiresAt = null,
+                Gender = genders[nameRnd.Next(genders.Length)],
+                CredentialActivationCode = null,
+                CredentialActivationCodeExpiresAt = null,
                 Status = CitizenStatus.Activated,
                 UserId = u.Id,
                 CreatedAt = now,
@@ -487,9 +490,6 @@ public static class DbSeeder
         foreach (var citizen in citizensWithoutCredentials)
         {
             // age between 16 and 70
-            // var dob = now.AddYears(-rnd.Next(16, 70)).AddDays(-rnd.Next(0, 365));
-            var gender = genders[rnd.Next(genders.Length)];
-
             // calculate exact age
             var age = now.Year - citizen.DateOfBirth.Year;
             if (citizen.DateOfBirth > now.AddYears(-age)) age--;
@@ -497,13 +497,12 @@ public static class DbSeeder
             var credential = new Credential
             {
                 Id = Guid.NewGuid(),
-                Gender = gender,
                 Status = CredentialStatus.Active,
                 // Signature max 1024 - use a guid based string
                 Signature = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"),
                 // IssuedBy max 256
                 IssuedBy = issuedBy,
-                // DateOfBirth = dob,
+                IssueDate = now,
                 CitizenId = citizen.Id,
                 CreatedAt = now,
                 UpdatedAt = now
@@ -536,7 +535,6 @@ public static class DbSeeder
                     LicenseCode = licenseCodes[rnd.Next(licenseCodes.Length)],
                     // Restrictions max 2 chars
                     Restrictions = "00",
-                    StartDate = startDate,
                     ExpiryDate = startDate.AddYears(5),
                     CredentialId = credential.Id,
                     CreatedAt = now,

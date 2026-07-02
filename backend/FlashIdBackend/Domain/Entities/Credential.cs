@@ -4,13 +4,12 @@ namespace Domain.Entities;
 
 public class Credential : BaseEntity
 {
-    public Gender Gender { get; set; } = Gender.Unspecified;
-
     public CredentialStatus Status { get; set; }
 
     public string Signature { get; set; } = string.Empty;
 
     public string IssuedBy { get; set; } = string.Empty;
+    public DateTime IssueDate { get; set; }
 
     // navigation properties
     public Guid CitizenId { get; set; }
@@ -20,4 +19,10 @@ public class Credential : BaseEntity
     public IdentityDocument? IdentityDocument { get; set; }
     public DriversLicense? DriversLicense { get; set; }
     public Biometrics? Biometrics { get; set; }
+
+    public string? IdFrontImagePath { get; set; }
+
+    public string? IdBackImagePath { get; set; }
+
+    public string? SelfieImagePath { get; set; }
 }
