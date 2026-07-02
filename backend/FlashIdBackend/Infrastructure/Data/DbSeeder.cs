@@ -23,18 +23,37 @@ namespace Infrastructure.Data;
 // scanning features are built out.
 public static class DbSeeder
 {
+    private static readonly string[] FirstNames = new[]
+    {
+        "Liam","Noah","Ethan","Mason","Logan","James","Oliver","Benjamin","Elijah","Lucas",
+        "Mia","Emma","Olivia","Ava","Isabella","Sophia","Charlotte","Amelia","Harper","Evelyn",
+        "Thabo","Sipho","Nkosi","Sizwe","Lungelo","Bongani","Kgosi","Kayla","Zanele","Nomsa",
+        "Amogelang","Tshepo","Kagiso","Lesedi","Palesa","Neo","Mpho","Tendai","Kabelo","Sibusiso",
+        "Zinhle","Mandla","Andile","Zuko","Nosipho","Lerato","Mbali","Nokuthula","Xolani","Sizweleo",
+        "Daniel","Samuel","Jacob","Michael","William","Alexander","Henry","Sebastian","Levi","Mateo",
+        "Anele","Fikile","Yandiswa","Nokwanda","Sanele","Khanya","Thandolwethu","Busi","Karabo","Pule"
+    };
+
+    private static readonly string[] LastNames = new[]
+    {
+        "Ngata","Chisadza","Mokoena","Dlamini","Naidoo","Sithole","Botha","VanDerMerwe","Nkosi","Khumalo",
+        "Mafolo","Mabena","Mkhize","Maseko","Mabuza","Matsheka","Morrell","Meyer","VanWyk","Kruger",
+        "Smith","Johnson","Brown","Williams","Jones","Miller","Wilson","Anderson","Thomas","Taylor",
+        "Patel","Khan","Singh","Naidoo","Pillay","Govender","Perumal","Singh","Mahlangu","Radebe",
+        "Swanepoel","Botha","VanHeerden","Gumede","Mthembu","Mabuyi","Magubane","Mabutho","Mntambo","Mdluli"
+    };
+
     public static async Task SeedAsync(AppDbContext context)
     {
         await context.Database.MigrateAsync();
         // shared uniqueness trackers so users across roles don't collide
         var usedEmails = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var usedUsernames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var usedPhones = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        await SeedCitizenUsersAsync(context, usedEmails, usedUsernames, usedPhones);
+        await SeedCitizenUsersAsync(context, usedEmails, usedPhones);
         // Government administrators must exist before creating institutions or officials
-        await SeedGovernmentAdministratorUsersAsync(context, usedEmails, usedUsernames, usedPhones);
-        await SeedOfficialUsersAsync(context, usedEmails, usedUsernames, usedPhones);
+        await SeedGovernmentAdministratorUsersAsync(context, usedEmails, usedPhones);
+        await SeedOfficialUsersAsync(context, usedEmails, usedPhones);
         await RepairInvalidPasswordHashesAsync(context);
         await SeedCredentialsAsync(context);
         await SeedUserPreferencesAsync(context);
@@ -66,7 +85,7 @@ public static class DbSeeder
         await context.SaveChangesAsync();
     }
 
-    private static async Task SeedCitizenUsersAsync(AppDbContext context, HashSet<string> usedEmails, HashSet<string> usedUsernames, HashSet<string> usedPhones)
+    private static async Task SeedCitizenUsersAsync(AppDbContext context, HashSet<string> usedEmails, HashSet<string> usedPhones)
     {
         var now = DateTime.UtcNow;
 
@@ -74,10 +93,9 @@ public static class DbSeeder
         if (!await context.DomainUsers.AnyAsync(u => u.Role == UserRole.Citizen))
         {
             var citizens = CreateUsers(
-                count: 140,
+                count: 10,
                 role: UserRole.Citizen,
                 usedEmails: usedEmails,
-                usedUsernames: usedUsernames,
                 usedPhones: usedPhones,
                 now: now);
 
@@ -87,11 +105,15 @@ public static class DbSeeder
 
         // Create Citizen records for any User with Role == Citizen that does not yet have a Citizen row.
         var citizenUsers = await context.DomainUsers.Where(u => u.Role == UserRole.Citizen).ToListAsync();
-        var existingCitizenUserIds = new HashSet<Guid>(await context.Citizens.Select(c => c.UserId).ToListAsync());
+        var existingCitizenUserIds = new HashSet<Guid?>(await context.Citizens.Select(c => c.UserId).ToListAsync());
 
         // SA ID generator base (13 digits)
         long saIdBase = 9000000000000; // large starting number
         var existingSaIds = new HashSet<string>(await context.Citizens.Select(c => c.SaId).ToListAsync());
+
+        var nameRnd = new Random(54321); // NOSONAR
+
+        var genders = new[] { Gender.Male, Gender.Female, Gender.Other };
 
         var citizensToAdd = new List<Citizen>();
         foreach (var u in citizenUsers)
@@ -101,7 +123,7 @@ public static class DbSeeder
             string saId;
             do
             {
-                saId = (saIdBase++).ToString();
+                saId = saIdBase++.ToString();
             } while (existingSaIds.Contains(saId));
             existingSaIds.Add(saId);
 
@@ -109,9 +131,13 @@ public static class DbSeeder
             {
                 Id = Guid.NewGuid(),
                 SaId = saId,
-                ActivationCode = Guid.NewGuid().ToString("N").Substring(0, 8),
-                ActivationCodeExpiresAt = now.AddDays(7),
-                IsActivated = true,
+                Names = FirstNames[nameRnd.Next(FirstNames.Length)],
+                Surname = LastNames[nameRnd.Next(LastNames.Length)],
+                DateOfBirth = now.AddYears(-nameRnd.Next(16, 70)).AddDays(-nameRnd.Next(0, 365)),
+                Gender = genders[nameRnd.Next(genders.Length)],
+                CredentialActivationCode = null,
+                CredentialActivationCodeExpiresAt = null,
+                Status = CitizenStatus.Activated,
                 UserId = u.Id,
                 CreatedAt = now,
                 UpdatedAt = now
@@ -125,7 +151,7 @@ public static class DbSeeder
         }
     }
 
-    private static async Task SeedOfficialUsersAsync(AppDbContext context, HashSet<string> usedEmails, HashSet<string> usedUsernames, HashSet<string> usedPhones)
+    private static async Task SeedOfficialUsersAsync(AppDbContext context, HashSet<string> usedEmails, HashSet<string> usedPhones)
     {
         var now = DateTime.UtcNow;
 
@@ -133,10 +159,9 @@ public static class DbSeeder
         if (!await context.DomainUsers.AnyAsync(u => u.Role == UserRole.Official))
         {
             var officials = CreateUsers(
-                count: 40,
+                count: 5,
                 role: UserRole.Official,
                 usedEmails: usedEmails,
-                usedUsernames: usedUsernames,
                 usedPhones: usedPhones,
                 now: now);
 
@@ -172,6 +197,8 @@ public static class DbSeeder
             institutions = await context.Institutions.ToListAsync();
         }
 
+        var nameRnd = new Random(67890); // NOSONAR
+
         var officialsToAdd = new List<Official>();
         int offSeq = 1;
         int instIndex = 0;
@@ -194,6 +221,8 @@ public static class DbSeeder
             {
                 Id = Guid.NewGuid(),
                 OfficialId = officialId,
+                Names = FirstNames[nameRnd.Next(FirstNames.Length)],
+                Surname = LastNames[nameRnd.Next(LastNames.Length)],
                 CreatedAt = now,
                 UpdatedAt = now,
                 UserId = u.Id,
@@ -208,7 +237,7 @@ public static class DbSeeder
         }
     }
 
-    private static async Task SeedGovernmentAdministratorUsersAsync(AppDbContext context, HashSet<string> usedEmails, HashSet<string> usedUsernames, HashSet<string> usedPhones)
+    private static async Task SeedGovernmentAdministratorUsersAsync(AppDbContext context, HashSet<string> usedEmails, HashSet<string> usedPhones)
     {
         var now = DateTime.UtcNow;
 
@@ -216,10 +245,9 @@ public static class DbSeeder
         if (!await context.DomainUsers.AnyAsync(u => u.Role == UserRole.GovernmentAdministrator))
         {
             var govAdmins = CreateUsers(
-                count: 20,
+                count: 5,
                 role: UserRole.GovernmentAdministrator,
                 usedEmails: usedEmails,
-                usedUsernames: usedUsernames,
                 usedPhones: usedPhones,
                 now: now);
 
@@ -231,6 +259,8 @@ public static class DbSeeder
         var govUsers = await context.DomainUsers.Where(u => u.Role == UserRole.GovernmentAdministrator).ToListAsync();
         var existingGovUserIds = new HashSet<Guid>(await context.GovernmentAdministrators.Select(g => g.UserId).ToListAsync());
         var existingGovernmentIds = new HashSet<string>(await context.GovernmentAdministrators.Select(g => g.GovernmentId).ToListAsync());
+
+        var nameRnd = new Random(11223); // NOSONAR
 
         var govAdminsToAdd = new List<GovernmentAdministrator>();
         int govSeq = 1;
@@ -250,6 +280,8 @@ public static class DbSeeder
             {
                 Id = Guid.NewGuid(),
                 GovernmentId = governmentId,
+                Names = FirstNames[nameRnd.Next(FirstNames.Length)],
+                Surname = LastNames[nameRnd.Next(LastNames.Length)],
                 CreatedAt = now,
                 UpdatedAt = now,
                 UserId = u.Id
@@ -297,36 +329,17 @@ public static class DbSeeder
         int count,
         UserRole role,
         HashSet<string> usedEmails,
-        HashSet<string> usedUsernames,
         HashSet<string> usedPhones,
         DateTime now)
     {
-        var firstNames = new[] {
-            "Liam","Noah","Ethan","Mason","Logan","James","Oliver","Benjamin","Elijah","Lucas",
-            "Mia","Emma","Olivia","Ava","Isabella","Sophia","Charlotte","Amelia","Harper","Evelyn",
-            "Thabo","Sipho","Nkosi","Sizwe","Lungelo","Bongani","Kgosi","Kayla","Zanele","Nomsa",
-            "Amogelang","Tshepo","Kagiso","Lesedi","Palesa","Neo","Mpho","Tendai","Kabelo","Sibusiso",
-            "Zinhle","Mandla","Andile","Zuko","Nosipho","Lerato","Mbali","Nokuthula","Xolani","Sizweleo",
-            "Daniel","Samuel","Jacob","Michael","William","Alexander","Henry","Sebastian","Levi","Mateo",
-            "Anele","Fikile","Yandiswa","Nokwanda","Sanele","Khanya","Thandolwethu","Busi","Karabo","Pule"
-        };
-
-        var lastNames = new[] {
-            "Ngata","Chisadza","Mokoena","Dlamini","Naidoo","Sithole","Botha","VanDerMerwe","Nkosi","Khumalo",
-            "Mafolo","Mabena","Mkhize","Maseko","Mabuza","Matsheka","Morrell","Meyer","VanWyk","Kruger",
-            "Smith","Johnson","Brown","Williams","Jones","Miller","Wilson","Anderson","Thomas","Taylor",
-            "Patel","Khan","Singh","Naidoo","Pillay","Govender","Perumal","Singh","Mahlangu","Radebe",
-            "Swanepoel","Botha","VanHeerden","Gumede","Mthembu","Mabuyi","Magubane","Mabutho","Mntambo","Mdluli"
-        };
-
-        var rnd = new Random(12345);
+        var rnd = new Random(12345); // NOSONAR
         var phoneBase = 710000000; // will increment for unique numbers
 
         var created = 0;
         while (created < count)
         {
-            var first = firstNames[rnd.Next(firstNames.Length)];
-            var last = lastNames[rnd.Next(lastNames.Length)];
+            var first = FirstNames[rnd.Next(FirstNames.Length)];
+            var last = LastNames[rnd.Next(LastNames.Length)];
 
             // email: name.surname@flashid.local (lowercase)
             var emailBase = $"{first}.{last}".ToLowerInvariant();
@@ -338,30 +351,6 @@ public static class DbSeeder
                 emailSuffix++;
             }
 
-            // username variants: nameInitialsurname | namesurnameInitial | name_surname
-            string username;
-            var pattern = rnd.Next(3);
-            switch (pattern)
-            {
-                case 0:
-                    username = $"{first}{last[0]}"; // e.g. JohnD
-                    break;
-                case 1:
-                    username = $"{first}{last}{first[0]}"; // e.g. JohnDoeJ
-                    break;
-                default:
-                    username = $"{first}_{last}"; // e.g. John_Doe
-                    break;
-            }
-
-            var unameBase = username;
-            var unameSuffix = 1;
-            while (usedUsernames.Contains(username))
-            {
-                username = unameBase + unameSuffix;
-                unameSuffix++;
-            }
-
             // phone +27 71 xxxxxxx style
             string phone;
             do
@@ -370,17 +359,13 @@ public static class DbSeeder
             } while (usedPhones.Contains(phone));
 
             usedEmails.Add(email);
-            usedUsernames.Add(username);
             usedPhones.Add(phone);
 
             yield return new User
             {
                 Id = Guid.NewGuid(),
-                Names = first,
-                Surname = last,
                 Email = email,
                 PhoneNumber = phone,
-                Username = username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
                 FailedLoginAttempts = 0,
                 LockoutUntil = null,
@@ -399,7 +384,7 @@ public static class DbSeeder
     private static async Task SeedCredentialsAsync(AppDbContext context)
     {
         var now = DateTime.UtcNow;
-        var rnd = new Random(99999);
+        var rnd = new Random(99999); // NOSONAR
 
         // get all citizens that don't have a credential yet
         var citizensWithoutCredentials = await context.Citizens
@@ -412,7 +397,6 @@ public static class DbSeeder
         var official = await context.Officials.FirstOrDefaultAsync();
         var issuedBy = official?.Id.ToString() ?? "SYSTEM";
 
-        var genders = new[] { Gender.Male, Gender.Female, Gender.Other };
         var citizenships = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
         var nationalities = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
         var countries = new[] { "South Africa", "Zimbabwe", "Mozambique", "Namibia" };
@@ -426,23 +410,19 @@ public static class DbSeeder
         foreach (var citizen in citizensWithoutCredentials)
         {
             // age between 16 and 70
-            var dob = now.AddYears(-rnd.Next(16, 70)).AddDays(-rnd.Next(0, 365));
-            var gender = genders[rnd.Next(genders.Length)];
-
             // calculate exact age
-            var age = now.Year - dob.Year;
-            if (dob > now.AddYears(-age)) age--;
+            var age = now.Year - citizen.DateOfBirth.Year;
+            if (citizen.DateOfBirth > now.AddYears(-age)) age--;
 
             var credential = new Credential
             {
                 Id = Guid.NewGuid(),
-                Gender = gender,
                 Status = CredentialStatus.Active,
                 // Signature max 1024 - use a guid based string
                 Signature = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"),
                 // IssuedBy max 256
                 IssuedBy = issuedBy,
-                DateOfBirth = dob,
+                IssueDate = now,
                 CitizenId = citizen.Id,
                 CreatedAt = now,
                 UpdatedAt = now
@@ -475,7 +455,6 @@ public static class DbSeeder
                     LicenseCode = licenseCodes[rnd.Next(licenseCodes.Length)],
                     // Restrictions max 2 chars
                     Restrictions = "00",
-                    StartDate = startDate,
                     ExpiryDate = startDate.AddYears(5),
                     CredentialId = credential.Id,
                     CreatedAt = now,
@@ -499,7 +478,7 @@ public static class DbSeeder
     private static async Task SeedUserPreferencesAsync(AppDbContext context)
     {
         var now = DateTime.UtcNow;
-        var rnd = new Random(11111);
+        var rnd = new Random(11111); // NOSONAR
 
         // get all users that don't have preferences yet
         // UserPreferences has unique index on UserId so one per user only
@@ -511,11 +490,27 @@ public static class DbSeeder
 
         var themes = new[] { Theme.Light, Theme.Dark, Theme.System };
 
+        var citizenNames = await context.Citizens
+            .Where(c => c.UserId.HasValue)
+            .ToDictionaryAsync(c => c.UserId!.Value, c => c.Names);
+
+        var officialNames = await context.Officials
+            .ToDictionaryAsync(o => o.UserId, o => o.Names);
+
+        var govAdminNames = await context.GovernmentAdministrators
+            .ToDictionaryAsync(g => g.UserId, g => g.Names);
+
         var preferencesToAdd = usersWithoutPreferences.Select(u => new UserPreferences
         {
             Id = Guid.NewGuid(),
             // PreferredName max 100 chars
-            PreferredName = u.Names,
+            PreferredName = u.Role switch
+            {
+                UserRole.Citizen => citizenNames.GetValueOrDefault(u.Id, string.Empty),
+                UserRole.Official => officialNames.GetValueOrDefault(u.Id, string.Empty),
+                UserRole.GovernmentAdministrator => govAdminNames.GetValueOrDefault(u.Id, string.Empty),
+                _ => string.Empty
+            },
             Theme = themes[rnd.Next(themes.Length)],
             PreferredDisclosure = rnd.Next(2) == 0,
             UserId = u.Id,
@@ -530,7 +525,7 @@ public static class DbSeeder
     private static async Task SeedAuditLogsAsync(AppDbContext context)
     {
         var now = DateTime.UtcNow;
-        var rnd = new Random(22222);
+        var rnd = new Random(22222); // NOSONAR
 
         // only seed if no audit logs exist yet
         if (await context.AuditLogs.AnyAsync()) return;

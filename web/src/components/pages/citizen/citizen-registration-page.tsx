@@ -21,7 +21,7 @@ export const CitizenRegistrationPage = () => {
                 Register for your FlashID account
               </Text>
             </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto pb-8">
+            <CardContent className="flex flex-1 flex-col overflow-y-auto pb-8">
               <RegistrationForm />
             </CardContent>
           </Card>

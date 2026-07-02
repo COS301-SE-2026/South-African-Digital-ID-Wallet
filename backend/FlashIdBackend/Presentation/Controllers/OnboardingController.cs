@@ -2,7 +2,7 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Onboarding.Exceptions;
-using Application.Common.Interfaces;
+using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Features.Onboarding.Dtos;
 
 namespace Presentation.Controllers;

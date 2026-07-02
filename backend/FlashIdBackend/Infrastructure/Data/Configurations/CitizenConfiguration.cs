@@ -1,4 +1,6 @@
+using Application.Common.Services;
 using Domain.Entities;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,6 +10,8 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
 {
     public void Configure(EntityTypeBuilder<Citizen> builder)
     {
+        const string dateFormat = "datetime2";
+
         builder.HasKey(c => c.Id);
 
         builder.HasIndex(c => c.SaId).IsUnique();
@@ -17,40 +21,58 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
             .HasMaxLength(13)
             .IsUnicode(false);
 
-        builder.Property(c => c.ActivationCode)
+        builder.Property(c => c.Names)
             .IsRequired()
             .HasMaxLength(256);
 
-        builder.Property(c => c.ActivationCodeExpiresAt)
-            .HasColumnType("datetime2");
-
-        builder.Property(c => c.IsActivated)
+        builder.Property(c => c.Surname)
             .IsRequired()
-            .HasDefaultValue(false);
+            .HasMaxLength(256);
+
+        builder.Property(c => c.DateOfBirth)
+            .IsRequired()
+            .HasColumnType(dateFormat);
+
+        builder.Property(c => c.Gender)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(20);
+
+        builder.Property(c => c.CredentialActivationCode)
+            .HasMaxLength(256);
+
+        builder.Property(c => c.CredentialActivationCodeExpiresAt)
+            .HasColumnType(dateFormat);
+
+        builder.Property(c => c.Status)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .HasDefaultValue(CitizenStatus.Pending);
 
         builder.Property(c => c.CreatedAt)
             .IsRequired()
-            .HasColumnType("datetime2")
+            .HasColumnType(dateFormat)
             .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAdd();
 
         builder.Property(c => c.UpdatedAt)
             .IsRequired()
-            .HasColumnType("datetime2")
+            .HasColumnType(dateFormat)
             .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAddOrUpdate();
-
-        builder.Property(c => c.UserId)
-            .IsRequired();
 
         builder.HasOne(c => c.User)
             .WithMany()
             .HasForeignKey(c => c.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false);
 
         builder.HasMany(b => b.Credentials)
             .WithOne(credential => credential.Citizen)
             .HasForeignKey(credential => credential.CitizenId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasQueryFilter(c => c.User == null || !c.User.IsDeleted);
     }
 }

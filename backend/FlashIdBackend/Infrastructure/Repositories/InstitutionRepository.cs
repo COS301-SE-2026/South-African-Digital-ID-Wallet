@@ -3,7 +3,7 @@ using Domain.Entities;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Services;
+namespace Infrastructure.Repositories;
 
 public class InstitutionRepository : IInstitutionRepository
 {

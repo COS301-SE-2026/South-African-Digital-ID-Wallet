@@ -1,4 +1,3 @@
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Mapping;
@@ -8,7 +7,7 @@ using Application.Features.Institutions.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
 
-namespace Infrastructure.Services;
+namespace Application.Common.Services;
 
 public class InstitutionService : IInstitutionService
 {

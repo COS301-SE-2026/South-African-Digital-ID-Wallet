@@ -6,6 +6,10 @@ public class GovernmentAdministrator
 
     public string GovernmentId { get; set; } = string.Empty;
 
+    public string Names { get; set; } = string.Empty;
+
+    public string Surname { get; set; } = string.Empty;
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
