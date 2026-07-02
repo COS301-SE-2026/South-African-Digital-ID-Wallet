@@ -12,13 +12,13 @@ namespace Application.Common.Services;
 public class OnboardingService : IOnboardingService
 {
     private readonly IOnboardingRepository _onboardingRepository;
-    private readonly IMockGovernmentRegistryRepository _mockGovernmentRegistryRepository;
-    private readonly IGovernmentRegistryGateway _governmentRegistryRepository;
+    // private readonly IMockGovernmentRegistryRepository _mockGovernmentRegistryRepository;
+    private readonly IGovernmentRegistryGateway _governmentRegistryGateway;
     public OnboardingService(IOnboardingRepository registryService, IMockGovernmentRegistryRepository mockGovernmentRegistryRepository, IGovernmentRegistryGateway governmentRegistryGateway)
     {
         _onboardingRepository = registryService;
-        _mockGovernmentRegistryRepository = mockGovernmentRegistryRepository;
-        _governmentRegistryRepository = governmentRegistryGateway;
+        // _mockGovernmentRegistryRepository = mockGovernmentRegistryRepository;
+        _governmentRegistryGateway = governmentRegistryGateway;
     }
 
     public async Task<OnboardCitizenResponse> OnboardCitizenAsync(OnboardCitizenRequest request)
@@ -27,10 +27,9 @@ public class OnboardingService : IOnboardingService
             throw new CitizenConsentRequiredException();
 
         //Check if the user already exists... business logic
-        var identityRecord = _mockGovernmentRegistryRepository.GetBySaId(request.SaId);
-        var citizenRecord = _governmentRegistryRepository.GetCitizenBySaIdAsync(request.SaId);
+        var citizenRecord = await _governmentRegistryGateway.GetCitizenBySaIdAsync(request.SaId);
 
-        if (identityRecord is null)
+        if (citizenRecord is null)
             throw new IdentityRecordNotFoundException();
 
         var existingCitizen = await _onboardingRepository.GetCitizenBySaIdAsync(request.SaId);
@@ -44,8 +43,8 @@ public class OnboardingService : IOnboardingService
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Names = identityRecord.Names,
-            Surname = identityRecord.Surname,
+            Names = citizenRecord.Names,
+            Surname = citizenRecord.Surname,
             Email = request.Email,
             PhoneNumber = request.PhoneNumber,
             Username = request.Email,
@@ -59,7 +58,7 @@ public class OnboardingService : IOnboardingService
         var citizen = new Citizen
         {
             Id = Guid.NewGuid(),
-            SaId = identityRecord.SaId,
+            SaId = citizenRecord.SaId,
             UserId = user.Id,
             IsActivated = false,
             ActivationCode = activationCode,
@@ -69,14 +68,15 @@ public class OnboardingService : IOnboardingService
         };
 
         // Repository handles all persistence — the service never touches AppDbContext directly.
-        await _onboardingRepository.AddUserAsync(user);
+        //Edit once Nathan merges DB changes so that 
+        //await _onboardingRepository.AddUserAsync(user);
         await _onboardingRepository.AddCitizenAsync(citizen);
         await _onboardingRepository.SaveChangesAsync();
 
         return new OnboardCitizenResponse
         {
             CitizenId = citizen.Id,
-            SaId = identityRecord.SaId,
+            SaId = citizenRecord.SaId,
             ActivationCode = activationCode,
             ActivationCodeExpiresAt = citizen.ActivationCodeExpiresAt,
             Status = "Pending",

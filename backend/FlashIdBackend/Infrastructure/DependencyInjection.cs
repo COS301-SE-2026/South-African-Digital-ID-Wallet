@@ -8,6 +8,7 @@ using Infrastructure.Repositories;
 using Infrastructure.Services;
 using Infrastructure.Services.GovernmentRegistry;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure;
@@ -27,7 +28,15 @@ public static class DependencyInjection
         services.AddScoped<ICitizenRepository, CitizenRepository>();
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
 
-        services.AddHttpClient<IGovernmentRegistryGateway, GovernmentRegistryGateway>();
+        services.AddHttpClient<IGovernmentRegistryGateway, GovernmentRegistryGateway>((serviceProvider, client) =>
+            {
+                var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+                client.BaseAddress = new Uri(configuration["GovernmentRegistry:BaseUrl"]!);
+
+                client.DefaultRequestHeaders.Add(
+                    "X-API-KEY",
+                    configuration["GovernmentRegistry:ApiKeyGov"]);
+            });
 
         return services;
     }

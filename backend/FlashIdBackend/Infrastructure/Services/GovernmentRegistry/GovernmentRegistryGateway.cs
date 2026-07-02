@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Features.Onboarding.Dtos;
@@ -13,10 +14,17 @@ public class GovernmentRegistryGateway : IGovernmentRegistryGateway
         _httpClient = httpClient;
     }
 
-    public async Task<CitizenRecordDto> GetCitizenBySaIdAsync(string saId)
+    public async Task<CitizenRecordDto?> GetCitizenBySaIdAsync(string saId)
     {
-        return await _httpClient.GetFromJsonAsync<CitizenRecordDto>(
-            $"api/citizens/{saId}");
+        var cleanSaId = saId.Trim();
+        var govRegistryResponse = await _httpClient.GetAsync($"api/citizens/{cleanSaId}");
+
+        if (govRegistryResponse.StatusCode == HttpStatusCode.NotFound)
+            return null;
+
+        govRegistryResponse.EnsureSuccessStatusCode();
+
+        return await govRegistryResponse.Content.ReadFromJsonAsync<CitizenRecordDto>();
     }
 
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Onboarding.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Features.Onboarding.Dtos;
 
 namespace Presentation.Controllers;
@@ -10,28 +11,27 @@ namespace Presentation.Controllers;
 [ApiController]
 [Route("api/onboarding")]
 [Authorize(Roles = "Official")]
-/*TODO: Implement retrieval of credential data once moch-gov db set up :)*/
 public class OnboardingController : ControllerBase
 {
-    private readonly IMockGovernmentRegistryRepository _registryRepository;
+    private readonly IGovernmentRegistryGateway _registryGateway;
     private readonly IOnboardingService _onboardingService;
 
     public OnboardingController(
-       IMockGovernmentRegistryRepository registryRepository,
+        IGovernmentRegistryGateway registryGateway,
        IOnboardingService onboardingService)
     {
-        _registryRepository = registryRepository;
+        _registryGateway = registryGateway;
         _onboardingService = onboardingService;
     }
 
     [HttpGet("verify/{idNumber}")]
-    public IActionResult VerifyCitizenIdentity(string idNumber)
+    public async Task<IActionResult> VerifyCitizenIdentity(string idNumber)
     {
-        var record = _registryRepository.GetBySaId(idNumber);
+        var record = await _registryGateway.GetCitizenBySaIdAsync(idNumber);
 
         if (record is null)
         {
-            throw new IdentityRecordNotFoundException();
+            return NotFound(new { message = "Citizen record not found." });
         }
 
         return Ok(record);
