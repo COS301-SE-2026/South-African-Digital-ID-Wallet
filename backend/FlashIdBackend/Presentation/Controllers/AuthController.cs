@@ -1,9 +1,9 @@
-using Application.Common.Interfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Auth.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using Application.Features.Auth.DTOs.Exceptions;
+using Application.Features.Auth.Exceptions;
 
 namespace Presentation.Controllers;
 

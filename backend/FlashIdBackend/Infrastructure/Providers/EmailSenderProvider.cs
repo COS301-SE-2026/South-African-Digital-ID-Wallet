@@ -9,7 +9,7 @@ namespace Infrastructure.Providers;
 public class EmailSenderProvider : IEmailSenderProvider
 {
     private readonly IConfiguration _config;
-    //
+
     public EmailSenderProvider(IConfiguration config)
     {
         _config = config;
@@ -31,8 +31,5 @@ public class EmailSenderProvider : IEmailSenderProvider
         await smtp.AuthenticateAsync(fromAddress, appPassword, ct);
         await smtp.SendAsync(email, cancellationToken: ct);
         await smtp.DisconnectAsync(true, ct);
-
-        // var mail = "t3chtitansgo@gmail.com";
-        // var pw = "Capstone_Group8";
     }
 }

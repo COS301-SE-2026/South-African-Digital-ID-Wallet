@@ -402,30 +402,6 @@ public static class DbSeeder
                 emailSuffix++;
             }
 
-            // username variants: nameInitialsurname | namesurnameInitial | name_surname
-            // string username;
-            // var pattern = rnd.Next(3);
-            // switch (pattern)
-            // {
-            //     case 0:
-            //         username = $"{first}{last[0]}"; // e.g. JohnD
-            //         break;
-            //     case 1:
-            //         username = $"{first}{last}{first[0]}"; // e.g. JohnDoeJ
-            //         break;
-            //     default:
-            //         username = $"{first}_{last}"; // e.g. John_Doe
-            //         break;
-            // }
-            //
-            // var unameBase = username;
-            // var unameSuffix = 1;
-            // while (usedUsernames.Contains(username))
-            // {
-            //     username = unameBase + unameSuffix;
-            //     unameSuffix++;
-            // }
-
             // phone +27 71 xxxxxxx style
             string phone;
             do

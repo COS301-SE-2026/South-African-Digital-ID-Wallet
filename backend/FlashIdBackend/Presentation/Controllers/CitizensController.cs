@@ -1,4 +1,4 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Citizens.DTOs;
 using Application.Features.Citizens.Exceptions;
 using Microsoft.AspNetCore.Mvc;

@@ -1,4 +1,4 @@
-namespace Application.Features.Auth.DTOs.Exceptions;
+namespace Application.Features.Auth.Exceptions;
 
 public class EmailNotVerifiedException : Exception
 {

@@ -1,6 +1,5 @@
 using Application.Features.Onboarding.Dtos;
 using Application.Features.Onboarding.Exceptions;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Domain.Entities;

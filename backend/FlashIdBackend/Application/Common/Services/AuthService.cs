@@ -1,9 +1,9 @@
-using Application.Common.Interfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Mapping;
 using Application.Features.Auth.DTOs;
-using Application.Features.Auth.DTOs.Exceptions;
+using Application.Features.Auth.Exceptions;
 using Application.Features.Citizens.DTOs;
 using Domain.Entities;
 using Domain.Enums;
