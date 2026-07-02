@@ -10,6 +10,32 @@ const defaultDevices = [
 
 export const TrustedDevices = ({
   devices = defaultDevices,
-}: TrustedDevicesProps) => {}
+}: TrustedDevicesProps) => {
+  return (
+    <div className="bg-card rounded-3xl border p-6">
+      <h3 className="text-lg font-semibold mb-3">Trusted Devices</h3>
+
+      <div className="space-y-3">
+        {devices.map((d) => (
+          <div
+            key={d.id}
+            className="flex items-center justify-between p-3 border rounded-2xl"
+          >
+            <div>
+              <div className="font-semibold">{d.name}</div>
+              <div className="text-sm text-muted-text">
+                Last seen {d.lastSeen}
+              </div>
+            </div>
+
+            <div>
+              <Button variant="text">Remove device</Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default TrustedDevices
