@@ -1,4 +1,4 @@
-using Application.Common.Interfaces;
+using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
@@ -6,6 +6,7 @@ using Domain.Entities;
 using Infrastructure.Providers;
 using Infrastructure.Repositories;
 using Infrastructure.Services;
+using Infrastructure.Services.GovernmentRegistry;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,11 +24,10 @@ public static class DependencyInjection
         services.AddScoped<IAuthRepository, AuthRepository>();
         services.AddScoped<IMockGovernmentRegistryRepository, MockGovernmentRegistryRepository>();
         services.AddScoped<IOnboardingRepository, OnboardingRepository>();
-
-        services.AddScoped<IOnboardingService, OnboardingService>();
-
         services.AddScoped<ICitizenRepository, CitizenRepository>();
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
+
+        services.AddHttpClient<IGovernmentRegistryGateway, GovernmentRegistryGateway>();
 
         return services;
     }

@@ -1,5 +1,5 @@
 using System.Net.Http.Json;
-using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Features.Onboarding.Dtos;
 
 namespace Infrastructure.Services.GovernmentRegistry;
@@ -13,7 +13,7 @@ public class GovernmentRegistryGateway : IGovernmentRegistryGateway
         _httpClient = httpClient;
     }
 
-    public async Task<CitizenRecordDto?> GetCitizenBySaIdAsync(string saId)
+    public async Task<CitizenRecordDto> GetCitizenBySaIdAsync(string saId)
     {
         return await _httpClient.GetFromJsonAsync<CitizenRecordDto>(
             $"api/citizens/{saId}");
