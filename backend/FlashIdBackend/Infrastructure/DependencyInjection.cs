@@ -1,7 +1,6 @@
 using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
-using Application.Common.Interfaces.ServiceInterfaces;
 using Domain.Entities;
 using Infrastructure.Providers;
 using Infrastructure.Repositories;
@@ -24,8 +23,12 @@ public static class DependencyInjection
 
         services.AddScoped<IAuthRepository, AuthRepository>();
         services.AddScoped<IOnboardingRepository, OnboardingRepository>();
+
         services.AddScoped<ICitizenRepository, CitizenRepository>();
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
+
+        services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
+
 
         services.AddHttpClient<IGovernmentRegistryGateway, GovernmentRegistryGateway>((serviceProvider, client) =>
             {

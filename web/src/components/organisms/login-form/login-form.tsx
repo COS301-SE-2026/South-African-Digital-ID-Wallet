@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import loginService from '@/services/login-service/login-service'
 import { useUser } from '@/context/user-context'
+import axios from 'axios'
 
 const DASHBOARD_ROUTES: Record<string, string> = {
   citizen: '/citizen',
@@ -52,7 +53,15 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
       })
       router.push(getDashboardRoute(data.role))
     },
-    onError: () => {
+    onError: (err) => {
+      if (
+        axios.isAxiosError(err) &&
+        err.response?.data?.code === 'EMAIL_NOT_VERIFIED'
+      ) {
+        toast.error('Please verify your email address to continue.')
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`)
+        return
+      }
       toast.error('Login failed')
     },
   })

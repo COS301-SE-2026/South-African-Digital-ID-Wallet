@@ -23,13 +23,13 @@ public class DriversLicenseConfiguration : IEntityTypeConfiguration<DriversLicen
             .IsRequired()
             .HasMaxLength(2);
 
-        builder.Property(d => d.StartDate)
-            .IsRequired()
-            .HasColumnType("datetime2");
-
         builder.Property(d => d.ExpiryDate)
             .IsRequired()
             .HasColumnType("datetime2");
+
+        builder.Property(d => d.PhotoPath)
+            .IsRequired()
+            .HasMaxLength(512);
 
         builder.Property(d => d.CreatedAt)
             .IsRequired()

@@ -10,23 +10,11 @@ public static class CitizenRegistrationValidator
 
     public static void Validate(RegisterCitizenRequestDto request)
     {
-        if (string.IsNullOrWhiteSpace(request.SaId))
-            throw new InvalidCitizenRegistrationRequestException("SA ID number is required.");
+        if (string.IsNullOrWhiteSpace(request.Email))
+            throw new InvalidCitizenRegistrationRequestException("Email is required.");
 
-        if (request.SaId.Length != 13 || !request.SaId.All(char.IsDigit))
-            throw new InvalidCitizenRegistrationRequestException(
-                "SA ID number must be exactly 13 digits.");
-
-        if (string.IsNullOrWhiteSpace(request.Username))
-            throw new InvalidCitizenRegistrationRequestException("Username is required.");
-
-        if (request.Username.Length < 8)
-            throw new InvalidCitizenRegistrationRequestException(
-                "Username must be at least 8 characters.");
-
-        if (request.Username.Any(char.IsWhiteSpace))
-            throw new InvalidCitizenRegistrationRequestException(
-                "Username must not contain spaces.");
+        if (!IsValidEmail(request.Email))
+            throw new InvalidCitizenRegistrationRequestException("Invalid email address");
 
         if (string.IsNullOrWhiteSpace(request.Password))
             throw new InvalidCitizenRegistrationRequestException("Password is required.");
@@ -50,8 +38,18 @@ public static class CitizenRegistrationValidator
         if (!request.Password.Any(c => AllowedSpecialChars.Contains(c)))
             throw new InvalidCitizenRegistrationRequestException(
                 "Password must contain at least one special character (!@#$%^&*_-+=.<>?~).");
+    }
 
-        if (string.IsNullOrWhiteSpace(request.ActivationCode))
-            throw new InvalidCitizenRegistrationRequestException("Activation code is required.");
+    private static bool IsValidEmail(string email)
+    {
+        try
+        {
+            var address = new System.Net.Mail.MailAddress(email);
+            return address.Address == email;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

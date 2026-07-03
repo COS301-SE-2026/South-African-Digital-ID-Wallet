@@ -11,14 +11,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         builder.HasKey(u => u.Id);
 
-        builder.Property(u => u.Names)
-            .IsRequired()
-            .HasMaxLength(100);
-
-        builder.Property(u => u.Surname)
-            .IsRequired()
-            .HasMaxLength(100);
-
         builder.Property(u => u.Email)
             .IsRequired()
             .HasMaxLength(256);
@@ -27,13 +19,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(20);
 
-        builder.Property(u => u.Username)
-            .IsRequired()
-            .HasMaxLength(100);
-
         builder.Property(u => u.PasswordHash)
             .IsRequired()
             .HasMaxLength(256);
+
+        builder.Property(u => u.PasswordSet)
+            .IsRequired()
+            .HasDefaultValue(false);
 
         builder.Property(u => u.FailedLoginAttempts)
             .IsRequired()
@@ -71,13 +63,21 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasIndex(u => u.Email).IsUnique();
 
-        builder.HasIndex(u => u.Username).IsUnique();
-
         builder.HasOne(u => u.Preference)
             .WithOne(up => up.User)
             .HasForeignKey<UserPreferences>(up => up.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasQueryFilter(u => !u.IsDeleted);
+
+        builder.Property(u => u.EmailOTPHash)
+            .HasMaxLength(256);
+
+        builder.Property(u => u.EmailOTPExpiresAt)
+            .HasColumnType("datetime2");
+
+        builder.Property(u => u.OTPAttemptCount)
+        .IsRequired()
+        .HasDefaultValue(0);
     }
 }

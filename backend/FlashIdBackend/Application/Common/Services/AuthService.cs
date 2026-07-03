@@ -1,8 +1,10 @@
-using Application.Common.Interfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Mapping;
 using Application.Features.Auth.DTOs;
+using Application.Features.Auth.Exceptions;
+using Application.Features.Citizens.DTOs;
 using Domain.Entities;
 using Domain.Enums;
 
@@ -13,17 +15,20 @@ public class AuthService : IAuthService
     private readonly IAuthRepository _authRepository;
     private readonly IJwtTokenProvider _jwtTokenProvider;
     private readonly IPasswordHashingProvider _passwordHashingProvider;
+    private readonly ICitizenService _citizenService;
     private readonly AuthMapper _mapper;
 
     public AuthService(
         IAuthRepository authRepository,
         IJwtTokenProvider jwtTokenProvider,
         IPasswordHashingProvider passwordHashingProvider,
+        ICitizenService citizenService,
         AuthMapper mapper)
     {
         _authRepository = authRepository;
         _jwtTokenProvider = jwtTokenProvider;
         _passwordHashingProvider = passwordHashingProvider;
+        _citizenService = citizenService;
         _mapper = mapper;
     }
 
@@ -72,6 +77,17 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Invalid email or password.");
         }
 
+        if (!user.IsEmailVerified)
+        {
+            try
+            {
+                await _citizenService.ResendOtpAsync(new ResendOtpRequestDto { Email = user.Email });
+            }
+            catch { /* Ignore errors during otp resend */}
+
+            throw new EmailNotVerifiedException(user.Email);
+        }
+
         user.FailedLoginAttempts = 0;
         user.LockoutUntil = null;
         user.LastLoginAt = DateTime.UtcNow;
@@ -98,8 +114,8 @@ public class AuthService : IAuthService
             ExpiresAt = expiresAt,
             UserId = user.Id,
             Role = user.Role.ToString(),
-            Names = user.Names,
-            Surname = user.Surname,
+            // Names = user.Names,
+            // Surname = user.Surname,
         };
     }
 
