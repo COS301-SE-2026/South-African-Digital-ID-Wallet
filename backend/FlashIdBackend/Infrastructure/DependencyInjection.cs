@@ -40,6 +40,12 @@ public static class DependencyInjection
                     configuration["GovernmentRegistry:ApiKeyGov"]);
             });
 
+        services.AddHttpClient<ISmsProvider, SmsPortalProvider>((serviceProvider, client) =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            client.BaseAddress = new Uri(configuration["SmsPortalProvider:BaseUrl"]);
+        });
+
         return services;
     }
 }
