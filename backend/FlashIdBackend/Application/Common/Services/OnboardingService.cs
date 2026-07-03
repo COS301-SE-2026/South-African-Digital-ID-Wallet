@@ -54,8 +54,8 @@ public class OnboardingService : IOnboardingService
         {
             Id = Guid.NewGuid(),
             SaId = citizenRecord.SaId,
-            Names = identityRecord.Names,
-            Surname = identityRecord.Surname,
+            Names = citizenRecord.Names,
+            Surname = citizenRecord.Surname,
             UserId = user.Id,
             Status = CitizenStatus.Pending,
             CredentialActivationCode = activationCode,
