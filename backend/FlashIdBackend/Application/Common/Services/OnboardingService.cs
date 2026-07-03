@@ -12,12 +12,11 @@ namespace Application.Common.Services;
 public class OnboardingService : IOnboardingService
 {
     private readonly IOnboardingRepository _onboardingRepository;
-    // private readonly IMockGovernmentRegistryRepository _mockGovernmentRegistryRepository;
+
     private readonly IGovernmentRegistryGateway _governmentRegistryGateway;
-    public OnboardingService(IOnboardingRepository registryService, IMockGovernmentRegistryRepository mockGovernmentRegistryRepository, IGovernmentRegistryGateway governmentRegistryGateway)
+    public OnboardingService(IOnboardingRepository registryService, IGovernmentRegistryGateway governmentRegistryGateway)
     {
         _onboardingRepository = registryService;
-        // _mockGovernmentRegistryRepository = mockGovernmentRegistryRepository;
         _governmentRegistryGateway = governmentRegistryGateway;
     }
 

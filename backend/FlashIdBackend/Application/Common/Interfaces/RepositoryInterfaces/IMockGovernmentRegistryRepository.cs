@@ -1,8 +1,0 @@
-using Application.Features.Onboarding.Dtos;
-
-namespace Application.Common.Interfaces.ServiceInterfaces;
-
-public interface IMockGovernmentRegistryRepository
-{
-    CitizenRecordDto? GetBySaId(string idNumber);
-}

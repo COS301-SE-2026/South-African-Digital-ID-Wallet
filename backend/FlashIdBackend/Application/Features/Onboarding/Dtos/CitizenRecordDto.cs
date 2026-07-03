@@ -8,8 +8,6 @@ public class CitizenRecordDto
     public string Fullname => $"{Names} {Surname}";
     public DateTime DateOfBirth { get; set; }
     public string? Gender { get; set; }
-    public string? Nationality { get; set; }
-
 
 }
 

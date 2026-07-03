@@ -23,7 +23,6 @@ public static class DependencyInjection
         services.AddScoped<IJwtTokenProvider, JwtTokenProvider>();
 
         services.AddScoped<IAuthRepository, AuthRepository>();
-        services.AddScoped<IMockGovernmentRegistryRepository, MockGovernmentRegistryRepository>();
         services.AddScoped<IOnboardingRepository, OnboardingRepository>();
         services.AddScoped<ICitizenRepository, CitizenRepository>();
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
