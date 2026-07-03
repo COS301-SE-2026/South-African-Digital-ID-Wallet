@@ -30,18 +30,17 @@ export default function CitizenDashboardPage() {
               <div>
                 <StatusPill intent="active">Identity verified</StatusPill>
                 <h1 className="text-3xl font-bold mt-3">
-                  Your Flash ID wallet is active.
+                  Your Flash ID wallet is now active.
                 </h1>
                 <p className="text-muted-text mt-2">
-                  Present a secure QR code when a bank, hospital, police officer
-                  or authorised service provider needs to verify your identity.
+                  Present a secure QR code.
                 </p>
                 <div className="mt-4 flex gap-3">
                   <button className="bg-primary text-primary-foreground px-4 py-2 rounded-2xl font-semibold">
                     Generate QR Code
                   </button>
                   <button className="bg-muted px-4 py-2 rounded-2xl">
-                    Request New Credential
+                    Request a New Credential
                   </button>
                 </div>
               </div>
@@ -73,6 +72,42 @@ export default function CitizenDashboardPage() {
               </div>
             </div>
           </section>
+
+          <aside className="col-span-4 space-y-6">
+            <div className="bg-card rounded-3xl border p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="rounded-full bg-primary h-12 w-12 flex items-center justify-center text-white font-bold">
+                    {(user?.names?.[0] ?? 'U') + (user?.surname?.[0] ?? '')}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold">
+                    {user?.names ?? 'Guest User'} {user?.surname ?? ''}
+                  </div>
+                  <div className="text-muted-text text-sm">
+                    {user
+                      ? `ID ending ••••${String(user.userId).slice(-3)}`
+                      : 'Not signed in'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <div className="text-muted-text text-sm">Trust</div>
+                <div className="h-3 bg-muted rounded-full mt-2 overflow-hidden">
+                  <div
+                    className="h-3 bg-gradient-to-r from-green-500 to-yellow-400"
+                    style={{ width: '92%' }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <TrustedDevices />
+
+            <NotificationsList />
+          </aside>
         </div>
       </main>
     </div>
