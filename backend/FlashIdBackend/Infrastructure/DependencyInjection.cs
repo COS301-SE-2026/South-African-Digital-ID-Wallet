@@ -1,10 +1,11 @@
+using System.Net.Http.Headers;
+using System.Text;
 using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Domain.Entities;
 using Infrastructure.Providers;
 using Infrastructure.Repositories;
-using Infrastructure.Services;
 using Infrastructure.Services.GovernmentRegistry;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -43,7 +44,26 @@ public static class DependencyInjection
         services.AddHttpClient<ISmsProvider, SmsPortalProvider>((serviceProvider, client) =>
         {
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-            client.BaseAddress = new Uri(configuration["SmsPortalProvider:BaseUrl"]);
+            var baseUrl = configuration["SmsPortalProvider:BaseUrl"];
+            var apiKey = configuration["SmsPortalProvider:ApiKey"];
+            var apiSecret = configuration["SmsPortalProvider:ApiSecret"];
+
+            if (string.IsNullOrWhiteSpace(baseUrl) ||
+                                                      string.IsNullOrWhiteSpace(apiKey) ||
+                                                      string.IsNullOrWhiteSpace(apiSecret))
+            {
+                throw new InvalidOperationException("SMSPortal configuration is missing.");
+            }
+
+            var apiCredential = Convert.ToBase64String(
+                Encoding.UTF8.GetBytes($"{apiKey}:{apiSecret}")
+                );
+
+            client.BaseAddress = new Uri(baseUrl);
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", apiCredential);
+
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         });
 
         return services;
