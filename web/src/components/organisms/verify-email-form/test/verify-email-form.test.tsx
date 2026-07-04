@@ -1,8 +1,9 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { VerifyEmailForm } from '../verify-email-form'
+import axios from 'axios'
 
 const mockPush = jest.fn()
 const mockGet = jest.fn()
@@ -215,6 +216,35 @@ describe('VerifyEmailForm', () => {
       await waitFor(() => expect(toast.error).toHaveBeenCalled())
       expect(mockPush).not.toHaveBeenCalled()
     })
+
+    it('shows the server error message when verification fails with an axios error', async () => {
+      jest.spyOn(axios, 'isAxiosError').mockReturnValueOnce(true)
+      const fakeError = {
+        response: { data: { error: 'Invalid verification code' } },
+      }
+      ;(registerService.verifyEmail as jest.Mock).mockRejectedValue(fakeError)
+      const user = userEvent.setup()
+      render(<VerifyEmailForm />, { wrapper: createWrapper() })
+      await user.type(getCodeInput(), VALID_CODE)
+      await user.click(getVerifyButton())
+      await waitFor(() =>
+        expect(toast.error).toHaveBeenCalledWith('Invalid verification code')
+      )
+    })
+
+    it('shows "Verfying..." and disables the button while the mutation is pending', async () => {
+      ;(registerService.verifyEmail as jest.Mock).mockImplementation(
+        () => new Promise(() => {})
+      )
+      const user = userEvent.setup()
+      render(<VerifyEmailForm />, { wrapper: createWrapper() })
+      await user.type(getCodeInput(), VALID_CODE)
+      await user.click(getVerifyButton())
+      await waitFor(() =>
+        expect(screen.getByText('Verifying...')).toBeInTheDocument()
+      )
+      expect(screen.getByRole('button', { name: /verifying/i })).toBeDisabled()
+    })
   })
 
   describe('resend otp behaviour', () => {
@@ -283,6 +313,43 @@ describe('VerifyEmailForm', () => {
       expect(
         screen.queryByRole('button', { name: /resend in \d+s/i })
       ).not.toBeInTheDocument()
+    })
+
+    it('shows the server error message when resend fails with an axios error', async () => {
+      jest.spyOn(axios, 'isAxiosError').mockReturnValueOnce(true)
+      const fakeError = { response: { data: { error: 'Too many requests' } } }
+      ;(registerService.resendOtp as jest.Mock).mockRejectedValue(fakeError)
+      const user = userEvent.setup()
+      render(<VerifyEmailForm />, { wrapper: createWrapper() })
+      await user.click(getResendButton())
+      await waitFor(() =>
+        expect(toast.error).toHaveBeenCalledWith('Too many requests')
+      )
+    })
+
+    it('countdown decrements by 1 each second', async () => {
+      jest.useFakeTimers()
+      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
+      render(<VerifyEmailForm />, { wrapper: createWrapper() })
+      await user.click(getResendButton())
+      await waitFor(() =>
+        expect(
+          screen.getByRole('button', { name: /resend in 60s/i })
+        ).toBeInTheDocument()
+      )
+      act(() => jest.advanceTimersByTime(1000))
+      await waitFor(() =>
+        expect(
+          screen.getByRole('button', { name: /resend in 59s/i })
+        ).toBeInTheDocument()
+      )
+      act(() => jest.advanceTimersByTime(1000))
+      await waitFor(() =>
+        expect(
+          screen.getByRole('button', { name: /resend in 58s/i })
+        ).toBeInTheDocument()
+      )
+      jest.useRealTimers()
     })
   })
 })
