@@ -11,6 +11,18 @@ const api = axios.create({
   withCredentials: true,
 })
 
+// Guard to ensure multiple simultaneous 401 failures only trigger one redirect
+let isRedirectingToLogin = false
+
+const handleUnauthorized = () => {
+  if (isRedirectingToLogin) return
+  isRedirectingToLogin = true
+  window.localStorage.removeItem('flashid-session-expires-at')
+  window.localStorage.removeItem('flashid-user')
+  window.sessionStorage.removeItem('flashid-user')
+  window.location.href = '/'
+}
+
 // If the session expires or is invalid, clear any stale local user data and redirect to login so the user isn't stuck seeing broken pages.
 api.interceptors.response.use(
   (response) => response,
@@ -21,9 +33,7 @@ api.interceptors.response.use(
       !window.location.pathname.startsWith('/login') &&
       window.location.pathname !== '/'
     ) {
-      window.localStorage.clear()
-      window.sessionStorage.clear()
-      window.location.href = '/'
+      handleUnauthorized()
     }
     return Promise.reject(error)
   }
