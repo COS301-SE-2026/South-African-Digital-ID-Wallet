@@ -3,36 +3,33 @@ import userEvent from '@testing-library/user-event'
 import { RegistrationForm } from '../registration-form'
 import React from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { VerifyEmailForm } from '../../verify-email-form/verify-email-form'
-
-const mockPush = jest.fn()
-const mockGet = jest.fn()
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: mockPush,
-    replace: jest.fn(),
-    prefetch: jest.fn(),
+    push: jest.fn(),
   }),
-  useSearchParams: () => ({ get: mockGet }),
 }))
 
 jest.mock('@/services/citizen-register-service', () => ({
   registerService: {
-    verifyEmail: jest.fn(),
-    resendOtp: jest.fn(),
+    register: jest.fn(),
   },
 }))
 
 jest.mock('react-hot-toast', () => ({
-  registerService: {
+  __esModule: true,
+  default: {
     success: jest.fn(),
     error: jest.fn(),
   },
 }))
 
-import { registerService } from '@/services/citizen-register-service'
-import toast from 'react-hot-toast'
+jest.mock('@/lib/api', () => ({
+  default: {
+    get: jest.fn(),
+    post: jest.fn(),
+  },
+}))
 
 const VALID_EMAIL = 'user@gmail.com'
 const VALID_PASSWORD = 'Password1!'
@@ -48,16 +45,16 @@ const createWrapper = () => {
   return Wrapper
 }
 
-function getVerifyButton() {
-  return screen.getByRole('button', { name: /verify email/i })
+function getEmailInput() {
+  return screen.getByLabelText(/email/i)
 }
 
-function getResendButton() {
-  return screen.getByRole('button', { name: /resend/i })
+function getPasswordInput() {
+  return screen.getByLabelText('Password:')
 }
 
-function getCodeInput() {
-  return screen.getByLabelText(/verification code/i)
+function getConfirmPasswordInput() {
+  return screen.getByLabelText(/verify password/i)
 }
 
 function getSubmitButton() {
@@ -84,248 +81,509 @@ async function fillValidForm(
     await user.type(screen.getByLabelText('Verify password:'), confirm)
 }
 
-describe('VerifyEmailForm', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockGet.mockReturnValue(VALID_EMAIL)
-    ;(registerService.verifyEmail as jest.Mock).mockResolvedValue({
-      message: 'Email verified successfully',
-    })
-    ;(registerService.resendOtp as jest.Mock).mockResolvedValue({
-      message: 'Verification code resent',
-    })
-  })
-
+describe('RegistrationForm — unit tests', () => {
   describe('rendering', () => {
-    it('renders the verification code input', () => {
-      render(<VerifyEmailForm />, { wrapper: createWrapper() })
-      expect(getCodeInput()).toBeInTheDocument()
+    it('renders all required form fields', () => {
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      expect(screen.getByLabelText('Email:')).toBeInTheDocument()
+      expect(screen.getByLabelText('Password:')).toBeInTheDocument()
+      expect(screen.getByLabelText('Verify password:')).toBeInTheDocument()
     })
 
-    it('renders the Verify email submit button', () => {
-      render(<VerifyEmailForm />, { wrapper: createWrapper() })
-      expect(getVerifyButton()).toBeInTheDocument()
+    it('renders the Create Account submit button', () => {
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      expect(getSubmitButton()).toBeInTheDocument()
     })
 
-    it('renders the Resend code button', () => {
-      render(<VerifyEmailForm />, { wrapper: createWrapper() })
-      expect(getResendButton()).toBeInTheDocument()
+    it('renders a link to the login page', () => {
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      expect(screen.getByRole('link', { name: /log in/i })).toBeInTheDocument()
+    })
+
+    it('renders the input fields with the correct placeholder text', () => {
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      expect(
+        screen.getByPlaceholderText('Enter your email address')
+      ).toBeInTheDocument()
+      expect(
+        screen.getByPlaceholderText('Enter your password')
+      ).toBeInTheDocument()
+      expect(
+        screen.getByPlaceholderText('Re-enter your password')
+      ).toBeInTheDocument()
+    })
+
+    it('"Log In" link points to href "/"', () => {
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      const loginLink = screen.getByRole('link', { name: /log in/i })
+      expect(loginLink).toHaveAttribute('href', '/')
     })
   })
+
+  describe('email input behaviour', () => {
+    it('strips spaces so that spaced input is stored without them', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.type(getEmailInput(), 'user @gmail. com ')
+      expect(getEmailInput()).toHaveValue('user@gmail.com')
+    })
+
+    it('pressing the space key does not insert a character', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.type(getEmailInput(), ' ')
+      expect(getEmailInput()).toHaveValue('')
+    })
+
+    it('a valid email address satisfies the email requirement', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText('Must be a valid email address')
+      ).toBeInTheDocument()
+      await user.type(getEmailInput(), VALID_EMAIL)
+      await user.click(getSubmitButton())
+      expect(
+        screen.queryByText('Must be a valid email address')
+      ).not.toBeInTheDocument()
+    })
+
+    it('an empty email does not satisfy the email requirement', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText('Must be a valid email address')
+      ).toBeInTheDocument()
+    })
+  })
+
+  describe('password input behaviour', () => {
+    it('strips spaces so that spaced input is stored without them', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.type(getPasswordInput(), 'S3cure Pass !')
+      expect(getPasswordInput()).toHaveValue('S3curePass!')
+    })
+
+    it('pressing the space key does not insert a character', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.type(getPasswordInput(), ' ')
+      expect(getPasswordInput()).toHaveValue('')
+    })
+
+    it('a valid password requires 10+ characters', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText('Must be at least 10 characters')
+      ).not.toHaveClass('line-through')
+      await user.type(getPasswordInput(), 'abcdefghij')
+      await user.click(getSubmitButton())
+      expect(screen.getByText('Must be at least 10 characters')).toHaveClass(
+        'line-through'
+      )
+    })
+
+    it('a valid password requires an uppercase', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText('Must contain at least 1 capital letter (A-Z)')
+      ).not.toHaveClass('line-through')
+      await user.type(getPasswordInput(), 'A')
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText('Must contain at least 1 capital letter (A-Z)')
+      ).toHaveClass('line-through')
+    })
+
+    it('a valid password requires a lowercase', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText('Must contain at least 1 lowercase letter (a-z)')
+      ).not.toHaveClass('line-through')
+      await user.type(getPasswordInput(), 'b')
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText('Must contain at least 1 lowercase letter (a-z)')
+      ).toHaveClass('line-through')
+    })
+
+    it('a valid password requires a digit', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText('Must contain at least 1 digit (0-9)')
+      ).not.toHaveClass('line-through')
+      await user.type(getPasswordInput(), '1')
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText('Must contain at least 1 digit (0-9)')
+      ).toHaveClass('line-through')
+    })
+
+    it('a valid password requires a special character', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText(
+          'Must conatain at least 1 special character (!@#$%^&*)'
+        )
+      ).not.toHaveClass('line-through')
+      await user.type(getPasswordInput(), '@')
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText(
+          'Must conatain at least 1 special character (!@#$%^&*)'
+        )
+      ).toHaveClass('line-through')
+    })
+  })
+
+  describe('confirm password input behaviour', () => {
+    it('strips spaces so that spaced input is stored without them', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.type(getConfirmPasswordInput(), 'S3cure Pass !')
+      expect(getConfirmPasswordInput()).toHaveValue('S3curePass!')
+    })
+
+    it('pressing the space key does not insert a character', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.type(getConfirmPasswordInput(), ' ')
+      expect(getConfirmPasswordInput()).toHaveValue('')
+    })
+
+    it('confirm password matching the password satisfies the match requirement', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.type(getPasswordInput(), VALID_PASSWORD)
+      await user.type(getConfirmPasswordInput(), VALID_PASSWORD)
+      await user.click(getSubmitButton())
+      expect(
+        screen.queryByText('Must match the password above')
+      ).not.toBeInTheDocument()
+    })
+
+    it('confirm password not matching the password does not satisfy the match requirement', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.type(getPasswordInput(), 'notMatching101!')
+      await user.type(getConfirmPasswordInput(), 'not_Matching101!')
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText('Must match the password above')
+      ).toBeInTheDocument()
+    })
+
+    it('an empty confirm password does not satisfy the match requirement', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText('Must match the password above')
+      ).toBeInTheDocument()
+    })
+  })
+
+  describe('requirement list visibility', () => {
+    it('email requirement list is hidden before the form has been submitted', () => {
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      expect(
+        screen.queryByText('Must be a valid email address')
+      ).not.toBeInTheDocument()
+    })
+
+    it('password requirement list is hidden before the form has been submitted', () => {
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      expect(
+        screen.queryByText('Must be at least 10 characters')
+      ).not.toBeInTheDocument()
+      expect(
+        screen.queryByText('Must contain at least 1 capital letter (A-Z)')
+      ).not.toBeInTheDocument()
+      expect(
+        screen.queryByText('Must contain at least 1 digit (0-9)')
+      ).not.toBeInTheDocument()
+      expect(
+        screen.queryByText('Must contain at least 1 lowercase letter (a-z)')
+      ).not.toBeInTheDocument()
+      expect(
+        screen.queryByText(
+          'Must conatain at least 1 special character (!@#$%^&*)'
+        )
+      ).not.toBeInTheDocument()
+    })
+
+    it('confirm password requirement list is hidden before the form has been submitted', () => {
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      expect(
+        screen.queryByText('Must match the password above')
+      ).not.toBeInTheDocument()
+    })
+
+    it('requirement lists become visisble after clikcing submit on an empty form', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(getSubmitButton())
+      expect(
+        screen.queryByText('Must be a valid email address')
+      ).toBeInTheDocument()
+      expect(
+        screen.queryByText('Must be at least 10 characters')
+      ).toBeInTheDocument()
+      expect(
+        screen.queryByText('Must contain at least 1 capital letter (A-Z)')
+      ).toBeInTheDocument()
+      expect(
+        screen.queryByText('Must contain at least 1 digit (0-9)')
+      ).toBeInTheDocument()
+      expect(
+        screen.queryByText('Must contain at least 1 lowercase letter (a-z)')
+      ).toBeInTheDocument()
+      expect(
+        screen.queryByText(
+          'Must conatain at least 1 special character (!@#$%^&*)'
+        )
+      ).toBeInTheDocument()
+      expect(
+        screen.queryByText('Must match the password above')
+      ).toBeInTheDocument()
+    })
+
+    it('an unmet requirement item renders with the text-destructive class', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(getSubmitButton())
+      expect(screen.getByText('Must be a valid email address')).toHaveClass(
+        'text-destructive'
+      )
+    })
+  })
+
+  // describe('submit button state', () => {
+
+  // })
+
+  // describe('form submission - invalid form', () => {
+
+  // })
+
+  // describe('form submission - valid form', () => {
+
+  // })
+
+  // describe('mutation success', () => {
+
+  // })
+
+  // describe('mutation error', () => {
+
+  // })
+
+  //   it('a valid email address satisfies the email requirement', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm />, { wrapper: createWrapper() })
+  //     await user.click(getSubmitButton())
+  //     expect(screen.getByText('Must be a valid email address')).toBeInTheDocument()
+  //     await user.type(getEmailInput(), VALID_EMAIL)
+  //     await user.click(getSubmitButton())
+  //     expect(screen.queryByText('Must be a valid email address')).not.toBeInTheDocument()
+  //   })
+
+  //   it('an empty email does not satisfy the email requirement', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm />, { wrapper: createWrapper() })
+  //     await user.click(getSubmitButton())
+  //     expect(screen.getByText('Must be a valid email address')).toBeInTheDocument()
+  //   })
+  // })
+
+  //   it('13 non-digit characters mixed with dots must NOT satisfy the Exactly 13 digits requirement', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm onSubmitAction={jest.fn()} />)
+  //     await user.type(screen.getByLabelText('Email:'), VALID_EMAIL)
+  //     await user.type(screen.getByLabelText('Password:'), VALID_PASSWORD)
+  //     await user.type(screen.getByLabelText('Verify password:'), VALID_PASSWORD)
+  //     await user.type(screen.getByLabelText('ID number:'), 'AAAAAAAAAAAA.')
+  //     expect(getSubmitButton()).toBeDisabled()
+  //   })
+
+  //   it('10 digits followed by 3 letters must be treated as invalid', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm onSubmitAction={jest.fn()} />)
+  //     await user.type(screen.getByLabelText('Email:'), VALID_EMAIL)
+  //     await user.type(screen.getByLabelText('Password:'), VALID_PASSWORD)
+  //     await user.type(screen.getByLabelText('Verify password:'), VALID_PASSWORD)
+  //     await user.type(screen.getByLabelText('ID number:'), '1234567890ABC')
+  //     expect(getSubmitButton()).toBeDisabled()
+  //   })
+  // })
+
+  // describe('Password validation', () => {
+  //   it('rejects a password shorter than 10 characters', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm />)
+  //     await user.type(screen.getByLabelText('Email:'), VALID_EMAIL)
+  //     await user.type(screen.getByLabelText('Password:'), 'Short1!')
+  //     await user.type(screen.getByLabelText('Verify password:'), 'Short1!')
+  //     expect(getSubmitButton()).toBeDisabled()
+  //   })
+
+  //   it('rejects a password with no uppercase letter', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm />)
+  //     await fillValidForm(user, {
+  //       password: 'nouppercase1!',
+  //       confirm: 'nouppercase1!',
+  //     })
+  //     expect(getSubmitButton()).toBeDisabled()
+  //   })
+
+  //   it('rejects a password with no lowercase letter', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm />)
+  //     await fillValidForm(user, {
+  //       password: 'NOLOWERCASE1!',
+  //       confirm: 'NOLOWERCASE1!',
+  //     })
+  //     expect(getSubmitButton()).toBeDisabled()
+  //   })
+
+  //   it('rejects a password that contains no digit', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm />)
+  //     await fillValidForm(user, {
+  //       password: 'NoDigitPass!',
+  //       confirm: 'NoDigitPass!',
+  //     })
+  //     expect(getSubmitButton()).toBeDisabled()
+  //   })
+
+  //   it('rejects a password that contains no special character', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm />)
+  //     await fillValidForm(user, {
+  //       password: 'NoSpecial1234',
+  //       confirm: 'NoSpecial1234',
+  //     })
+  //     expect(getSubmitButton()).toBeDisabled()
+  //   })
+
+  //   it('rejects a password whose only special character is a parenthesis', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm />)
+  //     await fillValidForm(user, {
+  //       password: 'Password1(',
+  //       confirm: 'Password1(',
+  //     })
+  //     expect(getSubmitButton()).toBeDisabled()
+  //   })
+
+  //   it('accepts a password that meets every requirement', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm />)
+  //     await fillValidForm(user)
+  //     expect(getSubmitButton()).not.toBeDisabled()
+  //   })
+
+  //   it('strips spaces from the password field', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm />)
+  //     await user.type(screen.getByLabelText('Password:'), 'Pass word1!')
+  //     expect(screen.getByLabelText('Password:')).toHaveValue('Password1!')
+  //   })
+  // })
+
+  // describe('Confirm Password validation', () => {
+  //   it('rejects when the confirm password field is empty', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm />)
+  //     await user.type(screen.getByLabelText('Email:'), VALID_EMAIL)
+  //     await user.type(screen.getByLabelText('Password:'), VALID_PASSWORD)
+  //     expect(getSubmitButton()).toBeDisabled()
+  //   })
+
+  //   it('rejects when confirm password does not match password', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm />)
+  //     await fillValidForm(user, { confirm: 'DifferentPass1!' })
+  //     expect(getSubmitButton()).toBeDisabled()
+  //   })
+
+  //   it('accepts when confirm password exactly matches password', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm />)
+  //     await fillValidForm(user)
+  //     expect(getSubmitButton()).not.toBeDisabled()
+  //   })
+
+  //   it('rejects when both password and confirm are empty', () => {
+  //     render(<RegistrationForm />)
+  //     expect(getSubmitButton()).toBeDisabled()
+  //   })
+  // })
+
+  // describe('form submission', () => {
+  //   it('does not call onSubmitAction when the form is invalid and submit is clicked', async () => {
+  //     const user = userEvent.setup()
+  //     const onSubmit = jest.fn()
+  //     render(<RegistrationForm onSubmitAction={onSubmit} />)
+  //     await user.click(getSubmitButton())
+  //     expect(onSubmit).not.toHaveBeenCalled()
+  //   })
+
+  //   it('does not call onSubmitAction when Enter is pressed while the form is invalid', async () => {
+  //     const user = userEvent.setup()
+  //     const onSubmit = jest.fn()
+  //     render(<RegistrationForm onSubmitAction={onSubmit} />)
+  //     await user.type(screen.getByLabelText('ID number:'), '123')
+  //     await user.keyboard('{Enter}')
+  //     expect(onSubmit).not.toHaveBeenCalled()
+  //   })
+
+  //   it('calls onSubmitAction once with the correct payload when the form is valid', async () => {
+  //     const user = userEvent.setup()
+  //     const onSubmit = jest.fn()
+  //     render(<RegistrationForm onSubmitAction={onSubmit} />)
+  //     await fillValidForm(user)
+  //     await user.click(getSubmitButton())
+
+  //     expect(onSubmit).toHaveBeenCalledTimes(1)
+  //     expect(onSubmit).toHaveBeenCalledWith({
+  //       email: VALID_EMAIL,
+  //       password: VALID_PASSWORD,
+  //     })
+  //   })
+
+  //   it('does not throw when onSubmitAction prop is not provided', async () => {
+  //     const user = userEvent.setup()
+  //     render(<RegistrationForm />)
+  //     await fillValidForm(user)
+  //     await expect(user.click(getSubmitButton())).resolves.not.toThrow()
+  //   })
+
+  //   it('the submitted payload does not contain a confirmPassword field', async () => {
+  //     const user = userEvent.setup()
+  //     const onSubmit = jest.fn()
+  //     render(<RegistrationForm onSubmitAction={onSubmit} />)
+  //     await fillValidForm(user)
+  //     await user.click(getSubmitButton())
+
+  //     expect(onSubmit.mock.calls[0][0]).not.toHaveProperty('confirmPassword')
+  //   })
+  // })
 })
-
-// describe('RegistrationForm — unit tests', () => {
-//   describe('rendering', () => {
-//     it('renders all required form fields', () => {
-//       render(<RegistrationForm />)
-//       expect(screen.getByLabelText('Email:')).toBeInTheDocument()
-//       expect(screen.getByLabelText('Password:')).toBeInTheDocument()
-//       expect(screen.getByLabelText('Verify password:')).toBeInTheDocument()
-//     })
-
-//     it('renders the Create Account submit button', () => {
-//       render(<RegistrationForm />)
-//       expect(getSubmitButton()).toBeInTheDocument()
-//     })
-
-//     it('renders a link to the login page', () => {
-//       render(<RegistrationForm />)
-//       expect(screen.getByRole('link', { name: /log in/i })).toBeInTheDocument()
-//     })
-//   })
-
-//   describe('Email validation', () => {
-//     it('strips spaces so that spaced input is stored without them', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm />)
-//       await user.type(screen.getByLabelText('ID number:'), '123 456 789 0123')
-//       expect(screen.getByLabelText('ID number:')).toHaveValue('1234567890123')
-//     })
-
-//     it('13 alphabetic characters must NOT satisfy the Exactly 13 digits requirement', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm onSubmitAction={jest.fn()} />)
-//       await user.type(screen.getByLabelText('Email:'), VALID_EMAIL)
-//       await user.type(screen.getByLabelText('Password:'), VALID_PASSWORD)
-//       await user.type(screen.getByLabelText('Verify password:'), VALID_PASSWORD)
-//       expect(getSubmitButton()).toBeDisabled()
-//     })
-
-//     it('13 non-digit characters mixed with dots must NOT satisfy the Exactly 13 digits requirement', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm onSubmitAction={jest.fn()} />)
-//       await user.type(screen.getByLabelText('Email:'), VALID_EMAIL)
-//       await user.type(screen.getByLabelText('Password:'), VALID_PASSWORD)
-//       await user.type(screen.getByLabelText('Verify password:'), VALID_PASSWORD)
-//       await user.type(screen.getByLabelText('ID number:'), 'AAAAAAAAAAAA.')
-//       expect(getSubmitButton()).toBeDisabled()
-//     })
-
-//     it('10 digits followed by 3 letters must be treated as invalid', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm onSubmitAction={jest.fn()} />)
-//       await user.type(screen.getByLabelText('Email:'), VALID_EMAIL)
-//       await user.type(screen.getByLabelText('Password:'), VALID_PASSWORD)
-//       await user.type(screen.getByLabelText('Verify password:'), VALID_PASSWORD)
-//       await user.type(screen.getByLabelText('ID number:'), '1234567890ABC')
-//       expect(getSubmitButton()).toBeDisabled()
-//     })
-//   })
-
-//   describe('Password validation', () => {
-//     it('rejects a password shorter than 10 characters', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm />)
-//       await user.type(screen.getByLabelText('Email:'), VALID_EMAIL)
-//       await user.type(screen.getByLabelText('Password:'), 'Short1!')
-//       await user.type(screen.getByLabelText('Verify password:'), 'Short1!')
-//       expect(getSubmitButton()).toBeDisabled()
-//     })
-
-//     it('rejects a password with no uppercase letter', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm />)
-//       await fillValidForm(user, {
-//         password: 'nouppercase1!',
-//         confirm: 'nouppercase1!',
-//       })
-//       expect(getSubmitButton()).toBeDisabled()
-//     })
-
-//     it('rejects a password with no lowercase letter', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm />)
-//       await fillValidForm(user, {
-//         password: 'NOLOWERCASE1!',
-//         confirm: 'NOLOWERCASE1!',
-//       })
-//       expect(getSubmitButton()).toBeDisabled()
-//     })
-
-//     it('rejects a password that contains no digit', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm />)
-//       await fillValidForm(user, {
-//         password: 'NoDigitPass!',
-//         confirm: 'NoDigitPass!',
-//       })
-//       expect(getSubmitButton()).toBeDisabled()
-//     })
-
-//     it('rejects a password that contains no special character', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm />)
-//       await fillValidForm(user, {
-//         password: 'NoSpecial1234',
-//         confirm: 'NoSpecial1234',
-//       })
-//       expect(getSubmitButton()).toBeDisabled()
-//     })
-
-//     it('rejects a password whose only special character is a parenthesis', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm />)
-//       await fillValidForm(user, {
-//         password: 'Password1(',
-//         confirm: 'Password1(',
-//       })
-//       expect(getSubmitButton()).toBeDisabled()
-//     })
-
-//     it('accepts a password that meets every requirement', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm />)
-//       await fillValidForm(user)
-//       expect(getSubmitButton()).not.toBeDisabled()
-//     })
-
-//     it('strips spaces from the password field', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm />)
-//       await user.type(screen.getByLabelText('Password:'), 'Pass word1!')
-//       expect(screen.getByLabelText('Password:')).toHaveValue('Password1!')
-//     })
-//   })
-
-//   describe('Confirm Password validation', () => {
-//     it('rejects when the confirm password field is empty', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm />)
-//       await user.type(screen.getByLabelText('Email:'), VALID_EMAIL)
-//       await user.type(screen.getByLabelText('Password:'), VALID_PASSWORD)
-//       expect(getSubmitButton()).toBeDisabled()
-//     })
-
-//     it('rejects when confirm password does not match password', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm />)
-//       await fillValidForm(user, { confirm: 'DifferentPass1!' })
-//       expect(getSubmitButton()).toBeDisabled()
-//     })
-
-//     it('accepts when confirm password exactly matches password', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm />)
-//       await fillValidForm(user)
-//       expect(getSubmitButton()).not.toBeDisabled()
-//     })
-
-//     it('rejects when both password and confirm are empty', () => {
-//       render(<RegistrationForm />)
-//       expect(getSubmitButton()).toBeDisabled()
-//     })
-//   })
-
-//   describe('form submission', () => {
-//     it('does not call onSubmitAction when the form is invalid and submit is clicked', async () => {
-//       const user = userEvent.setup()
-//       const onSubmit = jest.fn()
-//       render(<RegistrationForm onSubmitAction={onSubmit} />)
-//       await user.click(getSubmitButton())
-//       expect(onSubmit).not.toHaveBeenCalled()
-//     })
-
-//     it('does not call onSubmitAction when Enter is pressed while the form is invalid', async () => {
-//       const user = userEvent.setup()
-//       const onSubmit = jest.fn()
-//       render(<RegistrationForm onSubmitAction={onSubmit} />)
-//       await user.type(screen.getByLabelText('ID number:'), '123')
-//       await user.keyboard('{Enter}')
-//       expect(onSubmit).not.toHaveBeenCalled()
-//     })
-
-//     it('calls onSubmitAction once with the correct payload when the form is valid', async () => {
-//       const user = userEvent.setup()
-//       const onSubmit = jest.fn()
-//       render(<RegistrationForm onSubmitAction={onSubmit} />)
-//       await fillValidForm(user)
-//       await user.click(getSubmitButton())
-
-//       expect(onSubmit).toHaveBeenCalledTimes(1)
-//       expect(onSubmit).toHaveBeenCalledWith({
-//         email: VALID_EMAIL,
-//         password: VALID_PASSWORD,
-//       })
-//     })
-
-//     it('does not throw when onSubmitAction prop is not provided', async () => {
-//       const user = userEvent.setup()
-//       render(<RegistrationForm />)
-//       await fillValidForm(user)
-//       await expect(user.click(getSubmitButton())).resolves.not.toThrow()
-//     })
-
-//     it('the submitted payload does not contain a confirmPassword field', async () => {
-//       const user = userEvent.setup()
-//       const onSubmit = jest.fn()
-//       render(<RegistrationForm onSubmitAction={onSubmit} />)
-//       await fillValidForm(user)
-//       await user.click(getSubmitButton())
-
-//       expect(onSubmit.mock.calls[0][0]).not.toHaveProperty('confirmPassword')
-//     })
-//   })
-// })
 
 // describe('RegistrationForm — integration tests', () => {
 //   it('submit button remains disabled until every field satisfies its requirements', async () => {
