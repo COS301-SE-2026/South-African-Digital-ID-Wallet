@@ -3,11 +3,13 @@ import userEvent from '@testing-library/user-event'
 import { RegistrationForm } from '../registration-form'
 import React from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { registerService } from '@/services/citizen-register-service'
+import toast from 'react-hot-toast'
+import axios from 'axios'
+import { useRouter } from 'next/navigation'
 
 jest.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-  }),
+  useRouter: jest.fn(),
 }))
 
 jest.mock('@/services/citizen-register-service', () => ({
@@ -369,19 +371,139 @@ describe('RegistrationForm — unit tests', () => {
         'text-destructive'
       )
     })
+
+    it('a met requirement item renders with the line-through class', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText('Must contain at least 1 capital letter (A-Z)')
+      ).not.toHaveClass('line-through')
+      await user.type(getPasswordInput(), 'A')
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText('Must contain at least 1 capital letter (A-Z)')
+      ).toHaveClass('line-through')
+    })
+
+    it('requirement list for a field hides again after that field is edited after clicking submit', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText('Must contain at least 1 capital letter (A-Z)')
+      ).toBeInTheDocument()
+      await user.type(getPasswordInput(), 'A')
+      expect(
+        screen.queryByText('Must contain at least 1 capital letter (A-Z)')
+      ).not.toBeInTheDocument()
+    })
+
+    it('requirement list is hidden when show is true but all requirements for that field are met', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.type(getEmailInput(), VALID_EMAIL)
+      await user.click(getSubmitButton())
+      expect(
+        screen.queryByText('Must be a valid email address')
+      ).not.toBeInTheDocument()
+      expect(
+        screen.getByText('Must contain at least 1 capital letter (A-Z)')
+      ).toBeInTheDocument()
+    })
   })
 
-  // describe('submit button state', () => {
+  describe('submit button state', () => {
+    it('shows "Create account" and is enabled in idle state', () => {
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      expect(getSubmitButton()).not.toBeDisabled()
+      expect(getSubmitButton()).toHaveTextContent('Create account')
+    })
 
-  // })
+    it('is disabled and shows "Creating account..." while the mutation is pending', async () => {
+      ;(registerService.register as jest.Mock).mockReturnValue(
+        new Promise(() => {})
+      )
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await fillValidForm(user)
+      const button = getSubmitButton()
+      await user.click(button)
+      expect(button).toBeDisabled()
+      expect(screen.getByText('Creating account...')).toBeInTheDocument()
+    })
 
-  // describe('form submission - invalid form', () => {
+    it('shows the spinner icon while the mutation is pending', async () => {
+      ;(registerService.register as jest.Mock).mockReturnValue(
+        new Promise(() => {})
+      )
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await fillValidForm(user)
+      await user.click(getSubmitButton())
+      expect(document.querySelector('.animate-spin')).toBeInTheDocument()
+    })
+  })
 
-  // })
+  describe('form submission - invalid form', () => {
+    beforeEach(() => jest.clearAllMocks())
 
-  // describe('form submission - valid form', () => {
+    it('does not call registerService.register when form is invalid', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(getSubmitButton())
+      expect(registerService.register).not.toHaveBeenCalled()
+    })
 
-  // })
+    it('does not call onSubmitAction when form is invalid', async () => {
+      const onSubmitAction = jest.fn()
+      const user = userEvent.setup()
+      render(<RegistrationForm onSubmitAction={onSubmitAction} />, {
+        wrapper: createWrapper(),
+      })
+      await user.click(getSubmitButton())
+      expect(onSubmitAction).not.toHaveBeenCalled()
+    })
+
+    it('clicking submit with an invalid form reveals the requirements lists', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(getSubmitButton())
+      expect(
+        screen.getByText('Must be a valid email address')
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText('Must be a valid email address')
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText('Must be at least 10 characters')
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText('Must contain at least 1 capital letter (A-Z)')
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText('Must contain at least 1 digit (0-9)')
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText('Must contain at least 1 lowercase letter (a-z)')
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          'Must conatain at least 1 special character (!@#$%^&*)'
+        )
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText('Must match the password above')
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText('Must match the password above')
+      ).toBeInTheDocument()
+    })
+  })
+
+  describe('form submission - valid form', () => {
+
+  })
 
   // describe('mutation success', () => {
 
