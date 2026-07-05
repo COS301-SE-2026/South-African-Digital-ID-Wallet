@@ -56,3 +56,8 @@ secrets.json
 
 # VS Code
 .vscode/
+
+#Secrets
+appsettings.Development.json
+appsettings.Staging.json
+appsettings.Production.json

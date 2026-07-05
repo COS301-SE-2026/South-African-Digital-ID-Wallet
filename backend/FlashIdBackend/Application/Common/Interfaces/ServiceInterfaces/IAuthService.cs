@@ -1,6 +1,6 @@
 using Application.Features.Auth.DTOs;
 
-namespace Application.Common.Interfaces;
+namespace Application.Common.Interfaces.ServiceInterfaces;
 
 public interface IAuthService
 {

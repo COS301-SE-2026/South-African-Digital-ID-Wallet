@@ -2,6 +2,7 @@ using Domain.Entities;
 using Infrastructure.Data;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
+
 namespace Infrastructure.Repositories;
 
 public class OnboardingRepository : IOnboardingRepository //IMPLEMENTS Application's interface
