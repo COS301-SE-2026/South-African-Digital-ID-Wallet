@@ -28,7 +28,8 @@ export const SessionTimeoutWatcher = () => {
 
       if (minutesRemaining <= 0) {
         toast.error('Your session has expired. Please log in again.')
-        void logout()
+        window.localStorage.removeItem(SESSION_EXPIRY_KEY)
+        logout()
         return
       }
 
