@@ -33,6 +33,14 @@ jest.mock('@/lib/api', () => ({
   },
 }))
 
+jest.mock('axios', () => ({
+  __esModule: true,
+  default: {
+    isAxiosError: jest.fn(),
+  },
+  isAxiosError: jest.fn(),
+}))
+
 const VALID_EMAIL = 'user@gmail.com'
 const VALID_PASSWORD = 'Password1!'
 
@@ -502,16 +510,133 @@ describe('RegistrationForm — unit tests', () => {
   })
 
   describe('form submission - valid form', () => {
+    beforeEach(() => {
+      jest.clearAllMocks()
+      ;(registerService.register as jest.Mock).mockResolvedValue({})
+    })
 
+    it('calls registerService.register with { email, password }', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await fillValidForm(user)
+      await user.click(getSubmitButton())
+      expect(registerService.register).toHaveBeenCalledWith(
+        {
+          email: VALID_EMAIL,
+          password: VALID_PASSWORD,
+        },
+        expect.any(Object)
+      )
+    })
+
+    it('calls onSubmitAction with { email, password } when the prop is provided', async () => {
+      const onSubmitAction = jest.fn()
+      const user = userEvent.setup()
+      render(<RegistrationForm onSubmitAction={onSubmitAction} />, {
+        wrapper: createWrapper(),
+      })
+      await fillValidForm(user)
+      await user.click(getSubmitButton())
+      expect(onSubmitAction).toHaveBeenCalledWith({
+        email: VALID_EMAIL,
+        password: VALID_PASSWORD,
+      })
+    })
+
+    it('does not throw when onSubmitAction is not provided', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await fillValidForm(user)
+      await expect(user.click(getSubmitButton())).resolves.not.toThrow()
+    })
   })
 
-  // describe('mutation success', () => {
+  describe('mutation success', () => {
+    beforeEach(() => {
+      jest.clearAllMocks()
+      ;(registerService.register as jest.Mock).mockResolvedValue({})
+    })
 
-  // })
+    it('calls toast.success with the confirmation message', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await fillValidForm(user)
+      await user.click(getSubmitButton())
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith(
+          'Account created successfully. Please check your email to verify your account.'
+        )
+      })
+    })
 
-  // describe('mutation error', () => {
+    it('navigates to /verify-email with the encoded email in the query string', async () => {
+      const mockPush = jest.fn()
+      jest
+        .mocked(useRouter)
+        .mockReturnValue({ push: mockPush } as unknown as ReturnType<
+          typeof useRouter
+        >)
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await fillValidForm(user)
+      await user.click(getSubmitButton())
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith(
+          `/verify-email?email=${encodeURIComponent(VALID_EMAIL)}`
+        )
+      })
+    })
+  })
 
-  // })
+  describe('mutation error', () => {
+    beforeEach(() => jest.clearAllMocks())
+
+    it('shows the API error message from response.data.error when it is Axios error', async () => {
+      const axiosError = {
+        response: { data: { error: 'Email already in use' } },
+      }
+      ;(registerService.register as jest.Mock).mockRejectedValue(axiosError)
+      ;(axios.isAxiosError as unknown as jest.Mock).mockReturnValue(true)
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await fillValidForm(user)
+      await user.click(getSubmitButton())
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Email already in use')
+      })
+    })
+
+    it('shows the generic fallback message when the error is not an Axios error', async () => {
+      ;(registerService.register as jest.Mock).mockRejectedValue(
+        'Network error'
+      )
+      ;(axios.isAxiosError as unknown as jest.Mock).mockReturnValue(false)
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await fillValidForm(user)
+      await user.click(getSubmitButton())
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Registration failed. Please try again.'
+        )
+      })
+    })
+
+    it('shows the generic fallback message when Axios error has no response.data.error', async () => {
+      const axiosError = { response: { data: {} } }
+      ;(registerService.register as jest.Mock).mockRejectedValue(axiosError)
+      ;(axios.isAxiosError as unknown as jest.Mock).mockReturnValue(true)
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await fillValidForm(user)
+      await user.click(getSubmitButton())
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Registration failed. Please try again.'
+        )
+      })
+    })
+  })
 
   //   it('a valid email address satisfies the email requirement', async () => {
   //     const user = userEvent.setup()
