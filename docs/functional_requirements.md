@@ -279,7 +279,7 @@ The system shall associate verification records with authenticated officials.
 The system shall allow citizens to select which credential fields are included in a QR code payload before generation.
 
 ##### R3.4.2:
-The system shall enforce a mandatory minimum set of fields that cannot be excluded from any QR code payload. The mandatory fields are: full name, SA ID number, and date of birth.
+The system shall enforce a mandatory minimum set of fields that cannot be excluded from any QR code payload. The mandatory fields are: full name, SA ID number, date of birth, and photo. The photo enables the verifying official to visually cross-reference the credential against the person presenting it, reducing the risk of a credential being presented by someone other than its rightful holder.
 
 ##### R3.4.3:
 The system shall display a pre-generation preview to the citizen showing exactly which fields will be visible to the verifier before the QR code is generated.
