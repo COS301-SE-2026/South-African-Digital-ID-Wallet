@@ -9,6 +9,10 @@ on:
       - dev
   workflow_dispatch:
 
+
+env:
+  PROJECT_PATH: backend/FlashIdBackend/Presentation/Presentation.csproj
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,24 +20,28 @@ jobs:
       contents: read #This is required for actions/checkout
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.x'
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+      - name: Restore Dependencies
+        run: dotnet restore "${{env.PROJECT_PATH}}"
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+      - name: Build
+        run: dotnet build "${{env.PROJECT_PATH}}" --configuration Release --no-restore
 
-      - name: Upload artifact for deployment job
+      - name: Publish
+        run: dotnet publish "${{env.PROJECT_PATH}}" --configuration Release --no-build --output ./publish
+
+      - name: Upload publish artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ./publish
 
   deploy:
     runs-on: ubuntu-latest
@@ -44,6 +52,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
+          path: ./publish
       
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -51,5 +60,5 @@ jobs:
         with:
           app-name: 'api-flashid-dev'
           slot-name: 'Production'
-          package: .
+          package: ./publish
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9B2671C2F93E4B3AB5921897445E516F }}
