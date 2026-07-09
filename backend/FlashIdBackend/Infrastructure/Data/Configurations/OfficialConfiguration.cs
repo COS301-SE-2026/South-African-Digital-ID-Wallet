@@ -14,6 +14,14 @@ public class OfficialConfiguration : IEntityTypeConfiguration<Official>
             .IsRequired()
             .HasMaxLength(50);
 
+        builder.Property(o => o.Names)
+            .IsRequired()
+            .HasMaxLength(256);
+
+        builder.Property(o => o.Surname)
+            .IsRequired()
+            .HasMaxLength(256);
+
         builder.Property(o => o.CreatedAt)
             .IsRequired()
             .HasColumnType("datetime2")
@@ -43,5 +51,7 @@ public class OfficialConfiguration : IEntityTypeConfiguration<Official>
             .WithMany(i => i.Officials)
             .HasForeignKey(o => o.InstitutionId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasQueryFilter(o => !o.User.IsDeleted);
     }
 }
