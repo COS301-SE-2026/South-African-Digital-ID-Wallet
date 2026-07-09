@@ -43,7 +43,7 @@ jobs:
 
       - name: Debug Kudu connectivity
         run: |
-          curl -v -u '$web-flashid-dev:${{ secrets.KUDU_DEBUG_PWD }}' https://web-flashid-dev-c5f2gbd8hbcqf8h2.southafricanorth-01.scm.azurewebsites.net/api/settings
+          curl -v -u '$web-flashid-dev:${{ secrets.KUDU_DEBUG_PWD }}' https://web-flashid-dev-c5f2gbd8hbcqf8h2.scm.southafricanorth-01.azurewebsites.net/api/settings
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
