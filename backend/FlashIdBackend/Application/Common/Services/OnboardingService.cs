@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Application.Features.Onboarding.Dtos;
 using Application.Features.Onboarding.Exceptions;
 using Application.Common.Interfaces.GatewayInterfaces;
@@ -23,6 +24,13 @@ public class OnboardingService : IOnboardingService
     {
         if (!request.ConsentGiven)
             throw new CitizenConsentRequiredException();
+
+        if (!string.IsNullOrWhiteSpace(request.PhoneNumber) &&
+            !Regex.IsMatch(request.PhoneNumber, @"^(\+27|0)[6-8][0-9]{8}$"))
+            throw new InvalidSAPhoneNumberException();
+
+        if (!string.IsNullOrWhiteSpace(request.Email) && _onboardingRepository.GetUserByEmailAsync(request.Email) == null)
+            throw new DuplicateEmailRegisteredException();
 
         //Check if the user already exists... business logic
         var citizenRecord = await _governmentRegistryGateway.GetCitizenBySaIdAsync(request.SaId);
@@ -66,7 +74,7 @@ public class OnboardingService : IOnboardingService
 
         // Repository handles all persistence — the service never touches AppDbContext directly.
         //Edit once Nathan merges DB changes so that 
-        //await _onboardingRepository.AddUserAsync(user);
+        // await _onboardingRepository.AddUserAsync(user);
         await _onboardingRepository.AddCitizenAsync(citizen);
         await _onboardingRepository.SaveChangesAsync();
 
