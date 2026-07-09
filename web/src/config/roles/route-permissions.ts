@@ -15,11 +15,19 @@ export function getAllowedRoles(pathname: string): UserRole[] | null {
     return PERMISSIONS_ROUTING[pathname]
   }
 
-  for (const [route, roles] of Object.entries(PERMISSIONS_ROUTING)) {
+  const sortedRoutes = Object.keys(PERMISSIONS_ROUTING).sort(
+    (a, b) => b.length - a.length
+  )
+  for (const route of sortedRoutes) {
     if (pathname.startsWith(route + '/')) {
-      return roles
+      return PERMISSIONS_ROUTING[route]
     }
   }
 
+  const PROTECTED_ROUTES = ['/citizen', '/officials', '/gov-admin']
+
+  if (PROTECTED_ROUTES.some((prefix) => pathname.startsWith(prefix))) {
+    return []
+  }
   return null
 }

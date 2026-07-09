@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { type UserRole, DEFAULT_USER_ROLE_DASHBOARD } from '@/types/roles'
@@ -26,6 +26,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useUser()
   const router = useRouter()
 
+  const allowed = !loading && user ? getAllowedRoles(pathname) : null
+  const hasAccess =
+    !!user && (!allowed || allowed.includes(user.role as UserRole))
+
   useEffect(() => {
     if (loading) {
       return
@@ -34,13 +38,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       router.replace('/')
       return
     }
-    const allowed = getAllowedRoles(pathname)
-    if (allowed && !allowed.includes(user.role as UserRole)) {
+    if (!hasAccess) {
       router.replace(DEFAULT_USER_ROLE_DASHBOARD[user.role as UserRole] ?? '/')
     }
-  }, [user, loading, pathname, router])
+  }, [user, loading, pathname, router, hasAccess])
 
-  if (!loading && !user) {
+  if (loading) {
+    return <div>Load</div>
+  }
+
+  if (!user || !hasAccess) {
     return null
   }
 
@@ -66,7 +73,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className=" flex h-screen overflow-hidden">
-      {/* TODO: Update navSections to work with loggeed in user role :)*/}
       <AppSidebar
         navSections={navSections}
         user={{ name: displayName, initials, idLabel }}

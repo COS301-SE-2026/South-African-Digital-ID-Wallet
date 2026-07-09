@@ -11,13 +11,25 @@ export async function proxy(req: NextRequest) {
   }
 
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+    const jwtSecret = process.env.JWT_SECRET
+
+    if (!jwtSecret) {
+      return NextResponse.redirect(new URL('/', req.url))
+    }
+
+    const secret = new TextEncoder().encode(jwtSecret)
     const { payload } = await jwtVerify(token, secret, {
       issuer: 'FlashID',
       audience: 'FlashID-Users',
     })
 
-    const role = payload['role'] as string
+    const sub = payload['sub'] as string | undefined
+    const role = payload['role'] as string | undefined
+
+    if (!sub || !role) {
+      return NextResponse.redirect(new URL('/', req.url))
+    }
+
     const dashboardRole = DEFAULT_USER_ROLE_DASHBOARD[role as UserRole]
 
     if (!dashboardRole || !req.nextUrl.pathname.startsWith(dashboardRole)) {
