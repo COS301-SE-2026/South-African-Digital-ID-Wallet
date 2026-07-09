@@ -20,6 +20,9 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY web/package.json ./web/package.json
 
+ENV LEFTHOOK=0
+RUN pnpm install --frozen-lockfile --filter ./web...
+
 RUN pnpm install --frozen-lockfile --filter ./web...
 
 # ---------- builder ----------
