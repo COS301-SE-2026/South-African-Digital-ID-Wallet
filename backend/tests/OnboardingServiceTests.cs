@@ -1,6 +1,8 @@
 using Application.Features.Onboarding.Dtos;
 using Application.Features.Onboarding.Exceptions;
+using Application.Common.Interfaces.ServiceInterfaces;
 using Infrastructure.Data;
+using Infrastructure.Repositories;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,8 +22,8 @@ public class OnboardingServiceTest
     private static OnboardingService CreateService(AppDbContext context)
     {
         return new OnboardingService(
-            new MockGovernmentRegistryService(),
-            context
+            new OnboardingRepository(context),
+            new MockGovernmentRegistryRepository()
         );
     }
 
@@ -112,7 +114,7 @@ public class OnboardingServiceTest
     [Fact]
     public void MockGovernmentRegistry_WithKnownSaId_ReturnsIdentityRecord()
     {
-        var registryService = new MockGovernmentRegistryService();
+        var registryService = new MockGovernmentRegistryRepository();
 
         var record = registryService.GetBySaId("0000001971025");
 
