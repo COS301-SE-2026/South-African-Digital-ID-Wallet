@@ -19,6 +19,11 @@ public class OnboardingRepository : IOnboardingRepository //IMPLEMENTS Applicati
         return await _context.Citizens.FirstOrDefaultAsync(c => c.SaId == saId);
     }
 
+    public async Task<User?> GetUserByEmailAsync(string email)
+    {
+        return await _context.DomainUsers.FirstOrDefaultAsync(u => u.Email == email);
+    }
+
     public Task AddUserAsync(User user)
     {
         // YOUR method: AddUser
