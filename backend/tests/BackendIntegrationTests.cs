@@ -162,4 +162,92 @@ public class BackendIntegrationTests
         Assert.Equal(AuditEventType.FailedLoginAttempt, auditLog.EventType);
         Assert.Equal("10.0.0.1", auditLog.IpAddress);
     }
+
+    [Fact]
+    public async Task LogoutAsync_WritesLogoutAuditLog()
+    {
+        using var context = CreateContext();
+        var service = CreateAuthService(context);
+        var user = CreateCitizenUser("tiana.rogers@example.com", "secret@1234");
+
+        context.DomainUsers.Add(user);
+        await context.SaveChangesAsync();
+
+        var result = await service.LogoutAsync(user.Id, "127.0.0.1");
+        var auditLog = await context.AuditLogs.SingleAsync();
+
+        Assert.Equal("Logged out successfully.", result.Message);
+        Assert.Equal(AuditEventType.UserLoggedOut, auditLog.EventType);
+        Assert.Equal(user.Id, auditLog.ActorId);
+        Assert.Equal("127.0.0.1", auditLog.IpAddress);
+    }
+
+    [Fact]
+    public async Task RegisterInstitutionAsync_PersistsInstitutionAndAuditLog()
+    {
+        using var context = CreateContext();
+        var service = CreateInstitutionService(context);
+        var (adminUser, admin) = CreateGovernmentAdmin();
+
+        context.DomainUsers.Add(adminUser);
+        context.GovernmentAdministrators.Add(admin);
+        await context.SaveChangesAsync();
+
+        var request = new RegisterInstitutionRequestDto
+        {
+            Name = "Home Affairs Johannesburg",
+            Type = InstitutionType.HomeAffairs,
+            VerificationNumber = "HA-JHB-2026-001",
+            AdminId = admin.Id,
+        };
+
+        var result = await service.RegisterInstitutionAsync(request);
+
+        var institution = await context.Institutions.SingleAsync();
+        var auditLog = await context.AuditLogs.SingleAsync();
+
+        Assert.Equal(institution.Id, result.InstitutionId);
+        Assert.Equal("Home Affairs Johannesburg", result.Name);
+        Assert.Equal("HomeAffairs", result.Type);
+        Assert.NotEmpty(result.ApiKey);
+        Assert.StartsWith("flashid_live_", result.ApiKey);
+        Assert.NotEqual(Guid.Empty, result.ApiKeyReference);
+        Assert.Equal("HA-JHB-2026-001", result.VerificationNumber);
+        Assert.Equal(AuditEventType.InstitutionRegistered, auditLog.EventType);
+        Assert.Equal(admin.UserId, auditLog.ActorId);
+    }
+
+    [Fact]
+    public async Task GetInstitutionByIdAsync_ReturnsSeededInstitution()
+    {
+        using var context = CreateContext();
+        var service = CreateInstitutionService(context);
+        var (adminUser, admin) = CreateGovernmentAdmin();
+        var institutionId = Guid.NewGuid();
+
+        context.DomainUsers.Add(adminUser);
+        context.GovernmentAdministrators.Add(admin);
+        context.Institutions.Add(
+            new Institution
+            {
+                Id = institutionId,
+                Name = "Licensing Department Cape Town",
+                Type = InstitutionType.LicensingDepartment,
+                VerificationNumber = "LD-CT-2026-009",
+                ApiKeyReference = Guid.NewGuid(),
+                RegisteredById = admin.Id,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+            }
+        );
+        await context.SaveChangesAsync();
+
+        var result = await service.GetInstitutionByIdAsync(institutionId);
+
+        Assert.Equal(institutionId, result.InstitutionId);
+        Assert.Equal("Licensing Department Cape Town", result.Name);
+        Assert.Equal("LicensingDepartment", result.Type);
+        Assert.Equal("LD-CT-2026-009", result.VerificationNumber);
+        Assert.Equal(admin.Id, result.RegisteredById);
+    }
 }
