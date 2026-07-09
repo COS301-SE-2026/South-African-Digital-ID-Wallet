@@ -52,5 +52,54 @@ public class BackendIntegrationTests
         return new InstitutionService(new InstitutionRepository(context), new InstitutionMapper());
     }
 
+    private static User CreateCitizenUser(string email, string password)
+    {
+        return new User
+        {
+            Id = Guid.NewGuid(),
+            Names = "Tiana",
+            Surname = "Rogers",
+            Email = email,
+            PhoneNumber = "0813456789",
+            Username = email,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+            FailedLoginAttempts = 0,
+            IsDeleted = false,
+            IsEmailVerified = true,
+            Role = UserRole.Citizen,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+    }
 
+    private static (User User, GovernmentAdministrator Admin) CreateGovernmentAdmin()
+    {
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Names = "Anele",
+            Surname = "Dlamini",
+            Email = "anele.dlamini@flashid.gov.za",
+            PhoneNumber = "0820000000",
+            Username = "anele.dlamini@flashid.gov.za",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@12345"),
+            FailedLoginAttempts = 0,
+            IsDeleted = false,
+            IsEmailVerified = true,
+            Role = UserRole.GovernmentAdministrator,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+    };
+
+    var admin = new GovernmentAdministrator
+        {
+            Id = Guid.NewGuid(),
+            GovernmentId = "GOV-ADM-001",
+            UserId = user.Id,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+        return (user, admin);
+    }
 }
