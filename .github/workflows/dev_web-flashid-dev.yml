@@ -41,6 +41,10 @@ jobs:
           docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:dev-${{ github.sha }}
           docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:dev-latest
 
+      - name: Debug Kudu connectivity
+        run: |
+          curl -v -u '$web-flashid-dev:${{ secrets.KUDU_DEBUG_PWD }}' https://web-flashid-dev.scm.azurewebsites.net/api/settings
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
