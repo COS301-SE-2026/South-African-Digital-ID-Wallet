@@ -36,30 +36,47 @@ public class OnboardingService : IOnboardingService
         };
     }
 
+    private static string NormalizeSaPhoneNumber(string phoneNumber)
+    {
+        var normalized = phoneNumber.Trim().Replace(" ", "").Replace("-", "");
+
+        if (normalized.StartsWith("0"))
+            normalized = $"+27{normalized[1..]}";
+
+        return normalized;
+    }
+
     public async Task<OnboardCitizenResponse> OnboardCitizenAsync(OnboardCitizenRequest request, Guid officialId, string ipAddress)
     {
         if (!request.ConsentGiven)
             throw new CitizenConsentRequiredException();
+
+        var email = string.IsNullOrWhiteSpace(request.Email)
+            ? null
+            : request.Email.Trim().ToLowerInvariant();
+
+        var phoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber)
+            ? null
+            : NormalizeSaPhoneNumber(request.PhoneNumber);
 
         var citizenRecord = await _governmentRegistryGateway.GetCitizenBySaIdAsync(request.SaId);
 
         if (citizenRecord is null)
             throw new IdentityRecordNotFoundException();
 
-        if (string.IsNullOrWhiteSpace(request.PhoneNumber) &&
-            string.IsNullOrWhiteSpace(request.Email))
+        if (email is null && phoneNumber is null)
             throw new ArgumentException("At least one contact method is required.");
 
-        if (!string.IsNullOrWhiteSpace(request.PhoneNumber) &&
-            !Regex.IsMatch(request.PhoneNumber, @"^(\+27|0)[6-8][0-9]{8}$"))
+        if (phoneNumber is not null &&
+            !Regex.IsMatch(phoneNumber, @"^(\+27)[6-8][0-9]{8}$"))
             throw new InvalidSAPhoneNumberException();
 
-        if (!string.IsNullOrWhiteSpace(request.Email) && !Regex.IsMatch(request.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-            throw new ArgumentException("Invalid email address format.", nameof(request.Email));
+        if (email is not null && !Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            throw new ArgumentException("Invalid email address format.", nameof(email));
 
-        if (!string.IsNullOrWhiteSpace(request.Email))
+        if (email is not null)
         {
-            var existingUser = await _onboardingRepository.GetUserByEmailAsync(request.Email);
+            var existingUser = await _onboardingRepository.GetUserByEmailAsync(email);
 
             if (existingUser is not null)
                 throw new DuplicateEmailRegisteredException();
@@ -73,16 +90,18 @@ public class OnboardingService : IOnboardingService
 
         var activationCode = Random.Shared.Next(100000, 999999).ToString();
 
+        var now = DateTime.UtcNow;
+
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Email = request.Email,
-            PhoneNumber = request.PhoneNumber,
+            Email = email,
+            PhoneNumber = phoneNumber,
             Role = UserRole.Citizen,
             IsEmailVerified = false,
             IsDeleted = false,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
+            CreatedAt = now,
+            UpdatedAt = now,
         };
 
         var citizen = new Citizen
@@ -94,9 +113,9 @@ public class OnboardingService : IOnboardingService
             UserId = user.Id,
             Status = CitizenStatus.Pending,
             CredentialActivationCode = activationCode,
-            CredentialActivationCodeExpiresAt = DateTime.UtcNow.AddMinutes(15),
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
+            CredentialActivationCodeExpiresAt = now.AddMinutes(15),
+            CreatedAt = now,
+            UpdatedAt = now,
         };
 
         var consentAudit = new AuditLog
@@ -106,7 +125,7 @@ public class OnboardingService : IOnboardingService
             Details = $"POPIA Section 11 consent recorded during onboarding for citizen {citizenRecord.SaId}.",
             ActorId = officialId,
             IpAddress = ipAddress,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = now
         };
 
         var onboardAudit = new AuditLog
@@ -116,7 +135,7 @@ public class OnboardingService : IOnboardingService
             Details = $"Citizen, {citizenRecord.SaId}, has been onboarded into FlashID system with pending account by Home Affairs Official, {officialId}.",
             ActorId = officialId,
             IpAddress = ipAddress,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = now
         };
 
         await _onboardingRepository.AddAuditLogAsync(consentAudit);
