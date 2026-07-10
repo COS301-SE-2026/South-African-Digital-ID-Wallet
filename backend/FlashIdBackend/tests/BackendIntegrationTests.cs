@@ -6,7 +6,6 @@ using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
 using Infrastructure.Providers;
-using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
