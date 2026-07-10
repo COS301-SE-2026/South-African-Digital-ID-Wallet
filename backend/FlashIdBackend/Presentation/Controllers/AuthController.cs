@@ -1,8 +1,9 @@
-using Application.Common.Interfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Auth.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Application.Features.Auth.Exceptions;
 
 namespace Presentation.Controllers;
 
@@ -70,6 +71,10 @@ public class AuthController : ControllerBase
             result.Token = string.Empty;
 
             return Ok(result);
+        }
+        catch (EmailNotVerifiedException ex)
+        {
+            return StatusCode(403, new { error = ex.Message, code = "EMAIL_NOT_VERIFIED" });
         }
         catch (UnauthorizedAccessException ex)
         {
