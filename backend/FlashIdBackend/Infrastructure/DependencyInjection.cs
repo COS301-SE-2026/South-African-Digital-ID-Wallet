@@ -26,6 +26,9 @@ public static class DependencyInjection
 
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
 
+        services.AddScoped<ICredentialRepository, CredentialRepository>();
+        services.AddSingleton<IQrSigningProvider, Ed25519SigningProvider>();
+
         return services;
     }
 }
