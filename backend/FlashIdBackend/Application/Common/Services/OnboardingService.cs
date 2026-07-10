@@ -36,7 +36,7 @@ public class OnboardingService : IOnboardingService
         };
     }
 
-    public async Task<OnboardCitizenResponse> OnboardCitizenAsync(OnboardCitizenRequest request)
+    public async Task<OnboardCitizenResponse> OnboardCitizenAsync(OnboardCitizenRequest request, Guid officialId, string ipAddress)
     {
         if (!request.ConsentGiven)
             throw new CitizenConsentRequiredException();
@@ -99,6 +99,28 @@ public class OnboardingService : IOnboardingService
             UpdatedAt = DateTime.UtcNow,
         };
 
+        var consentAudit = new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.ConsentRecorded,
+            Details = $"POPIA Section 11 consent recorded during onboarding for citizen {citizenRecord.SaId}.",
+            ActorId = officialId,
+            IpAddress = ipAddress,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        var onboardAudit = new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.OnboardCitizen,
+            Details = $"Citizen, {citizenRecord.SaId}, has been onboarded into FlashID system with pending account by Home Affairs Official, {officialId}.",
+            ActorId = officialId,
+            IpAddress = ipAddress,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _onboardingRepository.AddAuditLogAsync(consentAudit);
+        await _onboardingRepository.AddAuditLogAsync(onboardAudit);
         await _onboardingRepository.AddUserAsync(user);
         await _onboardingRepository.AddCitizenAsync(citizen);
         await _onboardingRepository.SaveChangesAsync();
