@@ -8,6 +8,7 @@ import { FieldRow } from '@/components/molecules/FieldRow'
 import { colors } from '@/theme/colors'
 import { spacing, radius } from '@/theme/spacing'
 import { typography } from '@/theme/typography'
+import { useQrDisclosureStore } from '@/stores/qrDisclosureStore'
 
 type CredentialType = 'identityDocument' | 'driversLicense'
 
@@ -83,7 +84,16 @@ export default function SelectFieldsScreen() {
     })
   }
 
+  const setSelection = useQrDisclosureStore((state) => state.setSelection)
+
   const handleContinue = () => {
+    setSelection({
+      credentialType,
+      mandatoryFields,
+      selectedOptionalFields: optionalFields.filter(
+        (field) => selectedFields[field]
+      ),
+    })
     router.push('/qr/preview')
   }
 
