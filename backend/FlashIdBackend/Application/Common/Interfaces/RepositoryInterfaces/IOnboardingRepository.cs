@@ -9,5 +9,7 @@ public interface IOnboardingRepository
 
     Task AddUserAsync(User user);
     Task AddCitizenAsync(Citizen citizen);
+
+    Task AddAuditLogAsync(AuditLog auditLog);
     Task SaveChangesAsync();
 }

@@ -26,17 +26,19 @@ public class OnboardingRepository : IOnboardingRepository //IMPLEMENTS Applicati
 
     public Task AddUserAsync(User user)
     {
-        // YOUR method: AddUser
-        // EF Core method inside: .Add()  <-  these are intentionally different names
         _context.DomainUsers.Add(user);
         return Task.CompletedTask;
     }
 
     public Task AddCitizenAsync(Citizen citizen)
     {
-        // YOUR method: AddCitizen
-        // EF Core method inside: .Add()
         _context.Citizens.Add(citizen);
+        return Task.CompletedTask;
+    }
+
+    public Task AddAuditLogAsync(AuditLog auditLog)
+    {
+        _context.AuditLogs.Add(auditLog);
         return Task.CompletedTask;
     }
 
