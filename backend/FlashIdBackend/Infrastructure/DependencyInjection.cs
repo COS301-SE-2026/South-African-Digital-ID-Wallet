@@ -66,6 +66,8 @@ public static class DependencyInjection
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         });
 
+        services.AddScoped<ISmsProvider, AzureCommunicationSmsProvider>();
+
         return services;
     }
 }
