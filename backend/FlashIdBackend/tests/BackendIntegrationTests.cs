@@ -6,6 +6,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
 using Infrastructure.Providers;
+using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -16,9 +17,9 @@ public class BackendIntegrationTests
     private const string LocalhostIp = "127.0.0.1";
     private const string SecondaryTestIp = "10.0.0.1";
 
-    private const string CitizenTestPassword = "secret@1234";
-    private const string AdminTestPassword = "admin@12345";
-    private const string WrongTestPassword = "wrong";
+    private const string CitizenTestPassword = "CitizenPwd123!";
+    private const string AdminTestPassword = "AdminPwd123!";
+    private const string WrongTestPassword = "InvalidPwd123!";
 
     private static AppDbContext CreateContext()
     {
@@ -45,11 +46,17 @@ public class BackendIntegrationTests
 
     private static AuthService CreateAuthService(AppDbContext context)
     {
+        var authRepository = new AuthRepository(context);
+        var configuration = CreateJwtConfiguration();
+        var jwtProvider = new JwtTokenProvider(configuration);
+        var passwordHashingProvider = new PasswordHashingProvider();
+        var mapper = new AuthMapper();
+
         return new AuthService(
-            new AuthRepository(context),
-            new JwtTokenProvider(CreateJwtConfiguration()),
-            new PasswordHashingProvider(),
-            new AuthMapper()
+            authRepository,
+            jwtProvider,
+            passwordHashingProvider,
+            mapper
         );
     }
 
