@@ -15,11 +15,11 @@ namespace tests;
 public class BackendIntegrationTests
 {
     private const string LocalhostIp = "127.0.0.1";
-    private const string SecondaryTestIp = "10.0.0.1";
+    private const string SecondaryTestIp = "203.0.113.1"; // TEST-NET-3 (RFC 5737), reserved for documentation/testing use only
 
-    private const string CitizenTestPassword = "CitizenPwd123!";
-    private const string AdminTestPassword = "AdminPwd123!";
-    private const string WrongTestPassword = "InvalidPwd123!";
+    private const string CitizenTestPassword = "CitizenPwd123!"; // NOSONAR - test-only dummy credential, not a real secret
+    private const string AdminTestPassword = "AdminPwd123!"; // NOSONAR - test-only dummy credential, not a real secret
+    private const string WrongTestPassword = "InvalidPwd123!"; // NOSONAR - test-only dummy credential, not a real secret
 
     private static AppDbContext CreateContext()
     {
@@ -36,7 +36,7 @@ public class BackendIntegrationTests
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    ["Jwt:Key"] = "integration-test-secret-key-which-is-long-enough",
+                    ["Jwt:Key"] = "integration-test-secret-key-which-is-long-enough", // NOSONAR - test-only dummy key, not a real secret
                     ["Jwt:Issuer"] = "FlashId",
                     ["Jwt:Audience"] = "FlashIdWeb",
                 }
