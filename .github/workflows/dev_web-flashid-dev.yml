@@ -1,4 +1,4 @@
-# retrigger
+#retrigger
 name: Build and deploy web app to Azure Web App - web-flashid-dev
 
 on: 
