@@ -27,14 +27,15 @@ public class OnboardingController : ControllerBase
     [HttpGet("verify/{idNumber}")]
     public async Task<IActionResult> VerifyCitizenIdentity(string idNumber)
     {
-        var record = await _registryGateway.GetCitizenBySaIdAsync(idNumber);
-
-        if (record is null)
+        try
         {
-            return NotFound(new { message = "Citizen record not found." });
+            var record = await _onboardingService.VerifyCitizenIdentityAsync(idNumber);
+            return Ok(record);
         }
-
-        return Ok(record);
+        catch (IdentityRecordNotFoundException)
+        {
+            return NotFound(new { message = "Citizen record not found in government registry." });
+        }
     }
 
     [HttpPost("citizen")]
