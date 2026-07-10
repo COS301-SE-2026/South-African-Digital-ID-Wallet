@@ -1,5 +1,7 @@
 using Application.Features.Auth.DTOs;
+using Application.Features.Citizens.DTOs;
 using Application.Features.Institutions.DTOs;
+using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Mapping;
 using Application.Common.Services;
 using Domain.Entities;
@@ -20,6 +22,18 @@ public class BackendIntegrationTests
     private const string CitizenTestPassword = "CitizenPwd123!"; // NOSONAR - test-only dummy credential, not a real secret
     private const string AdminTestPassword = "AdminPwd123!"; // NOSONAR - test-only dummy credential, not a real secret
     private const string WrongTestPassword = "InvalidPwd123!"; // NOSONAR - test-only dummy credential, not a real secret
+
+
+
+    private sealed class StubCitizenService : ICitizenService
+    {
+        public Task<RegisterCitizenResponseDto> RegisterCitizenAsync(RegisterCitizenRequestDto request) =>
+            throw new NotImplementedException();
+
+        public Task VerifyEmailAsync(VerifyEmailRequestDto request) => Task.CompletedTask;
+
+        public Task ResendOtpAsync(ResendOtpRequestDto request) => Task.CompletedTask;
+    }
 
     private static AppDbContext CreateContext()
     {
@@ -50,12 +64,14 @@ public class BackendIntegrationTests
         var configuration = CreateJwtConfiguration();
         var jwtProvider = new JwtTokenProvider(configuration);
         var passwordHashingProvider = new PasswordHashingProvider();
+        var citizenService = new StubCitizenService();
         var mapper = new AuthMapper();
 
         return new AuthService(
             authRepository,
             jwtProvider,
             passwordHashingProvider,
+            citizenService,
             mapper
         );
     }
@@ -70,12 +86,10 @@ public class BackendIntegrationTests
         return new User
         {
             Id = Guid.NewGuid(),
-            Names = "Tiana",
-            Surname = "Rogers",
             Email = email,
             PhoneNumber = "0813456789",
-            Username = email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+            PasswordSet = true,
             FailedLoginAttempts = 0,
             IsDeleted = false,
             IsEmailVerified = true,
@@ -90,12 +104,10 @@ public class BackendIntegrationTests
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Names = "Anele",
-            Surname = "Dlamini",
             Email = "anele.dlamini@flashid.gov.za",
             PhoneNumber = "0820000000",
-            Username = "anele.dlamini@flashid.gov.za",
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(AdminTestPassword),
+            PasswordSet = true,
             FailedLoginAttempts = 0,
             IsDeleted = false,
             IsEmailVerified = true,
@@ -108,6 +120,8 @@ public class BackendIntegrationTests
         {
             Id = Guid.NewGuid(),
             GovernmentId = "GOV-ADM-001",
+            Names = "Anele",
+            Surname = "Dlamini",
             UserId = user.Id,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
@@ -144,8 +158,6 @@ public class BackendIntegrationTests
         Assert.NotEmpty(result.Token);
         Assert.Equal(user.Id, result.UserId);
         Assert.Equal("Citizen", result.Role);
-        Assert.Equal("Tiana", result.Names);
-        Assert.Equal("Rogers", result.Surname);
         Assert.True(result.ExpiresAt > DateTime.UtcNow);
         Assert.Equal(0, storedUser.FailedLoginAttempts);
         Assert.NotNull(storedUser.LastLoginAt);

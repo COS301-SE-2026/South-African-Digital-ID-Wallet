@@ -2,6 +2,7 @@ using Application.Features.Onboarding.Dtos;
 using Application.Features.Onboarding.Exceptions;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Services;
+using Domain.Enums;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -50,9 +51,10 @@ public class OnboardingServiceTest
         Assert.NotNull(user);
         Assert.Equal(request.SaId, result.SaId);
         Assert.Equal("Pending", result.Status);
-        Assert.False(citizen!.IsActivated);
-        Assert.False(string.IsNullOrWhiteSpace(citizen.ActivationCode));
-        Assert.NotEqual(Guid.Empty, citizen.UserId);
+        Assert.Equal(CitizenStatus.Pending, citizen!.Status);
+        Assert.False(string.IsNullOrWhiteSpace(citizen.CredentialActivationCode));
+        Assert.NotNull(citizen.UserId);
+        Assert.NotEqual(Guid.Empty, citizen.UserId!.Value);
     }
 
     [Fact]
