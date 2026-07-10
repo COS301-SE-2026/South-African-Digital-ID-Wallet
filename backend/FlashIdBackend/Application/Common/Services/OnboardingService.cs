@@ -20,6 +20,22 @@ public class OnboardingService : IOnboardingService
         _governmentRegistryGateway = governmentRegistryGateway;
     }
 
+    public async Task<VerifiedCitizenRecordResponse> VerifyCitizenIdentityAsync(string saId)
+    {
+        var citizenRecord = await _governmentRegistryGateway.GetCitizenBySaIdAsync(saId);
+
+        if (citizenRecord is null)
+            throw new IdentityRecordNotFoundException();
+
+        return new VerifiedCitizenRecordResponse
+        {
+            SaId = citizenRecord.SaId,
+            FullName = $"{citizenRecord.Names} {citizenRecord.Surname}",
+            DateOfBirth = citizenRecord.DateOfBirth,
+            IsVerified = true
+        };
+    }
+
     public async Task<OnboardCitizenResponse> OnboardCitizenAsync(OnboardCitizenRequest request)
     {
         if (!request.ConsentGiven)
