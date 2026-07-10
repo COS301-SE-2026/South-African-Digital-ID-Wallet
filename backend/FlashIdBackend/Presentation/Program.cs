@@ -116,5 +116,4 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.MapGet("/debug/cors-origin", () => allowedOrigins);
-app.Run();
+await app.RunAsync();

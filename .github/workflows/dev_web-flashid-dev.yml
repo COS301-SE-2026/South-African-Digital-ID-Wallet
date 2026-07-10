@@ -1,11 +1,9 @@
-#retrigger
 name: Build and deploy web app to Azure Web App - web-flashid-dev
 
 on: 
   push:
     branches: 
       - dev
-      - feature/web-deployment
     paths:
       - "web/**"
       - "pnpm-lock.yaml"
@@ -19,7 +17,7 @@ env:
 
 jobs:
   deploy-dev:
-    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/feature/web-deployment'
+    if: github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
