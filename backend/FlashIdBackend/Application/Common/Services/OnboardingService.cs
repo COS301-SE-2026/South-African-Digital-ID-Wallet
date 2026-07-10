@@ -41,25 +41,36 @@ public class OnboardingService : IOnboardingService
         if (!request.ConsentGiven)
             throw new CitizenConsentRequiredException();
 
-        if (!string.IsNullOrWhiteSpace(request.PhoneNumber) &&
-            !Regex.IsMatch(request.PhoneNumber, @"^(\+27|0)[6-8][0-9]{8}$"))
-            throw new InvalidSAPhoneNumberException();
-
-        if (!string.IsNullOrWhiteSpace(request.Email) && _onboardingRepository.GetUserByEmailAsync(request.Email) == null)
-            throw new DuplicateEmailRegisteredException();
-
-        //Check if the user already exists... business logic
         var citizenRecord = await _governmentRegistryGateway.GetCitizenBySaIdAsync(request.SaId);
 
         if (citizenRecord is null)
             throw new IdentityRecordNotFoundException();
 
+        if (string.IsNullOrWhiteSpace(request.PhoneNumber) &&
+            string.IsNullOrWhiteSpace(request.Email))
+            throw new ArgumentException("At least one contact method is required.");
+
+        if (!string.IsNullOrWhiteSpace(request.PhoneNumber) &&
+            !Regex.IsMatch(request.PhoneNumber, @"^(\+27|0)[6-8][0-9]{8}$"))
+            throw new InvalidSAPhoneNumberException();
+
+        if (!string.IsNullOrWhiteSpace(request.Email) && !Regex.IsMatch(request.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            throw new ArgumentException("Invalid email address format.", nameof(request.Email));
+
+        if (!string.IsNullOrWhiteSpace(request.Email))
+        {
+            var existingUser = await _onboardingRepository.GetUserByEmailAsync(request.Email);
+
+            if (existingUser is not null)
+                throw new DuplicateEmailRegisteredException();
+        }
+
         var existingCitizen = await _onboardingRepository.GetCitizenBySaIdAsync(request.SaId);
+
         if (existingCitizen is not null)
             throw new DuplicateIdRegisteredException();
 
-        // The activation code is a 6-digit number sent to the citizen out-of-band.
-        // In production this would be sent via SMS or email, not returned in the response.
+
         var activationCode = Random.Shared.Next(100000, 999999).ToString();
 
         var user = new User
@@ -88,9 +99,7 @@ public class OnboardingService : IOnboardingService
             UpdatedAt = DateTime.UtcNow,
         };
 
-        // Repository handles all persistence — the service never touches AppDbContext directly.
-        //Edit once Nathan merges DB changes so that 
-        // await _onboardingRepository.AddUserAsync(user);
+        await _onboardingRepository.AddUserAsync(user);
         await _onboardingRepository.AddCitizenAsync(citizen);
         await _onboardingRepository.SaveChangesAsync();
 
