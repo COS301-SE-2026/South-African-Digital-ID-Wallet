@@ -66,7 +66,7 @@ public class CitizenService : ICitizenService
             CreatedAt = DateTime.UtcNow,
         };
 
-        await _citizenRepository.AddUserAync(user);
+        await _citizenRepository.AddUserAsync(user);
         await _citizenRepository.AddAuditLogAsync(auditLog);
         await _citizenRepository.SaveChangesAsync();
 

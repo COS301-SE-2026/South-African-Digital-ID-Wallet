@@ -30,7 +30,7 @@ public class CitizenRepository : ICitizenRepository
             .FirstOrDefaultAsync(u => u.Email == email);
     }
 
-    public Task AddUserAync(User user)
+    public Task AddUserAsync(User user)
     {
         _context.DomainUsers.Add(user);
         return Task.CompletedTask;
