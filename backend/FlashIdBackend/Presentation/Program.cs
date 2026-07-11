@@ -12,15 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 const string FrontendCorsPolicy = "FrontendCorsPolicy";
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -36,7 +28,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(FrontendCorsPolicy, policy =>
     {
         policy
-            .WithOrigins("http://localhost:3000")
+            .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -86,6 +78,15 @@ builder.Services.AddRateLimiter(options =>
         opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         opt.QueueLimit = 0;
     });
+
+    options.AddFixedWindowLimiter("resend-otp", opt =>
+    {
+        opt.PermitLimit = 3;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 0;
+    });
+
     options.RejectionStatusCode = 429;
 });
 
@@ -100,11 +101,16 @@ if (app.Environment.IsDevelopment())
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    if (!await db.DomainUsers.AnyAsync())
+    await db.Database.MigrateAsync();
+
+    if (app.Environment.IsDevelopment())
     {
-        Console.WriteLine("[SEED] Database is empty, seeding sample data ...");
-        await DbSeeder.SeedAsync(db);
-        Console.WriteLine("[SEED] Database seeded successfully!");
+        if (!await db.DomainUsers.AnyAsync())
+        {
+            Console.WriteLine("[SEED] Database is empty, seeding sample data ...");
+            await DbSeeder.SeedAsync(db);
+            Console.WriteLine("[SEED] Database seeded successfully!");
+        }
     }
 }
 
@@ -115,4 +121,4 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();

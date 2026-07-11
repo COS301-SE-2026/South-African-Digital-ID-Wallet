@@ -8,11 +8,9 @@ public class CitizenRegistrationValidatorTests
 {
     // mock data
     private static RegisterCitizenRequestDto ValidRequest() => new()
-    {                                      // registration requirements
-        SaId = "0001015009087",  // 13 digits
-        Username = "testuser",       // 8+ chars
-        Password = "SecureP@ss1",   // 10+ chars, upper, lower, digit, special
-        ActivationCode = "abc12345",       // non-empty
+    {
+        Email = "natethebait@gmail.com",
+        Password = "P@ssword123"  // NOSONAR - test credential, not a real secret
     };
 
     // sends valid request through the validator, checks that no exception was thrown at all
@@ -23,65 +21,65 @@ public class CitizenRegistrationValidatorTests
         Assert.Null(ex);
     }
 
-    // sets sa id to empty string, checks that correct exception is thrown with a message that contains "SA ID"
+    // test empty email
     [Fact]
-    public void Validate_SaIdEmpty_ThrowsInvalidRequest()
+    public void Validate_EmailEmpty_ThrowsInvalidRequest()
     {
         var req = ValidRequest();
-        req.SaId = "";
+        req.Email = "";
 
         var ex = Assert.Throws<InvalidCitizenRegistrationRequestException>(
             () => CitizenRegistrationValidator.Validate(req));
 
-        Assert.Contains("SA ID", ex.Message);
+        Assert.Contains("Email", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
-    // test sa id too short, mentions "13" in the message
+    // test email white space
     [Fact]
-    public void Validate_SaIdTooShort_ThrowsInvalidRequest()
+    public void Validate_EmailWhitespace_ThrowsInvalidRequest()
     {
         var req = ValidRequest();
-        req.SaId = "123456";
-
-        var ex = Assert.Throws<InvalidCitizenRegistrationRequestException>(
-            () => CitizenRegistrationValidator.Validate(req));
-
-        Assert.Contains("13", ex.Message);
-    }
-
-    // sa id is 13 chars but contains letters, checks that the validator rejects non-numeric input
-    [Fact]
-    public void Validate_SaIdContainsLetters_ThrowsInvalidRequest()
-    {
-        var req = ValidRequest();
-        req.SaId = "00010150090AB";   // 13 chars but not all digits
+        req.Email = "    ";
 
         Assert.Throws<InvalidCitizenRegistrationRequestException>(
             () => CitizenRegistrationValidator.Validate(req));
     }
 
-    // username is only 3 chars, checks that the validator rejects usernames shorter than 8, mentions "8" in the message
+    // test invalid email format
     [Fact]
-    public void Validate_UsernameTooShort_ThrowsInvalidRequest()
+    public void Validate_EmailInvalidFormat_ThrowsInvalidRequest()
     {
         var req = ValidRequest();
-        req.Username = "abc";   // only 3 chars
+        req.Email = "invalid-email";
 
         var ex = Assert.Throws<InvalidCitizenRegistrationRequestException>(
             () => CitizenRegistrationValidator.Validate(req));
 
-        Assert.Contains("8", ex.Message);
+        Assert.Contains("email", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
-    // username contains a space, checks that the validator rejects usernames with whitespace
+    // test email missing '@'
     [Fact]
-    public void Validate_UsernameContainsSpace_ThrowsInvalidRequest()
+    public void Validate_EmailMissingAtSign_ThrowsInvalidRequest()
     {
         var req = ValidRequest();
-        req.Username = "test user";
+        req.Email = "examplegmail.com";
 
         Assert.Throws<InvalidCitizenRegistrationRequestException>(
             () => CitizenRegistrationValidator.Validate(req));
+    }
+
+    // test empty password
+    [Fact]
+    public void Validate_PasswordEmpty_ThrowsInvalidRequest()
+    {
+        var req = ValidRequest();
+        req.Password = "";
+
+        var ex = Assert.Throws<InvalidCitizenRegistrationRequestException>(
+            () => CitizenRegistrationValidator.Validate(req));
+
+        Assert.Contains("Password", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     // password is only 7 chars, checks that the validator rejects passwords shorter than 10, mentions "10" in the message
@@ -141,16 +139,26 @@ public class CitizenRegistrationValidatorTests
             () => CitizenRegistrationValidator.Validate(req));
     }
 
-    // activation code is empty, checks that the validator requires a non-empty activation code
     [Fact]
-    public void Validate_ActivationCodeEmpty_ThrowsInvalidRequest()
+    public void Validate_PasswordOnlyAllowedSpecialChars_DoesNotThrow()
+    {
+        var allowed = new[] { '!', '@', '#', '$', '%', '^', '&', '*', '_', '+', '-', '=', '.', '<', '>', '?', '~' };
+        foreach (var character in allowed)
+        {
+            var req = ValidRequest();
+            req.Password = $"Password12{character}";
+            var ex = Record.Exception(() => CitizenRegistrationValidator.Validate(req));
+            Assert.Null(ex);
+        }
+    }
+
+    [Fact]
+    public void Validate_PasswordWithDisallowedSpecialChar_ThrowsInvalidRequest()
     {
         var req = ValidRequest();
-        req.ActivationCode = "";
+        req.Password = "Password(23";
 
-        var ex = Assert.Throws<InvalidCitizenRegistrationRequestException>(
+        Assert.Throws<InvalidCitizenRegistrationRequestException>(
             () => CitizenRegistrationValidator.Validate(req));
-
-        Assert.Contains("Activation code", ex.Message);
     }
 }

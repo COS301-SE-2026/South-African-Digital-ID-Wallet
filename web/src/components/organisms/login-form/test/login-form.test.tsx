@@ -48,6 +48,7 @@ describe('LoginForm', () => {
     expect(onSubmit).toHaveBeenCalledWith({
       email: 'test@example.com',
       password: 'secret123',
+      rememberMe: false,
     })
   })
 
