@@ -6,7 +6,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>tests</RootNamespace>
     <TargetFramework>net10.0</TargetFramework>
-    <!-- <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport> -->
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,12 +18,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="xunit.v3" Version="3.2.2" />
-    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.8" />
+    <PackageReference Include="xunit.v3.mtp-v2" Version="3.2.2" />
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
+    <ProjectReference Include="..\Presentation\Presentation.csproj" />
   </ItemGroup>
 
+  
 </Project>
