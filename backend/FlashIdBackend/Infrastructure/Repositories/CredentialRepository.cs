@@ -22,4 +22,14 @@ public class CredentialRepository : ICredentialRepository
             .Include(c => c.DriversLicense)
             .FirstOrDefaultAsync(c => c.Id == id);
     }
+
+    public async Task<List<Credential>> GetByUserIdAsync(Guid userId)
+    {
+        return await _context.Credentials
+            .Include(c => c.Citizen)
+            .Include(c => c.IdentityDocument)
+            .Include(c => c.DriversLicense)
+            .Where(c => c.Citizen.UserId == userId)
+            .ToListAsync();
+    }
 }

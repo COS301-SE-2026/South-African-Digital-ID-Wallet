@@ -47,4 +47,22 @@ public class CredentialsController : ControllerBase
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
+
+    [HttpGet("mine")]
+    public async Task<IActionResult> GetMyCredentials()
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
+
+            var userId = Guid.Parse(userIdClaim);
+            var result = await _qrService.GetMyCredentialsAsync(userId);
+            return Ok(result);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
 }

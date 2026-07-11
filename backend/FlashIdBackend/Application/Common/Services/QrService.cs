@@ -76,4 +76,18 @@ public class QrService : IQrService
         public string Payload { get; set; } = string.Empty;
         public string Signature { get; set; } = string.Empty;
     }
+
+    public async Task<List<CredentialSummaryDto>> GetMyCredentialsAsync(Guid userId)
+    {
+        var credentials = await _credentialRepository.GetByUserIdAsync(userId);
+
+        return credentials
+            .Where(c => c.Status == CredentialStatus.Active)
+            .Select(c => new CredentialSummaryDto
+            {
+                Id = c.Id,
+                CredentialType = c.IdentityDocument != null ? "Identity Document" : "Driver's License",
+            })
+            .ToList();
+    }
 }
