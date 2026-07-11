@@ -85,9 +85,10 @@ export default function SelectFieldsScreen() {
   }
 
   const setSelection = useQrDisclosureStore((state) => state.setSelection)
-
+  const credentialId = useQrDisclosureStore((state) => state.credentialId)
   const handleContinue = () => {
     setSelection({
+      credentialId,
       credentialType,
       mandatoryFields,
       selectedOptionalFields: optionalFields.filter(
