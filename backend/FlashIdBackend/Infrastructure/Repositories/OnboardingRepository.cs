@@ -24,12 +24,6 @@ public class OnboardingRepository : IOnboardingRepository //IMPLEMENTS Applicati
         return await _context.DomainUsers.FirstOrDefaultAsync(u => u.Email == email);
     }
 
-    public Task AddUserAsync(User user)
-    {
-        _context.DomainUsers.Add(user);
-        return Task.CompletedTask;
-    }
-
     public Task AddCitizenAsync(Citizen citizen)
     {
         _context.Citizens.Add(citizen);
@@ -39,6 +33,12 @@ public class OnboardingRepository : IOnboardingRepository //IMPLEMENTS Applicati
     public Task AddAuditLogAsync(AuditLog auditLog)
     {
         _context.AuditLogs.Add(auditLog);
+        return Task.CompletedTask;
+    }
+
+    public Task AddActivationAsync(CitizenActivation citizenActivation)
+    {
+        _context.CitizenActivations.Add(citizenActivation);
         return Task.CompletedTask;
     }
 

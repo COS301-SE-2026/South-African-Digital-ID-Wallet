@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using Application.Features.Onboarding.Dtos;
 using Application.Features.Onboarding.Exceptions;
@@ -64,8 +66,8 @@ public class OnboardingService : IOnboardingService
         if (citizenRecord is null)
             throw new IdentityRecordNotFoundException();
 
-        if (email is null && phoneNumber is null)
-            throw new ArgumentException("At least one contact method is required.");
+        if (email is null)
+            throw new ArgumentException("Email is required.");
 
         if (phoneNumber is not null &&
             !Regex.IsMatch(phoneNumber, @"^(\+27)[6-8][0-9]{8}$"))
@@ -87,22 +89,7 @@ public class OnboardingService : IOnboardingService
         if (existingCitizen is not null)
             throw new DuplicateIdRegisteredException();
 
-
-        var activationCode = Random.Shared.Next(100000, 999999).ToString();
-
         var now = DateTime.UtcNow;
-
-        var user = new User
-        {
-            Id = Guid.NewGuid(),
-            Email = email,
-            PhoneNumber = phoneNumber,
-            Role = UserRole.Citizen,
-            IsEmailVerified = false,
-            IsDeleted = false,
-            CreatedAt = now,
-            UpdatedAt = now,
-        };
 
         var citizen = new Citizen
         {
@@ -110,22 +97,35 @@ public class OnboardingService : IOnboardingService
             SaId = citizenRecord.SaId,
             Names = citizenRecord.Names,
             Surname = citizenRecord.Surname,
-            UserId = user.Id,
+            DateOfBirth = citizenRecord.DateOfBirth,
+            Gender = Enum.TryParse<Gender>(
+                citizenRecord.Gender,
+                ignoreCase: true,
+                out var parsedGender)
+                ? parsedGender
+                : Gender.Unspecified,
             Status = CitizenStatus.Pending,
             CreatedAt = now,
             UpdatedAt = now,
         };
 
+        var rawToken = GenerateSecureToken();
+        var rawPin = GenerateSecurePin();
+
         var activation = new CitizenActivation()
         {
             Id = Guid.NewGuid(),
             CitizenId = citizen.Id,
-            TokenHash = Random.Shared.Next(100000, 999999).ToString(),
-            PinHash = Random.Shared.Next(100000, 999999).ToString(),
-            ExpiresAt = now.AddMinutes(180),
+            Email = email,
+            PhoneNumber = (phoneNumber is null) ? null : phoneNumber,
+            TokenHash = HashToken(rawToken),
+            PinHash = HashPin(rawPin),
+            ExpiresAt = now.AddHours(48),
             AttemptCount = 0,
             CreatedAt = now,
         };
+
+        citizen.Activations.Add(activation);
 
         var consentAudit = new AuditLog
         {
@@ -149,18 +149,47 @@ public class OnboardingService : IOnboardingService
 
         await _onboardingRepository.AddAuditLogAsync(consentAudit);
         await _onboardingRepository.AddAuditLogAsync(onboardAudit);
-        await _onboardingRepository.AddUserAsync(user);
         await _onboardingRepository.AddCitizenAsync(citizen);
+        await _onboardingRepository.AddActivationAsync(activation);
         await _onboardingRepository.SaveChangesAsync();
 
         return new OnboardCitizenResponse
         {
             CitizenId = citizen.Id,
             SaId = citizenRecord.SaId,
-            ActivationCode = activationCode,
-            ActivationCodeExpiresAt = activation.ExpiresAt,
+            ActivationPin = rawPin,
+            ActivationExpiresAt = activation.ExpiresAt,
             Status = "Pending",
         };
+    }
+
+    private static string GenerateSecureToken()
+    {
+        var tokenBytes = RandomNumberGenerator.GetBytes(32);
+        return Convert.ToHexString(tokenBytes);
+    }
+
+    private static string GenerateSecurePin()
+    {
+        var pin = RandomNumberGenerator.GetInt32(0, 1_000_000);
+        return pin.ToString("D6");
+    }
+
+    private static string HashToken(string rawToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(rawToken);
+
+        var tokenBytes = Encoding.UTF8.GetBytes(rawToken);
+        var hashBytes = SHA256.HashData(tokenBytes);
+
+        return Convert.ToHexString(hashBytes);
+    }
+
+    private static string HashPin(string rawPin)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(rawPin);
+
+        return BCrypt.Net.BCrypt.HashPassword(rawPin, workFactor: 12);
     }
 
 }
