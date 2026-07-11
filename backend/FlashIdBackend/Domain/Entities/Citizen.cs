@@ -14,11 +14,12 @@ public class Citizen : BaseEntity
 
     public Gender Gender { get; set; } = Gender.Unspecified;
 
-    public string? CredentialActivationCode { get; set; }
-
-    public DateTime? CredentialActivationCodeExpiresAt { get; set; }
-
     public CitizenStatus Status { get; set; }
+
+    public DateTime? ActivatedAt { get; set; }
+
+    public ICollection<CitizenActivation> Activations { get; set; }
+        = new List<CitizenActivation>();
 
     // navigation properties
     public Guid? UserId { get; set; }

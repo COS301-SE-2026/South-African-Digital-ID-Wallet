@@ -112,10 +112,19 @@ public class OnboardingService : IOnboardingService
             Surname = citizenRecord.Surname,
             UserId = user.Id,
             Status = CitizenStatus.Pending,
-            CredentialActivationCode = activationCode,
-            CredentialActivationCodeExpiresAt = now.AddMinutes(15),
             CreatedAt = now,
             UpdatedAt = now,
+        };
+
+        var activation = new CitizenActivation()
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            TokenHash = Random.Shared.Next(100000, 999999).ToString(),
+            PinHash = Random.Shared.Next(100000, 999999).ToString(),
+            ExpiresAt = now.AddMinutes(180),
+            AttemptCount = 0,
+            CreatedAt = now,
         };
 
         var consentAudit = new AuditLog
@@ -149,7 +158,7 @@ public class OnboardingService : IOnboardingService
             CitizenId = citizen.Id,
             SaId = citizenRecord.SaId,
             ActivationCode = activationCode,
-            ActivationCodeExpiresAt = citizen.CredentialActivationCodeExpiresAt,
+            ActivationCodeExpiresAt = activation.ExpiresAt,
             Status = "Pending",
         };
     }
