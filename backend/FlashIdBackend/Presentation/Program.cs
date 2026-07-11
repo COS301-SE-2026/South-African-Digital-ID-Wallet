@@ -12,15 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 const string FrontendCorsPolicy = "FrontendCorsPolicy";
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -36,7 +28,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(FrontendCorsPolicy, policy =>
     {
         policy
-            .WithOrigins("http://localhost:3000")
+            .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -129,4 +121,4 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();

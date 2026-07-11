@@ -56,7 +56,7 @@ export const VerifyEmailForm = () => {
     },
   })
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (code.length !== 6) {
       toast.error('Enter the 6-digit code')

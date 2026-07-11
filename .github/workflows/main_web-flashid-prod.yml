@@ -1,0 +1,48 @@
+name: Build and deploy web app to Azure Web App - web-flashid-prod
+
+on: 
+  push:
+    branches: 
+      - main
+      - feature/web-deployment-prod
+    paths:
+      - "web/**"
+      - "pnpm-lock.yaml"
+      - "dockerfile.web"
+      - ".github/workflows/main_web-flashid-prod.yml"
+  workflow_dispatch:
+
+env:
+  ACR_NAME: acrflashid
+  IMAGE_NAME: web-flashid
+
+jobs:
+  deploy-main:
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feature/web-deployment-prod'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to ACR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ env.ACR_NAME }}.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and push prod image
+        run: |
+          docker build -f dockerfile.web \
+            --build-arg NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL_PROD }} \
+            -t ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:prod-${{ github.sha }} \
+            -t ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:prod-latest \
+            .
+          docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:prod-${{ github.sha }}
+          docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:prod-latest
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@02a81bead70021f5284939794bcec79c271ab383 # v3
+        with:
+          app-name: 'web-flashid-prod'
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_WEB_PROD }}
+          images: '${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:prod-${{ github.sha }}'
