@@ -135,8 +135,6 @@ public static class DbSeeder
                 Surname = LastNames[nameRnd.Next(LastNames.Length)],
                 DateOfBirth = now.AddYears(-nameRnd.Next(16, 70)).AddDays(-nameRnd.Next(0, 365)),
                 Gender = genders[nameRnd.Next(genders.Length)],
-                CredentialActivationCode = null,
-                CredentialActivationCodeExpiresAt = null,
                 Status = CitizenStatus.Activated,
                 UserId = u.Id,
                 CreatedAt = now,
