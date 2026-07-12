@@ -1,6 +1,8 @@
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Infrastructure.Data;
 
@@ -51,6 +53,7 @@ public static class DbSeeder
         var usedPhones = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         await SeedCitizenUsersAsync(context, usedEmails, usedPhones);
+        await SeedPendingCitizenActivationAsync(context);
         // Government administrators must exist before creating institutions or officials
         await SeedGovernmentAdministratorUsersAsync(context, usedEmails, usedPhones);
         await SeedOfficialUsersAsync(context, usedEmails, usedPhones);
@@ -136,6 +139,7 @@ public static class DbSeeder
                 DateOfBirth = now.AddYears(-nameRnd.Next(16, 70)).AddDays(-nameRnd.Next(0, 365)),
                 Gender = genders[nameRnd.Next(genders.Length)],
                 Status = CitizenStatus.Activated,
+                ActivatedAt = now,
                 UserId = u.Id,
                 CreatedAt = now,
                 UpdatedAt = now
@@ -147,6 +151,106 @@ public static class DbSeeder
             await context.Citizens.AddRangeAsync(citizensToAdd);
             await context.SaveChangesAsync();
         }
+    }
+
+    private static async Task SeedPendingCitizenActivationAsync(
+    AppDbContext context)
+    {
+        const string testEmail =
+            "pending.citizen@flashid.local";
+
+        const string testSaId =
+            "9901015009087";
+
+        if (await context.CitizenActivations.AnyAsync(
+                a => a.Email == testEmail))
+        {
+            return;
+        }
+
+        if (await context.Citizens.AnyAsync(
+                c => c.SaId == testSaId))
+        {
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+
+        const string rawToken =
+            "FLASHID-SEED-ACTIVATION-TOKEN";
+
+        const string rawPin =
+            "123456";
+
+        var tokenBytes =
+            Encoding.UTF8.GetBytes(rawToken);
+
+        var tokenHash = Convert.ToHexString(
+            SHA256.HashData(tokenBytes));
+
+        var pinHash = BCrypt.Net.BCrypt.HashPassword(
+            rawPin,
+            workFactor: 12);
+
+        var citizen = new Citizen
+        {
+            Id = Guid.NewGuid(),
+
+            SaId = testSaId,
+            Names = "Pending",
+            Surname = "Citizen",
+
+            DateOfBirth = new DateTime(
+                1999,
+                1,
+                1,
+                0,
+                0,
+                0,
+                DateTimeKind.Utc),
+
+            Gender = Gender.Unspecified,
+
+            Status = CitizenStatus.Pending,
+            ActivatedAt = null,
+
+            UserId = null,
+
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+
+        var activation = new CitizenActivation
+        {
+            Id = Guid.NewGuid(),
+
+            CitizenId = citizen.Id,
+
+            Email = testEmail,
+            PhoneNumber = null,
+
+            TokenHash = tokenHash,
+            PinHash = pinHash,
+
+            Status = ActivationStatus.Pending,
+
+            ExpiresAt = now.AddDays(30),
+
+            AttemptCount = 0,
+            LockedUntil = null,
+
+            UsedAt = null,
+            RevokedAt = null,
+            RevokedReason = null,
+
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+
+        await context.Citizens.AddAsync(citizen);
+        await context.CitizenActivations.AddAsync(activation);
+
+        await context.SaveChangesAsync();
     }
 
     private static async Task SeedOfficialUsersAsync(AppDbContext context, HashSet<string> usedEmails, HashSet<string> usedPhones)
@@ -365,6 +469,7 @@ public static class DbSeeder
                 Email = email,
                 PhoneNumber = phone,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
+                PasswordSet = true,
                 FailedLoginAttempts = 0,
                 LockoutUntil = null,
                 LastLoginAt = null,

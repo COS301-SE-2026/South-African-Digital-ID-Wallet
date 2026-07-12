@@ -4,22 +4,27 @@ using System.Text.RegularExpressions;
 using Application.Features.Onboarding.Dtos;
 using Application.Features.Onboarding.Exceptions;
 using Application.Common.Interfaces.GatewayInterfaces;
+using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Domain.Entities;
 using Domain.Enums;
+using Microsoft.Extensions.Configuration;
 
 namespace Application.Common.Services;
 
 public class OnboardingService : IOnboardingService
 {
     private readonly IOnboardingRepository _onboardingRepository;
-
     private readonly IGovernmentRegistryGateway _governmentRegistryGateway;
-    public OnboardingService(IOnboardingRepository registryService, IGovernmentRegistryGateway governmentRegistryGateway)
+    private readonly IEmailSenderProvider _emailSenderProvider;
+    private readonly IConfiguration _configuration;
+    public OnboardingService(IOnboardingRepository registryService, IGovernmentRegistryGateway governmentRegistryGateway, IEmailSenderProvider emailSenderProvider, IConfiguration configuration)
     {
         _onboardingRepository = registryService;
         _governmentRegistryGateway = governmentRegistryGateway;
+        _emailSenderProvider = emailSenderProvider;
+        _configuration = configuration;
     }
 
     public async Task<VerifiedCitizenRecordResponse> VerifyCitizenIdentityAsync(string saId)
@@ -125,8 +130,6 @@ public class OnboardingService : IOnboardingService
             CreatedAt = now,
         };
 
-        citizen.Activations.Add(activation);
-
         var consentAudit = new AuditLog
         {
             Id = Guid.NewGuid(),
@@ -134,14 +137,14 @@ public class OnboardingService : IOnboardingService
             Details = $"POPIA Section 11 consent recorded during onboarding for citizen {citizenRecord.SaId}.",
             ActorId = officialId,
             IpAddress = ipAddress,
-            CreatedAt = now
+            CreatedAt = now,
         };
 
         var onboardAudit = new AuditLog
         {
             Id = Guid.NewGuid(),
             EventType = AuditEventType.OnboardCitizen,
-            Details = $"Citizen, {citizenRecord.SaId}, has been onboarded into FlashID system with pending account by Home Affairs Official, {officialId}.",
+            Details = $"Citizen, {citizenRecord.SaId}, has been onboarded into FlashID system with a pending account by Home Affairs Official, {officialId}.",
             ActorId = officialId,
             IpAddress = ipAddress,
             CreatedAt = now
@@ -152,6 +155,11 @@ public class OnboardingService : IOnboardingService
         await _onboardingRepository.AddCitizenAsync(citizen);
         await _onboardingRepository.AddActivationAsync(activation);
         await _onboardingRepository.SaveChangesAsync();
+
+        var activationLink = BuildActivationLink(rawToken);
+        var message = $"Please find attached your activation link : {activationLink}";
+
+        await _emailSenderProvider.SendEmailAsync(email, "FlashID", message);
 
         return new OnboardCitizenResponse
         {
@@ -178,18 +186,33 @@ public class OnboardingService : IOnboardingService
     private static string HashToken(string rawToken)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(rawToken);
-
         var tokenBytes = Encoding.UTF8.GetBytes(rawToken);
         var hashBytes = SHA256.HashData(tokenBytes);
-
         return Convert.ToHexString(hashBytes);
     }
 
     private static string HashPin(string rawPin)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(rawPin);
-
         return BCrypt.Net.BCrypt.HashPassword(rawPin, workFactor: 12);
+    }
+
+    private string BuildActivationLink(string rawToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(rawToken);
+
+        var frontendUrl = _configuration["Activation:FrontendBaseUrl"];
+
+        if (string.IsNullOrWhiteSpace(frontendUrl))
+        {
+            throw new InvalidOperationException("Activation frontend URL is not configured.");
+        }
+
+        var baseUrl = frontendUrl.TrimEnd('/');
+
+        var encodedToken = Uri.EscapeDataString(rawToken);
+
+        return $"{baseUrl}/activate?encodedToken={encodedToken}";
     }
 
 }
