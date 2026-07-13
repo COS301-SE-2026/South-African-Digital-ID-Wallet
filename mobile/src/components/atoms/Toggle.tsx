@@ -44,6 +44,8 @@ export function Toggle({
     <Pressable
       onPress={handlePress}
       disabled={disabled}
+      accessibilityRole="switch"
+      accessibilityState={{ disabled, checked: value }}
       style={[
         styles.track,
         {
