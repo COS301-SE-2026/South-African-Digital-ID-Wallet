@@ -1,9 +1,6 @@
-using Application.Common.Interfaces;
-using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Mapping;
 using Application.Common.Services;
-using Infrastructure.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;

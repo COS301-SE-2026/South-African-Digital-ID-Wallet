@@ -11,11 +11,6 @@ public class CredentialConfiguration : IEntityTypeConfiguration<Credential>
     {
         builder.HasKey(c => c.Id);
 
-        builder.Property(c => c.Gender)
-            .IsRequired()
-            .HasConversion<string>()
-            .HasMaxLength(20);
-
         builder.Property(c => c.Status)
             .IsRequired()
             .HasConversion<string>();
@@ -27,6 +22,10 @@ public class CredentialConfiguration : IEntityTypeConfiguration<Credential>
         builder.Property(c => c.IssuedBy)
             .IsRequired()
             .HasMaxLength(256);
+
+        builder.Property(c => c.IssueDate)
+            .IsRequired()
+            .HasColumnType("datetime2");
 
         builder.Property(c => c.CreatedAt)
             .IsRequired()
@@ -62,6 +61,15 @@ public class CredentialConfiguration : IEntityTypeConfiguration<Credential>
             .WithOne(b => b.Credential)
             .HasForeignKey<Biometrics>(b => b.CredentialId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Property(c => c.IdFrontImagePath)
+            .HasMaxLength(512);
+
+        builder.Property(c => c.IdBackImagePath)
+            .HasMaxLength(512);
+
+        builder.Property(c => c.SelfieImagePath)
+            .HasMaxLength(512);
     }
 }
 

@@ -28,10 +28,6 @@ public class IdentityDocumentConfiguration : IEntityTypeConfiguration<IdentityDo
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(i => i.DateOfBirth)
-            .IsRequired()
-            .HasColumnType("datetime2");
-
         builder.Property(i => i.CreatedAt)
             .IsRequired()
             .HasColumnType("datetime2")
@@ -43,6 +39,10 @@ public class IdentityDocumentConfiguration : IEntityTypeConfiguration<IdentityDo
             .HasColumnType("datetime2")
             .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAddOrUpdate();
+
+        builder.Property(i => i.PhotoPath)
+            .IsRequired()
+            .HasMaxLength(512);
 
         builder.Property(i => i.CredentialId)
             .IsRequired();

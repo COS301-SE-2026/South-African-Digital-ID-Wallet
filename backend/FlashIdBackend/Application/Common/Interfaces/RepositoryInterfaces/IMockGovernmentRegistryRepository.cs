@@ -1,6 +1,6 @@
 using Application.Features.Onboarding.Dtos;
 
-namespace Application.Common.Interfaces.ServiceInterfaces;
+namespace Application.Common.Interfaces.RepositoryInterfaces;
 
 public interface IMockGovernmentRegistryRepository
 {

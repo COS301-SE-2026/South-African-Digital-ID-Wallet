@@ -1,7 +1,7 @@
-using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Features.Onboarding.Dtos;
 
-namespace Infrastructure.Services;
+namespace Infrastructure.Repositories;
 
 public class MockGovernmentRegistryRepository : IMockGovernmentRegistryRepository
 {

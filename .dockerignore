@@ -1,0 +1,15 @@
+**/node_modules
+**/.next
+**/dist
+**/build
+**/.git
+**/.env
+**/.env.local
+**/.env.*.local
+!**/.env.example
+**/coverage
+**/.vscode
+**/.idea
+backend
+mobile
+docs

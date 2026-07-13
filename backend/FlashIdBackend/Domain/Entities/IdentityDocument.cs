@@ -14,11 +14,11 @@ public class IdentityDocument
 
     public string Nationality { get; set; } = string.Empty;
 
-    public DateTime DateOfBirth { get; set; }
-
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
+
+    public string PhotoPath { get; set; } = string.Empty;
 
     // Navigation property back to Credential
     public Guid CredentialId { get; set; }
