@@ -279,7 +279,7 @@ The system shall associate verification records with authenticated officials.
 The system shall allow citizens to select which credential fields are included in a QR code payload before generation.
 
 ##### R3.4.2:
-The system shall enforce a mandatory minimum set of fields that cannot be excluded from any QR code payload. The mandatory fields are: full name, SA ID number, date of birth, and photo. The photo enables the verifying official to visually cross-reference the credential against the person presenting it, reducing the risk of a credential being presented by someone other than its rightful holder.
+The system shall enforce a mandatory minimum set of fields per credential type that cannot be excluded from any QR code payload. For an identity document, the mandatory fields are: identity number, full surname, full forenames, date of birth, citizenship status, and photograph. For a driver's license, the mandatory fields are: full name, SA ID number, photo, license number, license code, expiry date, and country of issue. The photograph enables the verifying official to visually cross-reference the credential against the person presenting it, reducing the risk of a credential being presented by someone other than its rightful holder.
 
 ##### R3.4.3:
 The system shall display a pre-generation preview to the citizen showing exactly which fields will be visible to the verifier before the QR code is generated.
@@ -287,6 +287,8 @@ The system shall display a pre-generation preview to the citizen showing exactly
 ##### R3.4.4:
 The system shall allow citizens to save preferred disclosure settings per credential type and per verifier type (hospital, police, Home Affairs, DLTC).
 
+##### R3.4.5:
+The system shall provide a "select all" action allowing citizens to quickly disclose all optional fields when the credential is being presented to an official, such as a police officer, who is legally entitled to view the complete record under the National Road Traffic Act.
 ---
 
 #### R3.5: Additional Disclosure Request Flow
