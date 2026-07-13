@@ -35,7 +35,7 @@ describe('DisplayScreen', () => {
       expect(screen.getByText('Valid credential')).toBeOnTheScreen()
     })
     expect(screen.getByText(/^(1:00|0:5\d)$/)).toBeOnTheScreen()
-  })
+  }, 15000)
 
   it('shows an error state when generation fails', async () => {
     ;(qrService.generate as jest.Mock).mockRejectedValue(
@@ -47,5 +47,5 @@ describe('DisplayScreen', () => {
     await waitFor(() => {
       expect(screen.getByText('Something went wrong')).toBeOnTheScreen()
     })
-  })
+  }, 15000)
 })

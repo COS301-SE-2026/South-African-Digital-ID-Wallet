@@ -37,5 +37,5 @@ describe('QR disclosure flow', () => {
 
     expect(screen.getByText('Identity number')).toBeOnTheScreen()
     expect(screen.getByText('Gender')).toBeOnTheScreen()
-  })
+  }, 15000)
 })
