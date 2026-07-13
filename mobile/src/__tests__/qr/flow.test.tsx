@@ -1,9 +1,4 @@
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-} from '@testing-library/react-native'
+import { render, screen, fireEvent } from '@testing-library/react-native'
 import SelectFieldsScreen from '@/app/qr/select-fields'
 import PreviewScreen from '@/app/qr/preview'
 import { useQrDisclosureStore } from '@/stores/qrDisclosureStore'
