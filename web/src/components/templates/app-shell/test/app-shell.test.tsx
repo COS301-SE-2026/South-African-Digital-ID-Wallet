@@ -9,6 +9,20 @@ jest.mock('next/navigation', () => ({
   }),
 }))
 
+jest.mock('@/context/user-context', () => ({
+  useUser: jest.fn().mockReturnValue({
+    user: {
+      role: 'Official',
+      names: 'Test',
+      surname: 'User',
+      email: 'test@example.com',
+      userId: '12345678',
+    },
+    loading: false,
+    logout: jest.fn(),
+  }),
+}))
+
 describe('AppShell', () => {
   it('renders the correct page header for the current pathname', () => {
     render(
