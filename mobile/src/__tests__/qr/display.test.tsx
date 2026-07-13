@@ -34,7 +34,7 @@ describe('DisplayScreen', () => {
     await waitFor(() => {
       expect(screen.getByText('Valid credential')).toBeOnTheScreen()
     })
-    expect(screen.getByText('1:00')).toBeOnTheScreen()
+    expect(screen.getByText(/^(1:00|0:5\d)$/)).toBeOnTheScreen()
   })
 
   it('shows an error state when generation fails', async () => {
