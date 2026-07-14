@@ -80,7 +80,7 @@ export default function OnboardCitizenPage() {
     await retrieveRecord(result.data.idNumber)
   }
 
-  function createPendingAccount() {
+  const createPendingAccount = async () => {
     if (!record) {
       toast.error('Retrieve the citizen record first')
       return
@@ -90,11 +90,31 @@ export default function OnboardCitizenPage() {
     const firstName = nameParts[0] ?? ''
     const lastName = nameParts.slice(1).join(' ') || 'Unknown'
 
-    onboardCitizen({
-      idNumber: record.idNumber,
+    const result = onboardingSchema.safeParse({
+      phone,
       email,
-      phoneNumber: phone,
-      consentProvided: contactDetailsConsent,
+      contactDetailsConsent,
+      idConsent,
+    })
+
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors
+
+      setErrors({
+        phone: fieldErrors.phone?.[0] ?? '',
+        email: fieldErrors.email?.[0] ?? '',
+        contactDetailsConsent: fieldErrors.contactDetailsConsent?.[0] ?? '',
+        idConsent: fieldErrors.idConsent?.[0] ?? '',
+      })
+
+      return
+    }
+
+    await onboardCitizen({
+      idNumber: record.idNumber,
+      email: result.data.email,
+      phoneNumber: result.data.phone,
+      consentProvided: result.data.contactDetailsConsent,
     })
   }
 
