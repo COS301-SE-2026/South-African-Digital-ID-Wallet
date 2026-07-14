@@ -46,7 +46,7 @@ export const RetrieveIdentityRecord = ({
           />
 
           {errors.idNumber && (
-            <div className="mt-2 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2">
+            <div className="mt-2 flex items-center gap-2 rounded-md border border-danger-red/55 bg-danger-red/5 px-3 py-2">
               <span className="text-danger-red">
                 <ShieldAlert className="h=1 w=1" />
               </span>
@@ -75,7 +75,7 @@ export const RetrieveIdentityRecord = ({
           </label>
 
           {errors.idConsent && (
-            <div className="mt-2 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2">
+            <div className="mt-2 flex items-center gap-2 rounded-md border border-danger-red/55 bg-danger-red/5 px-3 py-2">
               <span className="text-danger-red">
                 <ShieldAlert className="h=1 w=1" />
               </span>

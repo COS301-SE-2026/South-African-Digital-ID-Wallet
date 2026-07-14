@@ -6,6 +6,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import type { CaptureContactDetailsProps } from './types'
+import { UserRoundPlus } from 'lucide-react'
+
+import toast from 'react-hot-toast'
 
 export const CaptureContactDetails = ({
   record,
@@ -53,7 +56,7 @@ export const CaptureContactDetails = ({
             </div>
 
             {errors.phone && (
-              <div className="mt-2 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2">
+              <div className="mt-2 flex items-center gap-2 rounded-md border border-danger-red/55 bg-danger-red/5 px-3 py-2">
                 <span className="text-danger-red">
                   <ShieldAlert className="h=1 w=1" />
                 </span>
@@ -82,7 +85,7 @@ export const CaptureContactDetails = ({
             </div>
 
             {errors.email && (
-              <div className="mt-2 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2">
+              <div className="mt-2 flex items-center gap-2 rounded-md border border-danger-red/55 bg-danger-red/5 px-3 py-2">
                 <span className="text-danger-red">
                   <ShieldAlert className="h=1 w=1" />
                 </span>
@@ -114,7 +117,7 @@ export const CaptureContactDetails = ({
         </label>
 
         {errors.contactDetailsConsent && (
-          <div className="mt-2 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2">
+          <div className="mt-2 flex items-center gap-2 rounded-md border border-danger-red/55 bg-danger-red/5 px-3 py-2">
             <span className="text-danger-red">
               <ShieldAlert className="h=1 w=1" />
             </span>
@@ -136,6 +139,28 @@ export const CaptureContactDetails = ({
         >
           Create Pending FlashID Account
         </Button>
+
+        {accountCreated && onboardResponse && (
+          <div className="rounded-2xl border border-success-green/70 bg-success-green/10 p-5 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="flex h-15 w-15 items-center justify-center rounded-full bg-success-green/20">
+                <span className="text-xl text-success-green/100">
+                  <UserRoundPlus className="h=10 w=10" />
+                </span>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-success-green/100">
+                  Citizen onboarded successfully
+                </h3>
+
+                <p className="text-sm text-success-green/90">
+                  The pending FlashID account has been created.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* <Button
           className="w-full"

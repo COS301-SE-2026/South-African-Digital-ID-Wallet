@@ -58,6 +58,7 @@ export default function OnboardCitizenPage() {
       toast.success('Pending FlashID account created')
     },
     onError: () => {
+      setOnboardResponse(null)
       toast.error('Could not create pending FlashID account')
     },
   })
