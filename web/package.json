@@ -12,7 +12,10 @@
     "format:check": "prettier --check .",
     "type-check": "tsc --noEmit",
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@hookform/error-message": "2.0.1",
@@ -49,6 +52,7 @@
     "zustand": "5.0.12"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "4",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.2",
@@ -57,7 +61,7 @@
     "@types/node": "20",
     "@types/react": "19",
     "@types/react-dom": "19",
-    "cypress": "15.14.2",
+    "dotenv": "^17.4.2",
     "eslint": "9",
     "eslint-config-next": "16.2.4",
     "eslint-config-prettier": "10.1.8",
