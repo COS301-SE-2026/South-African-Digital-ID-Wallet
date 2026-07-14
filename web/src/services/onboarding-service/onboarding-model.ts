@@ -1,20 +1,15 @@
 import { IdentityRecord } from '@/types'
-import { IdentityRecordStatus, IdentityRecordBackendResponse } from './types'
+import { IdentityRecordStatus } from './types'
 
 const mapStatus = (status?: string): IdentityRecordStatus => {
   return status === 'Not Found' ? 'Not Found' : 'Verified'
 }
 
-export const identityRecordModel = (
-  row: IdentityRecordBackendResponse
-): IdentityRecord => {
-  const firstName = row.firstName ?? row.names ?? ''
-  const surname = row.surname ?? row.lastName ?? ''
-
+export const identityRecordModel = (row: IdentityRecord): IdentityRecord => {
   return {
-    idNumber: row.saId ?? row.idNumber ?? '',
-    fullName: row.fullName ?? `${firstName} ${surname}`.trim(),
-    dateOfBirth: row.dateOfBirth ?? '',
+    idNumber: row.idNumber ?? '',
+    fullName: row.fullName ?? '',
+    dateOfBirth: row.dateOfBirth?.split('T')[0] ?? '',
     status: mapStatus(row.status),
   }
 }
