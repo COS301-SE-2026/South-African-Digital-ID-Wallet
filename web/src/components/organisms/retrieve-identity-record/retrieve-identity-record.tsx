@@ -60,7 +60,13 @@ export const RetrieveIdentityRecord = ({
             <input
               type="checkbox"
               checked={idConsent}
-              onChange={(event) => setConsent(event.target.checked)}
+              onChange={(event) => {
+                setConsent(event.target.checked)
+                setErrors({
+                  ...errors,
+                  phone: '',
+                })
+              }}
               className="mt-1"
             />
             <span className="text-sm">

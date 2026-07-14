@@ -17,7 +17,10 @@ export const onboardingSchema = z.object({
   phone: z
     .string()
     .trim()
-    .regex(/^(?:\+27|0)[6-8][0-9]\d{8}$/),
+    .regex(/^(?:\+27[678]\d{8}|0[678]\d{8})$/, {
+      error:
+        'Enter a valid South African mobile number.\n(e.g. +27612345678 or 0612345678).',
+    }),
 
   email: z.string().trim().email({ error: 'Enter a valid email address.' }),
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ClipboardCheck, Send } from 'lucide-react'
+import { ClipboardCheck, Send, ShieldAlert } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
@@ -33,24 +33,63 @@ export const CaptureContactDetails = ({
 
       <CardContent className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="grid gap-2">
-            <Label htmlFor="phone">Phone Number</Label>
-            <Input
-              id="phone"
-              placeholder="+27..."
-              value={phone}
-              onChange={(event) => setPhone(event.target.value)}
-            />
+          <div>
+            <div className="grid gap-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                placeholder="+27..."
+                value={phone}
+                onChange={(event) => {
+                  setPhone(event.target.value)
+
+                  setErrors({
+                    ...errors,
+                    phone: '',
+                  })
+                }}
+              />
+            </div>
+
+            {errors.phone && (
+              <div className="mt-2 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2">
+                <span className="text-danger-red">
+                  <ShieldAlert className="h=1 w=1" />
+                </span>
+                <p className="whitespace-pre-line text-sm font-medium text-danger-red">
+                  {errors.phone}
+                </p>
+              </div>
+            )}
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email Address</Label>
-            <Input
-              id="email"
-              placeholder="citizen@example.com"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-            />
+          <div>
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                placeholder="citizen@example.com"
+                value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value)
+                  setErrors({
+                    ...errors,
+                    email: '',
+                  })
+                }}
+              />
+            </div>
+
+            {errors.email && (
+              <div className="mt-2 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2">
+                <span className="text-danger-red">
+                  <ShieldAlert className="h=1 w=1" />
+                </span>
+                <p className="text-sm font-medium text-danger-red">
+                  {errors.email}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -58,7 +97,13 @@ export const CaptureContactDetails = ({
           <input
             type="checkbox"
             checked={contactDetailsConsent}
-            onChange={(event) => setContactConsent(event.target.checked)}
+            onChange={(event) => {
+              setContactConsent(event.target.checked)
+              setErrors({
+                ...errors,
+                contactDetailsConsent: '',
+              })
+            }}
             className="mt-1"
           />
           <span className="text-sm">
@@ -66,6 +111,17 @@ export const CaptureContactDetails = ({
             and receive an activation code.
           </span>
         </label>
+
+        {errors.contactDetailsConsent && (
+          <div className="mt-2 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2">
+            <span className="text-danger-red">
+              <ShieldAlert className="h=1 w=1" />
+            </span>
+            <p className="text-sm font-medium text-danger-red">
+              {errors.contactDetailsConsent}
+            </p>
+          </div>
+        )}
 
         <Button
           className="w-full bg-deep-green text-clean-white hover:bg-deep-green/70"
