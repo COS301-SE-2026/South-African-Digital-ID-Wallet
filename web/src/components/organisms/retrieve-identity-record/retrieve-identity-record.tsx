@@ -113,7 +113,7 @@ export const RetrieveIdentityRecord = ({
                   <strong>Name:</strong> {record.fullName}
                 </p>
                 <p>
-                  <strong>ID:</strong> {record.idNumber}
+                  <strong>ID:</strong> {record.saId}
                 </p>
                 <p>
                   <strong>DOB:</strong> {record.dateOfBirth}

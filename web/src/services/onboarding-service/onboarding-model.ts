@@ -6,8 +6,9 @@ const mapStatus = (status?: string): IdentityRecordStatus => {
 }
 
 export const identityRecordModel = (row: IdentityRecord): IdentityRecord => {
+  console.log('IdNumber: ', row.saId)
   return {
-    idNumber: row.idNumber ?? '',
+    saId: row.saId ?? '',
     fullName: row.fullName ?? '',
     dateOfBirth: row.dateOfBirth?.split('T')[0] ?? '',
     status: mapStatus(row.status),

@@ -115,7 +115,7 @@ export default function OnboardCitizenPage() {
     }
 
     await onboardCitizen({
-      idNumber: record.idNumber,
+      idNumber: record.saId,
       email: result.data.email,
       phoneNumber: result.data.phone,
       consentProvided: result.data.contactDetailsConsent,
