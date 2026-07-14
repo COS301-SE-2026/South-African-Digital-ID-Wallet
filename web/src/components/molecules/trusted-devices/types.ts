@@ -1,9 +1,9 @@
-export type TrustedDeviceItem = {
+import type { LucideIcon } from 'lucide-react'
+
+export interface TrustedDevice {
   id: string
   name: string
-  lastSeen: string
-}
-
-export type TrustedDevicesProps = {
-  devices?: TrustedDeviceItem[]
+  meta: string
+  status: 'Active' | 'Known'
+  icon: LucideIcon
 }
