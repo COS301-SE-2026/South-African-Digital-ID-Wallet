@@ -8,4 +8,6 @@ export type OnboardingStatusCardProps = {
   email: string
   accountCreated: boolean
   activationSent: boolean
+  errors: Record<string, string>
+  setErrors: (r: Record<string, string>) => void
 }

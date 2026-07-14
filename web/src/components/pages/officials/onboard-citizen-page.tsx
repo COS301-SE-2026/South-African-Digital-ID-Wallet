@@ -5,6 +5,7 @@ import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
 import { IdentityRecord } from '@/types'
+import { onboardingSchema, retrivalSchema } from '@/schemas'
 import {
   OnboardCitizenFormValues,
   onboardingService,
@@ -26,6 +27,7 @@ export default function OnboardCitizenPage() {
   const [contactDetailsConsent, setContactConsent] = useState(false)
   const [accountCreated, setAccountCreated] = useState(false)
   const [activationSent, setActivationSent] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const { mutate: retrieveRecord, isPending: isRetrievingRecord } = useMutation(
     {
@@ -98,6 +100,8 @@ export default function OnboardCitizenPage() {
             setConsent={setConsent}
             record={record}
             retrieveIdentityRecord={retrieveIdentityRecord}
+            errors={errors}
+            setErrors={setErrors}
           />
 
           <OnboardingStatusCard
@@ -108,6 +112,8 @@ export default function OnboardCitizenPage() {
             email={email}
             accountCreated={accountCreated}
             activationSent={activationSent}
+            errors={errors}
+            setErrors={setErrors}
           />
         </div>
 

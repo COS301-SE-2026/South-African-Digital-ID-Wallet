@@ -15,6 +15,7 @@ export const RetrieveIdentityRecord = ({
   setConsent,
   record,
   retrieveIdentityRecord,
+  errors,
 }: RetrieveIdentityRecordProps) => {
   return (
     <Card className="lg:col-span-2">
