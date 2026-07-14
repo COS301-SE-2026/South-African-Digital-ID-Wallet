@@ -51,7 +51,7 @@ export const RetrieveIdentityRecord = ({
           <Button
             className="bg-deep-green text-clean-white hover:bg-deep-green/70"
             onClick={retrieveIdentityRecord}
-            disabled={!idNumber}
+            disabled={!idNumber || !idConsent}
           >
             Retrieve from Government Registry
           </Button>
