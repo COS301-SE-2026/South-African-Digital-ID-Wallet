@@ -112,8 +112,6 @@ export default function OnboardCitizenPage() {
             email={email}
             accountCreated={accountCreated}
             activationSent={activationSent}
-            errors={errors}
-            setErrors={setErrors}
           />
         </div>
 
@@ -129,6 +127,8 @@ export default function OnboardCitizenPage() {
           createPendingAccount={createPendingAccount}
           accountCreated={accountCreated}
           sendActivationCode={sendActivationCode}
+          errors={errors}
+          setErrors={setErrors}
         />
 
         <AuditLogPreview

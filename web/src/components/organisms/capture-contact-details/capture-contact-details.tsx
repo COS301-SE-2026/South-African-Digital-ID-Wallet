@@ -19,6 +19,8 @@ export const CaptureContactDetails = ({
   createPendingAccount,
   accountCreated,
   sendActivationCode,
+  errors,
+  setErrors,
 }: CaptureContactDetailsProps) => {
   return (
     <Card>

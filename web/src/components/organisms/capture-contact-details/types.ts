@@ -12,4 +12,6 @@ export type CaptureContactDetailsProps = {
   createPendingAccount: () => void
   accountCreated: boolean
   sendActivationCode: () => void
+  errors: Record<string, string>
+  setErrors: (r: Record<string, string>) => void
 }

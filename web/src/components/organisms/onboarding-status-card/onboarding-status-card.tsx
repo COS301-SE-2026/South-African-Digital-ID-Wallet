@@ -13,8 +13,6 @@ export const OnboardingStatusCard = ({
   email,
   accountCreated,
   activationSent,
-  errors,
-  setErrors,
 }: OnboardingStatusCardProps) => {
   return (
     <Card>
