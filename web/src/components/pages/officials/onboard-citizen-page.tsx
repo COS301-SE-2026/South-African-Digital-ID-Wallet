@@ -64,6 +64,8 @@ export default function OnboardCitizenPage() {
       return
     }
 
+    setErrors({})
+
     const result = retrivalSchema.safeParse({ idNumber, idConsent })
 
     if (!result.success) {
@@ -71,7 +73,7 @@ export default function OnboardCitizenPage() {
 
       setErrors({
         idNumber: fieldErrors.idNumber?.[0] ?? '',
-        idconsent: fieldErrors.idConsent?.[0] ?? '',
+        idConsent: fieldErrors.idConsent?.[0] ?? '',
       })
 
       return
@@ -89,6 +91,8 @@ export default function OnboardCitizenPage() {
     const nameParts = record.fullName.trim().split(' ')
     const firstName = nameParts[0] ?? ''
     const lastName = nameParts.slice(1).join(' ') || 'Unknown'
+
+    setErrors({})
 
     const result = onboardingSchema.safeParse({
       phone,

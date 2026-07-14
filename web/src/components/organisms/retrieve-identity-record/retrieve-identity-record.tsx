@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Search } from 'lucide-react'
+import { Search, ShieldAlert } from 'lucide-react'
 import type { RetrieveIdentityRecordProps } from './types'
 
 export const RetrieveIdentityRecord = ({
@@ -16,6 +16,7 @@ export const RetrieveIdentityRecord = ({
   record,
   retrieveIdentityRecord,
   errors,
+  setErrors,
 }: RetrieveIdentityRecordProps) => {
   return (
     <Card className="lg:col-span-2">
@@ -34,8 +35,26 @@ export const RetrieveIdentityRecord = ({
             id="idNumber"
             placeholder="Enter South African ID number"
             value={idNumber}
-            onChange={(event) => setIdNumber(event.target.value)}
+            onChange={(event) => {
+              setIdNumber(event.target.value)
+
+              setErrors({
+                ...errors,
+                idNumber: '',
+              })
+            }}
           />
+
+          {errors.idNumber && (
+            <div className="mt-2 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2">
+              <span className="text-danger-red">
+                <ShieldAlert className="h=1 w=1" />
+              </span>
+              <p className="text-sm font-medium text-danger-red">
+                {errors.idNumber}
+              </p>
+            </div>
+          )}
 
           <label className="flex items-start gap-3 rounded-xl border p-4">
             <input
@@ -48,6 +67,17 @@ export const RetrieveIdentityRecord = ({
               Citizen has provided explicit consent to retrieve Identity Record.
             </span>
           </label>
+
+          {errors.idConsent && (
+            <div className="mt-2 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2">
+              <span className="text-danger-red">
+                <ShieldAlert className="h=1 w=1" />
+              </span>
+              <p className="text-sm font-medium text-danger-red">
+                {errors.idConsent}
+              </p>
+            </div>
+          )}
 
           <Button
             className="bg-deep-green text-clean-white hover:bg-deep-green/70"
