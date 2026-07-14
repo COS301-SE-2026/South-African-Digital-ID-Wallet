@@ -18,7 +18,7 @@ export const CaptureContactDetails = ({
   idConsent,
   createPendingAccount,
   accountCreated,
-  sendActivationCode,
+  //sendActivationCode,
   errors,
   setErrors,
 }: CaptureContactDetailsProps) => {

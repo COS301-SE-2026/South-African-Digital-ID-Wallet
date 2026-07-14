@@ -58,13 +58,26 @@ export default function OnboardCitizenPage() {
     },
   })
 
-  function retrieveIdentityRecord() {
+  const retrieveIdentityRecord = async () => {
     if (!idNumber.trim()) {
       toast.error('Enter an ID number first')
       return
     }
 
-    retrieveRecord(idNumber.trim())
+    const result = retrivalSchema.safeParse({ idNumber, idConsent })
+
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors
+
+      setErrors({
+        idNumber: fieldErrors.idNumber?.[0] ?? '',
+        idconsent: fieldErrors.idConsent?.[0] ?? '',
+      })
+
+      return
+    }
+
+    await retrieveRecord(result.data.idNumber)
   }
 
   function createPendingAccount() {
@@ -85,9 +98,9 @@ export default function OnboardCitizenPage() {
     })
   }
 
-  function sendActivationCode() {
-    setActivationSent(true)
-  }
+  // function sendActivationCode() {
+  //   setActivationSent(true)
+  // }
 
   return (
     <main className="min-h-full bg-background p-6 pb-10">
@@ -126,7 +139,7 @@ export default function OnboardCitizenPage() {
           idConsent={idConsent}
           createPendingAccount={createPendingAccount}
           accountCreated={accountCreated}
-          sendActivationCode={sendActivationCode}
+          //sendActivationCode={sendActivationCode}
           errors={errors}
           setErrors={setErrors}
         />
