@@ -21,6 +21,7 @@ export const CaptureContactDetails = ({
   //sendActivationCode,
   errors,
   setErrors,
+  onboardResponse,
 }: CaptureContactDetailsProps) => {
   return (
     <Card>

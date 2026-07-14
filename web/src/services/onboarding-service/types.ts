@@ -7,7 +7,7 @@ export type OnboardCitizenFormValues = {
 
 export type OnboardCitizenResponse = {
   citizenId: string
-  idNumber: string
+  saId: string
   actvationPin: string
   activationExpiresAt: string
   status: string

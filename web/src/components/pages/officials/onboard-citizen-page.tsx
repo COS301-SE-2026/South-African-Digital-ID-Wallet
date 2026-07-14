@@ -8,6 +8,7 @@ import { IdentityRecord } from '@/types'
 import { onboardingSchema, retrivalSchema } from '@/schemas'
 import {
   OnboardCitizenFormValues,
+  OnboardCitizenResponse,
   onboardingService,
 } from '@/services/onboarding-service'
 
@@ -28,6 +29,8 @@ export default function OnboardCitizenPage() {
   const [accountCreated, setAccountCreated] = useState(false)
   const [activationSent, setActivationSent] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [onboardResponse, setOnboardResponse] =
+    useState<OnboardCitizenResponse | null>(null)
 
   const { mutate: retrieveRecord, isPending: isRetrievingRecord } = useMutation(
     {
@@ -49,7 +52,8 @@ export default function OnboardCitizenPage() {
   const { mutate: onboardCitizen, isPending: isCreatingAccount } = useMutation({
     mutationFn: (formValues: OnboardCitizenFormValues) =>
       onboardingService.onboardCitizen(formValues),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setOnboardResponse(data)
       setAccountCreated(true)
       toast.success('Pending FlashID account created')
     },
@@ -166,6 +170,7 @@ export default function OnboardCitizenPage() {
           //sendActivationCode={sendActivationCode}
           errors={errors}
           setErrors={setErrors}
+          onboardResponse={onboardResponse}
         />
 
         <AuditLogPreview
