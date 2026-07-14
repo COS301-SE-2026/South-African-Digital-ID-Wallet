@@ -77,14 +77,15 @@ export const CaptureContactDetails = ({
         >
           Create Pending FlashID Account
         </Button>
-        <Button
+
+        {/* <Button
           className="w-full"
           onClick={sendActivationCode}
           disabled={!accountCreated}
         >
           <Send className="mr-2 h-4 w-4" />
           Send Activation Code
-        </Button>
+        </Button> */}
       </CardContent>
     </Card>
   )
