@@ -4,5 +4,6 @@ export const loginDto = (formData: LoginFormValues) => {
   return {
     email: formData.email,
     password: formData.password,
+    rememberMe: formData.rememberMe ?? false,
   }
 }

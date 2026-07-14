@@ -1,7 +1,10 @@
 using Application.Features.Onboarding.Dtos;
 using Application.Features.Onboarding.Exceptions;
+using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Common.Services;
+using Domain.Enums;
 using Infrastructure.Data;
-using Infrastructure.Services;
+using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace tests;
@@ -20,8 +23,8 @@ public class OnboardingServiceTest
     private static OnboardingService CreateService(AppDbContext context)
     {
         return new OnboardingService(
-            new MockGovernmentRegistryService(),
-            context
+            new OnboardingRepository(context),
+            new MockGovernmentRegistryRepository()
         );
     }
 
@@ -41,16 +44,17 @@ public class OnboardingServiceTest
 
         var result = await service.OnboardCitizenAsync(request);
 
-        var citizen = await context.Citizens.FirstOrDefaultAsync(c => c.SaId == request.SaId);
-        var user = await context.DomainUsers.FirstOrDefaultAsync(u => u.Email == request.Email);
+        var citizen = await context.Citizens.FirstOrDefaultAsync(c => c.SaId == request.SaId, TestContext.Current.CancellationToken);
+        var user = await context.DomainUsers.FirstOrDefaultAsync(u => u.Email == request.Email, TestContext.Current.CancellationToken);
 
         Assert.NotNull(citizen);
         Assert.NotNull(user);
         Assert.Equal(request.SaId, result.SaId);
         Assert.Equal("Pending", result.Status);
-        Assert.False(citizen!.IsActivated);
-        Assert.False(string.IsNullOrWhiteSpace(citizen.ActivationCode));
-        Assert.NotEqual(Guid.Empty, citizen.UserId);
+        Assert.Equal(CitizenStatus.Pending, citizen!.Status);
+        Assert.False(string.IsNullOrWhiteSpace(citizen.CredentialActivationCode));
+        Assert.NotNull(citizen.UserId);
+        Assert.NotEqual(Guid.Empty, citizen.UserId!.Value);
     }
 
     [Fact]
@@ -68,7 +72,7 @@ public class OnboardingServiceTest
         };
 
         await Assert.ThrowsAsync<CitizenConsentRequiredException>(() =>
-    service.OnboardCitizenAsync(request));
+            service.OnboardCitizenAsync(request));
     }
 
     [Fact]
@@ -86,7 +90,7 @@ public class OnboardingServiceTest
         };
 
         await Assert.ThrowsAsync<IdentityRecordNotFoundException>(() =>
-    service.OnboardCitizenAsync(request));
+            service.OnboardCitizenAsync(request));
     }
 
     [Fact]
@@ -112,7 +116,7 @@ public class OnboardingServiceTest
     [Fact]
     public void MockGovernmentRegistry_WithKnownSaId_ReturnsIdentityRecord()
     {
-        var registryService = new MockGovernmentRegistryService();
+        var registryService = new MockGovernmentRegistryRepository();
 
         var record = registryService.GetBySaId("0000001971025");
 
@@ -121,5 +125,4 @@ public class OnboardingServiceTest
         Assert.Equal("Tiana", record.Names);
         Assert.Equal("Rogers", record.Surname);
     }
-
 }
