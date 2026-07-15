@@ -6,7 +6,6 @@ const mapStatus = (status?: string): IdentityRecordStatus => {
 }
 
 export const identityRecordModel = (row: IdentityRecord): IdentityRecord => {
-  console.log('IdNumber: ', row.saId)
   return {
     saId: row.saId ?? '',
     fullName: row.fullName ?? '',

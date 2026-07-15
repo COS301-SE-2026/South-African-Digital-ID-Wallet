@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace Infrastructure.Middleware;
 
@@ -25,12 +27,24 @@ public class ApiKeyMiddleware
         }
         
         var configuredKey = _configuration["Security:ApiKeyGov"];
-        if(!string.Equals(configuredKey, apiKey, StringComparison.Ordinal))
+
+        if (string.IsNullOrWhiteSpace(configuredKey))
         {
-            context.Response.StatusCode = 401;
+            throw new InvalidOperationException("Government Registry API key is not configured.");
+        }
+        
+        var suppliedKeyBytes = Encoding.UTF8.GetBytes(apiKey.ToString());
+        
+        var configuredKeyBytes = Encoding.UTF8.GetBytes(configuredKey);
+        
+        var isValid = suppliedKeyBytes.Length == configuredKeyBytes.Length && CryptographicOperations.FixedTimeEquals(suppliedKeyBytes, configuredKeyBytes);
+
+        if (!isValid)
+        {
             await context.Response.WriteAsync("Invalid API Key.");
             return;
         }
+        
         await _next(context);
     }
     

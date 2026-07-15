@@ -48,7 +48,7 @@ export const RetrieveIdentityRecord = ({
           {errors.idNumber && (
             <div className="mt-2 flex items-center gap-2 rounded-md border border-danger-red/55 bg-danger-red/5 px-3 py-2">
               <span className="text-danger-red">
-                <ShieldAlert className="h=1 w=1" />
+                <ShieldAlert className="h-10 w-10" />
               </span>
               <p className="text-sm font-medium text-danger-red">
                 {errors.idNumber}
@@ -64,7 +64,7 @@ export const RetrieveIdentityRecord = ({
                 setConsent(event.target.checked)
                 setErrors({
                   ...errors,
-                  phone: '',
+                  idConsent: '',
                 })
               }}
               className="mt-1"
@@ -77,7 +77,7 @@ export const RetrieveIdentityRecord = ({
           {errors.idConsent && (
             <div className="mt-2 flex items-center gap-2 rounded-md border border-danger-red/55 bg-danger-red/5 px-3 py-2">
               <span className="text-danger-red">
-                <ShieldAlert className="h=1 w=1" />
+                <ShieldAlert className="h-10 w-10" />
               </span>
               <p className="text-sm font-medium text-danger-red">
                 {errors.idConsent}

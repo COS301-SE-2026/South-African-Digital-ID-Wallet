@@ -30,8 +30,17 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
                 (StatusCodes.Status409Conflict, "Email already registered",
                     exception.Message),
 
-            EmailDeliveryException => (StatusCodes.Status503ServiceUnavailable, "Email service unavailable",
+            EmailDeliveryException => (StatusCodes.Status503ServiceUnavailable, "Required value missing",
                     exception.Message),
+
+            ArgumentNullException => (StatusCodes.Status400BadRequest, "Invalid request",
+                exception.Message),
+
+            ArgumentOutOfRangeException => (StatusCodes.Status400BadRequest, "Value outside allowed range",
+                exception.Message),
+
+            ArgumentException => (StatusCodes.Status400BadRequest, "Invalid request.",
+                exception.Message),
 
             _ => (StatusCodes.Status500InternalServerError, "Internal server error",
                     environment.IsDevelopment() ? exception.Message : "An unexpected server error occurred.")
