@@ -72,7 +72,6 @@ public static class DbSeeder
             {
                 return existing;
             }
-            ;
             var user = new User
             {
                 Id = Guid.NewGuid(),

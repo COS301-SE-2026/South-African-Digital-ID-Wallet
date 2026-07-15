@@ -83,6 +83,22 @@ jobs:
           done
           echo "Backend failed to start. Log:"; cat backend.log; exit 1
 
+      - name: Verify E2E accounts exist
+        run: |
+          echo " seeding lines "
+          grep -a "\[SEED\]" backend.log || echo "!! NO [SEED] LINES - seeder never ran"
+          echo " smoke test "
+          fail=0
+          for e in citizen govadmin official; do
+            code=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
+              -X POST http://localhost:5118/api/auth/login \
+              -H "Content-Type: application/json" \
+              -d "{\"email\":\"$e.e2e@flashid.local\",\"password\":\"password123\",\"rememberMe\":false}")
+            echo "$e.e2e@flashid.local -> HTTP $code $(cat /tmp/resp.json)"
+            [ "$code" = "200" ] || fail=1
+          done
+          [ $fail -eq 0 ] || { echo "::error::E2E accounts missing or backend rejecting logins"; exit 1; }
+
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium firefox
         working-directory: ./web
