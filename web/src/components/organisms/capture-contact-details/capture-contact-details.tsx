@@ -159,6 +159,64 @@ export const CaptureContactDetails = ({
                 </p>
               </div>
             </div>
+
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-text">
+                  SA ID
+                </p>
+                <p className="mt-1 font-medium text-muted-text">
+                  {onboardResponse?.saId}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-text">
+                  Status
+                </p>
+                <p className="mt-1 font-medium text-muted-text">
+                  {onboardResponse?.status}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-text">
+                  Activation PIN
+                </p>
+
+                <div className="mt-1 flex items-center gap-2">
+                  <code className="rounded-md bg-white px-3 py-2 text-lg font-semibold tracking-widest text-muted-text">
+                    {onboardResponse?.activationPin}
+                  </code>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void navigator.clipboard.writeText(
+                        onboardResponse?.activationPin ?? ''
+                      )
+
+                      toast.success('Activation PIN copied')
+                    }}
+                    className="rounded-md border border-success-green/50 bg-white px-3 py-2 text-sm font-medium text-success-green/80 hover:bg-success-green/10"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-text">
+                  Expires
+                </p>
+
+                <p className="mt-1 font-medium text-muted-text">
+                  {new Date(
+                    onboardResponse?.activationExpiresAt ?? ''
+                  ).toLocaleString()}
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
