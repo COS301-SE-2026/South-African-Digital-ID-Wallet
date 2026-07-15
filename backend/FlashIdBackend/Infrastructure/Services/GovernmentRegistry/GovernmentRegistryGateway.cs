@@ -32,7 +32,7 @@ public class GovernmentRegistryGateway : IGovernmentRegistryGateway
     {
         ArgumentException.ThrowIfNullOrEmpty(saId, nameof(saId));
         var clean = saId.Trim();
-        if (!Regex.IsMatch(clean, @"^\d{13}$"))
+        if (!Regex.IsMatch(clean, @"^\d{13}$", RegexOptions.None, TimeSpan.FromMilliseconds(600)))
             throw new ArgumentException("Invalid South African ID number");
         return clean;
     }

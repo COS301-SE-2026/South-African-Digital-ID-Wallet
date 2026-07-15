@@ -86,10 +86,12 @@ public class OnboardingService : IOnboardingService
             throw new ArgumentException("Email is required.");
 
         if (phoneNumber is not null &&
-            !Regex.IsMatch(phoneNumber, @"^(\+27)[6-8][0-9]{8}$"))
+            !Regex.IsMatch(phoneNumber, @"^(\+27)[6-8][0-9]{8}$", RegexOptions.None
+            , TimeSpan.FromMilliseconds(600)))
             throw new InvalidSAPhoneNumberException();
 
-        if (email is not null && !Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+        if (email is not null && !Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.None
+                , TimeSpan.FromMilliseconds(600)))
             throw new ArgumentException("Invalid email address format.", nameof(email));
 
         if (email is not null)
