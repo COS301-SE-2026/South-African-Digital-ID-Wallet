@@ -29,6 +29,17 @@ public class OnboardingService : IOnboardingService
 
     public async Task<VerifiedCitizenRecordResponse> VerifyCitizenIdentityAsync(string saId)
     {
+
+        var cleanSaId = string.IsNullOrWhiteSpace(saId)
+            ? null
+            : saId.Trim();
+
+        if (cleanSaId is null)
+            throw new ArgumentException("Invalid South African ID Number.");
+
+        if (!Regex.IsMatch(cleanSaId, @"^\d{13}$"))
+            throw new ArgumentException("Invalid South African ID number");
+
         var citizenRecord = await _governmentRegistryGateway.GetCitizenBySaIdAsync(saId);
 
         if (citizenRecord is null)
