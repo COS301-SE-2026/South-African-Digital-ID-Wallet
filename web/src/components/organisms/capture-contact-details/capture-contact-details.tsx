@@ -217,6 +217,11 @@ export const CaptureContactDetails = ({
                 </p>
               </div>
             </div>
+
+            <p className="mt-5 text-sm text-success-green/80">
+              Keep the activation PIN secure. It should only be provided to the
+              citizen through the approved delivery channel.
+            </p>
           </div>
         )}
 
