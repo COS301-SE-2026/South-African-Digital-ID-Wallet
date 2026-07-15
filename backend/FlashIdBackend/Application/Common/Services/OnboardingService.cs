@@ -37,7 +37,7 @@ public class OnboardingService : IOnboardingService
         if (cleanSaId is null)
             throw new ArgumentException("Invalid South African ID Number.");
 
-        if (!Regex.IsMatch(cleanSaId, @"^\d{13}$"))
+        if (!Regex.IsMatch(cleanSaId, @"^\d{13}$", RegexOptions.None, TimeSpan.FromMilliseconds(600)))
             throw new ArgumentException("Invalid South African ID number");
 
         var citizenRecord = await _governmentRegistryGateway.GetCitizenBySaIdAsync(saId);
