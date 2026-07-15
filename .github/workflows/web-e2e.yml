@@ -34,10 +34,10 @@ jobs:
 
     env:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://localhost:5118
+      ASPNETCORE_URLS: http://0.0.0.0:5118
       ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=FlashIdDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;"
-      NEXT_PUBLIC_API_URL: http://localhost:5118
-      E2E_BASE_URL: http://localhost:3000
+      NEXT_PUBLIC_API_URL: http://127.0.0.1:5118
+      E2E_BASE_URL: http://127.0.0.1:3000
       E2E_PASSWORD: password123
       E2E_CITIZEN_EMAIL: citizen.e2e@flashid.local
       E2E_GOVADMIN_EMAIL: govadmin.e2e@flashid.local
@@ -62,7 +62,7 @@ jobs:
           version: 9.15.9
 
       - name: Install web dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
         working-directory: ./web
 
       - name: Restore backend
@@ -76,7 +76,7 @@ jobs:
       - name: Wait for backend
         run: |
           for i in {1..60}; do
-            if curl -fsS http://localhost:5118/swagger/index.html >/dev/null 2>&1; then
+            if curl -fsS http://127.0.0.1:5118/swagger/index.html >/dev/null 2>&1; then
               echo "Backend up after $((i*3))s"; exit 0
             fi
               sleep 3
@@ -91,7 +91,7 @@ jobs:
           fail=0
           for e in citizen govadmin official; do
             code=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
-              -X POST http://localhost:5118/api/auth/login \
+              -X POST http://127.0.0.1:5118/api/auth/login \
               -H "Content-Type: application/json" \
               -d "{\"email\":\"$e.e2e@flashid.local\",\"password\":\"password123\",\"rememberMe\":false}")
             echo "$e.e2e@flashid.local -> HTTP $code $(cat /tmp/resp.json)"
@@ -100,7 +100,7 @@ jobs:
           [ $fail -eq 0 ] || { echo "::error::E2E accounts missing or backend rejecting logins"; exit 1; }
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps chromium firefox
+        run: pnpm exec playwright install --with-deps chromium firefox # NOSONAR - not a package install; no --ignore-scripts option exists
         working-directory: ./web
 
       - name: Run Playwright E2E
