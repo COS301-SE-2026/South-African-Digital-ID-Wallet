@@ -18,6 +18,7 @@ import {
   OnboardingStatusCard,
   RetrieveIdentityRecord,
 } from '@/components/organisms'
+import { handleApiError } from '@/lib/exceptionhandler'
 
 export default function OnboardCitizenPage() {
   const [idNumber, setIdNumber] = useState('')
@@ -42,9 +43,9 @@ export default function OnboardCitizenPage() {
         setActivationSent(false)
         toast.success('Identity record retrieved')
       },
-      onError: () => {
+      onError: (error) => {
         setRecord(null)
-        toast.error('Could not retrieve identity record')
+        handleApiError(error)
       },
     }
   )
@@ -57,9 +58,9 @@ export default function OnboardCitizenPage() {
       setAccountCreated(true)
       toast.success('Pending FlashID account created')
     },
-    onError: () => {
+    onError: (error) => {
       setOnboardResponse(null)
-      toast.error('Could not create pending FlashID account')
+      handleApiError(error)
     },
   })
 
