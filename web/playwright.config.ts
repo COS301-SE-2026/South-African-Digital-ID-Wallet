@@ -20,9 +20,9 @@ export default defineConfig({
   expect: { timeout: 5_000 },
   use: {
     baseURL,
-    trace: 'on',
+    trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    video: 'on',
+    video: 'retain-on-failure',
   },
   projects: [
     { name: 'setup', testMatch: /\.setup\.ts$/ },
