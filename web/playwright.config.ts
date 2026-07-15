@@ -47,6 +47,6 @@ export default defineConfig({
     command: 'pnpm run build && pnpm run start',
     url: baseURL,
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    timeout: process.env.CI ? 240_000 : 120_000,
   },
 })
