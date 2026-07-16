@@ -1,29 +1,71 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { TrustedDevices } from '../trusted-devices'
 
 describe('TrustedDevices', () => {
-  it('renders the heading and default device names', () => {
+  it('renders the trusted devices heading', () => {
     render(<TrustedDevices />)
 
-    expect(screen.getByText('Trusted Devices')).toBeInTheDocument()
-    expect(screen.getByText('Samsung Galaxy A54')).toBeInTheDocument()
-    expect(screen.getByText('iPhone 12')).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: /trusted devices/i })
+    ).toBeInTheDocument()
   })
 
-  it('renders a revoke button for each device', () => {
+  it('renders the list of trusted devices', () => {
     render(<TrustedDevices />)
 
-    expect(screen.getAllByRole('button', { name: 'Revoke' })).toHaveLength(2)
+    expect(screen.getByText(/iphone 16 pro max/i)).toBeInTheDocument()
+
+    expect(screen.getByText(/brave web portal/i)).toBeInTheDocument()
+
+    expect(screen.getByText(/ipad pro/i)).toBeInTheDocument()
   })
 
-  it('renders custom devices when provided', () => {
-    render(
-      <TrustedDevices
-        devices={[{ id: 'tablet', name: 'Samsung Tablet', lastSeen: 'Today' }]}
-      />
-    )
+  it('renders the device status labels', () => {
+    render(<TrustedDevices />)
 
-    expect(screen.getByText('Samsung Tablet')).toBeInTheDocument()
-    expect(screen.queryByText('iPhone 12')).not.toBeInTheDocument()
+    expect(screen.getByText(/active/i)).toBeInTheDocument()
+
+    expect(screen.getAllByText(/known/i)).toHaveLength(2)
+  })
+
+  it('opens the manage devices modal', async () => {
+    const user = userEvent.setup()
+
+    render(<TrustedDevices />)
+
+    await user.click(screen.getByRole('button', { name: /manage/i }))
+
+    expect(
+      screen.getAllByRole('heading', { name: /trusted devices/i })
+    ).toHaveLength(2)
+
+    expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument()
+  })
+
+  it('renders an unlink button for each device in the modal', async () => {
+    const user = userEvent.setup()
+
+    render(<TrustedDevices />)
+
+    await user.click(screen.getByRole('button', { name: /manage/i }))
+
+    expect(
+      screen.getAllByRole('button', { name: /unlink device/i })
+    ).toHaveLength(3)
+  })
+
+  it('closes the modal when Close is clicked', async () => {
+    const user = userEvent.setup()
+
+    render(<TrustedDevices />)
+
+    await user.click(screen.getByRole('button', { name: /manage/i }))
+
+    await user.click(screen.getByRole('button', { name: /close/i }))
+
+    expect(
+      screen.getAllByRole('heading', { name: /trusted devices/i })
+    ).toHaveLength(1)
   })
 })
