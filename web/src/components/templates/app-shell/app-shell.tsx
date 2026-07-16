@@ -1,6 +1,11 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+
+import { type UserRole, DEFAULT_USER_ROLE_DASHBOARD } from '@/types/roles'
+import { getAllowedRoles } from '@/config/roles/route-permissions'
 import { useUser } from '@/context/user-context'
 import { AppSidebar } from '../../organisms/app-sidebar/app-sidebar'
 import { AppTopBar } from '../../organisms/app-top-bar/app-top-bar'
@@ -19,23 +24,42 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const header = pageHeaders[pathname] ?? defaultPageHeader
   const { user, loading, logout } = useUser()
+  const router = useRouter()
 
-  const navSections =
-    loading && !user
-      ? pathname.startsWith('/officials')
-        ? officialsNavSections
-        : pathname.startsWith('/gov-admin')
-          ? governmentAdminNavSections
-          : citizenNavSections
-      : user?.role === 'Official'
-        ? officialsNavSections
-        : user?.role === 'GovernmentAdministrator'
-          ? governmentAdminNavSections
-          : pathname.startsWith('/officials')
-            ? officialsNavSections
-            : pathname.startsWith('/gov-admin')
-              ? governmentAdminNavSections
-              : citizenNavSections
+  const allowed = !loading && user ? getAllowedRoles(pathname) : null
+  const hasAccess =
+    !!user && (!allowed || allowed.includes(user.role as UserRole))
+
+  useEffect(() => {
+    if (loading) {
+      return
+    }
+    if (!user) {
+      router.replace('/')
+      return
+    }
+    if (!hasAccess) {
+      router.replace(DEFAULT_USER_ROLE_DASHBOARD[user.role as UserRole] ?? '/')
+    }
+  }, [user, loading, pathname, router, hasAccess])
+
+  if (loading) {
+    return <div>Load</div>
+  }
+
+  if (!user || !hasAccess) {
+    return null
+  }
+
+  let navSections = citizenNavSections
+
+  if (user?.role === 'Official') {
+    navSections = officialsNavSections
+  } else if (user?.role === 'GovernmentAdministrator') {
+    navSections = governmentAdminNavSections
+  } else if (user?.role === 'Citizen') {
+    navSections = citizenNavSections
+  }
 
   const displayName = user
     ? `${user.names ?? ''} ${user.surname ?? ''}`.trim() || user.email
@@ -49,7 +73,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className=" flex h-screen overflow-hidden">
-      {/* TODO: Update navSections to work with loggeed in user role :)*/}
       <AppSidebar
         navSections={navSections}
         user={{ name: displayName, initials, idLabel }}

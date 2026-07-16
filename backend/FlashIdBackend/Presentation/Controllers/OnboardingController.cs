@@ -1,8 +1,9 @@
+using System.Security.Claims;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Onboarding.Exceptions;
-using Application.Common.Interfaces.RepositoryInterfaces;
+using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Features.Onboarding.Dtos;
 
 namespace Presentation.Controllers;
@@ -10,37 +11,40 @@ namespace Presentation.Controllers;
 [ApiController]
 [Route("api/onboarding")]
 [Authorize(Roles = "Official")]
-/*TODO: Implement retrieval of credential data once moch-gov db set up :)*/
 public class OnboardingController : ControllerBase
 {
-    private readonly IMockGovernmentRegistryRepository _registryRepository;
     private readonly IOnboardingService _onboardingService;
 
     public OnboardingController(
-       IMockGovernmentRegistryRepository registryRepository,
        IOnboardingService onboardingService)
     {
-        _registryRepository = registryRepository;
         _onboardingService = onboardingService;
     }
 
     [HttpGet("verify/{idNumber}")]
-    public IActionResult VerifyCitizenIdentity(string idNumber)
+    public async Task<IActionResult> VerifyCitizenIdentity(string idNumber)
     {
-        var record = _registryRepository.GetBySaId(idNumber);
-
-        if (record is null)
+        try
         {
-            throw new IdentityRecordNotFoundException();
+            var record = await _onboardingService.VerifyCitizenIdentityAsync(idNumber);
+            return Ok(record);
         }
-
-        return Ok(record);
+        catch (IdentityRecordNotFoundException)
+        {
+            return NotFound(new { message = "Citizen record not found in government registry." });
+        }
     }
 
     [HttpPost("citizen")]
     public async Task<IActionResult> OnboardCitizen([FromBody] OnboardCitizenRequest request)
     {
-        var response = await _onboardingService.OnboardCitizenAsync(request);
+        var officialIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(officialIdValue, out var officialId))
+        {
+            return Unauthorized(new { message = "the authenticated official could not be identified." });
+        }
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var response = await _onboardingService.OnboardCitizenAsync(request, officialId, ipAddress);
 
         return Ok(response);
     }
