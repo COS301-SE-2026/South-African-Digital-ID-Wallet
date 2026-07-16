@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { CheckCircle2, IdCard, Lock, X } from 'lucide-react'
 import type { ActivityLogItem } from '@/components/molecules/activity-overview-card/types'
+import { DashboardModal } from '@/components/molecules/dashboard-modal/dashboard-modal'
 
 const lastActivity: ActivityLogItem[] = [
   {
@@ -67,52 +68,26 @@ export function ActivityOverviewCard() {
         </div>
       </div>
 
-      {showAllActivity && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-3xl rounded-3xl border bg-card shadow-2xl">
-            <div className="flex items-center justify-between border-b p-6">
-              <div>
-                <h2 className="text-2xl font-bold">Activity History</h2>
+      <DashboardModal
+        open={showAllActivity}
+        title="Activity History"
+        onClose={() => setShowAllActivity(false)}
+      >
+        <div className="space-y-4">
+          {lastActivity.map((item) => (
+            <div
+              key={item.id}
+              className="flex items-center gap-4 rounded-2xl border p-5"
+            >
+              <div className="flex-1">
+                <h3 className="font-semibold">{item.title}</h3>
+
+                <p className="mt-1 text-sm text-muted-text">{item.timestamp}</p>
               </div>
-
-              <button
-                onClick={() => setShowAllActivity(false)}
-                className="rounded-xl p-2 hover:bg-muted"
-              >
-                <X className="h-5 w-5" />
-              </button>
             </div>
-
-            <div className="max-h-[500px] overflow-y-auto p-6 space-y-4">
-              {lastActivity.map((item) => {
-                return (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-4 rounded-2xl border p-5"
-                  >
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{item.title}</h3>
-
-                      <p className="mt-1 text-sm text-muted-text">
-                        {item.timestamp}
-                      </p>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-
-            <div className="flex justify-end border-t p-6">
-              <button
-                onClick={() => setShowAllActivity(false)}
-                className="rounded-xl bg-primary px-5 py-2 font-semibold text-primary-foreground"
-              >
-                Close
-              </button>
-            </div>
-          </div>
+          ))}
         </div>
-      )}
+      </DashboardModal>
     </>
   )
 }

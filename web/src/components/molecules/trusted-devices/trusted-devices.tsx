@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Smartphone, Monitor, X, Unplug } from 'lucide-react'
 import type { TrustedDevice } from '@/components/molecules/trusted-devices/types'
+import { DashboardModal } from '@/components/molecules/dashboard-modal/dashboard-modal'
 
 const devices: TrustedDevice[] = [
   {
@@ -39,7 +40,7 @@ export function TrustedDevices() {
             onClick={() => setShowDevices(true)}
             className="text-sm font-semibold text-green-700 hover:text-green-800"
           >
-            Manage
+            Manage devices
           </button>
         </div>
 
@@ -81,75 +82,56 @@ export function TrustedDevices() {
         </ul>
       </div>
 
-      {showDevices && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-3xl rounded-3xl border bg-card shadow-2xl">
-            <div className="flex items-center justify-between border-b p-6">
-              <div>
-                <h2 className="text-2xl font-bold">Trusted Devices</h2>
-              </div>
+      <DashboardModal
+        open={showDevices}
+        title="Trusted Devices"
+        onClose={() => setShowDevices(false)}
+      >
+        <div className="space-y-4">
+          {devices.map((device) => {
+            const Icon = device.icon
 
-              <button
-                onClick={() => setShowDevices(false)}
-                className="rounded-xl p-2 hover:bg-muted"
+            return (
+              <div
+                key={device.id}
+                className="flex items-center justify-between rounded-2xl border p-5"
               >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="max-h-[500px] space-y-4 overflow-y-auto p-6">
-              {devices.map((device) => {
-                const Icon = device.icon
-
-                return (
-                  <div
-                    key={device.id}
-                    className="flex items-center justify-between rounded-2xl border p-5"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="rounded-2xl bg-muted p-4">
-                        <Icon className="h-7 w-7 text-green-700" />
-                      </div>
-
-                      <div>
-                        <h3 className="font-semibold text-lg">{device.name}</h3>
-
-                        <p className="mt-1 text-sm text-muted-text">
-                          {device.meta}
-                        </p>
-
-                        <span
-                          className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                            device.status === 'Active'
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-gray-100 text-gray-600'
-                          }`}
-                        >
-                          {device.status}
-                        </span>
-                      </div>
-                    </div>
-
-                    <button className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 font-semibold text-red-600 transition-colors hover:bg-red-100">
-                      <Unplug className="h-4 w-4" />
-                      Unlink Device
-                    </button>
+                <div className="flex items-center gap-4">
+                  <div className="rounded-2xl bg-muted p-4">
+                    <Icon className="h-7 w-7 text-green-700" />
                   </div>
-                )
-              })}
-            </div>
 
-            <div className="flex justify-end border-t p-6">
-              <button
-                onClick={() => setShowDevices(false)}
-                className="rounded-xl bg-primary px-5 py-2 font-semibold text-primary-foreground"
-              >
-                Close
-              </button>
-            </div>
-          </div>
+                  <div>
+                    <h3 className="font-semibold text-lg">{device.name}</h3>
+
+                    <p className="mt-1 text-sm text-muted-text">
+                      {device.meta}
+                    </p>
+
+                    <span
+                      className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                        device.status === 'Active'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      {device.status}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 font-semibold text-red-600 hover:bg-red-100"
+                >
+                  <Unplug className="h-4 w-4" />
+                  Unlink Device
+                </button>
+              </div>
+            )
+          })}
         </div>
-      )}
+      </DashboardModal>
     </>
   )
 }

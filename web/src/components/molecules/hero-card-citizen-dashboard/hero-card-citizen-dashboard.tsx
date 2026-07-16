@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 import Image from 'next/image'
-import { StatusPill } from '@/components/atoms/status-pill/status-pill'
 import qrCodeImage from '@/assets/images/qrCodeImage.png'
 
 const qr_duration = 120
