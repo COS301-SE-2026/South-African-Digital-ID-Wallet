@@ -1,10 +1,15 @@
 'use client'
-import { LockKeyhole, ShieldCheck } from 'lucide-react'
+import { LockKeyhole, ShieldCheck, UnlockKeyhole } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { VerifyIdentityCardProps } from './types'
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from '@/components/ui/input-otp'
 import { ActivationProgress } from '@/components/molecules/activation-progress-bar'
 
 export function VerifyIdentityCard({
@@ -23,15 +28,15 @@ export function VerifyIdentityCard({
   }
 
   return (
-    <Card className="w-full rounded-3xl border-border/70 bg-card shadow-xl shadow-deep-green/10">
+    <Card className="w-full rounded-lg border-border/70 bg-card shadow-xl shadow-deep-green/10">
       <CardHeader className="space-y-6">
         <ActivationProgress currentStep={1} />
         <div>
-          <CardTitle className="text-2xl text-deep-green">
+          <CardTitle className="font-semibold text-2xl text-deep-green">
             Verify your identity
           </CardTitle>
 
-          <p className="mt-3 max-w-xl leading-7 text-muted-foreground">
+          <p className="mt-1 max-w-xl leading-7 text-muted-foreground">
             Enter your South African ID number and the 6-digit activation PIN.
           </p>
         </div>
@@ -51,32 +56,40 @@ export function VerifyIdentityCard({
               onChange={(event) =>
                 onSaIdChange(event.target.value.replace(/\D/g, ''))
               }
+              className="rounded-md"
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="activation-pin">6-digit activation PIN</Label>
 
-            <Input
-              id="activation-pin"
-              value={pin}
-              inputMode="numeric"
-              maxLength={6}
-              placeholder="Enter your PIN"
-              className="tracking-[0.5em]"
-              onChange={(event) =>
-                onPinChange(event.target.value.replace(/\D/g, ''))
-              }
-            />
+            <InputOTP maxLength={6} value={pin} onChange={onPinChange}>
+              <InputOTPGroup className="gap-2 sm:gap3">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <InputOTPSlot
+                    key={index}
+                    index={index}
+                    className="h-12 w-12 rounded-md border border-input
+                                                    text-xl  shadow-sm
+                                                    first:rounded-md last:rounded-md
+                                                    data-[active=true]:border-primary-green
+                                                    data-[active=true]:ring-2
+                                                    data-[active=true]:ring-primary-green/20
+        "
+                  />
+                ))}
+              </InputOTPGroup>
+            </InputOTP>
 
             {onRequestNewPin && (
-              <button
+              <Button
                 type="button"
-                className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                variant="link"
+                className="h-auto p-0 "
                 onClick={onRequestNewPin}
               >
                 Didn&apos;t receive a PIN?
-              </button>
+              </Button>
             )}
 
             <div>
@@ -89,23 +102,26 @@ export function VerifyIdentityCard({
               <Button
                 type="submit"
                 size="lg"
-                className="w-full"
+                className="w-full rounded-md"
                 disabled={
                   isSubmitting || saId.length !== 13 || pin.length !== 6
                 }
               >
-                <LockKeyhole className="size-4" />
+                {isSubmitting ? (
+                  <UnlockKeyhole className="mr-2 h-4 w-4" />
+                ) : (
+                  <LockKeyhole className="mr-2 h-4 w-4" />
+                )}
                 {isSubmitting ? 'Verifying...' : 'Verify & Continue'}
               </Button>
 
-              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <div className="mt-5 flex items-center justify-center gap-2 text-sm text-muted-foreground">
                 <ShieldCheck
-                  className="size-4 text-primary"
+                  className="size-5 text-primary"
                   aria-hidden="true"
                 />
+                <span>Your information is safe with FlashID</span>
               </div>
-
-              <span>Your information is safe with FlashID</span>
             </div>
           </div>
         </form>
