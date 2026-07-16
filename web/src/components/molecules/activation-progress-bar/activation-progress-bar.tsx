@@ -14,11 +14,11 @@ export function ActivationProgress({ currentStep }: ActivationProgressProps) {
               <span className="absolute left-1/2 top-4 h-px w-full bg-border" />
             )}
 
-            <div className="relative z-10 mx-auto flex size-8 items-center justify center rounded-full bg-muted font-semibold text-muted-foreground">
+            <div className="relative z-10 mx-auto flex size-8 items-center justify-center rounded-full bg-muted font-semibold text-muted-foreground">
               <span
                 className={
                   active || complete
-                    ? 'flex size-8 items-center round-full bg-primary-green text-primary-green-foreground'
+                    ? 'flex size-8 items-center justify-center rounded-full bg-primary-green text-primary-foreground'
                     : ''
                 }
               >
