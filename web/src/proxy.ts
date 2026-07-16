@@ -44,4 +44,5 @@ export async function proxy(req: NextRequest) {
 
 export const config = {
   matcher: ['/citizen/:path*', '/officials/:path*', '/gov-admin/:path*'],
+  runtime: 'nodejs',
 }
