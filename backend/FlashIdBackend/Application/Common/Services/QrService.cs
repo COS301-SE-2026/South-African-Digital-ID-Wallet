@@ -86,7 +86,11 @@ public class QrService : IQrService
             .Select(c => new CredentialSummaryDto
             {
                 Id = c.Id,
-                CredentialType = c.IdentityDocument != null ? "Identity Document" : "Driver's License",
+                CredentialType = c.IdentityDocument != null
+                    ? "Identity Document"
+                    : c.DriversLicense != null
+                        ? "Driver's License"
+                        : "Unknown",
             })
             .ToList();
     }
