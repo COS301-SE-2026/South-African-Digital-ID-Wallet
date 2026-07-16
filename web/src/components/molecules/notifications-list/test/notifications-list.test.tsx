@@ -1,29 +1,33 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { NotificationsList } from '../notifications-list'
 
 describe('NotificationsList', () => {
-  it('renders the heading and default notifications', () => {
+  it('renders the heading and the preview list', () => {
     render(<NotificationsList />)
 
     expect(screen.getByText('Notifications')).toBeInTheDocument()
-    expect(screen.getByText('Credential review available')).toBeInTheDocument()
-    expect(screen.getByText('Security alert')).toBeInTheDocument()
+    expect(
+      screen.getByText("Driver's Licence expires in 7 days")
+    ).toBeInTheDocument()
+    expect(screen.getByText('Passport expires in 3 months')).toBeInTheDocument()
   })
 
-  it('renders custom notifications when provided', () => {
-    render(
-      <NotificationsList
-        notifications={[
-          {
-            id: 'n3',
-            title: 'Profile updated',
-            subtitle: 'Home address changed',
-            time: 'Now',
-          },
-        ]}
-      />
-    )
-    expect(screen.getByText('Profile updated')).toBeInTheDocument()
-    expect(screen.queryByText('Security alert')).not.toBeInTheDocument()
+  it('opens the full notifications modal when "View all" is clicked', () => {
+    render(<NotificationsList />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'View all' }))
+
+    expect(screen.getByText('All Notifications')).toBeInTheDocument()
+    expect(screen.getByText('SARS filing reminder6')).toBeInTheDocument()
+  })
+
+  it('closes the modal when Close is clicked', () => {
+    render(<NotificationsList />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'View all' }))
+    expect(screen.getByText('All Notifications')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    expect(screen.queryByText('All Notifications')).not.toBeInTheDocument()
   })
 })
