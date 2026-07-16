@@ -4,6 +4,7 @@ on:
   push:
     branches: 
       - dev
+      - fix/stuck-on-login-page
     paths:
       - "web/**"
       - "pnpm-lock.yaml"
@@ -17,7 +18,7 @@ env:
 
 jobs:
   deploy-dev:
-    if: github.ref == 'refs/heads/dev'
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/fix/stuck-on-login-page'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
