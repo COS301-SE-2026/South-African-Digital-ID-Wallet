@@ -17,43 +17,43 @@ const notifications: NotificationItem[] = [
   },
   {
     id: 'vehicle-renewal',
-    title: 'Vehicle licence renewal due',
+    title: 'Vehicle licence renewal due1',
     description: 'Renew before the end of the month.',
     tone: 'warning',
   },
   {
     id: 'tax-reminder1',
-    title: 'SARS filing reminder',
+    title: 'SARS filing reminder1',
     description: 'Tax filing season is now open.',
     tone: 'warning',
   },
   {
     id: 'tax-reminder2',
-    title: 'SARS filing reminder',
+    title: 'SARS filing reminder2',
     description: 'Tax filing season is now open.',
     tone: 'warning',
   },
   {
     id: 'tax-reminder3',
-    title: 'SARS filing reminder',
+    title: 'SARS filing reminder3',
     description: 'Tax filing season is now open.',
     tone: 'warning',
   },
   {
     id: 'tax-reminder4',
-    title: 'SARS filing reminder',
+    title: 'SARS filing reminder4',
     description: 'Tax filing season is now open.',
     tone: 'warning',
   },
   {
     id: 'tax-reminder5',
-    title: 'SARS filing reminder',
+    title: 'SARS filing reminder5',
     description: 'Tax filing season is now open.',
     tone: 'warning',
   },
   {
     id: 'tax-reminder6',
-    title: 'SARS filing reminder',
+    title: 'SARS filing reminder6',
     description: 'Tax filing season is now open.',
     tone: 'warning',
   },
@@ -77,8 +77,7 @@ export function NotificationsList() {
           </button>
         </div>
 
-        {/* Dashboard Preview */}
-        <div className="mt-4 h-[150px] overflow-y-auto pr-2">
+        <div className="mt-4 h-[120px] overflow-y-auto pr-2">
           <div className="space-y-3">
             {notifications.map((notification) => (
               <div

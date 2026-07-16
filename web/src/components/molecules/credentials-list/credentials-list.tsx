@@ -37,7 +37,7 @@ export function CredentialsList() {
           return (
             <div
               key={credential.id}
-              className="bg-card rounded-2xl border p-4 flex flex-col justify-between"
+              className="bg-card rounded-2xl border p-4 h-30 flex flex-col justify-between"
             >
               <div className="flex items-start justify-between">
                 <Icon className="h-8 w-8 mb-3" />
