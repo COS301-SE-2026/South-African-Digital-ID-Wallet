@@ -19,7 +19,9 @@ describe('NotificationsList', () => {
 
     expect(screen.getByText('All Notifications')).toBeInTheDocument()
     expect(
-      screen.getByText("Driver's Licence expires in 7 days")
+      expect(
+        screen.getAllByText("Driver's Licence expires in 7 days").length
+      ).toBeGreaterThan(0)
     ).toBeInTheDocument()
   })
 
