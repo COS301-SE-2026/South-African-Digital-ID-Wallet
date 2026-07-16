@@ -19,19 +19,26 @@ public class OnboardingRepository : IOnboardingRepository //IMPLEMENTS Applicati
         return await _context.Citizens.FirstOrDefaultAsync(c => c.SaId == saId);
     }
 
-    public Task AddUserAsync(User user)
+    public async Task<User?> GetUserByEmailAsync(string email)
     {
-        // YOUR method: AddUser
-        // EF Core method inside: .Add()  <-  these are intentionally different names
-        _context.DomainUsers.Add(user);
-        return Task.CompletedTask;
+        return await _context.DomainUsers.FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public Task AddCitizenAsync(Citizen citizen)
     {
-        // YOUR method: AddCitizen
-        // EF Core method inside: .Add()
         _context.Citizens.Add(citizen);
+        return Task.CompletedTask;
+    }
+
+    public Task AddAuditLogAsync(AuditLog auditLog)
+    {
+        _context.AuditLogs.Add(auditLog);
+        return Task.CompletedTask;
+    }
+
+    public Task AddActivationAsync(CitizenActivation citizenActivation)
+    {
+        _context.CitizenActivations.Add(citizenActivation);
         return Task.CompletedTask;
     }
 
