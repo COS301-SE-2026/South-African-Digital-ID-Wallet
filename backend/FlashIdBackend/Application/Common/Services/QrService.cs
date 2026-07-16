@@ -2,6 +2,7 @@ using System.Text.Json;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Features.Credentials;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Exceptions;
 using Domain.Enums;
@@ -32,6 +33,15 @@ public class QrService : IQrService
 
         if (credential.Status != CredentialStatus.Active)
             throw new CredentialNotActiveException();
+
+        var credentialType = credential.IdentityDocument != null ? DisclosableFields.IdentityDocumentType : DisclosableFields.DriversLicenseType;
+        var allowedFields = DisclosableFields.For(credentialType);
+        var allowedKeys = allowedFields.Select(f => f.Key).ToHashSet();
+        var mandatoryKeys = allowedFields.Where(f => f.Mandatory).Select(f => f.Key).ToHashSet();
+        var unknownKeys = request.DisclosedFields.Where(k => !allowedKeys.Contains(k)).ToList();
+        if (unknownKeys.Count > 0) throw new UnknownDisclosureFieldException(unknownKeys);
+        var missingMandatoryKeys = mandatoryKeys.Where(k => !request.DisclosedFields.Contains(k)).ToList();
+        if (missingMandatoryKeys.Count > 0) throw new MissingMandatoryFieldsException(missingMandatoryKeys);
 
         var issuedAt = DateTime.UtcNow;
         var expiresAt = issuedAt.AddSeconds(QrLifetimeSeconds);
