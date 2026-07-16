@@ -56,8 +56,11 @@ const ALL_OPTIONAL_FIELDS = Array.from(
 
 export default function SelectFieldsScreen() {
   const router = useRouter()
+  const storeCredentialType = useQrDisclosureStore(
+    (state) => state.credentialType
+  )
   const [credentialType, setCredentialType] =
-    useState<CredentialType>('identityDocument')
+    useState<CredentialType>(storeCredentialType)
   const [selectedFields, setSelectedFields] = useState<Record<string, boolean>>(
     Object.fromEntries(ALL_OPTIONAL_FIELDS.map((field) => [field, false]))
   )
