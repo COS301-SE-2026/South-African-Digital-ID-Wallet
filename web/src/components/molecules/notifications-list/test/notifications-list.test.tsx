@@ -18,7 +18,9 @@ describe('NotificationsList', () => {
     fireEvent.click(screen.getByRole('button', { name: 'View all' }))
 
     expect(screen.getByText('All Notifications')).toBeInTheDocument()
-    expect(screen.getByText('SARS filing reminder6')).toBeInTheDocument()
+    expect(
+      screen.getByText("Driver's Licence expires in 7 days")
+    ).toBeInTheDocument()
   })
 
   it('closes the modal when Close is clicked', () => {
