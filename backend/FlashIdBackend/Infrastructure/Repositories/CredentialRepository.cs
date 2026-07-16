@@ -1,0 +1,33 @@
+using Application.Common.Interfaces.RepositoryInterfaces;
+using Domain.Entities;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace Infrastructure.Repositories;
+
+public class CredentialRepository : ICredentialRepository
+{
+    private readonly AppDbContext _context;
+
+    public CredentialRepository(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<Citizen?> GetCitizenByUserIdAsync(Guid userId)
+    {
+        return await _context.Citizens
+            .FirstOrDefaultAsync(c => c.UserId == userId);
+    }
+
+    public async Task<List<Credential>> GetCredentialsByCitizenIdAsync(Guid citizenId)
+    {
+        return await _context.Credentials
+            .AsNoTracking()
+            .Include(c => c.IdentityDocument)
+            .Include(c => c.DriversLicense)
+            .Where(c => c.CitizenId == citizenId)
+            .OrderBy(c => c.IssueDate)
+            .ToListAsync();
+    }
+}
