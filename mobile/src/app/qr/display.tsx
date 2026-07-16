@@ -31,6 +31,7 @@ export default function DisplayScreen() {
   const [errorMessage, setErrorMessage] = useState('')
   const [qrValue, setQrValue] = useState('')
   const [secondsRemaining, setSecondsRemaining] = useState(0)
+  const [expiresAtMs, setExpiresAtMs] = useState<number | null>(null)
 
   const isExpired = status === 'ready' && secondsRemaining <= 0
   const isWarning =
@@ -44,12 +45,11 @@ export default function DisplayScreen() {
       const disclosedFields = [...mandatoryFields, ...selectedOptionalFields]
       const response = await qrService.generate(credentialId, disclosedFields)
       const expiresAt = new Date(response.expiresAt).getTime()
-      const secondsLeft = Math.max(
-        Math.round((expiresAt - Date.now()) / 1000),
-        0
-      )
       setQrValue(response.token)
-      setSecondsRemaining(secondsLeft)
+      setExpiresAtMs(expiresAt)
+      setSecondsRemaining(
+        Math.max(Math.round((expiresAt - Date.now()) / 1000), 0)
+      )
       setStatus('ready')
     } catch {
       setErrorMessage('Could not generate your QR code. Please try again.')
@@ -71,12 +71,14 @@ export default function DisplayScreen() {
   }, [fetchQr])
 
   useEffect(() => {
-    if (status !== 'ready' || isExpired) return
+    if (status !== 'ready' || isExpired || expiresAtMs === null) return
     const interval = setInterval(() => {
-      setSecondsRemaining((prev) => Math.max(prev - 1, 0))
+      setSecondsRemaining(
+        Math.max(Math.round((expiresAtMs - Date.now()) / 1000), 0)
+      )
     }, 1000)
     return () => clearInterval(interval)
-  }, [status, isExpired])
+  }, [status, isExpired, expiresAtMs])
 
   useEffect(() => {
     Animated.timing(expiredProgress, {
