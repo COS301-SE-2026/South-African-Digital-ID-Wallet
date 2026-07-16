@@ -1,12 +1,14 @@
 import { ActivationInfoItem } from '@/components/molecules/activation-info-item/activation-info-item'
-import { BadgeCheck } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
 export default function Page() {
   return (
-    <ActivationInfoItem
-      key={'Security'}
-      icon={BadgeCheck}
-      title={'title'}
-      description={'description'}
-    />
+    <div className=" m-10 justify-center ">
+      <ActivationInfoItem
+        key={'Security'}
+        icon={ShieldCheck}
+        title={'Secure & Encrypted'}
+        description={'Your data is protected with bank-level security'}
+      />
+    </div>
   )
 }
