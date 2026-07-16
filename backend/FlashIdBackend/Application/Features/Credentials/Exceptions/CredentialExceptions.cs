@@ -17,3 +17,9 @@ public class CredentialAccessDeniedException : Exception
     public CredentialAccessDeniedException()
         : base("You do not have permission to access this credential.") { }
 }
+
+public class InvalidDisclosedFieldsException : Exception
+{
+    public InvalidDisclosedFieldsException(IEnumerable<string> fields)
+        : base($"Invalid or missing disclosed fields: {string.Join(", ", fields)}") { }
+}

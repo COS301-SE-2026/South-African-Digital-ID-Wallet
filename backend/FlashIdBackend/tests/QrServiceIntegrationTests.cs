@@ -99,7 +99,14 @@ public class QrServiceIntegrationTests
         await context.Credentials.AddAsync(credential, TestContext.Current.CancellationToken);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var request = new GenerateQrRequestDto { DisclosedFields = new List<string> { "Full name", "SA ID number" } };
+        var request = new GenerateQrRequestDto
+        {
+            DisclosedFields = new List<string>
+          {
+        "Full name", "SA ID number", "Photo", "License number",
+        "License code", "Expiry date", "Country of issue",
+          },
+        };
         var result = await service.GenerateQrAsync(credential.Id, user.Id, request);
 
         Assert.NotNull(result);

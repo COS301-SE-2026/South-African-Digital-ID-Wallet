@@ -33,6 +33,21 @@ public class QrService : IQrService
         if (credential.Status != CredentialStatus.Active)
             throw new CredentialNotActiveException();
 
+        var isIdentityDocument = credential.IdentityDocument != null;
+        var mandatoryFields = isIdentityDocument
+            ? QrFieldDefinitions.IdentityDocumentMandatoryFields
+            : QrFieldDefinitions.DriversLicenseMandatoryFields;
+        var optionalFields = isIdentityDocument
+            ? QrFieldDefinitions.IdentityDocumentOptionalFields
+            : QrFieldDefinitions.DriversLicenseOptionalFields;
+        var allowedFields = new HashSet<string>(mandatoryFields.Concat(optionalFields));
+
+        var invalidFields = request.DisclosedFields.Where(f => !allowedFields.Contains(f)).ToList();
+        var missingMandatoryFields = mandatoryFields.Where(f => !request.DisclosedFields.Contains(f)).ToList();
+
+        if (invalidFields.Count > 0 || missingMandatoryFields.Count > 0)
+            throw new InvalidDisclosedFieldsException(invalidFields.Concat(missingMandatoryFields));
+
         var issuedAt = DateTime.UtcNow;
         var expiresAt = issuedAt.AddSeconds(QrLifetimeSeconds);
 

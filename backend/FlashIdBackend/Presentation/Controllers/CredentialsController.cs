@@ -42,6 +42,10 @@ public class CredentialsController : ControllerBase
         {
             return BadRequest(new { error = ex.Message });
         }
+        catch (InvalidDisclosedFieldsException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
         catch (Exception)
         {
             return StatusCode(500, new { error = "An unexpected error occurred." });
