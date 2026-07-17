@@ -27,6 +27,7 @@ public static class DependencyInjection
 
         services.AddScoped<ICitizenRepository, CitizenRepository>();
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
+        services.AddScoped<ITrustedDeviceRepository, TrustedDeviceRepository>();
 
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
 

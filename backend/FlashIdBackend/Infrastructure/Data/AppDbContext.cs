@@ -25,6 +25,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<UserPreferences> UserPreferences => Set<UserPreferences>();
 
     public DbSet<CitizenActivation> CitizenActivations => Set<CitizenActivation>();
+    public DbSet<TrustedDevice> TrustedDevices => Set<TrustedDevice>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
