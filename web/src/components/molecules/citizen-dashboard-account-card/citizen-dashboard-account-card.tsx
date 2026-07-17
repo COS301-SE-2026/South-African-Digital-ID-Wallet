@@ -1,10 +1,9 @@
 import * as React from 'react'
 import { ChevronRight } from 'lucide-react'
-import type { AppUser } from '@/components/molecules/citizen-dashboard-account-card/types'
-
-interface AccountCardProps {
-  readonly user: AppUser | null
-}
+import type {
+  AppUser,
+  AccountCardProps,
+} from '@/components/molecules/citizen-dashboard-account-card/types'
 
 export function AccountCardCitizenDashboard({ user }: AccountCardProps) {
   const fullName = user

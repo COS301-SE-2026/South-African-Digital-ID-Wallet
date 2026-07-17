@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react'
 
 export type CredentialStatus = 'Verified' | 'Pending' | 'Expired'
 
-export interface Credential {
+export type Credential = {
   id: string
   title: string
   issuer: string

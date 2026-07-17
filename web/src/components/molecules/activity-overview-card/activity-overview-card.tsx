@@ -1,7 +1,10 @@
-import * as React from 'react'
-import { CheckCircle2, IdCard, Lock, X } from 'lucide-react'
+'use client'
+
+import { useState } from 'react'
+import { CheckCircle2, IdCard, Lock } from 'lucide-react'
 import type { ActivityLogItem } from '@/components/molecules/activity-overview-card/types'
 import { DashboardModal } from '@/components/molecules/dashboard-modal/dashboard-modal'
+import { Button } from '@/components/ui/button'
 
 const lastActivity: ActivityLogItem[] = [
   {
@@ -28,7 +31,7 @@ const lastActivity: ActivityLogItem[] = [
 ]
 
 export function ActivityOverviewCard() {
-  const [showAllActivity, setShowAllActivity] = React.useState(false)
+  const [showAllActivity, setShowAllActivity] = useState(false)
 
   return (
     <>
@@ -36,12 +39,14 @@ export function ActivityOverviewCard() {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold">Activity Overview</h2>
 
-          <button
+          <Button
+            variant="link"
+            size="sm"
+            className="text-green-700 hover:text-green-800"
             onClick={() => setShowAllActivity(true)}
-            className="text-sm font-semibold text-green-700 hover:text-green-800"
           >
             View all
-          </button>
+          </Button>
         </div>
 
         <div className="mt-4 h-[150px] overflow-y-auto pr-2">

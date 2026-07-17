@@ -1,7 +1,11 @@
-import * as React from 'react'
-import { Bell, X } from 'lucide-react'
+'use client'
+
+import { useState } from 'react'
+import { Bell } from 'lucide-react'
 import type { NotificationItem } from '@/components/molecules/notifications-list/types'
 import { DashboardModal } from '@/components/molecules/dashboard-modal/dashboard-modal'
+import { Button } from '@/components/ui/button'
+import { Text } from '@/components/atoms/text'
 
 const notifications: NotificationItem[] = [
   {
@@ -18,28 +22,31 @@ const notifications: NotificationItem[] = [
   },
   {
     id: 'vehicle-renewal',
-    title: 'Vehicle licence renewal due1',
+    title: 'Vehicle licence renewal due',
     description: 'Renew before the end of the month.',
     tone: 'warning',
   },
 ]
 
 export function NotificationsList() {
-  const [showAllNotifications, setShowAllNotifications] = React.useState(false)
+  const [showAllNotifications, setShowAllNotifications] = useState(false)
 
   return (
     <>
       <div className="bg-card rounded-3xl border p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold">Notifications</h2>
+          <Text as="h2" variant="h4">
+            Notifications
+          </Text>
 
-          <button
-            type="button"
+          <Button
+            variant="link"
+            size="sm"
+            className="text-primary-green hover:text-green-800"
             onClick={() => setShowAllNotifications(true)}
-            className="text-sm font-semibold text-primary-green hover:text-green-800"
           >
             View all
-          </button>
+          </Button>
         </div>
 
         <div className="mt-4 h-[120px] overflow-y-auto pr-2">
