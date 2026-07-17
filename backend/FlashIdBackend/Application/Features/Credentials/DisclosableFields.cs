@@ -11,7 +11,7 @@ public static class DisclosableFields
     {
         new("idNumber", "Identity number", true),
         new("fullSurname", "Full surname", true),
-        new("fulLForename", "Full forename", true),
+        new("fullForenames", "Full forenames", true),
         new("dateOfBirth", "Date of birth", true),
         new("citizenshipStatus", "Citizenship status", true),
         new("photograph", "Photograph", true),
@@ -24,8 +24,8 @@ public static class DisclosableFields
     public static readonly IReadOnlyList<DisclosableField> DriversLicense = new List<DisclosableField>
     {
         new("fullName", "Full name", true),
-        new("saIdNumber", "SA identity number", true),
-        new("photograph", "Photograph", true),
+        new("saIdNumber", "SA ID number", true),
+        new("photo", "Photo", true),
         new("licenseNumber", "License number", true),
         new("licenseCode", "License code", true),
         new("expiryDate", "Expiry date", true),
