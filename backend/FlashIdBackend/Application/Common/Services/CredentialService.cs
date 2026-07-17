@@ -25,12 +25,17 @@ public class CredentialService : ICredentialService
             return Enumerable.Empty<CredentialResponseDto>();
         }
         var credentials = await _credentialRepository.GetCredentialsByCitizenIdAsync(citizen.Id);
-        return credentials.Select(MapToDto);
+        return credentials.Select(c => MapToDto(c, citizen));
     }
 
-    private CredentialResponseDto MapToDto(Credential credential)
+    private CredentialResponseDto MapToDto(Credential credential, Citizen citizen)
     {
         var dto = _mapper.CredentialToResponseDto(credential);
+
+        if (dto.IdentityDocument != null)
+        {
+            dto.IdentityDocument.IdNumber = citizen.SaId;
+        }
 
         if (credential.DriversLicense != null)
         {

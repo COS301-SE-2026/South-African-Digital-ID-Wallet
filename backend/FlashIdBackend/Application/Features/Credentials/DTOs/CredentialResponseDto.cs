@@ -6,6 +6,7 @@ public class IdentityDocumentDetailDto
     public string Citizenship { get; set; } = string.Empty;
     public string CountryOfBirth { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
+    public string IdNumber { get; set; } = string.Empty;
 }
 
 public class DriversLicenseDetailDto
