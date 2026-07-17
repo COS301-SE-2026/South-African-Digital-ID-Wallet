@@ -10,11 +10,13 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddScoped<ICitizenService, CitizenService>();
+        services.AddScoped<ICredentialService, CredentialService>();
         services.AddScoped<IOnboardingService, OnboardingService>();
 
         services.AddScoped<IInstitutionService, InstitutionService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddSingleton<CitizenMapper>();
+        services.AddSingleton<CredentialMapper>();
         services.AddSingleton<InstitutionMapper>();
         services.AddSingleton<AuthMapper>();
         return services;
