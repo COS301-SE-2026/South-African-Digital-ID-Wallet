@@ -33,6 +33,7 @@ jobs:
         run: |
           docker build -f dockerfile.web \
             --build-arg NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL_DEV }} \
+            --build-arg API_INTERNAL_URL=${{ vars.NEXT_PUBLIC_API_URL_DEV }} \
             -t ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:dev-${{ github.sha }} \
             -t ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:dev-latest \
             .
