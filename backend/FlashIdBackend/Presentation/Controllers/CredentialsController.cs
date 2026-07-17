@@ -42,14 +42,6 @@ public class CredentialsController : ControllerBase
         {
             return BadRequest(new { error = ex.Message });
         }
-        catch (UnknownDisclosureFieldException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-        catch (MissingMandatoryFieldsException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
         catch (InvalidDisclosedFieldsException ex)
         {
             return BadRequest(new { error = ex.Message });

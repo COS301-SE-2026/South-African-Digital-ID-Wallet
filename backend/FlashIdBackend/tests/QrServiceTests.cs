@@ -110,6 +110,34 @@ public class QrServiceTests
     }
 
     [Fact]
+    public async Task GenerateQrAsync_UnknownFieldValue_ThrowsInvalidDisclosedFieldsException()
+    {
+        var userId = Guid.NewGuid();
+        var credential = ValidCredential(userId);
+        var fakeRepository = new FakeCredentialRepository { CredentialToReturn = credential };
+        var fakeSigningProvider = new FakeQrSigningProvider();
+        var qrService = new QrService(fakeRepository, fakeSigningProvider);
+
+        var request = new GenerateQrRequestDto { DisclosedFields = new List<string> { "Not a real field" } };
+
+        await Assert.ThrowsAsync<InvalidDisclosedFieldsException>(() => qrService.GenerateQrAsync(credential.Id, userId, request));
+    }
+
+    [Fact]
+    public async Task GenerateQrAsync_MissingMandatoryField_ThrowsInvalidDisclosedFieldsException()
+    {
+        var userId = Guid.NewGuid();
+        var credential = ValidCredential(userId);
+        var fakeRepository = new FakeCredentialRepository { CredentialToReturn = credential };
+        var fakeSigningProvider = new FakeQrSigningProvider();
+        var qrService = new QrService(fakeRepository, fakeSigningProvider);
+
+        var request = new GenerateQrRequestDto { DisclosedFields = new List<string> { "Full name" } };
+
+        await Assert.ThrowsAsync<InvalidDisclosedFieldsException>(() => qrService.GenerateQrAsync(credential.Id, userId, request));
+    }
+
+    [Fact]
     public async Task GetMyCredentialsAsync_OnlyReturnsActiveCredentials()
     {
         var userId = Guid.NewGuid();

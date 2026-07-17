@@ -1,15 +1,5 @@
 namespace Application.Features.Credentials.Exceptions;
 
-public class MissingMandatoryFieldsException : Exception
-{
-    public MissingMandatoryFieldsException(IEnumerable<string> missingKeys) : base($"The following mandatory fields must be included: {string.Join(", ", missingKeys)}.") { }
-}
-
-public class UnknownDisclosureFieldException : Exception
-{
-    public UnknownDisclosureFieldException(IEnumerable<string> unknownKeys) : base($"The following fields are not valid for this credential type: {string.Join(", ", unknownKeys)}.") { }
-}
-
 public class CredentialNotFoundException : Exception
 {
     public CredentialNotFoundException(Guid credentialId)

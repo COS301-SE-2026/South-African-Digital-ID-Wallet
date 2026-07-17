@@ -145,6 +145,34 @@ public class QrServiceIntegrationTests
     }
 
     [Fact]
+    public async Task GenerateQrAsync_MissingMandatoryField_ThrowsInvalidDisclosedFieldsException()
+    {
+        using var context = CreateContext();
+        var service = CreateQrService(context);
+        var (user, citizen) = CreateCitizenWithUser();
+
+        var credential = new Credential
+        {
+            Id = Guid.NewGuid(),
+            Status = CredentialStatus.Active,
+            Signature = string.Empty,
+            IssuedBy = "Home Affairs",
+            IssueDate = DateTime.UtcNow,
+            CitizenId = citizen.Id,
+            Citizen = citizen,
+        };
+
+        await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
+        await context.Citizens.AddAsync(citizen, TestContext.Current.CancellationToken);
+        await context.Credentials.AddAsync(credential, TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var request = new GenerateQrRequestDto { DisclosedFields = new List<string> { "Full name" } };
+
+        await Assert.ThrowsAsync<InvalidDisclosedFieldsException>(() => service.GenerateQrAsync(credential.Id, user.Id, request));
+    }
+
+    [Fact]
     public async Task GetMyCredentialsAsync_ReturnsOnlyActiveCredentialsForThatUser()
     {
         using var context = CreateContext();
