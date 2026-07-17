@@ -51,7 +51,14 @@ public class QrServiceTests
         var fakeSigningProvider = new FakeQrSigningProvider();
         var qrService = new QrService(fakeRepository, fakeSigningProvider);
 
-        var request = new GenerateQrRequestDto { DisclosedFields = new List<string> { "Full name" } };
+        var request = new GenerateQrRequestDto
+        {
+            DisclosedFields = new List<string>
+           {
+             "Full name", "SA ID number", "Photo", "License number",
+             "License code", "Expiry date", "Country of issue",
+           },
+        };
         var result = await qrService.GenerateQrAsync(credential.Id, userId, request);
 
         Assert.False(string.IsNullOrEmpty(result.Token));

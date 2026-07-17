@@ -1,5 +1,5 @@
 export type IdentityRecord = {
-  idNumber: string
+  saId: string
   fullName: string
   dateOfBirth: string
   status: 'Verified' | 'Not Found'
