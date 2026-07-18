@@ -15,7 +15,7 @@ export const citizenNavSections: SidebarNavSection[] = [
       },
       {
         label: 'My Credentials',
-        href: '/under-construction',
+        href: '/citizen/my-credentials',
         icon: 'credentials',
       },
       { label: 'Share QR Code', href: '/under-construction', icon: 'qr' },
