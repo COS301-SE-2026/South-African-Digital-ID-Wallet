@@ -5,6 +5,7 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Credentials;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Exceptions;
+using Domain.Entities;
 using Domain.Enums;
 
 namespace Application.Common.Services;
@@ -15,11 +16,13 @@ public class QrService : IQrService
 
     private readonly ICredentialRepository _credentialRepository;
     private readonly IQrSigningProvider _qrSigningProvider;
+    private readonly IQrDisclosureTokenRepository _qrDisclosureTokenRepository;
 
-    public QrService(ICredentialRepository credentialRepository, IQrSigningProvider qrSigningProvider)
+    public QrService(ICredentialRepository credentialRepository, IQrSigningProvider qrSigningProvider, IQrDisclosureTokenRepository qrDisclosureTokenRepository)
     {
         _credentialRepository = credentialRepository;
         _qrSigningProvider = qrSigningProvider;
+        _qrDisclosureTokenRepository = qrDisclosureTokenRepository;
     }
 
     public async Task<GenerateQrResponseDto> GenerateQrAsync(Guid credentialId, Guid requestingUserId, GenerateQrRequestDto request)
@@ -51,9 +54,19 @@ public class QrService : IQrService
 
         var issuedAt = DateTime.UtcNow;
         var expiresAt = issuedAt.AddSeconds(QrLifetimeSeconds);
+        var jti = Guid.NewGuid();
+
+        await _qrDisclosureTokenRepository.AddAsync(new QrDisclosureToken
+        {
+            Id = Guid.NewGuid(),
+            Jti = jti,
+            CredentialId = credential.Id,
+            ExpiresAt = expiresAt,
+        });
 
         var payload = new QrPayload
         {
+            Jti = jti,
             CredentialId = credential.Id,
             DisclosedFields = request.DisclosedFields,
             IssuedAt = issuedAt,
@@ -81,6 +94,7 @@ public class QrService : IQrService
 
     private class QrPayload
     {
+        public Guid Jti { get; set; }
         public Guid CredentialId { get; set; }
         public List<string> DisclosedFields { get; set; } = new();
         public DateTime IssuedAt { get; set; }

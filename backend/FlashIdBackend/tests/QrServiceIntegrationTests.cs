@@ -38,10 +38,11 @@ public class QrServiceIntegrationTests
     private static QrService CreateQrService(AppDbContext context)
     {
         var credentialRepository = new CredentialRepository(context);
+        var qrDisclosureTokenRepository = new QrDisclosureTokenRepository(context);
         var configuration = CreateQrConfiguration();
         var signingProvider = new Ed25519SigningProvider(configuration);
 
-        return new QrService(credentialRepository, signingProvider);
+        return new QrService(credentialRepository, signingProvider, qrDisclosureTokenRepository);
     }
 
     private static (User User, Citizen Citizen) CreateCitizenWithUser()
