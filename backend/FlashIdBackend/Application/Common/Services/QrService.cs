@@ -62,6 +62,8 @@ public class QrService : IQrService
             Jti = jti,
             CredentialId = credential.Id,
             ExpiresAt = expiresAt,
+            CreatedAt = issuedAt,
+            UpdatedAt = issuedAt,
         });
 
         var payload = new QrPayload

@@ -8,6 +8,7 @@ using Infrastructure.Providers;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Data.Sqlite;
 
 namespace tests;
 
@@ -15,11 +16,16 @@ public class QrServiceIntegrationTests
 {
     private static AppDbContext CreateContext()
     {
+        var connection = new SqliteConnection("DataSource=:memory:");
+        connection.Open();
+
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .UseSqlite(connection)
             .Options;
 
-        return new AppDbContext(options);
+        var context = new AppDbContext(options);
+        context.Database.EnsureCreated();
+        return context;
     }
 
     private static IConfiguration CreateQrConfiguration()
@@ -93,6 +99,8 @@ public class QrServiceIntegrationTests
             IssueDate = DateTime.UtcNow,
             CitizenId = citizen.Id,
             Citizen = citizen,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
         };
 
         await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
@@ -117,6 +125,52 @@ public class QrServiceIntegrationTests
     }
 
     [Fact]
+    public async Task GenerateQrAsync_PersistsToken_ThatCanOnlyBeClaimedOnce()
+    {
+        using var context = CreateContext();
+        var qrDisclosureTokenRepository = new QrDisclosureTokenRepository(context);
+        var service = CreateQrService(context);
+        var (user, citizen) = CreateCitizenWithUser();
+
+        var credential = new Credential
+        {
+            Id = Guid.NewGuid(),
+            Status = CredentialStatus.Active,
+            Signature = string.Empty,
+            IssuedBy = "Home Affairs",
+            IssueDate = DateTime.UtcNow,
+            CitizenId = citizen.Id,
+            Citizen = citizen,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+        await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
+        await context.Citizens.AddAsync(citizen, TestContext.Current.CancellationToken);
+        await context.Credentials.AddAsync(credential, TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var request = new GenerateQrRequestDto
+        {
+            DisclosedFields = new List<string>
+            {
+                "Full name", "SA ID number", "Photo", "License number", "License code", "Expiry date",
+                "Country of issue",
+            }
+        };
+        await service.GenerateQrAsync(credential.Id, user.Id, request);
+
+        var persistedToken = await context.QrDisclosureTokens.SingleAsync(TestContext.Current.CancellationToken);
+        Assert.Null(persistedToken.UsedAt);
+
+        var firstClaim = await qrDisclosureTokenRepository.TryMarkUsedAsync(persistedToken.Jti);
+        var secondClaim = await qrDisclosureTokenRepository.TryMarkUsedAsync(persistedToken.Jti);
+
+        Assert.True(firstClaim);
+        Assert.False(secondClaim);
+    }
+
+    [Fact]
     public async Task GenerateQrAsync_RevokedCredential_ThrowsCredentialNotActiveException()
     {
         using var context = CreateContext();
@@ -132,6 +186,8 @@ public class QrServiceIntegrationTests
             IssueDate = DateTime.UtcNow,
             CitizenId = citizen.Id,
             Citizen = citizen,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
         };
 
         await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
@@ -161,6 +217,8 @@ public class QrServiceIntegrationTests
             IssueDate = DateTime.UtcNow,
             CitizenId = citizen.Id,
             Citizen = citizen,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
         };
 
         await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
@@ -189,6 +247,8 @@ public class QrServiceIntegrationTests
             IssueDate = DateTime.UtcNow,
             CitizenId = citizen.Id,
             Citizen = citizen,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
         };
 
         var expiredCredential = new Credential
@@ -200,6 +260,8 @@ public class QrServiceIntegrationTests
             IssueDate = DateTime.UtcNow,
             CitizenId = citizen.Id,
             Citizen = citizen,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
         };
 
         await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
