@@ -17,7 +17,7 @@ public class OfficialRepository : IOfficialRepository
     public async Task<Official?> GetByUserIdAsync(Guid userId)
     {
         return await _context.Officials
-            .Include(o => o.User)
+            .Include(o => o.Institution)
             .FirstOrDefaultAsync(o => o.UserId == userId);
     }
 
