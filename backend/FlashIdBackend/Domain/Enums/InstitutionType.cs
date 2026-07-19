@@ -5,7 +5,7 @@ public enum InstitutionType
     HomeAffairs,
     LicensingDepartment,
     LawEnforcement,
-    HealthCare,
+    Healthcare,
     FinancialInstitution,
 }
 
