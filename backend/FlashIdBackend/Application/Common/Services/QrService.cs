@@ -68,6 +68,7 @@ public class QrService : IQrService
 
         var payload = new QrPayload
         {
+            Type = "disclosure",
             Jti = jti,
             CredentialId = credential.Id,
             DisclosedFields = request.DisclosedFields,
@@ -94,8 +95,9 @@ public class QrService : IQrService
         };
     }
 
-    private class QrPayload
+    private sealed class QrPayload
     {
+        public string Type { get; set; } = "disclosure";
         public Guid Jti { get; set; }
         public Guid CredentialId { get; set; }
         public List<string> DisclosedFields { get; set; } = new();
@@ -103,7 +105,7 @@ public class QrService : IQrService
         public DateTime ExpiresAt { get; set; }
     }
 
-    private class QrEnvelope
+    private sealed class QrEnvelope
     {
         public string Payload { get; set; } = string.Empty;
         public string Signature { get; set; } = string.Empty;
