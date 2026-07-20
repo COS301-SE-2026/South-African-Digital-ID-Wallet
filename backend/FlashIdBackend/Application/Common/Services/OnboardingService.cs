@@ -225,7 +225,7 @@ public class OnboardingService : IOnboardingService
 
         var encodedToken = Uri.EscapeDataString(rawToken);
 
-        return $"{baseUrl}/activate?encodedToken={encodedToken}";
+        return $"{baseUrl}/activate?token={encodedToken}";
     }
 
 }
