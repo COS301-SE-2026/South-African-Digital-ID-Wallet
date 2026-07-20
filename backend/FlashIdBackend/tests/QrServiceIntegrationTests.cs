@@ -47,8 +47,9 @@ public class QrServiceIntegrationTests
         var qrDisclosureTokenRepository = new QrDisclosureTokenRepository(context);
         var configuration = CreateQrConfiguration();
         var signingProvider = new Ed25519SigningProvider(configuration);
+        var institutionRepository = new InstitutionRepository(context);
 
-        return new QrService(credentialRepository, signingProvider, qrDisclosureTokenRepository);
+        return new QrService(credentialRepository, signingProvider, qrDisclosureTokenRepository, institutionRepository);
     }
 
     private static (User User, Citizen Citizen) CreateCitizenWithUser()

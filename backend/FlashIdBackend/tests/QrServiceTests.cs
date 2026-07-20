@@ -45,6 +45,22 @@ public class QrServiceTests
         }
     }
 
+    private class FakeInstitutionRepository : IInstitutionRepository
+    {
+        public List<AuditLog> AuditLogs { get; } = new();
+        public Task<GovernmentAdministrator?> GetAdminByIdAsync(Guid adminId) => Task.FromResult<GovernmentAdministrator?>(null);
+        public Task<bool> InstitutionExistsByVerificationNumberAsync(string verificationNumber) => Task.FromResult(false);
+        public Task AddInstitutionAsync(Institution institution) => Task.CompletedTask;
+        public Task AddAuditLogAsync(AuditLog auditLog)
+        {
+            AuditLogs.Add(auditLog);
+            return Task.CompletedTask;
+        }
+        public Task<List<Institution>> GetAllInstitutionsAsync() => Task.FromResult(new List<Institution>());
+        public Task<Institution?> GetInstitutionByIdAsync(Guid id) => Task.FromResult<Institution?>(null);
+        public Task SaveChangesAsync() => Task.CompletedTask;
+    }
+
     private static Credential ValidCredential(Guid userId, CredentialStatus status = CredentialStatus.Active)
     {
         var citizen = new Citizen
@@ -70,7 +86,7 @@ public class QrServiceTests
         var fakeRepository = new FakeCredentialRepository { CredentialToReturn = credential };
         var fakeSigningProvider = new FakeQrSigningProvider();
         var fakeQrDisclosureTokenRepository = new FakeQrDisclosureTokenRepository();
-        var qrService = new QrService(fakeRepository, fakeSigningProvider, fakeQrDisclosureTokenRepository);
+        var qrService = new QrService(fakeRepository, fakeSigningProvider, fakeQrDisclosureTokenRepository, new FakeInstitutionRepository());
 
         var request = new GenerateQrRequestDto
         {
@@ -92,7 +108,7 @@ public class QrServiceTests
         var fakeRepository = new FakeCredentialRepository { CredentialToReturn = null };
         var fakeSigningProvider = new FakeQrSigningProvider();
         var fakeQrDisclosureTokenRepository = new FakeQrDisclosureTokenRepository();
-        var qrService = new QrService(fakeRepository, fakeSigningProvider, fakeQrDisclosureTokenRepository);
+        var qrService = new QrService(fakeRepository, fakeSigningProvider, fakeQrDisclosureTokenRepository, new FakeInstitutionRepository());
 
         var request = new GenerateQrRequestDto { DisclosedFields = new List<string>() };
 
@@ -109,7 +125,7 @@ public class QrServiceTests
         var fakeRepository = new FakeCredentialRepository { CredentialToReturn = credential };
         var fakeSigningProvider = new FakeQrSigningProvider();
         var fakeQrDisclosureTokenRepository = new FakeQrDisclosureTokenRepository();
-        var qrService = new QrService(fakeRepository, fakeSigningProvider, fakeQrDisclosureTokenRepository);
+        var qrService = new QrService(fakeRepository, fakeSigningProvider, fakeQrDisclosureTokenRepository, new FakeInstitutionRepository());
 
         var request = new GenerateQrRequestDto { DisclosedFields = new List<string>() };
 
@@ -125,7 +141,7 @@ public class QrServiceTests
         var fakeRepository = new FakeCredentialRepository { CredentialToReturn = credential };
         var fakeSigningProvider = new FakeQrSigningProvider();
         var fakeQrDisclosureTokenRepository = new FakeQrDisclosureTokenRepository();
-        var qrService = new QrService(fakeRepository, fakeSigningProvider, fakeQrDisclosureTokenRepository);
+        var qrService = new QrService(fakeRepository, fakeSigningProvider, fakeQrDisclosureTokenRepository, new FakeInstitutionRepository());
 
         var request = new GenerateQrRequestDto { DisclosedFields = new List<string>() };
 
@@ -141,7 +157,7 @@ public class QrServiceTests
         var fakeRepository = new FakeCredentialRepository { CredentialToReturn = credential };
         var fakeSigningProvider = new FakeQrSigningProvider();
         var fakeQrDisclosureTokenRepository = new FakeQrDisclosureTokenRepository();
-        var qrService = new QrService(fakeRepository, fakeSigningProvider, fakeQrDisclosureTokenRepository);
+        var qrService = new QrService(fakeRepository, fakeSigningProvider, fakeQrDisclosureTokenRepository, new FakeInstitutionRepository());
 
         var request = new GenerateQrRequestDto { DisclosedFields = new List<string> { "Not a real field" } };
 
@@ -156,7 +172,7 @@ public class QrServiceTests
         var fakeRepository = new FakeCredentialRepository { CredentialToReturn = credential };
         var fakeSigningProvider = new FakeQrSigningProvider();
         var fakeQrDisclosureTokenRepository = new FakeQrDisclosureTokenRepository();
-        var qrService = new QrService(fakeRepository, fakeSigningProvider, fakeQrDisclosureTokenRepository);
+        var qrService = new QrService(fakeRepository, fakeSigningProvider, fakeQrDisclosureTokenRepository, new FakeInstitutionRepository());
 
         var request = new GenerateQrRequestDto { DisclosedFields = new List<string> { "Full name" } };
 
@@ -175,7 +191,7 @@ public class QrServiceTests
         };
         var fakeSigningProvider = new FakeQrSigningProvider();
         var fakeQrDisclosureTokenRepository = new FakeQrDisclosureTokenRepository();
-        var qrService = new QrService(fakeRepository, fakeSigningProvider, fakeQrDisclosureTokenRepository);
+        var qrService = new QrService(fakeRepository, fakeSigningProvider, fakeQrDisclosureTokenRepository, new FakeInstitutionRepository());
 
         var result = await qrService.GetMyCredentialsAsync(userId);
 
