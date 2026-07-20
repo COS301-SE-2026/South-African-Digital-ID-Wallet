@@ -12,6 +12,9 @@ public static class DependencyInjection
         services.AddScoped<ICitizenService, CitizenService>();
         services.AddScoped<IOnboardingService, OnboardingService>();
         services.AddScoped<ITrustedDeviceService, TrustedDeviceService>();
+        services.AddScoped<IActivityOverviewService, ActivityOverviewService>();
+        services.AddScoped<IDashboardAccountCardService, DashboardAccountCardService>();
+        services.AddScoped<INotificationService, NotificationService>();
 
         services.AddScoped<IInstitutionService, InstitutionService>();
         services.AddScoped<IAuthService, AuthService>();
@@ -19,6 +22,9 @@ public static class DependencyInjection
         services.AddSingleton<InstitutionMapper>();
         services.AddSingleton<AuthMapper>();
         services.AddSingleton<TrustedDeviceMapper>();
+        services.AddSingleton<ActivityOverviewMapper>();
+        services.AddSingleton<DashboardAccountCardMapper>();
+        services.AddSingleton<NotificationMapper>();
         return services;
     }
 }

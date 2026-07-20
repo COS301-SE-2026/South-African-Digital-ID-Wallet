@@ -15,3 +15,10 @@ export type ActivityLogItem = {
   icon: LucideIcon
   tone: 'green' | 'blue' | 'amber'
 }
+
+export type ActivityItem = {
+  id: string
+  title: string
+  timestamp: string
+  type: string | null
+}
