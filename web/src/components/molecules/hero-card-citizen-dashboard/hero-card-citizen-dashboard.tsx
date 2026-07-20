@@ -29,7 +29,11 @@ export function WalletHeroCard() {
   return (
     <div className="bg-deep-green rounded-3xl p-6 flex items-center justify-between gap-6">
       <div>
-        <Text as="h1" variant="h1" className="mt-3">
+        <Text
+          as="h1"
+          variant="sub-lg"
+          className="mt-3 text-white text-2xl md:text-3xl font-bold"
+        >
           This is your FlashID wallet dashboard.
         </Text>
 
