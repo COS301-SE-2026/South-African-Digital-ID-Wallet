@@ -22,7 +22,7 @@ export default function CitizenDashboardPage() {
           </section>
 
           <aside className="col-span-4 space-y-6 min-h-0">
-            <AccountCardCitizenDashboard user={user} />
+            <AccountCardCitizenDashboard />
             <ActivityOverviewCard />
             <TrustedDevices />
           </aside>
