@@ -68,4 +68,20 @@ public class CitizenVerificationService : ICitizenVerificationService
             throw new InvalidOperationException("Activation is temporarily locked.");
         }
     }
+
+    private async Task ValidateAccountLinkingAsync(Citizen citizen, Guid userId, CancellationToken cancellationToken)
+    {
+        if (citizen.UserId is not null && citizen.UserId != userId)
+        {
+            throw new InvalidOperationException("The citizen has already been linked to another account.");
+        }
+
+        var citizenAlreadyLinkedToUser =
+            await _verificationRepository.GetCitizenByUserIdAsync(userId, cancellationToken);
+
+        if (citizenAlreadyLinkedToUser is not null && citizenAlreadyLinkedToUser.SaId != citizen.SaId)
+        {
+            throw new InvalidOperationException("The account has already been linked to another citizen.");
+        }
+    }
 }
