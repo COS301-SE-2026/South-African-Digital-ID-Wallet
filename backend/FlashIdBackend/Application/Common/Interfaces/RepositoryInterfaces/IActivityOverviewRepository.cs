@@ -7,5 +7,5 @@ public interface IActivityOverviewRepository
 {
     Task<Citizen?> GetCitizenByUserIdAsync(Guid userId);
 
-    Task<List<ActivityOverviewDto>> GetActivityByCitizenIdAsync(Guid citizenId);
+    Task<List<ActivityOverviewDto>> GetActivityByUserIdAsync(Guid userId);
 }

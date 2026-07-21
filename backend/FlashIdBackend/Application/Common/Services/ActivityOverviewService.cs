@@ -15,11 +15,6 @@ public class ActivityOverviewService : IActivityOverviewService
 
     public async Task<List<ActivityOverviewDto>> GetMyActivityAsync(Guid userId)
     {
-        var citizen = await _repository.GetCitizenByUserIdAsync(userId);
-
-        if (citizen == null)
-            return new List<ActivityOverviewDto>();
-
-        return await _repository.GetActivityByCitizenIdAsync(citizen.Id);
+        return await _repository.GetActivityByUserIdAsync(userId);
     }
 }

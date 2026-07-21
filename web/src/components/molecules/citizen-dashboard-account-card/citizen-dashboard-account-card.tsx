@@ -13,7 +13,9 @@ export function AccountCardCitizenDashboard() {
   React.useEffect(() => {
     const fetchAccount = async () => {
       try {
-        const { data } = await api.get<AppUser>('/api/dashboard-account/me')
+        const { data } = await api.get<AppUser>(
+          '/api/dashboard-account-card/me'
+        )
         setUser(data)
       } catch (error) {
         console.error('Failed to load account:', error)

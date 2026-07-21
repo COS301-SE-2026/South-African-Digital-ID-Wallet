@@ -21,11 +21,11 @@ public class ActivityOverviewRepository : IActivityOverviewRepository
             .FirstOrDefaultAsync(c => c.UserId == userId);
     }
 
-    public async Task<List<ActivityOverviewDto>> GetActivityByCitizenIdAsync(Guid citizenId)
+    public async Task<List<ActivityOverviewDto>> GetActivityByUserIdAsync(Guid userId)
     {
         return await _context.AuditLogs
             .AsNoTracking()
-            .Where(a => a.ActorId == citizenId)
+            .Where(a => a.ActorId == userId)
             .OrderByDescending(a => a.CreatedAt)
             .Select(a => new ActivityOverviewDto
             {
