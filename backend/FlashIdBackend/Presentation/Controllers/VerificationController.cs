@@ -17,7 +17,7 @@ public class VerificationController : ControllerBase
         _citizenVerificationService = citizenVerificationService;
     }
 
-    [HttpPost("/activate")]
+    [HttpPost("activate")]
     public async Task<IActionResult> VerifyCitizenActivation([FromQuery] string token, [FromBody] VerificationRequestDto request, CancellationToken cancellationToken)
     {
         return Ok();
