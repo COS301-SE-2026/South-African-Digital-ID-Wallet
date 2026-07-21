@@ -21,39 +21,35 @@ export const DisclosurePreview = ({
   const allDisclosedFields = [...mandatoryFields, ...selectedOptionalFields]
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-2">
-        <Eye className="h-5 w-5 text-muted-foreground" />
-        <Text variant="sub-lg">Review what you&apos;re sharing</Text>
-      </div>
-
+    <div className="flex flex-col gap-4">
+      <Text variant="sub-lg">Confirm what you&apos;re sharing</Text>
       <Text variant="sub-sm" className="text-muted-foreground">
-        The verifier will see exactly the fields listed below for your{' '}
-        {CREDENTIAL_TYPE_LABELS[credentialType]}, nothing more.
+        {CREDENTIAL_TYPE_LABELS[credentialType]}
       </Text>
 
-      <Card className="p-4">
-        <Text
-          variant="sub-sm"
-          className="mb-2 text-xs uppercase tracking-wide text-muted-foreground"
-        >
-          Visible to verifier ({allDisclosedFields.length} fields)
+      <div className="flex items-start gap-2 rounded-md border border-border bg-muted/40 p-3">
+        <Eye className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+        <Text variant="sub-sm" className="text-muted-foreground">
+          This is exactly what the verifier will see when they scan your QR
+          code.
         </Text>
-        <ul className="flex flex-col gap-1">
-          {allDisclosedFields.map((field) => (
-            <li key={field}>
-              <Text variant="sub-sm">{field}</Text>
-            </li>
-          ))}
-        </ul>
+      </div>
+
+      <Card className="p-0">
+        {allDisclosedFields.map((field) => (
+          <div
+            key={field}
+            className="border-b border-border px-4 py-3 last:border-b-0"
+          >
+            <Text variant="sub-sm">{field}</Text>
+          </div>
+        ))}
       </Card>
 
-      {selectedOptionalFields.length === 0 && (
-        <Text variant="sub-sm" className="text-muted-foreground">
-          Only the required fields will be shared. You can go back to add
-          optional fields if needed.
-        </Text>
-      )}
+      <Text variant="sub-sm" className="text-center text-muted-foreground">
+        {allDisclosedFields.length} field
+        {allDisclosedFields.length === 1 ? '' : 's'} will be shared
+      </Text>
 
       <div className="flex gap-3">
         <Button
@@ -62,10 +58,10 @@ export const DisclosurePreview = ({
           onClick={onBack}
           className="flex-1"
         >
-          Back
+          Go back
         </Button>
-        <Button type="button" onClick={onConfirm} className="flex-1">
-          Generate QR code
+        <Button type="button" onClick={onConfirm} className="flex-[2]">
+          Confirm and generate QR
         </Button>
       </div>
     </div>
