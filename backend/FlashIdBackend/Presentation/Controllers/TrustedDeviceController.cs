@@ -39,4 +39,22 @@ public class TrustedDevicesController : ControllerBase
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
+
+    [HttpDelete("{deviceId:guid}")]
+    public async Task<IActionResult> UnlinkDevice(Guid deviceId)
+    {
+        var userIdClaim = User.FindFirst("userId")?.Value;
+
+        if (userIdClaim == null)
+            return Unauthorized();
+
+        var success = await _trustedDeviceService.UnlinkDeviceAsync(
+            Guid.Parse(userIdClaim),
+            deviceId);
+
+        if (!success)
+            return NotFound();
+
+        return NoContent();
+    }
 }

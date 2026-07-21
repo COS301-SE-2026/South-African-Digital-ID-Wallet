@@ -32,4 +32,9 @@ public class TrustedDeviceService : ITrustedDeviceService
 
         return devices.Select(device => _mapper.TrustedDeviceToDto(device));
     }
+
+    public async Task<bool> UnlinkDeviceAsync(Guid userId, Guid deviceId)
+    {
+        return await _trustedDeviceRepository.UnlinkDeviceAsync(userId, deviceId);
+    }
 }

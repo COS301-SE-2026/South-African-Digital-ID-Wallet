@@ -28,4 +28,27 @@ public class TrustedDeviceRepository : ITrustedDeviceRepository
             .OrderByDescending(td => td.LastActive)
             .ToListAsync();
     }
+
+    public async Task<bool> UnlinkDeviceAsync(Guid userId, Guid deviceId)
+    {
+        var citizen = await _context.Citizens
+            .FirstOrDefaultAsync(c => c.UserId == userId);
+
+        if (citizen == null)
+            return false;
+
+        var device = await _context.TrustedDevices
+            .FirstOrDefaultAsync(d =>
+                d.Id == deviceId &&
+                d.CitizenId == citizen.Id);
+
+        if (device == null)
+            return false;
+
+        _context.TrustedDevices.Remove(device);
+
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
 }

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Smartphone, Monitor, Unplug } from 'lucide-react'
-
+import { Button } from '@/components/ui/button'
 import api from '@/lib/api'
 import { DashboardModal } from '@/components/molecules/dashboard-modal/dashboard-modal'
 import type { TrustedDevice } from '@/components/molecules/trusted-devices/types'
@@ -64,18 +64,32 @@ export function TrustedDevices() {
     )
   }
 
+  const unlinkDevice = async (deviceId: string) => {
+    try {
+      await api.delete(`/api/trusted-devices/${deviceId}`)
+
+      setDevices((previous) =>
+        previous.filter((device) => device.id !== deviceId)
+      )
+    } catch (error) {
+      console.error('Failed to unlink device:', error)
+    }
+  }
+
   return (
     <>
       <div className="bg-card rounded-3xl border p-6">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold">Trusted Devices</h2>
 
-          <button
+          <Button
+            variant="link"
+            size="sm"
             onClick={() => setShowDevices(true)}
-            className="text-sm font-semibold text-green-700 hover:text-green-800"
+            className="text-green-700 hover:text-green-800"
           >
             Manage devices
-          </button>
+          </Button>
         </div>
 
         {devices.length === 0 ? (
@@ -128,7 +142,7 @@ export function TrustedDevices() {
         onClose={() => setShowDevices(false)}
       >
         {devices.length === 0 ? (
-          <p className="text-muted-text">No trusted devices found.</p>
+          <p className="text-muted-text">No trusted devices were found.</p>
         ) : (
           <div className="space-y-4">
             {devices.map((device) => {
@@ -164,13 +178,16 @@ export function TrustedDevices() {
                   </div>
 
                   {device.status !== 'Active' && (
-                    <button
+                    <Button
                       type="button"
-                      className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 font-semibold text-red-600 hover:bg-red-100"
+                      variant="destructive"
+                      size="lg"
+                      onClick={() => unlinkDevice(device.id)}
+                      className="rounded-xl"
                     >
                       <Unplug className="h-4 w-4" />
                       Unlink Device
-                    </button>
+                    </Button>
                   )}
                 </div>
               )
