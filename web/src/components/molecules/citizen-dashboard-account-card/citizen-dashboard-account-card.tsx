@@ -16,6 +16,7 @@ export function AccountCardCitizenDashboard() {
         const { data } = await api.get<AppUser>(
           '/api/dashboard-account-card/me'
         )
+
         setUser(data)
       } catch (error) {
         console.error('Failed to load account:', error)
@@ -41,9 +42,13 @@ export function AccountCardCitizenDashboard() {
     ? `${user.names ?? ''} ${user.surname ?? ''}`.trim()
     : 'Guest User'
 
-  const idSuffix = user?.userId ? String(user.userId).slice(-3) : '084'
+  const idSuffix = user?.saId ? user.saId.slice(-4) : '084'
 
   const citizenship = user?.citizenship ?? 'South African Citizen'
+
+  const initials = user
+    ? `${user.names?.charAt(0) ?? ''}${user.surname?.charAt(0) ?? ''}`.toUpperCase()
+    : 'GU'
 
   return (
     <div className="bg-card rounded-3xl border p-4">
@@ -58,15 +63,19 @@ export function AccountCardCitizenDashboard() {
         </button>
       </div>
 
-      <div className="mt-3 flex items-center justify-between gap-3">
+      <div className="mt-4 flex items-center justify-between gap-4">
         <div className="flex-1">
-          <div className="text-muted-text text-sm">{fullName}</div>
+          <div className="text-sm text-muted-text">{fullName}</div>
 
-          <div className="text-muted-text mt-0.5 text-sm">
+          <div className="mt-1 text-sm text-muted-text">
             ID ending &bull;&bull;&bull;&bull;{idSuffix}
           </div>
 
-          <div className="text-muted-text mt-0.5 text-sm">{citizenship}</div>
+          <div className="mt-1 text-sm text-muted-text">{citizenship}</div>
+        </div>
+
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-xl font-bold text-green-700">
+          {initials}
         </div>
       </div>
     </div>
