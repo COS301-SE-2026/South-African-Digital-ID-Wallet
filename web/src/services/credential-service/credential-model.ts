@@ -1,4 +1,4 @@
-import { IdCard, Car, type LucideIcon } from 'lucide-react'
+import { IdCard, Car } from 'lucide-react'
 
 import type {
   CredentialDetailRow,
