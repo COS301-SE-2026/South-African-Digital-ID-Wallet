@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { RefreshCw } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Text, StatusPill } from '@/components/atoms'
@@ -27,6 +28,7 @@ export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
   const [qrValue, setQrValue] = React.useState('')
   const [secondsRemaining, setSecondsRemaining] = React.useState(0)
   const [expiresAtMs, setExpiresAtMs] = React.useState<number | null>(null)
+  const hasShownWarningToast = React.useRef(false)
 
   const isExpired = status === 'ready' && secondsRemaining <= 0
   const isWarning =
@@ -44,6 +46,7 @@ export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
       setSecondsRemaining(
         Math.max(Math.round((expiresAt - Date.now()) / 1000), 0)
       )
+      hasShownWarningToast.current = false
       setStatus('ready')
     } catch {
       setErrorMessage('Could not generate your QR code. Please try again.')
@@ -71,6 +74,13 @@ export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
     }, 1000)
     return () => clearInterval(interval)
   }, [status, isExpired, expiresAtMs])
+
+  React.useEffect(() => {
+    if (isWarning && !hasShownWarningToast.current) {
+      hasShownWarningToast.current = true
+      toast.error('15 seconds left - your QR code is about to expire')
+    }
+  }, [isWarning])
 
   if (status === 'loading') {
     return (
