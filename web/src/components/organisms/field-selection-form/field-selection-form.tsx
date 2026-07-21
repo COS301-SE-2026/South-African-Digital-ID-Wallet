@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Text } from '@/components/atoms'
 import { FieldToggleRow } from '@/components/molecules'
@@ -19,7 +20,6 @@ export const FieldSelectionForm = ({
 }: Readonly<FieldSelectionFormProps>) => {
   const [credentialType, setCredentialType] =
     React.useState<CredentialType>('identityDocument')
-
   const [selectedFields, setSelectedFields] = React.useState<
     Record<string, boolean>
   >({})
@@ -57,7 +57,7 @@ export const FieldSelectionForm = ({
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       <Text variant="sub-lg">Choose what to share</Text>
 
       <Tabs
@@ -91,40 +91,46 @@ export const FieldSelectionForm = ({
         </Button>
       </div>
 
-      <div>
-        <Text
-          variant="sub-sm"
-          className="mb-2 text-xs uppercase tracking-wide text-muted-foreground"
-        >
-          Always shared
-        </Text>
-        {mandatoryFields.map((field) => (
-          <FieldToggleRow
-            key={field}
-            label={field}
-            checked={true}
-            onCheckedChange={() => {}}
-            locked
-          />
-        ))}
-      </div>
+      <Card className="p-0">
+        <div className="px-4 pt-4">
+          <Text
+            variant="sub-sm"
+            className="text-xs uppercase tracking-wide text-muted-foreground"
+          >
+            Always shared
+          </Text>
+        </div>
+        <div className="px-4">
+          {mandatoryFields.map((field) => (
+            <FieldToggleRow
+              key={field}
+              label={field}
+              checked={true}
+              onCheckedChange={() => {}}
+              locked
+            />
+          ))}
+        </div>
 
-      <div>
-        <Text
-          variant="sub-sm"
-          className="mb-2 text-xs uppercase tracking-wide text-muted-foreground"
-        >
-          Optional fields
-        </Text>
-        {optionalFields.map((field) => (
-          <FieldToggleRow
-            key={field}
-            label={field}
-            checked={!!selectedFields[field]}
-            onCheckedChange={() => toggleField(field)}
-          />
-        ))}
-      </div>
+        <div className="border-t border-border px-4 pt-4">
+          <Text
+            variant="sub-sm"
+            className="text-xs uppercase tracking-wide text-muted-foreground"
+          >
+            Optional fields
+          </Text>
+        </div>
+        <div className="px-4 pb-4">
+          {optionalFields.map((field) => (
+            <FieldToggleRow
+              key={field}
+              label={field}
+              checked={!!selectedFields[field]}
+              onCheckedChange={() => toggleField(field)}
+            />
+          ))}
+        </div>
+      </Card>
 
       <Text variant="sub-sm" className="text-center text-muted-foreground">
         {mandatoryFields.length} shared, {selectedCount} of{' '}
