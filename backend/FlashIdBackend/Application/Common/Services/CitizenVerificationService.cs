@@ -2,6 +2,8 @@ using System.Text.RegularExpressions;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Verification.Dtos;
+using Domain.Entities;
+using Domain.Enums;
 
 namespace Application.Common.Services;
 
@@ -41,6 +43,29 @@ public class CitizenVerificationService : ICitizenVerificationService
                 RegexOptions.None, TimeSpan.FromSeconds(500)))
         {
             throw new ArgumentException("A valid 6-digit activation pin is required.");
+        }
+    }
+
+    public static void ValidateActivationState(CitizenActivation activation, DateTime now)
+    {
+        if (activation.Status == ActivationStatus.Used || activation.UsedAt is not null)
+        {
+            throw new InvalidOperationException("Activation has already been used.");
+        }
+
+        if (activation.Status == ActivationStatus.Revoked || activation.RevokedAt is not null)
+        {
+            throw new InvalidOperationException("Activation is no longer valid.");
+        }
+
+        if (activation.ExpiresAt <= now)
+        {
+            throw new InvalidOperationException("Activation has expired.");
+        }
+
+        if (activation.LockedUntil is not null && activation.LockedUntil > now)
+        {
+            throw new InvalidOperationException("Activation is temporarily locked.");
         }
     }
 }
