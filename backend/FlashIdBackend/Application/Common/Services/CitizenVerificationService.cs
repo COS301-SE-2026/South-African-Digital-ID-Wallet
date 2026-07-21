@@ -10,6 +10,10 @@ namespace Application.Common.Services;
 public class CitizenVerificationService : ICitizenVerificationService
 {
 
+    private const int InitialMaxPinAttempts = 3;
+    private const int SecondMaxPinAttempts = 5;
+    private const int FinalMaxPinAttempts = 6;
+
     private readonly IVerificationRepository _verificationRepository;
 
     public CitizenVerificationService(IVerificationRepository verificationRepository)
@@ -65,7 +69,8 @@ public class CitizenVerificationService : ICitizenVerificationService
 
         if (activation.LockedUntil is not null && activation.LockedUntil > now)
         {
-            throw new InvalidOperationException("Activation is temporarily locked.");
+            var timeLeft = activation.LockedUntil - now;
+            throw new InvalidOperationException($"Activation is temporarily locked.{timeLeft} minutes remaining.");
         }
     }
 
@@ -83,5 +88,28 @@ public class CitizenVerificationService : ICitizenVerificationService
         {
             throw new InvalidOperationException("The account has already been linked to another citizen.");
         }
+    }
+
+    private async Task RecordFailedAttemptAsync(CitizenActivation activation, DateTime now,
+        CancellationToken cancellationToken)
+    {
+        activation.AttemptCount++;
+        activation.UpdatedAt = now;
+        switch (activation.AttemptCount)
+        {
+            case InitialMaxPinAttempts:
+                activation.LockedUntil = now.AddMinutes(5);
+                break;
+            case SecondMaxPinAttempts:
+                activation.LockedUntil = now.AddMinutes(10);
+                break;
+            case FinalMaxPinAttempts:
+                activation.Status = ActivationStatus.Revoked;
+                activation.RevokedAt = now;
+                activation.LockedUntil = null;
+                break;
+        }
+
+        await _verificationRepository.SaveChangesAsync(cancellationToken);
     }
 }
