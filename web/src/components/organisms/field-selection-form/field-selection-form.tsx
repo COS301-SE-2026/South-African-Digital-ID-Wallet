@@ -4,22 +4,16 @@ import * as React from 'react'
 import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Text } from '@/components/atoms'
 import { FieldToggleRow } from '@/components/molecules'
-import {
-  MANDATORY_FIELDS,
-  OPTIONAL_FIELDS,
-  CredentialType,
-} from '@/services/qr-service'
+import { MANDATORY_FIELDS, OPTIONAL_FIELDS } from '@/services/qr-service'
 import type { FieldSelectionFormProps } from './types'
 
 export const FieldSelectionForm = ({
   credentialId,
+  credentialType,
   onContinue,
 }: Readonly<FieldSelectionFormProps>) => {
-  const [credentialType, setCredentialType] =
-    React.useState<CredentialType>('identityDocument')
   const [selectedFields, setSelectedFields] = React.useState<
     Record<string, boolean>
   >({})
@@ -61,26 +55,6 @@ export const FieldSelectionForm = ({
       <Text variant="sub-lg" className="font-bold">
         Choose what to share
       </Text>
-
-      <Tabs
-        value={credentialType}
-        onValueChange={(value) => setCredentialType(value as CredentialType)}
-      >
-        <TabsList className="w-full rounded-full border border-deep-green/30 bg-muted p-1">
-          <TabsTrigger
-            value="identityDocument"
-            className="flex-1 text-muted-foreground hover:text-muted-foreground data-active:bg-sidebar data-active:text-sidebar-foreground"
-          >
-            Identity document
-          </TabsTrigger>
-          <TabsTrigger
-            value="driversLicense"
-            className="flex-1 text-muted-foreground hover:text-muted-foreground data-active:bg-sidebar data-active:text-sidebar-foreground"
-          >
-            Driver&apos;s license
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
 
       <div className="rounded-lg border border-amber-400 bg-amber-100 p-4">
         <Text variant="sub-sm" className="font-bold">

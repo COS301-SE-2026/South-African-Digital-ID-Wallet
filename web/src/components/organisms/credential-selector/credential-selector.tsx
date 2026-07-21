@@ -7,7 +7,8 @@ import { Card } from '@/components/ui/card'
 import { Text } from '@/components/atoms'
 import { qrService } from '@/services/qr-service'
 import type { CredentialSelectorProps } from './types'
-
+const mapCredentialType = (label: string) =>
+  label === "Driver's License" ? 'driversLicense' : 'identityDocument'
 export const CredentialSelector = ({
   onSelect,
 }: Readonly<CredentialSelectorProps>) => {
@@ -56,7 +57,12 @@ export const CredentialSelector = ({
           <Card
             key={credential.id}
             className="flex cursor-pointer flex-row items-center justify-between p-4 transition-colors hover:bg-muted"
-            onClick={() => onSelect(credential.id)}
+            onClick={() =>
+              onSelect(
+                credential.id,
+                mapCredentialType(credential.credentialType)
+              )
+            }
           >
             <Text variant="sub-sm">{credential.credentialType}</Text>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />

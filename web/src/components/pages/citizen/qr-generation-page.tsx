@@ -15,11 +15,18 @@ type Step = 'select-credential' | 'select-fields' | 'preview' | 'display'
 export const QrGenerationPage = () => {
   const [step, setStep] = React.useState<Step>('select-credential')
   const [credentialId, setCredentialId] = React.useState<string | null>(null)
+  const [credentialType, setCredentialType] = React.useState<
+    QrDisclosureSelection['credentialType'] | null
+  >(null)
   const [selection, setSelection] =
     React.useState<QrDisclosureSelection | null>(null)
 
-  const handleCredentialSelect = (id: string) => {
+  const handleCredentialSelect = (
+    id: string,
+    type: QrDisclosureSelection['credentialType']
+  ) => {
     setCredentialId(id)
+    setCredentialType(type)
     setStep('select-fields')
   }
 
@@ -50,9 +57,10 @@ export const QrGenerationPage = () => {
         <CredentialSelector onSelect={handleCredentialSelect} />
       )}
 
-      {step === 'select-fields' && credentialId && (
+      {step === 'select-fields' && credentialId && credentialType && (
         <FieldSelectionForm
           credentialId={credentialId}
+          credentialType={credentialType}
           onContinue={handleFieldSelectionContinue}
         />
       )}
