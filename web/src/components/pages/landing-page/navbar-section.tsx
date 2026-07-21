@@ -1,48 +1,71 @@
-const NAV_LINKS = ['Features', 'Solutions', 'Pricing', 'Resources', 'Security']
+'use client'
+import { ArrowRight } from 'lucide-react'
+import Image from 'next/image'
+import FlashIdLogo from '@/assets/images/FlashID-white.png'
+import Link from 'next/link'
+
+const NAV_LINKS = ['Features', 'Solutions', 'Resources', 'Security']
 
 export function LandingPageNavbar() {
   return (
-    <header className="sticky top-0 z-50 border-b border-white/20 bg-deep-green">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
-        {/* Logo */}
-        <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-white bg-brand-gold text-md font-bold text-clean-white">
-            ID
-          </span>
+    <header className="sticky top-0 z-50">
+      <div className="border-b border-clean-white bg-deep-green">
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-10">
+          <Link href="/" className="group flex items-center gap-3">
+            <Image
+              src={FlashIdLogo}
+              alt="Flash ID"
+              width={170}
+              height={48}
+              priority
+              className="h-11 w-auto transition-transform duration-300 group-hover:scale-105"
+            />
+            <h1 className="text-xl font-bold tracking-tight text-clean-white">
+              Flash
+              <span className="text-accent-gold">ID</span>
+            </h1>
+          </Link>
 
-          <span className="text-md font-bold text-clean-white">VerifyID</span>
+          <nav className="hidden lg:block">
+            <ul className="flex items-center gap-1">
+              {NAV_LINKS.map((item) => (
+                <li key={item}>
+                  <Link
+                    href={`#${item.toLowerCase()}`}
+                    className="rounded-lg px-4 py-2 text-sm font-medium text-clean-white/90 transition-all duration-200 hover:bg-clean-white/20 hover:text-clean-white"
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login"
+              className="rounded-lg px-5 py-2.5 text-sm font-semibold text-clean-white transition-all duration-200 hover:bg-clean-white/20"
+            >
+              Sign In
+            </Link>
+
+            <Link
+              href="#install"
+              className="group inline-flex items-center gap-2 rounded-lg bg-clean-white px-5 py-2.5 text-sm font-semibold text-primary-green shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-cream-background hover:shadow-xl"
+            >
+              Install App
+              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
+          </div>
         </div>
+      </div>
 
-        {/* Navigation */}
-        <ul className="hidden items-center gap-8 md:flex">
-          {NAV_LINKS.map((link) => (
-            <li key={link}>
-              <a
-                href={`#${link.toLowerCase()}`}
-                className="text-md font-medium text-clean-white transition-colors hover:text-brand-gold"
-              >
-                {link}
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        {/* Actions */}
-        <div className="flex items-center gap-5">
-          <a
-            href="#sign-in"
-            className="hidden text-md font-medium text-clean-white transition-colors hover:text-brand-gold sm:block"
-          >
-            Sign In
-          </a>
-
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-full border border-white bg-brand-forest px-6 py-3 text-md font-semibold text-clean-white transition-all duration-200 hover:bg-brand-forestDark hover:border-brand-gold"
-          >
-            Get Started
-          </button>
-        </div>
+      <div className="flex h-1 w-full">
+        <div className="h-full flex-1 bg-deep-green" />
+        <div className="h-full flex-1 bg-accent-gold" />
+        <div className="h-full flex-1 bg-text-primary" />
+        <div className="h-full flex-1 bg-national-red" />
+        <div className="h-full flex-1 bg-national-blue" />
       </div>
     </header>
   )
