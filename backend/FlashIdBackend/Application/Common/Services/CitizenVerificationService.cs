@@ -4,7 +4,7 @@ using Application.Features.Verification.Dtos;
 
 namespace Application.Common.Services;
 
-public class CitizenVerificationService : ICitizenVerificationService
+public class CitizenVerificationService
 {
     private readonly ICitizenVerificationService _citizenVerificationService;
     private readonly IVerificationRepository _verificationRepository;
@@ -17,7 +17,7 @@ public class CitizenVerificationService : ICitizenVerificationService
     }
 
 
-    public Task<VerificationResponseDto> VerififyCitizenActivation(VerificationRequestDto request)
+    public Task<VerificationResponseDto> VerifyCitizenActivation(VerificationRequestDto request)
     {
         return null;
     }

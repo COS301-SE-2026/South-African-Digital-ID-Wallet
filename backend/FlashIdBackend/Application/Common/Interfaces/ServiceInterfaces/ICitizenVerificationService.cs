@@ -4,6 +4,6 @@ namespace Application.Common.Interfaces.ServiceInterfaces;
 
 public interface ICitizenVerificationService
 {
-    Task<VerificationResponseDto> VerififyCitizenActivation(VerificationRequestDto request);
+    Task<VerificationResponseDto> VerifyCitizenActivation(VerificationRequestDto request, Guid userId, CancellationToken cancellationToken);
 
 }
