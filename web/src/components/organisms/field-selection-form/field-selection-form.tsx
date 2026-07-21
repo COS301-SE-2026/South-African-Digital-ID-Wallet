@@ -58,24 +58,34 @@ export const FieldSelectionForm = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <Text variant="sub-lg">Choose what to share</Text>
+      <Text variant="sub-lg" className="font-bold">
+        Choose what to share
+      </Text>
 
       <Tabs
         value={credentialType}
         onValueChange={(value) => setCredentialType(value as CredentialType)}
       >
-        <TabsList className="w-full">
-          <TabsTrigger value="identityDocument" className="flex-1">
+        <TabsList className="w-full rounded-full border border-deep-green/30 bg-muted p-1">
+          <TabsTrigger
+            value="identityDocument"
+            className="flex-1 text-muted-foreground hover:text-muted-foreground data-active:bg-sidebar data-active:text-sidebar-foreground"
+          >
             Identity document
           </TabsTrigger>
-          <TabsTrigger value="driversLicense" className="flex-1">
+          <TabsTrigger
+            value="driversLicense"
+            className="flex-1 text-muted-foreground hover:text-muted-foreground data-active:bg-sidebar data-active:text-sidebar-foreground"
+          >
             Driver&apos;s license
           </TabsTrigger>
         </TabsList>
       </Tabs>
 
-      <div className="rounded-lg border border-amber-400 bg-amber-50 p-4">
-        <Text variant="sub-sm">Is an official requesting your details?</Text>
+      <div className="rounded-lg border border-amber-400 bg-amber-100 p-4">
+        <Text variant="sub-sm" className="font-bold">
+          Is an official requesting your details?
+        </Text>
         <Text variant="sub-sm" className="mb-3 mt-1 text-muted-foreground">
           Officials such as police officers are legally entitled to see every
           field. Select all before showing your QR code.
@@ -83,8 +93,7 @@ export const FieldSelectionForm = ({
         <Button
           type="button"
           onClick={handleSelectAll}
-          className="w-full gap-2"
-          variant="secondary"
+          className="w-full gap-2 bg-amber-400 font-bold text-amber-950 hover:bg-amber-500"
         >
           {allSelected && <Check className="h-4 w-4" />}
           {allSelected ? 'All fields selected' : 'Select all for official'}

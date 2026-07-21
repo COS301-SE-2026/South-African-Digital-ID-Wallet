@@ -43,7 +43,7 @@ export const QrGenerationPage = () => {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col gap-6 p-6">
+    <div className="flex w-full flex-col gap-6 p-6">
       <Text variant="h3">Generate QR code</Text>
 
       {step === 'select-credential' && (
