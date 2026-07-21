@@ -74,7 +74,7 @@ public class QrServiceIntegrationTests
             SaId = "9001015800083",
             Names = "Thandiwe",
             Surname = "Mokoena",
-            DateOfBirth = new DateTime(1990, 1, 1),
+            DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             Status = CitizenStatus.Activated,
             UserId = user.Id,
             CreatedAt = DateTime.UtcNow,
@@ -275,5 +275,159 @@ public class QrServiceIntegrationTests
 
         Assert.Single(result);
         Assert.Equal(activeCredential.Id, result[0].Id);
+    }
+
+    [Fact]
+    public async Task ResolveAsync_ValidToken_ReturnsDisclosedValuesAndMarksTokenAsUsed()
+    {
+        using var context = CreateContext();
+        var service = CreateQrService(context);
+        var (user, citizen) = CreateCitizenWithUser();
+
+        var cred = new Credential
+        {
+            Id = Guid.NewGuid(),
+            Status = CredentialStatus.Active,
+            Signature = string.Empty,
+            IssuedBy = "Home Affairs",
+            IssueDate = DateTime.UtcNow,
+            CitizenId = citizen.Id,
+            Citizen = citizen,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+        var driversL = new DriversLicense
+        {
+            Id = Guid.NewGuid(),
+            LicenseNumber = "4589161234567",
+            LicenseCode = LicenseCode.C,
+            Restrictions = "01",
+            ExpiryDate = new DateTime(2030, 01, 01, 0, 0, 0, DateTimeKind.Utc),
+            PhotoPath = "drivers-license-photo.jpg",
+            CountryOfIssue = "South Africa",
+            CredentialId = cred.Id,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+        await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
+        await context.Citizens.AddAsync(citizen, TestContext.Current.CancellationToken);
+        await context.Credentials.AddAsync(cred, TestContext.Current.CancellationToken);
+        await context.DriversLicenses.AddAsync(driversL, TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var req = new GenerateQrRequestDto
+        {
+            DisclosedFields = new List<string>
+            {
+                "Full name", "SA ID number", "Photo", "License number", "License code", "Country of issue", "Expiry date",
+            }
+        };
+
+        var generated = await service.GenerateQrAsync(cred.Id, user.Id, req);
+        var res = await service.ResolveAsync(generated.Token, user.Id, "127.0.0.1");
+
+        Assert.Equal("Driver's License", res.CredentialType);
+        Assert.Equal("Thandiwe Mokoena", res.DisclosedFields["Full name"]);
+        Assert.Equal("9001015800083", res.DisclosedFields["SA ID number"]);
+        Assert.Equal("4589161234567", res.DisclosedFields["License number"]);
+        Assert.Equal("South Africa", res.DisclosedFields["Country of issue"]);
+
+        var persistedToken = await context.QrDisclosureTokens
+            .AsNoTracking()
+            .SingleAsync(TestContext.Current.CancellationToken);
+        Assert.NotNull(persistedToken.UsedAt);
+
+        var auditlog = await context.AuditLogs.SingleAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(AuditEventType.CredentialVerified, auditlog.EventType);
+        Assert.Equal(user.Id, auditlog.ActorId);
+    }
+
+    [Fact]
+    public async Task ResolveAlreadyUsed_TokenAlreadyUsed_ThrowsInvalidDisclosureTokenException()
+    {
+        using var context = CreateContext();
+        var service = CreateQrService(context);
+        var (user, citizen) = CreateCitizenWithUser();
+
+        var cred = new Credential
+        {
+            Id = Guid.NewGuid(),
+            Status = CredentialStatus.Active,
+            Signature = string.Empty,
+            IssuedBy = "Home Affairs",
+            IssueDate = DateTime.UtcNow,
+            CitizenId = citizen.Id,
+            Citizen = citizen,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+        await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
+        await context.Citizens.AddAsync(citizen, TestContext.Current.CancellationToken);
+        await context.Credentials.AddAsync(cred, TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var req = new GenerateQrRequestDto
+        {
+            DisclosedFields = new List<string>
+            {
+                "Full name", "SA ID number", "Photo", "License number", "License code", "Country of issue", "Expiry date",
+            }
+        };
+        var generated = await service.GenerateQrAsync(cred.Id, user.Id, req);
+
+        await service.ResolveAsync(generated.Token, user.Id, "127.0.0.1");
+        await Assert.ThrowsAsync<InvalidDisclosureTokenException>(() => service.ResolveAsync(generated.Token, user.Id, "127.0.0.1"));
+    }
+
+    [Fact]
+    public async Task ResolveAsync_MalformedToken_ThrowsInvalidDisclosureTokenException()
+    {
+        using var context = CreateContext();
+        var service = CreateQrService(context);
+
+        await Assert.ThrowsAsync<InvalidDisclosureTokenException>(() => service.ResolveAsync("not-a-valid-base64!", Guid.NewGuid(), "127.0.0.1"));
+    }
+
+    [Fact]
+    public async Task ResolveAsync_CredentialRevokedAfterGeneration_ThrowsInvalidDisclosureTokenException()
+    {
+        using var context = CreateContext();
+        var service = CreateQrService(context);
+        var (user, citizen) = CreateCitizenWithUser();
+
+        var cred = new Credential
+        {
+            Id = Guid.NewGuid(),
+            Status = CredentialStatus.Active,
+            Signature = string.Empty,
+            IssuedBy = "Home Affairs",
+            IssueDate = DateTime.UtcNow,
+            CitizenId = citizen.Id,
+            Citizen = citizen,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+        await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
+        await context.Citizens.AddAsync(citizen, TestContext.Current.CancellationToken);
+        await context.Credentials.AddAsync(cred, TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var req = new GenerateQrRequestDto
+        {
+            DisclosedFields = new List<string>
+            {
+                "Full name", "SA ID number", "Photo", "License number", "License code", "Country of issue", "Expiry date",
+            }
+        };
+        var generated = await service.GenerateQrAsync(cred.Id, user.Id, req);
+
+        cred.Status = CredentialStatus.Revoked;
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        await Assert.ThrowsAsync<InvalidDisclosureTokenException>(() => service.ResolveAsync(generated.Token, user.Id, "127.0.0.1"));
     }
 }
