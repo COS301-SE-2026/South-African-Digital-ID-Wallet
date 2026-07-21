@@ -17,6 +17,7 @@ public static class DependencyInjection
         services.AddSingleton<CitizenMapper>();
         services.AddSingleton<InstitutionMapper>();
         services.AddSingleton<AuthMapper>();
+        services.AddScoped<ICitizenVerificationService, CitizenVerificationService>();
         return services;
     }
 }

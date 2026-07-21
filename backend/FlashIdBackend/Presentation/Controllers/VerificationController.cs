@@ -28,7 +28,9 @@ public class VerificationController : ControllerBase
             return Unauthorized(new { message = "The authenticated account could not be identified." });
         }
 
-        var response = await _citizenVerificationService.VerifyCitizenActivation(request, userId, cancellationToken);
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+        var response = await _citizenVerificationService.VerifyCitizenActivation(request, userId, ipAddress, cancellationToken);
         return Ok(response);
     }
 

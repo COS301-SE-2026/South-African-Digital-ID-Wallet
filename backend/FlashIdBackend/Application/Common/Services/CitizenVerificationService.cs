@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
@@ -22,10 +24,75 @@ public class CitizenVerificationService : ICitizenVerificationService
 
     }
 
-    public Task<VerificationResponseDto> VerifyCitizenActivation(VerificationRequestDto request, Guid userId,
-        CancellationToken cancellationToken)
+    public async Task<VerificationResponseDto> VerifyCitizenActivation(VerificationRequestDto request, Guid userId,
+        string ipAddress, CancellationToken cancellationToken)
     {
-        return null;
+        ValidateRequest(request);
+
+        var cleanSaId = request.SaId;
+        var cleanPin = request.Pin;
+        var tokenHash = HashToken(request.Token.Trim());
+
+        var activation = await _verificationRepository.GetActivationByTokenHashAsync(tokenHash, cancellationToken);
+
+        if (activation is null)
+        {
+            throw new InvalidOperationException("Activation details are invalid.");
+        }
+
+        var now = DateTime.UtcNow;
+
+        ValidateActivationState(activation, now);
+
+        var citizen = await _verificationRepository.GetCitizenByUserIdAsync(userId, cancellationToken);
+        if (citizen is null)
+        {
+            throw new InvalidOperationException("Citizen linked to this activation could not be found.");
+        }
+
+        if (!string.Equals(citizen.SaId, cleanSaId, StringComparison.Ordinal))
+        {
+            await RecordFailedAttemptAsync(activation, now, cancellationToken);
+            throw new InvalidOperationException("Activation details are invalid.");
+        }
+        var pinMatches = BCrypt.Net.BCrypt.Verify(cleanPin, activation.PinHash);
+        if (!pinMatches)
+        {
+            await RecordFailedAttemptAsync(activation, now, cancellationToken);
+            throw new InvalidOperationException("Activation details are invalid.");
+        }
+
+        await ValidateAccountLinkingAsync(citizen, userId, cancellationToken);
+
+        citizen.UserId = userId;
+        citizen.Status = CitizenStatus.Activated;
+        citizen.UpdatedAt = now;
+
+        activation.Status = ActivationStatus.Used;
+        activation.UsedAt = now;
+        activation.UpdatedAt = now;
+        activation.LockedUntil = null;
+
+        var auditLog = new AuditLog()
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.CitizenVerified,
+            Details = $"Citizen {citizen.Id} was verified using the activation link verification service.",
+            ActorId = userId,
+            CreatedAt = now,
+            IpAddress = ipAddress,
+        };
+
+        await _verificationRepository.AddAuditLogAsync(auditLog, cancellationToken);
+        await _verificationRepository.SaveChangesAsync(cancellationToken);
+
+        return new VerificationResponseDto
+        {
+            CitizenId = citizen.Id,
+            Status = citizen.Status.ToString(),
+            IsVerified = true,
+            Message = "Your identity has been verified successfully."
+        };
     }
 
     private static void ValidateRequest(VerificationRequestDto request)
@@ -111,5 +178,13 @@ public class CitizenVerificationService : ICitizenVerificationService
         }
 
         await _verificationRepository.SaveChangesAsync(cancellationToken);
+    }
+
+    private static string HashToken(string rawToken)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(rawToken);
+        var tokenBytes = Encoding.UTF8.GetBytes(rawToken);
+        var hashBytes = SHA256.HashData(tokenBytes);
+        return Convert.ToHexString(hashBytes);
     }
 }
