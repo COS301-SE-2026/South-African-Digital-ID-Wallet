@@ -1,7 +1,11 @@
 export interface AppUser {
-  names?: string
-  surname?: string
-  userId?: string | number
-  citizenship?: string
-  memberSince?: string
+  userId: string
+  saId: string
+  names: string
+  surname: string
+  citizenship: string
+}
+
+export type AccountCardProps = {
+  readonly user: AppUser | null
 }

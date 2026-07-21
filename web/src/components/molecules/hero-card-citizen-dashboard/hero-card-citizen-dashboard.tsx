@@ -1,9 +1,10 @@
 'use client'
 
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { StatusPill } from '@/components/atoms/status-pill/status-pill'
 import qrCodeImage from '@/assets/images/qrCodeImage.png'
+import { Button } from '@/components/ui/button'
+import { Text } from '@/components/atoms/text'
 
 const qr_duration = 120
 
@@ -14,9 +15,9 @@ function formatTime(totalSeconds: number) {
 }
 
 export function WalletHeroCard() {
-  const [secondsLeft, setSecondsLeft] = React.useState(qr_duration)
+  const [secondsLeft, setSecondsLeft] = useState(qr_duration)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setSecondsLeft((prev) => (prev <= 1 ? 0 : prev - 1))
     }, 1000)
@@ -28,20 +29,25 @@ export function WalletHeroCard() {
   return (
     <div className="bg-deep-green rounded-3xl p-6 flex items-center justify-between gap-6">
       <div>
-        <h1 className="text-2xl font-bold mt-3 text-white">
+        <Text
+          as="h1"
+          variant="sub-lg"
+          className="mt-3 text-white text-2xl md:text-3xl font-bold"
+        >
           This is your FlashID wallet dashboard.
-        </h1>
+        </Text>
+
         <p className="text-white/80 mt-2 max-w-md">
           Present a secure QR code when an authorised service provider needs to
           verify your identity.
         </p>
         <div className="mt-4 flex gap-3">
-          <button
+          <Button
             onClick={handleGenerate}
-            className="bg-white bg-deep-green px-4 py-2 rounded-2xl font-semibold hover:bg-white/90 transition-colors"
+            className="bg-white text-deep-green hover:bg-white/90"
           >
             Generate QR Code
-          </button>
+          </Button>
         </div>
       </div>
 

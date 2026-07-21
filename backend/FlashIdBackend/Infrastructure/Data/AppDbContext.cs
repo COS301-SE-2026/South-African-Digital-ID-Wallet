@@ -24,6 +24,10 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<User> DomainUsers => Set<User>();
     public DbSet<UserPreferences> UserPreferences => Set<UserPreferences>();
 
+    public DbSet<CitizenActivation> CitizenActivations => Set<CitizenActivation>();
+    public DbSet<TrustedDevice> TrustedDevices => Set<TrustedDevice>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         //this lets IdentityDbContext set up its own tables

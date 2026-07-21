@@ -42,7 +42,7 @@ describe('AccountCardCitizenDashboard', () => {
     render(<AccountCardCitizenDashboard user={mockUser} />)
 
     expect(
-      screen.getByRole('link', { name: /manage account/i })
+      screen.getByRole('button', { name: /manage account/i })
     ).toBeInTheDocument()
   })
 })

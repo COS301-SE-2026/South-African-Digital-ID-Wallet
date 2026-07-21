@@ -1,6 +1,6 @@
 import type { LucideIcon } from 'lucide-react'
 
-export interface ActivityStatItem {
+export type ActivityStatItem = {
   id: string
   label: string
   value: number
@@ -8,10 +8,17 @@ export interface ActivityStatItem {
   tone: 'green' | 'amber' | 'blue'
 }
 
-export interface ActivityLogItem {
+export type ActivityLogItem = {
   id: string
   title: string
   timestamp: string
   icon: LucideIcon
   tone: 'green' | 'blue' | 'amber'
+}
+
+export type ActivityItem = {
+  id: string
+  title: string
+  timestamp: string
+  type: string | null
 }

@@ -1,44 +1,81 @@
+'use client'
+
 import * as React from 'react'
-import { ChevronRight } from 'lucide-react'
-import { AvatarInitials } from '@/components/atoms/avatar-citizen-dashboard/avatar-initials'
+
+import api from '@/lib/api'
+
 import type { AppUser } from '@/components/molecules/citizen-dashboard-account-card/types'
 
-interface AccountCardProps {
-  user: AppUser | null
-}
+export function AccountCardCitizenDashboard() {
+  const [user, setUser] = React.useState<AppUser | null>(null)
+  const [loading, setLoading] = React.useState(true)
 
-export function AccountCardCitizenDashboard({ user }: AccountCardProps) {
-  const initials = `${user?.names?.[0] ?? 'U'}${user?.surname?.[0] ?? ''}`
+  React.useEffect(() => {
+    const fetchAccount = async () => {
+      try {
+        const { data } = await api.get<AppUser>(
+          '/api/dashboard-account-card/me'
+        )
+
+        setUser(data)
+      } catch (error) {
+        console.error('Failed to load account:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAccount()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="bg-card rounded-3xl border p-4">
+        <h2 className="text-sm font-bold">Your Account</h2>
+
+        <p className="mt-3 text-sm text-muted-text">Loading account...</p>
+      </div>
+    )
+  }
+
   const fullName = user
     ? `${user.names ?? ''} ${user.surname ?? ''}`.trim()
     : 'Guest User'
-  const idSuffix = user?.userId ? String(user.userId).slice(-3) : '084'
+
+  const idSuffix = user?.saId ? user.saId.slice(-4) : '084'
+
   const citizenship = user?.citizenship ?? 'South African Citizen'
-  const memberSince = user?.memberSince ?? '12 Feb 2024'
+
+  const initials = user
+    ? `${user.names?.charAt(0) ?? ''}${user.surname?.charAt(0) ?? ''}`.toUpperCase()
+    : 'GU'
 
   return (
     <div className="bg-card rounded-3xl border p-4">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-bold">Your Account</h2>
 
-        <a
-          href="#"
+        <button
+          type="button"
           className="inline-flex items-center gap-1 text-xs font-semibold text-green-700 hover:text-green-800"
         >
           Manage account
-          <ChevronRight className="h-3.5 w-3.5" />
-        </a>
+        </button>
       </div>
 
-      <div className="mt-3 flex items-center justify-between gap-3">
+      <div className="mt-4 flex items-center justify-between gap-4">
         <div className="flex-1">
-          <div className="text-muted-text text-sm">Lebron James{fullName}</div>
+          <div className="text-sm text-muted-text">{fullName}</div>
 
-          <div className="text-muted-text text-sm mt-0.5">
+          <div className="mt-1 text-sm text-muted-text">
             ID ending &bull;&bull;&bull;&bull;{idSuffix}
           </div>
 
-          <div className="text-muted-text text-sm mt-0.5">{citizenship}</div>
+          <div className="mt-1 text-sm text-muted-text">{citizenship}</div>
+        </div>
+
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-xl font-bold text-green-700">
+          {initials}
         </div>
       </div>
     </div>
