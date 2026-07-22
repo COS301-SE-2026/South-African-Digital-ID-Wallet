@@ -1,6 +1,6 @@
-import { LandingPageNavbar } from './navbar-section'
+import { LandingPageNavbar } from '../navbar-section'
 import { LandingPageContent } from './content-section'
-import { LandingPageFooter } from './footer-section'
+import { LandingPageFooter } from '../footer-section'
 
 export function LandingPage() {
   return (

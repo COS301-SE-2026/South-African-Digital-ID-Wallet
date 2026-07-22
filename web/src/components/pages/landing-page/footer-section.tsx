@@ -8,7 +8,6 @@ import FlashIdLogo from '@/assets/images/FlashID-white.png'
 export function LandingPageFooter() {
   return (
     <footer className="bg-deep-green">
-      {/* South African Accent Line */}
       <div className="flex h-1 w-full">
         <div className="flex-1 bg-deep-green" />
         <div className="flex-1 bg-accent-gold" />
@@ -18,7 +17,6 @@ export function LandingPageFooter() {
       </div>
 
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-5 lg:flex-row lg:px-10">
-        {/* Left */}
         <div className="flex items-center gap-4">
           <Image
             src={FlashIdLogo}
@@ -39,16 +37,10 @@ export function LandingPageFooter() {
           </div>
         </div>
 
-        {/* Center */}
         <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-clean-white/70">
           <div className="flex items-center gap-2">
             <Mail className="h-4 w-4 text-accent-gold" />
-            info@flashid.co.za
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Phone className="h-4 w-4 text-accent-gold" />
-            +27 (0) 12 345 6789
+            t3chtitansgo@gmail.com
           </div>
 
           <div className="flex items-center gap-2">
@@ -57,7 +49,6 @@ export function LandingPageFooter() {
           </div>
         </div>
 
-        {/* Right */}
         <div className="flex items-center gap-5 text-sm">
           <Link
             href="#"

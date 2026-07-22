@@ -76,7 +76,6 @@ export function LandingPageContent() {
                 </span>
               </div>
 
-              {/* Heading */}
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.1] tracking-tight text-gray-900">
                 Your next step toward a safer digital{' '}
                 <span className="text-emerald-600">South Africa</span>
