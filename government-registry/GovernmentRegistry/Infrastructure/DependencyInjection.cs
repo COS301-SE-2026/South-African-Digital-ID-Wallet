@@ -13,6 +13,7 @@ public static class DependencyInjection
     {
        services.AddDbContext<AppDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
        services.AddScoped<ICitizenRecordRepository, CitizenRecordRepository>();
+       services.AddScoped<ICredentialsRepository, CredentialsRepository>();
        return services;
     }
 }
