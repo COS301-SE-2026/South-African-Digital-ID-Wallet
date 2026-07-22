@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Presentation.Controllers;
 
 [ApiController]
-[Route("api/citizen-verfication")]
+[Route("api/citizen-verification")]
 [Authorize(Roles = "Citizen")]
 public class VerificationController : ControllerBase
 {
@@ -20,7 +20,7 @@ public class VerificationController : ControllerBase
     }
 
     [HttpPost("activate-token")]
-    public async Task<IActionResult> VerifyCitizenActivation([FromQuery] string token, [FromBody] VerificationRequestDto request, CancellationToken cancellationToken)
+    public async Task<IActionResult> VerifyCitizenActivation([FromBody] VerificationRequestDto request, CancellationToken cancellationToken)
     {
         var userIdvalue = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdvalue, out var userId))
