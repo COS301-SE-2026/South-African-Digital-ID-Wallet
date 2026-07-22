@@ -159,7 +159,7 @@ public class QrServiceTests
         var fakeQrDisclosureTokenRepository = new FakeQrDisclosureTokenRepository();
         var qrService = new QrService(fakeRepository, fakeSigningProvider, fakeQrDisclosureTokenRepository, new FakeInstitutionRepository());
 
-        var request = new GenerateQrRequestDto { DisclosedFields = new List<string> { "Not a real field" } };
+        var request = new GenerateQrRequestDto { DisclosedFields = new List<string> { "This is not a real field" } };
 
         await Assert.ThrowsAsync<InvalidDisclosedFieldsException>(() => qrService.GenerateQrAsync(credential.Id, userId, request));
     }

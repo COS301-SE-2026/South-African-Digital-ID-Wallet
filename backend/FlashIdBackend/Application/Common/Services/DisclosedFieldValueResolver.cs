@@ -21,7 +21,7 @@ public static class DisclosedFieldValueResolver
         "Identity number" => cred.Citizen.SaId,
         "SA ID number" => cred.Citizen.SaId,
         "Full surname" => cred.Citizen.Surname,
-        "Full forename" => cred.Citizen.Names,
+        "Full forenames" => cred.Citizen.Names,
         "Full name" => $"{cred.Citizen.Names} {cred.Citizen.Surname}",
         "Date of birth" => cred.Citizen.DateOfBirth.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
         "Gender" => cred.Citizen.Gender.ToString(),
