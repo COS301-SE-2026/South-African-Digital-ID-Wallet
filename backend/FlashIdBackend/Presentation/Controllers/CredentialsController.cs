@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Exceptions;
@@ -12,10 +13,12 @@ namespace Presentation.Controllers;
 public class CredentialsController : ControllerBase
 {
     private readonly IQrService _qrService;
+    private readonly ICredentialActivationService _credentialActivationService;
 
-    public CredentialsController(IQrService qrService)
+    public CredentialsController(IQrService qrService, ICredentialActivationService credentialActivationService)
     {
         _qrService = qrService;
+        _credentialActivationService = credentialActivationService;
     }
 
     [HttpPost("{credentialId}/qr-token")]
@@ -72,8 +75,17 @@ public class CredentialsController : ControllerBase
 
     [HttpPost("activate")]
     [Authorize(Roles = "Citizen")]
-    public async Task<ActionResult<ActivateCredentialsRequestDto>> ActivateCredentials(ActivateCredentialsRequestDto request, CancellationToken cancellationToken)
+    public async Task<ActionResult<ActivateCredentialsResponseDto>> ActivateCredentials(ActivateCredentialsRequestDto request, CancellationToken cancellationToken)
     {
-        return Ok(new ActivateCredentialsRequestDto());
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            return Unauthorized(new { message = "The authenticated account could not be identified." });
+        }
+
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+        var response = await _credentialActivationService.ActivateCredentialsAsync(request, userId, ipAddress, cancellationToken);
+        return Ok(response);
     }
 }
