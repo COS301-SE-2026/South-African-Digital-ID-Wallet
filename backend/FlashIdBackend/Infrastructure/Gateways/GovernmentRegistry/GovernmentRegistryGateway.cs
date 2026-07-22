@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Features.Onboarding.Dtos;
 
-namespace Infrastructure.Services.GovernmentRegistry;
+namespace Infrastructure.Gateways.GovernmentRegistry;
 
 public class GovernmentRegistryGateway : IGovernmentRegistryGateway
 {

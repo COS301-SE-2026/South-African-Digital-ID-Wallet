@@ -1,4 +1,4 @@
-namespace Infrastructure.Services.GovernmentRegistry.Dtos;
+namespace Infrastructure.Gateways.GovernmentRegistry.Dtos;
 
 public class GovernmentRegistryCitizenRecordDto
 {
