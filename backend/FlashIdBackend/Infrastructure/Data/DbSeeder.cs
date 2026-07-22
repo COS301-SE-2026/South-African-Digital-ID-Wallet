@@ -27,6 +27,10 @@ namespace Infrastructure.Data;
 // scanning features are built out.
 public static class DbSeeder
 {
+    private sealed record DeviceTemplate(string Name, string Type, string Os, string Browser);
+
+    private sealed record NotificationTemplate(string Title, string Description, string Tone);
+
     private static readonly string[] FirstNames = new[]
     {
         "Liam","Noah","Ethan","Mason","Logan","James","Oliver","Benjamin","Elijah","Lucas",
@@ -700,13 +704,13 @@ public static class DbSeeder
 
         var deviceTemplates = new[]
         {
-            new { Name = "iPhone 15 Pro", Type = "Mobile", Os = "iOS 18.1", Browser = "Safari" },
-            new { Name = "Samsung Galaxy S24", Type = "Mobile", Os = "Android 15", Browser = "Chrome" },
-            new { Name = "MacBook Pro", Type = "Desktop", Os = "macOS Sequoia", Browser = "Safari" },
-            new { Name = "Dell XPS 15", Type = "Desktop", Os = "Windows 11", Browser = "Edge" },
-            new { Name = "iPad Air", Type = "Tablet", Os = "iPadOS 18.1", Browser = "Safari" },
-            new { Name = "HP Pavilion", Type = "Desktop", Os = "Windows 11", Browser = "Chrome" },
-            new { Name = "Google Pixel 9", Type = "Mobile", Os = "Android 15", Browser = "Chrome" },
+            new DeviceTemplate("iPhone 15 Pro", "Mobile", "iOS 18.1", "Safari"),
+            new DeviceTemplate("Samsung Galaxy S24", "Mobile", "Android 15", "Chrome"),
+            new DeviceTemplate("MacBook Pro", "Desktop", "macOS Sequoia", "Safari"),
+            new DeviceTemplate("Dell XPS 15", "Desktop", "Windows 11", "Edge"),
+            new DeviceTemplate("iPad Air", "Tablet", "iPadOS 18.1", "Safari"),
+            new DeviceTemplate("HP Pavilion", "Desktop", "Windows 11", "Chrome"),
+            new DeviceTemplate("Google Pixel 9", "Mobile", "Android 15", "Chrome"),
         };
 
         var locations = new[]
@@ -717,14 +721,9 @@ public static class DbSeeder
 
         var devicesToAdd = new List<TrustedDevice>();
 
-        // Prioritize Harper Miller (or any Harper/Miller match) with a fuller device history
-        var priorityCitizens = allCitizens
-            .Where(c => c.Names == "Harper" || c.Surname == "Miller")
-            .ToList();
-
-        foreach (var citizen in priorityCitizens)
+        void AddDevicesForCitizen(Citizen citizen, int minDevices, int maxDevicesExclusive, int maxLastActiveDaysAgo, int trustedThreshold)
         {
-            var deviceCount = rnd.Next(3, 5);
+            var deviceCount = rnd.Next(minDevices, maxDevicesExclusive);
             for (int i = 0; i < deviceCount; i++)
             {
                 var template = deviceTemplates[rnd.Next(deviceTemplates.Length)];
@@ -737,9 +736,9 @@ public static class DbSeeder
                     Browser = template.Browser,
                     IpAddress = SampleIpAddresses[rnd.Next(SampleIpAddresses.Length)],
                     Location = locations[rnd.Next(locations.Length)],
-                    LastActive = now.AddDays(-rnd.Next(0, 14)),
+                    LastActive = now.AddDays(-rnd.Next(0, maxLastActiveDaysAgo)),
                     IsCurrentDevice = i == 0,
-                    IsTrusted = rnd.Next(10) > 1, // mostly trusted, occasionally not
+                    IsTrusted = rnd.Next(10) > trustedThreshold,
                     CitizenId = citizen.Id,
                     CreatedAt = now.AddDays(-rnd.Next(30, 365)),
                     UpdatedAt = now
@@ -747,30 +746,20 @@ public static class DbSeeder
             }
         }
 
+        // Prioritize Harper Miller (or any Harper/Miller match) with a fuller device history
+        var priorityCitizens = allCitizens
+            .Where(c => c.Names == "Harper" || c.Surname == "Miller")
+            .ToList();
+
+        foreach (var citizen in priorityCitizens)
+        {
+            AddDevicesForCitizen(citizen, minDevices: 3, maxDevicesExclusive: 5, maxLastActiveDaysAgo: 14, trustedThreshold: 1);
+        }
+
         // Give the remaining citizens 1-3 devices each
         foreach (var citizen in allCitizens.Where(c => !priorityCitizens.Contains(c)))
         {
-            var deviceCount = rnd.Next(1, 4);
-            for (int i = 0; i < deviceCount; i++)
-            {
-                var template = deviceTemplates[rnd.Next(deviceTemplates.Length)];
-                devicesToAdd.Add(new TrustedDevice
-                {
-                    Id = Guid.NewGuid(),
-                    DeviceName = template.Name,
-                    DeviceType = template.Type,
-                    OperatingSystem = template.Os,
-                    Browser = template.Browser,
-                    IpAddress = SampleIpAddresses[rnd.Next(SampleIpAddresses.Length)],
-                    Location = locations[rnd.Next(locations.Length)],
-                    LastActive = now.AddDays(-rnd.Next(0, 30)),
-                    IsCurrentDevice = i == 0,
-                    IsTrusted = rnd.Next(10) > 2,
-                    CitizenId = citizen.Id,
-                    CreatedAt = now.AddDays(-rnd.Next(30, 365)),
-                    UpdatedAt = now
-                });
-            }
+            AddDevicesForCitizen(citizen, minDevices: 1, maxDevicesExclusive: 4, maxLastActiveDaysAgo: 30, trustedThreshold: 2);
         }
 
         await context.TrustedDevices.AddRangeAsync(devicesToAdd);
@@ -790,16 +779,35 @@ public static class DbSeeder
 
         var notificationTemplates = new[]
         {
-            new { Title = "Credential verified", Description = "Your identity credential was successfully verified by an official.", Tone = "success" },
-            new { Title = "New device signed in", Description = "A new device was used to access your account. If this wasn't you, review your trusted devices.", Tone = "warning" },
-            new { Title = "Drivers license renewal due", Description = "Your drivers license is due for renewal within the next 30 days.", Tone = "info" },
-            new { Title = "Profile updated", Description = "Your account preferences were updated successfully.", Tone = "success" },
-            new { Title = "Failed login attempt detected", Description = "We noticed a failed login attempt on your account.", Tone = "warning" },
-            new { Title = "Document upload complete", Description = "Your supporting document was uploaded and is pending review.", Tone = "info" },
-            new { Title = "Welcome to FlashID", Description = "Your digital ID wallet is ready to use.", Tone = "success" },
+            new NotificationTemplate("Credential verified", "Your identity credential was successfully verified by an official.", "success"),
+            new NotificationTemplate("New device signed in", "A new device was used to access your account. If this wasn't you, review your trusted devices.", "warning"),
+            new NotificationTemplate("Drivers license renewal due", "Your drivers license is due for renewal within the next 30 days.", "info"),
+            new NotificationTemplate("Profile updated", "Your account preferences were updated successfully.", "success"),
+            new NotificationTemplate("Failed login attempt detected", "We noticed a failed login attempt on your account.", "warning"),
+            new NotificationTemplate("Document upload complete", "Your supporting document was uploaded and is pending review.", "info"),
+            new NotificationTemplate("Welcome to FlashID", "Your digital ID wallet is ready to use.", "success"),
         };
 
         var notificationsToAdd = new List<Notification>();
+
+        void AddNotificationsForCitizen(Citizen citizen, int minCount, int maxCountExclusive, int maxDaysAgo)
+        {
+            var count = rnd.Next(minCount, maxCountExclusive);
+            for (int i = 0; i < count; i++)
+            {
+                var template = notificationTemplates[rnd.Next(notificationTemplates.Length)];
+                notificationsToAdd.Add(new Notification
+                {
+                    Id = Guid.NewGuid(),
+                    CitizenId = citizen.Id,
+                    Title = template.Title,
+                    Description = template.Description,
+                    Tone = template.Tone,
+                    CreatedAt = now.AddDays(-rnd.Next(0, maxDaysAgo)),
+                    IsRead = rnd.Next(2) == 0
+                });
+            }
+        }
 
         var priorityCitizens = allCitizens
             .Where(c => c.Names == "Harper" || c.Surname == "Miller")
@@ -807,44 +815,15 @@ public static class DbSeeder
 
         foreach (var citizen in priorityCitizens)
         {
-            var count = rnd.Next(4, 7);
-            for (int i = 0; i < count; i++)
-            {
-                var template = notificationTemplates[rnd.Next(notificationTemplates.Length)];
-                notificationsToAdd.Add(new Notification
-                {
-                    Id = Guid.NewGuid(),
-                    CitizenId = citizen.Id,
-                    Title = template.Title,
-                    Description = template.Description,
-                    Tone = template.Tone,
-                    CreatedAt = now.AddDays(-rnd.Next(0, 30)),
-                    IsRead = rnd.Next(2) == 0
-                });
-            }
+            AddNotificationsForCitizen(citizen, minCount: 4, maxCountExclusive: 7, maxDaysAgo: 30);
         }
 
         foreach (var citizen in allCitizens.Where(c => !priorityCitizens.Contains(c)))
         {
-            var count = rnd.Next(1, 5);
-            for (int i = 0; i < count; i++)
-            {
-                var template = notificationTemplates[rnd.Next(notificationTemplates.Length)];
-                notificationsToAdd.Add(new Notification
-                {
-                    Id = Guid.NewGuid(),
-                    CitizenId = citizen.Id,
-                    Title = template.Title,
-                    Description = template.Description,
-                    Tone = template.Tone,
-                    CreatedAt = now.AddDays(-rnd.Next(0, 60)),
-                    IsRead = rnd.Next(2) == 0
-                });
-            }
+            AddNotificationsForCitizen(citizen, minCount: 1, maxCountExclusive: 5, maxDaysAgo: 60);
         }
 
         await context.Notifications.AddRangeAsync(notificationsToAdd);
         await context.SaveChangesAsync();
     }
-
 }
