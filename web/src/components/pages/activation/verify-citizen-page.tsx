@@ -5,6 +5,9 @@ import { ShieldCheck, Landmark, WalletCards, LockKeyhole } from 'lucide-react'
 import { VerifyIdentityCard } from '@/components/organisms/verify-identity-card'
 import Image from 'next/image'
 
+const STEPS = ['Verify Identity', 'Activate Credentials', 'Complete']
+const CURRENT_STEP = 1
+
 export default function VerifyCitizen() {
   const [saId, setSaId] = useState('')
   const [pin, setPin] = useState('')
@@ -57,6 +60,8 @@ export default function VerifyCitizen() {
 
         <div className="w-full lg:pt-2">
           <VerifyIdentityCard
+            steps={STEPS}
+            currentStep={CURRENT_STEP}
             saId={saId}
             pin={pin}
             onSaIdChange={setSaId}
