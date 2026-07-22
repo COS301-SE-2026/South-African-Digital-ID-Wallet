@@ -49,9 +49,9 @@ public static class DbSeeder
 
     private static readonly string[] SampleIpAddresses = new[]
     {
-        "102.130.10.1", "196.11.240.5", "41.21.100.3",
-        "154.0.5.22", "196.25.200.8", "41.113.10.14",
-        "102.65.30.9", "196.15.45.7", "41.205.20.11"
+        "102.130.10.1", "196.11.240.5", "41.21.100.3", // NOSONAR
+        "154.0.5.22", "196.25.200.8", "41.113.10.14", // NOSONAR
+        "102.65.30.9", "196.15.45.7", "41.205.20.11" // NOSONAR
     };
 
     public static async Task SeedAsync(AppDbContext context)
@@ -641,21 +641,11 @@ public static class DbSeeder
         var now = DateTime.UtcNow;
         var rnd = new Random(22222); // NOSONAR
 
-        // only seed if no audit logs exist yet
         if (await context.AuditLogs.AnyAsync()) return;
 
         var allUsers = await context.DomainUsers.ToListAsync();
         if (allUsers.Count == 0) return;
 
-        // sample IP addresses
-        var ipAddresses = new[]
-        {
-        "102.130.10.1", "196.11.240.5", "41.21.100.3",
-        "154.0.5.22", "196.25.200.8", "41.113.10.14",
-        "102.65.30.9", "196.15.45.7", "41.205.20.11"
-    };
-
-        // sample details per event type
         var eventDetails = new Dictionary<AuditEventType, string[]>
     {
         { AuditEventType.UserRegistered, new[] { "User registered via web portal", "User registered via mobile app" } },

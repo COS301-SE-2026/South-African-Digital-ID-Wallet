@@ -5,12 +5,9 @@ import { ActivityOverviewCard } from '@/components/molecules/activity-overview-c
 import { CredentialsList } from '@/components/molecules/credentials-list/credentials-list'
 import { TrustedDevices } from '@/components/molecules/trusted-devices/trusted-devices'
 import { NotificationsList } from '@/components/molecules/notifications-list/notifications-list'
-import { useUser } from '@/context/user-context'
 import { AccountCardCitizenDashboard } from '@/components/molecules/citizen-dashboard-account-card/citizen-dashboard-account-card'
 
 export default function CitizenDashboardPage() {
-  const { user } = useUser()
-
   return (
     <div className="flex h-screen overflow-hidden bg-[#f6f2ea]">
       <main className="flex-1 p-6 flex flex-col min-h-0 overflow-auto">
