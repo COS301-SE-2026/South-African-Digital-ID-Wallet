@@ -38,10 +38,6 @@ export function ActivityOverviewCard() {
                 icon = Lock
                 tone = 'amber'
                 break
-
-              default:
-                icon = CheckCircle2
-                tone = 'green'
             }
 
             return {

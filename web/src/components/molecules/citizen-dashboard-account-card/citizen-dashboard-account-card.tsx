@@ -38,17 +38,22 @@ export function AccountCardCitizenDashboard() {
     )
   }
 
-  const fullName = user
-    ? `${user.names ?? ''} ${user.surname ?? ''}`.trim()
-    : 'Guest User'
+  if (!user) {
+    return (
+      <div className="bg-card rounded-3xl border p-4">
+        <h2 className="text-sm font-bold">Your Account</h2>
 
-  const idSuffix = user?.saId ? user.saId.slice(-4) : '084'
-
-  const citizenship = user?.citizenship ?? 'South African Citizen'
-
-  const initials = user
-    ? `${user.names?.charAt(0) ?? ''}${user.surname?.charAt(0) ?? ''}`.toUpperCase()
-    : 'GU'
+        <p className="mt-3 text-sm text-muted-text">
+          Unable to load account information.
+        </p>
+      </div>
+    )
+  }
+  const fullName = `${user.names ?? ''} ${user.surname ?? ''}`.trim()
+  const idSuffix = user.saId.slice(-4)
+  const citizenship = user.citizenship
+  const initials =
+    `${user.names?.charAt(0) ?? ''}${user.surname?.charAt(0) ?? ''}`.toUpperCase()
 
   return (
     <div className="bg-card rounded-3xl border p-4">

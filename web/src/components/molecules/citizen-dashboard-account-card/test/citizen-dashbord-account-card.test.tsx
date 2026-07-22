@@ -1,48 +1,81 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { AccountCardCitizenDashboard } from '../citizen-dashboard-account-card'
+import api from '@/lib/api'
+
+jest.mock('@/lib/api')
+
+const mockedApi = api as jest.Mocked<typeof api>
 
 describe('AccountCardCitizenDashboard', () => {
   const mockUser = {
     userId: '1234567890123',
+    saId: '9901015000123',
     names: 'LeBron',
     surname: 'James',
     citizenship: 'South African Citizen',
-    memberSince: '12 Feb 2024',
   }
 
-  it('renders the account heading', () => {
-    render(<AccountCardCitizenDashboard user={mockUser} />)
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('renders the account heading', async () => {
+    mockedApi.get.mockResolvedValueOnce({
+      data: mockUser,
+    })
+
+    render(<AccountCardCitizenDashboard />)
 
     expect(
       screen.getByRole('heading', { name: /your account/i })
     ).toBeInTheDocument()
+
+    await waitFor(() => {
+      expect(screen.getByText(/lebron james/i)).toBeInTheDocument()
+    })
   })
 
-  it('renders the user information', () => {
-    render(<AccountCardCitizenDashboard user={mockUser} />)
+  it('renders the user information', async () => {
+    mockedApi.get.mockResolvedValueOnce({
+      data: mockUser,
+    })
 
-    expect(screen.getByText(/lebron james/i)).toBeInTheDocument()
+    render(<AccountCardCitizenDashboard />)
+
+    expect(await screen.findByText(/lebron james/i)).toBeInTheDocument()
 
     expect(screen.getByText(/south african citizen/i)).toBeInTheDocument()
 
-    expect(screen.getByText(/id ending ••••123/i)).toBeInTheDocument()
+    expect(screen.getByText(/id ending ••••0123/i)).toBeInTheDocument()
   })
 
-  it('renders guest user information when no user is provided', () => {
-    render(<AccountCardCitizenDashboard user={null} />)
+  it('renders an error message when the account cannot be loaded', async () => {
+    mockedApi.get.mockRejectedValueOnce(new Error('API Error'))
 
-    expect(screen.getByText(/guest user/i)).toBeInTheDocument()
-
-    expect(screen.getByText(/south african citizen/i)).toBeInTheDocument()
-
-    expect(screen.getByText(/id ending ••••084/i)).toBeInTheDocument()
-  })
-
-  it('renders the manage account link', () => {
-    render(<AccountCardCitizenDashboard user={mockUser} />)
+    render(<AccountCardCitizenDashboard />)
 
     expect(
-      screen.getByRole('button', { name: /manage account/i })
+      await screen.findByText(/unable to load account information/i)
     ).toBeInTheDocument()
+  })
+
+  it('renders the manage account button', async () => {
+    mockedApi.get.mockResolvedValueOnce({
+      data: mockUser,
+    })
+
+    render(<AccountCardCitizenDashboard />)
+
+    expect(
+      await screen.findByRole('button', { name: /manage account/i })
+    ).toBeInTheDocument()
+  })
+
+  it('shows the loading state initially', () => {
+    mockedApi.get.mockImplementation(() => new Promise(() => {}))
+
+    render(<AccountCardCitizenDashboard />)
+
+    expect(screen.getByText(/loading account/i)).toBeInTheDocument()
   })
 })
