@@ -62,7 +62,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<ISmsProvider, AzureCommunicationSmsProvider>();
-
+        services.AddScoped<IVerificationRepository, VerificationRepository>();
         return services;
     }
 }
