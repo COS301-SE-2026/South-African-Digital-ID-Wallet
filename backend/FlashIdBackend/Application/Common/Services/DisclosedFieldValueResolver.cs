@@ -29,6 +29,8 @@ public static class DisclosedFieldValueResolver
         "Country of birth" => cred.IdentityDocument?.CountryOfBirth ?? string.Empty,
         "Photograph" => cred.IdentityDocument?.PhotoPath ?? string.Empty,
         "Photo" => cred.DriversLicense?.PhotoPath ?? string.Empty,
+        "Signature" => string.Empty, // placeholder for future implementation
+        "Card issue date and number" => string.Empty,
         "License number" => cred.DriversLicense?.LicenseNumber ?? string.Empty,
         "License code" => cred.DriversLicense?.LicenseCode.ToString() ?? string.Empty,
         "Expiry date" => cred.DriversLicense?.ExpiryDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? string.Empty,

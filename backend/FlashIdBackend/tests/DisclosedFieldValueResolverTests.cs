@@ -131,4 +131,14 @@ public class DisclosedFieldValueResolverTests
         var cred = IdentityDocumentCredential();
         Assert.Throws<InvalidOperationException>(() => DisclosedFieldValueResolver.Resolve(cred, new[] { "This is not a real field" }));
     }
+
+    [Theory]
+    [InlineData("Signature")]
+    [InlineData("Card issue date and number")]
+    public void Resolve_NotYetImplementedFields_ReturnsEmptyStringe(string field)
+    {
+        var cred = IdentityDocumentCredential();
+        var res = DisclosedFieldValueResolver.Resolve(cred, new[] { field });
+        Assert.Equal(string.Empty, res[field]);
+    }
 }
