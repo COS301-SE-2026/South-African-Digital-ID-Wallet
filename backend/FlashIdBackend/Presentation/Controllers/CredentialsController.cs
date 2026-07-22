@@ -69,4 +69,11 @@ public class CredentialsController : ControllerBase
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
+
+    [HttpPost("activate")]
+    [Authorize(Roles = "Citizen")]
+    public async Task<ActionResult<ActivateCredentialsRequestDto>> ActivateCredentials(ActivateCredentialsRequestDto request, CancellationToken cancellationToken)
+    {
+        return Ok(new ActivateCredentialsRequestDto());
+    }
 }
