@@ -29,8 +29,8 @@ public class CitizenVerificationService : ICitizenVerificationService
     {
         ValidateRequest(request);
 
-        var cleanSaId = request.SaId;
-        var cleanPin = request.Pin;
+        var cleanSaId = request.SaId.Trim();
+        var cleanPin = request.Pin.Trim();
         var tokenHash = HashToken(request.Token.Trim());
 
         var activation = await _verificationRepository.GetActivationByTokenHashAsync(tokenHash, cancellationToken);
@@ -40,14 +40,19 @@ public class CitizenVerificationService : ICitizenVerificationService
             throw new InvalidOperationException("Activation details are invalid.");
         }
 
+        var citizen = activation.Citizen;
+        if (citizen is null)
+        {
+            throw new InvalidOperationException("Citizen linked to this activation could not be found.");
+        }
+
         var now = DateTime.UtcNow;
 
         ValidateActivationState(activation, now);
 
-        var citizen = await _verificationRepository.GetCitizenByUserIdAsync(userId, cancellationToken);
-        if (citizen is null)
+        if (activation.LockedUntil.HasValue && activation.LockedUntil.Value <= now)
         {
-            throw new InvalidOperationException("Citizen linked to this activation could not be found.");
+            activation.LockedUntil = null;
         }
 
         if (!string.Equals(citizen.SaId, cleanSaId, StringComparison.Ordinal))
@@ -65,7 +70,7 @@ public class CitizenVerificationService : ICitizenVerificationService
         await ValidateAccountLinkingAsync(citizen, userId, cancellationToken);
 
         citizen.UserId = userId;
-        citizen.Status = CitizenStatus.Activated;
+        citizen.Status = CitizenStatus.Verified;
         citizen.UpdatedAt = now;
 
         activation.Status = ActivationStatus.Used;
@@ -105,13 +110,13 @@ public class CitizenVerificationService : ICitizenVerificationService
         }
 
         if (string.IsNullOrWhiteSpace(request.SaId) || !Regex.IsMatch(request.SaId.Trim(), @"^\d{13}$",
-                RegexOptions.None, TimeSpan.FromSeconds(500)))
+                RegexOptions.None, TimeSpan.FromMilliseconds(500)))
         {
             throw new ArgumentException("A valid 13-digit South African ID number is required.");
         }
 
         if (string.IsNullOrWhiteSpace(request.Pin) || !Regex.IsMatch(request.Pin.Trim(), @"^\d{6}$",
-                RegexOptions.None, TimeSpan.FromSeconds(500)))
+                RegexOptions.None, TimeSpan.FromMilliseconds(500)))
         {
             throw new ArgumentException("A valid 6-digit activation pin is required.");
         }
@@ -136,8 +141,8 @@ public class CitizenVerificationService : ICitizenVerificationService
 
         if (activation.LockedUntil is not null && activation.LockedUntil > now)
         {
-            var timeLeft = activation.LockedUntil - now;
-            throw new InvalidOperationException($"Activation is temporarily locked.{timeLeft} minutes remaining.");
+            var timeLeft = (int)Math.Ceiling((activation.LockedUntil.Value - now).TotalMinutes);
+            throw new InvalidOperationException($"Activation is temporarily locked. Approximately {timeLeft} minutes remaining.");
         }
     }
 
@@ -151,7 +156,7 @@ public class CitizenVerificationService : ICitizenVerificationService
         var citizenAlreadyLinkedToUser =
             await _verificationRepository.GetCitizenByUserIdAsync(userId, cancellationToken);
 
-        if (citizenAlreadyLinkedToUser is not null && citizenAlreadyLinkedToUser.SaId != citizen.SaId)
+        if (citizenAlreadyLinkedToUser is not null && citizenAlreadyLinkedToUser.Id != citizen.Id)
         {
             throw new InvalidOperationException("The account has already been linked to another citizen.");
         }
@@ -170,7 +175,7 @@ public class CitizenVerificationService : ICitizenVerificationService
             case SecondMaxPinAttempts:
                 activation.LockedUntil = now.AddMinutes(10);
                 break;
-            case FinalMaxPinAttempts:
+            case >= FinalMaxPinAttempts:
                 activation.Status = ActivationStatus.Revoked;
                 activation.RevokedAt = now;
                 activation.LockedUntil = null;
