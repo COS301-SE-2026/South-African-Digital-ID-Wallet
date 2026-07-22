@@ -1,21 +1,50 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ActivityOverviewCard } from '../activity-overview-card'
+import api from '@/lib/api'
+
+jest.mock('@/lib/api')
+const mockedApi = api as jest.Mocked<typeof api>
+
+const mockActivity = [
+  {
+    id: '1',
+    title: 'Credential verified by bank official',
+    timestamp: '2026-07-01T10:00:00Z',
+    type: 'credentialverified',
+  },
+  {
+    id: '2',
+    title: "Driver's Licence credential issued",
+    timestamp: '2026-06-15T09:30:00Z',
+    type: 'licenseissued',
+  },
+  {
+    id: '3',
+    title: 'Biometric login successful',
+    timestamp: '2026-06-10T08:00:00Z',
+    type: 'biometriclogin',
+  },
+]
 
 describe('ActivityOverviewCard', () => {
-  it('renders the activity overview heading', () => {
+  beforeEach(() => {
+    mockedApi.get.mockResolvedValue({ data: mockActivity })
+  })
+
+  it('renders the activity overview heading', async () => {
     render(<ActivityOverviewCard />)
 
     expect(
-      screen.getByRole('heading', { name: /activity overview/i })
+      await screen.findByRole('heading', { name: /activity overview/i })
     ).toBeInTheDocument()
   })
 
-  it('renders recent activity items', () => {
+  it('renders recent activity items', async () => {
     render(<ActivityOverviewCard />)
 
     expect(
-      screen.getByText(/credential verified by bank official/i)
+      await screen.findByText(/credential verified by bank official/i)
     ).toBeInTheDocument()
 
     expect(
@@ -30,7 +59,8 @@ describe('ActivityOverviewCard', () => {
 
     render(<ActivityOverviewCard />)
 
-    await user.click(screen.getByRole('button', { name: /view all/i }))
+    const viewAllBtn = await screen.findByRole('button', { name: /view all/i })
+    await user.click(viewAllBtn)
 
     expect(
       screen.getByRole('heading', { name: /activity history/i })
@@ -44,7 +74,8 @@ describe('ActivityOverviewCard', () => {
 
     render(<ActivityOverviewCard />)
 
-    await user.click(screen.getByRole('button', { name: /view all/i }))
+    const viewAllBtn = await screen.findByRole('button', { name: /view all/i })
+    await user.click(viewAllBtn)
 
     expect(
       screen.getByRole('heading', { name: /activity history/i })
@@ -52,8 +83,10 @@ describe('ActivityOverviewCard', () => {
 
     await user.click(screen.getByRole('button', { name: /close/i }))
 
-    expect(
-      screen.queryByRole('heading', { name: /activity history/i })
-    ).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('heading', { name: /activity history/i })
+      ).not.toBeInTheDocument()
+    )
   })
 })
