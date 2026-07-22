@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.RegularExpressions;
 using Application.Common.Interfaces.GatewayInterfaces;
+using Application.Features.Credentials.DTOs;
 using Application.Features.Onboarding.Dtos;
 
 namespace Infrastructure.Gateways.GovernmentRegistry;
@@ -26,6 +27,36 @@ public class GovernmentRegistryGateway : IGovernmentRegistryGateway
         govRegistryResponse.EnsureSuccessStatusCode();
 
         return await govRegistryResponse.Content.ReadFromJsonAsync<CitizenRecordDto>();
+    }
+
+    public async Task<GovernmentRegistryIdentityDocumentDto?> GetIdentityDocumentBySaIdAsync(string saId,
+        CancellationToken cancellationToken)
+    {
+        var cleanSaId = ValidateSaId(saId);
+
+        var govRegistryResponse = await _httpClient.GetAsync($"api/credentials/{Uri.EscapeDataString(cleanSaId)}/identity-document");
+
+        if (govRegistryResponse.StatusCode == HttpStatusCode.NotFound)
+            return null;
+
+        govRegistryResponse.EnsureSuccessStatusCode();
+
+        return await govRegistryResponse.Content.ReadFromJsonAsync<GovernmentRegistryIdentityDocumentDto>();
+    }
+
+    public async Task<GovernmentRegistryDriversLicenseDto?> GetDriversLicenseBySaIdAsync(string saId,
+        CancellationToken cancellationToken)
+    {
+        var cleanSaId = ValidateSaId(saId);
+
+        var govRegistryResponse = await _httpClient.GetAsync($"api/credentials/{Uri.EscapeDataString(cleanSaId)}/drivers-license");
+
+        if (govRegistryResponse.StatusCode == HttpStatusCode.NotFound)
+            return null;
+
+        govRegistryResponse.EnsureSuccessStatusCode();
+
+        return await govRegistryResponse.Content.ReadFromJsonAsync<GovernmentRegistryDriversLicenseDto>();
     }
 
     private static string ValidateSaId(string saId)
