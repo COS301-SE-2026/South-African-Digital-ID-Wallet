@@ -34,16 +34,17 @@ public static class DependencyInjection
 
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
 
+        services.AddScoped<ICredentialRepository, CredentialRepository>();
+        services.AddSingleton<IQrSigningProvider, Ed25519SigningProvider>();
 
         services.AddHttpClient<IGovernmentRegistryGateway, GovernmentRegistryGateway>((serviceProvider, client) =>
-            {
-                var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-                client.BaseAddress = new Uri(configuration["GovernmentRegistry:BaseUrl"]!);
-
-                client.DefaultRequestHeaders.Add(
-                    "X-API-KEY",
-                    configuration["GovernmentRegistry:ApiKeyGov"]);
-            });
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            client.BaseAddress = new Uri(configuration["GovernmentRegistry:BaseUrl"]!);
+            client.DefaultRequestHeaders.Add(
+                "X-API-KEY",
+                configuration["GovernmentRegistry:ApiKeyGov"]);
+        });
 
         services.AddHttpClient<ISmsProvider, SmsPortalProvider>((serviceProvider, client) =>
         {
@@ -51,22 +52,16 @@ public static class DependencyInjection
             var baseUrl = configuration["SmsPortalProvider:BaseUrl"];
             var apiKey = configuration["SmsPortalProvider:ApiKey"];
             var apiSecret = configuration["SmsPortalProvider:ApiSecret"];
-
             if (string.IsNullOrWhiteSpace(baseUrl) ||
-                                                      string.IsNullOrWhiteSpace(apiKey) ||
-                                                      string.IsNullOrWhiteSpace(apiSecret))
+                string.IsNullOrWhiteSpace(apiKey) ||
+                string.IsNullOrWhiteSpace(apiSecret))
             {
                 throw new InvalidOperationException("SMSPortal configuration is missing.");
             }
-
             var apiCredential = Convert.ToBase64String(
-                Encoding.UTF8.GetBytes($"{apiKey}:{apiSecret}")
-                );
-
+                Encoding.UTF8.GetBytes($"{apiKey}:{apiSecret}"));
             client.BaseAddress = new Uri(baseUrl);
-
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", apiCredential);
-
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         });
 
