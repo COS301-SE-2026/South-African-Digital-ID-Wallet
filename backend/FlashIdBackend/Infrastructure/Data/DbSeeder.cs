@@ -47,6 +47,13 @@ public static class DbSeeder
         "Swanepoel","Botha","VanHeerden","Gumede","Mthembu","Mabuyi","Magubane","Mabutho","Mntambo","Mdluli"
     };
 
+    private static readonly string[] SampleIpAddresses = new[]
+    {
+        "102.130.10.1", "196.11.240.5", "41.21.100.3",
+        "154.0.5.22", "196.25.200.8", "41.113.10.14",
+        "102.65.30.9", "196.15.45.7", "41.205.20.11"
+    };
+
     public static async Task SeedAsync(AppDbContext context)
     {
         await context.Database.MigrateAsync();
@@ -679,7 +686,7 @@ public static class DbSeeder
                     // Details is nvarchar(max) so no length limit
                     Details = details[rnd.Next(details.Length)],
                     // IpAddress max 45 chars
-                    IpAddress = ipAddresses[rnd.Next(ipAddresses.Length)],
+                    IpAddress = SampleIpAddresses[rnd.Next(SampleIpAddresses.Length)],
                     ActorId = user.Id,
                     CreatedAt = now.AddDays(-rnd.Next(0, 30))
                 });
@@ -718,12 +725,6 @@ public static class DbSeeder
             "Durban, KwaZulu-Natal", "Bloemfontein, Free State", "Port Elizabeth, Eastern Cape"
         };
 
-        var ipAddresses = new[]
-        {
-            "102.130.10.1", "196.11.240.5", "41.21.100.3",
-            "154.0.5.22", "196.25.200.8", "41.113.10.14"
-        };
-
         var devicesToAdd = new List<TrustedDevice>();
 
         // Prioritize Harper Miller (or any Harper/Miller match) with a fuller device history
@@ -744,7 +745,7 @@ public static class DbSeeder
                     DeviceType = template.Type,
                     OperatingSystem = template.Os,
                     Browser = template.Browser,
-                    IpAddress = ipAddresses[rnd.Next(ipAddresses.Length)],
+                    IpAddress = SampleIpAddresses[rnd.Next(SampleIpAddresses.Length)],
                     Location = locations[rnd.Next(locations.Length)],
                     LastActive = now.AddDays(-rnd.Next(0, 14)),
                     IsCurrentDevice = i == 0,
@@ -770,7 +771,7 @@ public static class DbSeeder
                     DeviceType = template.Type,
                     OperatingSystem = template.Os,
                     Browser = template.Browser,
-                    IpAddress = ipAddresses[rnd.Next(ipAddresses.Length)],
+                    IpAddress = SampleIpAddresses[rnd.Next(SampleIpAddresses.Length)],
                     Location = locations[rnd.Next(locations.Length)],
                     LastActive = now.AddDays(-rnd.Next(0, 30)),
                     IsCurrentDevice = i == 0,
