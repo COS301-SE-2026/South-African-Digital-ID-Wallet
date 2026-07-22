@@ -13,5 +13,5 @@ const config: Config = {
 }
 
 export default createJestConfig(
-  config as Parameters<typeof createJestConfig>[0],
+  config as Parameters<typeof createJestConfig>[0]
 )
