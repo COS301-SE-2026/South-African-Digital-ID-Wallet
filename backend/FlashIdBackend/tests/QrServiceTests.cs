@@ -17,9 +17,9 @@ public class QrServiceTests
 
         public Citizen? CitizenToReturn { get; set; }
 
-        public Task<Credential?> GetByIdAsync(Guid id) => Task.FromResult(CredentialsToReturn);
-        public Task<List<Credential>> GetByIdAsync(Guid userId) => Task.FromResult(CredentialsToReturn);
-        public Task<Citizen?> GetCitizenByUserIdAsync(Guid userId) =>? Task.FromResult(CitizenToReturn);
+        public Task<Credential?> GetByIdAsync(Guid id) => Task.FromResult(CredentialToReturn);
+        public Task<List<Credential>> GetByUserIdAsync(Guid userId) => Task.FromResult(CredentialsToReturn);
+        public Task<Citizen?> GetCitizenByUserIdAsync(Guid userId) => Task.FromResult(CitizenToReturn);
         public Task<List<Credential>> GetCredentialsByCitizenIdAsync(Guid citizenId) => Task.FromResult(CredentialsToReturn);
     }
 
