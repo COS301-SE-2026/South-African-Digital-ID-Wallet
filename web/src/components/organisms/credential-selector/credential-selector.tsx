@@ -56,6 +56,8 @@ export const CredentialSelector = ({
         {credentials.map((credential) => (
           <Card
             key={credential.id}
+            role="button"
+            tabIndex={0}
             className="flex cursor-pointer flex-row items-center justify-between p-4 transition-colors hover:bg-muted"
             onClick={() =>
               onSelect(
@@ -63,6 +65,15 @@ export const CredentialSelector = ({
                 mapCredentialType(credential.credentialType)
               )
             }
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                onSelect(
+                  credential.id,
+                  mapCredentialType(credential.credentialType)
+                )
+              }
+            }}
           >
             <Text variant="sub-sm">{credential.credentialType}</Text>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />

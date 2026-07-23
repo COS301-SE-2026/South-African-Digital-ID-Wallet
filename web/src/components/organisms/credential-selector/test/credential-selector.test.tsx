@@ -73,4 +73,48 @@ describe('CredentialSelector', () => {
     await user.click(screen.getByText('Identity Document'))
     expect(onSelect).toHaveBeenCalledWith('credential-1', 'identityDocument')
   })
+  it('renders each credential card with role button for accessibility', async () => {
+    ;(qrService.getMine as jest.Mock).mockResolvedValue([
+      { id: 'credential-1', credentialType: 'Identity Document' },
+    ])
+    renderWithClient(<CredentialSelector onSelect={() => {}} />)
+    await waitFor(() => {
+      expect(screen.getByText('Identity Document')).toBeInTheDocument()
+    })
+    expect(
+      screen.getByRole('button', { name: /identity document/i })
+    ).toBeInTheDocument()
+  })
+
+  it('calls onSelect when activated with the Enter key', async () => {
+    const user = userEvent.setup()
+    const onSelect = jest.fn()
+    ;(qrService.getMine as jest.Mock).mockResolvedValue([
+      { id: 'credential-1', credentialType: 'Identity Document' },
+    ])
+    renderWithClient(<CredentialSelector onSelect={onSelect} />)
+    await waitFor(() => {
+      expect(screen.getByText('Identity Document')).toBeInTheDocument()
+    })
+    const card = screen.getByRole('button', { name: /identity document/i })
+    card.focus()
+    await user.keyboard('{Enter}')
+    expect(onSelect).toHaveBeenCalledWith('credential-1', 'identityDocument')
+  })
+
+  it('calls onSelect when activated with the Space key', async () => {
+    const user = userEvent.setup()
+    const onSelect = jest.fn()
+    ;(qrService.getMine as jest.Mock).mockResolvedValue([
+      { id: 'credential-1', credentialType: 'Identity Document' },
+    ])
+    renderWithClient(<CredentialSelector onSelect={onSelect} />)
+    await waitFor(() => {
+      expect(screen.getByText('Identity Document')).toBeInTheDocument()
+    })
+    const card = screen.getByRole('button', { name: /identity document/i })
+    card.focus()
+    await user.keyboard(' ')
+    expect(onSelect).toHaveBeenCalledWith('credential-1', 'identityDocument')
+  })
 })
