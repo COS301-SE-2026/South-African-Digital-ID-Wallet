@@ -11,4 +11,7 @@ public interface IInstitutionService
     Task<IEnumerable<GetInstitutionResponseDto>> GetAllInstitutionsAsync();
 
     Task<GetInstitutionResponseDto> GetInstitutionByIdAsync(Guid institutionId);
+
+    Task<RegenerateApiKeyResponseDto> RegenerateApiKeyAsync(Guid institutionId, Guid adminId);
+
 }

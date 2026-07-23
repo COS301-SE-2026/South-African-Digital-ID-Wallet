@@ -95,6 +95,44 @@ public class InstitutionService : IInstitutionService
         return _mapper.InstitutionToGetResponseDto(institution);
     }
 
+    public async Task<RegenerateApiKeyResponseDto> RegenerateApiKeyAsync(Guid institutionId, Guid adminId)
+    {
+        var institution = await _institutionRepository.GetInstitutionByIdAsync(institutionId);
+
+        if (institution == null)
+            throw new InvalidInstitutionRequestException(
+                $"Institution with ID '{institutionId}' was not found.");
+
+        var newApiKey = GenerateApiKey();
+        institution.ApiKeyHash = HashApiKey(newApiKey);
+        institution.ApiKeyReference = Guid.NewGuid();
+        institution.UpdatedAt = DateTime.UtcNow;
+
+        var auditLog = new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.InstitutionApiKeyRegenerated,
+            Details = $"API key regenerated for institution '{institution.Name}' by admin '{adminId}'.",
+            IpAddress = "system",
+            ActorId = adminId,
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        await _institutionRepository.AddAuditLogAsync(auditLog);
+        await _institutionRepository.SaveChangesAsync();
+
+        var message = $"Your FlashID institution API key has been regenerated: {newApiKey}. " +
+            "The previous key is no longer valid. Keep this key secure - it will not be shown again.";
+        await _emailSenderProvider.SendEmailAsync(institution.ContactEmail, "FlashID API Key Regenerated", message);
+
+        return new RegenerateApiKeyResponseDto
+        {
+            InstitutionId = institution.Id,
+            ApiKey = newApiKey,
+            RegeneratedAt = DateTime.UtcNow,
+        };
+    }
+
     private static string GenerateApiKey()
     {
         var bytes = new byte[16];
