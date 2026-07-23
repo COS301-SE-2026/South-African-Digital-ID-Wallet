@@ -68,6 +68,17 @@ export const VerificationPage = () => {
         </>
       )}
 
+      {status === 'error' && (
+        <div className="flex flex-col items-center gap-4 py-6 text-center">
+          <Text variant="sub-md" className="text-destructive">
+            {errorMessage}
+          </Text>
+          <Button type="button" onClick={handleScanAgain}>
+            Scan again
+          </Button>
+        </div>
+      )}
+
       {status === 'result' && result && (
         <div className="flex flex-col gap-4">
           <ScanResultCard
