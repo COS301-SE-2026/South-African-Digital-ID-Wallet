@@ -19,7 +19,7 @@ public class CredentialsActivationRepository : ICredentialsActivationRepository
         await _context.IdentityDocuments.AddAsync(identityDocument, cancellationToken);
     }
 
-    public async Task<bool?> HasIdentityDocumentAsync(Guid citizenId, CancellationToken cancellationToken)
+    public async Task<bool> HasIdentityDocumentAsync(Guid citizenId, CancellationToken cancellationToken)
     {
         return await _context.IdentityDocuments.AnyAsync(i => i.Credential.CitizenId == citizenId);
     }
@@ -29,9 +29,14 @@ public class CredentialsActivationRepository : ICredentialsActivationRepository
         await _context.DriversLicenses.AddAsync(driversLicense);
     }
 
-    public async Task<bool?> HasDriversLicenseAsync(Guid citizenId, CancellationToken cancellationToken)
+    public async Task<bool> HasDriversLicenseAsync(Guid citizenId, CancellationToken cancellationToken)
     {
         return await _context.DriversLicenses.AnyAsync(d => d.Credential.CitizenId == citizenId, cancellationToken);
+    }
+
+    public async Task AddCredentialAsync(Credential credential, CancellationToken cancellationToken)
+    {
+        await _context.Credentials.AddAsync(credential, cancellationToken);
     }
 
     public async Task AddAuditLogAsync(AuditLog auditLog, CancellationToken cancellationToken)
