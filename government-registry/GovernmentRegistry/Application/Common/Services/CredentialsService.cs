@@ -7,9 +7,9 @@ using DriversLicenseResponseDto = Application.Features.Credentials.Dtos.DriversL
 
 namespace Application.Common.Services;
 
-public class CredentialsService:ICredentialsService
+public class CredentialsService : ICredentialsService
 {
-    
+
     private readonly ICredentialsRepository _credentialsRepository;
 
     public CredentialsService(ICredentialsRepository credentialsRepository)
@@ -21,9 +21,9 @@ public class CredentialsService:ICredentialsService
     {
         var cleanSaId = saId?.Trim();
         ArgumentException.ThrowIfNullOrWhiteSpace(cleanSaId);
-        
-        var document = await _credentialsRepository.GetIdentityDocumentBySaIdAsync(cleanSaId,cancellationToken);
-        
+
+        var document = await _credentialsRepository.GetIdentityDocumentBySaIdAsync(cleanSaId, cancellationToken);
+
         if (document is null)
         {
             throw new ArgumentNullException("Identity document not found.");
@@ -49,9 +49,9 @@ public class CredentialsService:ICredentialsService
     {
         var cleanSaId = saId?.Trim();
         ArgumentException.ThrowIfNullOrWhiteSpace(cleanSaId);
-        
-        var document = await _credentialsRepository.GetDriversLicenseBySaIdAsync(cleanSaId,cancellationToken);
-        
+
+        var document = await _credentialsRepository.GetDriversLicenseBySaIdAsync(cleanSaId, cancellationToken);
+
         if (document is null)
         {
             throw new ArgumentNullException("Driver's License not found.");
@@ -63,10 +63,10 @@ public class CredentialsService:ICredentialsService
             Signature = document.Signature,
             IssuedBy = document.IssuedBy,
             IssueDate = document.IssueDate,
-            LicenseNumber =  document.LicenseNumber,
+            LicenseNumber = document.LicenseNumber,
             LicenseCode = document.LicenseCode,
-            Restrictions =  document.Restrictions,
-            ExpiryDate =  document.ExpiryDate,
+            Restrictions = document.Restrictions,
+            ExpiryDate = document.ExpiryDate,
             PhotoBlob = document.PhotoBlob,
         };
 

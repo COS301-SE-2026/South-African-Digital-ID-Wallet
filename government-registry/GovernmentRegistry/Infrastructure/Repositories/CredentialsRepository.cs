@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class CredentialsRepository:ICredentialsRepository
+public class CredentialsRepository : ICredentialsRepository
 {
     private readonly AppDbContext _context;
     public CredentialsRepository(AppDbContext context)
@@ -18,7 +18,8 @@ public class CredentialsRepository:ICredentialsRepository
             .Include(document => document.Citizen)
             .FirstOrDefaultAsync(document => document.Citizen.SaId == saId, cancellationToken);
     }
-    public async Task<DriversLicense?> GetDriversLicenseBySaIdAsync(string saId, CancellationToken cancellationToken){
+    public async Task<DriversLicense?> GetDriversLicenseBySaIdAsync(string saId, CancellationToken cancellationToken)
+    {
         return await _context.DriversLicenses.AsNoTracking()
             .Include(document => document.Citizen)
             .FirstOrDefaultAsync(license => license.Citizen.SaId == saId, cancellationToken);

@@ -4,6 +4,7 @@ using Domain.Enums;
 using Riok.Mapperly.Abstractions;
 
 namespace Application.Common.Mapping;
+
 [Mapper]
 public partial class IdentityDocumentMapper
 {
