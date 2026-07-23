@@ -15,8 +15,12 @@ public class QrServiceTests
         public Credential? CredentialToReturn { get; set; }
         public List<Credential> CredentialsToReturn { get; set; } = new();
 
-        public Task<Credential?> GetByIdAsync(Guid id) => Task.FromResult(CredentialToReturn);
-        public Task<List<Credential>> GetByUserIdAsync(Guid userId) => Task.FromResult(CredentialsToReturn);
+        public Citizen? CitizenToReturn { get; set; }
+
+        public Task<Credential?> GetByIdAsync(Guid id) => Task.FromResult(CredentialsToReturn);
+        public Task<List<Credential>> GetByIdAsync(Guid userId) => Task.FromResult(CredentialsToReturn);
+        public Task<Citizen?> GetCitizenByUserIdAsync(Guid userId) =>? Task.FromResult(CitizenToReturn);
+        public Task<List<Credential>> GetCredentialsByCitizenIdAsync(Guid citizenId) => Task.FromResult(CredentialsToReturn);
     }
 
     private class FakeQrSigningProvider : IQrSigningProvider
