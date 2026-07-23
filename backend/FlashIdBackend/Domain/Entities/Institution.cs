@@ -13,6 +13,8 @@ public class Institution : BaseEntity
 
     public string VerificationNumber { get; set; } = string.Empty;
 
+    public string ContactEmail { get; set; } = string.Empty;
+
     // navigation properties
     public Guid RegisteredById { get; set; }
     public GovernmentAdministrator RegisteredBy { get; set; } = null!;
