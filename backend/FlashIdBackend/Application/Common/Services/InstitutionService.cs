@@ -47,6 +47,7 @@ public class InstitutionService : IInstitutionService
             VerificationNumber = request.VerificationNumber,
             ContactEmail = request.ContactEmail,
             ApiKeyReference = apiKeyReference,
+            ApiKeyHash = HashApiKey(apiKey),
             RegisteredById = request.AdminId,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
@@ -99,5 +100,12 @@ public class InstitutionService : IInstitutionService
         var bytes = new byte[16];
         System.Security.Cryptography.RandomNumberGenerator.Fill(bytes);
         return $"flashid_live_{Convert.ToHexString(bytes).ToLower()}";
+    }
+
+    private static string HashApiKey(string apiKey)
+    {
+        var bytes = System.Security.Cryptography.SHA256.HashData(
+            System.Text.Encoding.UTF8.GetBytes(apiKey));
+        return Convert.ToHexString(bytes).ToLower();
     }
 }

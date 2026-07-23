@@ -11,6 +11,8 @@ public class Institution : BaseEntity
     // store KeyVault reference GUID rather than raw secret
     public Guid ApiKeyReference { get; set; }
 
+    // SHA-256 hash of the current active API key, never the plaintext value
+    public string ApiKeyHash { get; set; } = string.Empty;
     public string VerificationNumber { get; set; } = string.Empty;
 
     public string ContactEmail { get; set; } = string.Empty;
