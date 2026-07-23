@@ -25,11 +25,13 @@ public class CredentialsController : ControllerBase
 
     [HttpGet("me")]
     [Authorize(Roles = "Citizen")]
-    public async Task < IActionResult > GetMyCredentials()
+    public async Task<IActionResult> GetMyCredentials()
     {
-        try {
+        try
+        {
             var userIdClaim = User.FindFirst("userId")?.Value;
-            if (userIdClaim == null) {
+            if (userIdClaim == null)
+            {
                 return Unauthorized(new { error = "Invalid token." });
             }
 
@@ -37,17 +39,20 @@ public class CredentialsController : ControllerBase
             var result = await _credentialService.GetMyCredentialsAsync(userId);
             return Ok(result);
         }
-        catch (Exception) {
-            return StatusCode(500, new { error="An unexpected error occurred." });
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
 
     [HttpGet("mine")]
-public async Task < IActionResult > GetMyCredentialSummaries()
+    public async Task<IActionResult> GetMyCredentialSummaries()
     {
-        try {
+        try
+        {
             var userIdClaim = User.FindFirst("userId")?.Value;
-            if (userIdClaim == null) {
+            if (userIdClaim == null)
+            {
                 return Unauthorized(new { error = "Invalid token." });
             }
 
@@ -55,19 +60,22 @@ public async Task < IActionResult > GetMyCredentialSummaries()
             var result = await _qrService.GetMyCredentialsAsync(userId);
             return Ok(result);
         }
-        catch (Exception) {
+        catch (Exception)
+        {
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
 
     [HttpPost("{credentialId}/qr-token")]
-public async Task < IActionResult > GenerateQr(
+    public async Task<IActionResult> GenerateQr(
         Guid credentialId,
         [FromBody] GenerateQrRequestDto request)
     {
-        try {
+        try
+        {
             var userIdClaim = User.FindFirst("userId")?.Value;
-            if (userIdClaim == null) {
+            if (userIdClaim == null)
+            {
                 return Unauthorized(new { error = "Invalid token." });
             }
 
@@ -79,19 +87,20 @@ public async Task < IActionResult > GenerateQr(
         {
             return NotFound(new { error = ex.Message });
         }
-  catch (CredentialAccessDeniedException ex)
+        catch (CredentialAccessDeniedException ex)
         {
             return StatusCode(403, new { error = ex.Message });
         }
-  catch (CredentialNotActiveException ex)
+        catch (CredentialNotActiveException ex)
         {
             return BadRequest(new { error = ex.Message });
         }
-  catch (InvalidDisclosedFieldsException ex)
+        catch (InvalidDisclosedFieldsException ex)
         {
             return BadRequest(new { error = ex.Message });
         }
-  catch (Exception) {
+        catch (Exception)
+        {
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
