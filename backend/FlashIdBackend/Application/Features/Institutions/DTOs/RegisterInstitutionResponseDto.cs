@@ -8,5 +8,6 @@ public class RegisterInstitutionResponseDto
     public string ApiKey { get; set; } = string.Empty;
     public Guid ApiKeyReference { get; set; }
     public string VerificationNumber { get; set; } = string.Empty;
+    public string ContactEmail { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
 }

@@ -1,3 +1,4 @@
+using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Mapping;
@@ -13,11 +14,13 @@ public class InstitutionService : IInstitutionService
 {
     private readonly IInstitutionRepository _institutionRepository;
     private readonly InstitutionMapper _mapper;
+    private readonly IEmailSenderProvider _emailSenderProvider;
 
-    public InstitutionService(IInstitutionRepository institutionRepository, InstitutionMapper mapper)
+    public InstitutionService(IInstitutionRepository institutionRepository, InstitutionMapper mapper, IEmailSenderProvider emailSenderProvider)
     {
         _institutionRepository = institutionRepository;
         _mapper = mapper;
+        _emailSenderProvider = emailSenderProvider;
     }
 
     public async Task<RegisterInstitutionResponseDto> RegisterInstitutionAsync(
@@ -42,6 +45,7 @@ public class InstitutionService : IInstitutionService
             Name = request.Name,
             Type = request.Type,
             VerificationNumber = request.VerificationNumber,
+            ContactEmail = request.ContactEmail,
             ApiKeyReference = apiKeyReference,
             RegisteredById = request.AdminId,
             CreatedAt = DateTime.UtcNow,
@@ -65,6 +69,11 @@ public class InstitutionService : IInstitutionService
         var dto = _mapper.InstitutionToRegisterResponseDto(institution);
         dto.ApiKey = apiKey;
         dto.ApiKeyReference = apiKeyReference;
+
+        var message = $"Your FlashID institution API key has been generated: {apiKey}. " +
+            "Keep this key secure - it will not be shown again.";
+        await _emailSenderProvider.SendEmailAsync(request.ContactEmail, "FlashID API Key", message);
+
         return dto;
     }
 
