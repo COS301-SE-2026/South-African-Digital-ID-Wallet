@@ -64,7 +64,7 @@ public class DashboardAccountCardServiceTests
 
         Assert.NotNull(result);
 
-        Assert.Equal(userId, result!.UserId);
+        Assert.Equal(userId, result.UserId);
         Assert.Equal("0001015009087", result.SaId);
         Assert.Equal("Logan", result.Names);
         Assert.Equal("Dlamini", result.Surname);

@@ -1,7 +1,6 @@
 'use client'
 
 import { useMemo } from 'react'
-import { IdCard, Car } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 

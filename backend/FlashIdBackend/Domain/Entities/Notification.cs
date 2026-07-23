@@ -6,7 +6,7 @@ public class Notification
 
     public Guid CitizenId { get; set; }
 
-    public Citizen Citizen { get; set; } = null!;
+    public Citizen Citizen { get; set; }
 
     public string Title { get; set; } = string.Empty;
 

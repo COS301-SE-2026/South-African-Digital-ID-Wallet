@@ -24,5 +24,5 @@ public class TrustedDevice : BaseEntity
 
     public Guid CitizenId { get; set; }
 
-    public Citizen Citizen { get; set; } = null!;
+    public Citizen Citizen { get; set; }
 }
