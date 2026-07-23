@@ -9,7 +9,7 @@ namespace tests;
 
 public class OfficialBadgeServiceTests
 {
-    private class FakeOfficialRepository : IOfficialRepository
+    private sealed class FakeOfficialRepository : IOfficialRepository
     {
         public Official? OfficialToReturn { get; set; }
 
@@ -17,7 +17,7 @@ public class OfficialBadgeServiceTests
         public Task<Official?> GetByIdAsync(Guid id) => Task.FromResult(OfficialToReturn);
     }
 
-    private class FakeQrSigningProvider : IQrSigningProvider
+    private sealed class FakeQrSigningProvider : IQrSigningProvider
     {
         public bool VerifyResult { get; set; } = true;
 

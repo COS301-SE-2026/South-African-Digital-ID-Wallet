@@ -6,6 +6,7 @@ namespace tests;
 
 public class DisclosedFieldValueResolverTests
 {
+    private const string GenderField = "Gender";
     private static Credential IdentityDocumentCredential()
     {
         var citizen = new Citizen
@@ -94,8 +95,8 @@ public class DisclosedFieldValueResolverTests
     public void Resolve_Gender_ReturnsCitizenGender()
     {
         var cred = IdentityDocumentCredential();
-        var res = DisclosedFieldValueResolver.Resolve(cred, new[] { "Gender" });
-        Assert.Equal("Female", res["Gender"]);
+        var res = DisclosedFieldValueResolver.Resolve(cred, new[] { GenderField });
+        Assert.Equal("Female", res[GenderField]);
     }
 
     [Theory]
@@ -118,8 +119,8 @@ public class DisclosedFieldValueResolverTests
     public void Resolve_MultiplFields_ReturnsAllRequestedValues()
     {
         var cred = IdentityDocumentCredential();
-        var res = DisclosedFieldValueResolver.Resolve(cred, new[] { "Identity number", "Full surname", "Gender" });
-        Assert.Equal("Female", res["Gender"]);
+        var res = DisclosedFieldValueResolver.Resolve(cred, new[] { "Identity number", "Full surname", GenderField });
+        Assert.Equal("Female", res[GenderField]);
         Assert.Equal("Mokoena", res["Full surname"]);
         Assert.Equal("9001015800083", res["Identity number"]);
         Assert.Equal(3, res.Count);
