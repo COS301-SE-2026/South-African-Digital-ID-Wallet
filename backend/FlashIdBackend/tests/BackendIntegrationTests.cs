@@ -1,3 +1,4 @@
+using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Features.Auth.DTOs;
 using Application.Features.Citizens.DTOs;
 using Application.Features.Institutions.DTOs;
@@ -33,6 +34,12 @@ public class BackendIntegrationTests
         public Task VerifyEmailAsync(VerifyEmailRequestDto request) => Task.CompletedTask;
 
         public Task ResendOtpAsync(ResendOtpRequestDto request) => Task.CompletedTask;
+    }
+
+    private sealed class StubEmailSenderProvider : IEmailSenderProvider
+    {
+        public Task SendEmailAsync(string toEmail, string subject, string message, CancellationToken ct = default) =>
+            Task.CompletedTask;
     }
 
     private static AppDbContext CreateContext()
@@ -78,7 +85,7 @@ public class BackendIntegrationTests
 
     private static InstitutionService CreateInstitutionService(AppDbContext context)
     {
-        return new InstitutionService(new InstitutionRepository(context), new InstitutionMapper());
+        return new InstitutionService(new InstitutionRepository(context), new InstitutionMapper(), new StubEmailSenderProvider());
     }
 
     private static User CreateCitizenUser(string email, string password)
@@ -224,6 +231,7 @@ public class BackendIntegrationTests
             Type = InstitutionType.HomeAffairs,
             VerificationNumber = "HA-JHB-2026-001",
             AdminId = admin.Id,
+            ContactEmail = "contact@homeaffairs-jhb.gov.za",
         };
 
         var result = await service.RegisterInstitutionAsync(request);
