@@ -1,89 +1,56 @@
 'use client'
 
-import * as React from 'react'
-
-import { AccountCard, ActivityOverviewCard } from '@/components/molecules'
 import {
-  ChangePasswordModal,
-  AccountTerminationModal,
+  AccountCard,
+  SelectiveDisclosureCard,
+  UpdateEmailCard,
+  UpdatePasswordCard,
+  DeleteAccountCard,
 } from '@/components/molecules'
+
 import { AppSidebar } from '@/components/organisms/app-sidebar'
 import { AppTopBar } from '@/components/organisms/app-top-bar'
-import { useUser } from '@/context/user-context'
-import { manageUserAccountNavSections } from '@/config/navigation'
 
 import type { ManageUserAccountUser } from './types'
 
-const user: ManageUserAccountUser = {
-  name: 'Unathi Tshakalisa',
-  initials: 'UT',
-  idLabel: '••••084',
+type ManageUserAccountProps = {
+  user: ManageUserAccountUser
+  navSections: React.ComponentProps<typeof AppSidebar>['navSections']
+  onLogout: () => void
 }
 
-export function ManageUserAccount() {
-  const [showModal, setShowModal] = React.useState(false)
-  const [showTerminate, setShowTerminate] = React.useState(false)
-  const { logout } = useUser()
-
+export function ManageUserAccount({
+  user,
+  navSections,
+  onLogout,
+}: ManageUserAccountProps) {
   return (
     <div className="flex h-screen overflow-hidden">
-      <AppSidebar
-        navSections={manageUserAccountNavSections}
-        user={user}
-        onLogout={logout}
-      />
-
-      <main className="flex-1 p-4 flex flex-col min-h-0">
+      <AppSidebar navSections={navSections} user={user} onLogout={onLogout} />
+      <main className="flex-1 flex flex-col p-4 gap-4">
         <AppTopBar
-          title="Security & Recovery"
-          description="Manage your account security, recovery options and data controls."
-          user={{ name: user.name, initials: user.initials }}
+          title="Account management"
+          description="Manage your account and data controls."
+          user={{
+            name: user.name,
+            initials: user.initials,
+          }}
         />
-
-        <div className="grid grid-cols-2 gap-4 mt-4 flex-1 items-stretch min-h-0 overflow-auto pr-2">
-          <div className="min-h-0 flex flex-col h-full">
-            <div className="flex-1 h-full">
-              <AccountCard />
+        <div className="flex-1 grid grid-cols-2 gap-4 min-h-0">
+          <AccountCard />
+          <div className="flex flex-col gap-4 min-h-0">
+            <div className="flex-[2] min-h-0">
+              <SelectiveDisclosureCard />
             </div>
-          </div>
-
-          <div className="space-y-4 min-h-0 flex flex-col">
-            <div className="flex-1 min-h-0">
-              <ActivityOverviewCard />
-            </div>
-
-            <div className="bg-card rounded-3xl border p-4 flex flex-col items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => setShowModal(true)}
-                className="w-full bg-primary py-2 px-4 rounded-2xl text-primary-foreground font-semibold text-sm"
-              >
-                Change Password
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowTerminate(true)}
-                className="w-full bg-destructive py-2 px-4 rounded-2xl text-clean-white font-semibold text-sm"
-              >
-                Terminate Account
-              </button>
+            <div className="grid grid-cols-2 gap-4 flex-1">
+              <UpdateEmailCard />
+              <UpdatePasswordCard />
             </div>
           </div>
         </div>
-
-        <ChangePasswordModal
-          open={showModal}
-          onCloseAction={() => setShowModal(false)}
-        />
-        <AccountTerminationModal
-          open={showTerminate}
-          onCloseAction={() => setShowTerminate(false)}
-          onConfirmAction={() => {
-            setShowTerminate(false)
-            alert('Account terminated demo')
-          }}
-        />
+        <div className="shrink-0">
+          <DeleteAccountCard />
+        </div>
       </main>
     </div>
   )
