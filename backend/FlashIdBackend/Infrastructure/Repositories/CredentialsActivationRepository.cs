@@ -21,12 +21,12 @@ public class CredentialsActivationRepository : ICredentialsActivationRepository
 
     public async Task<bool> HasIdentityDocumentAsync(Guid citizenId, CancellationToken cancellationToken)
     {
-        return await _context.IdentityDocuments.AnyAsync(i => i.Credential.CitizenId == citizenId);
+        return await _context.IdentityDocuments.AnyAsync(i => i.Credential.CitizenId == citizenId, cancellationToken);
     }
 
     public async Task AddDriversLicenseAsync(DriversLicense driversLicense, CancellationToken cancellationToken)
     {
-        await _context.DriversLicenses.AddAsync(driversLicense);
+        await _context.DriversLicenses.AddAsync(driversLicense, cancellationToken);
     }
 
     public async Task<bool> HasDriversLicenseAsync(Guid citizenId, CancellationToken cancellationToken)

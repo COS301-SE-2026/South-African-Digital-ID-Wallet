@@ -34,14 +34,14 @@ public class GovernmentRegistryGateway : IGovernmentRegistryGateway
     {
         var cleanSaId = ValidateSaId(saId);
 
-        var govRegistryResponse = await _httpClient.GetAsync($"api/credentials/{Uri.EscapeDataString(cleanSaId)}/identity-document");
+        var govRegistryResponse = await _httpClient.GetAsync($"api/credentials/{Uri.EscapeDataString(cleanSaId)}/identity-document", cancellationToken);
 
         if (govRegistryResponse.StatusCode == HttpStatusCode.NotFound)
             return null;
 
         govRegistryResponse.EnsureSuccessStatusCode();
 
-        return await govRegistryResponse.Content.ReadFromJsonAsync<GovernmentRegistryIdentityDocumentDto>();
+        return await govRegistryResponse.Content.ReadFromJsonAsync<GovernmentRegistryIdentityDocumentDto>(cancellationToken);
     }
 
     public async Task<GovernmentRegistryDriversLicenseDto?> GetDriversLicenseBySaIdAsync(string saId,
@@ -49,14 +49,14 @@ public class GovernmentRegistryGateway : IGovernmentRegistryGateway
     {
         var cleanSaId = ValidateSaId(saId);
 
-        var govRegistryResponse = await _httpClient.GetAsync($"api/credentials/{Uri.EscapeDataString(cleanSaId)}/drivers-license");
+        var govRegistryResponse = await _httpClient.GetAsync($"api/credentials/{Uri.EscapeDataString(cleanSaId)}/drivers-license", cancellationToken);
 
         if (govRegistryResponse.StatusCode == HttpStatusCode.NotFound)
             return null;
 
         govRegistryResponse.EnsureSuccessStatusCode();
 
-        return await govRegistryResponse.Content.ReadFromJsonAsync<GovernmentRegistryDriversLicenseDto>();
+        return await govRegistryResponse.Content.ReadFromJsonAsync<GovernmentRegistryDriversLicenseDto>(cancellationToken);
     }
 
     private static string ValidateSaId(string saId)

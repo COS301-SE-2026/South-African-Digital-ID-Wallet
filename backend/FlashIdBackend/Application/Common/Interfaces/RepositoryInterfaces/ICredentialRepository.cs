@@ -6,5 +6,5 @@ public interface ICredentialRepository
 {
     Task<Credential?> GetByIdAsync(Guid id);
     Task<List<Credential>> GetByUserIdAsync(Guid userId);
-    Task<Citizen?> GetCitizenByIdAsync(Guid citizenId, CancellationToken cancellationToken);
+    Task<Citizen?> GetCitizenByIdAsync(Guid userId, CancellationToken cancellationToken);
 }

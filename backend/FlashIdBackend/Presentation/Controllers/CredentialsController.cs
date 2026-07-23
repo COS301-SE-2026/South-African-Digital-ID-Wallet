@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Exceptions;
@@ -13,12 +12,10 @@ namespace Presentation.Controllers;
 public class CredentialsController : ControllerBase
 {
     private readonly IQrService _qrService;
-    private readonly ICredentialActivationService _credentialActivationService;
 
     public CredentialsController(IQrService qrService, ICredentialActivationService credentialActivationService)
     {
         _qrService = qrService;
-        _credentialActivationService = credentialActivationService;
     }
 
     [HttpPost("{credentialId}/qr-token")]
