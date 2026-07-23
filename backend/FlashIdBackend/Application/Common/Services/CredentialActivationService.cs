@@ -1,6 +1,9 @@
+using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Credentials.DTOs;
+using Application.Features.Credentials.Enums;
+using Domain.Entities;
 using Domain.Enums;
 
 namespace Application.Common.Services;
@@ -9,10 +12,12 @@ public class CredentialActivationService : ICredentialActivationService
 {
 
     private readonly ICredentialRepository _credentialRepository;
+    private readonly IGovernmentRegistryGateway _governmentRegistryGateway;
 
-    public CredentialActivationService(ICredentialRepository credentialRepository)
+    public CredentialActivationService(ICredentialRepository credentialRepository, IGovernmentRegistryGateway governmentRegistryGateway)
     {
         _credentialRepository = credentialRepository;
+        _governmentRegistryGateway = governmentRegistryGateway;
     }
     public async Task<ActivateCredentialsResponseDto> ActivateCredentialsAsync(ActivateCredentialsRequestDto request, Guid userId,
         string ipAddress, CancellationToken cancellationToken)
@@ -36,7 +41,37 @@ public class CredentialActivationService : ICredentialActivationService
 
         var requestedTypes = request.CredentialTypes.Distinct().ToList();
 
+        var saId = citizen.SaId;
+
+        foreach (var credentialType in requestedTypes)
+        {
+            switch (credentialType)
+            {
+                case CredentialType.IdentityDocument:
+
+                    break;
+                case CredentialType.DriversLicense:
+                    break;
+            }
+
+        }
+
 
         return new ActivateCredentialsResponseDto();
+    }
+
+    private async Task GetIDAsync(string saId, Citizen citizen, CancellationToken cancellationToken)
+    {
+        var id = await _governmentRegistryGateway.GetIdentityDocumentBySaIdAsync(saId, cancellationToken);
+        if (id is null)
+        {
+            throw new InvalidOperationException("Identity document not found.");
+        }
+
+        var identityDocument = new IdentityDocument()
+        {
+            Id = new Guid(),
+
+        };
     }
 }
