@@ -1,34 +1,47 @@
 'use client'
 
-import * as React from 'react'
+import { useMemo } from 'react'
 import { IdCard, Car } from 'lucide-react'
-import type { Credential } from '@/components/molecules/credentials-list/types'
+import { useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
 
-const credentials: Credential[] = [
-  {
-    id: 'national-id',
-    title: 'National ID Card',
-    issuer: 'Department of Home Affairs',
-    status: 'Verified',
-    icon: IdCard,
-    tone: 'blue',
-  },
-  {
-    id: 'drivers-licence',
-    title: "Driver's Licence",
-    issuer: 'Class B',
-    status: 'Verified',
-    icon: Car,
-    tone: 'red',
-  },
-]
+import { Text } from '@/components/atoms'
+import {
+  credentialService,
+  toCredentialView,
+} from '@/services/credential-service'
 
 export function CredentialsList() {
+  const router = useRouter()
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['credentials', 'me'],
+    queryFn: () => credentialService.getMine(),
+  })
+
+  const credentials = useMemo(() => (data ?? []).map(toCredentialView), [data])
+
+  const viewOnClick = (credentialId: string) => {
+    router.push(`/citizen/my-credentials?selected=${credentialId}`)
+  }
+
   return (
     <div className="bg-card rounded-3xl border p-6">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold">Credential list</h2>
       </div>
+
+      {isLoading && <Text variant="sub-md">Loading credentials.</Text>}
+
+      {isError && (
+        <Text variant="sub-md" className="text-red">
+          Failed to load the credentials.
+        </Text>
+      )}
+
+      {data && credentials.length === 0 && (
+        <Text variant="sub-md">No credentials.</Text>
+      )}
 
       <div className="mt-4 grid grid-cols-2 gap-4">
         {credentials.map((credential) => {
@@ -45,6 +58,7 @@ export function CredentialsList() {
                 <button
                   type="button"
                   className="text-xs font-semibold text-green-700 hover:text-green-800"
+                  onClick={() => viewOnClick(credential.id)}
                 >
                   View credential
                 </button>

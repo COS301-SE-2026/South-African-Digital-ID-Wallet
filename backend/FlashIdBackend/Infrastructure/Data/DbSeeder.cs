@@ -426,7 +426,7 @@ public static class DbSeeder
                 {
                     Id = Guid.NewGuid(),
                     Name = name,
-                    Type = Domain.Enums.InstitutionType.HomeAffairs,
+                    Type = name.StartsWith("Licensing", StringComparison.Ordinal) ? InstitutionType.LicensingDepartment : InstitutionType.HomeAffairs,
                     ApiKeyReference = Guid.NewGuid(),
                     VerificationNumber = $"VER{DateTime.UtcNow.Ticks % 100000 + idx:00000}",
                     RegisteredById = govAdminIds[idx % govAdminIds.Count],
@@ -512,8 +512,9 @@ public static class DbSeeder
         if (citizensWithoutCredentials.Count == 0) return;
 
         // get an official to use as IssuedBy
-        var official = await context.Officials.FirstOrDefaultAsync();
-        var issuedBy = official?.Id.ToString() ?? "SYSTEM";
+        var institutions = await context.Institutions.OrderBy(i => i.Name).ToListAsync();
+        var idIssuer = institutions.FirstOrDefault(i => i.Type == InstitutionType.HomeAffairs)?.Name ?? "SYSTEM";
+        var licenseIssuer = institutions.FirstOrDefault(i => i.Type == InstitutionType.LicensingDepartment)?.Name ?? "SYSTEM";
 
         var citizenships = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
         var nationalities = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
@@ -532,20 +533,8 @@ public static class DbSeeder
             var age = now.Year - citizen.DateOfBirth.Year;
             if (citizen.DateOfBirth > now.AddYears(-age)) age--;
 
-            var credential = new Credential
-            {
-                Id = Guid.NewGuid(),
-                Status = CredentialStatus.Active,
-                // Signature max 1024 - use a guid based string
-                Signature = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"),
-                // IssuedBy max 256
-                IssuedBy = issuedBy,
-                IssueDate = now,
-                CitizenId = citizen.Id,
-                CreatedAt = now,
-                UpdatedAt = now
-            };
-            credentialsToAdd.Add(credential);
+            var idCredential = NewCredential(citizen.Id, idIssuer, now);
+            credentialsToAdd.Add(idCredential);
 
             // every citizen 16+ gets an identity document
             identityDocsToAdd.Add(new IdentityDocument
@@ -555,7 +544,7 @@ public static class DbSeeder
                 CountryOfBirth = countries[rnd.Next(countries.Length)],
                 Nationality = nationalities[rnd.Next(nationalities.Length)],
                 Status = idStatuses[rnd.Next(idStatuses.Length)],
-                CredentialId = credential.Id,
+                CredentialId = idCredential.Id,
                 CreatedAt = now,
                 UpdatedAt = now
             });
@@ -563,6 +552,8 @@ public static class DbSeeder
             // only citizens 18+ get a drivers license
             if (age >= 18)
             {
+                var licenseCredential = NewCredential(citizen.Id, licenseIssuer, now);
+                credentialsToAdd.Add(licenseCredential);
                 var startDate = now.AddYears(-rnd.Next(1, 10));
                 driversLicensesToAdd.Add(new DriversLicense
                 {
@@ -574,7 +565,7 @@ public static class DbSeeder
                     // Restrictions max 2 chars
                     Restrictions = "00",
                     ExpiryDate = startDate.AddYears(5),
-                    CredentialId = credential.Id,
+                    CredentialId = licenseCredential.Id,
                     CreatedAt = now,
                     UpdatedAt = now
                 });
@@ -593,6 +584,17 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
     }
+    private static Credential NewCredential(Guid citizenId, string issuedBy, DateTime now) => new()
+    {
+        Id = Guid.NewGuid(),
+        Status = CredentialStatus.Active,
+        Signature = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"),
+        IssuedBy = issuedBy,
+        IssueDate = now,
+        CitizenId = citizenId,
+        CreatedAt = now,
+        UpdatedAt = now
+    };
     private static async Task SeedUserPreferencesAsync(AppDbContext context)
     {
         var now = DateTime.UtcNow;
