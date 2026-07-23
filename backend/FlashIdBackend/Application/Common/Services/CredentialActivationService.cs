@@ -15,10 +15,11 @@ public class CredentialActivationService : ICredentialActivationService
     private readonly IGovernmentRegistryGateway _governmentRegistryGateway;
     private readonly ICredentialsActivationRepository _credentialsActivationRepository;
 
-    public CredentialActivationService(ICredentialRepository credentialRepository, IGovernmentRegistryGateway governmentRegistryGateway)
+    public CredentialActivationService(ICredentialRepository credentialRepository, IGovernmentRegistryGateway governmentRegistryGateway, ICredentialsActivationRepository credentialsActivationRepository)
     {
         _credentialRepository = credentialRepository;
         _governmentRegistryGateway = governmentRegistryGateway;
+        _credentialsActivationRepository = credentialsActivationRepository;
     }
     public async Task<ActivateCredentialsResponseDto> ActivateCredentialsAsync(ActivateCredentialsRequestDto request, Guid userId,
         string ipAddress, CancellationToken cancellationToken)
@@ -40,25 +41,66 @@ public class CredentialActivationService : ICredentialActivationService
             throw new ArgumentNullException("At least one credential type must be selected.");
         }
 
-        var activatedTypes = new List<CredentialType>();
         var requestedTypes = request.CredentialTypes.Distinct().ToList();
+        var activatedTypes = new List<CredentialType>();
+        var alreadyActivatedTypes = new List<CredentialType>();
 
         foreach (var credentialType in requestedTypes)
         {
             switch (credentialType)
             {
                 case CredentialType.IdentityDocument:
-                    break;
-                case CredentialType.DriversLicense:
-                    break;
-            }
+                    {
+                        var wasActivated = await AddIdAsync(citizen, cancellationToken);
 
+                        if (wasActivated)
+                        {
+                            activatedTypes.Add(CredentialType.IdentityDocument);
+                        }
+                        else
+                        {
+                            alreadyActivatedTypes.Add(CredentialType.IdentityDocument);
+                        }
+
+                        break;
+                    }
+                case CredentialType.DriversLicense:
+                    {
+                        var wasActivated = await AddDriversLicenseAsync(citizen, cancellationToken);
+
+                        if (wasActivated)
+                        {
+                            activatedTypes.Add(CredentialType.IdentityDocument);
+                        }
+                        else
+                        {
+                            alreadyActivatedTypes.Add(CredentialType.IdentityDocument);
+                        }
+
+                        break;
+                    }
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(credentialType), credentialType, "The selected credential type is not supported.");
+            }
         }
 
-        return new ActivateCredentialsResponseDto();
+        if (activatedTypes.Count > 0)
+        {
+            citizen.Status = CitizenStatus.Activated;
+            citizen.ActivatedAt = DateTime.UtcNow;
+            await _credentialsActivationRepository.SaveChangesAsync(cancellationToken);
+        }
+
+        return new ActivateCredentialsResponseDto
+        {
+            Status = "Success",
+            Message = BuildResponseMessage(activatedTypes, alreadyActivatedTypes),
+            ActivatedCredentials = activatedTypes,
+        };
     }
 
-    private async Task<bool> GetIdAsync(Citizen citizen, CancellationToken cancellationToken)
+    private async Task<bool> AddIdAsync(Citizen citizen, CancellationToken cancellationToken)
     {
         var alreadyExists = await _credentialsActivationRepository.HasIdentityDocumentAsync(citizen.Id, cancellationToken);
 
@@ -109,7 +151,7 @@ public class CredentialActivationService : ICredentialActivationService
         return true;
     }
 
-    private async Task<bool> GetDriversLicenseAsync(Citizen citizen, CancellationToken cancellationToken)
+    private async Task<bool> AddDriversLicenseAsync(Citizen citizen, CancellationToken cancellationToken)
     {
         var alreadyExists = await _credentialsActivationRepository.HasDriversLicenseAsync(citizen.Id, cancellationToken);
 
@@ -158,5 +200,20 @@ public class CredentialActivationService : ICredentialActivationService
 
         await _credentialsActivationRepository.AddCredentialAsync(credential, cancellationToken);
         return true;
+    }
+
+    private static string BuildResponseMessage(IReadOnlyCollection<CredentialType> activatedTypes, IReadOnlyCollection<CredentialType> alreadyActivatedTypes)
+    {
+        if (activatedTypes.Count > 0 && alreadyActivatedTypes.Count == 0)
+        {
+            return "The selected credentials were activated successfully.";
+        }
+
+        if (activatedTypes.Count == 0 && alreadyActivatedTypes.Count > 0)
+        {
+            return "The selected credentials were already activated.";
+        }
+
+        return "Some credentials were activated successfully, while others were already active.";
     }
 }

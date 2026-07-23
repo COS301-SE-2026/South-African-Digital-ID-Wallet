@@ -33,8 +33,8 @@ public class CredentialRepository : ICredentialRepository
             .ToListAsync();
     }
 
-    public async Task<Citizen?> GetCitizenByIdAsync(Guid citizenId, CancellationToken cancellationToken)
+    public async Task<Citizen?> GetCitizenByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
-        return await _context.Citizens.FirstOrDefaultAsync(c => c.Id == citizenId);
+        return await _context.Citizens.FirstOrDefaultAsync(c => c.UserId == userId);
     }
 }

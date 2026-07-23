@@ -72,20 +72,4 @@ public class CredentialsController : ControllerBase
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
-
-    [HttpPost("activate")]
-    [Authorize(Roles = "Citizen")]
-    public async Task<ActionResult<ActivateCredentialsResponseDto>> ActivateCredentials(ActivateCredentialsRequestDto request, CancellationToken cancellationToken)
-    {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdClaim, out var userId))
-        {
-            return Unauthorized(new { message = "The authenticated account could not be identified." });
-        }
-
-        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-
-        var response = await _credentialActivationService.ActivateCredentialsAsync(request, userId, ipAddress, cancellationToken);
-        return Ok(response);
-    }
 }

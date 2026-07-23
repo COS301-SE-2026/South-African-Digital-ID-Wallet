@@ -26,7 +26,7 @@ public class CredentialsService : ICredentialsService
 
         if (document is null)
         {
-            throw new ArgumentNullException("Identity document not found.");
+            return null;
         }
 
         var id = new IdentityDocument()
@@ -54,7 +54,7 @@ public class CredentialsService : ICredentialsService
 
         if (document is null)
         {
-            throw new ArgumentNullException("Driver's License not found.");
+            return null;
         }
 
         var driversLicense = new DriversLicense()
