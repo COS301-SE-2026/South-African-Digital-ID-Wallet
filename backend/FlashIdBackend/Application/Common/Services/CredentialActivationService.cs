@@ -14,6 +14,9 @@ public class CredentialActivationService : ICredentialActivationService
     private readonly ICredentialRepository _credentialRepository;
     private readonly IGovernmentRegistryGateway _governmentRegistryGateway;
     private readonly ICredentialsActivationRepository _credentialsActivationRepository;
+    private List<CredentialType> _activatedTypes = new List<CredentialType>();
+    private List<CredentialType> _alreadyActivatedTypes = new List<CredentialType>();
+    private List<CredentialType> _unavailableTypes = new List<CredentialType>();
 
     public CredentialActivationService(ICredentialRepository credentialRepository, IGovernmentRegistryGateway governmentRegistryGateway, ICredentialsActivationRepository credentialsActivationRepository)
     {
@@ -24,6 +27,10 @@ public class CredentialActivationService : ICredentialActivationService
     public async Task<ActivateCredentialsResponseDto> ActivateCredentialsAsync(ActivateCredentialsRequestDto request, Guid userId,
         string ipAddress, CancellationToken cancellationToken)
     {
+        _activatedTypes.Clear();
+        _alreadyActivatedTypes.Clear();
+        _unavailableTypes.Clear();
+
         var citizen = await _credentialRepository.GetCitizenByIdAsync(userId, cancellationToken);
 
         if (citizen is null)
@@ -42,8 +49,7 @@ public class CredentialActivationService : ICredentialActivationService
         }
 
         var requestedTypes = request.CredentialTypes.Distinct().ToList();
-        var activatedTypes = new List<CredentialType>();
-        var alreadyActivatedTypes = new List<CredentialType>();
+
 
         foreach (var credentialType in requestedTypes)
         {
@@ -55,11 +61,7 @@ public class CredentialActivationService : ICredentialActivationService
 
                         if (wasActivated)
                         {
-                            activatedTypes.Add(CredentialType.IdentityDocument);
-                        }
-                        else
-                        {
-                            alreadyActivatedTypes.Add(CredentialType.IdentityDocument);
+                            _activatedTypes.Add(CredentialType.IdentityDocument);
                         }
 
                         break;
@@ -70,11 +72,7 @@ public class CredentialActivationService : ICredentialActivationService
 
                         if (wasActivated)
                         {
-                            activatedTypes.Add(CredentialType.IdentityDocument);
-                        }
-                        else
-                        {
-                            alreadyActivatedTypes.Add(CredentialType.IdentityDocument);
+                            _activatedTypes.Add(CredentialType.DriversLicense);
                         }
 
                         break;
@@ -85,18 +83,17 @@ public class CredentialActivationService : ICredentialActivationService
             }
         }
 
-        if (activatedTypes.Count > 0)
+        if (_activatedTypes.Count > 0)
         {
             citizen.Status = CitizenStatus.Activated;
-            citizen.ActivatedAt = DateTime.UtcNow;
+            citizen.ActivatedAt ??= DateTime.UtcNow;
             await _credentialsActivationRepository.SaveChangesAsync(cancellationToken);
         }
 
         return new ActivateCredentialsResponseDto
         {
             Status = "Success",
-            Message = BuildResponseMessage(activatedTypes, alreadyActivatedTypes),
-            ActivatedCredentials = activatedTypes,
+            Message = BuildResponseMessage(),
         };
     }
 
@@ -106,13 +103,15 @@ public class CredentialActivationService : ICredentialActivationService
 
         if (alreadyExists)
         {
+            _alreadyActivatedTypes.Add(CredentialType.IdentityDocument);
             return false;
         }
 
         var id = await _governmentRegistryGateway.GetIdentityDocumentBySaIdAsync(citizen.SaId, cancellationToken);
         if (id is null)
         {
-            throw new InvalidOperationException("Identity document not found.");
+            _unavailableTypes.Add(CredentialType.IdentityDocument);
+            return false;
         }
 
         var credential = new Credential()
@@ -157,13 +156,15 @@ public class CredentialActivationService : ICredentialActivationService
 
         if (alreadyExists)
         {
+            _alreadyActivatedTypes.Add(CredentialType.DriversLicense);
             return false;
         }
 
         var dL = await _governmentRegistryGateway.GetDriversLicenseBySaIdAsync(citizen.SaId, cancellationToken);
         if (dL is null)
         {
-            throw new InvalidOperationException("Identity document not found.");
+            _unavailableTypes.Add(CredentialType.DriversLicense);
+            return false;
         }
 
         var credential = new Credential()
@@ -202,18 +203,23 @@ public class CredentialActivationService : ICredentialActivationService
         return true;
     }
 
-    private static string BuildResponseMessage(IReadOnlyCollection<CredentialType> activatedTypes, IReadOnlyCollection<CredentialType> alreadyActivatedTypes)
+    private string BuildResponseMessage()
     {
-        if (activatedTypes.Count > 0 && alreadyActivatedTypes.Count == 0)
-        {
-            return "The selected credentials were activated successfully.";
-        }
+        var unavailable = string.Join(", ", _unavailableTypes.Select(t => t switch { CredentialType.IdentityDocument => "Identity Document", CredentialType.DriversLicense => "Driver's License", _ => t.ToString() }));
+        var alreadyActivated = string.Join(", ", _alreadyActivatedTypes.Select(t => t switch { CredentialType.IdentityDocument => "Identity Document", CredentialType.DriversLicense => "Driver's License", _ => t.ToString() }));
+        var activated = string.Join(", ", _activatedTypes.Select(t => t switch { CredentialType.IdentityDocument => "Identity Document", CredentialType.DriversLicense => "Driver's License", _ => t.ToString() }));
 
-        if (activatedTypes.Count == 0 && alreadyActivatedTypes.Count > 0)
-        {
-            return "The selected credentials were already activated.";
-        }
+        var messages = new List<string>();
 
-        return "Some credentials were activated successfully, while others were already active.";
+        if (_activatedTypes.Count > 0)
+            messages.Add($"The following credentials were activated successfully: {activated}");
+
+        if (_alreadyActivatedTypes.Count > 0)
+            messages.Add($"The following credentials were already activated: {alreadyActivated}");
+
+        if (_unavailableTypes.Count > 0)
+            messages.Add($"The following credentials were unavailable: {unavailable}");
+
+        return string.Join(Environment.NewLine, messages);
     }
 }
