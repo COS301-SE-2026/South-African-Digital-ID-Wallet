@@ -15,6 +15,10 @@ public static class DependencyInjection
         services.AddScoped<IInstitutionService, InstitutionService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IQrService, QrService>();
+        services.AddScoped<IDashboardAccountCardService, DashboardAccountCardService>();
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IActivityOverviewService, ActivityOverviewService>();
+        services.AddScoped<ITrustedDeviceService, TrustedDeviceService>();
         services.AddSingleton<CitizenMapper>();
         services.AddSingleton<CredentialMapper>();
         services.AddSingleton<InstitutionMapper>();
