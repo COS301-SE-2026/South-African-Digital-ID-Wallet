@@ -460,6 +460,9 @@ The system shall display the generated API key exactly once at the point of crea
 ##### R8.1.6:
 The system shall store only the SHA-256 hash of the API key — never the plaintext value.
 
+##### R8.1.7:
+The system shall email the newly generated API key to the institution's registered contact email at the point of creation, in addition to the one-time on-screen display.
+
 ---
 
 #### R8.2: Institution Management
@@ -482,6 +485,12 @@ The system shall allow government administrators to regenerate an institution's 
 
 ##### R8.3.2:
 The system shall log all institution registration, deactivation, and key regeneration events to the audit trail with the administrator's ID and a timestamp.
+
+##### R8.3.3:
+The system shall automatically regenerate every institution's API key every 30 days as a scheduled security measure. The previous key shall be invalidated immediately upon regeneration.
+
+##### R8.3.4:
+The system shall email the newly regenerated API key (whether triggered manually or by the automatic 30-day cycle) to the institution's registered contact email.
 
 ---
 
