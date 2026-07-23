@@ -11,6 +11,7 @@ public enum AuditEventType
     CredentialVerified,
     CredentialExpired,
     InstitutionRegistered,
+    InstitutionApiKeyRegenerated,
     OfficialVerified,
     AccountDeleted,
     ConsentRecorded,
