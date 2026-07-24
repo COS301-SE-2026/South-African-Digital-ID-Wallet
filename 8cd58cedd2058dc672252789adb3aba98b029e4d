@@ -1,0 +1,26 @@
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_712d174fc3f309 22,31-32
+backend/FlashIdBackend/tests/QrServiceTests.cs
+  h_712d174fc3f309 21,26,32-65,85-90,92-96,104,123,137,150,158-167,171-181,188
+backend/FlashIdBackend/Infrastructure/Migrations/20260724211005_MergeSnapshot.cs
+  h_712d174fc3f309 7-12
+web/src/components/molecules/index.ts
+  h_712d174fc3f309 10
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_712d174fc3f309 16,19-21,25,110-126
+backend/FlashIdBackend/Infrastructure/Repositories/CredentialRepository.cs
+  h_712d174fc3f309 52-56
+backend/FlashIdBackend/Infrastructure/Data/AppDbContext.cs
+  h_712d174fc3f309 27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "8cd58cedd2058dc672252789adb3aba98b029e4d",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
