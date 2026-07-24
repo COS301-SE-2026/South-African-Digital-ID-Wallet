@@ -87,6 +87,11 @@ export const officialsNavSections: SidebarNavSection[] = [
         icon: 'onboard',
       },
       {
+        label: 'Verifications',
+        href: '/officials/verifications',
+        icon: 'users',
+      },
+      {
         label: 'Notifications',
         href: '/under-construction',
         icon: 'notifications',
