@@ -37,7 +37,7 @@ public class CredentialConfiguration : IEntityTypeConfiguration<Credential>
             .IsRequired()
             .HasColumnType("datetime2")
             .HasDefaultValueSql("GETUTCDATE()")
-            .ValueGeneratedOnAddOrUpdate();
+            .ValueGeneratedOnAdd();
 
         builder.Property(c => c.CitizenId)
             .IsRequired();
