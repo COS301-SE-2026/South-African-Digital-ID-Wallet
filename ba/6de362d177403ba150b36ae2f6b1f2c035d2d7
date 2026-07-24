@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Infrastructure/Repositories/ManageUserAccountRepository.cs
+  h_0aff3b71f739b1 1-29
+backend/FlashIdBackend/Application/Common/Services/ManageUserAccountService.cs
+  h_0aff3b71f739b1 1-34,36-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "ba6de362d177403ba150b36ae2f6b1f2c035d2d7",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
