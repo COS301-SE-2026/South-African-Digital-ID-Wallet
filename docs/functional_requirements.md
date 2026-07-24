@@ -231,7 +231,7 @@ The QR payload shall not contain raw personally identifiable information.
 The system shall enforce one-time use on generated QR codes. A QR code that has been scanned successfully shall return an INVALID result with reason already_used on any subsequent scan. A QR code that returned INVALID on a scan may not be retried — a new QR code must be generated.
 
 ##### R3.1.6:
-The system shall display a live expiry countdown timer to the citizen while a QR code is active. A visual warning shall be shown when fewer than 60 seconds remain. When the timer reaches zero the QR code shall be visually replaced with an expired state.
+The system shall display a live expiry countdown timer to the citizen while a QR code is active. A visual warning shall be shown when fewer than 15 seconds remain. When the timer reaches zero the QR code shall be visually replaced with an expired state.
 
 ---
 
