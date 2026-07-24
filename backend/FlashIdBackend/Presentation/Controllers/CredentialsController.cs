@@ -13,7 +13,7 @@ public class CredentialsController : ControllerBase
 {
     private readonly IQrService _qrService;
 
-    public CredentialsController(IQrService qrService)
+    public CredentialsController(IQrService qrService, ICredentialActivationService credentialActivationService)
     {
         _qrService = qrService;
     }
@@ -63,6 +63,29 @@ public class CredentialsController : ControllerBase
             var userId = Guid.Parse(userIdClaim);
             var result = await _qrService.GetMyCredentialsAsync(userId);
             return Ok(result);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    [HttpPost("resolve")]
+    public async Task<IActionResult> Resolve([FromBody] ResolveCredentialRequestDto req)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
+
+            var userId = Guid.Parse(userIdClaim);
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var res = await _qrService.ResolveAsync(req.Token, userId, ipAddress);
+            return Ok(res);
+        }
+        catch (InvalidDisclosureTokenException idte)
+        {
+            return BadRequest(new { error = idte.Message });
         }
         catch (Exception)
         {
