@@ -4,6 +4,7 @@ on:
   push:
     branches: 
       - dev
+      - feature/qr-scanning-frontend
     paths:
       - "web/**"
       - "pnpm-lock.yaml"
@@ -17,7 +18,7 @@ env:
 
 jobs:
   deploy-dev:
-    if: github.ref == 'refs/heads/dev'
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/feature/qr-scanning-frontend'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
