@@ -170,7 +170,7 @@ public class OnboardingService : IOnboardingService
         await _onboardingRepository.SaveChangesAsync();
 
         var activationLink = BuildActivationLink(rawToken);
-        var message = $"Please find attached your activation link : {activationLink}";
+        var message = BuildEmailMessage(activationLink);
 
         await _emailSenderProvider.SendEmailAsync(email, "FlashID", message);
 
@@ -223,9 +223,159 @@ public class OnboardingService : IOnboardingService
 
         var baseUrl = frontendUrl.TrimEnd('/');
 
-        var encodedToken = Uri.EscapeDataString(rawToken);
+        var token = Uri.EscapeDataString(rawToken);
 
-        return $"{baseUrl}/activate?token={encodedToken}";
+        return $"{baseUrl}/activate?token={token}";
+    }
+
+    private string BuildEmailMessage(string activationLink)
+    {
+        return
+            $$"""
+             <div style="background-color:#f7f4ea; padding:32px 16px; font-family:Arial, Helvetica, sans-serif;">
+             
+                 <table role="presentation"
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        style="max-width:480px; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e5e7eb;">
+                     <tr>
+                         <td style="padding:0;">
+                             <table role="presentation"
+                                    width="100%"
+                                    cellpadding="0"
+                                    cellspacing="0">
+                                 <tr>
+                                     <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+             
+                                     <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+             
+                                     <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+             
+                                     <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+                                 </tr>
+                             </table>
+                         </td>
+                     </tr>
+             
+                     
+                     <tr>
+                         <td style="padding:28px 32px 0 32px;">
+                             <span style="font-size:22px; font-weight:700; color:#053b2c; letter-spacing:0.5px;">
+                                 FlashID
+                             </span>
+             
+                             <div style="margin-top:4px; color:#6b7280; font-size:12px; letter-spacing:0.4px;">
+                                 Prove yourself in a flash.
+                             </div>
+                         </td>
+                     </tr>
+             
+                     
+                     <tr>
+                         <td style="padding:24px 32px 0 32px; color:#111827; font-size:15px; line-height:1.6;">
+                             Hi there,
+                             <br /><br />
+             
+                             Welcome to <strong>FlashID</strong>. Your identity has been
+                             successfully onboarded and your pending FlashID profile is ready.
+             
+                             <br /><br />
+             
+                             Use the button below to continue the activation process and securely
+                             link your digital credentials.
+                         </td>
+                     </tr>
+             
+                     
+                     <tr>
+                         <td align="center" style="padding:28px 32px 28px 32px;">
+                             <a href="{{activationLink}}"
+                                target="_blank"
+                                style="display:inline-block; background-color:#007a4d; color:#ffffff; text-decoration:none; font-size:15px; font-weight:700; padding:14px 32px; border-radius:10px;">
+                                 Activate my FlashID
+                             </a>
+                         </td>
+                     </tr>
+             
+                     
+                     <tr>
+                         <td style="padding:0 32px 24px 32px; color:#6b7280; font-size:13px; line-height:1.6;">
+                             If the button does not work, copy and paste this link into your browser:
+             
+                             <br /><br />
+             
+                             <a href="{{activationLink}}"
+                                style="color:#002395; text-decoration:underline; word-break:break-all;">
+                                 {{activationLink}}
+                             </a>
+                         </td>
+                     </tr>
+             
+                     
+                     <tr>
+                         <td style="padding:0 32px 24px 32px; color:#6b7280; font-size:13px; line-height:1.6;">
+                             This activation link is valid for 48 hours.
+             
+                             <br /><br />
+             
+                             For your security, do not share or forward this activation link.
+                             If you did not request a FlashID profile, you can safely ignore this email.
+                         </td>
+                     </tr>
+             
+                     
+                     <tr>
+                         <td style="padding:0 32px 28px 32px; color:#111827; font-size:14px; line-height:1.6;">
+                             Stay secure,<br />
+                             <strong>The FlashID Team</strong>
+                         </td>
+                     </tr>
+             
+                     
+                     <tr>
+                         <td style="padding:0;">
+                             <table role="presentation"
+                                    width="100%"
+                                    cellpadding="0"
+                                    cellspacing="0">
+                                 <tr>
+                                     <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+             
+                                     <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+             
+                                     <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+             
+                                     <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+                                 </tr>
+                             </table>
+                         </td>
+                     </tr>
+                 </table>
+             
+                 <p style="text-align:center; color:#9ca3af; font-size:12px; line-height:1.5; margin:16px auto 0 auto; max-width:480px;">
+                     &copy; {{DateTime.UtcNow.Year}} FlashID |
+                     South African Digital ID Wallet.<br />
+                     All rights reserved.
+                 </p>
+             </div>
+             """;
     }
 
 }
