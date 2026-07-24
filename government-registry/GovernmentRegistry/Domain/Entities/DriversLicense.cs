@@ -4,8 +4,8 @@ namespace Domain.Entities;
 
 public class DriversLicense : Credential
 {
-   
-    
+
+
     public string LicenseNumber { get; set; } = string.Empty;
 
     public LicenseCode LicenseCode { get; set; } = LicenseCode.Unspecified;
@@ -15,6 +15,6 @@ public class DriversLicense : Credential
     public DateOnly ExpiryDate { get; set; }
 
     public string PhotoBlob { get; set; } = string.Empty;
-    
-    
+
+
 }

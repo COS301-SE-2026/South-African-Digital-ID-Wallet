@@ -13,7 +13,7 @@ import { useUser } from '@/context/user-context'
 import axios from 'axios'
 
 const DASHBOARD_ROUTES: Record<string, string> = {
-  citizen: '/citizen',
+  citizen: '/citizen/citizen-dashboard',
   official: '/officials',
   governmentadministrator: '/gov-admin',
   govadmin: '/gov-admin',
@@ -25,7 +25,7 @@ const getDashboardRoute = (role: string) => {
     .toLowerCase()
     .replace(/[_\s-]+/g, '')
 
-  return DASHBOARD_ROUTES[normalizedRole] ?? '/citizen'
+  return DASHBOARD_ROUTES[normalizedRole] ?? '/citizen/citizen-dashboard'
 }
 
 export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {

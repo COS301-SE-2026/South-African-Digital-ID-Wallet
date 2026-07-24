@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Application;
 using Infrastructure;
@@ -22,7 +23,10 @@ builder.Services.AddInfrastructure();
 
 builder.Services.AddApplication();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 builder.Services.AddCors(options =>
 {

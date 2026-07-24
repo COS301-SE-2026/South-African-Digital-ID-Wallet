@@ -8,13 +8,17 @@ export const citizenNavSections: SidebarNavSection[] = [
   {
     title: 'Citizen Portal',
     items: [
-      { label: 'Dashboard', href: '/citizen', icon: 'dashboard' },
+      {
+        label: 'Dashboard',
+        href: '/citizen/citizen-dashboard',
+        icon: 'dashboard',
+      },
       {
         label: 'My Credentials',
-        href: '/under-construction',
+        href: '/citizen/my-credentials',
         icon: 'credentials',
       },
-      { label: 'Share QR Code', href: '/under-construction', icon: 'qr' },
+      { label: 'Share QR Code', href: '/citizen/qr', icon: 'qr' },
       {
         label: 'Notifications',
         href: '/under-construction',
