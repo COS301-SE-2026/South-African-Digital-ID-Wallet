@@ -1,5 +1,5 @@
-import { LandingPageNavbar } from './navbar-section'
-import { LandingPageFooter } from './footer-section'
+import { LandingPageNavbar } from '../../organisms/landing-page-navbar/landing-page-navbar'
+import { LandingPageFooter } from '../../organisms/landing-page-footer/landing-page-footer'
 import {
   Check,
   ShieldCheck,
