@@ -19,6 +19,7 @@ public static class DependencyInjection
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IActivityOverviewService, ActivityOverviewService>();
         services.AddScoped<ITrustedDeviceService, TrustedDeviceService>();
+        services.AddScoped<IOfficialBadgeService, OfficialBadgeService>();
         services.AddSingleton<CitizenMapper>();
         services.AddSingleton<CredentialMapper>();
         services.AddSingleton<InstitutionMapper>();
@@ -27,6 +28,8 @@ public static class DependencyInjection
         services.AddSingleton<ActivityOverviewMapper>();
         services.AddSingleton<DashboardAccountCardMapper>();
         services.AddSingleton<NotificationMapper>();
+        services.AddScoped<ICitizenVerificationService, CitizenVerificationService>();
+        services.AddScoped<ICredentialActivationService, CredentialActivationService>();
         return services;
     }
 }

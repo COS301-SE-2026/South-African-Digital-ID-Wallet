@@ -49,4 +49,9 @@ public class CredentialRepository : ICredentialRepository
             .Where(c => c.Citizen.UserId == userId)
             .ToListAsync();
     }
+
+    public async Task<Citizen?> GetCitizenByIdAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        return await _context.Citizens.FirstOrDefaultAsync(c => c.UserId == userId, cancellationToken);
+    }
 }

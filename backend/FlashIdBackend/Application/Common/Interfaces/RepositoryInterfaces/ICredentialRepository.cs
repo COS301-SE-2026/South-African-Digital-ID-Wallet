@@ -8,4 +8,5 @@ public interface ICredentialRepository
     Task<List<Credential>> GetCredentialsByCitizenIdAsync(Guid citizenId);
     Task<Credential?> GetByIdAsync(Guid id);
     Task<List<Credential>> GetByUserIdAsync(Guid userId);
+    Task<Citizen?> GetCitizenByIdAsync(Guid userId, CancellationToken cancellationToken);
 }

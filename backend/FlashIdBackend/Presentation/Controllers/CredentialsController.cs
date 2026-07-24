@@ -13,13 +13,16 @@ public class CredentialsController : ControllerBase
 {
     private readonly ICredentialService _credentialService;
     private readonly IQrService _qrService;
+    private readonly ICredentialActivationService _credentialActivationService;
 
     public CredentialsController(
-    ICredentialService credentialService,
-    IQrService qrService)
+      ICredentialService credentialService,
+      IQrService qrService,
+      ICredentialActivationService credentialActivationService)
     {
         _credentialService = credentialService;
         _qrService = qrService;
+        _credentialActivationService = credentialActivationService;
     }
 
 
@@ -98,6 +101,29 @@ public class CredentialsController : ControllerBase
         catch (InvalidDisclosedFieldsException ex)
         {
             return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    [HttpPost("resolve")]
+    public async Task<IActionResult> Resolve([FromBody] ResolveCredentialRequestDto req)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
+
+            var userId = Guid.Parse(userIdClaim);
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var res = await _qrService.ResolveAsync(req.Token, userId, ipAddress);
+            return Ok(res);
+        }
+        catch (InvalidDisclosureTokenException idte)
+        {
+            return BadRequest(new { error = idte.Message });
         }
         catch (Exception)
         {

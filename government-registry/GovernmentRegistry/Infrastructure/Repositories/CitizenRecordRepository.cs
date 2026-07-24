@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class CitizenRecordRepository: ICitizenRecordRepository
+public class CitizenRecordRepository : ICitizenRecordRepository
 {
     private readonly AppDbContext _context;
 
@@ -15,10 +15,10 @@ public class CitizenRecordRepository: ICitizenRecordRepository
         _context = context;
     }
 
-    public async Task<CitizenRecord>  GetCitizenRecord(string saId)
+    public async Task<CitizenRecord> GetCitizenRecord(string saId)
     {
-       return await _context.CitizenRecords
-            .FirstOrDefaultAsync(c => c.SaId == saId);
-        
+        return await _context.CitizenRecords
+             .FirstOrDefaultAsync(c => c.SaId == saId);
+
     }
 }
