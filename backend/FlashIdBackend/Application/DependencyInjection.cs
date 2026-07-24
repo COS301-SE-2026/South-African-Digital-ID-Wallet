@@ -16,7 +16,9 @@ public static class DependencyInjection
         services.AddScoped<IQrService, QrService>();
         services.AddSingleton<CitizenMapper>();
         services.AddSingleton<InstitutionMapper>();
+        services.AddScoped<IManageUserAccountService, ManageUserAccountService>();
         services.AddSingleton<AuthMapper>();
+        services.AddSingleton<ManageUserAccountMapper>();
         return services;
     }
 }

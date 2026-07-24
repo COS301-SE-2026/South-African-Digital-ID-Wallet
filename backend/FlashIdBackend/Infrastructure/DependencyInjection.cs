@@ -32,6 +32,7 @@ public static class DependencyInjection
 
         services.AddScoped<ICredentialRepository, CredentialRepository>();
         services.AddSingleton<IQrSigningProvider, Ed25519SigningProvider>();
+        services.AddScoped<IManageUserAccountRepository, ManageUserAccountRepository>();
 
         services.AddHttpClient<IGovernmentRegistryGateway, GovernmentRegistryGateway>((serviceProvider, client) =>
         {
