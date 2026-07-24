@@ -1,6 +1,12 @@
 'use client'
 
-export const UpdatePasswordCard = () => {
+import { FC } from 'react'
+
+import { UpdatePasswordCardProps } from './types'
+
+export const UpdatePasswordCard: FC<UpdatePasswordCardProps> = ({
+  onAction,
+}) => {
   return (
     <div className="bg-card rounded-3xl border p-6 flex flex-col">
       <h2 className="text-xl font-bold">Update Password</h2>
@@ -15,7 +21,10 @@ export const UpdatePasswordCard = () => {
         <li>✓ Improve security</li>
       </ul>
 
-      <button className="mt-6 w-full bg-primary rounded-2xl py-3 text-primary-foreground font-semibold">
+      <button
+        onClick={onAction}
+        className="mt-6 w-full bg-primary rounded-2xl py-3 text-primary-foreground font-semibold"
+      >
         Update Password
       </button>
     </div>

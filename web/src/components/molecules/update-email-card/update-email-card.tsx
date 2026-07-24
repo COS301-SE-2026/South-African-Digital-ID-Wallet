@@ -1,6 +1,10 @@
 'use client'
 
-export const UpdateEmailCard = () => {
+import { FC } from 'react'
+
+import { UpdateEmailCardProps } from './types'
+
+export const UpdateEmailCard: FC<UpdateEmailCardProps> = ({ onAction }) => {
   return (
     <div className="bg-card rounded-3xl border p-6 flex flex-col">
       <h2 className="text-xl font-bold">Update Email</h2>
@@ -15,7 +19,10 @@ export const UpdateEmailCard = () => {
         <li>✓ Receive notifications</li>
       </ul>
 
-      <button className="mt-6 w-full bg-primary rounded-2xl py-3 text-primary-foreground font-semibold">
+      <button
+        onClick={onAction}
+        className="mt-6 w-full bg-primary rounded-2xl py-3 text-primary-foreground font-semibold"
+      >
         Update Email
       </button>
     </div>
