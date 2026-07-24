@@ -1,60 +1,124 @@
 'use client'
 
+import * as React from 'react'
 import { AccountInfoRow, StatusPill } from '@/components/atoms'
+import api from '@/lib/api'
+import type { ManageUserAccountDto } from './types'
 
 export const AccountCard = () => {
+  const [account, setAccount] = React.useState<ManageUserAccountDto | null>(
+    null
+  )
+  const [loading, setLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    const fetchAccount = async () => {
+      try {
+        const { data } = await api.get<ManageUserAccountDto>(
+          '/api/manage-user-account/me'
+        )
+
+        setAccount(data)
+      } catch (err) {
+        console.error('Failed to load account', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAccount()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="bg-card rounded-3xl border p-6">
+        <h2 className="text-3xl font-bold">Account</h2>
+        <p className="mt-4 text-muted-text">Loading account information...</p>
+      </div>
+    )
+  }
+
+  if (!account) {
+    return (
+      <div className="bg-card rounded-3xl border p-6">
+        <h2 className="text-3xl font-bold">Account</h2>
+        <p className="mt-4 text-red-500">Failed to load account information.</p>
+      </div>
+    )
+  }
+
   const rows = [
-    { label: 'Full Name', value: 'Unathi Tshakalisa' },
+    {
+      label: 'Full Name',
+      value: account.fullName,
+    },
     {
       label: 'ID Ending',
-      value: <span className="font-semibold">••••084</span>,
+      value: <span className="font-semibold">••••{account.idEnding}</span>,
     },
     {
       label: 'Email Address',
-      value: 'unathi@example.com',
+      value: account.emailAddress || '-',
     },
     {
       label: 'Phone Number',
-      value: '+27 82 123 4567',
+      value: account.phoneNumber || '-',
     },
     {
       label: 'Date of Birth',
-      value: '12 Feb 1998',
-    },
-    {
-      label: 'Nationality',
-      value: 'South African Citizen',
+      value: new Date(account.dateOfBirth).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }),
     },
     {
       label: 'Member Since',
-      value: '14 Apr 2024',
+      value: new Date(account.memberSince).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }),
     },
     {
       label: 'Last Login',
-      value: 'Today, 09:42',
+      value: account.lastLogin
+        ? new Date(account.lastLogin).toLocaleString('en-GB')
+        : 'Never',
     },
   ]
 
   return (
-    <div className="bg-card rounded-3xl border p-6 h-full flex flex-col">
+    <div className="bg-card rounded-3xl border p-6 flex flex-col h-full">
       <div className="mb-5">
         <h2 className="text-3xl font-bold text-foreground">Account</h2>
-
         <p className="text-muted-text mt-2">
           View your account information and manage your personal details.
         </p>
       </div>
 
-      <div className="border rounded-3xl overflow-hidden flex-1">
+      <div className="border rounded-3xl overflow-hidden flex-1 flex flex-col">
         {rows.map((row) => (
-          <AccountInfoRow key={row.label} label={row.label} value={row.value} />
+          <div key={row.label} className="flex-1 flex items-center w-full">
+            <AccountInfoRow label={row.label} value={row.value} />
+          </div>
         ))}
 
-        <AccountInfoRow
-          label="Account Status"
-          border={false}
-          value={<StatusPill intent="active">Active</StatusPill>}
-        />
+        <div className="flex-1 flex items-center w-full">
+          <AccountInfoRow
+            border={false}
+            label="Account Status"
+            value={
+              <StatusPill
+                intent={
+                  account.accountStatus === 'Activated' ? 'active' : 'inactive'
+                }
+              >
+                {account.accountStatus}
+              </StatusPill>
+            }
+          />
+        </div>
       </div>
     </div>
   )
