@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation'
 import { ActivationInfoItem } from '@/components/molecules/activation-info-item'
 import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 import { ShieldCheck, Landmark, WalletCards } from 'lucide-react'
 import {
   ActivateCredentialsForm,
@@ -13,10 +15,17 @@ import {
   ProgressStepper,
   VerificationSuccessModal,
 } from '@/components/molecules'
+import { activateCredentialsService } from '@/services/activate-credentials-service'
+import type { CredentialType } from '@/services/activate-credentials-service'
+import { verificationService } from '@/services/verification-service'
 
 const STEPS = ['Verify Identity', 'Activate Credentials', 'Complete']
 
-export default function VerifyCitizen() {
+type VerifyCitizenProps = {
+  token?: string
+}
+
+export default function VerifyCitizen({ token = '' }: VerifyCitizenProps) {
   const router = useRouter()
   const [step, setStep] = useState<1 | 2>(1)
   const [saId, setSaId] = useState('')
@@ -28,9 +37,36 @@ export default function VerifyCitizen() {
   })
 
   const [successOpen, setSuccessOpen] = useState(false)
+  const { mutate: verifyCitizen, isPending: isVerifying } = useMutation({
+    mutationFn: () => verificationService.verify({ token, saId, pin }),
+    onSuccess: () => {
+      setSuccessOpen(true)
+    },
+    onError: () => {
+      toast.error('Could not verify your details. Please check and try again.')
+    },
+  })
 
   function handleVerification() {
-    // this is temporary code that just advance to next flow, needs integration please
+    verifyCitizen()
+  }
+
+  const { mutate: activateCredentials, isPending: isActivating } = useMutation({
+    mutationFn: (types: CredentialType[]) =>
+      activateCredentialsService.activate(types),
+    onSuccess: (response) => {
+      toast.success(response.message || 'Credentials activated')
+      router.push('/citizen')
+    },
+    onError: () => {
+      toast.error('Could not activate credentials. Please try again.')
+    },
+  })
+  function handleActivateSubmit() {
+    const types: CredentialType[] = []
+    if (selected.identityDocument) types.push('identityDocument')
+    if (selected.driversLicense) types.push('driversLicense')
+    activateCredentials(types)
   }
 
   return (
@@ -80,8 +116,9 @@ export default function VerifyCitizen() {
                 pin={pin}
                 onSaIdChange={setSaId}
                 onPinChange={setPin}
-                onSubmit={() => setSuccessOpen(true)}
+                onSubmit={handleVerification}
                 onRequestNewPin={() => {}}
+                isSubmitting={isVerifying}
               />
             </div>
           </div>
@@ -94,15 +131,16 @@ export default function VerifyCitizen() {
               selection={selected}
               onSelectionChange={setSelected}
               onBack={() => setStep(1)}
-              onSubmit={() => router.push('/citizen')}
+              onSubmit={handleActivateSubmit}
+              isSubmitting={isActivating}
             />
           </div>
         ))}
       <VerificationSuccessModal
         open={successOpen}
         variant="id-document"
-        fullName="Unathi L. Tshakalisa"
-        credentialValue="990101 5009 087"
+        fullName="Verified citizen"
+        credentialValue={saId}
         onContinueAction={() => {
           setSuccessOpen(false)
           setStep(2)
