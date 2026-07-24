@@ -1,10 +1,11 @@
 using System.Security.Cryptography;
 using System.Text;
+using Application.Common.Interfaces.ProviderInterfaces;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace Infrastructure.Providers;
 
-public class DeviceTokenProvider
+public class DeviceTokenProvider : IDeviceTokenProvider
 {
     public string GenerateToken()
     {

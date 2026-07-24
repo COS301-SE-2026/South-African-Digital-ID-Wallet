@@ -18,21 +18,28 @@ public class AuthService : IAuthService
     private readonly ICitizenService _citizenService;
     private readonly AuthMapper _mapper;
 
+    private readonly ITrustedDeviceRepository _trustedDeviceRepository;
+    private readonly IDeviceTokenProvider _deviceTokenProvider;
+
     public AuthService(
         IAuthRepository authRepository,
         IJwtTokenProvider jwtTokenProvider,
         IPasswordHashingProvider passwordHashingProvider,
         ICitizenService citizenService,
-        AuthMapper mapper)
+        AuthMapper mapper,
+        ITrustedDeviceRepository trustedDeviceRepository,
+        IDeviceTokenProvider deviceTokenProvider)
     {
         _authRepository = authRepository;
         _jwtTokenProvider = jwtTokenProvider;
         _passwordHashingProvider = passwordHashingProvider;
         _citizenService = citizenService;
         _mapper = mapper;
+        _trustedDeviceRepository = trustedDeviceRepository;
+        _deviceTokenProvider = deviceTokenProvider;
     }
 
-    public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request, string ipAddress)
+    public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request, string? deviceToken, string ipAddress)
     {
         if (string.IsNullOrWhiteSpace(request.Email))
             throw new UnauthorizedAccessException("Email is required.");

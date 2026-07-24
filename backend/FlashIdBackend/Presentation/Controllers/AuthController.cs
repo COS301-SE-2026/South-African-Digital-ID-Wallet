@@ -54,7 +54,20 @@ public class AuthController : ControllerBase
         try
         {
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            var result = await _authService.LoginAsync(request, ipAddress);
+            Request.Cookies.TryGetValue("flashid_device", out var deviceToken);
+            var result = await _authService.LoginAsync(request, deviceToken, ipAddress);
+
+            if (result.RequiresDeviceVerification)
+            {
+                result.Token = string.Empty;
+                return Ok(result);
+            }
+
+            if (string.IsNullOrWhiteSpace(result.Token))
+            {
+                _logger.LogError("Login completed without an access token for {Email}", request.Email);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { error = "The login could not be completed." });
+            }
 
             // The token is set in an HttpOnly cookie so JavaScript cannot read it.
             // Secure = true in production forces HTTPS; in development HTTP is allowed.
@@ -65,6 +78,7 @@ public class AuthController : ControllerBase
                 SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
                 Path = "/",
                 Expires = result.ExpiresAt,
+                IsEssential = true
             };
 
             Response.Cookies.Append("access_token", result.Token, cookieOptions);

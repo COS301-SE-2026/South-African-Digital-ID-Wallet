@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<IActivityOverviewRepository, ActivityOverviewRepository>();
         services.AddScoped<IDashboardAccountCardRepository, DashboardAccountCardRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddSingleton<IDeviceTokenProvider, DeviceTokenProvider>();
 
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
 

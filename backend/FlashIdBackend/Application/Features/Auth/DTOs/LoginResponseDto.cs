@@ -8,4 +8,7 @@ public class LoginResponseDto
     public string Role { get; set; } = string.Empty;
     public string Names { get; set; } = string.Empty;
     public string Surname { get; set; } = string.Empty;
+
+    public bool RequiresDeviceVerification { get; set; }
+    public Guid? DeviceVerificationId { get; set; }
 }
