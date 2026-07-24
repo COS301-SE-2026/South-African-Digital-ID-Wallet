@@ -26,6 +26,18 @@ export const QrCameraScanner: FC<QrCameraScannerProps> = ({
       {
         highlightScanRegion: true,
         highlightCodeOutline: true,
+        calculateScanRegion: (video) => {
+          const smallerDimension = Math.min(video.videoWidth, video.videoHeight)
+          const scanRegionSize = Math.round(smallerDimension * 0.9)
+          return {
+            x: Math.round((video.videoWidth - scanRegionSize) / 2),
+            y: Math.round((video.videoHeight - scanRegionSize) / 2),
+            width: scanRegionSize,
+            height: scanRegionSize,
+            downScaledWidth: 700,
+            downScaledHeight: 700,
+          }
+        },
       }
     )
     scannerRef.current = scanner
@@ -63,6 +75,23 @@ export const QrCameraScanner: FC<QrCameraScannerProps> = ({
     }
   }, [paused, state])
 
+  //   useEffect(() => {
+  //     const container = videoRef.current?.parentElement
+  //     if(!container) return
+
+  //     const observer = new ResizeObserver(() => {
+  //         if(scannerRef.current) {
+  //             scannerRef.current.stop()
+  //             scannerRef.current.start().catch(() => {
+  //                 // mount effect already handles startup failures
+  //             })
+  //         }
+  //     })
+
+  //     observer.observe(container)
+  //     return () => observer.disconnect()
+  //   }, [])
+
   if (state === 'denied') {
     return (
       <Text variant="sub-md">
@@ -82,7 +111,7 @@ export const QrCameraScanner: FC<QrCameraScannerProps> = ({
   }
 
   return (
-    <div className="overflow-hidden rounded-md">
+    <div className="relative overflow-hidden rounded-md">
       <video ref={videoRef} className="w-full" muted playsInline />
       {state === 'requesting' && (
         <Text variant="sub-sm">Requesting camera access...</Text>

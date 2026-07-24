@@ -53,15 +53,17 @@ export const VerificationPage = () => {
   }
 
   return (
-    <div className="flex w-full flex-col gap-6 p-6">
+    <div className="mx-auto flex w-full max-w-md flex-col gap-4 p-4 sm:gap-6 sm:p-6">
       <Text variant="h3">Scan the QR Code</Text>
 
       {(status === 'scanning' || status === 'processing') && (
         <>
-          <QrCameraScanner
-            onScan={handleScan}
-            paused={status === 'processing'}
-          />
+          <div className="mx-auto aspect-square w-full max-w-sm">
+            <QrCameraScanner
+              onScan={handleScan}
+              paused={status === 'processing'}
+            />
+          </div>
           {status === 'processing' && (
             <Text variant="sub-md">Checking QR Code...</Text>
           )}
