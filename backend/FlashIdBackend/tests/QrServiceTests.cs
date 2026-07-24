@@ -14,9 +14,11 @@ public class QrServiceTests
     {
         public Credential? CredentialToReturn { get; set; }
         public List<Credential> CredentialsToReturn { get; set; } = new();
+        public Citizen? CitizenToReturn { get; set; }
 
         public Task<Credential?> GetByIdAsync(Guid id) => Task.FromResult(CredentialToReturn);
         public Task<List<Credential>> GetByUserIdAsync(Guid userId) => Task.FromResult(CredentialsToReturn);
+        public Task<Citizen?> GetCitizenByIdAsync(Guid citizenId, CancellationToken cancellationToken) => Task.FromResult(CitizenToReturn);
     }
 
     private sealed class FakeQrSigningProvider : IQrSigningProvider

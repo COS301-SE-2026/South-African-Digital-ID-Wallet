@@ -1,0 +1,39 @@
+name: Government Registry CI
+
+on:
+  push:
+    branches: ["main", "dev"]
+    paths: ['government-registry/**']
+  pull_request:
+    branches: ["main", "dev"]
+    paths: ['government-registry/**']
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore ./government-registry/GovernmentRegistry
+          
+      - name: Build
+        run: dotnet build ./government-registry/GovernmentRegistry --no-restore --configuration Release
+
+      - name: Run tests with coverage
+        run: dotnet test ./government-registry/GovernmentRegistry --no-build --configuration Release --coverage --coverage-output-format cobertura --results-directory ./government-registry/TestResults
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./government-registry/TestResults/**/*.cobertura.xml
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}

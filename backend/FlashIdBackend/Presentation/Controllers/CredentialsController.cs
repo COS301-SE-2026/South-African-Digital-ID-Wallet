@@ -13,7 +13,7 @@ public class CredentialsController : ControllerBase
 {
     private readonly IQrService _qrService;
 
-    public CredentialsController(IQrService qrService)
+    public CredentialsController(IQrService qrService, ICredentialActivationService credentialActivationService)
     {
         _qrService = qrService;
     }
