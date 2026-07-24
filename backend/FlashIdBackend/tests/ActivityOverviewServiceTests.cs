@@ -9,6 +9,9 @@ namespace tests;
 
 public class ActivityOverviewServiceTests
 {
+    private const string TestIpAddressPrimary = "192.168.1.10"; // NOSONAR
+    private const string TestIpAddressSecondary = "192.168.1.11"; // NOSONAR
+
     private static AppDbContext CreateContext()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
@@ -49,7 +52,7 @@ public class ActivityOverviewServiceTests
             Id = userId,
             Email = "logan@test.com",
             PhoneNumber = "0821234567",
-            PasswordHash = "hash",
+            PasswordHash = "hash", // NOSONAR
             PasswordSet = true,
             Role = UserRole.Citizen,
             IsDeleted = false,
@@ -70,13 +73,13 @@ public class ActivityOverviewServiceTests
             ActorId = userId,
             EventType = AuditEventType.UserLoggedIn,
             Details = "User logged in successfully",
-            IpAddress = "192.168.1.10",
+            IpAddress = TestIpAddressPrimary,
             CreatedAt = DateTime.UtcNow
         };
 
-        context.DomainUsers.Add(user);
-        context.Citizens.Add(citizen);
-        context.AuditLogs.Add(auditLog);
+        await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
+        await context.Citizens.AddAsync(citizen, TestContext.Current.CancellationToken);
+        await context.AuditLogs.AddAsync(auditLog, TestContext.Current.CancellationToken);
 
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
@@ -99,49 +102,57 @@ public class ActivityOverviewServiceTests
         var userId = Guid.NewGuid();
         var otherUserId = Guid.NewGuid();
 
-        context.DomainUsers.AddRange(
-            new User
+        await context.DomainUsers.AddRangeAsync(
+            new[]
             {
-                Id = userId,
-                Email = "user1@test.com",
-                PhoneNumber = "0821111111",
-                PasswordHash = "hash",
-                PasswordSet = true,
-                Role = UserRole.Citizen,
-                IsDeleted = false,
-                IsEmailVerified = true
+                new User
+                {
+                    Id = userId,
+                    Email = "user1@test.com",
+                    PhoneNumber = "0821111111",
+                    PasswordHash = "hash", // NOSONAR
+                    PasswordSet = true,
+                    Role = UserRole.Citizen,
+                    IsDeleted = false,
+                    IsEmailVerified = true
+                },
+                new User
+                {
+                    Id = otherUserId,
+                    Email = "user2@test.com",
+                    PhoneNumber = "0822222222",
+                    PasswordHash = "hash", // NOSONAR
+                    PasswordSet = true,
+                    Role = UserRole.Citizen,
+                    IsDeleted = false,
+                    IsEmailVerified = true
+                }
             },
-            new User
-            {
-                Id = otherUserId,
-                Email = "user2@test.com",
-                PhoneNumber = "0822222222",
-                PasswordHash = "hash",
-                PasswordSet = true,
-                Role = UserRole.Citizen,
-                IsDeleted = false,
-                IsEmailVerified = true
-            });
+            TestContext.Current.CancellationToken);
 
-        context.AuditLogs.AddRange(
-            new AuditLog
+        await context.AuditLogs.AddRangeAsync(
+            new[]
             {
-                Id = Guid.NewGuid(),
-                ActorId = userId,
-                EventType = AuditEventType.UserLoggedIn,
-                Details = "Correct User",
-                IpAddress = "192.168.1.10",
-                CreatedAt = DateTime.UtcNow
+                new AuditLog
+                {
+                    Id = Guid.NewGuid(),
+                    ActorId = userId,
+                    EventType = AuditEventType.UserLoggedIn,
+                    Details = "Correct User",
+                    IpAddress = TestIpAddressPrimary,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new AuditLog
+                {
+                    Id = Guid.NewGuid(),
+                    ActorId = otherUserId,
+                    EventType = AuditEventType.UserLoggedOut,
+                    Details = "Other User",
+                    IpAddress = TestIpAddressSecondary,
+                    CreatedAt = DateTime.UtcNow
+                }
             },
-            new AuditLog
-            {
-                Id = Guid.NewGuid(),
-                ActorId = otherUserId,
-                EventType = AuditEventType.UserLoggedOut,
-                Details = "Other User",
-                IpAddress = "192.168.1.11",
-                CreatedAt = DateTime.UtcNow
-            });
+            TestContext.Current.CancellationToken);
 
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
@@ -160,40 +171,46 @@ public class ActivityOverviewServiceTests
 
         var userId = Guid.NewGuid();
 
-        context.DomainUsers.Add(new User
-        {
-            Id = userId,
-            Email = "logan@test.com",
-            PhoneNumber = "0821234567",
-            PasswordHash = "hash",
-            PasswordSet = true,
-            Role = UserRole.Citizen,
-            IsDeleted = false,
-            IsEmailVerified = true
-        });
+        await context.DomainUsers.AddAsync(
+            new User
+            {
+                Id = userId,
+                Email = "logan@test.com",
+                PhoneNumber = "0821234567",
+                PasswordHash = "hash", // NOSONAR
+                PasswordSet = true,
+                Role = UserRole.Citizen,
+                IsDeleted = false,
+                IsEmailVerified = true
+            },
+            TestContext.Current.CancellationToken);
 
         var older = DateTime.UtcNow.AddMinutes(-10);
         var newer = DateTime.UtcNow;
 
-        context.AuditLogs.AddRange(
-            new AuditLog
+        await context.AuditLogs.AddRangeAsync(
+            new[]
             {
-                Id = Guid.NewGuid(),
-                ActorId = userId,
-                EventType = AuditEventType.UserLoggedIn,
-                Details = "Older Activity",
-                IpAddress = "192.168.1.10",
-                CreatedAt = older
+                new AuditLog
+                {
+                    Id = Guid.NewGuid(),
+                    ActorId = userId,
+                    EventType = AuditEventType.UserLoggedIn,
+                    Details = "Older Activity",
+                    IpAddress = TestIpAddressPrimary,
+                    CreatedAt = older
+                },
+                new AuditLog
+                {
+                    Id = Guid.NewGuid(),
+                    ActorId = userId,
+                    EventType = AuditEventType.UserLoggedOut,
+                    Details = "Newest Activity",
+                    IpAddress = TestIpAddressPrimary,
+                    CreatedAt = newer
+                }
             },
-            new AuditLog
-            {
-                Id = Guid.NewGuid(),
-                ActorId = userId,
-                EventType = AuditEventType.UserLoggedOut,
-                Details = "Newest Activity",
-                IpAddress = "192.168.1.10",
-                CreatedAt = newer
-            });
+            TestContext.Current.CancellationToken);
 
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 

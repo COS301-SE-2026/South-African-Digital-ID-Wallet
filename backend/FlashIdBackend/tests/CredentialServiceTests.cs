@@ -59,7 +59,7 @@ public class CredentialServiceTests
             Status = CredentialStatus.Active,
             Signature = "sig",
             IssuedBy = "Department of Home Affairs",
-            IssueDate = new DateTime(2024, 2, 12),
+            IssueDate = new DateTime(2024, 2, 12, 0, 0, 0, DateTimeKind.Utc),
             IdentityDocument = new IdentityDocument
             {
                 Id = Guid.NewGuid(),
@@ -70,8 +70,8 @@ public class CredentialServiceTests
             },
         };
 
-        context.Citizens.Add(citizen);
-        context.Credentials.Add(credential);
+        await context.Citizens.AddAsync(citizen, TestContext.Current.CancellationToken);
+        await context.Credentials.AddAsync(credential, TestContext.Current.CancellationToken);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var service = CreateService(context);

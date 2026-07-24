@@ -54,7 +54,7 @@ public class DashboardAccountCardServiceTests
             Surname = "Dlamini"
         };
 
-        context.Citizens.Add(citizen);
+        await context.Citizens.AddAsync(citizen, TestContext.Current.CancellationToken);
 
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 

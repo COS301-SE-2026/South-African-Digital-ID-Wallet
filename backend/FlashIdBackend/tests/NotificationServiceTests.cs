@@ -62,8 +62,8 @@ public class NotificationServiceTests
             CreatedAt = DateTime.UtcNow
         };
 
-        context.Citizens.Add(citizen);
-        context.Notifications.Add(notification);
+        await context.Citizens.AddAsync(citizen, TestContext.Current.CancellationToken);
+        await context.Notifications.AddAsync(notification, TestContext.Current.CancellationToken);
 
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
@@ -105,27 +105,33 @@ public class NotificationServiceTests
             Surname = "Smith"
         };
 
-        context.Citizens.AddRange(citizen, otherCitizen);
+        await context.Citizens.AddRangeAsync(
+            new[] { citizen, otherCitizen },
+            TestContext.Current.CancellationToken);
 
-        context.Notifications.AddRange(
-            new Notification
+        await context.Notifications.AddRangeAsync(
+            new[]
             {
-                Id = Guid.NewGuid(),
-                CitizenId = citizen.Id,
-                Title = "My Notification",
-                Description = "Visible",
-                Tone = "Info",
-                CreatedAt = DateTime.UtcNow
+                new Notification
+                {
+                    Id = Guid.NewGuid(),
+                    CitizenId = citizen.Id,
+                    Title = "My Notification",
+                    Description = "Visible",
+                    Tone = "Info",
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Notification
+                {
+                    Id = Guid.NewGuid(),
+                    CitizenId = otherCitizen.Id,
+                    Title = "Other Notification",
+                    Description = "Hidden",
+                    Tone = "Warning",
+                    CreatedAt = DateTime.UtcNow
+                }
             },
-            new Notification
-            {
-                Id = Guid.NewGuid(),
-                CitizenId = otherCitizen.Id,
-                Title = "Other Notification",
-                Description = "Hidden",
-                Tone = "Warning",
-                CreatedAt = DateTime.UtcNow
-            });
+            TestContext.Current.CancellationToken);
 
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
@@ -153,30 +159,34 @@ public class NotificationServiceTests
             Surname = "Dlamini"
         };
 
-        context.Citizens.Add(citizen);
+        await context.Citizens.AddAsync(citizen, TestContext.Current.CancellationToken);
 
         var older = DateTime.UtcNow.AddMinutes(-10);
         var newer = DateTime.UtcNow;
 
-        context.Notifications.AddRange(
-            new Notification
+        await context.Notifications.AddRangeAsync(
+            new[]
             {
-                Id = Guid.NewGuid(),
-                CitizenId = citizen.Id,
-                Title = "Older Notification",
-                Description = "Old",
-                Tone = "Info",
-                CreatedAt = older
+                new Notification
+                {
+                    Id = Guid.NewGuid(),
+                    CitizenId = citizen.Id,
+                    Title = "Older Notification",
+                    Description = "Old",
+                    Tone = "Info",
+                    CreatedAt = older
+                },
+                new Notification
+                {
+                    Id = Guid.NewGuid(),
+                    CitizenId = citizen.Id,
+                    Title = "Newest Notification",
+                    Description = "New",
+                    Tone = "Success",
+                    CreatedAt = newer
+                }
             },
-            new Notification
-            {
-                Id = Guid.NewGuid(),
-                CitizenId = citizen.Id,
-                Title = "Newest Notification",
-                Description = "New",
-                Tone = "Success",
-                CreatedAt = newer
-            });
+            TestContext.Current.CancellationToken);
 
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 

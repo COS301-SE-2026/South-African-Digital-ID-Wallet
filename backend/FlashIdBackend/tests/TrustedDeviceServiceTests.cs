@@ -9,6 +9,8 @@ namespace tests;
 
 public class TrustedDeviceServiceTests
 {
+    private const string TestIpAddress = "192.168.1.10";
+
     private static AppDbContext CreateContext()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
@@ -60,15 +62,15 @@ public class TrustedDeviceServiceTests
             DeviceType = "Laptop",
             OperatingSystem = "macOS",
             Browser = "Chrome",
-            IpAddress = "192.168.1.10",
+            IpAddress = TestIpAddress,
             Location = "Pretoria",
             LastActive = DateTime.UtcNow,
             IsCurrentDevice = true,
             IsTrusted = true
         };
 
-        context.Citizens.Add(citizen);
-        context.TrustedDevices.Add(device);
+        await context.Citizens.AddAsync(citizen, TestContext.Current.CancellationToken);
+        await context.TrustedDevices.AddAsync(device, TestContext.Current.CancellationToken);
 
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
@@ -83,7 +85,7 @@ public class TrustedDeviceServiceTests
         Assert.Equal("Laptop", result[0].DeviceType);
         Assert.Equal("macOS", result[0].OperatingSystem);
         Assert.Equal("Chrome", result[0].Browser);
-        Assert.Equal("192.168.1.10", result[0].IpAddress);
+        Assert.Equal(TestIpAddress, result[0].IpAddress);
         Assert.Equal("Pretoria", result[0].Location);
         Assert.True(result[0].IsCurrentDevice);
         Assert.True(result[0].IsTrusted);
@@ -112,15 +114,15 @@ public class TrustedDeviceServiceTests
             DeviceType = "Laptop",
             OperatingSystem = "macOS",
             Browser = "Chrome",
-            IpAddress = "192.168.1.10",
+            IpAddress = TestIpAddress,
             Location = "Pretoria",
             LastActive = DateTime.UtcNow,
             IsCurrentDevice = true,
             IsTrusted = true
         };
 
-        context.Citizens.Add(citizen);
-        context.TrustedDevices.Add(device);
+        await context.Citizens.AddAsync(citizen, TestContext.Current.CancellationToken);
+        await context.TrustedDevices.AddAsync(device, TestContext.Current.CancellationToken);
 
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
