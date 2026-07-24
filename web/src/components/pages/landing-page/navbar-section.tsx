@@ -23,15 +23,12 @@ export function LandingPageNavbar() {
             <Image
               src={FlashIdLogo}
               alt="FlashID"
-              width={170}
-              height={48}
-              priority
-              className="h-11 w-auto transition-transform duration-300 group-hover:scale-105"
+              width={200}
+              height={50}
+              className="h-11 w-auto transition-transform duration-300"
             />
-
             <h1 className="text-xl font-bold tracking-tight text-clean-white">
-              Flash
-              <span className="text-accent-gold">ID</span>
+              Flash<span className="text-accent-gold">ID</span>
             </h1>
           </Link>
 
@@ -53,17 +50,17 @@ export function LandingPageNavbar() {
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="rounded-lg px-5 py-2.5 text-sm font-semibold text-clean-white transition-all duration-200 hover:bg-clean-white/20"
+              className="px-5 py-2.5 text-sm font-semibold text-clean-white hover:bg-clean-white/20 rounded-lg"
             >
               Login
             </Link>
 
             <Link
               href="/register"
-              className="group inline-flex items-center gap-2 rounded-lg bg-clean-white px-5 py-2.5 text-sm font-semibold text-primary-green shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-cream-background hover:shadow-xl"
+              className="group flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-primary-green bg-clean-white rounded-lg shadow-lg hover:shadow-xl"
             >
               Register
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
