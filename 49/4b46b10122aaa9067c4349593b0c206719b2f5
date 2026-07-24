@@ -1,0 +1,16 @@
+web/src/components/pages/login/login-page.tsx
+  h_0aff3b71f739b1 16
+web/src/components/pages/citizen/citizen-registration-page.tsx
+  h_0aff3b71f739b1 5-7,16-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "494b46b10122aaa9067c4349593b0c206719b2f5",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
