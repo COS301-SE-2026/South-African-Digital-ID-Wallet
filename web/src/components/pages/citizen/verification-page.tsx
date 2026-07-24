@@ -23,9 +23,7 @@ export const VerificationPage = () => {
     const parsed = parseScannedToken(rawText)
 
     if (!parsed) {
-      setErrorMessage(
-        `This is not a valid FlashID QR Code. Got: ${rawText.length} | ${rawText.slice(0, 20)} | ${rawText.slice(-20)}) | ${rawText}`
-      )
+      setErrorMessage('This is not a valid FlashID QR Code.')
       setStatus('error')
       return
     }
