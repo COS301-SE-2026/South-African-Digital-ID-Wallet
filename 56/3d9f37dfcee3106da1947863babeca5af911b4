@@ -1,0 +1,16 @@
+web/src/components/organisms/login-form/test/login-form.test.tsx
+  h_0aff3b71f739b1 34,45
+web/src/components/pages/landing-page/landing-page.tsx
+  h_0aff3b71f739b1 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "563d9f37dfcee3106da1947863babeca5af911b4",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
