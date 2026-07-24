@@ -9,8 +9,7 @@ import FlashIdLogo from '@/assets/images/FlashID-white.png'
 const NAV_LINKS = [
   { label: 'Home', href: '#home' },
   { label: 'About', href: '#about' },
-  { label: 'Features', href: '#features' },
-  { label: 'How It Works', href: '#how-it-works' },
+  { label: 'Features and How It Works', href: '#features&how-it-works' },
   { label: 'Preview', href: '#preview' },
 ]
 
