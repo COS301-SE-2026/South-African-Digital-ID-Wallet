@@ -20,6 +20,11 @@ public class QrService : IQrService
     private readonly IQrDisclosureTokenRepository _qrDisclosureTokenRepository;
     private readonly IInstitutionRepository _institutionRepository;
 
+    private static readonly JsonSerializerOptions CamelCaseOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
     public QrService(ICredentialRepository credentialRepository, IQrSigningProvider qrSigningProvider, IQrDisclosureTokenRepository qrDisclosureTokenRepository, IInstitutionRepository institutionRepository)
     {
         _credentialRepository = credentialRepository;
@@ -79,7 +84,7 @@ public class QrService : IQrService
             ExpiresAt = expiresAt,
         };
 
-        var payloadJson = JsonSerializer.Serialize(payload);
+        var payloadJson = JsonSerializer.Serialize(payload, CamelCaseOptions);
         var signature = _qrSigningProvider.Sign(payloadJson);
 
         var envelope = new QrEnvelope
@@ -89,7 +94,7 @@ public class QrService : IQrService
         };
 
         var token = Convert.ToBase64String(
-            System.Text.Encoding.UTF8.GetBytes(JsonSerializer.Serialize(envelope)));
+            System.Text.Encoding.UTF8.GetBytes(JsonSerializer.Serialize(envelope, CamelCaseOptions)));
 
         return new GenerateQrResponseDto
         {
@@ -140,12 +145,12 @@ public class QrService : IQrService
         try
         {
             var envelopeJson = Encoding.UTF8.GetString(Convert.FromBase64String(token));
-            envelope = JsonSerializer.Deserialize<QrEnvelope>(envelopeJson) ?? throw new InvalidDisclosureTokenException();
+            envelope = JsonSerializer.Deserialize<QrEnvelope>(envelopeJson, CamelCaseOptions) ?? throw new InvalidDisclosureTokenException();
             var payloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(envelope.Payload));
 
             if (!_qrSigningProvider.Verify(payloadJson, envelope.Signature)) throw new InvalidDisclosureTokenException();
 
-            payload = JsonSerializer.Deserialize<QrPayload>(payloadJson) ?? throw new InvalidDisclosureTokenException();
+            payload = JsonSerializer.Deserialize<QrPayload>(payloadJson, CamelCaseOptions) ?? throw new InvalidDisclosureTokenException();
         }
         catch (Exception e) when (e is FormatException or JsonException)
         {
