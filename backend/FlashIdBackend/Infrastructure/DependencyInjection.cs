@@ -40,6 +40,7 @@ public static class DependencyInjection
         services.AddScoped<IQrDisclosureTokenRepository, QrDisclosureTokenRepository>();
 
         services.AddScoped<IOfficialRepository, OfficialRepository>();
+        services.AddScoped<IManageUserAccountRepository, ManageUserAccountRepository>();
 
         services.AddHttpClient<IGovernmentRegistryGateway, GovernmentRegistryGateway>((serviceProvider, client) =>
         {
