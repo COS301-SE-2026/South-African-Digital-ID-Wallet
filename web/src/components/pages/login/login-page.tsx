@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-
 import { Text } from '@/components/atoms'
 import { AuthSidebar, LoginForm } from '@/components/organisms'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -14,7 +13,7 @@ export const LoginPage = () => {
 
         <div className="flex flex-1 items-center justify-center px-6 py-6 sm:px-8 lg:px-10 xl:px-14">
           <Card className="flex h-full max-h-[90vh] w-full max-w-xl flex-col">
-            <div className="px-6 pt-6">
+            <div className="px-3">
               <Link href="/">
                 <Button
                   type="button"
