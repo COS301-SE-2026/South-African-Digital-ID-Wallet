@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import FlashIdLogo from '@/assets/images/FlashID-white.png'
+import { Text } from '@/components/atoms'
 
 const NAV_LINKS = [
   { label: 'Home', href: '#home' },
@@ -26,9 +27,9 @@ export function LandingPageNavbar() {
               height={50}
               className="h-11 w-auto transition-transform duration-300"
             />
-            <h1 className="text-xl font-bold tracking-tight text-clean-white">
+            <Text as="h1" variant="h3" className="text-clean-white">
               Flash<span className="text-accent-gold">ID</span>
-            </h1>
+            </Text>
           </Link>
 
           <nav className="hidden lg:block">

@@ -1,5 +1,7 @@
 import { LandingPageNavbar } from '../../organisms/landing-page-navbar/landing-page-navbar'
 import { LandingPageFooter } from '../../organisms/landing-page-footer/landing-page-footer'
+import { Text } from '@/components/atoms'
+
 import {
   Check,
   ShieldCheck,
@@ -209,9 +211,9 @@ function ProblemAndAudienceSection() {
           </p>
         </div>
 
-        <h2 className="text-3xl font-bold text-center tracking-tight text-gray-900 sm:text-4xl mt-25">
+        <Text as="h2" variant="h2" className="text-center mt-25 text-gray-900">
           Who is involved?
-        </h2>
+        </Text>
 
         <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3 mt-10">
           {AUDIENCES.map(({ icon: Icon, tone, title, points }) => (
@@ -224,9 +226,9 @@ function ProblemAndAudienceSection() {
               >
                 <Icon className="h-5 w-5" strokeWidth={2.25} />
               </div>
-              <h3 className="mb-2 text-lg font-semibold text-gray-900">
+              <Text variant="h3" className="mb-2">
                 {title}
-              </h3>
+              </Text>
               <ul className="space-y-1.5">
                 {points.map((point) => (
                   <li
@@ -250,14 +252,14 @@ function FeaturesAndHowItWorksSection() {
   return (
     <section id="features&how-it-works" className="py-12 sm:py-16">
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="mb-12 text-3xl font-extrabold text-center tracking-tight text-gray-900 sm:text-4xl">
+        <Text variant="h2" as="h2" className="mb-12 text-center sm:text-4xl">
           Features & How It Works
-        </h2>
+        </Text>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="rounded-2xl border-2 border-emerald-600 bg-white p-6">
-            <h2 className="mb-4 text-xl font-extrabold tracking-tight text-gray-900">
+            <Text variant="h2" as="h2" className="mb-4 text-xl">
               Features
-            </h2>
+            </Text>
             <ul className="divide-y divide-gray-100">
               {FEATURES.map(({ icon: Icon, title, description }) => (
                 <li
@@ -268,9 +270,9 @@ function FeaturesAndHowItWorksSection() {
                     <Icon className="h-4 w-4" strokeWidth={2.25} />
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900">
+                    <Text variant="h4" as="h3">
                       {title}
-                    </h3>
+                    </Text>
                     <p className="mt-0.5 text-xs leading-relaxed text-gray-600">
                       {description}
                     </p>
@@ -282,9 +284,9 @@ function FeaturesAndHowItWorksSection() {
 
           <div className="flex flex-col gap-6">
             <div className="rounded-2xl border-2 border-emerald-600 bg-white p-6">
-              <h2 className="mb-4 text-xl font-extrabold tracking-tight text-gray-900">
+              <Text variant="h2" as="h2" className="mb-4 text-xl">
                 How FlashID Works
-              </h2>
+              </Text>
               <div>
                 {HOW_IT_WORKS.map((step, i) => (
                   <div
@@ -313,9 +315,9 @@ function FeaturesAndHowItWorksSection() {
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
                   <Shield className="h-4 w-4" />
                 </div>
-                <h2 className="text-xl font-extrabold tracking-tight text-gray-900">
+                <Text variant="h2" as="h2" className="mb-4 text-xl">
                   Security You Can Trust
-                </h2>
+                </Text>
               </div>
 
               <ul className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
@@ -348,9 +350,13 @@ function PreviewSection() {
     <section id="preview" className="py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+          <Text
+            variant="h2"
+            as="h2"
+            className="mb-4 text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900"
+          >
             Application Preview
-          </h2>
+          </Text>
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
