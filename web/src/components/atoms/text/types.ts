@@ -1,7 +1,16 @@
 import { ReactNode } from 'react'
 
 export type BaseTextProps = {
-  variant: 'h1' | 'h2' | 'h3' | 'h4' | 'sub-sm' | 'sub-md' | 'sub-lg' | 'label'
+  variant:
+    | 'h1'
+    | 'h2'
+    | 'h3'
+    | 'h4'
+    | 'sub-sm'
+    | 'sub-md'
+    | 'sub-lg'
+    | 'label'
+    | 'caption'
   className?: string
   dataCy?: string
   id?: string

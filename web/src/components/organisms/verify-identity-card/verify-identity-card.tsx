@@ -10,9 +10,13 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '@/components/ui/input-otp'
-import { ActivationProgress } from '@/components/molecules/activation-progress-bar'
+import { ProgressStepper } from '@/components/molecules'
+
+const DEFAULT_STEPS = ['Verify Identity', 'Activate Credentials', 'Complete']
 
 export function VerifyIdentityCard({
+  steps = DEFAULT_STEPS,
+  currentStep = 1,
   saId,
   pin,
   isSubmitting = false,
@@ -30,7 +34,7 @@ export function VerifyIdentityCard({
   return (
     <Card className="w-full rounded-lg border-border/70 bg-card shadow-xl shadow-deep-green/10">
       <CardHeader className="space-y-6">
-        <ActivationProgress currentStep={1} />
+        <ProgressStepper steps={steps} currentStep={currentStep} />
         <div>
           <CardTitle className="font-semibold text-2xl text-deep-green">
             Verify your identity

@@ -1,4 +1,6 @@
 export type VerifyIdentityCardProps = {
+  steps?: string[]
+  currentStep?: number
   saId: string
   pin: string
   isSubmitting?: boolean
