@@ -26,16 +26,7 @@ export function ManageUserAccount({
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <AppSidebar navSections={navSections} user={user} onLogout={onLogout} />
       <main className="flex-1 flex flex-col p-4 gap-4">
-        <AppTopBar
-          title="Account management"
-          description="Manage your account and data controls."
-          user={{
-            name: user.name,
-            initials: user.initials,
-          }}
-        />
         <div className="flex-1 grid grid-cols-2 gap-4 min-h-0">
           <AccountCard />
           <div className="flex flex-col gap-4 min-h-0">
