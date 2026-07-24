@@ -20,6 +20,11 @@ export const pageHeaders: Record<string, PageHeader> = {
     description: 'View and manage your digital identity wallet.',
   },
 
+  '/citizen/my-credentials': {
+    title: 'My Credentials',
+    description: 'View and manage your issued digital credentials. ',
+  },
+
   '/gov-admin': {
     title: 'Government Admin Dashboard',
     description: 'Manage credentials, users, and platform oversight.',
