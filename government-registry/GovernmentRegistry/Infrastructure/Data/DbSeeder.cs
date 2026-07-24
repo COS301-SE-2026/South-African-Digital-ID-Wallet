@@ -73,7 +73,7 @@ public static class DbSeeder
                 IssuedBy = "Department of Home Affairs",
                 IssueDate = new DateOnly(2020, 1, 1),
                 CountryOfBirth = "ZA",
-                CitizenshipStatus = CitizenStatus.CitizenByBirth,
+                CitizenshipStatus = CitizenStatus.Citizen,
                 Nationality = "South African",
                 PhotoBlob = $"mock/photos/{saId}/identity-document.jpg"
             });

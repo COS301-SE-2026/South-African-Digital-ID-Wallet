@@ -4,9 +4,9 @@ using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Domain.Entities;
+using Infrastructure.Gateways.GovernmentRegistry;
 using Infrastructure.Providers;
 using Infrastructure.Repositories;
-using Infrastructure.Services.GovernmentRegistry;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +32,9 @@ public static class DependencyInjection
 
         services.AddScoped<ICredentialRepository, CredentialRepository>();
         services.AddSingleton<IQrSigningProvider, Ed25519SigningProvider>();
+        services.AddScoped<IQrDisclosureTokenRepository, QrDisclosureTokenRepository>();
+
+        services.AddScoped<IOfficialRepository, OfficialRepository>();
 
         services.AddHttpClient<IGovernmentRegistryGateway, GovernmentRegistryGateway>((serviceProvider, client) =>
         {
@@ -62,7 +65,8 @@ public static class DependencyInjection
         });
 
         services.AddScoped<ISmsProvider, AzureCommunicationSmsProvider>();
-
+        services.AddScoped<IVerificationRepository, VerificationRepository>();
+        services.AddScoped<ICredentialsActivationRepository, CredentialsActivationRepository>();
         return services;
     }
 }
