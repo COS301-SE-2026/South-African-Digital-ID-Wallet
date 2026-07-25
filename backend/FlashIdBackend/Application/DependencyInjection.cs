@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<ICitizenVerificationService, CitizenVerificationService>();
         services.AddScoped<ICredentialActivationService, CredentialActivationService>();
         services.AddSingleton<ManageUserAccountMapper>();
+        services.AddScoped<IUpdatePasswordService, UpdatePasswordService>();
         return services;
     }
 }

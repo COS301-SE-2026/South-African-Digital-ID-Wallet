@@ -41,6 +41,7 @@ public static class DependencyInjection
 
         services.AddScoped<IOfficialRepository, OfficialRepository>();
         services.AddScoped<IManageUserAccountRepository, ManageUserAccountRepository>();
+        services.AddScoped<IUpdatePasswordRepository, UpdatePasswordRepository>();
 
         services.AddHttpClient<IGovernmentRegistryGateway, GovernmentRegistryGateway>((serviceProvider, client) =>
         {
