@@ -2,6 +2,7 @@
 
 import { FC, useEffect, useRef, useState } from 'react'
 import QrScanner from 'qr-scanner'
+import { FlashlightIcon, FlashlightOffIcon } from 'lucide-react'
 import { Text } from '@/components/atoms'
 import type { QrCameraScannerProps, CameraState } from './types'
 
@@ -11,56 +12,98 @@ export const QrCameraScanner: FC<QrCameraScannerProps> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null)
   const scannerRef = useRef<QrScanner | null>(null)
+  const streamRef = useRef<MediaStream | null>(null)
   const [state, setState] = useState<CameraState>('requesting')
+  const [hasTorch, setHasTorch] = useState(false)
+  const [torchOn, setTorchOn] = useState(false)
 
   useEffect(() => {
     if (!videoRef.current) return
 
     let cancelled = false
 
-    const scanner = new QrScanner(
-      videoRef.current,
-      (result) => {
-        if (!cancelled) onScan(result.data)
-      },
-      {
-        highlightScanRegion: true,
-        highlightCodeOutline: true,
-        calculateScanRegion: (video) => {
-          const smallerDimension = Math.min(video.videoWidth, video.videoHeight)
-          const scanRegionSize = Math.round(smallerDimension * 0.9)
-          return {
-            x: Math.round((video.videoWidth - scanRegionSize) / 2),
-            y: Math.round((video.videoHeight - scanRegionSize) / 2),
-            width: scanRegionSize,
-            height: scanRegionSize,
-            downScaledWidth: 700,
-            downScaledHeight: 700,
-          }
-        },
-      }
-    )
-    scannerRef.current = scanner
-
-    scanner
-      .start()
-      .then(() => {
-        if (!cancelled) setState('active')
-      })
-      .catch((error: unknown) => {
+    const setup = async () => {
+      let stream: MediaStream
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+          },
+          audio: false,
+        })
+      } catch (error) {
         if (cancelled) return
         if (error instanceof Error && error.name === 'NotAllowedError') {
           setState('denied')
         } else {
           setState('unavailable')
         }
-      })
+        return
+      }
+
+      if (cancelled) {
+        stream.getTracks().forEach((track) => track.stop())
+        return
+      }
+
+      streamRef.current = stream
+      if (!videoRef.current) return
+      videoRef.current.srcObject = stream
+
+      const scanner = new QrScanner(
+        videoRef.current,
+        (result) => {
+          if (!cancelled) onScan(result.data)
+        },
+        {
+          highlightScanRegion: true,
+          highlightCodeOutline: true,
+          calculateScanRegion: (video) => {
+            const smallerDimension = Math.min(
+              video.videoWidth,
+              video.videoHeight
+            )
+            const scanRegionSize = Math.round(smallerDimension * 0.9)
+            return {
+              x: Math.round((video.videoWidth - scanRegionSize) / 2),
+              y: Math.round((video.videoHeight - scanRegionSize) / 2),
+              width: scanRegionSize,
+              height: scanRegionSize,
+              downScaledWidth: 1080,
+              downScaledHeight: 1080,
+            }
+          },
+        }
+      )
+      scannerRef.current = scanner
+
+      try {
+        await scanner.start()
+        if (cancelled) return
+        setState('active')
+        const flashAvailable = await scanner.hasFlash()
+        if (!cancelled) setHasTorch(flashAvailable)
+      } catch (error: unknown) {
+        if (cancelled) return
+        if (error instanceof Error && error.name === 'NotAllowedError') {
+          setState('denied')
+        } else {
+          setState('unavailable')
+        }
+      }
+    }
+
+    setup()
 
     return () => {
       cancelled = true
-      scanner.stop()
-      scanner.destroy()
+      scannerRef.current?.stop()
+      scannerRef.current?.destroy()
       scannerRef.current = null
+      streamRef.current?.getTracks().forEach((track) => track.stop())
+      streamRef.current = null
     }
   }, [onScan])
 
@@ -75,22 +118,11 @@ export const QrCameraScanner: FC<QrCameraScannerProps> = ({
     }
   }, [paused, state])
 
-  //   useEffect(() => {
-  //     const container = videoRef.current?.parentElement
-  //     if(!container) return
-
-  //     const observer = new ResizeObserver(() => {
-  //         if(scannerRef.current) {
-  //             scannerRef.current.stop()
-  //             scannerRef.current.start().catch(() => {
-  //                 // mount effect already handles startup failures
-  //             })
-  //         }
-  //     })
-
-  //     observer.observe(container)
-  //     return () => observer.disconnect()
-  //   }, [])
+  const toggleTorch = async () => {
+    if (!scannerRef.current) return
+    await scannerRef.current.toggleFlash()
+    setTorchOn(scannerRef.current.isFlashOn())
+  }
 
   if (state === 'denied') {
     return (
@@ -115,6 +147,20 @@ export const QrCameraScanner: FC<QrCameraScannerProps> = ({
       <video ref={videoRef} className="w-full" muted playsInline />
       {state === 'requesting' && (
         <Text variant="sub-sm">Requesting camera access...</Text>
+      )}
+      {hasTorch && state === 'active' && (
+        <button
+          type="button"
+          onClick={toggleTorch}
+          className="absolute bottom-3 right-3 rounded-full bg-black/50 p-2 text-white transition hover:bg-black/70"
+          aria-label={torchOn ? 'Turn off flashlight' : 'Turn on flashlight'}
+        >
+          {torchOn ? (
+            <FlashlightIcon className="h-5 w-5" />
+          ) : (
+            <FlashlightOffIcon className="h-5 w-5" />
+          )}
+        </button>
       )}
     </div>
   )
