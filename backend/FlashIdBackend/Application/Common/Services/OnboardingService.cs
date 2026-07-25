@@ -170,7 +170,7 @@ public class OnboardingService : IOnboardingService
         await _onboardingRepository.SaveChangesAsync();
 
         var activationLink = BuildActivationLink(rawToken);
-        var message = BuildEmailMessage(activationLink);
+        var message = BuildEmailMessage(activationLink, citizen.Names);
 
         await _emailSenderProvider.SendEmailAsync(email, "FlashID", message);
 
@@ -225,10 +225,10 @@ public class OnboardingService : IOnboardingService
 
         var token = Uri.EscapeDataString(rawToken);
 
-        return $"{baseUrl}/activate?token={token}";
+        return $"{baseUrl}/citizens/activate-credentials?token={token}";
     }
 
-    private string BuildEmailMessage(string activationLink)
+    private string BuildEmailMessage(string activationLink, string name)
     {
         return
             $$"""
@@ -282,7 +282,7 @@ public class OnboardingService : IOnboardingService
                      
                      <tr>
                          <td style="padding:24px 32px 0 32px; color:#111827; font-size:15px; line-height:1.6;">
-                             Hi there,
+                             Hi there {{name}},
                              <br /><br />
              
                              Welcome to <strong>FlashID</strong>. Your identity has been
