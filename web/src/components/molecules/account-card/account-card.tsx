@@ -1,33 +1,19 @@
 'use client'
 
-import * as React from 'react'
+import { useQuery } from '@tanstack/react-query'
+
 import { AccountInfoRow, StatusPill } from '@/components/atoms'
-import api from '@/lib/api'
-import type { ManageUserAccountDto } from './types'
+import { manageUserAccountService } from '@/services'
 
 export const AccountCard = () => {
-  const [account, setAccount] = React.useState<ManageUserAccountDto | null>(
-    null
-  )
-  const [loading, setLoading] = React.useState(true)
-
-  React.useEffect(() => {
-    const fetchAccount = async () => {
-      try {
-        const { data } = await api.get<ManageUserAccountDto>(
-          '/api/manage-user-account/me'
-        )
-
-        setAccount(data)
-      } catch (err) {
-        console.error('Failed to load account', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchAccount()
-  }, [])
+  const {
+    data: account,
+    isLoading: loading,
+    isError,
+  } = useQuery({
+    queryKey: ['manageUserAccount', 'me'],
+    queryFn: () => manageUserAccountService.getMyAccount(),
+  })
 
   if (loading) {
     return (
@@ -38,7 +24,7 @@ export const AccountCard = () => {
     )
   }
 
-  if (!account) {
+  if (isError || !account) {
     return (
       <div className="bg-card rounded-3xl border p-6">
         <h2 className="text-3xl font-bold">Account</h2>
