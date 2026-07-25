@@ -123,17 +123,19 @@ export default function VerifyCitizen({ token = '' }: VerifyCitizenProps) {
             </div>
           </div>
         ) : (
-          <div className="mx-auto w-full max-w-[1100px] space-y-10">
-            <ProgressStepper steps={STEPS} currentStep={2} />
-            <ActivateCredentialsForm
-              identityDocumentAvailable
-              driversLicenseAvailable
-              selection={selected}
-              onSelectionChange={setSelected}
-              onBack={() => setStep(1)}
-              onSubmit={handleActivateSubmit}
-              isSubmitting={isActivating}
-            />
+          <div className=" mx-auto w-full max-w-[1100px] rounded-[32px] bg-white px-12 py-10 shadow-sm border border-neutral-200">
+            <div className="space-y-10">
+              <ProgressStepper steps={STEPS} currentStep={2} />
+              <ActivateCredentialsForm
+                identityDocumentAvailable
+                driversLicenseAvailable
+                selection={selected}
+                onSelectionChange={setSelected}
+                onBack={() => setStep(1)}
+                onSubmit={handleActivateSubmit}
+                isSubmitting={isActivating}
+              />
+            </div>
           </div>
         ))}
       <VerificationSuccessModal
