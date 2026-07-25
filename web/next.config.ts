@@ -4,12 +4,11 @@ import path from 'node:path'
 const nextConfig: NextConfig = {
   output: 'standalone',
   outputFileTracingRoot: path.join(__dirname, '../'),
-  allowedDevOrigins: ['10.0.0.7'],
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:5118/api/:path*',
+        destination: `${process.env.API_INTERNAL_URL ?? 'http://localhost:5118'}/api/:path*`,
       },
     ]
   },
