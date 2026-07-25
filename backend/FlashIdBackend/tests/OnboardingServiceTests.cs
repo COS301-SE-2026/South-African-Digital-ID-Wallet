@@ -4,9 +4,9 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Services;
 using Domain.Enums;
 using Infrastructure.Data;
+using Infrastructure.Gateways.GovernmentRegistry;
 using Infrastructure.Providers;
 using Infrastructure.Repositories;
-using Infrastructure.Services.GovernmentRegistry;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 

@@ -1,0 +1,17 @@
+{
+  "name": "government-registry",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "restore": "dotnet restore GovernmentRegistry/GovernmentRegistry.sln && dotnet tool restore --tool-manifest GovernmentRegistry/.config/dotnet-tools.json",
+    "dev": "dotnet watch run --project GovernmentRegistry/Presentation/Presentation.csproj",
+    "start": "dotnet run --project GovernmentRegistry/Presentation/Presentation.csproj",
+    "clean": "dotnet clean GovernmentRegistry/GovernmentRegistry.sln",
+    "build": "dotnet build GovernmentRegistry/Presentation/Presentation.csproj",
+    "type-check": "dotnet build GovernmentRegistry/GovernmentRegistry.sln",
+    "test": "dotnet test --solution GovernmentRegistry/GovernmentRegistry.sln",
+    "test:coverage": "dotnet test --solution GovernmentRegistry/GovernmentRegistry.sln --coverage --coverage-output-format cobertura --results-directory ./TestResults && reportgenerator -reports:\"./TestResults/**/*.cobertura.xml\" -targetdir:\"./CoverageReport\" -reporttypes:\"Html;TextSummary\"",
+    "format": "dotnet format GovernmentRegistry/",
+    "lint": "dotnet format --verify-no-changes GovernmentRegistry/"
+  }
+}

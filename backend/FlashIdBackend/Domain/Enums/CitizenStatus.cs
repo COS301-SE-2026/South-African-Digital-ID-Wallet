@@ -6,4 +6,5 @@ public enum CitizenStatus
     Activated,
     Deactivated,
     Suspended,
+    Verified,
 }

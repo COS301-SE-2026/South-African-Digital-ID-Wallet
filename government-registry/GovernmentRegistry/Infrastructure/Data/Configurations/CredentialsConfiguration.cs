@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Data.Configurations;
 
-public class CredentialsConfiguration: IEntityTypeConfiguration<Credential>
+public class CredentialsConfiguration : IEntityTypeConfiguration<Credential>
 {
     public void Configure(EntityTypeBuilder<Credential> builder)
     {
         builder.ToTable("Credentials");
-        
+
         builder.UseTptMappingStrategy();
-        
+
         builder.HasKey(c => c.Id);
 
         builder.Property(c => c.Signature)
@@ -20,7 +20,7 @@ public class CredentialsConfiguration: IEntityTypeConfiguration<Credential>
         builder.Property(c => c.IssuedBy)
             .IsRequired()
             .HasMaxLength(100);
-        
+
         builder.Property(c => c.IssueDate)
             .IsRequired();
 

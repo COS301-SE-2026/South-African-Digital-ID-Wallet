@@ -17,4 +17,5 @@ public enum AuditEventType
     OnboardCitizen,
     OnboardCitizenFailed,
     EmailAddressChanged,
+    CitizenVerified,
 }

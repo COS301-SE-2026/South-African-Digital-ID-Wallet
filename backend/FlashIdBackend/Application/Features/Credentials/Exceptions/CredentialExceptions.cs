@@ -23,3 +23,9 @@ public class InvalidDisclosedFieldsException : Exception
     public InvalidDisclosedFieldsException(IEnumerable<string> fields)
         : base($"Invalid or missing disclosed fields: {string.Join(", ", fields)}") { }
 }
+
+public class InvalidDisclosureTokenException : Exception
+{
+    public InvalidDisclosureTokenException()
+        : base("This QR Code is expired, invalid, or has already been used.") { }
+}
