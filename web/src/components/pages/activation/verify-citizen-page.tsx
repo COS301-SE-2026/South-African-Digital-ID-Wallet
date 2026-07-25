@@ -1,11 +1,10 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { ActivationInfoItem } from '@/components/molecules/activation-info-item'
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import { ShieldCheck, Landmark, WalletCards } from 'lucide-react'
+
 import {
   ActivateCredentialsForm,
   type ActivateCredentialsSelection,
@@ -22,7 +21,7 @@ import { verificationService } from '@/services/verification-service'
 const STEPS = ['Verify Identity', 'Activate Credentials']
 
 type VerifyCitizenProps = {
-  token?: string
+  readonly token?: string
 }
 
 export default function VerifyCitizen({ token = '' }: VerifyCitizenProps) {

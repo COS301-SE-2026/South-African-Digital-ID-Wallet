@@ -1,12 +1,12 @@
 export type VerifyIdentityCardProps = {
-  steps?: string[]
-  currentStep?: number
-  saId: string
-  pin: string
-  isSubmitting?: boolean
-  errorMessage?: string
-  onSaIdChange: (value: string) => void
-  onPinChange: (value: string) => void
-  onSubmit: () => void
-  onRequestNewPin?: () => void
+  readonly steps?: string[]
+  readonly currentStep?: number
+  readonly saId: string
+  readonly pin: string
+  readonly isSubmitting?: boolean
+  readonly errorMessage?: string
+  readonly onSaIdChange: (value: string) => void
+  readonly onPinChange: (value: string) => void
+  readonly onSubmit: () => void
+  readonly onRequestNewPin?: () => void
 }

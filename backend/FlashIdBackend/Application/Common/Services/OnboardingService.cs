@@ -58,7 +58,7 @@ public class OnboardingService : IOnboardingService
     {
         var normalized = phoneNumber.Trim().Replace(" ", "").Replace("-", "");
 
-        if (normalized.StartsWith("0"))
+        if (normalized.StartsWith('0'))
             normalized = $"+27{normalized[1..]}";
 
         return normalized;
@@ -228,7 +228,7 @@ public class OnboardingService : IOnboardingService
         return $"{baseUrl}/citizen/activate-credentials?token={token}";
     }
 
-    private string BuildEmailMessage(string activationLink, string name)
+    private static string BuildEmailMessage(string activationLink, string name)
     {
         return
             $$"""
