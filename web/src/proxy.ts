@@ -6,15 +6,17 @@ import { DEFAULT_USER_ROLE_DASHBOARD, type UserRole } from '@/types/roles'
 export async function proxy(req: NextRequest) {
   const token = req.cookies.get('access_token')?.value
 
+  const requestedPath = `${req.nextUrl.pathname}${req.nextUrl.search}`
+
   if (!token) {
-    return NextResponse.redirect(new URL('/', req.url))
+    return redirectToLogin(req, requestedPath)
   }
 
   try {
     const jwtSecret = process.env.JWT_SECRET
 
     if (!jwtSecret) {
-      return NextResponse.redirect(new URL('/', req.url))
+      return redirectToLogin(req, requestedPath)
     }
 
     const secret = new TextEncoder().encode(jwtSecret)
@@ -27,7 +29,7 @@ export async function proxy(req: NextRequest) {
     const role = payload['role'] as string | undefined
 
     if (!sub || !role) {
-      return NextResponse.redirect(new URL('/', req.url))
+      return redirectToLogin(req, requestedPath)
     }
 
     const dashboardRole = DEFAULT_USER_ROLE_DASHBOARD[role as UserRole]
@@ -35,11 +37,16 @@ export async function proxy(req: NextRequest) {
     if (!dashboardRole || !req.nextUrl.pathname.startsWith(dashboardRole)) {
       return NextResponse.redirect(new URL(dashboardRole ?? '/', req.url))
     }
+    return NextResponse.next()
   } catch {
-    return NextResponse.redirect(new URL('/', req.url))
+    return redirectToLogin(req, requestedPath)
   }
+}
 
-  return NextResponse.next()
+function redirectToLogin(req: NextRequest, returnTo: string) {
+  const loginUrl = new URL('/', req.url)
+  loginUrl.searchParams.set('returnTo', returnTo)
+  return NextResponse.redirect(loginUrl)
 }
 
 export const config = {

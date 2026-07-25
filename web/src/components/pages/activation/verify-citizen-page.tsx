@@ -19,7 +19,7 @@ import { activateCredentialsService } from '@/services/activate-credentials-serv
 import type { CredentialType } from '@/services/activate-credentials-service'
 import { verificationService } from '@/services/verification-service'
 
-const STEPS = ['Verify Identity', 'Activate Credentials', 'Complete']
+const STEPS = ['Verify Identity', 'Activate Credentials']
 
 type VerifyCitizenProps = {
   token?: string
@@ -56,7 +56,7 @@ export default function VerifyCitizen({ token = '' }: VerifyCitizenProps) {
       activateCredentialsService.activate(types),
     onSuccess: (response) => {
       toast.success(response.message || 'Credentials activated')
-      router.push('/citizen')
+      router.push('/citizen/my-credentials')
     },
     onError: () => {
       toast.error('Could not activate credentials. Please try again.')

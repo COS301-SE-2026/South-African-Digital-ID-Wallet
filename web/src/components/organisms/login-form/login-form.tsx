@@ -8,6 +8,7 @@ import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import loginService from '@/services/login-service/login-service'
 import { useUser } from '@/context/user-context'
 import axios from 'axios'
@@ -28,6 +29,13 @@ const getDashboardRoute = (role: string) => {
   return DASHBOARD_ROUTES[normalizedRole] ?? '/citizen/citizen-dashboard'
 }
 
+export function getSafeReturnTo(returnTo: string | null, fallback: string) {
+  if (!returnTo || !returnTo.startsWith('/') || returnTo.startsWith('//')) {
+    return fallback
+  }
+  return returnTo
+}
+
 export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
@@ -35,6 +43,12 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const [showPassword, setShowPassword] = React.useState(false)
   const router = useRouter()
   const { setUser } = useUser()
+
+  const searchParams = useSearchParams()
+  const returnTo = searchParams.get('returnTo')
+  const safeReturnTo = getSafeReturnTo(returnTo, '/register')
+
+  const registerHref = `/register?returnTo=${encodeURIComponent(safeReturnTo)}`
 
   const loginMutation = useMutation<
     Awaited<ReturnType<typeof loginService.login>>,
@@ -171,7 +185,7 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
             Don&apos;t have an account?{' '}
             <Link
               className="font-semibold hover:text-deep-green hover:underline"
-              href="/register"
+              href={registerHref}
             >
               Register
             </Link>
