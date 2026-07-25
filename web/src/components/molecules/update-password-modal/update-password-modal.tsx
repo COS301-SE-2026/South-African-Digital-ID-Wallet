@@ -103,7 +103,6 @@ export const UpdatePasswordModal: FC<UpdatePasswordModalProps> = ({
                 setErrorMessage('')
               }}
             />
-
             <TextField
               label="New password"
               type="password"
@@ -113,7 +112,6 @@ export const UpdatePasswordModal: FC<UpdatePasswordModalProps> = ({
                 setErrorMessage('')
               }}
             />
-
             <TextField
               label="Confirm new password"
               type="password"
