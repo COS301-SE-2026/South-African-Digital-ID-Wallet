@@ -1,0 +1,14 @@
+backend/FlashIdBackend/Presentation/appsettings.Development.json
+  h_0aff3b71f739b1 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "8559cb3f5f7c865c11067a91cc8a1e4cac381e2c",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
