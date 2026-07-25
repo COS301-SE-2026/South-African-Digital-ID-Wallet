@@ -50,6 +50,7 @@ public class ManageUserAccountController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status423Locked)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> VerifyPassword([FromBody] VerifyPasswordRequestDto req)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -67,7 +68,7 @@ public class ManageUserAccountController : ControllerBase
         }
         catch (IncorrectPasswordException ipe)
         {
-            return Unauthorized(new { error = ipe.Message });
+            return UnprocessableEntity(new { error = ipe.Message });
         }
         catch (AccountLockedException ale)
         {
@@ -80,6 +81,7 @@ public class ManageUserAccountController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> RequestEmailChange([FromBody] RequestEmailChangeRequestDto req)
     {
@@ -96,7 +98,7 @@ public class ManageUserAccountController : ControllerBase
         }
         catch (ReauthRequiredException rre)
         {
-            return Unauthorized(new { error = rre.Message, code = "REAUTH_REQUIRED" });
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = rre.Message, code = "REAUTH_REQUIRED" });
         }
         catch (NewEmailTakenException nete)
         {
