@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Infrastructure/Repositories/ActivityOverviewRepository.cs
+  h_0aff3b71f739b1 34
+web/src/components/molecules/delete-account-card/delete-account-card.tsx
+  h_0aff3b71f739b1 4-5,8,11-12,16,24-41,52,66,71,77,94,96,100-101,111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "ff93ddc1c51e80f823ab9f29af12e0c709e98e59",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
