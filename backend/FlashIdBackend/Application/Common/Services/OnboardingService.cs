@@ -172,7 +172,7 @@ public class OnboardingService : IOnboardingService
         var activationLink = BuildActivationLink(rawToken);
         var message = BuildEmailMessage(activationLink, citizen.Names);
 
-        await _emailSenderProvider.SendEmailAsync(email, "FlashID", message);
+        await _emailSenderProvider.SendEmailAsync(email, "Your FlashID Activation Link", message);
 
         return new OnboardCitizenResponse
         {

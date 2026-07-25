@@ -20,7 +20,7 @@ export const VerifyEmailForm = () => {
   const returnTo = searchParameters.get('returnTo')
   const safeReturnTo = getSafeReturnTo(returnTo, '/')
 
-  const loginHref = `/?returnTo=${encodeURIComponent(safeReturnTo)}`
+  const loginHref = `/login?returnTo=${encodeURIComponent(safeReturnTo)}`
 
   const [code, setCode] = React.useState('')
   const [cooldown, setCooldown] = React.useState(0)

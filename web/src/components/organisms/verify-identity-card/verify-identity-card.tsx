@@ -68,12 +68,12 @@ export function VerifyIdentityCard({
             <Label htmlFor="activation-pin">6-digit activation PIN</Label>
 
             <InputOTP maxLength={6} value={pin} onChange={onPinChange}>
-              <InputOTPGroup className="flex w-full gap-16">
+              <InputOTPGroup className="mx-auto flex w-fit justify-center gap-5">
                 {Array.from({ length: 6 }).map((_, index) => (
                   <InputOTPSlot
                     key={index}
                     index={index}
-                    className="flex-1 h-14 min-w-0 rounded-md border border-input
+                    className="flex-1 h-12 w-14 rounded-md border border-input
                                                     text-center text-xl shadow-sm
                                                     first:rounded-md last:rounded-md
                                                     data-[active=true]:border-primary-green
