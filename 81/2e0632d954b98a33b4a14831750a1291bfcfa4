@@ -1,0 +1,16 @@
+web/src/components/molecules/account-card/test/account-card.test.tsx
+  h_712d174fc3f309 2-3,5,7-9,11-20,22-30,33-35,38-40,42,44-50
+web/src/components/molecules/account-card/account-card.tsx
+  h_712d174fc3f309 3-4,6,9-16,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "812e0632d954b98a33b4a14831750a1291bfcfa4",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
