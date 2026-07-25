@@ -33,6 +33,7 @@ public static class DependencyInjection
         services.AddScoped<ICredentialActivationService, CredentialActivationService>();
         services.AddSingleton<ManageUserAccountMapper>();
         services.AddScoped<IUpdatePasswordService, UpdatePasswordService>();
+        services.AddScoped<IDeleteAccountService, DeleteAccountService>();
         return services;
     }
 }
