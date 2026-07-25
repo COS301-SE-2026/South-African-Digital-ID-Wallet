@@ -73,7 +73,7 @@ export function VerifyIdentityCard({
                   <InputOTPSlot
                     key={index}
                     index={index}
-                    className="flex-1 h-12 w-14 rounded-md border border-input
+                    className="flex-1 h-12 w-12 rounded-md border border-input
                                                     text-center text-xl shadow-sm
                                                     first:rounded-md last:rounded-md
                                                     data-[active=true]:border-primary-green
