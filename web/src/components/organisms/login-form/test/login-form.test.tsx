@@ -31,7 +31,7 @@ describe('LoginForm', () => {
   it('renders email and password fields', () => {
     render(<LoginForm />, { wrapper: createWrapper() })
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/^password:?$/i)).toBeInTheDocument()
   })
 
   it('calls onSubmitAction with email and password on submit', async () => {
@@ -42,7 +42,7 @@ describe('LoginForm', () => {
     })
 
     await user.type(screen.getByLabelText(/email/i), 'test@example.com')
-    await user.type(screen.getByLabelText(/password/i), 'secret123')
+    await user.type(screen.getByLabelText(/^password:?$/i), 'secret123')
     await user.click(screen.getByRole('button', { name: /login/i }))
 
     expect(onSubmit).toHaveBeenCalledWith({

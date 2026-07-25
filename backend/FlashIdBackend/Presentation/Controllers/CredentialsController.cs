@@ -11,20 +11,76 @@ namespace Presentation.Controllers;
 [Authorize]
 public class CredentialsController : ControllerBase
 {
+    private readonly ICredentialService _credentialService;
     private readonly IQrService _qrService;
+    private readonly ICredentialActivationService _credentialActivationService;
 
-    public CredentialsController(IQrService qrService, ICredentialActivationService credentialActivationService)
+    public CredentialsController(
+      ICredentialService credentialService,
+      IQrService qrService,
+      ICredentialActivationService credentialActivationService)
     {
+        _credentialService = credentialService;
         _qrService = qrService;
+        _credentialActivationService = credentialActivationService;
     }
 
-    [HttpPost("{credentialId}/qr-token")]
-    public async Task<IActionResult> GenerateQr(Guid credentialId, [FromBody] GenerateQrRequestDto request)
+
+    [HttpGet("me")]
+    [Authorize(Roles = "Citizen")]
+    public async Task<IActionResult> GetMyCredentials()
     {
         try
         {
             var userIdClaim = User.FindFirst("userId")?.Value;
-            if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { error = "Invalid token." });
+            }
+
+            var userId = Guid.Parse(userIdClaim);
+            var result = await _credentialService.GetMyCredentialsAsync(userId);
+            return Ok(result);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    [HttpGet("mine")]
+    public async Task<IActionResult> GetMyCredentialSummaries()
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { error = "Invalid token." });
+            }
+
+            var userId = Guid.Parse(userIdClaim);
+            var result = await _qrService.GetMyCredentialsAsync(userId);
+            return Ok(result);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    [HttpPost("{credentialId}/qr-token")]
+    public async Task<IActionResult> GenerateQr(
+        Guid credentialId,
+        [FromBody] GenerateQrRequestDto request)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { error = "Invalid token." });
+            }
 
             var userId = Guid.Parse(userIdClaim);
             var result = await _qrService.GenerateQrAsync(credentialId, userId, request);
@@ -45,24 +101,6 @@ public class CredentialsController : ControllerBase
         catch (InvalidDisclosedFieldsException ex)
         {
             return BadRequest(new { error = ex.Message });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
-        }
-    }
-
-    [HttpGet("mine")]
-    public async Task<IActionResult> GetMyCredentials()
-    {
-        try
-        {
-            var userIdClaim = User.FindFirst("userId")?.Value;
-            if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
-
-            var userId = Guid.Parse(userIdClaim);
-            var result = await _qrService.GetMyCredentialsAsync(userId);
-            return Ok(result);
         }
         catch (Exception)
         {
