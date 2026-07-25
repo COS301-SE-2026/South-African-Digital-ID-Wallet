@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_0aff3b71f739b1 43
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_0aff3b71f739b1 26,34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "458cbddb1350ff235a0f26e968667edefc43e1d4",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
