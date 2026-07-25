@@ -26,4 +26,47 @@ public class ManageUserAccountRepository : IManageUserAccountRepository
         _context.Citizens.Update(citizen);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<User?> GetUserByIdAsync(Guid userId)
+    {
+        return await _context.DomainUsers.FirstOrDefaultAsync(u => u.Id == userId);
+    }
+
+    public Task UpdateUserAsync(User user)
+    {
+        _context.DomainUsers.Update(user);
+        return Task.CompletedTask;
+    }
+
+    public async Task<bool> IsEmailTakenAsync(string email, Guid excludeUserId)
+    {
+        return await _context.DomainUsers.AnyAsync(u => u.Email == email && u.Id != excludeUserId);
+    }
+
+    public Task AddAuditLogAsync(AuditLog auditLog)
+    {
+        _context.AuditLogs.Add(auditLog);
+        return Task.CompletedTask;
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<bool> TryConfirmEmailChangeAsync(User user, AuditLog auditLog)
+    {
+        _context.DomainUsers.Update(user);
+        _context.AuditLogs.Add(auditLog);
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (DbUpdateException)
+        {
+            return false;
+        }
+    }
 }
