@@ -8,5 +8,5 @@ public interface IManageUserAccountService
     Task VerifyPasswordAsync(Guid userId, string password, string ipAddress);
     Task RequestEmailChangesAsync(Guid userId, string newEmail);
     Task ResendEmailChangeOtpAsync(Guid userId);
-    Task<ManageUserAccountDto> ConfirmEmailChangeAsync(Guid userId, string otp, string ipAddress);
+    Task<ManageUserAccountDto?> ConfirmEmailChangeAsync(Guid userId, string otp, string ipAddress);
 }

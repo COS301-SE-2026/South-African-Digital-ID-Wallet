@@ -90,7 +90,7 @@ public class ManageUserAccountService : IManageUserAccountService
         var otp = GenerateOtp();
 
         user.SetPendingEmailChange(cleanedEmail, _passwordHashingProvider.HashPassword(otp));
-        user.CleatPasswordReverification();
+        user.ClearPasswordReverification();
 
         await _manageUserAccountRepository.UpdateUserAsync(user);
         await _manageUserAccountRepository.SaveChangesAsync();
@@ -112,7 +112,7 @@ public class ManageUserAccountService : IManageUserAccountService
         await SendEmailChangeOtpAsync(user.PendingEmail, otp);
     }
 
-    public async Task<ManageUserAccountDto> ConfirmEmailChangeAsync(Guid userId, string otp, string ipAddress)
+    public async Task<ManageUserAccountDto?> ConfirmEmailChangeAsync(Guid userId, string otp, string ipAddress)
     {
         var user = await _manageUserAccountRepository.GetUserByIdAsync(userId) ?? throw new NoPendingEmailChangeException();
 

@@ -61,7 +61,7 @@ public class User : BaseEntity
 
     public void MarkPasswordReverified() => PasswordReverifiedAt = DateTime.UtcNow;
 
-    public void CleatPasswordReverification() => PasswordReverifiedAt = null;
+    public void ClearPasswordReverification() => PasswordReverifiedAt = null;
 
     public bool IsPasswordReverificationValid(int validMinutes = 10) =>
         PasswordReverifiedAt.HasValue &&
