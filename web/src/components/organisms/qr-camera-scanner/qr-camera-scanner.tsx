@@ -83,8 +83,6 @@ export const QrCameraScanner: FC<QrCameraScannerProps> = ({
         await scanner.start()
         if (cancelled) return
         setState('active')
-        const flashAvailable = await scanner.hasFlash()
-        if (!cancelled) setHasTorch(flashAvailable)
       } catch (error: unknown) {
         if (cancelled) return
         if (error instanceof Error && error.name === 'NotAllowedError') {
@@ -92,7 +90,17 @@ export const QrCameraScanner: FC<QrCameraScannerProps> = ({
         } else {
           setState('unavailable')
         }
+        return
       }
+
+      scanner
+        .hasFlash()
+        .then((available) => {
+          if (!cancelled) setHasTorch(available)
+        })
+        .catch(() => {
+          // torch detection failing should not affect the scan flow
+        })
     }
 
     setup()
