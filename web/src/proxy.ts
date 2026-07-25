@@ -44,7 +44,7 @@ export async function proxy(req: NextRequest) {
 }
 
 function redirectToLogin(req: NextRequest, returnTo: string) {
-  const loginUrl = new URL('/', req.url)
+  const loginUrl = new URL('/login', req.url)
   loginUrl.searchParams.set('returnTo', returnTo)
   return NextResponse.redirect(loginUrl)
 }

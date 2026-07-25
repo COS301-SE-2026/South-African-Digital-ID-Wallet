@@ -73,41 +73,7 @@ export default function VerifyCitizen({ token = '' }: VerifyCitizenProps) {
     <main className="min-h-full bg-background px-6 py-8 lg:px-10 lg:py-16 will-change-transform">
       {!successOpen &&
         (step === 1 ? (
-          <div className="mx-auto grid w-full max-w-[1500px] gap-12 lg:grid-cols-[0.78fr_1.22fr] lg:items-start xl:gap-16">
-            <section className="max-w-[560px] lg:pt-2">
-              <h1 className="mt-4 max-w-[560px] text-xl font-semibold tracking-tight text-deep-green sm:text-5xl">
-                Activate your digital identity
-              </h1>
-
-              <p className="mt-4 max-w-[540px] text-lg leading-8 text-muted-foreground sm:text-xl">
-                Enter the details provided during onboarding to link your
-                verified citizen record to your FlashID account.
-              </p>
-
-              <div className="mt-8 space-y-5">
-                <ActivationInfoItem
-                  icon={ShieldCheck}
-                  title={'Security & Encrypted'}
-                  description={
-                    'Your data is protected with bank-level security.'
-                  }
-                />
-                <ActivationInfoItem
-                  icon={Landmark}
-                  title={'Government Verified'}
-                  description={
-                    'We verify your identity against official Home Affairs records.'
-                  }
-                />
-                <ActivationInfoItem
-                  icon={WalletCards}
-                  title={'One Wallet. All You.'}
-                  description={
-                    'Access your verified credentials anytime, anywhere.'
-                  }
-                />
-              </div>
-            </section>
+          <div className="mx-auto flex w-full max-w-[800px] gap-12 lg:grid-cols-[0.78fr_1.22fr] lg:items-start xl:gap-16">
             <div className="w-full lg:pt-2">
               <VerifyIdentityCard
                 steps={STEPS}

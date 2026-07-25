@@ -75,7 +75,9 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
         names: data.names,
         surname: data.surname,
       })
-      router.push(getDashboardRoute(data.role))
+      const dashboardRoute = getDashboardRoute(data.role)
+      const destination = getSafeReturnTo(returnTo, dashboardRoute)
+      router.push(destination)
     },
     onError: (err) => {
       if (
