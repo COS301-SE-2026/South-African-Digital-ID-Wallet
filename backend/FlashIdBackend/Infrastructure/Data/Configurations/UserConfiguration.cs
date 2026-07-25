@@ -79,5 +79,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.OTPAttemptCount)
         .IsRequired()
         .HasDefaultValue(0);
+
+        builder.Property(u => u.PendingEmail)
+            .HasMaxLength(256);
+
+        builder.Property(u => u.PasswordReverifiedAt)
+            .HasColumnType("datetime2");
     }
 }

@@ -32,6 +32,9 @@ public class User : BaseEntity
     public DateTime? EmailOTPExpiresAt { get; private set; }
     public int OTPAttemptCount { get; private set; }
 
+    public string? PendingEmail { get; private set; }
+    public DateTime? PasswordReverifiedAt { get; set; }
+
     public void SetOtp(string otpHash, int expiryMinutes = 10)
     {
         EmailOTPHash = otpHash;
@@ -55,4 +58,31 @@ public class User : BaseEntity
     public void IncrementOtpAttempt() => OTPAttemptCount++;
 
     public bool IsOtpExpired() => EmailOTPExpiresAt is null || DateTime.UtcNow > EmailOTPExpiresAt;
+
+    public void MarkPasswordReverified() => PasswordReverifiedAt = DateTime.UtcNow;
+
+    public void CleatPasswordReverification() => PasswordReverifiedAt = null;
+
+    public bool IsPasswordReverificationValid(int validMinutes = 10) =>
+        PasswordReverifiedAt.HasValue &&
+        DateTime.UtcNow <= PasswordReverifiedAt.Value.AddMinutes(validMinutes);
+
+    public void SetPendingEmailChange(string pendingEmail, string otpHash, int expiryMinutes = 10)
+    {
+        PendingEmail = pendingEmail;
+        SetOtp(otpHash, expiryMinutes);
+    }
+
+    public void ClearPendingEmailChange()
+    {
+        PendingEmail = null;
+        ClearOtp();
+    }
+
+    public void ConfirmEmailChange()
+    {
+        if (PendingEmail is not null)
+            Email = PendingEmail;
+        ClearPendingEmailChange();
+    }
 }
