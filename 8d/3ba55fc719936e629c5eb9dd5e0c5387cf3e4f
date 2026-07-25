@@ -1,0 +1,22 @@
+web/src/lib/exceptionhandler.ts
+  h_712d174fc3f309 9,17-18
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IManageUserAccountCardService.cs
+  h_712d174fc3f309 11
+web/src/types/error-messages.ts
+  h_712d174fc3f309 8
+backend/FlashIdBackend/Application/Common/Services/ManageUserAccountService.cs
+  h_712d174fc3f309 93,115
+backend/FlashIdBackend/Domain/Entities/User.cs
+  h_712d174fc3f309 64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "8d3ba55fc719936e629c5eb9dd5e0c5387cf3e4f",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
