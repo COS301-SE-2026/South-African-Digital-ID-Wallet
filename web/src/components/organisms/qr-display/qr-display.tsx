@@ -106,43 +106,65 @@ export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
   }
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      <Card className="flex w-72 flex-col items-center gap-4 p-8">
-        {isExpired ? (
-          <div className="flex flex-col items-center gap-3 py-6 text-center">
-            <Text variant="sub-lg">QR code expired</Text>
-            <Text variant="sub-sm" className="text-muted-foreground">
-              Generate a new code to continue verification.
-            </Text>
-            <Button type="button" onClick={handleRetry} className="gap-2">
-              <RefreshCw className="h-4 w-4" />
-              Generate new QR
-            </Button>
-          </div>
-        ) : (
-          <QRCodeSVG value={qrValue} size={200} />
-        )}
+    <div className="flex min-h-screen items-center justify-center  px-6 py-12">
+      <Card className="w-full max-w-3xl rounded-[32px] border border-gray-200 bg-white p-10 shadow-2xl">
+        <div className="mb-10 text-center">
+          <Text variant="h2">Your QR Code</Text>
 
-        <div className="flex flex-col items-center gap-1">
-          {isExpired ? (
-            <StatusPill intent="inactive">Expired</StatusPill>
-          ) : (
-            <StatusPill intent="active">Valid credential</StatusPill>
-          )}
-          {!isExpired && (
-            <Text
-              variant="sub-lg"
-              className={isWarning ? 'font-bold text-destructive' : 'font-bold'}
-            >
-              {formatTime(secondsRemaining)}
-            </Text>
-          )}
+          <Text variant="sub-md" className="mt-2">
+            Share your identity securely
+          </Text>
+        </div>
+
+        <div className="flex justify-center">
+          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+            <QRCodeSVG value={qrValue} size={260} includeMargin />
+          </div>
+        </div>
+
+        <div className="mt-8 flex items-center justify-center gap-2">
+          <div
+            className={`h-3 w-3 rounded-full ${
+              isWarning ? 'bg-red-500' : 'bg-emerald-500'
+            }`}
+          />
+
+          <Text
+            variant="sub-md"
+            className={
+              isWarning
+                ? 'font-semibold text-red-600'
+                : 'font-semibold text-emerald-700'
+            }
+          >
+            Valid for {formatTime(secondsRemaining)}
+          </Text>
+        </div>
+
+        <Button
+          type="button"
+          onClick={handleRetry}
+          className="mt-8 h-12 w-full rounded-2xl bg-primary-green text-white hover:bg-amber-600"
+        >
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Refresh QR Code
+        </Button>
+
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onBack}
+          className="mt-4 h-12 w-full rounded-2xl"
+        >
+          Back
+        </Button>
+
+        <div className="mt-8 border-t border-gray-200 pt-6 text-center">
+          <Text variant="sub-sm" className="text-gray-500">
+            Secure • Encrypted • Controlled by You
+          </Text>
         </div>
       </Card>
-
-      <Button type="button" variant="secondary" onClick={onBack}>
-        Back to preview
-      </Button>
     </div>
   )
 }
