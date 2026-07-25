@@ -1,0 +1,14 @@
+backend/FlashIdBackend/Presentation/Controllers/ManageUserAccountController.cs
+  h_712d174fc3f309 53,71,84,101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "ae77e7e972d367cd16e886d38c6d92b9ccb682ce",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
