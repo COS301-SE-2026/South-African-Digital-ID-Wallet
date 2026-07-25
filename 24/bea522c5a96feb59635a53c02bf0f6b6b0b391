@@ -1,0 +1,22 @@
+backend/FlashIdBackend/Application/Features/UpdatePassword/DTOs/UpdatePasswordDto.cs
+  h_0aff3b71f739b1 1-10
+backend/FlashIdBackend/Infrastructure/Repositories/UpdatePasswordRepository.cs
+  h_0aff3b71f739b1 1-33
+web/src/components/molecules/update-password-modal/update-password-modal.tsx
+  h_0aff3b71f739b1 3,5-6,19,25,27-29,32,34,36-65,91
+backend/FlashIdBackend/Application/Common/Mapping/UpdatePasswordMapper.cs
+  h_0aff3b71f739b1 1-10
+backend/FlashIdBackend/Presentation/Controllers/UpdatePasswordController.cs
+  h_0aff3b71f739b1 1-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "24bea522c5a96feb59635a53c02bf0f6b6b0b391",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
