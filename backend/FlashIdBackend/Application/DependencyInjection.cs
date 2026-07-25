@@ -19,6 +19,7 @@ public static class DependencyInjection
         services.AddScoped<IManageUserAccountService, ManageUserAccountService>();
         services.AddSingleton<AuthMapper>();
         services.AddSingleton<ManageUserAccountMapper>();
+        services.AddScoped<IUpdatePasswordService, UpdatePasswordService>();
         return services;
     }
 }
