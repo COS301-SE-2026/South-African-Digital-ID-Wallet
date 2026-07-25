@@ -9,6 +9,10 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.ExceptionHandling;
+using Application.Common.Interfaces.RepositoryInterfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Common.Services;
+using Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +47,8 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddScoped<IDeleteAccountService, DeleteAccountService>();
+builder.Services.AddScoped<IDeleteAccountRepository, DeleteAccountRepository>();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
