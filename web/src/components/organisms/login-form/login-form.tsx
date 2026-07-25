@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { User } from 'lucide-react'
+import { User, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/atoms'
 import type { LoginFormProps } from '@/types/login-form'
 import { useMutation } from '@tanstack/react-query'
@@ -32,7 +32,7 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [rememberMe, setRememberMe] = React.useState(false)
-
+  const [showPassword, setShowPassword] = React.useState(false)
   const router = useRouter()
   const { setUser } = useUser()
 
@@ -113,14 +113,29 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
         >
           Password:
         </label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 text-base focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
-          required
-        />
+        <div className="relative mt-1">
+          <input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-md border border-border-grey px-4 py-3 pr-12 text-base focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
+            required
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute inset-y-0 right-3 flex items-center text-muted-text transition-colors hover:text-primary-green"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? (
+              <EyeOff className="h-5 w-5" />
+            ) : (
+              <Eye className="h-5 w-5" />
+            )}
+          </button>
+        </div>
       </div>
 
       <div className="flex items-center gap-2">
