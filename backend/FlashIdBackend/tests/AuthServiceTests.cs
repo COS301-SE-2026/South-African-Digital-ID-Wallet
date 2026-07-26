@@ -89,8 +89,59 @@ public class AuthServiceTests
         };
 
         var result = await authService.LoginAsync(request, "127.0.0.1");
-
         Assert.False(fakeJwtProvider.LastRememberMeValue);
         Assert.True(result.ExpiresAt < DateTime.UtcNow.AddDays(1));
     }
-}
+
+    [Fact]
+    public async Task GetCurrentUserAsync_ReturnsMappedUserProfile()
+    {
+        var user = ValidUser();
+        var citizen = new Citizen
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            Names = "Jacob",
+            Surname = "Kruger",
+            SaId = "1234567890123",
+        };
+        var fakeRepository = new FakeAuthRepository
+        {
+            UserToReturn = user,
+            CitizenToReturn = citizen,
+        };
+
+        var authService = new AuthService(
+            fakeRepository,
+            new FakeJwtTokenProvider(),
+            new FakePasswordHashingProvider(),
+            null!,
+            new AuthMapper());
+
+        var result = await authService.GetCurrentUserAsync(user.Id);
+        Assert.NotNull(result);
+        Assert.Equal(user.Id, result!.UserId);
+        Assert.Equal(user.Email, result.Email);
+        Assert.Equal(user.Role.ToString(), result.Role);
+        Assert.Equal(citizen.Names, result.Names);
+        Assert.Equal(citizen.Surname, result.Surname);
+        Assert.Equal(citizen.SaId, result.SaId);
+    }
+
+    [Fact]
+    public async Task GetCurrentUserAsync_ReturnsNull_WhenUserDoesNotExist()
+    {
+        var fakeRepository = new FakeAuthRepository
+        {
+            UserToReturn = null,
+        };
+        var authService = new AuthService(
+            fakeRepository,
+            new FakeJwtTokenProvider(),
+            new FakePasswordHashingProvider(),
+            null!,
+            new AuthMapper());
+
+        var result = await authService.GetCurrentUserAsync(Guid.NewGuid());
+        Assert.Null(result);
+    }
