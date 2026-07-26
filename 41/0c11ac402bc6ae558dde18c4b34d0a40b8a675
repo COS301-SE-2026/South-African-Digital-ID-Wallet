@@ -1,0 +1,20 @@
+web/src/app/providers.tsx
+  h_0aff3b71f739b1 17
+web/src/app/(portal)/layout.tsx
+  h_0aff3b71f739b1 2-3,10-15
+web/src/app/(auth)/login/layout.tsx
+  h_0aff3b71f739b1 1-9
+web/src/components/organisms/login-form/login-form.tsx
+  h_0aff3b71f739b1 163,165-166,168-170
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "410c11ac402bc6ae558dde18c4b34d0a40b8a675",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
