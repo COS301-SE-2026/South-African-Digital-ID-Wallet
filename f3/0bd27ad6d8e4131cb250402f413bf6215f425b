@@ -1,0 +1,33 @@
+web/src/components/molecules/account-card/account-card.tsx
+  h_99fca60b892ff4 36-44
+web/src/components/molecules/citizen-dashboard-account-card/citizen-dashboard-account-card.tsx
+  h_99fca60b892ff4 46
+backend/FlashIdBackend/Presentation/Controllers/ManageUserAccountController.cs
+  h_99fca60b892ff4 25-26,36,44,136,145
+web/src/components/molecules/update-email-modal/update-email-modal.tsx
+  h_99fca60b892ff4 138
+web/src/services/manage-user-account-service/manage-user-account-service.ts
+  h_99fca60b892ff4 5,8,25
+  s_ac0b9fbc0e8435::t_262a881f9599a6 26-27,30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "f30bd27ad6d8e4131cb250402f413bf6215f425b",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_ac0b9fbc0e8435": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cb95668f-278b-4bac-9343-06c08b5c5f65",
+        "model": "unknown"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
