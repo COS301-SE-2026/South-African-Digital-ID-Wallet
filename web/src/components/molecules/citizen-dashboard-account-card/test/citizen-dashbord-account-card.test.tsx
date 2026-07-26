@@ -59,7 +59,7 @@ describe('AccountCardCitizenDashboard', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders the manage account button', async () => {
+  it('renders the manage account link', async () => {
     mockedApi.get.mockResolvedValueOnce({
       data: mockUser,
     })
@@ -67,7 +67,7 @@ describe('AccountCardCitizenDashboard', () => {
     render(<AccountCardCitizenDashboard />)
 
     expect(
-      await screen.findByRole('button', { name: /manage account/i })
+      await screen.findByRole('link', { name: /manage account/i })
     ).toBeInTheDocument()
   })
 

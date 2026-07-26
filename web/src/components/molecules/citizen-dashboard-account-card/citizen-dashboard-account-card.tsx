@@ -2,12 +2,14 @@
 
 import * as React from 'react'
 import Link from 'next/link'
+import axios from 'axios'
 import api from '@/lib/api'
 import type { AppUser } from '@/components/molecules/citizen-dashboard-account-card/types'
 
 export function AccountCardCitizenDashboard() {
   const [user, setUser] = React.useState<AppUser | null>(null)
   const [loading, setLoading] = React.useState(true)
+  const [noCitizenRecord, setNoCitizenRecord] = React.useState(false)
 
   React.useEffect(() => {
     const fetchAccount = async () => {
@@ -19,6 +21,10 @@ export function AccountCardCitizenDashboard() {
         setUser(data)
       } catch (error) {
         console.error('Failed to load account:', error)
+
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+          setNoCitizenRecord(true)
+        }
       } finally {
         setLoading(false)
       }
@@ -33,6 +39,18 @@ export function AccountCardCitizenDashboard() {
         <h2 className="text-sm font-bold">Your Account</h2>
 
         <p className="mt-3 text-sm text-muted-text">Loading account...</p>
+      </div>
+    )
+  }
+
+  if (noCitizenRecord) {
+    return (
+      <div className="bg-card rounded-3xl border p-4">
+        <h2 className="text-sm font-bold">Your Account</h2>
+
+        <p className="mt-3 text-sm text-muted-text">
+          Activate your credentials to see your account information.
+        </p>
       </div>
     )
   }
