@@ -1,4 +1,3 @@
-// import axios, { AxiosResponse } from 'axios'
 import api from '@/lib/api'
 import registerUrls from './register-urls'
 import { registerDto } from './register-dto'
