@@ -1,0 +1,18 @@
+backend/FlashIdBackend/Application/Common/Services/ManageUserAccountService.cs
+  h_99fca60b892ff4 185
+backend/FlashIdBackend/Application/Common/Services/CitizenService.cs
+  h_99fca60b892ff4 81
+backend/FlashIdBackend/Application/Features/ManageUserAccountCard/Exceptions/ManageUserAccountCardExceptions.cs
+  h_99fca60b892ff4 25,30,35,40,45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "92a9188f509e0f02de82ab54bdac90400219d408",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
