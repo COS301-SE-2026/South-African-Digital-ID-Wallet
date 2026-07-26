@@ -9,6 +9,7 @@ import { getAllowedRoles } from '@/config/roles/route-permissions'
 import { useUser } from '@/context/user-context'
 import { AppSidebar } from '../../organisms/app-sidebar/app-sidebar'
 import { AppTopBar } from '../../organisms/app-top-bar/app-top-bar'
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import {
   officialsNavSections,
   citizenNavSections,
@@ -21,6 +22,7 @@ import {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   const header = pageHeaders[pathname] ?? defaultPageHeader
   const { user, loading, logout } = useUser()
@@ -78,12 +80,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         user={{ name: displayName, initials }}
         onLogout={logout}
       />
+
+      <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
+        <SheetContent side="left" className="p-0">
+          <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+          <AppSidebar
+            navSections={navSections}
+            user={{ name: displayName, initials, idLabel }}
+            onLogout={logout}
+            variant="mobile"
+            onNavigate={() => setMobileNavOpen(false)}
+          />
+        </SheetContent>
+      </Sheet>
+
       <div className="flex h-screen flex-1 flex-col overflow-hidden">
         <AppTopBar
           title={header.title}
           description={header.description}
           user={{ name: displayName, initials }}
           showNotifications={false}
+          onMenuClick={() => setMobileNavOpen(true)}
         />
         <div className="flex-1 overflow-y-auto">{children}</div>
       </div>

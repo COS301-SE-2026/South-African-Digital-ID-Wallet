@@ -7,7 +7,9 @@ import { useState } from 'react'
 import { UserProvider } from '@/context/user-context'
 import { SessionTimeoutWatcher } from '@/components/utility/session-timeout-watcher'
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const [queryClient] = useState(() => new QueryClient())
 
   return (
