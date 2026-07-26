@@ -13,6 +13,7 @@ using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Services;
 using Infrastructure.Repositories;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,6 +83,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+static string UserPartitionKey(HttpContext httpContext) =>
+    httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
+    ?? httpContext.Connection.RemoteIpAddress?.ToString()
+    ?? "unknown";
+
 // 5 registration attempts per minute per client — prevents brute-forcing activation codes
 builder.Services.AddRateLimiter(options =>
 {
@@ -103,7 +109,7 @@ builder.Services.AddRateLimiter(options =>
 
     options.AddPolicy("verify-password", httpContext =>
         RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            partitionKey: UserPartitionKey(httpContext),
             factory: _ => new FixedWindowRateLimiterOptions
             {
                 PermitLimit = 5,
@@ -114,21 +120,44 @@ builder.Services.AddRateLimiter(options =>
         )
     );
 
-    options.AddFixedWindowLimiter("email-change-request", opt =>
-    {
-        opt.PermitLimit = 5;
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opt.QueueLimit = 0;
-    });
+    options.AddPolicy("email-change-request", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: UserPartitionKey(httpContext),
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0,
+            }
+        )
+    );
 
-    options.AddFixedWindowLimiter("email-change-resend-otp", opt =>
-    {
-        opt.PermitLimit = 3;
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opt.QueueLimit = 0;
-    });
+    options.AddPolicy("email-change-resend-otp", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: UserPartitionKey(httpContext),
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 3,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0,
+            }
+        )
+    );
+
+    options.AddPolicy("email-change-confirm", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: UserPartitionKey(httpContext),
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0,
+            }
+        )
+    );
 
     options.RejectionStatusCode = 429;
 });
@@ -146,14 +175,11 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
 
-    if (app.Environment.IsDevelopment())
+    if (app.Environment.IsDevelopment() && (!await db.DomainUsers.AnyAsync()))
     {
-        if (!await db.DomainUsers.AnyAsync())
-        {
-            Console.WriteLine("[SEED] Database is empty, seeding sample data ...");
-            await DbSeeder.SeedAsync(db);
-            Console.WriteLine("[SEED] Database seeded successfully!");
-        }
+        Console.WriteLine("[SEED] Database is empty, seeding sample data ...");
+        await DbSeeder.SeedAsync(db);
+        Console.WriteLine("[SEED] Database seeded successfully!");
     }
 }
 
