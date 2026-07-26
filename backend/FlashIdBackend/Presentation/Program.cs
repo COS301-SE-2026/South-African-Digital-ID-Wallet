@@ -14,6 +14,7 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Services;
 using Infrastructure.Repositories;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -88,6 +89,20 @@ static string UserPartitionKey(HttpContext httpContext) =>
     ?? httpContext.Connection.RemoteIpAddress?.ToString()
     ?? "unknown";
 
+static void AddUserPartitionedPolicy(RateLimiterOptions options, string policyName, int permitLimit, TimeSpan window) =>
+    options.AddPolicy(policyName, httpContent =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: UserPartitionKey(httpContent),
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = permitLimit,
+                Window = window,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0,
+            }
+        )
+    );
+
 // 5 registration attempts per minute per client — prevents brute-forcing activation codes
 builder.Services.AddRateLimiter(options =>
 {
@@ -107,57 +122,10 @@ builder.Services.AddRateLimiter(options =>
         opt.QueueLimit = 0;
     });
 
-    options.AddPolicy("verify-password", httpContext =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: UserPartitionKey(httpContext),
-            factory: _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 5,
-                Window = TimeSpan.FromMinutes(1),
-                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                QueueLimit = 0,
-            }
-        )
-    );
-
-    options.AddPolicy("email-change-request", httpContext =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: UserPartitionKey(httpContext),
-            factory: _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 5,
-                Window = TimeSpan.FromMinutes(1),
-                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                QueueLimit = 0,
-            }
-        )
-    );
-
-    options.AddPolicy("email-change-resend-otp", httpContext =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: UserPartitionKey(httpContext),
-            factory: _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 3,
-                Window = TimeSpan.FromMinutes(1),
-                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                QueueLimit = 0,
-            }
-        )
-    );
-
-    options.AddPolicy("email-change-confirm", httpContext =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: UserPartitionKey(httpContext),
-            factory: _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 5,
-                Window = TimeSpan.FromMinutes(1),
-                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                QueueLimit = 0,
-            }
-        )
-    );
+    AddUserPartitionedPolicy(options, "verify-password", permitLimit: 5, window: TimeSpan.FromMinutes(1));
+    AddUserPartitionedPolicy(options, "email-change-request", permitLimit: 5, window: TimeSpan.FromMinutes(1));
+    AddUserPartitionedPolicy(options, "email-change-resend-otp", permitLimit: 3, window: TimeSpan.FromMinutes(1));
+    AddUserPartitionedPolicy(options, "email-change-confirm", permitLimit: 5, window: TimeSpan.FromMinutes(1));
 
     options.RejectionStatusCode = 429;
 });

@@ -22,7 +22,7 @@ public class NewEmailTakenException : Exception
 
 public class NoPendingEmailChangeException : Exception
 {
-    public NoPendingEmailChangeException() : base("no email change is currently pending. Please start again") { }
+    public NoPendingEmailChangeException() : base("No email change is currently pending. Please start again") { }
 }
 
 public class InvalidEmailChangeOtpException : Exception
