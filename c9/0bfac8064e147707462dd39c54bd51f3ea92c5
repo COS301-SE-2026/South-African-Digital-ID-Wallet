@@ -1,0 +1,14 @@
+web/src/services/citizen-register-service/test/citizen-register-service.test.ts
+  h_0aff3b71f739b1 1-120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "c90bfac8064e147707462dd39c54bd51f3ea92c5",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
