@@ -1,0 +1,34 @@
+web/src/components/molecules/update-email-modal/update-email-modal.tsx
+  h_99fca60b892ff4 182
+web/src/components/templates/app-shell/app-shell.tsx
+  h_99fca60b892ff4 3,22
+backend/FlashIdBackend/Application/Common/Services/UpdatePasswordService.cs
+  h_99fca60b892ff4 23,31,35,39
+backend/FlashIdBackend/Domain/Entities/AuditLog.cs
+  h_99fca60b892ff4 18
+backend/FlashIdBackend/Application/Common/Mapping/DeleteAccountMapper.cs
+  h_99fca60b892ff4 1-2
+web/src/components/molecules/delete-account-card/delete-account-card.tsx
+  h_99fca60b892ff4 100
+web/src/components/molecules/selective-disclosure-card/selective-disclosure-card.tsx
+  h_99fca60b892ff4 79,84,89,94,99,104
+web/src/components/molecules/update-password-card/update-password-card.tsx
+  h_99fca60b892ff4 25
+web/src/components/organisms/app-sidebar/app-sidebar.tsx
+  h_99fca60b892ff4 54-55,60
+web/src/components/molecules/update-email-card/update-email-card.tsx
+  h_99fca60b892ff4 23
+web/src/components/organisms/manage-user-account/manage-user-account.tsx
+  h_99fca60b892ff4 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "0ad8326cee7be7c46ba8d7c8468a426499d408ff",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
