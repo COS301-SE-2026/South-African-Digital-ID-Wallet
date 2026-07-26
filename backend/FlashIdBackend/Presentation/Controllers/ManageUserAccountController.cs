@@ -22,6 +22,8 @@ public class ManageUserAccountController : ControllerBase
         _manageUserAccountService = manageUserAccountService;
     }
 
+    private const string NoCitizenRecordMessage = "You have no credentials linked. To see your information please activate your credentials.";
+
     private bool TryGetUserId(out Guid userId)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -30,9 +32,8 @@ public class ManageUserAccountController : ControllerBase
 
     [HttpGet("me")]
     [ProducesResponseType(typeof(ManageUserAccountDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<ManageUserAccountDto>> GetMyAccount()
+    public async Task<IActionResult> GetMyAccount()
     {
         if (!TryGetUserId(out var userId)) return Unauthorized();
 
@@ -40,7 +41,7 @@ public class ManageUserAccountController : ControllerBase
 
         if (account is null)
         {
-            return NotFound();
+            return Ok(new { message = NoCitizenRecordMessage });
         }
 
         return Ok(account);
@@ -132,7 +133,7 @@ public class ManageUserAccountController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<ActionResult<ManageUserAccountDto>> ConfirmEmailChange([FromBody] ConfirmEmailChangeRequestDto req)
+    public async Task<IActionResult> ConfirmEmailChange([FromBody] ConfirmEmailChangeRequestDto req)
     {
         if (!TryGetUserId(out var userId)) return Unauthorized();
 
@@ -141,7 +142,7 @@ public class ManageUserAccountController : ControllerBase
         try
         {
             var account = await _manageUserAccountService.ConfirmEmailChangeAsync(userId, req.OTP, ipAddress);
-            return account is null ? NotFound() : Ok(account);
+            return account is null ? Ok(new { message = NoCitizenRecordMessage }) : Ok(account);
         }
         catch (NoPendingEmailChangeException npece)
         {

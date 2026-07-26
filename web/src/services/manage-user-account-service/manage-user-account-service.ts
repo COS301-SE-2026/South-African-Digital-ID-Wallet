@@ -2,10 +2,10 @@ import api from '@/lib/api'
 import manageUserAccountUrls from './manage-user-account-urls'
 import type { ManageUserAccountDto, MessageResponse } from './types'
 
-const getMyAccount = (): Promise<ManageUserAccountDto> =>
+const getMyAccount = (): Promise<ManageUserAccountDto | MessageResponse> =>
   api
     .get(manageUserAccountUrls.me())
-    .then((res) => res.data as ManageUserAccountDto)
+    .then((res) => res.data as ManageUserAccountDto | MessageResponse)
 
 const verifyPassword = (password: string): Promise<MessageResponse> =>
   api
@@ -22,10 +22,12 @@ const resendEmailChangeOtp = (): Promise<MessageResponse> =>
     .post(manageUserAccountUrls.resendEmailChangeOtp())
     .then((res) => res.data as MessageResponse)
 
-const confirmEmailChange = (otp: string): Promise<ManageUserAccountDto> =>
+const confirmEmailChange = (
+  otp: string
+): Promise<ManageUserAccountDto | MessageResponse> =>
   api
     .post(manageUserAccountUrls.confirmEmailChange(), { otp })
-    .then((res) => res.data as ManageUserAccountDto)
+    .then((res) => res.data as ManageUserAccountDto | MessageResponse)
 
 const manageUserAccountService = {
   getMyAccount,

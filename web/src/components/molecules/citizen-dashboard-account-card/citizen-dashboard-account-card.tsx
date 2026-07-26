@@ -43,7 +43,7 @@ export function AccountCardCitizenDashboard() {
         <h2 className="text-sm font-bold">Your Account</h2>
 
         <p className="mt-3 text-sm text-muted-text">
-          Unable to load account information.
+          Activate your credentials to see your account information.
         </p>
       </div>
     )

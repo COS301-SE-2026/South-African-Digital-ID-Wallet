@@ -135,7 +135,7 @@ export const UpdateEmailModal: FC<UpdateEmailModalProps> = ({
   const handleEmailSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (requestChangeMutation.isPending) return
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!/^[^\s@.]+@[^\s@.]+(?:\.[^\s@.]+)+$/.test(email)) {
       setErrorMessage('Please enter a valid email address.')
       return
     }

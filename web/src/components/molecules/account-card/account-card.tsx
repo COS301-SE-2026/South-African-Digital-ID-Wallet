@@ -33,6 +33,15 @@ export const AccountCard = () => {
     )
   }
 
+  if ('message' in account) {
+    return (
+      <div className="bg-card rounded-3xl border p-6">
+        <h2 className="text-3xl font-bold">Account</h2>
+        <p className="mt-4 text-muted-text">{account.message}</p>
+      </div>
+    )
+  }
+
   const rows = [
     {
       label: 'Full Name',
