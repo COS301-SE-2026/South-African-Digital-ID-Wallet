@@ -2,6 +2,7 @@ import type React from 'react'
 
 export type User = {
   userId: string
+  saId?: string
   email: string
   role: string
   names?: string
