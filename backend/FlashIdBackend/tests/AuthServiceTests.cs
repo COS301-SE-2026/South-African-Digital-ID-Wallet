@@ -145,3 +145,4 @@ public class AuthServiceTests
         var result = await authService.GetCurrentUserAsync(Guid.NewGuid());
         Assert.Null(result);
     }
+}
