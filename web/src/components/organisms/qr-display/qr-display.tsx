@@ -108,25 +108,27 @@ export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
   return (
     <div className="flex min-h-screen items-center justify-center  px-6 py-12">
       <Card className="w-full max-w-3xl rounded-[32px] border border-gray-200 bg-white p-10 shadow-2xl">
-        <div className="mb-10 text-center">
+        <div className=" text-center">
           <Text variant="h2">Your QR Code</Text>
 
-          <Text variant="sub-md" className="mt-2">
+          <Text variant="sub-md" className="mt-1">
             Share your identity securely
           </Text>
         </div>
 
         <div className="flex justify-center">
-          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-            <QRCodeSVG value={qrValue} size={260} includeMargin />
+          <div className="relative p-6">
+            <div className="absolute left-3 top-3 h-8 w-8 border-l-4 border-t-4 border-emerald-600" />
+            <div className="absolute right-3 top-3 h-8 w-8 border-r-4 border-t-4 border-amber-500" />
+            <div className="absolute bottom-3 left-3 h-8 w-8 border-b-4 border-l-4 border-red-500" />
+            <div className="absolute bottom-3 right-3 h-8 w-8 border-b-4 border-r-4 border-blue-600" />
+            <QRCodeSVG value={qrValue} size={300} includeMargin />
           </div>
         </div>
 
-        <div className="mt-8 flex items-center justify-center gap-2">
+        <div className=" flex items-center justify-center gap-2">
           <div
-            className={`h-3 w-3 rounded-full ${
-              isWarning ? 'bg-red-500' : 'bg-emerald-500'
-            }`}
+            className={`h-3 w-3 rounded-full ${isWarning ? 'bg-red-500' : 'bg-emerald-500'}`}
           />
 
           <Text
@@ -144,7 +146,7 @@ export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
         <Button
           type="button"
           onClick={handleRetry}
-          className="mt-8 h-12 w-full rounded-2xl bg-primary-green text-white hover:bg-amber-600"
+          className="mt-1 h-12 w-full rounded-2xl bg-primary-green text-white hover:bg-amber-600"
         >
           <RefreshCw className="mr-2 h-4 w-4" />
           Refresh QR Code
@@ -154,7 +156,7 @@ export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
           type="button"
           variant="secondary"
           onClick={onBack}
-          className="mt-4 h-12 w-full rounded-2xl"
+          className=" h-12 w-full rounded-2xl"
         >
           Back
         </Button>
