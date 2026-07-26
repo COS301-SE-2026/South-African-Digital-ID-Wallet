@@ -75,7 +75,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className=" flex h-screen overflow-hidden">
       <AppSidebar
         navSections={navSections}
-        user={{ name: displayName, initials, idLabel }}
+        user={{ name: displayName, initials }}
         onLogout={logout}
       />
       <div className="flex h-screen flex-1 flex-col overflow-hidden">

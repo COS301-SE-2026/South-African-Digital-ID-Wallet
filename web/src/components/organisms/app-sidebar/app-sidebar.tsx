@@ -157,9 +157,6 @@ export const AppSidebar = ({
                 <p className="truncate text-sm font-extrabold text-clean-white">
                   {user.name}
                 </p>
-                <p className="truncate text-xs font-semibold text-accent-gold/80">
-                  {user.idLabel}
-                </p>
               </div>
             </div>
           </div>

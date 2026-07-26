@@ -10,6 +10,7 @@ import { TextField } from '@/components/molecules'
 import { manageUserAccountService } from '@/services/manage-user-account-service'
 
 import { UpdateEmailModalProps, Step } from './types'
+import { useUser } from '@/context/user-context'
 
 const getErrorMessage = (error: unknown, fallback: string): string => {
   if (!axios.isAxiosError(error)) {
@@ -91,11 +92,14 @@ export const UpdateEmailModal: FC<UpdateEmailModalProps> = ({
     },
   })
 
+  const { refresh } = useUser()
+
   const confirmMutation = useMutation({
     mutationFn: () => manageUserAccountService.confirmEmailChange(otp),
     onSuccess: (account) => {
       queryClient.setQueryData(['manageUserAccount', 'me'], account)
       queryClient.invalidateQueries({ queryKey: ['manageUserAccount', 'me'] })
+      void refresh()
       toast.success('Email updated')
       handleClose()
     },
@@ -135,7 +139,7 @@ export const UpdateEmailModal: FC<UpdateEmailModalProps> = ({
   const handleEmailSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (requestChangeMutation.isPending) return
-    if (!/^[^\s@.]+@[^\s@.]+(?:\.[^\s@.]+)+$/.test(email)) {
+    if (!/^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/.test(email)) {
       setErrorMessage('Please enter a valid email address.')
       return
     }

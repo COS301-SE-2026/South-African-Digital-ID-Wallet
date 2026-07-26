@@ -14,6 +14,16 @@ public class AuthRepository : IAuthRepository
         _context = context;
     }
 
+    public async Task<(string? Names, string? Surname)> GetCitizenNameByUserIdAsync(Guid userId)
+    {
+        var citizen = await _context.Citizens
+            .Where(c => c.UserId == userId)
+            .Select(c => new { c.Names, c.Surname })
+            .FirstOrDefaultAsync();
+
+        return citizen is null ? (null, null) : (citizen.Names, citizen.Surname);
+    }
+
     public async Task<User?> GetUserByEmailAsync(string email)
     {
         return await _context.DomainUsers
