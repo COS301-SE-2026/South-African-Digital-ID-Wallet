@@ -1,0 +1,16 @@
+backend/FlashIdBackend/tests/AuthServiceTests.cs
+  h_0aff3b71f739b1 17,20
+web/src/services/citizen-register-service/test/citizen-register-service.test.ts
+  h_0aff3b71f739b1 44,47,50,78,98,115
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "74777f948d56aa44eb5a6d2cdcd2d410d91e75a3",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
