@@ -51,4 +51,23 @@ public class TrustedDeviceRepository : ITrustedDeviceRepository
 
         return true;
     }
+
+    public async Task<TrustedDevice?> GetTokenHashAsync(Guid citizenId, string deviceTokenHash, CancellationToken cancellationToken)
+    {
+        return await _context.TrustedDevices.FirstOrDefaultAsync(device =>
+            device.DeviceTokenHash == deviceTokenHash &&
+            device.CitizenId == citizenId && device.IsTrusted, cancellationToken);
+    }
+
+    public async Task AddTrustedDeviceAsync(TrustedDevice trustedDevice, CancellationToken cancellationToken)
+    {
+        await _context.TrustedDevices.AddAsync(trustedDevice, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdateTrustedDeviceAsync(TrustedDevice trustedDevice, CancellationToken cancellationToken)
+    {
+        _context.TrustedDevices.Update(trustedDevice);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
 }

@@ -27,8 +27,8 @@ namespace Infrastructure.Data;
 // scanning features are built out.
 public static class DbSeeder
 {
-    private sealed record DeviceTemplate(string Name, string Type, string Os, string Browser);
-
+    private sealed record DeviceTemplate(string DeviceType, string OperatingSystem, string Browser);
+    private sealed record LocationTemplate(string City, string Country);
     private sealed record NotificationTemplate(string Title, string Description, string Tone);
 
     private static readonly string[] FirstNames = new[]
@@ -706,19 +706,23 @@ public static class DbSeeder
 
         var deviceTemplates = new[]
         {
-            new DeviceTemplate("iPhone 15 Pro", "Mobile", "iOS 18.1", "Safari"),
-            new DeviceTemplate("Samsung Galaxy S24", "Mobile", "Android 15", "Chrome"),
-            new DeviceTemplate("MacBook Pro", "Desktop", "macOS Sequoia", "Safari"),
-            new DeviceTemplate("Dell XPS 15", "Desktop", "Windows 11", "Edge"),
-            new DeviceTemplate("iPad Air", "Tablet", "iPadOS 18.1", "Safari"),
-            new DeviceTemplate("HP Pavilion", "Desktop", "Windows 11", "Chrome"),
-            new DeviceTemplate("Google Pixel 9", "Mobile", "Android 15", "Chrome"),
+            new DeviceTemplate("Mobile", "iOS 18.1", "Safari"),
+            new DeviceTemplate("Mobile", "Android 15", "Chrome"),
+            new DeviceTemplate("Desktop", "macOS Sequoia", "Safari"),
+            new DeviceTemplate("Desktop", "Windows 11", "Edge"),
+            new DeviceTemplate("Tablet", "iPadOS 18.1", "Safari"),
+            new DeviceTemplate("Desktop", "Windows 11", "Chrome"),
+            new DeviceTemplate("Mobile", "Android 15", "Chrome"),
         };
 
         var locations = new[]
         {
-            "Pretoria, Gauteng", "Johannesburg, Gauteng", "Cape Town, Western Cape",
-            "Durban, KwaZulu-Natal", "Bloemfontein, Free State", "Port Elizabeth, Eastern Cape"
+            new LocationTemplate("Pretoria", "South Africa"),
+            new LocationTemplate("Johannesburg", "South Africa"),
+            new LocationTemplate("Cape Town", "South Africa"),
+            new LocationTemplate("Durban", "South Africa"),
+            new LocationTemplate("Bloemfontein", "South Africa"),
+            new LocationTemplate("Gqeberha", "South Africa")
         };
 
         var devicesToAdd = new List<TrustedDevice>();
@@ -729,17 +733,21 @@ public static class DbSeeder
             for (int i = 0; i < deviceCount; i++)
             {
                 var template = deviceTemplates[rnd.Next(deviceTemplates.Length)];
+                var location = locations[rnd.Next(locations.Length)];
+
+                var seedDeviceToken = $"seed-device-{citizen.Id}-{i}";
+                var deviceTokenHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(seedDeviceToken)));
+
                 devicesToAdd.Add(new TrustedDevice
                 {
                     Id = Guid.NewGuid(),
-                    DeviceName = template.Name,
-                    DeviceType = template.Type,
-                    OperatingSystem = template.Os,
+                    DeviceTokenHash = deviceTokenHash,
+                    DeviceType = Enum.Parse<DeviceType>(template.DeviceType),
+                    OperatingSystem = template.OperatingSystem,
                     Browser = template.Browser,
-                    IpAddress = SampleIpAddresses[rnd.Next(SampleIpAddresses.Length)],
-                    Location = locations[rnd.Next(locations.Length)],
+                    LastKnownCity = location.City,
+                    LastKnownCountry = location.Country,
                     LastActive = now.AddDays(-rnd.Next(0, maxLastActiveDaysAgo)),
-                    IsCurrentDevice = i == 0,
                     IsTrusted = rnd.Next(10) > trustedThreshold,
                     CitizenId = citizen.Id,
                     CreatedAt = now.AddDays(-rnd.Next(30, 365)),
