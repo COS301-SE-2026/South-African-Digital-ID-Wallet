@@ -97,11 +97,15 @@ export const DeleteAccountCard = () => {
                   <span className="font-semibold">DELETE</span> below.
                 </p>
 
-                <label className="mt-6 block text-sm font-medium">
+                <label
+                  htmlFor="delete-confirmation"
+                  className="mt-6 block text-sm font-medium"
+                >
                   Type &quot;DELETE&quot;
                 </label>
 
                 <input
+                  id="delete-confirmation"
                   type="text"
                   value={confirmationText}
                   onChange={(e) => setConfirmationText(e.target.value)}

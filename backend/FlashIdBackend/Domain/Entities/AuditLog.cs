@@ -15,5 +15,5 @@ public class AuditLog
     public DateTime CreatedAt { get; set; }
 
     public Guid? ActorId { get; set; }
-    public User? Actor { get; set; } = null!;
+    public User? Actor { get; set; } = null;
 }

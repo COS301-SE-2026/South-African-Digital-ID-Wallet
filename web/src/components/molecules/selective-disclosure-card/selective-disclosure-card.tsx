@@ -76,32 +76,32 @@ export const SelectiveDisclosureCard = () => {
             <div className="mt-6 space-y-3">
               <label className="flex items-center gap-3">
                 <input type="checkbox" defaultChecked />
-                Full Name
+                <span>Full Name</span>
               </label>
 
               <label className="flex items-center gap-3">
                 <input type="checkbox" defaultChecked />
-                Date of Birth
+                <span>Date of Birth</span>
               </label>
 
               <label className="flex items-center gap-3">
                 <input type="checkbox" defaultChecked />
-                Nationality
+                <span>Nationality</span>
               </label>
 
               <label className="flex items-center gap-3">
                 <input type="checkbox" />
-                ID Number
+                <span>ID Number</span>
               </label>
 
               <label className="flex items-center gap-3">
                 <input type="checkbox" />
-                Address
+                <span>Address</span>
               </label>
 
               <label className="flex items-center gap-3">
                 <input type="checkbox" />
-                Phone Number
+                <span>Phone Number</span>
               </label>
             </div>
 

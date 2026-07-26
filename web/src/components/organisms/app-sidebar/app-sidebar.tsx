@@ -51,11 +51,13 @@ export const AppSidebar = ({
   const [isCollapsed, setIsCollapsed] = useState(false)
   const pathname = usePathname()
 
+  const css = isCollapsed ? 'w-24' : 'w-64'
+
   return (
     <aside
       className={`flex overflow-hidden flex-col bg-deep-green px-4 py-5 text-clean-white transition-all duration-300 ${
         variant === 'desktop'
-          ? `hidden lg:flex h-screen ${isCollapsed ? 'w-24' : 'w-64'}`
+          ? `hidden lg:flex h-screen ${css}`
           : 'h-full w-full'
       }`}
     >

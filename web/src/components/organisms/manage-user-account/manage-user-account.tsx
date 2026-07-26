@@ -11,8 +11,6 @@ import {
   UpdatePasswordCard,
   DeleteAccountCard,
 } from '@/components/molecules'
-import { AppTopBar } from '@/components/organisms/app-top-bar'
-import { AppSidebar } from '@/components/organisms/app-sidebar'
 
 import type { ManageUserAccountProps } from './types'
 
@@ -20,7 +18,7 @@ export function ManageUserAccount({
   user,
   navSections,
   onLogout,
-}: ManageUserAccountProps) {
+}: Readonly<ManageUserAccountProps>) {
   const [openEmail, setOpenEmail] = useState(false)
   const [openPass, setOpenPass] = useState(false)
 

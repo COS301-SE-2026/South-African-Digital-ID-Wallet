@@ -20,7 +20,7 @@ public class UpdatePasswordService : IUpdatePasswordService
 
     public async Task<bool> UpdatePasswordAsync(
         Guid userId,
-        UpdatePasswordDto dto)
+        UpdatePasswordDto updatePasswordDto)
     {
         var user = await _repository.GetUserByIdAsync(userId);
 
@@ -28,15 +28,15 @@ public class UpdatePasswordService : IUpdatePasswordService
             return false;
 
         if (!_passwordHashingProvider.VerifyPassword(
-                dto.CurrentPassword,
+                updatePasswordDto.CurrentPassword,
                 user.PasswordHash))
             return false;
 
-        if (dto.NewPassword != dto.ConfirmPassword)
+        if (updatePasswordDto.NewPassword != updatePasswordDto.ConfirmPassword)
             return false;
 
         user.PasswordHash =
-            _passwordHashingProvider.HashPassword(dto.NewPassword);
+            _passwordHashingProvider.HashPassword(updatePasswordDto.NewPassword);
 
         await _repository.UpdateUserAsync(user);
         await _repository.SaveChangesAsync();

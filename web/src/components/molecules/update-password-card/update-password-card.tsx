@@ -22,6 +22,7 @@ export const UpdatePasswordCard: FC<UpdatePasswordCardProps> = ({
       </ul>
 
       <button
+        type="button"
         onClick={onAction}
         className="mt-6 w-full bg-primary rounded-2xl py-3 text-primary-foreground font-semibold"
       >

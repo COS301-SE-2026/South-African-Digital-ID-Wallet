@@ -179,6 +179,7 @@ export const UpdateEmailModal: FC<UpdateEmailModalProps> = ({
               Update Email
             </Text>
             <button
+              type="button"
               aria-label="Close"
               onClick={handleClose}
               className="text-muted-text"
