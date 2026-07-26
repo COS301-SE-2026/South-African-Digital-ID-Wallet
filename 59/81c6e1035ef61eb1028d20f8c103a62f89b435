@@ -1,0 +1,16 @@
+web/src/components/organisms/manage-user-account/test/manage-user-account.test.tsx
+  h_99fca60b892ff4 4-5,20-23,26-33,36-37,39-40,43,45,49-53,56,66
+web/src/components/molecules/citizen-dashboard-account-card/citizen-dashboard-account-card.tsx
+  h_99fca60b892ff4 5,12,24-27,46,57,64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "5981c6e1035ef61eb1028d20f8c103a62f89b435",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
