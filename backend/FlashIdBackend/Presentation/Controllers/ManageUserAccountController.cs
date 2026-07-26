@@ -22,18 +22,19 @@ public class ManageUserAccountController : ControllerBase
         _manageUserAccountService = manageUserAccountService;
     }
 
+    private bool TryGetUserId(out Guid userId)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return Guid.TryParse(userIdClaim, out userId);
+    }
+
     [HttpGet("me")]
     [ProducesResponseType(typeof(ManageUserAccountDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ManageUserAccountDto>> GetMyAccount()
     {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (!Guid.TryParse(userIdClaim, out var userId))
-        {
-            return Unauthorized();
-        }
+        if (!TryGetUserId(out var userId)) return Unauthorized();
 
         var account = await _manageUserAccountService.GetAccountAsync(userId);
 
@@ -53,11 +54,7 @@ public class ManageUserAccountController : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> VerifyPassword([FromBody] VerifyPasswordRequestDto req)
     {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdClaim, out var userId))
-        {
-            return Unauthorized();
-        }
+        if (!TryGetUserId(out var userId)) return Unauthorized();
 
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
@@ -85,11 +82,7 @@ public class ManageUserAccountController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> RequestEmailChange([FromBody] RequestEmailChangeRequestDto req)
     {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdClaim, out var userId))
-        {
-            return Unauthorized();
-        }
+        if (!TryGetUserId(out var userId)) return Unauthorized();
 
         try
         {
@@ -117,11 +110,7 @@ public class ManageUserAccountController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> ResendEmailChangeOtp()
     {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdClaim, out var userId))
-        {
-            return Unauthorized();
-        }
+        if (!TryGetUserId(out var userId)) return Unauthorized();
 
         try
         {
@@ -145,11 +134,7 @@ public class ManageUserAccountController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ManageUserAccountDto>> ConfirmEmailChange([FromBody] ConfirmEmailChangeRequestDto req)
     {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdClaim, out var userId))
-        {
-            return Unauthorized();
-        }
+        if (!TryGetUserId(out var userId)) return Unauthorized();
 
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 

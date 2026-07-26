@@ -7,6 +7,7 @@ using Application.Features.ManageUserAccount.DTOs;
 using Application.Features.ManageUserAccountCard.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
+using System.Security.Cryptography;
 
 namespace Application.Common.Services;
 
@@ -85,6 +86,7 @@ public class ManageUserAccountService : IManageUserAccountService
 
         var cleanedEmail = newEmail.Trim();
 
+        if (string.Equals(cleanedEmail, user.Email, StringComparison.OrdinalIgnoreCase)) throw new InvalidEmailException();
         if (await _manageUserAccountRepository.IsEmailTakenAsync(cleanedEmail, userId)) throw new NewEmailTakenException(cleanedEmail);
 
         var otp = GenerateOtp();
@@ -136,13 +138,14 @@ public class ManageUserAccountService : IManageUserAccountService
             throw new NewEmailTakenException(takenEmail);
         }
 
+        var prevEmail = user.Email;
         user.ConfirmEmailChange();
 
         var auditLog = new AuditLog
         {
             Id = Guid.NewGuid(),
             EventType = AuditEventType.EmailAddressChanged,
-            Details = $"Email changed to '{user.Email}'",
+            Details = $"Email changed from '{prevEmail}' to '{user.Email}'",
             IpAddress = ipAddress,
             ActorId = user.Id,
             CreatedAt = DateTime.UtcNow,
@@ -179,7 +182,7 @@ public class ManageUserAccountService : IManageUserAccountService
         return dto;
     }
 
-    private static string GenerateOtp() => Random.Shared.Next(100000, 999999).ToString();
+    private static string GenerateOtp() => RandomNumberGenerator.GetInt32(100000, 999999).ToString();
 
     private Task SendEmailChangeOtpAsync(string toEmail, string otp) => _emailSenderProvider.SendEmailAsync(
         toEmail,
