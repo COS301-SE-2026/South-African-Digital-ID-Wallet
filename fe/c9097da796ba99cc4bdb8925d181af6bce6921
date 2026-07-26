@@ -1,0 +1,18 @@
+web/src/components/molecules/update-email-modal/update-email-modal.tsx
+  h_99fca60b892ff4 126,137,148
+web/src/components/organisms/verify-email-form/verify-email-form.tsx
+  h_99fca60b892ff4 33
+web/src/components/molecules/citizen-dashboard-account-card/test/citizen-dashbord-account-card.test.tsx
+  h_99fca60b892ff4 62,70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "fec9097da796ba99cc4bdb8925d181af6bce6921",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
