@@ -105,7 +105,7 @@ public class ManageUserAccountService : IManageUserAccountService
 
         var otp = GenerateOtp();
 
-        user.SetPendingEmailChange(user.PendingEmail, _passwordHashingProvider.HashPassword(otp));
+        if (!user.TryRegisterOtpResend(_passwordHashingProvider.HashPassword(otp))) throw new TooManyEmailChangeOtpAttemptsException();
 
         await _manageUserAccountRepository.UpdateUserAsync(user);
         await _manageUserAccountRepository.SaveChangesAsync();

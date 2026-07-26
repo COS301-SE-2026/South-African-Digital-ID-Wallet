@@ -132,6 +132,10 @@ public class ManageUserAccountController : ControllerBase
         {
             return BadRequest(new { error = npece.Message });
         }
+        catch (TooManyEmailChangeOtpAttemptsException tmecoae)
+        {
+            return BadRequest(new { error = tmecoae.Message });
+        }
     }
 
     [HttpPost("email/confirm")]

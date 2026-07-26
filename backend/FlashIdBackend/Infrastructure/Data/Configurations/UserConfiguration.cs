@@ -77,8 +77,12 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnType("datetime2");
 
         builder.Property(u => u.OTPAttemptCount)
-        .IsRequired()
-        .HasDefaultValue(0);
+            .IsRequired()
+            .HasDefaultValue(0);
+
+        builder.Property(u => u.OTPResendCount)
+            .IsRequired()
+            .HasDefaultValue(0);
 
         builder.Property(u => u.PendingEmail)
             .HasMaxLength(256);

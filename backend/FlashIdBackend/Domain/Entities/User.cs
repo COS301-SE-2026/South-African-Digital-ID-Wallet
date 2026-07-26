@@ -31,6 +31,7 @@ public class User : BaseEntity
     public string? EmailOTPHash { get; private set; }
     public DateTime? EmailOTPExpiresAt { get; private set; }
     public int OTPAttemptCount { get; private set; }
+    public int OTPResendCount { get; private set; }
 
     public string? PendingEmail { get; private set; }
     public DateTime? PasswordReverifiedAt { get; set; }
@@ -70,12 +71,14 @@ public class User : BaseEntity
     public void SetPendingEmailChange(string pendingEmail, string otpHash, int expiryMinutes = 10)
     {
         PendingEmail = pendingEmail;
+        OTPResendCount = 0;
         SetOtp(otpHash, expiryMinutes);
     }
 
     public void ClearPendingEmailChange()
     {
         PendingEmail = null;
+        OTPResendCount = 0;
         ClearOtp();
     }
 
@@ -84,5 +87,13 @@ public class User : BaseEntity
         if (PendingEmail is not null)
             Email = PendingEmail;
         ClearPendingEmailChange();
+    }
+
+    public bool TryRegisterOtpResend(string otpHash, int expiryMinutes = 10, int maxResends = 3)
+    {
+        if (OTPResendCount >= maxResends) return false;
+        OTPResendCount++;
+        SetOtp(otpHash, expiryMinutes);
+        return true;
     }
 }
