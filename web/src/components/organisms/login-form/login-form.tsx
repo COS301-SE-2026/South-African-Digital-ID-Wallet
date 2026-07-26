@@ -160,15 +160,14 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
       </div>
 
       <div className="flex flex-col gap-3">
-        <Button
+        <button
           type="submit"
-          variant="primary"
-          LeftIcon={User}
-          isLoading={isLoading}
-          className="w-full"
+          disabled={isLoading}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary-green px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Login
-        </Button>
+          <User className="h-4 w-4" />
+          {isLoading ? 'Logging in...' : 'Login'}
+        </button>
 
         <div className="space-y-1 text-center text-base text-primary-green">
           <a href="#" className="block hover:text-deep-green hover:underline">
