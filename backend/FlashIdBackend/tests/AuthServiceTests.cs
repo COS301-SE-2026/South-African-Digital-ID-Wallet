@@ -14,8 +14,10 @@ public class AuthServiceTests
     private class FakeAuthRepository : IAuthRepository
     {
         public User? UserToReturn { get; set; }
+        public Citizen? CitizenToReturn { get; set; }
         public Task<User?> GetUserByEmailAsync(string email) => Task.FromResult(UserToReturn);
         public Task<User?> GetUserByIdAsync(Guid userId) => Task.FromResult(UserToReturn);
+        public Task<Citizen?> GetCitizenByUserIdAsync(Guid userId) => Task.FromResult(CitizenToReturn);
         public Task UpdateUserAsync(User user) => Task.CompletedTask;
         public Task AddAuditLogAsync(AuditLog auditLog) => Task.CompletedTask;
         public Task SaveChangesAsync() => Task.CompletedTask;
