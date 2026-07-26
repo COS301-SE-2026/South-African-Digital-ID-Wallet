@@ -22,25 +22,25 @@ public class NewEmailTakenException : Exception
 
 public class NoPendingEmailChangeException : Exception
 {
-    public NoPendingEmailChangeException() : base("No email change is currently pending. Please start again") { }
+    public NoPendingEmailChangeException() : base("No email change is currently pending. Please start again.") { }
 }
 
 public class InvalidEmailChangeOtpException : Exception
 {
-    public InvalidEmailChangeOtpException() : base("Verification code is incorrect") { }
+    public InvalidEmailChangeOtpException() : base("Verification code is incorrect.") { }
 }
 
 public class EmailChangeOtpExpiredException : Exception
 {
-    public EmailChangeOtpExpiredException() : base("Verification code has expired. Please request another code") { }
+    public EmailChangeOtpExpiredException() : base("Verification code has expired. Please request another code.") { }
 }
 
 public class TooManyEmailChangeOtpAttemptsException : Exception
 {
-    public TooManyEmailChangeOtpAttemptsException() : base("Too many attempts. Please request a new code") { }
+    public TooManyEmailChangeOtpAttemptsException() : base("Too many attempts. Please request a new code.") { }
 }
 
 public class InvalidEmailException : Exception
 {
-    public InvalidEmailException() : base("Please enter a valid email address") { }
+    public InvalidEmailException() : base("Please enter a valid email address.") { }
 }

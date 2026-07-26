@@ -182,7 +182,7 @@ public class ManageUserAccountService : IManageUserAccountService
         return dto;
     }
 
-    private static string GenerateOtp() => RandomNumberGenerator.GetInt32(100000, 999999).ToString();
+    private static string GenerateOtp() => RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
 
     private Task SendEmailChangeOtpAsync(string toEmail, string otp) => _emailSenderProvider.SendEmailAsync(
         toEmail,
