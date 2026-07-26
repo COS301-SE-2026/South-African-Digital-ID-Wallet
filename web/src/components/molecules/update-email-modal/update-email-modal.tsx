@@ -123,6 +123,7 @@ export const UpdateEmailModal: FC<UpdateEmailModalProps> = ({
 
   const handlePasswordSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (verifyPasswordMutation.isPending) return
     if (!password) {
       setErrorMessage('Please enter your password.')
       return
@@ -133,6 +134,7 @@ export const UpdateEmailModal: FC<UpdateEmailModalProps> = ({
 
   const handleEmailSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (requestChangeMutation.isPending) return
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setErrorMessage('Please enter a valid email address.')
       return
@@ -143,6 +145,7 @@ export const UpdateEmailModal: FC<UpdateEmailModalProps> = ({
 
   const handleOtpSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (confirmMutation.isPending) return
     if (otp.length !== 6) {
       setErrorMessage('Enter the 6-digit code.')
       return
