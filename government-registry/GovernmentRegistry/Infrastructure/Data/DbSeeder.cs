@@ -75,7 +75,7 @@ public static class DbSeeder
                 CountryOfBirth = "ZA",
                 CitizenshipStatus = CitizenStatus.Citizen,
                 Nationality = "South African",
-                PhotoBlob = $"mock/photos/{saId}/identity-document.jpg"
+                PhotoBlob = MockPhotoData.PlaceholderPhotoBase64
             });
         }
 
@@ -92,7 +92,7 @@ public static class DbSeeder
                 LicenseCode = LicenseCode.B,
                 Restrictions = null,
                 ExpiryDate = new DateOnly(2029, 6, 1),
-                PhotoBlob = $"mock/photos/{saId}/drivers-license.jpg"
+                PhotoBlob = MockPhotoData.PlaceholderPhotoBase64
             });
         }
 
