@@ -1,0 +1,20 @@
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_99fca60b892ff4 13,42-48
+.gitignore
+  h_99fca60b892ff4 24-26
+backend/FlashIdBackend/Presentation/appsettings.json
+  h_99fca60b892ff4 6-8,23-35
+backend/FlashIdBackend/docker-compose.yml
+  h_99fca60b892ff4 14-24,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "d35e5b740ab266149475da940e67ef19ab65bed1",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
