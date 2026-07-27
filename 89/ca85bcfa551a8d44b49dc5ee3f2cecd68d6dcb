@@ -1,0 +1,18 @@
+web/src/components/organisms/verify-email-form/test/verify-email-form.test.tsx
+  h_99fca60b892ff4 192
+web/src/services/citizen-register-service/test/citizen-register-service.test.ts
+  h_99fca60b892ff4 47
+web/src/components/organisms/qr-camera-scanner/test/qr-camera-scanner.test.tsx
+  h_99fca60b892ff4 31,34-43,50,52,98-99,102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "89ca85bcfa551a8d44b49dc5ee3f2cecd68d6dcb",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
