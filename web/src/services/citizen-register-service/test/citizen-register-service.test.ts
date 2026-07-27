@@ -41,19 +41,13 @@ describe('registerFormModel', () => {
 
 describe('registerUrls', () => {
   it('citizenRegistration returns correct URL', () => {
-    expect(registerUrls.citizenRegistration()).toBe(
-      'http://localhost:5118/api/citizens/register'
-    )
+    expect(registerUrls.citizenRegistration()).toBe('/api/citizens/register')
   })
   it('verifyEmail returns correct URL', () => {
-    expect(registerUrls.verifyEmail()).toBe(
-      'http://localhost:5118/api/citizens/verify-email'
-    )
+    expect(registerUrls.verifyEmail()).toBe('/api/citizens/verify-email')
   })
   it('resendOtp returns correct URL', () => {
-    expect(registerUrls.resendOtp()).toBe(
-      'http://localhost:5118/api/citizens/resend-otp'
-    )
+    expect(registerUrls.resendOtp()).toBe('/api/citizens/resend-otp')
   })
 })
 
@@ -81,13 +75,10 @@ describe('registerService', () => {
       password: 'S3curep@ssword',
     })
 
-    expect(mockPost).toHaveBeenCalledWith(
-      'http://localhost:5118/api/citizens/register',
-      {
-        Email: 'example@example.com',
-        Password: 'S3curep@ssword',
-      }
-    )
+    expect(mockPost).toHaveBeenCalledWith('/api/citizens/register', {
+      Email: 'example@example.com',
+      Password: 'S3curep@ssword',
+    })
     expect(result).toEqual(mockData)
   })
 
@@ -104,13 +95,10 @@ describe('registerService', () => {
       code: '654321',
     })
 
-    expect(mockPost).toHaveBeenCalledWith(
-      'http://localhost:5118/api/citizens/verify-email',
-      {
-        Email: 'example@example.com',
-        OTP: '654321',
-      }
-    )
+    expect(mockPost).toHaveBeenCalledWith('/api/citizens/verify-email', {
+      Email: 'example@example.com',
+      OTP: '654321',
+    })
     expect(result).toEqual(mockData)
   })
 
@@ -124,12 +112,9 @@ describe('registerService', () => {
 
     const result = await registerService.resendOtp('example@example.com')
 
-    expect(mockPost).toHaveBeenCalledWith(
-      'http://localhost:5118/api/citizens/resend-otp',
-      {
-        Email: 'example@example.com',
-      }
-    )
+    expect(mockPost).toHaveBeenCalledWith('/api/citizens/resend-otp', {
+      Email: 'example@example.com',
+    })
     expect(result).toEqual(mockData)
   })
 })
