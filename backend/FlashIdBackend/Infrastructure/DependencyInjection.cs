@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Azure.Storage.Blobs;
+using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Common.Services;
 
 namespace Infrastructure;
 
@@ -46,6 +48,7 @@ public static class DependencyInjection
             return new BlobServiceClient(connectionString);
         });
         services.AddSingleton<IPhotoStorageProvider, AzureBlobPhotoStorageProvider>();
+        services.AddScoped<IDisclosedFieldsValueResolver, DisclosedFieldValueResolver>();
 
         services.AddScoped<IOfficialRepository, OfficialRepository>();
 
