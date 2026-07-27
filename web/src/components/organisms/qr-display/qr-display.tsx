@@ -172,7 +172,7 @@ export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
 
         <div className="mt-8 border-t border-gray-200 pt-6 text-center">
           <Text variant="sub-sm" className="text-gray-500">
-            Secure • Encrypted • Controlled by You
+            Secure • Signed • Controlled by You
           </Text>
         </div>
       </Card>
