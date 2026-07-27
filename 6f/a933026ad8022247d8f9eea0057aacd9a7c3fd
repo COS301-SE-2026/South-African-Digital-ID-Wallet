@@ -1,0 +1,16 @@
+web/e2e/auth.setup.ts
+  h_712d174fc3f309 23-30
+lefthook.yml
+  h_712d174fc3f309 68,73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "6fa933026ad8022247d8f9eea0057aacd9a7c3fd",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

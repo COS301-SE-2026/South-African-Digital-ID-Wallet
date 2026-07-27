@@ -1,0 +1,30 @@
+web/src/components/molecules/update-email-modal/update-email-modal.tsx
+  h_99fca60b892ff4 13,95-96,102
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IAuthRepository.cs
+  h_99fca60b892ff4 7
+backend/FlashIdBackend/Application/Common/Mapping/AuthMapper.cs
+  h_99fca60b892ff4 11-12
+web/src/components/organisms/app-sidebar/test/app-sidebar.test.tsx
+  h_99fca60b892ff4 67
+web/src/components/templates/app-shell/app-shell.tsx
+  h_99fca60b892ff4 78
+backend/FlashIdBackend/tests/AuthServiceTests.cs
+  h_99fca60b892ff4 17-20
+backend/FlashIdBackend/Application/Common/Services/AuthService.cs
+  h_99fca60b892ff4 149-150,152-155
+backend/FlashIdBackend/Infrastructure/Repositories/AuthRepository.cs
+  h_99fca60b892ff4 17-26
+backend/FlashIdBackend/Application/Features/Auth/DTOs/UserProfileDto.cs
+  h_99fca60b892ff4 8-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "9754219ee1e365918ff6ca0ed8859fc621e8ef1f",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

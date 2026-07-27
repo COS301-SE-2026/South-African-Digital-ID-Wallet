@@ -1,0 +1,20 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/IPhotoStorageProvider.cs
+  h_99fca60b892ff4 1-7
+government-registry/GovernmentRegistry/Infrastructure/Data/DbSeeder.cs
+  h_99fca60b892ff4 78,95
+backend/FlashIdBackend/Infrastructure/Providers/AzureBlobPhotoStorageProvider.cs
+  h_99fca60b892ff4 1-46
+government-registry/GovernmentRegistry/Infrastructure/Data/MockPhotoData.cs
+  h_99fca60b892ff4 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "a2a0e85756d2eb4bbecba855dd05a8aef42c58b5",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

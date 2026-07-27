@@ -1,0 +1,14 @@
+web/src/components/ui/skeleton.tsx
+  h_712d174fc3f309 1-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "c7762308aa91f5213ab2a79c26a8ae47a26598b2",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

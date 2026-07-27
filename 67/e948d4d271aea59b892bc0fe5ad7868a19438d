@@ -1,0 +1,14 @@
+web/src/components/pages/landing-page/navbar-section.tsx
+  h_0aff3b71f739b1 2,7,10-14,25,31,40-41,43,46,58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "67e948d4d271aea59b892bc0fe5ad7868a19438d",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

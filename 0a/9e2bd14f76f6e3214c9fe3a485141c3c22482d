@@ -1,0 +1,22 @@
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IManageUserAccountCardRepository.cs
+  h_0aff3b71f739b1 1-9
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_0aff3b71f739b1 35
+web/src/components/molecules/account-card/types.ts
+  h_0aff3b71f739b1 1-12
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IManageUserAccountCardService.cs
+  h_0aff3b71f739b1 1-8
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_0aff3b71f739b1 19,21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "0a9e2bd14f76f6e3214c9fe3a485141c3c22482d",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

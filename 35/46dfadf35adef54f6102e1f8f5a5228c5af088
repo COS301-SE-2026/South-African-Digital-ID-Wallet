@@ -1,0 +1,23 @@
+backend/FlashIdBackend/Infrastructure/Migrations/20260726171954_AddOtpResendCount.Designer.cs
+  s_2f43ede75cadac::t_a0b853e99b641e 1-1276
+backend/FlashIdBackend/Infrastructure/Migrations/20260726171954_AddOtpResendCount.cs
+  s_2f43ede75cadac::t_54cc9c7ba0f8bd 1-29
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  s_2f43ede75cadac::t_f2be3be2c1adf9 65,104,167,296,353,398,450,499,533,583,621,676,728-732,769,811
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "3546dfadf35adef54f6102e1f8f5a5228c5af088",
+  "prompts": {},
+  "sessions": {
+    "s_2f43ede75cadac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "21ddfdb0-14d9-4d32-9066-a23e4dd3d25f",
+        "model": "unknown"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

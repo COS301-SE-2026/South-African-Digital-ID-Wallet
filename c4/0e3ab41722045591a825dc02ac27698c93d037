@@ -1,0 +1,18 @@
+backend/FlashIdBackend/tests/CredentialServiceTests.cs
+  h_0aff3b71f739b1 62
+backend/FlashIdBackend/tests/NotificationServiceTests.cs
+  h_0aff3b71f739b1 108,110,130,134
+backend/FlashIdBackend/tests/ActivityOverviewServiceTests.cs
+  h_0aff3b71f739b1 12,105-106,108,110-112,114-122,126-129,131,133,145,151,174-180,182
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "c40e3ab41722045591a825dc02ac27698c93d037",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

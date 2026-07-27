@@ -1,0 +1,18 @@
+backend/FlashIdBackend/Application/Features/ManageUserAccountCard/DTOs/ManageUserAccountCardDto.cs
+  h_0aff3b71f739b1 1-16
+backend/FlashIdBackend/Presentation/appsettings.Development.json
+  h_0aff3b71f739b1 3-4
+backend/FlashIdBackend/Application/Common/Mapping/ManageUserAccountMapper.cs
+  h_0aff3b71f739b1 1-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "a14f9fd4021b27131a854fddc3564f372cc8af1e",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

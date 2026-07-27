@@ -1,0 +1,14 @@
+backend/FlashIdBackend/tests/AuthServiceTests.cs
+  h_0aff3b71f739b1 147
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "bae6369773358f233943b565b81b4745cada1240",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

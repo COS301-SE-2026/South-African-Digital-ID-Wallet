@@ -1,0 +1,26 @@
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_0aff3b71f739b1 36
+backend/FlashIdBackend/Infrastructure/Repositories/DeleteAccountRepository.cs
+  h_0aff3b71f739b1 1-113
+backend/FlashIdBackend/Domain/Entities/AuditLog.cs
+  h_0aff3b71f739b1 13,17-18
+web/src/components/molecules/citizen-dashboard-account-card/citizen-dashboard-account-card.tsx
+  h_0aff3b71f739b1 4,62-63,67
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_0aff3b71f739b1 45
+backend/FlashIdBackend/Application/Common/Mapping/DeleteAccountMapper.cs
+  h_0aff3b71f739b1 1-4
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IDeleteAccountRepository.cs
+  h_0aff3b71f739b1 1-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "855f000bff51136dd0cff3cc9097d04e1ad38ba5",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

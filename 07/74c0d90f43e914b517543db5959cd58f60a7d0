@@ -1,0 +1,14 @@
+web/src/components/organisms/qr-display/qr-display.tsx
+  h_0aff3b71f739b1 111,114,120-125,129,131,149
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "0774c0d90f43e914b517543db5959cd58f60a7d0",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
