@@ -64,4 +64,26 @@ public class TrustedDeviceRepository : ITrustedDeviceRepository
         _context.TrustedDevices.Update(trustedDevice);
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task AddDeviceVerificationAsync(DeviceVerification deviceVerification,
+        CancellationToken cancellationToken)
+    {
+        await _context.DeviceVerifications.AddAsync(deviceVerification, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdateDeviceVerificationAsync(DeviceVerification deviceVerification,
+        CancellationToken cancellationToken)
+    {
+        _context.DeviceVerifications.Update(deviceVerification);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<DeviceVerification?> GetDeviceVerificationAsync(Guid deviceVerificationId,
+        CancellationToken cancellationToken)
+    {
+        return await _context.DeviceVerifications.FirstOrDefaultAsync(d => d.Id == deviceVerificationId, cancellationToken);
+    }
+
+
 }

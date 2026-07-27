@@ -10,4 +10,7 @@ public interface ITrustedDeviceRepository
     Task<TrustedDevice?> GetByTokenHashAsync(Guid userId, string deviceToken, CancellationToken cancellationToken);
     Task AddTrustedDeviceAsync(TrustedDevice trustedDevice, CancellationToken cancellationToken);
     Task UpdateTrustedDeviceAsync(TrustedDevice trustedDevice, CancellationToken cancellationToken);
+    Task AddDeviceVerificationAsync(DeviceVerification deviceVerification, CancellationToken cancellationToken);
+    Task UpdateDeviceVerificationAsync(DeviceVerification deviceVerification, CancellationToken cancellationToken);
+    Task<DeviceVerification?> GetDeviceVerificationAsync(Guid deviceVerificationId, CancellationToken cancellationToken);
 }

@@ -22,6 +22,7 @@ public class AuthService : IAuthService
 
     private readonly ITrustedDeviceRepository _trustedDeviceRepository;
     private readonly IDeviceTokenProvider _deviceTokenProvider;
+    private readonly IEmailSenderProvider _emailSenderProvider;
 
     public AuthService(
         IAuthRepository authRepository,
@@ -30,7 +31,8 @@ public class AuthService : IAuthService
         ICitizenService citizenService,
         AuthMapper mapper,
         ITrustedDeviceRepository trustedDeviceRepository,
-        IDeviceTokenProvider deviceTokenProvider)
+        IDeviceTokenProvider deviceTokenProvider,
+        IEmailSenderProvider emailSenderProvider)
     {
         _authRepository = authRepository;
         _jwtTokenProvider = jwtTokenProvider;
@@ -39,6 +41,7 @@ public class AuthService : IAuthService
         _mapper = mapper;
         _trustedDeviceRepository = trustedDeviceRepository;
         _deviceTokenProvider = deviceTokenProvider;
+        _emailSenderProvider = emailSenderProvider;
     }
 
     public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request, string? deviceToken, string ipAddress, CancellationToken cancellationToken)
@@ -102,7 +105,7 @@ public class AuthService : IAuthService
 
         if (trustedDevice is null)
         {
-            var verification = await CreateDeviceVerification(user, ipAddress, cancellationToken);
+            var verification = await CreateDeviceVerificationAsync(user, ipAddress, cancellationToken);
 
             await _authRepository.UpdateUserAsync(user);
             await _authRepository.SaveChangesAsync();
@@ -146,7 +149,7 @@ public class AuthService : IAuthService
         };
     }
 
-    private async Task<DeviceVerification?> CreateDeviceVerification(User user, string ipAddress, CancellationToken cancellationToken)
+    private async Task<DeviceVerification?> CreateDeviceVerificationAsync(User user, string ipAddress, CancellationToken cancellationToken)
     {
         var otp = RandomNumberGenerator.GetInt32(100000, 1_000_000).ToString();
         var otpHash = HashOtp(otp);
@@ -163,8 +166,94 @@ public class AuthService : IAuthService
             UpdatedAt = DateTime.UtcNow,
         };
 
+        await _trustedDeviceRepository.AddDeviceVerificationAsync(verification, cancellationToken);
+        await SendVerficationOTPAsync(user.Email, otp, cancellationToken);
+
+        var verificationAuditLog = new AuditLog()
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.DeviceVerificationRequested,
+            Details = $"Device verification requested for {user.Email}.",
+            IpAddress = ipAddress,
+            ActorId = user.Id,
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        await _authRepository.AddAuditLogAsync(verificationAuditLog);
+        await _authRepository.SaveChangesAsync();
+
         return verification;
 
+    }
+
+    private async Task SendVerficationOTPAsync(string toEmail, string rawOtp, CancellationToken cancellationToken)
+    {
+        await _emailSenderProvider.SendEmailAsync(toEmail, "Your FlashID Device Verification Code",
+        $"""
+        <div style="background-color:#f7f4ea; padding:32px 16px; font-family:Arial, Helvetica, sans-serif;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e5e7eb;">
+                <tr>
+                    <td style="padding:0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:28px 32px 0 32px;">
+                        <span style="font-size:20px; font-weight:700; color:#053b2c; letter-spacing:0.5px;">FlashID</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 0 32px; color:#111827; font-size:15px; line-height:1.6;">
+                        Hi there,
+                        <br /><br />
+                        Use the verification code below to verify the device you wish to link to your FlashID account.
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 0 32px;">
+                        <div style="background-color:#f7f4ea; border:1px solid #ffb81c; border-radius:12px; padding:20px; text-align:center;">
+                            <span style="font-size:32px; font-weight:700; letter-spacing:10px; color:#053b2c;">{rawOtp}</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:20px 32px 0 32px; color:#6b7280; font-size:13px; line-height:1.6;">
+                        This code is active for the next 10 minutes. Once it expires, you will need to request a new one.
+                        <br /><br />
+                        If you did not request this code, you can safely ignore this email.
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 28px 32px; color:#111827; font-size:14px; line-height:1.6;">
+                        Stay secure,<br />
+                        The FlashID Team
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <p style="text-align:center; color:#9ca3af; font-size:12px; margin-top:16px;">
+                &copy; {DateTime.UtcNow.Year} FlashId | South African Digital ID Wallet. All rights reserved.
+            </p>
+        </div>
+        """);
     }
 
     private static string HashOtp(string otp)

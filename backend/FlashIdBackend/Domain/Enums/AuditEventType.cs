@@ -17,4 +17,10 @@ public enum AuditEventType
     OnboardCitizen,
     OnboardCitizenFailed,
     CitizenVerified,
+    CitizenVerificationFailed,
+    CitizenCredentialsActivated,
+    CitizenCredentialsDeactivated,
+    CitizenCredentialsActivationFailed,
+    DeviceVerificationRequested,
+    DeviceVerificationFailed,
 }
