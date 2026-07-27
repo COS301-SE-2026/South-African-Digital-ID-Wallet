@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "packageManager": "pnpm@9.15.9",
   "scripts": {
-    "install:all": "pnpm install && pnpm --filter ./web install && pnpm --filter ./backend restore && pnpm --filter ./mobile install",
+    "install:all": "pnpm install && pnpm --filter ./web install && pnpm --filter ./backend restore && pnpm --filter ./government-registry restore && pnpm --filter ./mobile install",
     "install:web": "pnpm --filter ./web install",
     "start:web": "pnpm --filter ./web start",
     "build:web": "pnpm --filter ./web build",
@@ -34,16 +34,28 @@
     "format:mobile": "pnpm --filter ./mobile format",
     "type-check:mobile": "pnpm --filter ./mobile type-check",
 
-    "dev": "concurrently --kill-others-on-fail \"pnpm --filter ./web dev\" \"pnpm --filter ./backend run dev\"",
-    "build": "pnpm install && pnpm --filter ./backend run build && pnpm --filter ./web build",
-    "test": "pnpm --filter ./web run test && pnpm --filter ./backend run test && pnpm --filter ./mobile run test",
-    "test:coverage": "pnpm --filter ./web run test:coverage && pnpm --filter ./backend run test:coverage && pnpm --filter ./mobile run test:coverage",
-    "format": "pnpm --filter ./backend run format && pnpm --filter ./web format",
-    "lint": "pnpm --filter ./backend run lint && pnpm --filter ./web lint",
-    "type-check": "pnpm --filter ./backend run type-check && pnpm --filter ./web type-check"
+    "install:government-registry": "pnpm --filter ./government-registry restore",
+    "start:government-registry": "pnpm --filter ./government-registry start",
+    "clean:government-registry": "pnpm --filter ./government-registry run clean",
+    "build:government-registry": "pnpm --filter ./government-registry run build",
+    "dev:government-registry": "pnpm --filter ./government-registry run dev",
+    "lint:government-registry": "pnpm --filter ./government-registry run lint",
+    "format:government-registry": "pnpm --filter ./government-registry run format",
+    "type-check:government-registry": "pnpm --filter ./government-registry run type-check",
+    "test:government-registry": "pnpm --filter ./government-registry run test",
+    "test:government-registry:coverage": "pnpm --filter ./government-registry run test:coverage",
+
+    "dev": "concurrently --kill-others-on-fail \"pnpm --filter ./web dev\" \"pnpm --filter ./backend run dev\" \"pnpm --filter ./government-registry run dev\"",
+    "build": "pnpm install && pnpm --filter ./backend run build && pnpm --filter ./government-registry run build && pnpm --filter ./web build",
+    "test": "pnpm --filter ./web run test && pnpm --filter ./backend run test && pnpm --filter ./government-registry run test && pnpm --filter ./mobile run test",
+    "test:coverage": "pnpm --filter ./web run test:coverage && pnpm --filter ./backend run test:coverage && pnpm --filter ./government-registry run test:coverage && pnpm --filter ./mobile run test:coverage",
+    "format": "pnpm --filter ./backend run format && pnpm --filter ./government-registry run format && pnpm --filter ./web format",
+    "lint": "pnpm --filter ./backend run lint && pnpm --filter ./government-registry run lint && pnpm --filter ./web lint",
+    "type-check": "pnpm --filter ./backend run type-check && pnpm --filter ./government-registry run type-check && pnpm --filter ./web run type-check"
   },
   "devDependencies": {
     "lefthook": "2.1.6",
     "concurrently": "^8.0.1"
   }
+  
 }

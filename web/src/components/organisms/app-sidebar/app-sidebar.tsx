@@ -45,14 +45,18 @@ export const AppSidebar = ({
   navSections,
   user,
   onLogout,
+  variant = 'desktop',
+  onNavigate,
 }: Readonly<AppSidebarProps>) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const pathname = usePathname()
 
   return (
     <aside
-      className={`flex h-screen overflow-hidden flex-col bg-deep-green px-4 py-5 text-clean-white transition-all duration-300 ${
-        isCollapsed ? 'w-24' : 'w-64'
+      className={`flex overflow-hidden flex-col bg-deep-green px-4 py-5 text-clean-white transition-all duration-300 ${
+        variant === 'desktop'
+          ? `hidden lg:flex h-screen ${isCollapsed ? 'w-24' : 'w-64'}`
+          : 'h-full w-full'
       }`}
     >
       <div
@@ -94,18 +98,20 @@ export const AppSidebar = ({
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsCollapsed((prev) => !prev)}
-          className="rounded-xl p-2 text-clean-white/70 transition hover:bg-clean-white/10 hover:text-clean-white"
-          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {isCollapsed ? (
-            <ChevronRight className="h-5 w-5" />
-          ) : (
-            <ChevronLeft className="h-5 w-5" />
-          )}
-        </button>
+        {variant === 'desktop' && (
+          <button
+            type="button"
+            onClick={() => setIsCollapsed((prev) => !prev)}
+            className="rounded-xl p-2 text-clean-white/70 transition hover:bg-clean-white/10 hover:text-clean-white"
+            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {isCollapsed ? (
+              <ChevronRight className="h-5 w-5" />
+            ) : (
+              <ChevronLeft className="h-5 w-5" />
+            )}
+          </button>
+        )}
       </div>
 
       <nav className="space-y-4">
@@ -127,6 +133,7 @@ export const AppSidebar = ({
                     key={`${section.title}-${item.href}-${item.label}`}
                     href={item.href}
                     title={isCollapsed ? item.label : undefined}
+                    onClick={() => onNavigate?.()}
                     className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${
                       isCollapsed ? 'justify-center px-0' : ''
                     } ${
@@ -163,11 +170,14 @@ export const AppSidebar = ({
               </div>
             </div>
           </div>
-          <div className="mt-2">
-            <Button onClick={onLogout} LeftIcon={LogOut}>
-              Logout
-            </Button>
-          </div>
+          <button
+            type="button"
+            onClick={onLogout}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-clean-white/10 px-3 py-2 text-sm font-semibold text-clean-white/80 transition hover:bg-red-500/10 hover:text-red-300"
+          >
+            <LogOut className="h-4 w-5" />
+            Logout
+          </button>
         </div>
       )}
 

@@ -2,6 +2,7 @@ packages:
   - 'web'
   - 'mobile'
   - 'backend'
+  - 'government-registry'
 
 onlyBuiltDependencies:
   - lefthook

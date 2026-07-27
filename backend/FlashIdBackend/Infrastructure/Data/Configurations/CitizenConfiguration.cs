@@ -38,11 +38,13 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
             .HasConversion<string>()
             .HasMaxLength(20);
 
-        builder.Property(c => c.CredentialActivationCode)
-            .HasMaxLength(256);
-
-        builder.Property(c => c.CredentialActivationCodeExpiresAt)
+        builder.Property(c => c.ActivatedAt)
             .HasColumnType(dateFormat);
+
+        builder.HasMany(c => c.Activations)
+            .WithOne(a => a.Citizen)
+            .HasForeignKey(a => a.CitizenId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(c => c.Status)
             .IsRequired()
@@ -60,7 +62,7 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
             .IsRequired()
             .HasColumnType(dateFormat)
             .HasDefaultValueSql("GETUTCDATE()")
-            .ValueGeneratedOnAddOrUpdate();
+            .ValueGeneratedOnAdd();
 
         builder.HasOne(c => c.User)
             .WithMany()

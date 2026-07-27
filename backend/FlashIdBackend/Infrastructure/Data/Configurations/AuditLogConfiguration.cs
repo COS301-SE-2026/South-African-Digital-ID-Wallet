@@ -17,8 +17,7 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
             .HasMaxLength(50);
 
         builder.Property(a => a.Details)
-            .IsRequired()
-            .HasColumnType("nvarchar(max)");
+            .IsRequired();
 
         builder.Property(a => a.IpAddress)
             .IsRequired()

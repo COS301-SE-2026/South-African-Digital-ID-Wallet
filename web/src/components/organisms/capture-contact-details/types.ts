@@ -1,3 +1,4 @@
+import { OnboardCitizenResponse } from '@/services/onboarding-service'
 import { IdentityRecord } from '@/types'
 
 export type CaptureContactDetailsProps = {
@@ -11,5 +12,8 @@ export type CaptureContactDetailsProps = {
   idConsent: boolean
   createPendingAccount: () => void
   accountCreated: boolean
-  sendActivationCode: () => void
+  //sendActivationCode: () => void
+  errors: Record<string, string>
+  setErrors: (r: Record<string, string>) => void
+  onboardResponse: OnboardCitizenResponse | null
 }

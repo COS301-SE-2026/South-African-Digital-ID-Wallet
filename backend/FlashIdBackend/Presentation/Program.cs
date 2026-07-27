@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Application;
 using Infrastructure;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Presentation.ExceptionHandling;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +23,10 @@ builder.Services.AddInfrastructure();
 
 builder.Services.AddApplication();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 builder.Services.AddCors(options =>
 {
@@ -37,6 +42,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -114,6 +121,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);
 app.UseRateLimiter();

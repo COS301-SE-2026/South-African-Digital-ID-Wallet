@@ -3,14 +3,18 @@ import userEvent from '@testing-library/user-event'
 import { AppSidebar } from '../app-sidebar'
 
 jest.mock('next/navigation', () => ({
-  usePathname: jest.fn().mockReturnValue('/citizen'),
+  usePathname: jest.fn().mockReturnValue('/citizen/citizen-dashboard'),
 }))
 
 const DEFAULT_NAV_SECTIONS = [
   {
     title: 'Citizen Portal',
     items: [
-      { label: 'Dashboard', href: '/citizen', icon: 'dashboard' as const },
+      {
+        label: 'Dashboard',
+        href: '/citizen/citizen-dashboard',
+        icon: 'dashboard' as const,
+      },
       {
         label: 'My Credentials',
         href: '/credentials',

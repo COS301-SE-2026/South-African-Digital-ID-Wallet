@@ -1,6 +1,8 @@
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Infrastructure.Data;
 
@@ -14,6 +16,8 @@ namespace Infrastructure.Data;
 //   7. Seeded DriversLicenses for Citizens aged 18+ (approximately 132)
 //   8. Seeded UserPreferences for all 200 Users
 //   9. Seeded AuditLogs for all 200 Users (2-5 entries each, approximately 703 total)
+//   10. Seeded TrustedDevices for all Citizens
+//   11. Seeded Notifications for all Citizens
 //
 // NOTE: Biometrics seeding is intentionally skipped.
 // Biometrics stores cryptographic hashes (FaceHash, FingerprintHash) of real
@@ -23,6 +27,10 @@ namespace Infrastructure.Data;
 // scanning features are built out.
 public static class DbSeeder
 {
+    private sealed record DeviceTemplate(string Name, string Type, string Os, string Browser);
+
+    private sealed record NotificationTemplate(string Title, string Description, string Tone);
+
     private static readonly string[] FirstNames = new[]
     {
         "Liam","Noah","Ethan","Mason","Logan","James","Oliver","Benjamin","Elijah","Lucas",
@@ -43,6 +51,13 @@ public static class DbSeeder
         "Swanepoel","Botha","VanHeerden","Gumede","Mthembu","Mabuyi","Magubane","Mabutho","Mntambo","Mdluli"
     };
 
+    private static readonly string[] SampleIpAddresses = new[]
+    {
+        "102.130.10.1", "196.11.240.5", "41.21.100.3", // NOSONAR
+        "154.0.5.22", "196.25.200.8", "41.113.10.14", // NOSONAR
+        "102.65.30.9", "196.15.45.7", "41.205.20.11" // NOSONAR
+    };
+
     public static async Task SeedAsync(AppDbContext context)
     {
         await context.Database.MigrateAsync();
@@ -51,6 +66,7 @@ public static class DbSeeder
         var usedPhones = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         await SeedCitizenUsersAsync(context, usedEmails, usedPhones);
+        await SeedPendingCitizenActivationAsync(context);
         // Government administrators must exist before creating institutions or officials
         await SeedGovernmentAdministratorUsersAsync(context, usedEmails, usedPhones);
         await SeedOfficialUsersAsync(context, usedEmails, usedPhones);
@@ -59,6 +75,8 @@ public static class DbSeeder
         await SeedCredentialsAsync(context);
         await SeedUserPreferencesAsync(context);
         await SeedAuditLogsAsync(context);
+        await SeedTrustedDevicesAsync(context);
+        await SeedNotificationsAsync(context);
     }
 
     private static async Task SeedE2ETestUsersAsync(AppDbContext context)
@@ -223,9 +241,8 @@ public static class DbSeeder
                 Surname = LastNames[nameRnd.Next(LastNames.Length)],
                 DateOfBirth = now.AddYears(-nameRnd.Next(16, 70)).AddDays(-nameRnd.Next(0, 365)),
                 Gender = genders[nameRnd.Next(genders.Length)],
-                CredentialActivationCode = null,
-                CredentialActivationCodeExpiresAt = null,
                 Status = CitizenStatus.Activated,
+                ActivatedAt = now,
                 UserId = u.Id,
                 CreatedAt = now,
                 UpdatedAt = now
@@ -237,6 +254,106 @@ public static class DbSeeder
             await context.Citizens.AddRangeAsync(citizensToAdd);
             await context.SaveChangesAsync();
         }
+    }
+
+    private static async Task SeedPendingCitizenActivationAsync(
+    AppDbContext context)
+    {
+        const string testEmail =
+            "pending.citizen@flashid.local";
+
+        const string testSaId =
+            "9901015009087";
+
+        if (await context.CitizenActivations.AnyAsync(
+                a => a.Email == testEmail))
+        {
+            return;
+        }
+
+        if (await context.Citizens.AnyAsync(
+                c => c.SaId == testSaId))
+        {
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+
+        const string rawToken =
+            "FLASHID-SEED-ACTIVATION-TOKEN";
+
+        const string rawPin =
+            "123456";
+
+        var tokenBytes =
+            Encoding.UTF8.GetBytes(rawToken);
+
+        var tokenHash = Convert.ToHexString(
+            SHA256.HashData(tokenBytes));
+
+        var pinHash = BCrypt.Net.BCrypt.HashPassword(
+            rawPin,
+            workFactor: 12);
+
+        var citizen = new Citizen
+        {
+            Id = Guid.NewGuid(),
+
+            SaId = testSaId,
+            Names = "Pending",
+            Surname = "Citizen",
+
+            DateOfBirth = new DateTime(
+                1999,
+                1,
+                1,
+                0,
+                0,
+                0,
+                DateTimeKind.Utc),
+
+            Gender = Gender.Unspecified,
+
+            Status = CitizenStatus.Pending,
+            ActivatedAt = null,
+
+            UserId = null,
+
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+
+        var activation = new CitizenActivation
+        {
+            Id = Guid.NewGuid(),
+
+            CitizenId = citizen.Id,
+
+            Email = testEmail,
+            PhoneNumber = null,
+
+            TokenHash = tokenHash,
+            PinHash = pinHash,
+
+            Status = ActivationStatus.Pending,
+
+            ExpiresAt = now.AddDays(30),
+
+            AttemptCount = 0,
+            LockedUntil = null,
+
+            UsedAt = null,
+            RevokedAt = null,
+            RevokedReason = null,
+
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+
+        await context.Citizens.AddAsync(citizen);
+        await context.CitizenActivations.AddAsync(activation);
+
+        await context.SaveChangesAsync();
     }
 
     private static async Task SeedOfficialUsersAsync(AppDbContext context, HashSet<string> usedEmails, HashSet<string> usedPhones)
@@ -397,7 +514,7 @@ public static class DbSeeder
                 {
                     Id = Guid.NewGuid(),
                     Name = name,
-                    Type = Domain.Enums.InstitutionType.HomeAffairs,
+                    Type = name.StartsWith("Licensing", StringComparison.Ordinal) ? InstitutionType.LicensingDepartment : InstitutionType.HomeAffairs,
                     ApiKeyReference = Guid.NewGuid(),
                     VerificationNumber = $"VER{DateTime.UtcNow.Ticks % 100000 + idx:00000}",
                     RegisteredById = govAdminIds[idx % govAdminIds.Count],
@@ -455,6 +572,7 @@ public static class DbSeeder
                 Email = email,
                 PhoneNumber = phone,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
+                PasswordSet = true,
                 FailedLoginAttempts = 0,
                 LockoutUntil = null,
                 LastLoginAt = null,
@@ -482,8 +600,9 @@ public static class DbSeeder
         if (citizensWithoutCredentials.Count == 0) return;
 
         // get an official to use as IssuedBy
-        var official = await context.Officials.FirstOrDefaultAsync();
-        var issuedBy = official?.Id.ToString() ?? "SYSTEM";
+        var institutions = await context.Institutions.OrderBy(i => i.Name).ToListAsync();
+        var idIssuer = institutions.FirstOrDefault(i => i.Type == InstitutionType.HomeAffairs)?.Name ?? "SYSTEM";
+        var licenseIssuer = institutions.FirstOrDefault(i => i.Type == InstitutionType.LicensingDepartment)?.Name ?? "SYSTEM";
 
         var citizenships = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
         var nationalities = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
@@ -502,20 +621,8 @@ public static class DbSeeder
             var age = now.Year - citizen.DateOfBirth.Year;
             if (citizen.DateOfBirth > now.AddYears(-age)) age--;
 
-            var credential = new Credential
-            {
-                Id = Guid.NewGuid(),
-                Status = CredentialStatus.Active,
-                // Signature max 1024 - use a guid based string
-                Signature = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"),
-                // IssuedBy max 256
-                IssuedBy = issuedBy,
-                IssueDate = now,
-                CitizenId = citizen.Id,
-                CreatedAt = now,
-                UpdatedAt = now
-            };
-            credentialsToAdd.Add(credential);
+            var idCredential = NewCredential(citizen.Id, idIssuer, now);
+            credentialsToAdd.Add(idCredential);
 
             // every citizen 16+ gets an identity document
             identityDocsToAdd.Add(new IdentityDocument
@@ -525,7 +632,7 @@ public static class DbSeeder
                 CountryOfBirth = countries[rnd.Next(countries.Length)],
                 Nationality = nationalities[rnd.Next(nationalities.Length)],
                 Status = idStatuses[rnd.Next(idStatuses.Length)],
-                CredentialId = credential.Id,
+                CredentialId = idCredential.Id,
                 CreatedAt = now,
                 UpdatedAt = now
             });
@@ -533,6 +640,8 @@ public static class DbSeeder
             // only citizens 18+ get a drivers license
             if (age >= 18)
             {
+                var licenseCredential = NewCredential(citizen.Id, licenseIssuer, now);
+                credentialsToAdd.Add(licenseCredential);
                 var startDate = now.AddYears(-rnd.Next(1, 10));
                 driversLicensesToAdd.Add(new DriversLicense
                 {
@@ -544,7 +653,7 @@ public static class DbSeeder
                     // Restrictions max 2 chars
                     Restrictions = "00",
                     ExpiryDate = startDate.AddYears(5),
-                    CredentialId = credential.Id,
+                    CredentialId = licenseCredential.Id,
                     CreatedAt = now,
                     UpdatedAt = now
                 });
@@ -563,6 +672,17 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
     }
+    private static Credential NewCredential(Guid citizenId, string issuedBy, DateTime now) => new()
+    {
+        Id = Guid.NewGuid(),
+        Status = CredentialStatus.Active,
+        Signature = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"),
+        IssuedBy = issuedBy,
+        IssueDate = now,
+        CitizenId = citizenId,
+        CreatedAt = now,
+        UpdatedAt = now
+    };
     private static async Task SeedUserPreferencesAsync(AppDbContext context)
     {
         var now = DateTime.UtcNow;
@@ -615,21 +735,11 @@ public static class DbSeeder
         var now = DateTime.UtcNow;
         var rnd = new Random(22222); // NOSONAR
 
-        // only seed if no audit logs exist yet
         if (await context.AuditLogs.AnyAsync()) return;
 
         var allUsers = await context.DomainUsers.ToListAsync();
         if (allUsers.Count == 0) return;
 
-        // sample IP addresses
-        var ipAddresses = new[]
-        {
-        "102.130.10.1", "196.11.240.5", "41.21.100.3",
-        "154.0.5.22", "196.25.200.8", "41.113.10.14",
-        "102.65.30.9", "196.15.45.7", "41.205.20.11"
-    };
-
-        // sample details per event type
         var eventDetails = new Dictionary<AuditEventType, string[]>
     {
         { AuditEventType.UserRegistered, new[] { "User registered via web portal", "User registered via mobile app" } },
@@ -660,7 +770,7 @@ public static class DbSeeder
                     // Details is nvarchar(max) so no length limit
                     Details = details[rnd.Next(details.Length)],
                     // IpAddress max 45 chars
-                    IpAddress = ipAddresses[rnd.Next(ipAddresses.Length)],
+                    IpAddress = SampleIpAddresses[rnd.Next(SampleIpAddresses.Length)],
                     ActorId = user.Id,
                     CreatedAt = now.AddDays(-rnd.Next(0, 30))
                 });
@@ -671,4 +781,139 @@ public static class DbSeeder
         await context.SaveChangesAsync();
     }
 
+    private static async Task SeedTrustedDevicesAsync(AppDbContext context)
+    {
+        var now = DateTime.UtcNow;
+        var rnd = new Random(33344); // NOSONAR
+
+        // only seed if no trusted devices exist yet
+        if (await context.TrustedDevices.AnyAsync()) return;
+
+        var allCitizens = await context.Citizens.ToListAsync();
+        if (allCitizens.Count == 0) return;
+
+        var deviceTemplates = new[]
+        {
+            new DeviceTemplate("iPhone 15 Pro", "Mobile", "iOS 18.1", "Safari"),
+            new DeviceTemplate("Samsung Galaxy S24", "Mobile", "Android 15", "Chrome"),
+            new DeviceTemplate("MacBook Pro", "Desktop", "macOS Sequoia", "Safari"),
+            new DeviceTemplate("Dell XPS 15", "Desktop", "Windows 11", "Edge"),
+            new DeviceTemplate("iPad Air", "Tablet", "iPadOS 18.1", "Safari"),
+            new DeviceTemplate("HP Pavilion", "Desktop", "Windows 11", "Chrome"),
+            new DeviceTemplate("Google Pixel 9", "Mobile", "Android 15", "Chrome"),
+        };
+
+        var locations = new[]
+        {
+            "Pretoria, Gauteng", "Johannesburg, Gauteng", "Cape Town, Western Cape",
+            "Durban, KwaZulu-Natal", "Bloemfontein, Free State", "Port Elizabeth, Eastern Cape"
+        };
+
+        var devicesToAdd = new List<TrustedDevice>();
+
+        void AddDevicesForCitizen(Citizen citizen, int minDevices, int maxDevicesExclusive, int maxLastActiveDaysAgo, int trustedThreshold)
+        {
+            var deviceCount = rnd.Next(minDevices, maxDevicesExclusive);
+            for (int i = 0; i < deviceCount; i++)
+            {
+                var template = deviceTemplates[rnd.Next(deviceTemplates.Length)];
+                devicesToAdd.Add(new TrustedDevice
+                {
+                    Id = Guid.NewGuid(),
+                    DeviceName = template.Name,
+                    DeviceType = template.Type,
+                    OperatingSystem = template.Os,
+                    Browser = template.Browser,
+                    IpAddress = SampleIpAddresses[rnd.Next(SampleIpAddresses.Length)],
+                    Location = locations[rnd.Next(locations.Length)],
+                    LastActive = now.AddDays(-rnd.Next(0, maxLastActiveDaysAgo)),
+                    IsCurrentDevice = i == 0,
+                    IsTrusted = rnd.Next(10) > trustedThreshold,
+                    CitizenId = citizen.Id,
+                    CreatedAt = now.AddDays(-rnd.Next(30, 365)),
+                    UpdatedAt = now
+                });
+            }
+        }
+
+        // Prioritize Harper Miller (or any Harper/Miller match) with a fuller device history
+        var priorityCitizens = allCitizens
+            .Where(c => c.Names == "Harper" || c.Surname == "Miller")
+            .ToList();
+
+        foreach (var citizen in priorityCitizens)
+        {
+            AddDevicesForCitizen(citizen, minDevices: 3, maxDevicesExclusive: 5, maxLastActiveDaysAgo: 14, trustedThreshold: 1);
+        }
+
+        // Give the remaining citizens 1-3 devices each
+        foreach (var citizen in allCitizens.Where(c => !priorityCitizens.Contains(c)))
+        {
+            AddDevicesForCitizen(citizen, minDevices: 1, maxDevicesExclusive: 4, maxLastActiveDaysAgo: 30, trustedThreshold: 2);
+        }
+
+        await context.TrustedDevices.AddRangeAsync(devicesToAdd);
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedNotificationsAsync(AppDbContext context)
+    {
+        var now = DateTime.UtcNow;
+        var rnd = new Random(44455); // NOSONAR
+
+        // only seed if no notifications exist yet
+        if (await context.Notifications.AnyAsync()) return;
+
+        var allCitizens = await context.Citizens.ToListAsync();
+        if (allCitizens.Count == 0) return;
+
+        var notificationTemplates = new[]
+        {
+            new NotificationTemplate("Credential verified", "Your identity credential was successfully verified by an official.", "success"),
+            new NotificationTemplate("New device signed in", "A new device was used to access your account. If this wasn't you, review your trusted devices.", "warning"),
+            new NotificationTemplate("Drivers license renewal due", "Your drivers license is due for renewal within the next 30 days.", "info"),
+            new NotificationTemplate("Profile updated", "Your account preferences were updated successfully.", "success"),
+            new NotificationTemplate("Failed login attempt detected", "We noticed a failed login attempt on your account.", "warning"),
+            new NotificationTemplate("Document upload complete", "Your supporting document was uploaded and is pending review.", "info"),
+            new NotificationTemplate("Welcome to FlashID", "Your digital ID wallet is ready to use.", "success"),
+        };
+
+        var notificationsToAdd = new List<Notification>();
+
+        void AddNotificationsForCitizen(Citizen citizen, int minCount, int maxCountExclusive, int maxDaysAgo)
+        {
+            var count = rnd.Next(minCount, maxCountExclusive);
+            for (int i = 0; i < count; i++)
+            {
+                var template = notificationTemplates[rnd.Next(notificationTemplates.Length)];
+                notificationsToAdd.Add(new Notification
+                {
+                    Id = Guid.NewGuid(),
+                    CitizenId = citizen.Id,
+                    Title = template.Title,
+                    Description = template.Description,
+                    Tone = template.Tone,
+                    CreatedAt = now.AddDays(-rnd.Next(0, maxDaysAgo)),
+                    IsRead = rnd.Next(2) == 0
+                });
+            }
+        }
+
+        var priorityCitizens = allCitizens
+            .Where(c => c.Names == "Harper" || c.Surname == "Miller")
+            .ToList();
+
+        foreach (var citizen in priorityCitizens)
+        {
+            AddNotificationsForCitizen(citizen, minCount: 4, maxCountExclusive: 7, maxDaysAgo: 30);
+        }
+
+        foreach (var citizen in allCitizens.Where(c => !priorityCitizens.Contains(c)))
+        {
+            AddNotificationsForCitizen(citizen, minCount: 1, maxCountExclusive: 5, maxDaysAgo: 60);
+        }
+
+        await context.Notifications.AddRangeAsync(notificationsToAdd);
+        await context.SaveChangesAsync();
+    }
 }

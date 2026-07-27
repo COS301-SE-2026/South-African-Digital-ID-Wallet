@@ -1,0 +1,80 @@
+'use client'
+
+import * as React from 'react'
+import { Text } from '@/components/atoms'
+import {
+  CredentialSelector,
+  FieldSelectionForm,
+  DisclosurePreview,
+  QrDisplay,
+} from '@/components/organisms'
+import type { QrDisclosureSelection } from '@/services/qr-service'
+
+type Step = 'select-credential' | 'select-fields' | 'preview' | 'display'
+
+export const QrGenerationPage = () => {
+  const [step, setStep] = React.useState<Step>('select-credential')
+  const [credentialId, setCredentialId] = React.useState<string | null>(null)
+  const [credentialType, setCredentialType] = React.useState<
+    QrDisclosureSelection['credentialType'] | null
+  >(null)
+  const [selection, setSelection] =
+    React.useState<QrDisclosureSelection | null>(null)
+
+  const handleCredentialSelect = (
+    id: string,
+    type: QrDisclosureSelection['credentialType']
+  ) => {
+    setCredentialId(id)
+    setCredentialType(type)
+    setStep('select-fields')
+  }
+
+  const handleFieldSelectionContinue = (
+    newSelection: QrDisclosureSelection
+  ) => {
+    setSelection(newSelection)
+    setStep('preview')
+  }
+
+  const handlePreviewConfirm = () => {
+    setStep('display')
+  }
+
+  const handlePreviewBack = () => {
+    setStep('select-fields')
+  }
+
+  const handleDisplayBack = () => {
+    setStep('preview')
+  }
+
+  return (
+    <div className="flex w-full flex-col gap-6 p-6">
+      {step === 'select-credential' && (
+        <CredentialSelector onSelect={handleCredentialSelect} />
+      )}
+
+      {step === 'select-fields' && credentialId && credentialType && (
+        <FieldSelectionForm
+          credentialId={credentialId}
+          credentialType={credentialType}
+          onContinue={handleFieldSelectionContinue}
+          onBack={() => setStep('select-credential')}
+        />
+      )}
+
+      {step === 'preview' && selection && (
+        <DisclosurePreview
+          selection={selection}
+          onConfirm={handlePreviewConfirm}
+          onBack={handlePreviewBack}
+        />
+      )}
+
+      {step === 'display' && selection && (
+        <QrDisplay selection={selection} onBack={handleDisplayBack} />
+      )}
+    </div>
+  )
+}

@@ -13,4 +13,8 @@ public enum AuditEventType
     InstitutionRegistered,
     OfficialVerified,
     AccountDeleted,
+    ConsentRecorded,
+    OnboardCitizen,
+    OnboardCitizenFailed,
+    CitizenVerified,
 }
