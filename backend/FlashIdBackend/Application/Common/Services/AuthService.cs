@@ -9,6 +9,7 @@ using Application.Features.Auth.Exceptions;
 using Application.Features.Citizens.DTOs;
 using Domain.Entities;
 using Domain.Enums;
+using Microsoft.Extensions.Hosting;
 
 namespace Application.Common.Services;
 
@@ -23,6 +24,7 @@ public class AuthService : IAuthService
     private readonly ITrustedDeviceRepository _trustedDeviceRepository;
     private readonly IDeviceTokenProvider _deviceTokenProvider;
     private readonly IEmailSenderProvider _emailSenderProvider;
+    private readonly IHostEnvironment _environment;
 
     public AuthService(
         IAuthRepository authRepository,
@@ -32,7 +34,8 @@ public class AuthService : IAuthService
         AuthMapper mapper,
         ITrustedDeviceRepository trustedDeviceRepository,
         IDeviceTokenProvider deviceTokenProvider,
-        IEmailSenderProvider emailSenderProvider)
+        IEmailSenderProvider emailSenderProvider,
+            IHostEnvironment environment)
     {
         _authRepository = authRepository;
         _jwtTokenProvider = jwtTokenProvider;
@@ -42,6 +45,8 @@ public class AuthService : IAuthService
         _trustedDeviceRepository = trustedDeviceRepository;
         _deviceTokenProvider = deviceTokenProvider;
         _emailSenderProvider = emailSenderProvider;
+        _environment = environment;
+
     }
 
     public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request, string? deviceToken, string ipAddress, CancellationToken cancellationToken)
@@ -290,7 +295,15 @@ public class AuthService : IAuthService
         };
 
         await _trustedDeviceRepository.AddDeviceVerificationAsync(verification, cancellationToken);
-        await SendVerficationOTPAsync(user.Email, otp, cancellationToken);
+
+        if (_environment.IsDevelopment())
+        {
+            Console.WriteLine($"Email otp: {otp}.");
+        }
+        else
+        {
+            await SendVerficationOTPAsync(user.Email, otp, cancellationToken);
+        }
 
         var verificationAuditLog = new AuditLog()
         {
