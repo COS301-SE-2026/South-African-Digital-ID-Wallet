@@ -251,6 +251,9 @@ public class AuthService : IAuthService
         };
 
         await _authRepository.AddAuditLogAsync(verifiedAuditLog);
+
+        user.LastLoginAt = DateTime.UtcNow;
+        await _authRepository.UpdateUserAsync(user);
         await _authRepository.SaveChangesAsync();
 
         var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user, request.RememberMe);

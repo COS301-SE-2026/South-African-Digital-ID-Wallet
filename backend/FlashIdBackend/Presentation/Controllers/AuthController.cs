@@ -105,6 +105,71 @@ public class AuthController : ControllerBase
         }
     }
 
+    [HttpPost("verify-device")]
+    public async Task<IActionResult> VerifyDevice([FromBody] VerifyDeviceRequestDto request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var result = await _authService.VerifyDeviceAsync(request, ipAddress, cancellationToken);
+
+            if (string.IsNullOrWhiteSpace(result.Token))
+            {
+                _logger.LogError("Device verification completed without an access token.");
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { error = "The login could not be completed." });
+            }
+
+            if (string.IsNullOrWhiteSpace(result.DeviceToken))
+            {
+                _logger.LogError("Device verification completed without a device token.");
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { error = "The device could not be trusted." });
+            }
+
+            var accessTokenOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = !_environment.IsDevelopment(),
+                SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
+                Path = "/",
+                Expires = result.ExpiresAt,
+                IsEssential = true
+            };
+            Response.Cookies.Append("access_token", result.Token, accessTokenOptions);
+
+            var deviceCookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = !_environment.IsDevelopment(),
+                SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
+                Path = "/",
+                Expires = DateTimeOffset.UtcNow.AddMonths(4),
+                IsEssential = true
+            };
+            Response.Cookies.Append("flashid_device", result.DeviceToken, deviceCookieOptions);
+
+            result.Token = string.Empty;
+            result.DeviceToken = null;
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError(ex, "Unexpected error during device verification.");
+            if (_environment.IsDevelopment())
+            {
+                return StatusCode(500, new { error = ex.Message, detail = ex.ToString() });
+            }
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
     // [Authorize] — must be authenticated (any role) to log out.
     [Authorize]
     [HttpPost("logout")]
