@@ -4,7 +4,9 @@
   "version": "0.1.0",
   "packageManager": "pnpm@9.15.9",
   "scripts": {
-    "install:all": "pnpm install && pnpm --filter ./web install && pnpm --filter ./backend restore && pnpm --filter ./government-registry restore && pnpm --filter ./mobile install",
+    "install:all": "pnpm install && pnpm --filter ./backend restore && pnpm --filter ./government-registry restore",
+    "postinstall": "lefthook install",
+
     "install:web": "pnpm --filter ./web install",
     "start:web": "pnpm --filter ./web start",
     "build:web": "pnpm --filter ./web build",
@@ -14,7 +16,6 @@
     "type-check:web": "pnpm --filter ./web type-check",
     "test:web": "pnpm --filter ./web run test",
     "test:web:coverage": "pnpm --filter ./web run test:coverage",
-    "postinstall": "lefthook install",
 
     "install:backend": "pnpm --filter ./backend restore",
     "start:backend": "pnpm --filter ./backend start",
@@ -29,10 +30,16 @@
 
     "install:mobile": "pnpm --filter ./mobile install",
     "start:mobile": "pnpm --filter ./mobile start",
-    "dev:mobile": "pnpm --filter ./mobile start",
+    "dev:mobile": "pnpm --filter ./mobile dev",
+    "android:mobile": "pnpm --filter ./mobile run android",
+    "ios:mobile": "pnpm --filter ./mobile run ios",
+    "build:mobile": "pnpm --filter ./mobile run build",
+    "prebuild:mobile": "pnpm --filter ./mobile run native:prebuild",
     "lint:mobile": "pnpm --filter ./mobile lint",
     "format:mobile": "pnpm --filter ./mobile format",
     "type-check:mobile": "pnpm --filter ./mobile type-check",
+    "test:mobile": "pnpm --filter ./mobile run test",
+    "test:mobile:coverage": "pnpm --filter ./mobile run test:coverage",
 
     "install:government-registry": "pnpm --filter ./government-registry restore",
     "start:government-registry": "pnpm --filter ./government-registry start",
@@ -49,9 +56,9 @@
     "build": "pnpm install && pnpm --filter ./backend run build && pnpm --filter ./government-registry run build && pnpm --filter ./web build",
     "test": "pnpm --filter ./web run test && pnpm --filter ./backend run test && pnpm --filter ./government-registry run test && pnpm --filter ./mobile run test",
     "test:coverage": "pnpm --filter ./web run test:coverage && pnpm --filter ./backend run test:coverage && pnpm --filter ./government-registry run test:coverage && pnpm --filter ./mobile run test:coverage",
-    "format": "pnpm --filter ./backend run format && pnpm --filter ./government-registry run format && pnpm --filter ./web format",
-    "lint": "pnpm --filter ./backend run lint && pnpm --filter ./government-registry run lint && pnpm --filter ./web lint",
-    "type-check": "pnpm --filter ./backend run type-check && pnpm --filter ./government-registry run type-check && pnpm --filter ./web run type-check"
+    "format": "pnpm --filter ./backend run format && pnpm --filter ./government-registry run format && pnpm --filter ./web format && pnpm --filter ./mobile format",
+    "lint": "pnpm --filter ./backend run lint && pnpm --filter ./government-registry run lint && pnpm --filter ./web lint && pnpm --filter ./mobile lint",
+    "type-check": "pnpm --filter ./backend run type-check && pnpm --filter ./government-registry run type-check && pnpm --filter ./web run type-check && pnpm --filter ./mobile run type-check"
   },
   "devDependencies": {
     "lefthook": "2.1.6",
