@@ -71,7 +71,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     ? (user.names?.[0] ?? user.email?.[0] ?? 'U') + (user.surname?.[0] ?? '')
     : ''
 
-  const idLabel = user ? `ID: ••••••${String(user.userId).slice(-3)}` : ''
+  const idLabel = user
+    ? `ID: ••••••${String(user.saId ?? user.userId).slice(-3)}`
+    : ''
 
   return (
     <div className=" flex h-screen overflow-hidden">

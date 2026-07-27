@@ -51,8 +51,6 @@ export const QrGenerationPage = () => {
 
   return (
     <div className="flex w-full flex-col gap-6 p-6">
-      <Text variant="h3">Generate QR code</Text>
-
       {step === 'select-credential' && (
         <CredentialSelector onSelect={handleCredentialSelect} />
       )}
@@ -62,6 +60,7 @@ export const QrGenerationPage = () => {
           credentialId={credentialId}
           credentialType={credentialType}
           onContinue={handleFieldSelectionContinue}
+          onBack={() => setStep('select-credential')}
         />
       )}
 

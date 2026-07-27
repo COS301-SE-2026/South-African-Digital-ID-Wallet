@@ -419,9 +419,11 @@ public class AuthService : IAuthService
     public async Task<UserProfileDto?> GetCurrentUserAsync(Guid userId)
     {
         var user = await _authRepository.GetUserByIdAsync(userId);
-        if (user == null) return null;
-
-        // Mapperly-generated mapper converts User entity to UserProfileDto.
-        return _mapper.UserToUserProfileDto(user);
+        if (user == null)
+        {
+            return null;
+        }
+        var citizen = await _authRepository.GetCitizenByUserIdAsync(userId);
+        return _mapper.UserToUserProfileDto(user, citizen);
     }
 }

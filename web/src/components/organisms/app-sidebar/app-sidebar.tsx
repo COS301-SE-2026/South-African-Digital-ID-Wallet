@@ -170,11 +170,14 @@ export const AppSidebar = ({
               </div>
             </div>
           </div>
-          <div className="mt-2">
-            <Button onClick={onLogout} LeftIcon={LogOut}>
-              Logout
-            </Button>
-          </div>
+          <button
+            type="button"
+            onClick={onLogout}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-clean-white/10 px-3 py-2 text-sm font-semibold text-clean-white/80 transition hover:bg-red-500/10 hover:text-red-300"
+          >
+            <LogOut className="h-4 w-5" />
+            Logout
+          </button>
         </div>
       )}
 

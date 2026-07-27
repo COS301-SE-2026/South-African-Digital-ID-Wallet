@@ -14,10 +14,7 @@ export function Providers({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <UserProvider>
-        <SessionTimeoutWatcher />
-        {children}
-      </UserProvider>
+      {children}
       <Toaster position="top-right" />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
