@@ -11,6 +11,7 @@ import type { FieldSelectionFormProps } from './types'
 
 export const FieldSelectionForm = ({
   credentialId,
+  onBack,
   credentialType,
   onContinue,
 }: Readonly<FieldSelectionFormProps>) => {
@@ -120,9 +121,19 @@ export const FieldSelectionForm = ({
         {optionalFields.length} optional selected
       </Text>
 
-      <Button type="button" onClick={handleContinue} className="w-full">
-        Review and continue
-      </Button>
+      <div className="flex gap-3">
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onBack}
+          className="flex-1"
+        >
+          Go back
+        </Button>
+        <Button type="button" onClick={handleContinue} className="flex-[2]">
+          Review and continue
+        </Button>
+      </div>
     </div>
   )
 }

@@ -47,7 +47,7 @@ describe('QrDisplay', () => {
     })
     render(<QrDisplay selection={baseSelection} onBack={() => {}} />)
     await waitFor(() => {
-      expect(screen.getByText(/valid credential/i)).toBeInTheDocument()
+      expect(screen.getByText(/valid for/i)).toBeInTheDocument()
     })
   })
 
@@ -68,17 +68,17 @@ describe('QrDisplay', () => {
     })
     render(<QrDisplay selection={baseSelection} onBack={() => {}} />)
     await waitFor(() => {
-      expect(screen.getByText(/valid credential/i)).toBeInTheDocument()
+      expect(screen.getByText(/valid for/i)).toBeInTheDocument()
     })
     act(() => {
       jest.advanceTimersByTime(3000)
     })
     await waitFor(() => {
-      expect(screen.getByText(/qr code expired/i)).toBeInTheDocument()
+      expect(screen.getByText(/valid for 0:00/i)).toBeInTheDocument()
     })
   })
 
-  it('calls onBack when back to preview is clicked', async () => {
+  it('calls onBack when back is clicked', async () => {
     ;(qrService.generate as jest.Mock).mockResolvedValue({
       token: 'qr-token-123',
       expiresAt: new Date(Date.now() + 60000).toISOString(),
@@ -87,9 +87,9 @@ describe('QrDisplay', () => {
     const user = userEvent.setup({ delay: null })
     render(<QrDisplay selection={baseSelection} onBack={onBack} />)
     await waitFor(() => {
-      expect(screen.getByText(/valid credential/i)).toBeInTheDocument()
+      expect(screen.getByText(/valid for/i)).toBeInTheDocument()
     })
-    await user.click(screen.getByRole('button', { name: /back to preview/i }))
+    await user.click(screen.getByRole('button', { name: /^back$/i }))
     expect(onBack).toHaveBeenCalledTimes(1)
   })
 })

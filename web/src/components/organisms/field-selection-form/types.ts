@@ -6,5 +6,6 @@ import type {
 export type FieldSelectionFormProps = {
   credentialId: string
   credentialType: CredentialType
+  onBack: () => void
   onContinue: (selection: QrDisclosureSelection) => void
 }
