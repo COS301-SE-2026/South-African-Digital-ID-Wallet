@@ -13,8 +13,5 @@
     "test:coverage": "dotnet test --solution FlashIdBackend/FlashIdBackend.sln --coverage --coverage-output-format cobertura --results-directory ./TestResults && reportgenerator -reports:\"./TestResults/**/*.cobertura.xml\" -targetdir:\"./CoverageReport\" -reporttypes:\"Html;TextSummary\"",
     "format": "dotnet format FlashIdBackend/",
     "lint": "dotnet format --verify-no-changes FlashIdBackend/"
-  },
-  "dependencies": {
-    "qr-scanner": "^1.4.2"
   }
 }

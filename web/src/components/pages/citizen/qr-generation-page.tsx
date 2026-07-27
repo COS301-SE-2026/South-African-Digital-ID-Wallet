@@ -60,6 +60,7 @@ export const QrGenerationPage = () => {
           credentialId={credentialId}
           credentialType={credentialType}
           onContinue={handleFieldSelectionContinue}
+          onBack={() => setStep('select-credential')}
         />
       )}
 

@@ -9,6 +9,7 @@ describe('FieldSelectionForm', () => {
         credentialId="credential-123"
         credentialType="identityDocument"
         onContinue={() => {}}
+        onBack={() => {}}
       />
     )
     const identityNumberSwitch = screen.getByRole('switch', {
@@ -24,6 +25,7 @@ describe('FieldSelectionForm', () => {
         credentialId="credential-123"
         credentialType="identityDocument"
         onContinue={() => {}}
+        onBack={() => {}}
       />
     )
     expect(screen.getByRole('switch', { name: /gender/i })).not.toBeChecked()
@@ -36,6 +38,7 @@ describe('FieldSelectionForm', () => {
         credentialId="credential-123"
         credentialType="identityDocument"
         onContinue={() => {}}
+        onBack={() => {}}
       />
     )
     const genderSwitch = screen.getByRole('switch', { name: /gender/i })
@@ -50,6 +53,7 @@ describe('FieldSelectionForm', () => {
         credentialId="credential-123"
         credentialType="identityDocument"
         onContinue={() => {}}
+        onBack={() => {}}
       />
     )
     await user.click(
@@ -69,6 +73,7 @@ describe('FieldSelectionForm', () => {
         credentialId="credential-123"
         credentialType="identityDocument"
         onContinue={onContinue}
+        onBack={() => {}}
       />
     )
     await user.click(screen.getByRole('switch', { name: /gender/i }))
@@ -96,6 +101,7 @@ describe('FieldSelectionForm', () => {
         credentialId="credential-123"
         credentialType="driversLicense"
         onContinue={() => {}}
+        onBack={() => {}}
       />
     )
     expect(
