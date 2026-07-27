@@ -1,0 +1,22 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IDisclosedFieldValueResolver.cs
+  h_99fca60b892ff4 1-8
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_99fca60b892ff4 14-15,51
+backend/FlashIdBackend/Application/Common/Services/QrService.cs
+  h_99fca60b892ff4 8,23,30,36,174
+backend/FlashIdBackend/Infrastructure/Providers/AzureBlobPhotoStorageProvider.cs
+  h_99fca60b892ff4 19
+backend/FlashIdBackend/Application/Common/Services/DisclosedFieldValueResolver.cs
+  h_99fca60b892ff4 3-4,8,10-18,23,29,40-41,52-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "f4ee21a4e0b626f2605193e95fa9ddda449ebaa5",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
