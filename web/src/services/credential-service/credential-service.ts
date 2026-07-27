@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios'
 import api from '@/lib/api'
 
-import credentialUrls from './credentialo-urls'
+import credentialUrls from './credential-urls'
 import type { CredentialResponse } from './types'
 
 const getMine = (): Promise<CredentialResponse[]> => {
