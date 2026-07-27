@@ -40,7 +40,6 @@ public class AuthService : IAuthService
         if (string.IsNullOrWhiteSpace(request.Password))
             throw new UnauthorizedAccessException("Password is required.");
 
-        // Delegate data access to the repository — the service never calls _context directly.
         var user = await _authRepository.GetUserByEmailAsync(request.Email);
 
         if (user == null)
@@ -55,7 +54,6 @@ public class AuthService : IAuthService
 
         if (!_passwordHashingProvider.VerifyPassword(request.Password, user.PasswordHash))
         {
-            // Business rule: lock after 5 failed attempts for 30 minutes.
             user.FailedLoginAttempts++;
             if (user.FailedLoginAttempts >= 5)
                 user.LockoutUntil = DateTime.UtcNow.AddMinutes(30);
@@ -105,7 +103,6 @@ public class AuthService : IAuthService
         await _authRepository.AddAuditLogAsync(auditLog);
         await _authRepository.SaveChangesAsync();
 
-        // Token generation is an Infrastructure concern — the service just calls the provider.
         var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user, request.RememberMe);
 
         return new LoginResponseDto
@@ -114,8 +111,6 @@ public class AuthService : IAuthService
             ExpiresAt = expiresAt,
             UserId = user.Id,
             Role = user.Role.ToString(),
-            // Names = user.Names,
-            // Surname = user.Surname,
         };
     }
 
@@ -144,9 +139,11 @@ public class AuthService : IAuthService
     public async Task<UserProfileDto?> GetCurrentUserAsync(Guid userId)
     {
         var user = await _authRepository.GetUserByIdAsync(userId);
-        if (user == null) return null;
-
-        // Mapperly-generated mapper converts User entity to UserProfileDto.
-        return _mapper.UserToUserProfileDto(user);
+        if (user == null)
+        {
+            return null;
+        }
+        var citizen = await _authRepository.GetCitizenByUserIdAsync(userId);
+        return _mapper.UserToUserProfileDto(user, citizen);
     }
 }

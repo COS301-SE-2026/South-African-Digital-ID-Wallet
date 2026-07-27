@@ -25,6 +25,12 @@ public class AuthRepository : IAuthRepository
         return await _context.DomainUsers.FindAsync(userId);
     }
 
+    public async Task<Citizen?> GetCitizenByUserIdAsync(Guid userId)
+    {
+        return await _context.Citizens
+            .FirstOrDefaultAsync(c => c.UserId == userId);
+    }
+
     public Task UpdateUserAsync(User user)
     {
         _context.DomainUsers.Update(user);
