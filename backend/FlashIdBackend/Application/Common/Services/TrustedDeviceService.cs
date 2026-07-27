@@ -20,15 +20,15 @@ public class TrustedDeviceService : ITrustedDeviceService
 
     public async Task<IEnumerable<TrustedDeviceDto>> GetMyTrustedDevicesAsync(Guid userId)
     {
-        var citizen = await _trustedDeviceRepository.GetCitizenByUserIdAsync(userId);
-
-        if (citizen == null)
-        {
-            return Enumerable.Empty<TrustedDeviceDto>();
-        }
+        // var citizen = await _trustedDeviceRepository.GetCitizenByUserIdAsync(userId);
+        //
+        // if (citizen == null)
+        // {
+        //     return Enumerable.Empty<TrustedDeviceDto>();
+        // }
 
         var devices = await _trustedDeviceRepository
-            .GetTrustedDevicesByCitizenIdAsync(citizen.Id);
+            .GetTrustedDevicesByUserIdAsync(userId);
 
         return devices.Select(device => _mapper.TrustedDeviceToDto(device));
     }

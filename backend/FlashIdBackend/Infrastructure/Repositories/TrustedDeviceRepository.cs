@@ -14,33 +14,27 @@ public class TrustedDeviceRepository : ITrustedDeviceRepository
         _context = context;
     }
 
-    public async Task<Citizen?> GetCitizenByUserIdAsync(Guid userId)
-    {
-        return await _context.Citizens
-            .FirstOrDefaultAsync(c => c.UserId == userId);
-    }
+    // public async Task<Citizen?> GetCitizenByUserIdAsync(Guid userId)
+    // {
+    //     return await _context.Citizens
+    //         .FirstOrDefaultAsync(c => c.UserId == userId);
+    // }
 
-    public async Task<List<TrustedDevice>> GetTrustedDevicesByCitizenIdAsync(Guid citizenId)
+    public async Task<List<TrustedDevice>> GetTrustedDevicesByUserIdAsync(Guid userId)
     {
         return await _context.TrustedDevices
             .AsNoTracking()
-            .Where(td => td.CitizenId == citizenId)
+            .Where(td => td.UserId == userId)
             .OrderByDescending(td => td.LastActive)
             .ToListAsync();
     }
 
     public async Task<bool> UnlinkDeviceAsync(Guid userId, Guid deviceId)
     {
-        var citizen = await _context.Citizens
-            .FirstOrDefaultAsync(c => c.UserId == userId);
-
-        if (citizen == null)
-            return false;
-
         var device = await _context.TrustedDevices
             .FirstOrDefaultAsync(d =>
                 d.Id == deviceId &&
-                d.CitizenId == citizen.Id);
+                d.UserId == userId);
 
         if (device == null)
             return false;
@@ -52,11 +46,11 @@ public class TrustedDeviceRepository : ITrustedDeviceRepository
         return true;
     }
 
-    public async Task<TrustedDevice?> GetTokenHashAsync(Guid citizenId, string deviceTokenHash, CancellationToken cancellationToken)
+    public async Task<TrustedDevice?> GetByTokenHashAsync(Guid userId, string deviceTokenHash, CancellationToken cancellationToken)
     {
         return await _context.TrustedDevices.FirstOrDefaultAsync(device =>
             device.DeviceTokenHash == deviceTokenHash &&
-            device.CitizenId == citizenId && device.IsTrusted, cancellationToken);
+            device.UserId == userId && device.IsTrusted, cancellationToken);
     }
 
     public async Task AddTrustedDeviceAsync(TrustedDevice trustedDevice, CancellationToken cancellationToken)

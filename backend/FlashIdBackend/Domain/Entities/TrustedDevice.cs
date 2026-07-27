@@ -20,7 +20,7 @@ public class TrustedDevice : BaseEntity
 
     public bool IsTrusted { get; set; }
 
-    public Guid CitizenId { get; set; }
+    public Guid UserId { get; set; }
 
-    public Citizen Citizen { get; set; } = null!;
+    public User User { get; set; } = null!;
 }

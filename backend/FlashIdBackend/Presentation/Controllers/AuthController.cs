@@ -49,13 +49,13 @@ public class AuthController : ControllerBase
 
     // Login is anonymous — no [Authorize] needed because the user does not have a token yet.
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request, CancellationToken cancellationToken)
     {
         try
         {
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
             Request.Cookies.TryGetValue("flashid_device", out var deviceToken);
-            var result = await _authService.LoginAsync(request, deviceToken, ipAddress);
+            var result = await _authService.LoginAsync(request, deviceToken, ipAddress, cancellationToken);
 
             if (result.RequiresDeviceVerification)
             {

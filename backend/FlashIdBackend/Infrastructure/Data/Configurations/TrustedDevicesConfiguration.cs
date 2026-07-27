@@ -15,8 +15,9 @@ public class TrustedDevicesConfiguration : IEntityTypeConfiguration<TrustedDevic
         builder.HasIndex(d => d.DeviceTokenHash)
             .IsUnique();
 
-        builder.HasOne(d => d.Citizen)
+        builder.HasOne(d => d.User)
             .WithMany()
-            .HasForeignKey(d => d.CitizenId);
+            .HasForeignKey(d => d.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
