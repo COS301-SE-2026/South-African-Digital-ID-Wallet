@@ -149,7 +149,127 @@ public class AuthService : IAuthService
         };
     }
 
-    private async Task<DeviceVerification?> CreateDeviceVerificationAsync(User user, string ipAddress, CancellationToken cancellationToken)
+    public async Task<LoginResponseDto> VerifyDeviceAsync(VerifyDeviceRequestDto request, string? ipAddress,
+        CancellationToken cancellationToken)
+    {
+        if (request.DeviceVerificationId == Guid.Empty)
+        {
+            throw new UnauthorizedAccessException("Device verification ID is required.");
+        }
+
+        if (string.IsNullOrEmpty(request.Otp))
+        {
+            throw new UnauthorizedAccessException("Verification OTP is required.");
+        }
+
+        var verification = await _trustedDeviceRepository.GetDeviceVerificationAsync(request.DeviceVerificationId, cancellationToken);
+
+        if (verification is null)
+        {
+            throw new UnauthorizedAccessException("Device verification request not found.");
+        }
+
+        if (verification.VerifiedAt.HasValue)
+        {
+            throw new UnauthorizedAccessException("Device verification has already been used.");
+        }
+
+        if (verification.ExpiresAt <= DateTime.UtcNow)
+        {
+            throw new UnauthorizedAccessException("Device verification code has expired.");
+        }
+
+        if (verification.AttemptCount >= 5)
+        {
+            throw new UnauthorizedAccessException("Too many verification attempts. Please log in again.");
+        }
+
+        var providedOtpHash = HashOtp(request.Otp);
+
+        if (!string.Equals(verification.OtpHash, providedOtpHash, StringComparison.Ordinal))
+        {
+            verification.AttemptCount++;
+            verification.UpdatedAt = DateTime.UtcNow;
+            await _trustedDeviceRepository.UpdateDeviceVerificationAsync(verification, cancellationToken);
+
+            var auditLog = new AuditLog()
+            {
+                Id = Guid.NewGuid(),
+                EventType = AuditEventType.DeviceVerificationFailed,
+                Details = "Invalid device verification code supplied.",
+                IpAddress = ipAddress,
+                ActorId = verification.UserId,
+                CreatedAt = DateTime.UtcNow,
+            };
+
+            await _authRepository.AddAuditLogAsync(auditLog);
+            await _authRepository.SaveChangesAsync();
+
+            throw new UnauthorizedAccessException("Invalid device verification code.");
+        }
+
+        var user = await _authRepository.GetUserByIdAsync(verification.UserId);
+
+        if (user is null || user.IsDeleted)
+        {
+            throw new UnauthorizedAccessException("The user account could not be found.");
+        }
+
+        var rawDeviceToken = _deviceTokenProvider.GenerateToken();
+        var hashedToken = _deviceTokenProvider.HashToken(rawDeviceToken);
+
+        var trustedDevice = new TrustedDevice
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            DeviceTokenHash = hashedToken,
+            DeviceType = request.DeviceType,
+            OperatingSystem = request.OperatingSystem,
+            Browser = request.Browser,
+            LastKnownCity = null,
+            LastKnownCountry = null,
+            LastActive = DateTime.UtcNow,
+            IsTrusted = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+        verification.VerifiedAt = DateTime.UtcNow;
+        verification.UpdatedAt = DateTime.UtcNow;
+
+        await _trustedDeviceRepository.AddTrustedDeviceAsync(trustedDevice, cancellationToken);
+        await _trustedDeviceRepository.UpdateDeviceVerificationAsync(verification, cancellationToken);
+
+        var verifiedAuditLog = new AuditLog()
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.DeviceVerified,
+            Details = $"User {user.Email} verified and trusted a new device.",
+            IpAddress = ipAddress,
+            ActorId = verification.UserId,
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        await _authRepository.AddAuditLogAsync(verifiedAuditLog);
+        await _authRepository.SaveChangesAsync();
+
+        var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user, request.RememberMe);
+
+        return new LoginResponseDto()
+        {
+            Token = token,
+            ExpiresAt = expiresAt,
+            UserId = user.Id,
+            Role = user.Role.ToString(),
+
+            RequiresDeviceVerification = false,
+            DeviceVerificationId = null,
+
+            DeviceToken = rawDeviceToken,
+        };
+    }
+
+    private async Task<DeviceVerification> CreateDeviceVerificationAsync(User user, string ipAddress, CancellationToken cancellationToken)
     {
         var otp = RandomNumberGenerator.GetInt32(100000, 1_000_000).ToString();
         var otpHash = HashOtp(otp);
