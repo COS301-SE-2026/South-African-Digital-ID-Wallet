@@ -1,0 +1,20 @@
+web/src/components/organisms/field-selection-form/types.ts
+  h_0aff3b71f739b1 9
+web/src/components/pages/citizen/qr-generation-page.tsx
+  h_0aff3b71f739b1 63
+web/src/components/organisms/field-selection-form/field-selection-form.tsx
+  h_0aff3b71f739b1 14,124-135
+web/src/components/organisms/field-selection-form/test/field-selection-form.test.tsx
+  h_0aff3b71f739b1 12,28,41,56,76,104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "590930650dad29925450e240184f8368c3eb7540",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
