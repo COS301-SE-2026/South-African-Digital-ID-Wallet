@@ -10,6 +10,7 @@ using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Azure.Storage.Blobs;
 
 namespace Infrastructure;
 
@@ -38,6 +39,13 @@ public static class DependencyInjection
         services.AddScoped<ICredentialRepository, CredentialRepository>();
         services.AddSingleton<IQrSigningProvider, Ed25519SigningProvider>();
         services.AddScoped<IQrDisclosureTokenRepository, QrDisclosureTokenRepository>();
+        services.AddSingleton(n =>
+        {
+            var configuration = n.GetRequiredService<IConfiguration>();
+            var connectionString = configuration["BlobStorage:ConnectionString"] ?? throw new InvalidOperationException("BlobStorage:ConnectionString not configured.");
+            return new BlobServiceClient(connectionString);
+        });
+        services.AddSingleton<IPhotoStorageProvider, AzureBlobPhotoStorageProvider>();
 
         services.AddScoped<IOfficialRepository, OfficialRepository>();
 
