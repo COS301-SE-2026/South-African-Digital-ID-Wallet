@@ -47,6 +47,20 @@ public class QrServiceTests
             token.UsedAt = DateTime.UtcNow;
             return Task.FromResult(true);
         }
+        public Task InvalidateActiveTokensForCredentialAsync(Guid credentialId)
+        {
+            foreach (var token in Tokens.Where(q => q.CredentialId == credentialId && q.UsedAt == null && q.ExpiresAt > DateTime.UtcNow))
+            {
+                token.UsedAt = DateTime.UtcNow;
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task<int> PurgeExpiredAsync(DateTime olderThan)
+        {
+            var removed = Tokens.RemoveAll(q => q.ExpiresAt < olderThan);
+            return Task.FromResult(removed);
+        }
     }
 
     private sealed class FakeInstitutionRepository : IInstitutionRepository
@@ -84,6 +98,12 @@ public class QrServiceTests
 
     private static QrService CreateService(Credential? credentialToReturn = null, List<Credential>? credentialsToReturn = null)
     {
+        var (service, _) = CreateServiceWithTokenRepo(credentialToReturn, credentialsToReturn);
+        return service;
+    }
+    private static (QrService Service, FakeQrDisclosureTokenRepository TokenRepo) CreateServiceWithTokenRepo(
+        Credential? credentialToReturn = null, List<Credential>? credentialsToReturn = null)
+    {
         var fakeRepo = new FakeCredentialRepository
         {
             CredentialToReturn = credentialToReturn,
@@ -92,8 +112,9 @@ public class QrServiceTests
         var fakeSigningProvider = new FakeQrSigningProvider();
         var fakeQrDisclosureTokenRepo = new FakeQrDisclosureTokenRepository();
         var fakeInstitutionRepo = new FakeInstitutionRepository();
+        var service = new QrService(fakeRepo, fakeSigningProvider, fakeQrDisclosureTokenRepo, fakeInstitutionRepo);
 
-        return new QrService(fakeRepo, fakeSigningProvider, fakeQrDisclosureTokenRepo, fakeInstitutionRepo);
+        return (service, fakeQrDisclosureTokenRepo);
     }
 
     [Fact]
@@ -179,6 +200,30 @@ public class QrServiceTests
         await Assert.ThrowsAsync<InvalidDisclosedFieldsException>(() => qrService.GenerateQrAsync(credential.Id, userId, request));
     }
 
+    [Fact]
+
+    public async Task GenerateQrAsync_CalledTwiceForSameCredential_InvalidatesPreviousToken()
+    {
+        var userId = Guid.NewGuid();
+        var credential = ValidCredential(userId);
+        var (qrService, tokenRepo) = CreateServiceWithTokenRepo(credential);
+
+        var request = new GenerateQrRequestDto
+        {
+            DisclosedFields = new List<string>
+            {
+                "Full name", "SA ID number", "Photo", "License number",
+                "License code", "Expiry date", "Country of issue",
+            },
+        };
+
+        await qrService.GenerateQrAsync(credential.Id, userId, request);
+        await qrService.GenerateQrAsync(credential.Id, userId, request);
+
+        Assert.Equal(2, tokenRepo.Tokens.Count);
+        Assert.NotNull(tokenRepo.Tokens[0].UsedAt);
+        Assert.Null(tokenRepo.Tokens[1].UsedAt);
+    }
     [Fact]
     public async Task GetMyCredentialsAsync_OnlyReturnsActiveCredentials()
     {
