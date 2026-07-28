@@ -1,0 +1,20 @@
+web/src/components/molecules/manage-user-trusted-devices/index.ts
+  h_0aff3b71f739b1 1
+web/src/components/pages/citizen/manage-user-account-page.tsx
+  h_0aff3b71f739b1 8
+web/src/components/organisms/manage-user-account/manage-user-account.tsx
+  h_0aff3b71f739b1 7,21-22,24-27,29-30,36-38,43
+web/src/components/molecules/manage-user-trusted-devices/types.ts
+  h_0aff3b71f739b1 1-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "e5d960448c68bb8e507e805bfbd165fc78cb2887",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
