@@ -1,4 +1,10 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react'
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+  within,
+} from '@testing-library/react'
 import '@testing-library/jest-dom'
 
 import { ManageUserTrustedDevices } from '../manage-user-trusted-devices'
@@ -98,8 +104,9 @@ describe('ManageUserTrustedDevices', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /Manage devices/i }))
 
-    expect(screen.getByTestId('dashboard-modal')).toBeInTheDocument()
-    expect(screen.getByText('Trusted Devices')).toBeInTheDocument()
+    const modal = screen.getByTestId('dashboard-modal')
+    expect(modal).toBeInTheDocument()
+    expect(within(modal).getByText('Trusted Devices')).toBeInTheDocument()
   })
 
   it('unlinks a known device', async () => {
