@@ -6,6 +6,7 @@ namespace Infrastructure.Data;
 
 public static class DbSeeder
 {
+    private static readonly Random PhotoRandom = new(42);
     public static async Task SeedAsync(AppDbContext context)
     {
         await context.Database.MigrateAsync();
@@ -75,7 +76,7 @@ public static class DbSeeder
                 CountryOfBirth = "ZA",
                 CitizenshipStatus = CitizenStatus.Citizen,
                 Nationality = "South African",
-                PhotoBlob = MockPhotoData.PlaceholderPhotoBase64
+                PhotoBlob = MockPhotoData.PhotoBlobNames[PhotoRandom.Next(MockPhotoData.PhotoBlobNames.Length)]
             });
         }
 
@@ -92,7 +93,7 @@ public static class DbSeeder
                 LicenseCode = LicenseCode.B,
                 Restrictions = null,
                 ExpiryDate = new DateOnly(2029, 6, 1),
-                PhotoBlob = MockPhotoData.PlaceholderPhotoBase64
+                PhotoBlob = MockPhotoData.PhotoBlobNames[PhotoRandom.Next(MockPhotoData.PhotoBlobNames.Length)]
             });
         }
 
