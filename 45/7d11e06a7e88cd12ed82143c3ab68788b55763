@@ -1,0 +1,14 @@
+web/src/components/molecules/manage-user-trusted-devices/test/manage-user-trusted-devices.test.tsx
+  h_0aff3b71f739b1 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "457d11e06a7e88cd12ed82143c3ab68788b55763",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
