@@ -57,4 +57,41 @@ public class CitizenVerificationServiceTests
     }
 
     private static Task<VerificationResponseDto> Act(Ctx c, Guid userId, string token = RawToken, string saId = ValidSaId, string pin = ValidPin) => c.Service.VerifyCitizenActivation(new VerificationRequestDto { Token = token, SaId = saId, Pin = pin }, userId, TestIpAddress, TestContext.Current.CancellationToken);
+
+    [Fact]
+    public void ValidateActivationState_AlreadyUsed_Throws()
+    {
+        var now = DateTime.UtcNow;
+        var a = new CitizenActivation { Status = ActivationStatus.Used, ExpiresAt = now.AddHours(1) };
+        var ex = Assert.Throws<InvalidOperationException>(() => CitizenVerificationService.ValidateActivationState(a, now));
+        Assert.Contains("already been used", ex.Message);
+    }
+
+    [Fact]
+    public void ValidateActivationState_Revoked_Throws()
+    {
+        var now = DateTime.UtcNow;
+        var a = new CitizenActivation { Status = ActivationStatus.Revoked, ExpiresAt = now.AddHours(1) };
+        var ex = Assert.Throws<InvalidOperationException>(() => CitizenVerificationService.ValidateActivationState(a, now));
+        Assert.Contains("no longer valid", ex.Message);
+    }
+
+    [Fact]
+    public void ValidateActivationState_Expired_Throws()
+    {
+        var now = DateTime.UtcNow;
+        var a = new CitizenActivation { ExpiresAt = now.AddMinutes(-1) };
+        var ex = Assert.Throws<InvalidOperationException>(() => CitizenVerificationService.ValidateActivationState(a, now));
+        Assert.Contains("expired", ex.Message);
+    }
+
+    [Fact]
+    public void ValidateActivationState_Locked_ThrowsWithMinutesRemaining()
+    {
+        var now = DateTime.UtcNow;
+        var a = new CitizenActivation { ExpiresAt = now.AddHours(1), LockedUntil = now.AddMinutes(5) };
+        var ex = Assert.Throws<InvalidOperationException>(() => CitizenVerificationService.ValidateActivationState(a, now));
+        Assert.Contains("temporarily locked", ex.Message);
+        Assert.Contains("5 minutes", ex.Message);
+    }
 }
