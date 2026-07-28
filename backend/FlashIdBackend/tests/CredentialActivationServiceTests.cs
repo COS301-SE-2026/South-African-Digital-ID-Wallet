@@ -73,4 +73,14 @@ public class CredentialActivationServiceTests
             ),
         };
     }
+
+    private static Task<ActivateCredentialsResponseDto> Act(Ctx c, params CredentialType[] types) => c.Service.ActivateCredentialsAsync(new() { CredentialTypes = types.ToList() }, Guid.NewGuid(), Ip, TestContext.Current.CancellationToken);
+
+    [Fact]
+    public async Task noCitizenLinked_Throws()
+    {
+        var c = Setup(noCitizen: true);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, CredentialType.IdentityDocument));
+        Assert.Empty(c.Repo.Added);
+    }
 }
