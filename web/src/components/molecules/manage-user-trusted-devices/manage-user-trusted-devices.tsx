@@ -143,6 +143,65 @@ export function ManageUserTrustedDevices() {
           )}
         </div>
       </div>
+      <DashboardModal
+        open={showDevices}
+        title="Trusted Devices"
+        onClose={() => setShowDevices(false)}
+      >
+        {devices.length === 0 ? (
+          <p className="text-muted-text">No trusted devices were found.</p>
+        ) : (
+          <div className="space-y-4">
+            {devices.slice(0, 3).map((device) => {
+              const Icon = device.icon
+
+              return (
+                <div
+                  key={device.id}
+                  className="flex items-center justify-between rounded-2xl border p-5"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="rounded-2xl bg-muted p-4">
+                      <Icon className="h-7 w-7 text-green-700" />
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-semibold">{device.name}</h3>
+
+                      <p className="mt-1 text-sm text-muted-text">
+                        {device.meta}
+                      </p>
+
+                      <span
+                        className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                          device.status === 'Active'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        {device.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  {device.status !== 'Active' && (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="lg"
+                      onClick={() => unlinkDevice(device.id)}
+                      className="rounded-xl"
+                    >
+                      <Unplug className="mr-2 h-4 w-4" />
+                      Unlink Device
+                    </Button>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </DashboardModal>
     </>
   )
 }
