@@ -1,0 +1,14 @@
+web/src/components/organisms/manage-user-account/test/manage-user-account.test.tsx
+  h_0aff3b71f739b1 7-8,25,34,44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "25fa8019f100395ccbc582e492c0d3606954cb1d",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

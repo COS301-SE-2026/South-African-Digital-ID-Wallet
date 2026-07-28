@@ -1,0 +1,18 @@
+backend/FlashIdBackend/Application/Common/Services/CredentialActivationService.cs
+  h_99fca60b892ff4 17-19
+government-registry/GovernmentRegistry/Infrastructure/Data/DbSeeder.cs
+  h_99fca60b892ff4 9,79,96
+government-registry/GovernmentRegistry/Infrastructure/Data/MockPhotoData.cs
+  h_99fca60b892ff4 5-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "78afe704210bfaf9c102cb67b71cc058d898ecd4",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
