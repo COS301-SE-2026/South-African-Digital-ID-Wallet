@@ -1,0 +1,18 @@
+web/src/components/organisms/verify-email-form/verify-email-form.tsx
+  h_99fca60b892ff4 33
+backend/FlashIdBackend/Infrastructure/Data/Configurations/UserConfiguration.cs
+  h_99fca60b892ff4 65-66
+web/src/components/organisms/verify-email-form/test/verify-email-form.test.tsx
+  h_99fca60b892ff4 192
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "deca1ca28496b792a08516997369e9d69ca81154",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
