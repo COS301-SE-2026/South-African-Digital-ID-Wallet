@@ -1,0 +1,18 @@
+backend/FlashIdBackend/tests/DisclosedFieldValueResolverTests.cs
+  h_99fca60b892ff4 4,11-18,94,96,99,104,107,117,120,123,128,131,139,142,148,151
+backend/FlashIdBackend/tests/QrServiceTests.cs
+  h_99fca60b892ff4 1,69-73,101,103
+backend/FlashIdBackend/tests/QrServiceIntegrationTests.cs
+  h_99fca60b892ff4 12,28-32,67,69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "efdfffc9a0c68eefa239983a72ae4eb130aaf923",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+backend/FlashIdBackend/tests/CredentialActivationServiceTests.cs
+  h_712d174fc3f309 17,59,72,77,143-182
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "71eeb15d5496b3637ef188c979a69e58067c636d",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

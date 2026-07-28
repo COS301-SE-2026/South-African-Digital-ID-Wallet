@@ -1,0 +1,32 @@
+backend/FlashIdBackend/Application/Features/TrustedDevices/DTOs/TrustedDeviceDto.cs
+  h_293a8616118f65 15,17
+backend/FlashIdBackend/Application/Common/Services/TrustedDeviceService.cs
+  h_293a8616118f65 1,6,13,18,22,26,31-37,39-53
+backend/FlashIdBackend/Presentation/Controllers/TrustedDeviceController.cs
+  h_293a8616118f65 33-35
+backend/FlashIdBackend/tests/TrustedDeviceServiceTests.cs
+  h_293a8616118f65 4,63
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/ITrustedDeviceService.cs
+  h_293a8616118f65 7
+backend/FlashIdBackend/Application/Common/Services/AuthService.cs
+  h_293a8616118f65 251
+web/src/components/molecules/trusted-devices/trusted-devices.tsx
+  h_293a8616118f65 12-13,31-35,39,47
+backend/FlashIdBackend/Domain/Entities/TrustedDevice.cs
+  h_293a8616118f65 13
+backend/FlashIdBackend/Application/Common/Mapping/TrustedDeviceMapper.cs
+  h_293a8616118f65 10-11
+backend/FlashIdBackend/Domain/Enums/DeviceType.cs
+  h_293a8616118f65 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "64d8c39d3f5fd2518111174ff0fe4ea19be39a97",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
