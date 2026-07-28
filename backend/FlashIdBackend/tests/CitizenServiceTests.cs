@@ -6,13 +6,15 @@ using Application.Features.Citizens.DTOs;
 using Application.Features.Citizens.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
+using Xunit.Runner.Common;
 
 namespace tests;
 
 public class CitizenServiceTests
 {
     private const string TestEmail = "thabo.mokoena@example.com";
-    private const string ValidPassword = "Str0ng!Passw0rd";
+    private const string TestPassword = "Str0ng!Passw0rd";
+    private const string TestOtp = "123456";
 
     private sealed class FakeCitizenRepo : ICitizenRepository
     {
@@ -21,11 +23,12 @@ public class CitizenServiceTests
         public List<User> AddedUsers = new();
         public List<AuditLog> AuditLogs = new();
         public int Saves;
+        public int Updates;
 
         public Task<bool> IsEmailTakenAsync(string email, Guid excludeUserId) => Task.FromResult(EmailTaken);
         public Task<User?> GetUserByEmailAsync(string email) => Task.FromResult(UserByEmail);
         public Task AddUserAync(User user) { AddedUsers.Add(user); return Task.CompletedTask; }
-        public Task UpdateUserAsync(User user) => Task.CompletedTask;
+        public Task UpdateUserAsync(User user) { Updates++; return Task.CompletedTask; }
         public Task AddAuditLogAsync(AuditLog log) { AuditLogs.Add(log); return Task.CompletedTask; }
         public Task SaveChangesAsync() { Saves++; return Task.CompletedTask; }
     }
@@ -40,7 +43,9 @@ public class CitizenServiceTests
     {
         public int SendCount;
         public string? LastToEmail;
-        public Task SendEmailAsync(string toEmail, string subject, string message, CancellationToken ct = default) { SendCount++; LastToEmail = toEmail; return Task.CompletedTask; }
+        public string? LastSubject;
+        public string? LastMessage;
+        public Task SendEmailAsync(string toEmail, string subject, string message, CancellationToken ct = default) { SendCount++; LastToEmail = toEmail; LastSubject = subject; LastMessage = message; return Task.CompletedTask; }
     }
 
     private sealed class Ctx
@@ -62,10 +67,13 @@ public class CitizenServiceTests
         };
     }
 
-    private static User UserWithOtp(string otp = "123456", int expiryMinutes = 10, bool verified = false, int attempts = 0)
+    private static User UserWithOtp(string? otp = "123456", int expiryMinutes = 10, bool verified = false, int attempts = 0)
     {
         var user = new User { Id = Guid.NewGuid(), Email = TestEmail, IsEmailVerified = verified };
-        user.SetOtp($"h:{otp}", expiryMinutes);
+        if (otp is not null)
+        {
+            user.SetOtp($"h:{otp}", expiryMinutes);
+        }
         for (var i = 0; i < attempts; i++)
         {
             user.IncrementOtpAttempt();
@@ -73,5 +81,63 @@ public class CitizenServiceTests
         return user;
     }
 
-    private static RegisterCitizenRequestDto RegisterRequest(string password = ValidPassword) => new() { Email = TestEmail, Password = password };
+    private static RegisterCitizenRequestDto RegisterRequest(string password = TestPassword) => new() { Email = TestEmail, Password = password };
+
+    [Fact]
+    public async Task Register_ValidRequest_CreatesUserWritesAuditAndSendOtp()
+    {
+        var c = Setup();
+        var response = await c.Service.RegisterCitizenAsync(new RegisterCitizenRequestDto { Email = TestEmail, Password = TestPassword });
+        var user = Assert.Single(c.Repo.AddedUsers);
+        Assert.Equal(TestEmail, user.Email);
+        Assert.Equal($"h:{TestPassword}", user.PasswordHash);
+        Assert.True(user.PasswordSet);
+        Assert.False(user.IsEmailVerified);
+        Assert.Equal(UserRole.Citizen, user.Role);
+        Assert.Matches(@"^h:\d{6}$", user.EmailOTPHash!);
+        var audit = Assert.Single(c.Repo.AuditLogs);
+        Assert.Equal(AuditEventType.UserRegistered, audit.EventType);
+        Assert.Equal(user.Id, audit.ActorId);
+        Assert.Equal("system", audit.IpAddress);
+        Assert.Equal(1, c.Repo.Saves);
+        Assert.Equal(1, c.Email.SendCount);
+        Assert.Equal(TestEmail, c.Email.LastToEmail);
+        Assert.Equal("Your FlashID verification code", c.Email.LastSubject);
+        Assert.Contains(user.EmailOTPHash![2..], c.Email.LastMessage!);
+        Assert.Equal(user.Id, response.UserId);
+        Assert.Equal(TestEmail, response.Email);
+        Assert.Contains("Account created successfully", response.Message);
+    }
+
+    [Fact]
+    public async Task Register_EmailAlreadyTaken_Throws()
+    {
+        var c = Setup(emailTaken: true);
+        await Assert.ThrowsAsync<EmailTakenException>(() => c.Service.RegisterCitizenAsync(RegisterRequest()));
+        Assert.Empty(c.Repo.AddedUsers);
+        Assert.Equal(0, c.Email.SendCount);
+    }
+
+    [Fact]
+    public async Task Register_InvalidRequest_ThrowsBeforeTouchingRepository()
+    {
+        var c = Setup();
+        await Assert.ThrowsAsync<InvalidCitizenRegistrationRequestException>(() => c.Service.RegisterCitizenAsync(RegisterRequest(password: "weak")));
+        Assert.Empty(c.Repo.AddedUsers);
+        Assert.Equal(0, c.Repo.Saves);
+    }
+
+    [Fact]
+    public async Task VerifyEmail_UnknownEmail_ThrowsInvalidOtp()
+    {
+        var c = Setup(existingUser: null);
+        await Assert.ThrowsAsync<InvalidOtpException>(() => c.Service.VerifyEmailAsync(new VerifyEmailRequestDto { Email = TestEmail, OTP = TestOtp }));
+    }
+
+    [Fact]
+    public async Task VerifyEmail_AlreadyVerified_Throws()
+    {
+        var c = Setup(existingUser: UserWithOtp(verified: true));
+        await Assert.ThrowsAsync<EmailAlreadyVerifiedException>(() => c.Service.VerifyEmailAsync(new VerifyEmailRequestDto { Email = TestEmail, OTP = TestOtp }));
+    }
 }
