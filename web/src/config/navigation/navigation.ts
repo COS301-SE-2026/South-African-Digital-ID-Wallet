@@ -18,6 +18,7 @@ export const citizenNavSections: SidebarNavSection[] = [
         href: '/citizen/my-credentials',
         icon: 'credentials',
       },
+      { label: 'Verifications', href: '/citizen/verifications', icon: 'users' },
       { label: 'Share QR Code', href: '/citizen/qr', icon: 'qr' },
       {
         label: 'Activate Credentials',
@@ -92,6 +93,11 @@ export const officialsNavSections: SidebarNavSection[] = [
         label: 'Onboard Citizen',
         href: '/officials/onboard-citizen',
         icon: 'onboard',
+      },
+      {
+        label: 'Verifications',
+        href: '/officials/verifications',
+        icon: 'users',
       },
       {
         label: 'Notifications',

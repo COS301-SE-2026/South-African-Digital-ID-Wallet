@@ -2,15 +2,15 @@
 
 import * as React from 'react'
 import { User, Eye, EyeOff } from 'lucide-react'
-import { Button } from '@/components/atoms'
-import type { LoginFormProps } from '@/types/login-form'
 import { useMutation } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
-import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
-import loginService from '@/services/login-service/login-service'
-import { useUser } from '@/context/user-context'
 import axios from 'axios'
+import toast from 'react-hot-toast'
+import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Button } from '@/components/atoms'
+import { useUser } from '@/context/user-context'
+import loginService from '@/services/login-service/login-service'
+import type { LoginFormProps } from '@/types/login-form'
 
 const DASHBOARD_ROUTES: Record<string, string> = {
   citizen: '/citizen/citizen-dashboard',
@@ -41,7 +41,7 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const [rememberMe, setRememberMe] = React.useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
   const router = useRouter()
-  const { setUser } = useUser()
+  const { refresh } = useUser()
 
   const searchParams = useSearchParams()
   const returnTo = searchParams.get('returnTo')
@@ -52,32 +52,30 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const loginMutation = useMutation<
     Awaited<ReturnType<typeof loginService.login>>,
     Error,
-    { email: string; password: string; rememberMe: boolean }
-  >({
-    mutationFn: (formValues: {
+    {
       email: string
       password: string
       rememberMe: boolean
-    }) => loginService.login(formValues),
+    }
+  >({
+    mutationFn: (formValues) => loginService.login(formValues),
+
     onSuccess: async (data) => {
       toast.success('Logged in')
+
       if (typeof window !== 'undefined') {
         window.localStorage.setItem(
           'flashid-session-expires-at',
           data.expiresAt
         )
       }
-      setUser({
-        userId: data.userId,
-        email,
-        role: data.role,
-        names: data.names,
-        surname: data.surname,
-      })
+
+      await refresh()
       const dashboardRoute = getDashboardRoute(data.role)
       const destination = getSafeReturnTo(returnTo, dashboardRoute)
       router.push(destination)
     },
+
     onError: (err) => {
       if (
         axios.isAxiosError(err) &&
@@ -87,6 +85,7 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
         router.push(`/verify-email?email=${encodeURIComponent(email)}`)
         return
       }
+
       toast.error('Login failed')
     },
   })
@@ -97,7 +96,13 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
     e
   ) => {
     e.preventDefault()
-    const data = { email, password, rememberMe }
+
+    const data = {
+      email,
+      password,
+      rememberMe,
+    }
+
     onSubmitAction?.(data)
     loginMutation.mutate(data)
   }
@@ -111,13 +116,14 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
         >
           Email:
         </label>
+
         <input
           id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 text-base focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           required
+          className="mt-1 w-full rounded-md border border-border-grey px-4 py-3 text-base focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
         />
       </div>
 
@@ -128,14 +134,15 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
         >
           Password:
         </label>
+
         <div className="relative mt-1">
           <input
             id="password"
             type={showPassword ? 'text' : 'password'}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-md border border-border-grey px-4 py-3 pr-12 text-base focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
             required
+            className="w-full rounded-md border border-border-grey px-4 py-3 pr-12 text-base focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
           />
 
           <button
@@ -161,24 +168,24 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
           onChange={(e) => setRememberMe(e.target.checked)}
           className="h-4 w-4 rounded border-border-grey"
         />
+
         <label htmlFor="rememberMe" className="text-base text-primary-green">
           Remember me
         </label>
       </div>
 
       <div className="flex flex-col gap-3">
-        <Button
-          variant="primary"
+        <button
           type="submit"
-          LeftIcon={User}
-          isLoading={isLoading}
-          className="w-full lg:w-full"
+          disabled={isLoading}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary-green px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Login
-        </Button>
+          <User className="h-4 w-4" />
+          {isLoading ? 'Logging in...' : 'Login'}
+        </button>
 
         <div className="space-y-1 text-center text-base text-primary-green">
-          <a className="block hover:text-deep-green hover:underline" href="#">
+          <a href="#" className="block hover:text-deep-green hover:underline">
             Forgot password?
           </a>
 
