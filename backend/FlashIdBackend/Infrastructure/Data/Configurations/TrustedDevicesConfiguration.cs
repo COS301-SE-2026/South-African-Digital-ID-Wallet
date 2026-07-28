@@ -12,7 +12,7 @@ public class TrustedDevicesConfiguration : IEntityTypeConfiguration<TrustedDevic
             .HasMaxLength(64)
             .IsRequired();
 
-        builder.HasIndex(d => d.DeviceTokenHash)
+        builder.HasIndex(d => new { d.UserId, d.DeviceTokenHash })
             .IsUnique();
 
         builder.HasOne(d => d.User)

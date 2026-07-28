@@ -154,7 +154,7 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<LoginResponseDto> VerifyDeviceAsync(VerifyDeviceRequestDto request, string? ipAddress,
+    public async Task<LoginResponseDto> VerifyDeviceAsync(VerifyDeviceRequestDto request, string? existingDeviceToken, string? ipAddress,
         CancellationToken cancellationToken)
     {
         if (request.DeviceVerificationId == Guid.Empty)
@@ -220,29 +220,45 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("The user account could not be found.");
         }
 
-        var rawDeviceToken = _deviceTokenProvider.GenerateToken();
+        var shouldSetDeviceCookie = string.IsNullOrWhiteSpace(existingDeviceToken);
+        var rawDeviceToken = shouldSetDeviceCookie ? _deviceTokenProvider.GenerateToken() : existingDeviceToken!;
         var hashedToken = _deviceTokenProvider.HashToken(rawDeviceToken);
 
-        var trustedDevice = new TrustedDevice
-        {
-            Id = Guid.NewGuid(),
-            UserId = user.Id,
-            DeviceTokenHash = hashedToken,
-            DeviceType = request.DeviceType,
-            OperatingSystem = request.OperatingSystem,
-            Browser = request.Browser,
-            LastKnownCity = null,
-            LastKnownCountry = null,
-            LastActive = DateTime.UtcNow,
-            IsTrusted = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-        };
+        var existingTrustedDevice = await _trustedDeviceRepository.GetByTokenHashAsync(user.Id, hashedToken, cancellationToken);
 
+        if (existingTrustedDevice is null)
+        {
+            var trustedDevice = new TrustedDevice
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                DeviceTokenHash = hashedToken,
+                DeviceType = request.DeviceType,
+                OperatingSystem = request.OperatingSystem,
+                Browser = request.Browser,
+                LastKnownCity = null,
+                LastKnownCountry = null,
+                LastActive = DateTime.UtcNow,
+                IsTrusted = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+            };
+
+            await _trustedDeviceRepository.AddTrustedDeviceAsync(trustedDevice, cancellationToken);
+        }
+        else
+        {
+            existingTrustedDevice.DeviceType = request.DeviceType;
+            existingTrustedDevice.OperatingSystem = request.OperatingSystem;
+            existingTrustedDevice.Browser = request.Browser;
+            existingTrustedDevice.LastActive = DateTime.UtcNow;
+            existingTrustedDevice.UpdatedAt = DateTime.UtcNow;
+
+            await _trustedDeviceRepository.UpdateTrustedDeviceAsync(existingTrustedDevice, cancellationToken);
+        }
         verification.VerifiedAt = DateTime.UtcNow;
         verification.UpdatedAt = DateTime.UtcNow;
 
-        await _trustedDeviceRepository.AddTrustedDeviceAsync(trustedDevice, cancellationToken);
         await _trustedDeviceRepository.UpdateDeviceVerificationAsync(verification, cancellationToken);
 
         var verifiedAuditLog = new AuditLog()
@@ -273,7 +289,7 @@ public class AuthService : IAuthService
             RequiresDeviceVerification = false,
             DeviceVerificationId = null,
 
-            DeviceToken = rawDeviceToken,
+            DeviceToken = shouldSetDeviceCookie ? rawDeviceToken : null,
         };
     }
 

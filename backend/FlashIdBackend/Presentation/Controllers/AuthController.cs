@@ -112,20 +112,15 @@ public class AuthController : ControllerBase
         try
         {
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            var result = await _authService.VerifyDeviceAsync(request, ipAddress, cancellationToken);
+            Request.Cookies.TryGetValue("flashid_device", out var deviceToken);
+
+            var result = await _authService.VerifyDeviceAsync(request, deviceToken, ipAddress, cancellationToken);
 
             if (string.IsNullOrWhiteSpace(result.Token))
             {
                 _logger.LogError("Device verification completed without an access token.");
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new { error = "The login could not be completed." });
-            }
-
-            if (string.IsNullOrWhiteSpace(result.DeviceToken))
-            {
-                _logger.LogError("Device verification completed without a device token.");
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new { error = "The device could not be trusted." });
             }
 
             var accessTokenOptions = new CookieOptions
@@ -139,16 +134,20 @@ public class AuthController : ControllerBase
             };
             Response.Cookies.Append("access_token", result.Token, accessTokenOptions);
 
-            var deviceCookieOptions = new CookieOptions
+            if (!string.IsNullOrWhiteSpace(result.DeviceToken))
             {
-                HttpOnly = true,
-                Secure = !_environment.IsDevelopment(),
-                SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
-                Path = "/",
-                Expires = DateTimeOffset.UtcNow.AddMonths(4),
-                IsEssential = true
-            };
-            Response.Cookies.Append("flashid_device", result.DeviceToken, deviceCookieOptions);
+                var deviceCookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = !_environment.IsDevelopment(),
+                    SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
+                    Path = "/",
+                    Expires = DateTimeOffset.UtcNow.AddMonths(4),
+                    IsEssential = true
+                };
+
+                Response.Cookies.Append("flashid_device", result.DeviceToken, deviceCookieOptions);
+            }
 
             result.Token = string.Empty;
             result.DeviceToken = null;
