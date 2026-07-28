@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import {
   AccountCard,
-  SelectiveDisclosureCard,
+  ManageUserTrustedDevices,
   UpdateEmailModal,
   UpdatePasswordModal,
   UpdateEmailCard,
@@ -12,38 +12,35 @@ import {
   DeleteAccountCard,
 } from '@/components/molecules'
 
-import type { ManageUserAccountProps } from './types'
-
-export function ManageUserAccount({
-  user,
-  navSections,
-  onLogout,
-}: Readonly<ManageUserAccountProps>) {
+export function ManageUserAccount() {
   const [openEmail, setOpenEmail] = useState(false)
   const [openPass, setOpenPass] = useState(false)
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <main className="flex-1 flex flex-col p-4 gap-4">
-        <div className="flex-1 grid grid-cols-2 gap-4 min-h-0">
+      <main className="flex flex-1 flex-col gap-5 overflow-hidden p-5">
+        <div className="grid min-h-0 flex-1 grid-cols-2 gap-5">
           <AccountCard />
-          <div className="flex flex-col gap-4 min-h-0">
-            <div className="flex-[2] min-h-0">
-              <SelectiveDisclosureCard />
+
+          <div className="flex min-h-0 flex-col gap-5">
+            <div className="h-[45%] min-h-[300px]">
+              <ManageUserTrustedDevices />
             </div>
-            <div className="grid grid-cols-2 gap-4 flex-1">
+
+            <div className="grid flex-1 grid-cols-2 gap-5">
               <UpdateEmailCard onAction={() => setOpenEmail(true)} />
               <UpdatePasswordCard onAction={() => setOpenPass(true)} />
             </div>
           </div>
         </div>
-        <div className="shrink-0">
-          <DeleteAccountCard />
-        </div>
+
+        <DeleteAccountCard />
+
         <UpdateEmailModal
           open={openEmail}
           onCloseAction={() => setOpenEmail(false)}
         />
+
         <UpdatePasswordModal
           open={openPass}
           onCloseAction={() => setOpenPass(false)}
