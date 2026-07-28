@@ -94,4 +94,120 @@ public class CitizenVerificationServiceTests
         Assert.Contains("temporarily locked", ex.Message);
         Assert.Contains("5 minutes", ex.Message);
     }
+
+    [Theory]
+    [InlineData("", ValidSaId, ValidPin)]
+    [InlineData(RawToken, "123", ValidPin)]
+    [InlineData(RawToken, ValidSaId, "12ab56")]
+    public async Task InvalidRequest_ThrowsArgumentException(string token, string saId, string pin)
+    {
+        var c = Setup();
+        await Assert.ThrowsAsync<ArgumentException>(() => Act(c, Guid.NewGuid(), token, saId, pin));
+        Assert.Null(c.Repo.RequestedHash);
+    }
+
+    [Fact]
+    public async Task UnknownToken_Throws()
+    {
+        var c = Setup(noActivation: true);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid()));
+        Assert.Equal(Sha256Hex(RawToken), c.Repo.RequestedHash);
+    }
+
+    [Fact]
+    public async Task ActivationWithoutCitizen_Throws()
+    {
+        var c = Setup(noCitizen: true);
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid()));
+        Assert.Contains("could not be found", ex.Message);
+    }
+
+    [Fact]
+    public async Task ValidDetails_VerifiesCitizenAndConsumesActivation()
+    {
+        var c = Setup();
+        var userId = Guid.NewGuid();
+        var response = await Act(c, userId);
+        Assert.True(response.IsVerified);
+        Assert.Equal(c.Citizen.Id, response.CitizenId);
+        Assert.Equal(nameof(CitizenStatus.Verified), response.Status);
+        Assert.Equal(userId, c.Citizen.UserId);
+        Assert.Equal(CitizenStatus.Verified, c.Citizen.Status);
+        Assert.Equal(ActivationStatus.Used, c.Activation.Status);
+        Assert.NotNull(c.Activation.UsedAt);
+        Assert.Null(c.Activation.LockedUntil);
+        var log = Assert.Single(c.Repo.AuditLogs);
+        Assert.Equal(AuditEventType.CitizenVerified, log.EventType);
+        Assert.Equal(userId, log.ActorId);
+        Assert.Equal(TestIpAddress, log.IpAddress);
+        Assert.Equal(1, c.Repo.Saves);
+    }
+
+    [Fact]
+    public async Task SaIdMismatch_RecordsFailedAttempt()
+    {
+        var c = Setup(citizenSaId: "8001015800087");
+        await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid()));
+        Assert.Equal(1, c.Activation.AttemptCount);
+        Assert.Equal(1, c.Repo.Saves);
+        Assert.Empty(c.Repo.AuditLogs);
+    }
+
+    [Fact]
+    public async Task WrongPin_RecordsFailedAttempt()
+    {
+        var c = Setup();
+        await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid(), pin: "999999"));
+        Assert.Equal(1, c.Activation.AttemptCount);
+        Assert.Equal(1, c.Repo.Saves);
+    }
+
+    [Theory]
+    [InlineData(2, 5)]
+    [InlineData(4, 10)]
+    public async Task WrongPinAtThreshold_LocksActivation(int startingAttempts, int expectedLockMinutes)
+    {
+        var c = Setup(attemptCount: startingAttempts);
+        var before = DateTime.UtcNow;
+        await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid(), pin: "999999"));
+        Assert.Equal(startingAttempts + 1, c.Activation.AttemptCount);
+        Assert.NotNull(c.Activation.LockedUntil);
+        var lockedFor = c.Activation.LockedUntil!.Value - before;
+        Assert.InRange(lockedFor, TimeSpan.FromMinutes(expectedLockMinutes - 1), TimeSpan.FromMinutes(expectedLockMinutes + 1));
+    }
+
+    [Fact]
+    public async Task SixthWrongPin_RevokesActivation()
+    {
+        var c = Setup(attemptCount: 5);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid(), pin: "999999"));
+        Assert.Equal(ActivationStatus.Revoked, c.Activation.Status);
+        Assert.NotNull(c.Activation.RevokedAt);
+        Assert.Null(c.Activation.LockedUntil);
+    }
+
+    [Fact]
+    public async Task ExpiredLock_IsClearedAndVerificationProceeds()
+    {
+        var c = Setup(lockedUntil: DateTime.UtcNow.AddMinutes(-1));
+        var response = await Act(c, Guid.NewGuid());
+        Assert.True(response.IsVerified);
+        Assert.Null(c.Activation.LockedUntil);
+    }
+
+    [Fact]
+    public async Task CitizenAlreadyLinkedToAnotherUser_Throws()
+    {
+        var c = Setup(citizenUserId: Guid.NewGuid());
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid()));
+        Assert.Contains("linked to another account", ex.Message);
+    }
+
+    [Fact]
+    public async Task UserAlreadyLinkedToAnotherCitizen_Throws()
+    {
+        var c = Setup(citizenForUser: new Citizen { Id = Guid.NewGuid(), SaId = "8001015800087" });
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid()));
+        Assert.Contains("linked to another citizen", ex.Message);
+    }
 }
