@@ -189,7 +189,7 @@ describe('VerifyEmailForm', () => {
       render(<VerifyEmailForm />, { wrapper: createWrapper() })
       await user.type(getCodeInput(), VALID_CODE)
       await user.click(getVerifyButton())
-      await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/'))
+      await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/login'))
     })
 
     it('shows a fallback error toast when verification fails', async () => {

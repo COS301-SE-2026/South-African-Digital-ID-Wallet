@@ -61,7 +61,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAdd();
 
-        builder.HasIndex(u => u.Email).IsUnique();
+        builder.HasIndex(u => u.Email)
+            .IsUnique()
+            .HasFilter("[IsDeleted] = 0");
 
         builder.HasOne(u => u.Preference)
             .WithOne(up => up.User)
