@@ -248,9 +248,7 @@ public class AuthService : IAuthService
         }
         else
         {
-            existingTrustedDevice.DeviceType = request.DeviceType;
-            existingTrustedDevice.OperatingSystem = request.OperatingSystem;
-            existingTrustedDevice.Browser = request.Browser;
+            existingTrustedDevice.IsTrusted = true;
             existingTrustedDevice.LastActive = DateTime.UtcNow;
             existingTrustedDevice.UpdatedAt = DateTime.UtcNow;
 

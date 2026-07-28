@@ -10,7 +10,7 @@ public class TrustedDevice : BaseEntity
 
     public string OperatingSystem { get; set; } = string.Empty;
 
-    public string? Browser { get; set; } = string.Empty;
+    public string Browser { get; set; } = string.Empty;
 
     public string? LastKnownCity { get; set; }
 

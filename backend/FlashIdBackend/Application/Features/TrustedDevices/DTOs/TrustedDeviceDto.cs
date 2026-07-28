@@ -12,9 +12,9 @@ public class TrustedDeviceDto
 
     public string Browser { get; set; } = string.Empty;
 
-    public string IpAddress { get; set; } = string.Empty;
+    public string? LastKnownCity { get; set; }
 
-    public string Location { get; set; } = string.Empty;
+    public string? LastKnownCountry { get; set; }
 
     public DateTime LastActive { get; set; }
 

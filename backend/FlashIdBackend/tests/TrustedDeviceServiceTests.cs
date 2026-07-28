@@ -1,6 +1,7 @@
 using Application.Common.Mapping;
 using Application.Common.Services;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -59,7 +60,7 @@ public class TrustedDeviceServiceTests
             Id = Guid.NewGuid(),
             CitizenId = citizen.Id,
             DeviceName = "MacBook Air",
-            DeviceType = "Laptop",
+            DeviceType = Enum.Parse<DeviceType>("Laptop"),
             OperatingSystem = "macOS",
             Browser = "Chrome",
             IpAddress = TestIpAddress,
@@ -85,7 +86,6 @@ public class TrustedDeviceServiceTests
         Assert.Equal("Laptop", result[0].DeviceType);
         Assert.Equal("macOS", result[0].OperatingSystem);
         Assert.Equal("Chrome", result[0].Browser);
-        Assert.Equal(TestIpAddress, result[0].IpAddress);
         Assert.Equal("Pretoria", result[0].Location);
         Assert.True(result[0].IsCurrentDevice);
         Assert.True(result[0].IsTrusted);
