@@ -1,0 +1,36 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IAuthService.cs
+  h_293a8616118f65 7
+backend/FlashIdBackend/Domain/Entities/TrustedDevice.cs
+  h_293a8616118f65 23,25
+backend/FlashIdBackend/Infrastructure/Repositories/TrustedDeviceRepository.cs
+  h_293a8616118f65 17-21,23,27,37,49,53
+backend/FlashIdBackend/Infrastructure/Data/AppDbContext.cs
+  h_293a8616118f65 30
+backend/FlashIdBackend/Infrastructure/Data/DbSeeder.cs
+  h_293a8616118f65 704-705,730,752,759,761,763-766
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/ITrustedDeviceRepository.cs
+  h_293a8616118f65 7-8,10
+backend/FlashIdBackend/Infrastructure/Data/Configurations/DeviceVerificationConfiguration.cs
+  h_293a8616118f65 1-20
+backend/FlashIdBackend/Presentation/Controllers/AuthController.cs
+  h_293a8616118f65 52,58
+backend/FlashIdBackend/Infrastructure/Data/Configurations/TrustedDevicesConfiguration.cs
+  h_293a8616118f65 18,20-21
+backend/FlashIdBackend/Application/Common/Services/TrustedDeviceService.cs
+  h_293a8616118f65 23-28,31
+backend/FlashIdBackend/Application/Common/Services/AuthService.cs
+  h_293a8616118f65 1-2,44,100-120,145-163,165-183,185
+backend/FlashIdBackend/Domain/Entities/DeviceVerification.cs
+  h_293a8616118f65 5,10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "5b19ab8ae7b1d65d1f0c850c772469516431efc5",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
