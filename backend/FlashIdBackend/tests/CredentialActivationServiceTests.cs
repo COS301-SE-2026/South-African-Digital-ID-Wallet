@@ -83,4 +83,22 @@ public class CredentialActivationServiceTests
         await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, CredentialType.IdentityDocument));
         Assert.Empty(c.Repo.Added);
     }
+
+    [Fact]
+    public async Task CitizenNotVerified_Throws()
+    {
+        var c = Setup(status: CitizenStatus.Pending);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, CredentialType.IdentityDocument));
+        Assert.Empty(c.Repo.Added);
+        Assert.Equal(0, c.Repo.Saves);
+    }
+
+    [Fact]
+    public async Task NoCredentialTypes_Throws()
+    {
+        var c = Setup();
+        await Assert.ThrowsAsync<ArgumentNullException>(() => Act(c));
+        Assert.Empty(c.Repo.Added);
+    }
+
 }
