@@ -101,4 +101,43 @@ public class CredentialActivationServiceTests
         Assert.Empty(c.Repo.Added);
     }
 
+    [Fact]
+    public async Task UnsupportedCredentialType_Throws()
+    {
+        var c = Setup();
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => Act(c, (CredentialType)99));
+        Assert.Empty(c.Repo.Added);
+    }
+
+    [Fact]
+    public async Task IdentityDocument_CreatesActiveCredentialAndActivatesCitizen()
+    {
+        var c = Setup();
+        var response = await Act(c, CredentialType.IdentityDocument);
+        Assert.Equal("Success", response.Status);
+        Assert.Contains("activated successfully: Identity Document", response.Message);
+        var credential = Assert.Single(c.Repo.Added);
+        Assert.Equal(c.Citizen.Id, credential.CitizenId);
+        Assert.Equal(CredentialStatus.Active, credential.Status);
+        Assert.Equal(new DateTime(2015, 6, 1), credential.IssueDate);
+        Assert.Equal(IdentityDocumentStatus.Citizen, credential.IdentityDocument!.Status);
+        Assert.Null(credential.DriversLicense);
+        Assert.Equal(CitizenStatus.Activated, c.Citizen.Status);
+        Assert.NotNull(c.Citizen.ActivatedAt);
+        Assert.Equal(1, c.Repo.Saves);
+    }
+
+    [Fact]
+    public async Task DriversLicense_CreatesActiveCredential()
+    {
+        var c = Setup();
+        var response = await Act(c, CredentialType.DriversLicense);
+        Assert.Contains("activated successfully: Driver's License", response.Message);
+        var credential = Assert.Single(c.Repo.Added);
+        Assert.Equal(LicenseCode.EB, credential.DriversLicense!.LicenseCode);
+        Assert.Equal(new DateTime(2030, 3, 15), credential.DriversLicense.ExpiryDate);
+        Assert.Null(credential.IdentityDocument);
+        Assert.Equal(CitizenStatus.Activated, c.Citizen.Status);
+        Assert.Equal(1, c.Repo.Saves);
+    }
 }
