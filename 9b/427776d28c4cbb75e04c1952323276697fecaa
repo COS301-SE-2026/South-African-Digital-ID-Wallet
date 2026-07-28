@@ -1,0 +1,16 @@
+web/src/components/organisms/login-form/login-form.tsx
+  h_293a8616118f65 6,9-10,13,44,62,65,72-73,78,88,99,103,105,119,137,171,178,180-181,183-185,188
+web/src/components/pages/index.ts
+  h_293a8616118f65 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "9b427776d28c4cbb75e04c1952323276697fecaa",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
