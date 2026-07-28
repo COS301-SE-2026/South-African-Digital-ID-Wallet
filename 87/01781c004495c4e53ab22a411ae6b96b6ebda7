@@ -1,0 +1,26 @@
+backend/FlashIdBackend/Domain/Enums/DeviceType.cs
+  h_293a8616118f65 1-9
+backend/FlashIdBackend/Domain/Entities/DeviceVerification.cs
+  h_293a8616118f65 1-11
+backend/FlashIdBackend/Domain/Entities/TrustedDevice.cs
+  h_293a8616118f65 7,9,13,15,17,25
+backend/FlashIdBackend/Infrastructure/Data/DbSeeder.cs
+  h_293a8616118f65 30-31,709-715,720-725,736-740,744-746,748-749
+backend/FlashIdBackend/Infrastructure/Data/Configurations/TrustedDevicesConfiguration.cs
+  h_293a8616118f65 1-22
+backend/FlashIdBackend/Infrastructure/Repositories/TrustedDeviceRepository.cs
+  h_293a8616118f65 54-72
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/ITrustedDeviceRepository.cs
+  h_293a8616118f65 10-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "8701781c004495c4e53ab22a411ae6b96b6ebda7",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+backend/FlashIdBackend/Application/Common/Services/AuthService.cs
+  h_293a8616118f65 423,425-427
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "f26a8a0a9e2ac4f7e5e7144cad33c2452b1b8035",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
