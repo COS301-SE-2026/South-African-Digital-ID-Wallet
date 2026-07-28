@@ -1,24 +1,11 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ManageUserAccount } from '../manage-user-account'
-import { ManageUserAccountUser } from '../types'
-import {
-  DeleteAccountCard,
-  SelectiveDisclosureCard,
-} from '@/components/molecules'
-
-jest.mock('@/components/organisms/app-sidebar', () => ({
-  AppSidebar: () => <div data-testid="app-sidebar" />,
-}))
-
-jest.mock('@/components/organisms/app-top-bar', () => ({
-  AppTopBar: () => <div data-testid="app-top-bar" />,
-}))
 
 jest.mock('@/components/molecules', () => ({
   AccountCard: () => <div data-testid="account-card" />,
-  SelectiveDisclosureCard: () => (
-    <div data-testod="selective-disclosure-card" />
+  ManageUserTrustedDevices: () => (
+    <div data-testid="manage-user-trusted-devices" />
   ),
   UpdateEmailCard: ({ onAction }: { onAction: () => void }) => (
     <button onClick={onAction}>Update Email</button>
@@ -33,21 +20,9 @@ jest.mock('@/components/molecules', () => ({
     open ? <div data-testid="update-password-modal" /> : null,
 }))
 
-const user: ManageUserAccountUser = {
-  name: 'LeBron James',
-  initials: 'LJ',
-  idLabel: 'ID ending 0123',
-}
-
-const defaultProperties = {
-  user,
-  navSections: [],
-  onLogout: jest.fn(),
-}
-
 describe('ManageUserAccount', () => {
   it('renders the account management cards', () => {
-    render(<ManageUserAccount {...defaultProperties} />)
+    render(<ManageUserAccount />)
 
     expect(screen.getByTestId('account-card')).toBeInTheDocument()
     expect(screen.getByTestId('delete-account-card')).toBeInTheDocument()
@@ -56,7 +31,7 @@ describe('ManageUserAccount', () => {
   it('opens the change email modal', async () => {
     const user = userEvent.setup()
 
-    render(<ManageUserAccount {...defaultProperties} />)
+    render(<ManageUserAccount />)
 
     await user.click(screen.getByRole('button', { name: /update email/i }))
 
@@ -66,7 +41,7 @@ describe('ManageUserAccount', () => {
   it('opens the change password modal', async () => {
     const user = userEvent.setup()
 
-    render(<ManageUserAccount {...defaultProperties} />)
+    render(<ManageUserAccount />)
 
     await user.click(screen.getByRole('button', { name: /update password/i }))
 
