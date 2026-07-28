@@ -14,7 +14,7 @@ public class CredentialActivationServiceTests
     private const string KnownSaId = "9001015800086";
     private const string TestIpAddress = "196.25.1.10";
 
-    private sealed class FakeCredentialRepo : ICredentialRepo
+    private sealed class FakeCredentialRepo : ICredentialRepository
     {
         public Citizen? CitizenToReturn { get; set; }
         public Task<Citizen?> GetCitizenByIdAsync(Guid u, CancellationToken c) => Task.FromResult(CitizenToReturn);
@@ -56,7 +56,7 @@ public class CredentialActivationServiceTests
 
     private static Ctx Setup(CitizenStatus status = CitizenStatus.Verified, bool noCitizen = false, bool hasId = false, bool hasDl = false, bool idAvailable = true, bool dlAvailable = true)
     {
-        var citizen = new Citizen { Id = Guid.NewGuid(), SaId = SaId, Status = status };
+        var citizen = new Citizen { Id = Guid.NewGuid(), SaId = KnownSaId, Status = status };
         var repo = new FakeActivationRepo { HasId = hasId, HasDl = hasDl };
         var gateway = new FakeGateway
         {
@@ -69,12 +69,12 @@ public class CredentialActivationServiceTests
             Citizen = citizen,
             Repo = repo,
             Service = new CredentialActivationService(
-                new FakeCredentialRepo { Citizen = noCitizen ? null : citizen }, gateway, repo
+                new FakeCredentialRepo { CitizenToReturn = noCitizen ? null : citizen }, gateway, repo
             ),
         };
     }
 
-    private static Task<ActivateCredentialsResponseDto> Act(Ctx c, params CredentialType[] types) => c.Service.ActivateCredentialsAsync(new() { CredentialTypes = types.ToList() }, Guid.NewGuid(), Ip, TestContext.Current.CancellationToken);
+    private static Task<ActivateCredentialsResponseDto> Act(Ctx c, params CredentialType[] types) => c.Service.ActivateCredentialsAsync(new() { CredentialTypes = types.ToList() }, Guid.NewGuid(), TestIpAddress, TestContext.Current.CancellationToken);
 
     [Fact]
     public async Task noCitizenLinked_Throws()
@@ -138,6 +138,46 @@ public class CredentialActivationServiceTests
         Assert.Equal(new DateTime(2030, 3, 15), credential.DriversLicense.ExpiryDate);
         Assert.Null(credential.IdentityDocument);
         Assert.Equal(CitizenStatus.Activated, c.Citizen.Status);
+        Assert.Equal(1, c.Repo.Saves);
+    }
+
+    [Fact]
+    public async Task BothTypes_AddsTwoCredentialsAndSavesOnce()
+    {
+        var c = Setup();
+        await Act(c, CredentialType.IdentityDocument, CredentialType.DriversLicense);
+        Assert.Equal(2, c.Repo.Added.Count);
+        Assert.Equal(1, c.Repo.Saves);
+    }
+
+    [Fact]
+    public async Task DuplicateTypesInRequest_ActivatesOnce()
+    {
+        var c = Setup();
+        await Act(c, CredentialType.IdentityDocument, CredentialType.IdentityDocument);
+        Assert.Single(c.Repo.Added);
+    }
+
+    [Fact]
+    public async Task AlreadyActivated_SkipsAndReports()
+    {
+        var c = Setup(hasId: true);
+        var response = await Act(c, CredentialType.IdentityDocument);
+        Assert.Contains("already activated: Identity Document", response.Message);
+        Assert.DoesNotContain("activated successfully", response.Message);
+        Assert.Empty(c.Repo.Added);
+        Assert.Equal(CitizenStatus.Verified, c.Citizen.Status);
+        Assert.Equal(0, c.Repo.Saves);
+    }
+
+    [Fact]
+    public async Task MixedOutcomes_ReportsActivatedAndUnavailable()
+    {
+        var c = Setup(dlAvailable: false);
+        var response = await Act(c, CredentialType.IdentityDocument, CredentialType.DriversLicense);
+        Assert.Contains("activated successfully: Identity Document", response.Message);
+        Assert.Contains("unavailable: Driver's License", response.Message);
+        Assert.Single(c.Repo.Added);
         Assert.Equal(1, c.Repo.Saves);
     }
 }
