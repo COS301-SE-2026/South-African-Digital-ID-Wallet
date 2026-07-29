@@ -25,5 +25,4 @@ export type SidebarNavSection = {
 export type SidebarUser = {
   name: string
   initials: string
-  idLabel: string
 }

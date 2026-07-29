@@ -22,6 +22,7 @@ public class QrServiceIntegrationTests
     private const string LicenseCodeField = "License code";
     private const string ExpiryDateField = "Expiry date";
     private const string CountryOfIssueField = "Country of issue";
+    private const string DateOfBirthField = "Date of birth";
     private const string HomeAffairsIssuer = "Home Affairs";
     private const string LocalHostIp = "127.0.0.1";
 
@@ -135,7 +136,7 @@ public class QrServiceIntegrationTests
         DisclosedFields = new List<string>
         {
             FullNameField, SaIdNumberField, PhotoField, LicenseNumberField,
-            LicenseCodeField, ExpiryDateField, CountryOfIssueField,
+            LicenseCodeField, ExpiryDateField, CountryOfIssueField,DateOfBirthField,
         },
     };
 

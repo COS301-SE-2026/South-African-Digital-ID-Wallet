@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import * as React from 'react'
 import { QRCodeSVG } from 'qrcode.react'
@@ -6,7 +6,7 @@ import { RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Text, StatusPill } from '@/components/atoms'
+import { Text } from '@/components/atoms'
 import { qrService } from '@/services/qr-service'
 import type { QrDisplayProps } from './types'
 
@@ -36,34 +36,43 @@ export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
     secondsRemaining <= WARNING_THRESHOLD_SECONDS &&
     !isExpired
 
-  const fetchQr = React.useCallback(async () => {
-    try {
-      const disclosedFields = [...mandatoryFields, ...selectedOptionalFields]
-      const response = await qrService.generate(credentialId, disclosedFields)
-      const expiresAt = new Date(response.expiresAt).getTime()
-      setQrValue(response.token)
-      setExpiresAtMs(expiresAt)
-      setSecondsRemaining(
-        Math.max(Math.round((expiresAt - Date.now()) / 1000), 0)
-      )
-      hasShownWarningToast.current = false
-      setStatus('ready')
-    } catch {
-      setErrorMessage('Could not generate your QR code. Please try again.')
-      setStatus('error')
+  const [retryToken, setRetryToken] = React.useState(0)
+
+  React.useEffect(() => {
+    let cancelled = false
+
+    const load = async () => {
+      try {
+        const disclosedFields = [...mandatoryFields, ...selectedOptionalFields]
+        const response = await qrService.generate(credentialId, disclosedFields)
+        if (cancelled) return
+        const expiresAt = new Date(response.expiresAt).getTime()
+        setQrValue(response.token)
+        setExpiresAtMs(expiresAt)
+        setSecondsRemaining(
+          Math.max(Math.round((expiresAt - Date.now()) / 1000), 0)
+        )
+        hasShownWarningToast.current = false
+        setStatus('ready')
+      } catch {
+        if (!cancelled) {
+          setErrorMessage('Could not generate your QR code. Please try again.')
+          setStatus('error')
+        }
+      }
     }
-  }, [credentialId, mandatoryFields, selectedOptionalFields])
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [credentialId, mandatoryFields, selectedOptionalFields, retryToken])
 
   const handleRetry = () => {
     setStatus('loading')
     setErrorMessage('')
-    fetchQr()
+    setRetryToken((t) => t + 1)
   }
-
-  React.useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchQr()
-  }, [fetchQr])
 
   React.useEffect(() => {
     if (status !== 'ready' || isExpired || expiresAtMs === null) return
@@ -163,7 +172,7 @@ export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
 
         <div className="mt-8 border-t border-gray-200 pt-6 text-center">
           <Text variant="sub-sm" className="text-gray-500">
-            Secure • Encrypted • Controlled by You
+            Secure • Signed • Controlled by You
           </Text>
         </div>
       </Card>
