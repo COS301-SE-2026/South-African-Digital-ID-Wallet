@@ -12,11 +12,11 @@ describe('FieldSelectionForm', () => {
         onBack={() => {}}
       />
     )
-    const identityNumberSwitch = screen.getByRole('switch', {
-      name: /identity number/i,
+    const dateOfBirthSwitch = screen.getByRole('switch', {
+      name: /date of birth/i,
     })
-    expect(identityNumberSwitch).toBeChecked()
-    expect(identityNumberSwitch).toBeDisabled()
+    expect(dateOfBirthSwitch).toBeChecked()
+    expect(dateOfBirthSwitch).toBeDisabled()
   })
 
   it('renders optional fields unchecked by default', () => {
@@ -83,14 +83,7 @@ describe('FieldSelectionForm', () => {
     expect(onContinue).toHaveBeenCalledWith({
       credentialId: 'credential-123',
       credentialType: 'identityDocument',
-      mandatoryFields: [
-        'Identity number',
-        'Full surname',
-        'Full forenames',
-        'Date of birth',
-        'Citizenship status',
-        'Photograph',
-      ],
+      mandatoryFields: ['Date of birth', 'Photograph'],
       selectedOptionalFields: ['Gender'],
     })
   })

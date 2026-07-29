@@ -16,24 +16,16 @@ describe('qrUrls', () => {
 describe('MANDATORY_FIELDS', () => {
   it('includes all required identity document fields', () => {
     expect(MANDATORY_FIELDS.identityDocument).toEqual([
-      'Identity number',
-      'Full surname',
-      'Full forenames',
       'Date of birth',
-      'Citizenship status',
       'Photograph',
     ])
   })
 
   it('includes all required drivers license fields', () => {
     expect(MANDATORY_FIELDS.driversLicense).toEqual([
-      'Full name',
-      'SA ID number',
       'Photo',
-      'License number',
-      'License code',
       'Expiry date',
-      'Country of issue',
+      'Date of birth',
     ])
   })
 })
@@ -41,6 +33,10 @@ describe('MANDATORY_FIELDS', () => {
 describe('OPTIONAL_FIELDS', () => {
   it('includes optional identity document fields', () => {
     expect(OPTIONAL_FIELDS.identityDocument).toEqual([
+      'Identity number',
+      'Full surname',
+      'Full forenames',
+      'Citizenship status',
       'Gender',
       'Country of birth',
       'Signature',
@@ -50,8 +46,12 @@ describe('OPTIONAL_FIELDS', () => {
 
   it('includes optional drivers license fields', () => {
     expect(OPTIONAL_FIELDS.driversLicense).toEqual([
+      'Full name',
+      'SA ID number',
+      'License number',
+      'License code',
+      'Country of issue',
       'Signature',
-      'Date of birth',
       'Vehicle restrictions',
       'Date of issue',
     ])
