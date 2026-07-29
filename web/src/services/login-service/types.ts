@@ -1,3 +1,5 @@
+import { DeviceType } from '@/types'
+
 export type LoginFormValues = {
   email: string
   password: string
@@ -16,7 +18,7 @@ export type LoginResponse = {
 export type VerifyDeviceRequest = {
   deviceVerificationId: string
   otp: string
-  deviceType: string
+  deviceType: DeviceType
   operatingSystem: string
   browser: string
   rememberMe?: boolean

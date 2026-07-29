@@ -9,7 +9,7 @@ import { DashboardModal } from '@/components/molecules/dashboard-modal/dashboard
 type OtpModalProps = {
   open: boolean
   onClose: () => void
-  onSuccess: () => void
+  onSuccess: (otp: string) => Promise<void>
 }
 
 const OTP_LENGTH = 6
@@ -69,12 +69,7 @@ export function OtpModal({
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      toast.success('Device verified.')
-
-      onClose()
-      onSuccess()
+      await onSuccess(otpCode)
     } catch {
       toast.error('Invalid verification code.')
     }

@@ -22,7 +22,7 @@ public class DeleteAccountService : IDeleteAccountService
         {
             await _repository.DeleteQrDisclosureTokensAsync(citizen.Id);
             await _repository.DeleteCredentialsAsync(citizen.Id);
-            await _repository.DeleteTrustedDevicesAsync(citizen.Id);
+            await _repository.DeleteTrustedDevicesAsync(userId);
             await _repository.DeleteNotificationsAsync(citizen.Id);
             await _repository.DeleteCitizenAsync(citizen);
         }

@@ -11,6 +11,7 @@ import { useUser } from '@/context/user-context'
 import loginService from '@/services/login-service/login-service'
 import { OtpModal } from '@/components/templates/otp-modal/otp-modal'
 import type { LoginFormProps } from '@/types/login-form'
+import { DeviceType } from '@/types'
 
 const DASHBOARD_ROUTES: Record<string, string> = {
   citizen: '/citizen/citizen-dashboard',
@@ -26,6 +27,33 @@ const getDashboardRoute = (role: string) => {
     .replace(/[_\s-]+/g, '')
 
   return DASHBOARD_ROUTES[normalizedRole] ?? '/citizen/citizen-dashboard'
+}
+
+const getOperatingSystem = () => {
+  const userAgent = window.navigator.userAgent
+  if (userAgent.includes('Windows')) return 'Windows'
+  if (userAgent.includes('Mac OS')) return 'macOS'
+  if (userAgent.includes('Android')) return 'Android'
+  if (userAgent.includes('iPhone') || userAgent.includes('iPad')) return 'iOS'
+  if (userAgent.includes('Linux')) return 'Linux'
+  return 'Unknown'
+}
+
+const getBrowser = () => {
+  const userAgent = window.navigator.userAgent
+  if (userAgent.includes('Edg/')) return 'Microsoft Edge'
+  if (userAgent.includes('Chrome/')) return 'Chrome'
+  if (userAgent.includes('Firefox')) return 'FireFox'
+  if (userAgent.includes('Safari/') && !userAgent.includes('Chrome/'))
+    return 'Safari'
+  return 'Unknown'
+}
+
+const getDeviceType = (): DeviceType => {
+  const userAgent = window.navigator.userAgent
+  if (/iPad|Tablet/i.test(userAgent)) return 'Tablet'
+  if (/Android|iPhone|Mobile/i.test(userAgent)) return 'Mobile'
+  return 'Laptop'
 }
 
 export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
@@ -82,11 +110,6 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
           router.push(`/verify-email?email=${encodeURIComponent(email)}`)
           return
         }
-
-        if (code === 'NEW_DEVICE' && err.response?.data?.loginAttemptId) {
-          setOtpModalOpen(true)
-          return
-        }
       }
 
       toast.error('Login failed')
@@ -110,8 +133,31 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
     loginMutation.mutate(data)
   }
 
-  const handleOtpSuccess = () => {
-    router.push(getDashboardRoute('citizen'))
+  const handleOtpSuccess = async (otp: string) => {
+    if (!deviceVerificationId) {
+      throw new Error('Missing device verification ID.')
+    }
+
+    const data = await loginService.verifyDevice({
+      deviceVerificationId,
+      otp,
+      deviceType: getDeviceType(),
+      operatingSystem: getOperatingSystem(),
+      browser: getBrowser(),
+      rememberMe,
+    })
+    toast.success('Device verified. Logged in.')
+
+    setOtpModalOpen(false)
+    setDeviceVerificationId('')
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('flashid-session-expires-at', data.expiresAt)
+    }
+
+    await refresh()
+
+    router.push(getDashboardRoute(data.role || pendingRole)) //TODO: link using return to logic please
   }
 
   return (

@@ -41,7 +41,7 @@ public class DeleteAccountRepository : IDeleteAccountRepository
     public async Task DeleteTrustedDevicesAsync(Guid citizenId)
     {
         var trustedDevices = await _context.TrustedDevices
-            .Where(d => d.CitizenId == citizenId)
+            .Where(d => d.UserId == citizenId)
             .ToListAsync();
 
         _context.TrustedDevices.RemoveRange(trustedDevices);
