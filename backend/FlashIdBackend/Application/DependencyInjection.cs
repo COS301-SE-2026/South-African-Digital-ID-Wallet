@@ -23,6 +23,7 @@ public static class DependencyInjection
         services.AddSingleton<CitizenMapper>();
         services.AddSingleton<CredentialMapper>();
         services.AddSingleton<InstitutionMapper>();
+        services.AddScoped<IManageUserAccountService, ManageUserAccountService>();
         services.AddSingleton<AuthMapper>();
         services.AddSingleton<TrustedDeviceMapper>();
         services.AddSingleton<ActivityOverviewMapper>();
@@ -30,6 +31,9 @@ public static class DependencyInjection
         services.AddSingleton<NotificationMapper>();
         services.AddScoped<ICitizenVerificationService, CitizenVerificationService>();
         services.AddScoped<ICredentialActivationService, CredentialActivationService>();
+        services.AddSingleton<ManageUserAccountMapper>();
+        services.AddScoped<IUpdatePasswordService, UpdatePasswordService>();
+        services.AddScoped<IDeleteAccountService, DeleteAccountService>();
         return services;
     }
 }

@@ -78,7 +78,7 @@ public class CitizenService : ICitizenService
         return response;
     }
 
-    private static string GenerateOtp() => Random.Shared.Next(100000, 999999).ToString();
+    private static string GenerateOtp() => Random.Shared.Next(100000, 1000000).ToString();
 
     private Task SendOtpEmailAsync(string toEmail, string otp) => _emailSenderProvider.SendEmailAsync(
         toEmail,

@@ -1,8 +1,7 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 import { type UserRole, DEFAULT_USER_ROLE_DASHBOARD } from '@/types/roles'
 import { getAllowedRoles } from '@/config/roles/route-permissions'
@@ -20,7 +19,9 @@ import {
   pageHeaders,
 } from '@/config/page-headers/page-headers'
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const pathname = usePathname()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
@@ -71,15 +72,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     ? (user.names?.[0] ?? user.email?.[0] ?? 'U') + (user.surname?.[0] ?? '')
     : ''
 
-  const idLabel = user
-    ? `ID: ••••••${String(user.saId ?? user.userId).slice(-3)}`
-    : ''
-
   return (
     <div className=" flex h-screen overflow-hidden">
       <AppSidebar
         navSections={navSections}
-        user={{ name: displayName, initials, idLabel }}
+        user={{ name: displayName, initials }}
         onLogout={logout}
       />
 
@@ -88,7 +85,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
           <AppSidebar
             navSections={navSections}
-            user={{ name: displayName, initials, idLabel }}
+            user={{ name: displayName, initials }}
             onLogout={logout}
             variant="mobile"
             onNavigate={() => setMobileNavOpen(false)}
