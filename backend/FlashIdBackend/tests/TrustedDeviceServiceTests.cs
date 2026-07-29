@@ -103,6 +103,19 @@ public class TrustedDeviceServiceTests
     }
 
     [Fact]
+    public async Task GetMyTrustedDevicesAsync_DifferentToken_IsNotCurrentDevice()
+    {
+        await using var context = CreateContext();
+        var userId = Guid.NewGuid();
+        var device = CreateTrustedDevice(userId, "some-other-token-hash");
+        await context.TrustedDevices.AddAsync(device, TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var service = CreateService(context);
+        var result = (await service.GetMyTrustedDevicesAsync(userId, RawDeviceToken)).Single();
+        Assert.False(result.IsCurrentDevice);
+    }
+
+    [Fact]
     public async Task UnlinkDeviceAsync_DeviceExists_ReturnsTrue_AndRemovesDevice()
     {
         await using var context = CreateContext();
@@ -125,9 +138,32 @@ public class TrustedDeviceServiceTests
     }
 
     [Fact]
+    public async Task UnlinkDeviceAsync_DeviceBelongsToDifferentUser_ReturnsFalse()
+    {
+        await using var context = CreateContext();
+
+        var deviceOwnerId = Guid.NewGuid();
+        var differentUserId = Guid.NewGuid();
+
+        var device = CreateTrustedDevice(deviceOwnerId);
+
+        await context.TrustedDevices.AddAsync(device, TestContext.Current.CancellationToken);
+
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var service = CreateService(context);
+
+        var result = await service.UnlinkDeviceAsync(differentUserId, device.Id);
+
+        Assert.False(result);
+
+        Assert.True(await context.TrustedDevices.AnyAsync(TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
     public async Task UnlinkDeviceAsync_DeviceDoesNotExist_ReturnsFalse()
     {
-        using var context = CreateContext();
+        await using var context = CreateContext();
 
         var service = CreateService(context);
 
