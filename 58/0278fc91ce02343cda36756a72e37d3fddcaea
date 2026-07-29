@@ -1,0 +1,14 @@
+web/src/services/scan-service/tests/scan-service.test.ts
+  h_712d174fc3f309 1-25,27-31,33,36-47,49,52-53,55-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "580278fc91ce02343cda36756a72e37d3fddcaea",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
