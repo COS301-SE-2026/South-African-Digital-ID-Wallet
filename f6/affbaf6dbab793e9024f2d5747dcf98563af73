@@ -1,0 +1,14 @@
+web/src/components/templates/otp-modal/otp-modal.tsx
+  h_0aff3b71f739b1 1-69,71-173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "f6affbaf6dbab793e9024f2d5747dcf98563af73",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
