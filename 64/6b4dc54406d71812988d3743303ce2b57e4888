@@ -1,0 +1,14 @@
+web/src/components/organisms/qr-camera-scanner/test/qr-camera-scanner.test.tsx
+  h_712d174fc3f309 14-16,24-25,27-33,45,56,103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "646b4dc54406d71812988d3743303ce2b57e4888",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
