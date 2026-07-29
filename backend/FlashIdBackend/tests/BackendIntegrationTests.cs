@@ -199,7 +199,7 @@ public class BackendIntegrationTests
         var email = "tiana.rogers@example.com";
         var password = CitizenTestPassword;
         var user = CreateCitizenUser(email, password);
-        var trustedDevice = CreateTrustedDevice(user.Id, password);
+        var trustedDevice = CreateTrustedDevice(user.Id);
 
         await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
         await context.TrustedDevices.AddAsync(trustedDevice, TestContext.Current.CancellationToken);

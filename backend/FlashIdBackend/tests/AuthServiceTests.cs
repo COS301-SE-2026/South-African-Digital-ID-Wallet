@@ -201,7 +201,7 @@ public class AuthServiceTests
     public async Task LoginAsync_RememberMeFalse_GeneratesShorterExpiry()
     {
         var user = ValidUser();
-        var fakeRepository = new FakeAuthRepository { UserToReturn = ValidUser() };
+        var fakeRepository = new FakeAuthRepository { UserToReturn = user };
         var fakeJwtProvider = new FakeJwtTokenProvider();
         var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { TrustedDeviceToReturn = ValidTrustedDevice(user.Id) };
 
@@ -215,7 +215,7 @@ public class AuthServiceTests
         };
 
         var result = await authService.LoginAsync(request, "trusted-browser-token", "127.0.0.1", CancellationToken.None);
-        Assert.False(fakeJwtProvider.LastRememberMeValue);
+        Assert.Equal(false, fakeJwtProvider.LastRememberMeValue);
         Assert.False(result.RequiresDeviceVerification);
         Assert.Equal("fake-token", result.Token);
         Assert.True(result.ExpiresAt < DateTime.UtcNow.AddDays(1));
