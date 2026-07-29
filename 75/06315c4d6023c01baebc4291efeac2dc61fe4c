@@ -1,0 +1,22 @@
+web/src/components/organisms/registration-form/registration-form.tsx
+  h_293a8616118f65 114-116
+web/src/proxy.ts
+  h_293a8616118f65 6-7,48-55
+web/src/components/organisms/verify-email-form/test/verify-email-form.test.tsx
+  h_293a8616118f65 192
+web/src/components/organisms/login-form/login-form.tsx
+  h_293a8616118f65 48,50-51,87-90
+web/src/components/organisms/verify-email-form/verify-email-form.tsx
+  h_293a8616118f65 23-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "7506315c4d6023c01baebc4291efeac2dc61fe4c",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

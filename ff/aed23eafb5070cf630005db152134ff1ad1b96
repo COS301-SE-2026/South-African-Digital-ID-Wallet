@@ -1,0 +1,19 @@
+backend/FlashIdBackend/tests/QrServiceTests.cs
+  s_a895fa584b4199::t_7ba876116a4ec5 51-64,106-111,122,124,138,209-231
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "ffaed23eafb5070cf630005db152134ff1ad1b96",
+  "prompts": {},
+  "sessions": {
+    "s_a895fa584b4199": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3a4c0e4c-c0fd-4202-bcc4-000d8b5c17c5",
+        "model": "unknown"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
