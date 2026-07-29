@@ -16,6 +16,7 @@ public enum AuditEventType
     ConsentRecorded,
     OnboardCitizen,
     OnboardCitizenFailed,
+    EmailAddressChanged,
     CitizenVerified,
     CitizenVerificationFailed,
     CitizenCredentialsActivated,

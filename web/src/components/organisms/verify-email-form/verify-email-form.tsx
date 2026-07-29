@@ -30,7 +30,7 @@ export const VerifyEmailForm = () => {
     mutationFn: () => registerService.verifyEmail({ email, code }),
     onSuccess: () => {
       toast.success('Email verified. Please log in.')
-      router.push('/')
+      router.push('/login')
     },
     onError: (err) => {
       const message =
