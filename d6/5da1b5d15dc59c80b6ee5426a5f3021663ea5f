@@ -1,0 +1,14 @@
+backend/FlashIdBackend/tests/TrustedDeviceServiceTests.cs
+  h_293a8616118f65 106,111-117,140-148,150,152,154-159,161,166
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "d65da1b5d15dc59c80b6ee5426a5f3021663ea5f",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
