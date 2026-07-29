@@ -128,8 +128,7 @@ public class QrServiceTests
         {
             DisclosedFields = new List<string>
            {
-             "Full name", "SA ID number", "Photo", "License number",
-             "License code", "Expiry date", "Country of issue",
+             "Photo", "Expiry date", "Date of birth",
            },
         };
         var result = await qrService.GenerateQrAsync(credential.Id, userId, request);
@@ -212,8 +211,7 @@ public class QrServiceTests
         {
             DisclosedFields = new List<string>
             {
-                "Full name", "SA ID number", "Photo", "License number",
-                "License code", "Expiry date", "Country of issue",
+                "Photo", "Expiry date", "Date of birth",
             },
         };
 
