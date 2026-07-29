@@ -1,3 +1,4 @@
+using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Features.Auth.DTOs;
 using Application.Features.Citizens.DTOs;
 using Application.Features.Institutions.DTOs;
@@ -11,6 +12,8 @@ using Infrastructure.Providers;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 
 namespace tests;
 
@@ -22,17 +25,50 @@ public class BackendIntegrationTests
     private const string CitizenTestPassword = "CitizenPwd123!"; // NOSONAR - test-only dummy credential, not a real secret
     private const string AdminTestPassword = "AdminPwd123!"; // NOSONAR - test-only dummy credential, not a real secret
     private const string WrongTestPassword = "InvalidPwd123!"; // NOSONAR - test-only dummy credential, not a real secret
-
+    private const string RawDeviceToken = "integration-test-device-token";// NOSONAR - test-only dummy credential, not a real secret
+    private const string HashedDeviceToken = "hashed-integration-test-device-token";// NOSONAR - test-only dummy credential, not a real secret
 
 
     private sealed class StubCitizenService : ICitizenService
     {
         public Task<RegisterCitizenResponseDto> RegisterCitizenAsync(RegisterCitizenRequestDto request) =>
-            throw new NotImplementedException();
+            throw new NotImplementedException("Citizen Registration is not apart of these integration tests.");
 
         public Task VerifyEmailAsync(VerifyEmailRequestDto request) => Task.CompletedTask;
 
         public Task ResendOtpAsync(ResendOtpRequestDto request) => Task.CompletedTask;
+    }
+
+    private sealed class FakeDeviceTokenProvider : IDeviceTokenProvider
+    {
+        public string GenerateToken()
+        {
+            return RawDeviceToken;
+        }
+
+        public string HashToken(string token)
+        {
+            return token == RawDeviceToken ? HashedDeviceToken : $"hashed-{token}";
+        }
+    }
+
+    private sealed class FakeEmailSenderProvide : IEmailSenderProvider
+    {
+        public Task SendEmailAsync(string email, string subject, string message, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+    }
+
+    public sealed class FakeHostEnvironment : IHostEnvironment
+    {
+        public string EnvironmentName { get; set; } = Environments.Development;
+
+        public string ApplicationName { get; set; } = "tests";
+
+        public string ContentRootPath { get; set; } = Directory.GetCurrentDirectory();
+
+        public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
     }
 
     private static AppDbContext CreateContext()
@@ -66,14 +102,19 @@ public class BackendIntegrationTests
         var passwordHashingProvider = new PasswordHashingProvider();
         var citizenService = new StubCitizenService();
         var mapper = new AuthMapper();
+        var trustedDevicesRepository = new TrustedDeviceRepository(context);
+        var deviceTokenProvider = new FakeDeviceTokenProvider();
+        var emailSenderProvider = new FakeEmailSenderProvide();
+        var environment = new FakeHostEnvironment();
 
         return new AuthService(
             authRepository,
             jwtProvider,
             passwordHashingProvider,
             citizenService,
-            mapper
-        );
+            mapper,
+            trustedDevicesRepository,
+            deviceTokenProvider, emailSenderProvider, environment);
     }
 
     private static InstitutionService CreateInstitutionService(AppDbContext context)
@@ -98,6 +139,26 @@ public class BackendIntegrationTests
             UpdatedAt = DateTime.UtcNow,
         };
     }
+
+    private static TrustedDevice CreateTrustedDevice(Guid userId, string deviceTokenHash = HashedDeviceToken)
+    {
+        return new TrustedDevice
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            DeviceTokenHash = deviceTokenHash,
+            DeviceType = Enum.Parse<DeviceType>("Laptop"),
+            OperatingSystem = "Windows 11",
+            Browser = "Chrome",
+            LastKnownCity = "Pretoria",
+            LastKnownCountry = "South Africa",
+            LastActive = DateTime.UtcNow.AddDays(-1),
+            IsTrusted = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+    }
+
 
     private static (User User, GovernmentAdministrator Admin) CreateGovernmentAdmin()
     {
@@ -138,28 +199,38 @@ public class BackendIntegrationTests
         var email = "tiana.rogers@example.com";
         var password = CitizenTestPassword;
         var user = CreateCitizenUser(email, password);
+        var trustedDevice = CreateTrustedDevice(user.Id, password);
 
         await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
+        await context.TrustedDevices.AddAsync(trustedDevice, TestContext.Current.CancellationToken);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var previousActive = trustedDevice.LastActive;
 
         var result = await service.LoginAsync(
             new LoginRequestDto
             {
                 Email = email,
                 Password = password,
+                RememberMe = false,
             },
-            LocalhostIp
+            RawDeviceToken,
+            LocalhostIp,
+            TestContext.Current.CancellationToken
         );
 
         var storedUser = await context.DomainUsers.FirstAsync(u => u.Id == user.Id, TestContext.Current.CancellationToken);
+        var storedDevice = await context.TrustedDevices.FirstAsync(d => d.Id == trustedDevice.Id, TestContext.Current.CancellationToken);
         var auditLog = await context.AuditLogs.SingleAsync(TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
+        Assert.False(result.RequiresDeviceVerification);
         Assert.NotEmpty(result.Token);
         Assert.Equal(user.Id, result.UserId);
-        Assert.Equal("Citizen", result.Role);
+        Assert.Equal(UserRole.Citizen.ToString(), result.Role);
         Assert.True(result.ExpiresAt > DateTime.UtcNow);
         Assert.Equal(0, storedUser.FailedLoginAttempts);
+        Assert.True(storedDevice.LastActive > previousActive);
         Assert.NotNull(storedUser.LastLoginAt);
         Assert.Equal(AuditEventType.UserLoggedIn, auditLog.EventType);
         Assert.Equal(LocalhostIp, auditLog.IpAddress);
@@ -177,7 +248,9 @@ public class BackendIntegrationTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(
-            () => service.LoginAsync(new LoginRequestDto { Email = email, Password = WrongTestPassword }, SecondaryTestIp)
+            () => service.LoginAsync(new LoginRequestDto { Email = email, Password = WrongTestPassword, RememberMe = true }, RawDeviceToken,
+                SecondaryTestIp,
+                TestContext.Current.CancellationToken)
         );
 
         var storedUser = await context.DomainUsers.FirstAsync(u => u.Id == user.Id, TestContext.Current.CancellationToken);

@@ -12,8 +12,8 @@ namespace tests;
 public class TrustedDeviceServiceTests
 {
     private const string TestIpAddress = "192.168.1.10";
-    private const string RawDeviceToken = "test-browser-token";
-    private const string HashedDeviceToken = "hashed-test-browser-token";
+    private const string RawDeviceToken = "test-browser-token";// NOSONAR - test-only dummy credential, not a real secret
+    private const string HashedDeviceToken = "hashed-test-browser-token";// NOSONAR - test-only dummy credential, not a real secret
 
     private class FakeDeviceTokenProvider : IDeviceTokenProvider
     {
@@ -57,7 +57,7 @@ public class TrustedDeviceServiceTests
             Browser = "Chrome",
             LastKnownCity = "Pretoria",
             LastKnownCountry = "South Africa",
-            LastActive = DateTime.UtcNow,
+            LastActive = DateTime.UtcNow.AddDays(-1),
             IsTrusted = true,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
