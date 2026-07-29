@@ -1,0 +1,14 @@
+backend/FlashIdBackend/Application/Application.csproj
+  h_293a8616118f65 16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "4de8c7e0714958a230ad6fe3e56583e92cc12e13",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
