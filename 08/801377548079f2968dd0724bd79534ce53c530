@@ -1,0 +1,14 @@
+backend/FlashIdBackend/tests/AzureBlobPhotoStorageProviderTests.cs
+  h_99fca60b892ff4 1-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "08801377548079f2968dd0724bd79534ce53c530",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
