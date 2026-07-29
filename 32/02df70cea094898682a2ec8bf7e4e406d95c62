@@ -1,0 +1,14 @@
+web/src/components/organisms/scan-result-card/test/scan-result-card.test.tsx
+  h_99fca60b892ff4 1-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "3202df70cea094898682a2ec8bf7e4e406d95c62",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
