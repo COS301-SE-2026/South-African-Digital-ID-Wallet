@@ -238,7 +238,7 @@ export const RegistrationForm = ({
         <Text variant="sub-sm" className="text-center">
           Already have an account?{' '}
           <Link
-            href="/"
+            href="/login"
             className="font-semibold text-primary-green hover:underline"
           >
             Log in

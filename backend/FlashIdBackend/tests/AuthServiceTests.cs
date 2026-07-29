@@ -6,6 +6,8 @@ using Application.Common.Services;
 using Application.Features.Auth.DTOs;
 using Domain.Entities;
 using Domain.Enums;
+using Infrastructure.Providers;
+using Org.BouncyCastle.Bcpg;
 
 namespace tests;
 
@@ -37,6 +39,87 @@ public class AuthServiceTests
             LastRememberMeValue = rememberMe;
             var expiresAt = rememberMe ? DateTime.UtcNow.AddDays(30) : DateTime.UtcNow.AddHours(8);
             return ("fake-token", expiresAt);
+        }
+    }
+
+    private class FakeDeviceTokenProvider : IDeviceTokenProvider
+    {
+        public string GenerateToken()
+        {
+            return "trusted-browser-token";
+        }
+
+        public string HashToken(string token)
+        {
+            return token == "trusted-browser-token" ? "hashed-trusted-browser-token" : $"hashed-{token}";
+        }
+    }
+
+    private class FakeTrustedDeviceRepository : ITrustedDeviceRepository
+    {
+        public TrustedDevice? TrustedDeviceToReturn { get; set; }
+        public DeviceVerification? VerificationToReturn { get; set; }
+
+        public Task<TrustedDevice?> GetByTokenHashAsync(Guid userId, string deviceTokenHash, CancellationToken cancellationToken)
+        {
+            if (TrustedDeviceToReturn is null) return Task.FromResult<TrustedDevice?>(null);
+
+            var matches = TrustedDeviceToReturn.UserId == userId &&
+                          TrustedDeviceToReturn.DeviceTokenHash == deviceTokenHash
+                          && TrustedDeviceToReturn.IsTrusted;
+            return Task.FromResult(matches ? TrustedDeviceToReturn : null);
+        }
+
+        public Task AddTrustedDeviceAsync(TrustedDevice trustedDevice, CancellationToken cancellationToken)
+        {
+            TrustedDeviceToReturn = trustedDevice;
+            return Task.CompletedTask;
+        }
+
+        public Task<DeviceVerification?> GetDeviceVerificationAsync(Guid deviceId, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(VerificationToReturn);
+        }
+
+        public Task UpdateTrustedDeviceAsync(TrustedDevice trustedDevice, CancellationToken cancellationToken)
+        {
+            TrustedDeviceToReturn = trustedDevice;
+            return Task.CompletedTask;
+        }
+
+        public Task AddDeviceVerificationAsync(DeviceVerification deviceVerification, CancellationToken cancellationToken)
+        {
+            VerificationToReturn = deviceVerification;
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateDeviceVerificationAsync(DeviceVerification deviceVerification,
+            CancellationToken cancellationToken)
+        {
+            VerificationToReturn = deviceVerification;
+            return Task.CompletedTask;
+        }
+
+        public Task<List<TrustedDevice>> GetTrustedDevicesByUserIdAsync(Guid userId)
+        {
+            var devices = TrustedDeviceToReturn is not null && TrustedDeviceToReturn.UserId == userId ? new List<TrustedDevice> { TrustedDeviceToReturn } :
+            [];
+            return Task.FromResult(devices);
+        }
+
+        public Task<bool> UnlinkDeviceAsync(Guid userId, Guid deviceId)
+        {
+            if (TrustedDeviceToReturn is null || TrustedDeviceToReturn.UserId != userId || TrustedDeviceToReturn.Id != deviceId) return Task.FromResult(false);
+            TrustedDeviceToReturn.IsTrusted = false;
+            return Task.FromResult(true);
+        }
+    }
+
+    private class FakeEmailSenderProvider : IEmailSenderProvider
+    {
+        public Task SendEmailAsync(string email, string subject, string message, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 
