@@ -123,4 +123,57 @@ describe('UserProvider', () => {
     expect(screen.getByTestId('email')).toHaveTextContent('none')
     expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull()
   })
+
+  it('Should clear both storage and redirect home on logout', async () => {
+    mockedApi.get.mockResolvedValue({ data: serverUser })
+    mockedLoginService.logout.mockResolvedValue(undefined)
+    window.sessionStorage.setItem('scratch', 'value')
+    renderProvider()
+    await settled('server@example.com')
+    await userEvent.click(screen.getByRole('button', { name: 'logout' }))
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/'))
+    expect(screen.getByTestId('email')).toHaveTextContent('none')
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull()
+    expect(window.sessionStorage.getItem('scratch')).toBeNull()
+  })
+
+  it('Should clear the session when logout request fails', async () => {
+    mockedApi.get.mockResolvedValue({ data: serverUser })
+    mockedLoginService.logout.mockResolvedValue(new Error('offline'))
+    renderProvider()
+    await settled('server@example.com')
+    await userEvent.click(screen.getByRole('button', { name: 'logout' }))
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/'))
+    expect(screen.getByTestId('email')).toHaveTextContent('none')
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull()
+  })
+
+  it('Shoild refetch the user on refresh', async () => {
+    mockedApi.get.mockResolvedValueOnce({ data: serverUser })
+    renderProvider()
+    await settled('server@example.com')
+    mockedApi.get.mockResolvedValueOnce({
+      data: { ...serverUser, email: 'refreshed@example.com' },
+    })
+    await userEvent.click(screen.getByRole('button', { name: 'refresh' }))
+    await settled('refreshed@example.com')
+  })
+
+  it('Should fallback to stored data when refresh fails', async () => {
+    mockedApi.get.mockResolvedValueOnce({ data: serverUser })
+    renderProvider()
+    await settled('server@example.com')
+    mockedApi.get.mockRejectedValueOnce(new Error('network'))
+    await userEvent.click(screen.getByRole('button', { name: 'refresh' }))
+    await waitFor(() =>
+      expect(screen.getByTestId('loading')).toHaveTextContent('false')
+    )
+    expect(screen.getByTestId('email')).toHaveTextContent('server@example.com')
+  })
+
+  it('Should provides safe default when used outside a provider', () => {
+    render(<Probe />)
+    expect(screen.getByTestId('email')).toHaveTextContent('none')
+    expect(screen.getByTestId('loading')).toHaveTextContent('true')
+  })
 })
