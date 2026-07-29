@@ -7,6 +7,8 @@ using Application.Features.Auth.DTOs;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Providers;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Org.BouncyCastle.Bcpg;
 
 namespace tests;
@@ -123,6 +125,17 @@ public class AuthServiceTests
         }
     }
 
+    private class FakeHostEnvironment : IHostEnvironment
+    {
+        public string EnvironmentName { get; set; } = Environments.Development;
+
+        public string ApplicationName { get; set; } = "tests";
+
+        public string ContentRootPath { get; set; } = Directory.GetCurrentDirectory();
+
+        public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
+    }
+
     private static User ValidUser() => new()
     {
         Id = Guid.NewGuid(),
@@ -133,46 +146,78 @@ public class AuthServiceTests
         IsEmailVerified = true,
     };
 
+    private static TrustedDevice ValidTrustedDevice(Guid userId)
+    {
+        return new TrustedDevice
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            DeviceTokenHash = "hashed-trusted-browser-token",
+            DeviceType = DeviceType.Desktop,
+            OperatingSystem = "Windows 11",
+            Browser = "Chrome",
+            LastActive = DateTime.UtcNow.AddDays(-1),
+            IsTrusted = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+    }
+
+    private static AuthService CreateAuthService(FakeAuthRepository fakeAuthRepository, FakeJwtTokenProvider fakeJwtTokenProvider, FakeTrustedDeviceRepository fakeTrustedDeviceRepository)
+    {
+        var fakePasswordHasher = new FakePasswordHashingProvider();
+        var fakeHostEnvironment = new FakeHostEnvironment();
+        var fakeEmailSenderProvider = new FakeEmailSenderProvider();
+        var fakeDeviceTokenProvider = new FakeDeviceTokenProvider();
+        var mapper = new AuthMapper();
+        return new AuthService(fakeAuthRepository, fakeJwtTokenProvider, fakePasswordHasher, null!, mapper, fakeTrustedDeviceRepository, fakeDeviceTokenProvider, fakeEmailSenderProvider, fakeHostEnvironment);
+    }
+
     [Fact]
     public async Task LoginAsync_RememberMeTrue_GeneratesLongerExpiry()
     {
-        var fakeRepository = new FakeAuthRepository { UserToReturn = ValidUser() };
+        var user = ValidUser();
+        var fakeRepository = new FakeAuthRepository { UserToReturn = user };
         var fakeJwtProvider = new FakeJwtTokenProvider();
-        var fakePasswordHasher = new FakePasswordHashingProvider();
-        var mapper = new AuthMapper();
-        var authService = new AuthService(fakeRepository, fakeJwtProvider, fakePasswordHasher, null!, mapper);
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { TrustedDeviceToReturn = ValidTrustedDevice(user.Id) };
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
 
         var request = new LoginRequestDto
         {
-            Email = "jacob.kruger1@flashid.local",
+            Email = user.Email,
             Password = "correct-password",
             RememberMe = true,
         };
 
-        var result = await authService.LoginAsync(request, "127.0.0.1");
+        var result = await authService.LoginAsync(request, "trusted-browser-token", "127.0.0.1", CancellationToken.None);
 
         Assert.True(fakeJwtProvider.LastRememberMeValue);
+        Assert.False(result.RequiresDeviceVerification);
+        Assert.Equal("fake-token", result.Token);
         Assert.True(result.ExpiresAt > DateTime.UtcNow.AddDays(29));
     }
 
     [Fact]
     public async Task LoginAsync_RememberMeFalse_GeneratesShorterExpiry()
     {
+        var user = ValidUser();
         var fakeRepository = new FakeAuthRepository { UserToReturn = ValidUser() };
         var fakeJwtProvider = new FakeJwtTokenProvider();
-        var fakePasswordHasher = new FakePasswordHashingProvider();
-        var mapper = new AuthMapper();
-        var authService = new AuthService(fakeRepository, fakeJwtProvider, fakePasswordHasher, null!, mapper);
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { TrustedDeviceToReturn = ValidTrustedDevice(user.Id) };
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
 
         var request = new LoginRequestDto
         {
-            Email = "jacob.kruger1@flashid.local",
+            Email = user.Email,
             Password = "correct-password",
             RememberMe = false,
         };
 
-        var result = await authService.LoginAsync(request, "127.0.0.1");
+        var result = await authService.LoginAsync(request, "trusted-browser-token", "127.0.0.1", CancellationToken.None);
         Assert.False(fakeJwtProvider.LastRememberMeValue);
+        Assert.False(result.RequiresDeviceVerification);
+        Assert.Equal("fake-token", result.Token);
         Assert.True(result.ExpiresAt < DateTime.UtcNow.AddDays(1));
     }
 
@@ -194,12 +239,10 @@ public class AuthServiceTests
             CitizenToReturn = citizen,
         };
 
-        var authService = new AuthService(
-            fakeRepository,
-            new FakeJwtTokenProvider(),
-            new FakePasswordHashingProvider(),
-            null!,
-            new AuthMapper());
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository();
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
 
         var result = await authService.GetCurrentUserAsync(user.Id);
         Assert.NotNull(result);
@@ -218,12 +261,10 @@ public class AuthServiceTests
         {
             UserToReturn = null,
         };
-        var authService = new AuthService(
-            fakeRepository,
-            new FakeJwtTokenProvider(),
-            new FakePasswordHashingProvider(),
-            null!,
-            new AuthMapper());
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository();
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
 
         var result = await authService.GetCurrentUserAsync(Guid.NewGuid());
         Assert.Null(result);
