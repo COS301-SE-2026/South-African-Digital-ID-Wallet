@@ -20,9 +20,30 @@ export const pageHeaders: Record<string, PageHeader> = {
     description: 'View and manage your digital identity wallet.',
   },
 
+  '/citizen/citizen-dashboard': {
+    title: 'Citizen Dashboard',
+    description: 'View and manage your digital identity wallet.',
+  },
+
+  '/citizen/verifications': {
+    title: 'Verifications',
+    description: 'Scan secure QR Code to verify identitities and credentials.',
+  },
+
+  '/citizen/qr': {
+    title: 'Share QR codes',
+    description:
+      'Generate secure QR codes to share selected identity information.',
+  },
+
   '/citizen/my-credentials': {
     title: 'My Credentials',
     description: 'View and manage your issued digital credentials. ',
+  },
+
+  '/citizen/manage-user-account': {
+    title: 'Manage Account',
+    description: 'Manage your profile, security settings, and trusted devices.',
   },
 
   '/gov-admin': {
