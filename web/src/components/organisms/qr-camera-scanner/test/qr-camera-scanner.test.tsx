@@ -47,6 +47,16 @@ describe('QrCameraScanner', () => {
         inFlashOn: jest.fn().mockReturnValue(false),
       } as unknown as QrScanner
     })
+
+    const stopTrack = jest.fn()
+    Object.defineProperty(navigator, 'mediaDevices', {
+      configurable: true,
+      value: {
+        getUserMedia: jest.fn().mockResolvedValue({
+          getTracks: () => [{ stop: stopTrack }],
+        }),
+      },
+    })
   })
 
   afterEach(() => {

@@ -28,4 +28,18 @@ public class QrDisclosureTokenRepository : IQrDisclosureTokenRepository
 
         return rowsAffected == 1;
     }
+
+    public async Task InvalidateActiveTokensForCredentialAsync(Guid credentialId)
+    {
+        await _context.QrDisclosureTokens
+            .Where(q => q.CredentialId == credentialId && q.UsedAt == null && q.ExpiresAt > DateTime.UtcNow)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(q => q.UsedAt, DateTime.UtcNow));
+    }
+
+    public async Task<int> PurgeExpiredAsync(DateTime olderThan)
+    {
+        return await _context.QrDisclosureTokens
+            .Where(q => q.ExpiresAt < olderThan)
+            .ExecuteDeleteAsync();
+    }
 }

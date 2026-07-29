@@ -64,6 +64,8 @@ public class QrService : IQrService
         var expiresAt = issuedAt.AddSeconds(QrLifetimeSeconds);
         var jti = Guid.NewGuid();
 
+        await _qrDisclosureTokenRepository.InvalidateActiveTokensForCredentialAsync(credential.Id);
+
         await _qrDisclosureTokenRepository.AddAsync(new QrDisclosureToken
         {
             Id = Guid.NewGuid(),
