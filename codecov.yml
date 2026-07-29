@@ -1,0 +1,3 @@
+ignore:
+  - "**/Migrations/**"
+  - "backend/FlashIdBackend/Infrastructure/Data/DbSeeder.cs"
