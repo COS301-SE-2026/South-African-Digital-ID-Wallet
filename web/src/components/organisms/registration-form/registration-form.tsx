@@ -111,6 +111,10 @@ export const RegistrationForm = ({
   const returnTo = searchParams.get('returnTo')
   const safeReturnTo = getSafeReturnTo(returnTo, '')
 
+  const loginHref = safeReturnTo
+    ? `/login?returnTo=${encodeURIComponent(safeReturnTo)}`
+    : `/login}`
+
   const registerMutation = useMutation({
     mutationFn: registerService.register,
     onSuccess: () => {
@@ -247,7 +251,7 @@ export const RegistrationForm = ({
         <Text variant="sub-sm" className="text-center">
           Already have an account?{' '}
           <Link
-            href="/"
+            href={loginHref}
             className="font-semibold text-primary-green hover:underline"
           >
             Log in

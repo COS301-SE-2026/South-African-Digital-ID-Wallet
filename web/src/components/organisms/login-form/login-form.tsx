@@ -45,9 +45,11 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
 
   const searchParams = useSearchParams()
   const returnTo = searchParams.get('returnTo')
-  const safeReturnTo = getSafeReturnTo(returnTo, '/register')
+  const safeReturnTo = getSafeReturnTo(returnTo, '')
 
-  const registerHref = `/register?returnTo=${encodeURIComponent(safeReturnTo)}`
+  const registerHref = safeReturnTo
+    ? `/register?returnTo=${encodeURIComponent(safeReturnTo)}`
+    : '/register'
 
   const loginMutation = useMutation<
     Awaited<ReturnType<typeof loginService.login>>,
@@ -82,7 +84,12 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
         err.response?.data?.code === 'EMAIL_NOT_VERIFIED'
       ) {
         toast.error('Please verify your email address to continue.')
-        router.push(`/verify-email?email=${encodeURIComponent(email)}`)
+
+        const verifyEmailHref = safeReturnTo
+          ? `/verify-email?email=${encodeURIComponent(email)}&returnTo=${encodeURIComponent(safeReturnTo)}`
+          : `/verify-email?email=${encodeURIComponent(email)}`
+
+        router.push(verifyEmailHref)
         return
       }
 
