@@ -123,10 +123,10 @@ describe('RegistrationForm — unit tests', () => {
       ).toBeInTheDocument()
     })
 
-    it('"Log In" link points to href "/"', () => {
+    it('"Log In" link points to href "/login"', () => {
       render(<RegistrationForm />, { wrapper: createWrapper() })
       const loginLink = screen.getByRole('link', { name: /log in/i })
-      expect(loginLink).toHaveAttribute('href', '/')
+      expect(loginLink).toHaveAttribute('href', '/login')
     })
   })
 
