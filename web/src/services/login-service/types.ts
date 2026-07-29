@@ -19,5 +19,5 @@ export type VerifyDeviceRequest = {
   deviceType: string
   operatingSystem: string
   browser: string
-  rememberMe: boolean
+  rememberMe?: boolean
 }

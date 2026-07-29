@@ -22,12 +22,11 @@ const logout = () => {
   return api.post('/api/auth/logout').then((res) => res.data)
 }
 
-const verifyDeviceRequest = async (
-  request: VerifyDeviceRequest,
-  formData: LoginFormValues
+const verifyDevice = async (
+  request: VerifyDeviceRequest
 ): Promise<LoginResponse> => {
   const url = loginUrls.verifyDevice()
-  const dto = verifyDeviceDto(request, formData)
+  const dto = verifyDeviceDto(request)
   return api.post(url, dto).then((res) => res.data as LoginResponse)
 }
 
@@ -35,6 +34,7 @@ const loginService = {
   login,
   getUser,
   logout,
+  verifyDevice,
 }
 
 export default loginService

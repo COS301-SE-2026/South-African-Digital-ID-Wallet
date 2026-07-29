@@ -12,16 +12,13 @@ export const loginDto = (formData: LoginFormValues) => {
   }
 }
 
-export const verifyDeviceDto = (
-  requestData: VerifyDeviceRequest,
-  formData: LoginFormValues
-) => {
+export const verifyDeviceDto = (requestData: VerifyDeviceRequest) => {
   return {
     deviceVerificationId: requestData.deviceVerificationId,
-    Otp: requestData.otp,
-    DeviceType: requestData.deviceType,
-    OperatingSystem: requestData.operatingSystem,
-    Browser: requestData.browser,
-    RememberMe: formData.rememberMe ?? false,
+    otp: requestData.otp,
+    deviceType: requestData.deviceType,
+    operatingSystem: requestData.operatingSystem,
+    browser: requestData.browser,
+    rememberMe: requestData.rememberMe ?? false,
   }
 }
