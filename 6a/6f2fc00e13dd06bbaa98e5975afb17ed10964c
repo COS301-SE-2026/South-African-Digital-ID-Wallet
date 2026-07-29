@@ -1,0 +1,14 @@
+codecov.yml
+  h_99fca60b892ff4 4-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "6a6f2fc00e13dd06bbaa98e5975afb17ed10964c",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
