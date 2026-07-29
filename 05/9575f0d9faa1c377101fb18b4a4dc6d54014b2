@@ -1,0 +1,14 @@
+backend/.gitignore
+  h_99fca60b892ff4 61-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "059575f0d9faa1c377101fb18b4a4dc6d54014b2",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
