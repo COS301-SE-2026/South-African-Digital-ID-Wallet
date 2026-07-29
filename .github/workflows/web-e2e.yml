@@ -38,7 +38,7 @@ jobs:
       ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=FlashIdDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;"
       NEXT_PUBLIC_API_URL: http://localhost:5118
       E2E_BASE_URL: http://localhost:3000
-      JWT_SECRET: dev-only-super-secret-key-that-is-long-enough-123456789
+      Jwt__Key: dev-only-super-secret-key-that-is-long-enough-123456789
       E2E_PASSWORD: password123
       E2E_CITIZEN_EMAIL: citizen.e2e@flashid.local
       E2E_GOVADMIN_EMAIL: govadmin.e2e@flashid.local
