@@ -8,13 +8,18 @@ export const citizenNavSections: SidebarNavSection[] = [
   {
     title: 'Citizen Portal',
     items: [
-      { label: 'Dashboard', href: '/citizen', icon: 'dashboard' },
+      {
+        label: 'Dashboard',
+        href: '/citizen/citizen-dashboard',
+        icon: 'dashboard',
+      },
       {
         label: 'My Credentials',
-        href: '/under-construction',
+        href: '/citizen/my-credentials',
         icon: 'credentials',
       },
-      { label: 'Share QR Code', href: '/under-construction', icon: 'qr' },
+      { label: 'Verifications', href: '/citizen/verifications', icon: 'users' },
+      { label: 'Share QR Code', href: '/citizen/qr', icon: 'qr' },
       {
         label: 'Notifications',
         href: '/under-construction',
@@ -34,6 +39,11 @@ export const citizenNavSections: SidebarNavSection[] = [
       {
         label: 'Privacy Settings',
         href: '/under-construction',
+        icon: 'settings',
+      },
+      {
+        label: 'Manage Account',
+        href: '/citizen/manage-user-account',
         icon: 'settings',
       },
     ],
@@ -84,6 +94,11 @@ export const officialsNavSections: SidebarNavSection[] = [
         label: 'Onboard Citizen',
         href: '/officials/onboard-citizen',
         icon: 'onboard',
+      },
+      {
+        label: 'Verifications',
+        href: '/officials/verifications',
+        icon: 'users',
       },
       {
         label: 'Notifications',

@@ -30,7 +30,7 @@ export const VerifyEmailForm = () => {
     mutationFn: () => registerService.verifyEmail({ email, code }),
     onSuccess: () => {
       toast.success('Email verified. Please log in.')
-      router.push('/')
+      router.push('/login')
     },
     onError: (err) => {
       const message =
@@ -56,7 +56,7 @@ export const VerifyEmailForm = () => {
     },
   })
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (code.length !== 6) {
       toast.error('Enter the 6-digit code')

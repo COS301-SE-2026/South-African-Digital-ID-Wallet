@@ -34,7 +34,7 @@ export const OnboardingStatusCard = ({
           done={!!phone || !!email}
         />
         <StatusItem label="Pending account created" done={accountCreated} />
-        <StatusItem label="Activation code sent" done={activationSent} />
+        <StatusItem label="Activation link sent" done={activationSent} />
       </CardContent>
     </Card>
   )

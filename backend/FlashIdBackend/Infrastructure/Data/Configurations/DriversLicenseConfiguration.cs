@@ -31,6 +31,11 @@ public class DriversLicenseConfiguration : IEntityTypeConfiguration<DriversLicen
             .IsRequired()
             .HasMaxLength(512);
 
+        builder.Property(d => d.CountryOfIssue)
+            .IsRequired()
+            .HasMaxLength(100)
+            .HasDefaultValue("South Africa");
+
         builder.Property(d => d.CreatedAt)
             .IsRequired()
             .HasColumnType("datetime2")
@@ -41,7 +46,7 @@ public class DriversLicenseConfiguration : IEntityTypeConfiguration<DriversLicen
             .IsRequired()
             .HasColumnType("datetime2")
             .HasDefaultValueSql("GETUTCDATE()")
-            .ValueGeneratedOnAddOrUpdate();
+            .ValueGeneratedOnAdd();
 
         builder.Property(d => d.CredentialId)
             .IsRequired();

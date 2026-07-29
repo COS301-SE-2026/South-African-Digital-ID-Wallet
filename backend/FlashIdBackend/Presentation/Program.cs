@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Application;
 using Infrastructure;
@@ -7,20 +8,19 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Presentation.ExceptionHandling;
+using Application.Common.Interfaces.RepositoryInterfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Common.Services;
+using Infrastructure.Repositories;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 var builder = WebApplication.CreateBuilder(args);
 
 const string FrontendCorsPolicy = "FrontendCorsPolicy";
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -29,14 +29,19 @@ builder.Services.AddInfrastructure();
 
 builder.Services.AddApplication();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(FrontendCorsPolicy, policy =>
     {
         policy
-            .WithOrigins("http://localhost:3000")
+            .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -44,7 +49,10 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddScoped<IDeleteAccountService, DeleteAccountService>();
+builder.Services.AddScoped<IDeleteAccountRepository, DeleteAccountRepository>();
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -76,6 +84,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+static string UserPartitionKey(HttpContext httpContext) =>
+    httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
+    ?? httpContext.Connection.RemoteIpAddress?.ToString()
+    ?? "unknown";
+
+static void AddUserPartitionedPolicy(RateLimiterOptions options, string policyName, int permitLimit, TimeSpan window) =>
+    options.AddPolicy(policyName, httpContent =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: UserPartitionKey(httpContent),
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = permitLimit,
+                Window = window,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0,
+            }
+        )
+    );
+
 // 5 registration attempts per minute per client — prevents brute-forcing activation codes
 builder.Services.AddRateLimiter(options =>
 {
@@ -95,6 +122,11 @@ builder.Services.AddRateLimiter(options =>
         opt.QueueLimit = 0;
     });
 
+    AddUserPartitionedPolicy(options, "verify-password", permitLimit: 5, window: TimeSpan.FromMinutes(1));
+    AddUserPartitionedPolicy(options, "email-change-request", permitLimit: 5, window: TimeSpan.FromMinutes(1));
+    AddUserPartitionedPolicy(options, "email-change-resend-otp", permitLimit: 3, window: TimeSpan.FromMinutes(1));
+    AddUserPartitionedPolicy(options, "email-change-confirm", permitLimit: 5, window: TimeSpan.FromMinutes(1));
+
     options.RejectionStatusCode = 429;
 });
 
@@ -111,17 +143,15 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
 
-    if (app.Environment.IsDevelopment())
+    if (app.Environment.IsDevelopment() && (!await db.DomainUsers.AnyAsync()))
     {
-        if (!await db.DomainUsers.AnyAsync())
-        {
-            Console.WriteLine("[SEED] Database is empty, seeding sample data ...");
-            await DbSeeder.SeedAsync(db);
-            Console.WriteLine("[SEED] Database seeded successfully!");
-        }
+        Console.WriteLine("[SEED] Database is empty, seeding sample data ...");
+        await DbSeeder.SeedAsync(db);
+        Console.WriteLine("[SEED] Database seeded successfully!");
     }
 }
 
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);
 app.UseRateLimiter();
@@ -129,4 +159,4 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();

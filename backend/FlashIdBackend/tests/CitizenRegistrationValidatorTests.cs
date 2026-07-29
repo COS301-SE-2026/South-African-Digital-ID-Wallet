@@ -6,22 +6,19 @@ namespace tests;
 
 public class CitizenRegistrationValidatorTests
 {
-    // mock data
     private static RegisterCitizenRequestDto ValidRequest() => new()
     {
         Email = "natethebait@gmail.com",
         Password = "P@ssword123"  // NOSONAR - test credential, not a real secret
     };
 
-    // sends valid request through the validator, checks that no exception was thrown at all
     [Fact]
     public void Validate_ValidRequest_DoesNotThrow()
     {
-        var ex = Record.Exception(() => CitizenRegistrationValidator.Validate(ValidRequest())); //xUnit helper, returns null for no errors, so assert expects null
+        var ex = Record.Exception(() => CitizenRegistrationValidator.Validate(ValidRequest()));
         Assert.Null(ex);
     }
 
-    // test empty email
     [Fact]
     public void Validate_EmailEmpty_ThrowsInvalidRequest()
     {
@@ -34,7 +31,6 @@ public class CitizenRegistrationValidatorTests
         Assert.Contains("Email", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
-    // test email white space
     [Fact]
     public void Validate_EmailWhitespace_ThrowsInvalidRequest()
     {
@@ -45,7 +41,6 @@ public class CitizenRegistrationValidatorTests
             () => CitizenRegistrationValidator.Validate(req));
     }
 
-    // test invalid email format
     [Fact]
     public void Validate_EmailInvalidFormat_ThrowsInvalidRequest()
     {
@@ -58,7 +53,6 @@ public class CitizenRegistrationValidatorTests
         Assert.Contains("email", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
-    // test email missing '@'
     [Fact]
     public void Validate_EmailMissingAtSign_ThrowsInvalidRequest()
     {
@@ -69,7 +63,6 @@ public class CitizenRegistrationValidatorTests
             () => CitizenRegistrationValidator.Validate(req));
     }
 
-    // test empty password
     [Fact]
     public void Validate_PasswordEmpty_ThrowsInvalidRequest()
     {
@@ -82,12 +75,11 @@ public class CitizenRegistrationValidatorTests
         Assert.Contains("Password", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
-    // password is only 7 chars, checks that the validator rejects passwords shorter than 10, mentions "10" in the message
     [Fact]
     public void Validate_PasswordTooShort_ThrowsInvalidRequest()
     {
         var req = ValidRequest();
-        req.Password = "Short@1";   // only 7 chars
+        req.Password = "Short@1";
 
         var ex = Assert.Throws<InvalidCitizenRegistrationRequestException>(
             () => CitizenRegistrationValidator.Validate(req));
@@ -95,7 +87,6 @@ public class CitizenRegistrationValidatorTests
         Assert.Contains("10", ex.Message);
     }
 
-    // password has no uppercase letter, checks that the validator enforces the uppercase requirement
     [Fact]
     public void Validate_PasswordNoUppercase_ThrowsInvalidRequest()
     {
@@ -106,7 +97,6 @@ public class CitizenRegistrationValidatorTests
             () => CitizenRegistrationValidator.Validate(req));
     }
 
-    // password has no lowercase letter, checks that the validator enforces the lowercase requirement
     [Fact]
     public void Validate_PasswordNoLowercase_ThrowsInvalidRequest()
     {
@@ -117,7 +107,6 @@ public class CitizenRegistrationValidatorTests
             () => CitizenRegistrationValidator.Validate(req));
     }
 
-    // password has no digit, checks that the validator enforces the digit requirement
     [Fact]
     public void Validate_PasswordNoDigit_ThrowsInvalidRequest()
     {
@@ -128,7 +117,6 @@ public class CitizenRegistrationValidatorTests
             () => CitizenRegistrationValidator.Validate(req));
     }
 
-    // password has no special character, checks that the validator enforces the special character requirement
     [Fact]
     public void Validate_PasswordNoSpecialChar_ThrowsInvalidRequest()
     {

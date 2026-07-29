@@ -5,8 +5,10 @@ import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
 import { IdentityRecord } from '@/types'
+import { onboardingSchema, retrivalSchema } from '@/schemas'
 import {
   OnboardCitizenFormValues,
+  OnboardCitizenResponse,
   onboardingService,
 } from '@/services/onboarding-service'
 
@@ -16,6 +18,7 @@ import {
   OnboardingStatusCard,
   RetrieveIdentityRecord,
 } from '@/components/organisms'
+import { handleApiError } from '@/lib/exceptionhandler'
 
 export default function OnboardCitizenPage() {
   const [idNumber, setIdNumber] = useState('')
@@ -26,6 +29,9 @@ export default function OnboardCitizenPage() {
   const [contactDetailsConsent, setContactConsent] = useState(false)
   const [accountCreated, setAccountCreated] = useState(false)
   const [activationSent, setActivationSent] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [onboardResponse, setOnboardResponse] =
+    useState<OnboardCitizenResponse | null>(null)
 
   const { mutate: retrieveRecord, isPending: isRetrievingRecord } = useMutation(
     {
@@ -37,9 +43,9 @@ export default function OnboardCitizenPage() {
         setActivationSent(false)
         toast.success('Identity record retrieved')
       },
-      onError: () => {
+      onError: (error) => {
         setRecord(null)
-        toast.error('Could not retrieve identity record')
+        handleApiError(error)
       },
     }
   )
@@ -47,25 +53,42 @@ export default function OnboardCitizenPage() {
   const { mutate: onboardCitizen, isPending: isCreatingAccount } = useMutation({
     mutationFn: (formValues: OnboardCitizenFormValues) =>
       onboardingService.onboardCitizen(formValues),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setOnboardResponse(data)
       setAccountCreated(true)
       toast.success('Pending FlashID account created')
     },
-    onError: () => {
-      toast.error('Could not create pending FlashID account')
+    onError: (error) => {
+      setOnboardResponse(null)
+      handleApiError(error)
     },
   })
 
-  function retrieveIdentityRecord() {
+  const retrieveIdentityRecord = async () => {
     if (!idNumber.trim()) {
       toast.error('Enter an ID number first')
       return
     }
 
-    retrieveRecord(idNumber.trim())
+    setErrors({})
+
+    const result = retrivalSchema.safeParse({ idNumber, idConsent })
+
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors
+
+      setErrors({
+        idNumber: fieldErrors.idNumber?.[0] ?? '',
+        idConsent: fieldErrors.idConsent?.[0] ?? '',
+      })
+
+      return
+    }
+
+    await retrieveRecord(result.data.idNumber)
   }
 
-  function createPendingAccount() {
+  const createPendingAccount = async () => {
     if (!record) {
       toast.error('Retrieve the citizen record first')
       return
@@ -75,17 +98,39 @@ export default function OnboardCitizenPage() {
     const firstName = nameParts[0] ?? ''
     const lastName = nameParts.slice(1).join(' ') || 'Unknown'
 
-    onboardCitizen({
-      idNumber: record.idNumber,
+    setErrors({})
+
+    const result = onboardingSchema.safeParse({
+      phone,
       email,
-      phoneNumber: phone,
-      consentProvided: contactDetailsConsent,
+      contactDetailsConsent,
+      idConsent,
+    })
+
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors
+
+      setErrors({
+        phone: fieldErrors.phone?.[0] ?? '',
+        email: fieldErrors.email?.[0] ?? '',
+        contactDetailsConsent: fieldErrors.contactDetailsConsent?.[0] ?? '',
+        idConsent: fieldErrors.idConsent?.[0] ?? '',
+      })
+
+      return
+    }
+
+    await onboardCitizen({
+      idNumber: record.saId,
+      email: result.data.email,
+      phoneNumber: result.data.phone,
+      consentProvided: result.data.contactDetailsConsent,
     })
   }
 
-  function sendActivationCode() {
-    setActivationSent(true)
-  }
+  // function sendActivationCode() {
+  //   setActivationSent(true)
+  // }
 
   return (
     <main className="min-h-full bg-background p-6 pb-10">
@@ -98,6 +143,8 @@ export default function OnboardCitizenPage() {
             setConsent={setConsent}
             record={record}
             retrieveIdentityRecord={retrieveIdentityRecord}
+            errors={errors}
+            setErrors={setErrors}
           />
 
           <OnboardingStatusCard
@@ -122,7 +169,10 @@ export default function OnboardCitizenPage() {
           idConsent={idConsent}
           createPendingAccount={createPendingAccount}
           accountCreated={accountCreated}
-          sendActivationCode={sendActivationCode}
+          //sendActivationCode={sendActivationCode}
+          errors={errors}
+          setErrors={setErrors}
+          onboardResponse={onboardResponse}
         />
 
         <AuditLogPreview

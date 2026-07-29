@@ -1,0 +1,69 @@
+# syntax=docker/dockerfile:1
+#
+# Build context is the REPO ROOT (needed for pnpm-lock.yml + workspace file).
+# From the repo root:
+#   docker build -f dockerfile.web \ -t web-flashid:local .
+# 
+# Option A: NEXT_PUBLIC_* values are baked into the bundle at BUILD time.
+# so CI builds a separate image per environment (dev-<sha>, prod-<sha>),
+# each with its own --build-arg NEXT_PUBLIC_API_URL. Images are NOT
+# portable across environments.
+
+FROM node:20-alpine AS base
+RUN apk add --no-cache libc6-compat git
+
+# ---------- deps ----------
+FROM base AS deps
+WORKDIR /repo
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY web/package.json ./web/package.json
+
+RUN npm pkg delete scripts.postinstall
+RUN pnpm install --frozen-lockfile --filter ./web...
+
+# ---------- builder ----------
+FROM base AS builder
+WORKDIR /repo
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY --from=deps /repo/node_modules ./node_modules
+COPY --from=deps /repo/web/node_modules ./web/node_modules
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY web ./web
+
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Option A: NEXT_PUBLIC_* vars are baked into the bundle at build time.
+# Each environment gets its own image built with its own values.
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ARG API_INTERNAL_URL
+ENV API_INTERNAL_URL=$API_INTERNAL_URL
+# Add more NEXT_PUBLIC_* build args here as your app needs them, e.g.:
+# ARG NEXT_PUBLIC_SOMETHING
+# ENV NEXT_PUBLIC_SOMETHING=$NEXT_PUBLIC_SOMETHING
+
+RUN pnpm --filter ./web run build
+
+# ---------- runner ----------
+FROM base AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN addgroup --system --gid 1001 nodejs \
+  && adduser --system --uid 1001 nextjs
+
+  # Path mirror the monorepo layout because of standalone output tracing
+COPY --from=builder /repo/web/public ./web/public
+COPY --from=builder --chown=nextjs:nodejs /repo/web/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /repo/web/.next/static ./web/.next/static
+
+USER nextjs
+EXPOSE 3000
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "web/server.js"]

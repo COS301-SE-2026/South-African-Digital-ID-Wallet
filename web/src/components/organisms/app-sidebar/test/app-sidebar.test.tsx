@@ -3,14 +3,18 @@ import userEvent from '@testing-library/user-event'
 import { AppSidebar } from '../app-sidebar'
 
 jest.mock('next/navigation', () => ({
-  usePathname: jest.fn().mockReturnValue('/citizen'),
+  usePathname: jest.fn().mockReturnValue('/citizen/citizen-dashboard'),
 }))
 
 const DEFAULT_NAV_SECTIONS = [
   {
     title: 'Citizen Portal',
     items: [
-      { label: 'Dashboard', href: '/citizen', icon: 'dashboard' as const },
+      {
+        label: 'Dashboard',
+        href: '/citizen/citizen-dashboard',
+        icon: 'dashboard' as const,
+      },
       {
         label: 'My Credentials',
         href: '/credentials',
@@ -20,7 +24,7 @@ const DEFAULT_NAV_SECTIONS = [
   },
 ]
 
-const DEFAULT_USER = { name: 'John Doe', initials: 'JD', idLabel: 'ID: 123456' }
+const DEFAULT_USER = { name: 'John Doe', initials: 'JD' }
 const mockLogout = jest.fn()
 
 describe('AppSidebar', () => {
@@ -60,7 +64,7 @@ describe('AppSidebar', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders user name and idLabel when expanded', () => {
+  it('renders user name when expanded', () => {
     render(
       <AppSidebar
         navSections={DEFAULT_NAV_SECTIONS}
@@ -69,7 +73,6 @@ describe('AppSidebar', () => {
       />
     )
     expect(screen.getByText('John Doe')).toBeInTheDocument()
-    expect(screen.getByText('ID: 123456')).toBeInTheDocument()
   })
 
   it('collapses when the toggle button is clicked', async () => {

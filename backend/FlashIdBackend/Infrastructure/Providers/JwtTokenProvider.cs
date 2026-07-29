@@ -17,14 +17,14 @@ public class JwtTokenProvider : IJwtTokenProvider
         _configuration = configuration;
     }
 
-    public (string Token, DateTime ExpiresAt) GenerateToken(User user)
+    public (string Token, DateTime ExpiresAt) GenerateToken(User user, bool rememberMe = false)
     {
         var jwtKey = _configuration["Jwt:Key"]
                      ?? throw new InvalidOperationException("JWT signing key is not configured.");
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expiresAt = DateTime.UtcNow.AddHours(8);
+        var expiresAt = rememberMe ? DateTime.UtcNow.AddDays(30) : DateTime.UtcNow.AddHours(8);
 
         var claims = new[]
         {
