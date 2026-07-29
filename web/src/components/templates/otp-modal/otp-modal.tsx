@@ -8,7 +8,6 @@ import { DashboardModal } from '@/components/molecules/dashboard-modal/dashboard
 
 type OtpModalProps = {
   open: boolean
-  loginAttemptId: string
   onClose: () => void
   onSuccess: () => void
 }
@@ -17,7 +16,6 @@ const OTP_LENGTH = 6
 
 export function OtpModal({
   open,
-  loginAttemptId,
   onClose,
   onSuccess,
 }: Readonly<OtpModalProps>) {

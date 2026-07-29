@@ -7,7 +7,6 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/atoms'
 import { useUser } from '@/context/user-context'
 import loginService from '@/services/login-service/login-service'
 import { OtpModal } from '@/components/templates/otp-modal/otp-modal'
@@ -34,8 +33,9 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const [password, setPassword] = React.useState('')
   const [rememberMe, setRememberMe] = React.useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
-  const [otpModalOpen, setOtpModalOpen] = React.useState(true)
-  const [loginAttemptId, setLoginAttemptId] = React.useState('')
+  const [otpModalOpen, setOtpModalOpen] = React.useState(false)
+  const [deviceVerificationId, setDeviceVerificationId] = React.useState('')
+  const [pendingRole, setPendingRole] = React.useState('')
 
   const router = useRouter()
   const { refresh } = useUser()
@@ -52,7 +52,15 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
     mutationFn: (formValues) => loginService.login(formValues),
 
     onSuccess: async (data) => {
-      toast.success('Logged in')
+      if (data.requiresDeviceVerification && data.deviceVerificationId) {
+        setDeviceVerificationId(data.deviceVerificationId)
+        setPendingRole(data.role)
+        setOtpModalOpen(true)
+        toast.success('Enter the verification code sent to your email.')
+        return
+      }
+
+      toast.success('Logged in.')
 
       if (typeof window !== 'undefined') {
         window.localStorage.setItem(
@@ -76,7 +84,6 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
         }
 
         if (code === 'NEW_DEVICE' && err.response?.data?.loginAttemptId) {
-          setLoginAttemptId(err.response.data.loginAttemptId)
           setOtpModalOpen(true)
           return
         }
@@ -205,7 +212,6 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
 
       <OtpModal
         open={otpModalOpen}
-        loginAttemptId={loginAttemptId}
         onClose={() => setOtpModalOpen(false)}
         onSuccess={handleOtpSuccess}
       />

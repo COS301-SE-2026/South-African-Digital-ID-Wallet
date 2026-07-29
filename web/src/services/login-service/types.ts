@@ -7,8 +7,17 @@ export type LoginFormValues = {
 export type LoginResponse = {
   userId: string
   role: string
-  names: string
-  surname: string
   token: string
   expiresAt: string
+  requiresDeviceVerification: boolean
+  deviceVerificationId?: string | null
+}
+
+export type VerifyDeviceRequest = {
+  deviceVerificationId: string
+  otp: string
+  deviceType: string
+  operatingSystem: string
+  browser: string
+  rememberMe: boolean
 }
