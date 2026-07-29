@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { View, Text, Pressable, StyleSheet, Animated } from 'react-native'
 import { useRouter } from 'expo-router'
 import QRCode from 'react-native-qrcode-svg'
@@ -40,35 +40,42 @@ export default function DisplayScreen() {
   const [expiredProgress] = useState(() => new Animated.Value(0))
   const [pulse] = useState(() => new Animated.Value(1))
 
-  const fetchQr = useCallback(async () => {
-    try {
-      const disclosedFields = [...mandatoryFields, ...selectedOptionalFields]
-      const response = await qrService.generate(credentialId, disclosedFields)
-      const expiresAt = new Date(response.expiresAt).getTime()
-      setQrValue(response.token)
-      setExpiresAtMs(expiresAt)
-      setSecondsRemaining(
-        Math.max(Math.round((expiresAt - Date.now()) / 1000), 0)
-      )
-      setStatus('ready')
-    } catch {
-      setErrorMessage('Could not generate your QR code. Please try again.')
-      setStatus('error')
+  const [retryToken, setRetryToken] = useState(0)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const load = async () => {
+      try {
+        const disclosedFields = [...mandatoryFields, ...selectedOptionalFields]
+        const response = await qrService.generate(credentialId, disclosedFields)
+        if (cancelled) return
+        const expiresAt = new Date(response.expiresAt).getTime()
+        setQrValue(response.token)
+        setExpiresAtMs(expiresAt)
+        setSecondsRemaining(
+          Math.max(Math.round((expiresAt - Date.now()) / 1000), 0)
+        )
+        setStatus('ready')
+      } catch {
+        if (!cancelled) {
+          setErrorMessage('Could not generate your QR code. Please try again.')
+          setStatus('error')
+        }
+      }
     }
-  }, [credentialId, mandatoryFields, selectedOptionalFields])
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [credentialId, mandatoryFields, selectedOptionalFields, retryToken])
 
   const handleRetry = () => {
     setStatus('loading')
     setErrorMessage('')
-    fetchQr()
+    setRetryToken((t) => t + 1)
   }
-
-  useEffect(() => {
-    // Standard fetch-on-mount pattern. This lint rule is overly strict about
-    // effects that call an async function which eventually sets state.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchQr()
-  }, [fetchQr])
 
   useEffect(() => {
     if (status !== 'ready' || isExpired || expiresAtMs === null) return

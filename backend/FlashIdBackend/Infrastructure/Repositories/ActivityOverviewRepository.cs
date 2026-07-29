@@ -31,7 +31,7 @@ public class ActivityOverviewRepository : IActivityOverviewRepository
             {
                 Id = a.Id,
                 Title = a.Details,
-                Timestamp = a.CreatedAt,
+                Timestamp = DateTime.SpecifyKind(a.CreatedAt, DateTimeKind.Utc),
                 Type = a.EventType.ToString()
             })
             .ToListAsync();
