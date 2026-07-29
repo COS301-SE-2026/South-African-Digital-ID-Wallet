@@ -79,7 +79,7 @@ public static class DbSeeder
         await SeedNotificationsAsync(context);
     }
 
-    private static async Task SeedE2ETestUsersAsync(AppDbContext context)
+    internal static async Task SeedE2ETestUsersAsync(AppDbContext context)
     {
         var now = DateTime.UtcNow;
 
