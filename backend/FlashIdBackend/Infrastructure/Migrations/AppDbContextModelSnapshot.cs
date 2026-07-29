@@ -62,7 +62,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("EventType", "CreatedAt");
 
-                    b.ToTable("AuditLogs", (string)null);
+                    b.ToTable("AuditLogs");
                 });
 
             modelBuilder.Entity("Domain.Entities.Biometrics", b =>
@@ -101,7 +101,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CredentialId")
                         .IsUnique();
 
-                    b.ToTable("Biometrics", (string)null);
+                    b.ToTable("Biometrics");
                 });
 
             modelBuilder.Entity("Domain.Entities.Citizen", b =>
@@ -164,7 +164,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Citizens", (string)null);
+                    b.ToTable("Citizens");
                 });
 
             modelBuilder.Entity("Domain.Entities.CitizenActivation", b =>
@@ -293,7 +293,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CitizenId");
 
-                    b.ToTable("Credentials", (string)null);
+                    b.ToTable("Credentials");
                 });
 
             modelBuilder.Entity("Domain.Entities.DriversLicense", b =>
@@ -350,7 +350,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CredentialId")
                         .IsUnique();
 
-                    b.ToTable("DriversLicenses", (string)null);
+                    b.ToTable("DriversLicenses");
                 });
 
             modelBuilder.Entity("Domain.Entities.GovernmentAdministrator", b =>
@@ -395,7 +395,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("GovernmentAdministrators", (string)null);
+                    b.ToTable("GovernmentAdministrators");
                 });
 
             modelBuilder.Entity("Domain.Entities.IdentityDocument", b =>
@@ -447,7 +447,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CredentialId")
                         .IsUnique();
 
-                    b.ToTable("IdentityDocuments", (string)null);
+                    b.ToTable("IdentityDocuments");
                 });
 
             modelBuilder.Entity("Domain.Entities.Institution", b =>
@@ -496,7 +496,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("VerificationNumber")
                         .IsUnique();
 
-                    b.ToTable("Institutions", (string)null);
+                    b.ToTable("Institutions");
                 });
 
             modelBuilder.Entity("Domain.Entities.Notification", b =>
@@ -530,7 +530,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CitizenId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Domain.Entities.Official", b =>
@@ -580,7 +580,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Officials", (string)null);
+                    b.ToTable("Officials");
                 });
 
             modelBuilder.Entity("Domain.Entities.QrDisclosureToken", b =>
@@ -618,7 +618,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Jti")
                         .IsUnique();
 
-                    b.ToTable("QrDisclosureTokens", (string)null);
+                    b.ToTable("QrDisclosureTokens");
                 });
 
             modelBuilder.Entity("Domain.Entities.TrustedDevice", b =>
@@ -673,7 +673,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CitizenId");
 
-                    b.ToTable("TrustedDevices", (string)null);
+                    b.ToTable("TrustedDevices");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -725,15 +725,27 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(0);
 
+                    b.Property<int>("OTPResendCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<DateTime?>("PasswordReverifiedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("PasswordSet")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
+
+                    b.Property<string>("PendingEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
@@ -754,7 +766,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("DomainUsers", (string)null);
+                    b.ToTable("DomainUsers");
                 });
 
             modelBuilder.Entity("Domain.Entities.UserPreferences", b =>
@@ -796,7 +808,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("UserPreferences", (string)null);
+                    b.ToTable("UserPreferences");
                 });
 
             modelBuilder.Entity("Infrastructure.Identity.ApplicationUser", b =>

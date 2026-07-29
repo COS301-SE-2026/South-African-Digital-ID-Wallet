@@ -41,6 +41,11 @@ export const citizenNavSections: SidebarNavSection[] = [
         href: '/under-construction',
         icon: 'settings',
       },
+      {
+        label: 'Manage Account',
+        href: '/citizen/manage-user-account',
+        icon: 'settings',
+      },
     ],
   },
 ]

@@ -7,6 +7,7 @@ namespace Infrastructure.Data.Configurations;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {
+    const string DateTime2 = "datetime2";
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.HasKey(u => u.Id);
@@ -40,10 +41,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasDefaultValue(false);
 
         builder.Property(u => u.LockoutUntil)
-            .HasColumnType("datetime2");
+            .HasColumnType(DateTime2);
 
         builder.Property(u => u.LastLoginAt)
-            .HasColumnType("datetime2");
+            .HasColumnType(DateTime2);
 
         builder.Property(u => u.Role)
             .IsRequired()
@@ -51,13 +52,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.CreatedAt)
             .IsRequired()
-            .HasColumnType("datetime2")
+            .HasColumnType(DateTime2)
             .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAdd();
 
         builder.Property(u => u.UpdatedAt)
             .IsRequired()
-            .HasColumnType("datetime2")
+            .HasColumnType(DateTime2)
             .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAdd();
 
@@ -74,10 +75,20 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(256);
 
         builder.Property(u => u.EmailOTPExpiresAt)
-            .HasColumnType("datetime2");
+            .HasColumnType(DateTime2);
 
         builder.Property(u => u.OTPAttemptCount)
-        .IsRequired()
-        .HasDefaultValue(0);
+            .IsRequired()
+            .HasDefaultValue(0);
+
+        builder.Property(u => u.OTPResendCount)
+            .IsRequired()
+            .HasDefaultValue(0);
+
+        builder.Property(u => u.PendingEmail)
+            .HasMaxLength(256);
+
+        builder.Property(u => u.PasswordReverifiedAt)
+            .HasColumnType(DateTime2);
     }
 }
