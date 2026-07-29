@@ -113,7 +113,7 @@ export const RegistrationForm = ({
 
   const loginHref = safeReturnTo
     ? `/login?returnTo=${encodeURIComponent(safeReturnTo)}`
-    : `/login}`
+    : `/login`
 
   const registerMutation = useMutation({
     mutationFn: registerService.register,

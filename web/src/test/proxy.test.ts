@@ -115,11 +115,11 @@ describe('proxy middleware', () => {
     expect(res.headers.get('location')).toBe('http://localhost/login')
   })
 
-  it('redirect to login when the role is unknown', async () => {
+  it('redirect to home when the role is unknown', async () => {
     mockPayload({ sub: 'user-one-two-three', role: 'SuperAdmin' })
     const res = await proxy(makeReq('/citizen/dashboard', 'valid.token'))
     expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toBe('http://localhost/login')
+    expect(res.headers.get('location')).toBe('http://localhost/')
   })
 
   it('Citizen redirects from /officials path back to /citizen', async () => {

@@ -20,9 +20,14 @@ export function CredentialCard({
             <Icon className="size-6" aria-hidden="true" />
           </div>
           <div className="flex-1">
-            <Text variant="sub-md" className="font-bold text-text-primary">
-              {title}
-            </Text>
+            <div className="flex items-center justify-between gap-2">
+              <Text variant="sub-md" className="font-bold text-text-primary">
+                {title}
+              </Text>
+              <StatusPill intent={available ? 'active' : 'inactive'}>
+                {available ? 'Available' : 'Unavailable'}
+              </StatusPill>
+            </div>
             <Text variant="sub-sm" className="mt-1 text-muted-foreground">
               {description}
             </Text>

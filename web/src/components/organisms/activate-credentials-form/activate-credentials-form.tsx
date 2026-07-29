@@ -25,6 +25,9 @@ export function ActivateCredentialsForm({
   return (
     <div className="space-y-6">
       <div className="text-center">
+        <Text variant="h3" className="font-bold text-text-primary">
+          Activate your digital credentials
+        </Text>
         <Text variant="sub-sm" className="mt-1 text-muted-foreground">
           Select the verified credentials you want to add to your FlashID
           wallet.
