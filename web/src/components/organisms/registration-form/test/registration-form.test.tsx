@@ -6,10 +6,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { registerService } from '@/services/citizen-register-service'
 import toast from 'react-hot-toast'
 import axios from 'axios'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
+  useSearchParams: jest.fn(),
 }))
 
 jest.mock('@/services/citizen-register-service', () => ({
@@ -40,6 +41,10 @@ jest.mock('axios', () => ({
   },
   isAxiosError: jest.fn(),
 }))
+
+beforeEach(() => {
+  ;(useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams())
+})
 
 const VALID_EMAIL = 'user@gmail.com'
 const VALID_PASSWORD = 'Password1!'

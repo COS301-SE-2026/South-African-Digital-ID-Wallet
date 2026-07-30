@@ -4,7 +4,7 @@ import * as React from 'react'
 import { ShieldCheck, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Text } from '@/components/atoms'
-import { TextField } from '@/components/molecules'
+import { TextField, getSafeReturnTo } from '@/components/molecules'
 
 import toast from 'react-hot-toast'
 import axios from 'axios'
@@ -16,6 +16,13 @@ export const VerifyEmailForm = () => {
   const router = useRouter()
   const searchParameters = useSearchParams()
   const email = searchParameters.get('email') ?? ''
+
+  const returnTo = searchParameters.get('returnTo')
+  const safeReturnTo = getSafeReturnTo(returnTo, '/')
+
+  const loginHref = safeReturnTo
+    ? `/login?returnTo=${encodeURIComponent(safeReturnTo)}`
+    : '/login'
 
   const [code, setCode] = React.useState('')
   const [cooldown, setCooldown] = React.useState(0)
@@ -30,7 +37,7 @@ export const VerifyEmailForm = () => {
     mutationFn: () => registerService.verifyEmail({ email, code }),
     onSuccess: () => {
       toast.success('Email verified. Please log in.')
-      router.push('/login')
+      router.push(loginHref)
     },
     onError: (err) => {
       const message =

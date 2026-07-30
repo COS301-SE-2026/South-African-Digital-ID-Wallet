@@ -58,7 +58,7 @@ public class OnboardingService : IOnboardingService
     {
         var normalized = phoneNumber.Trim().Replace(" ", "").Replace("-", "");
 
-        if (normalized.StartsWith("0"))
+        if (normalized.StartsWith('0'))
             normalized = $"+27{normalized[1..]}";
 
         return normalized;
@@ -93,14 +93,6 @@ public class OnboardingService : IOnboardingService
         if (email is not null && !Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.None
                 , TimeSpan.FromMilliseconds(600)))
             throw new ArgumentException("Invalid email address format.", nameof(email));
-
-        if (email is not null)
-        {
-            var existingUser = await _onboardingRepository.GetUserByEmailAsync(email);
-
-            if (existingUser is not null)
-                throw new DuplicateEmailRegisteredException();
-        }
 
         var existingCitizen = await _onboardingRepository.GetCitizenBySaIdAsync(request.SaId);
 
@@ -170,9 +162,9 @@ public class OnboardingService : IOnboardingService
         await _onboardingRepository.SaveChangesAsync();
 
         var activationLink = BuildActivationLink(rawToken);
-        var message = BuildEmailMessage(activationLink);
+        var message = BuildEmailMessage(activationLink, citizen.Names);
 
-        await _emailSenderProvider.SendEmailAsync(email, "FlashID", message);
+        await _emailSenderProvider.SendEmailAsync(email, "Your FlashID Activation Link", message);
 
         return new OnboardCitizenResponse
         {
@@ -225,10 +217,10 @@ public class OnboardingService : IOnboardingService
 
         var token = Uri.EscapeDataString(rawToken);
 
-        return $"{baseUrl}/activate?token={token}";
+        return $"{baseUrl}/citizen/activate-credentials?token={token}";
     }
 
-    private string BuildEmailMessage(string activationLink)
+    private static string BuildEmailMessage(string activationLink, string name)
     {
         return
             $$"""
@@ -282,7 +274,7 @@ public class OnboardingService : IOnboardingService
                      
                      <tr>
                          <td style="padding:24px 32px 0 32px; color:#111827; font-size:15px; line-height:1.6;">
-                             Hi there,
+                             Hi there {{name}},
                              <br /><br />
              
                              Welcome to <strong>FlashID</strong>. Your identity has been

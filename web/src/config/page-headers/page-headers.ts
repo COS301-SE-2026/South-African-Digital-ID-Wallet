@@ -46,6 +46,12 @@ export const pageHeaders: Record<string, PageHeader> = {
     description: 'View and manage your issued digital credentials. ',
   },
 
+  '/citizen/activate-credentials': {
+    title: 'Activate Credentials',
+    description:
+      'Verify your identity and add your credentials to your wallet.',
+  },
+
   '/citizen/manage-user-account': {
     title: 'Manage Account',
     description: 'Manage your profile, security settings, and trusted devices.',

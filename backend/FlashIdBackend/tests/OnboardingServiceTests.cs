@@ -138,8 +138,8 @@ public class OnboardingServiceTest
 
         Assert.Equal(1, emailSender.SendCount);
         Assert.Equal(NormalizedEmail, emailSender.LastToEmail);
-        Assert.Equal("FlashID", emailSender.LastSubject);
-        Assert.Contains($"{FrontendBaseUrl}/activate?token=", emailSender.LastMessage!);
+        Assert.Equal("Your FlashID Activation Link", emailSender.LastSubject);
+        Assert.Contains($"{FrontendBaseUrl}/citizen/activate-credentials?token=", emailSender.LastMessage!);
         Assert.DoesNotContain(activation.TokenHash, emailSender.LastMessage!);
     }
 
@@ -206,27 +206,6 @@ public class OnboardingServiceTest
 
         Assert.Single(context.Citizens);
         Assert.Empty(context.CitizenActivations);
-        Assert.Equal(0, emailSender.SendCount);
-    }
-
-    [Fact]
-    public async Task OnboardCitizen_WithDuplicateEmail_ThrowsDuplicateEmailRegisteredException()
-    {
-        using var context = CreateContext();
-        await context.DomainUsers.AddAsync(new User
-        {
-            Id = Guid.NewGuid(),
-            Email = NormalizedEmail,
-            Role = UserRole.Citizen,
-        }, TestContext.Current.CancellationToken);
-        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
-        var gateway = new FakeGovernmentRegistryGateway { CitizenToReturn = KnownRecord() };
-        var emailSender = new FakeEmailSenderProvider();
-        var service = CreateService(context, gateway, emailSender);
-        await Assert.ThrowsAsync<DuplicateEmailRegisteredException>(
-            () => service.OnboardCitizenAsync(ValidRequest(), Guid.NewGuid(), TestIpAddress)
-        );
-        Assert.Empty(context.Citizens);
         Assert.Equal(0, emailSender.SendCount);
     }
 
