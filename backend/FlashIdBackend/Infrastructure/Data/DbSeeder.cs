@@ -58,6 +58,15 @@ public static class DbSeeder
         "102.65.30.9", "196.15.45.7", "41.205.20.11" // NOSONAR
     };
 
+    private static readonly string[] MockPhotoBlobNames = new[]
+    {
+        "mock-photos-robin.png",
+        "mock-photos-raven.png",
+        "mock-photos-beast-boy.png",
+        "mock-photos-cyborg.png",
+        "mock-photos-starfire.png",
+    };
+
     public static async Task SeedAsync(AppDbContext context)
     {
         await context.Database.MigrateAsync();
@@ -533,7 +542,10 @@ public static class DbSeeder
             var age = now.Year - citizen.DateOfBirth.Year;
             if (citizen.DateOfBirth > now.AddYears(-age)) age--;
 
-            var idCredential = NewCredential(citizen.Id, idIssuer, now);
+            var photoPath = citizen.Status == CitizenStatus.Activated ? MockPhotoBlobNames[rnd.Next(MockPhotoBlobNames.Length)] : string.Empty;
+            var signature = citizen.Status == CitizenStatus.Activated ? "mock-photos-signature.png" : Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N");
+
+            var idCredential = NewCredential(citizen.Id, idIssuer, now, signature);
             credentialsToAdd.Add(idCredential);
 
             // every citizen 16+ gets an identity document
@@ -544,6 +556,7 @@ public static class DbSeeder
                 CountryOfBirth = countries[rnd.Next(countries.Length)],
                 Nationality = nationalities[rnd.Next(nationalities.Length)],
                 Status = idStatuses[rnd.Next(idStatuses.Length)],
+                PhotoPath = photoPath,
                 CredentialId = idCredential.Id,
                 CreatedAt = now,
                 UpdatedAt = now
@@ -552,7 +565,7 @@ public static class DbSeeder
             // only citizens 18+ get a drivers license
             if (age >= 18)
             {
-                var licenseCredential = NewCredential(citizen.Id, licenseIssuer, now);
+                var licenseCredential = NewCredential(citizen.Id, licenseIssuer, now, signature);
                 credentialsToAdd.Add(licenseCredential);
                 var startDate = now.AddYears(-rnd.Next(1, 10));
                 driversLicensesToAdd.Add(new DriversLicense
@@ -565,6 +578,7 @@ public static class DbSeeder
                     // Restrictions max 2 chars
                     Restrictions = "00",
                     ExpiryDate = startDate.AddYears(5),
+                    PhotoPath = photoPath,
                     CredentialId = licenseCredential.Id,
                     CreatedAt = now,
                     UpdatedAt = now
@@ -584,11 +598,11 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
     }
-    private static Credential NewCredential(Guid citizenId, string issuedBy, DateTime now) => new()
+    private static Credential NewCredential(Guid citizenId, string issuedBy, DateTime now, string signature) => new()
     {
         Id = Guid.NewGuid(),
         Status = CredentialStatus.Active,
-        Signature = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"),
+        Signature = signature,
         IssuedBy = issuedBy,
         IssueDate = now,
         CitizenId = citizenId,

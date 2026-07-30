@@ -143,7 +143,7 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
 
-    if (app.Environment.IsDevelopment() && (!await db.DomainUsers.AnyAsync()))
+    if (/*app.Environment.IsDevelopment() && */!await db.DomainUsers.AnyAsync())
     {
         Console.WriteLine("[SEED] Database is empty, seeding sample data ...");
         await DbSeeder.SeedAsync(db);
