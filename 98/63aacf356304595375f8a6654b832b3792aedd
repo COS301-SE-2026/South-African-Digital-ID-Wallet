@@ -1,0 +1,16 @@
+web/src/components/pages/brand-style-guide/voice-tone-section.tsx
+  h_0aff3b71f739b1 1-50
+web/src/components/pages/brand-style-guide/change-log.tsx
+  h_0aff3b71f739b1 1-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "9863aacf356304595375f8a6654b832b3792aedd",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

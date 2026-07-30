@@ -1,0 +1,16 @@
+web/src/components/pages/brand-style-guide/section-heading.tsx
+  h_0aff3b71f739b1 1-16
+web/src/components/pages/brand-style-guide/typography-section.tsx
+  h_0aff3b71f739b1 1-116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "cdbd29ac7dc31ca8a7c2e32a10e0ae349132d70c",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

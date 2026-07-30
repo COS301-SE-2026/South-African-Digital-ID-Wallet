@@ -1,0 +1,16 @@
+web/src/components/pages/brand-style-guide/design-tokens-section.tsx
+  h_0aff3b71f739b1 1-59
+web/src/components/pages/brand-style-guide/brand-style-guide-page.tsx
+  h_0aff3b71f739b1 7-15,66-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "43eac3abb427921adbd9086e3304a9f0a88d6c25",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
