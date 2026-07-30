@@ -1,0 +1,20 @@
+web/src/components/organisms/landing-page-navbar/landing-page-navbar.tsx
+  h_0aff3b71f739b1 14-15
+web/src/components/pages/brand-style-guide/brand-style-guide-page.tsx
+  h_0aff3b71f739b1 16,77
+web/src/components/organisms/landing-page-footer/landing-page-footer.tsx
+  h_0aff3b71f739b1 45,48,52,55
+web/src/components/pages/landing-page/landing-page.tsx
+  h_0aff3b71f739b1 4,20-24,26-31,149,371-372,374-375
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "5321daf67793fbc3ec0b734c188f80f710f2a101",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
