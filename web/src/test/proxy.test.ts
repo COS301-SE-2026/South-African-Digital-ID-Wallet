@@ -8,12 +8,16 @@ jest.mock(
     ({
       NextRequest: class MockNextRequest {
         url: string
-        nextUrl: { pathname: string }
+        nextUrl: { pathname: string; search: string }
         cookies: { get: (name: string) => { value: string } | undefined }
 
         constructor(url: string, init?: { headers?: Record<string, string> }) {
           this.url = url
-          this.nextUrl = { pathname: new URL(url).pathname }
+          const parsedUrl = new URL(url)
+          this.nextUrl = {
+            pathname: parsedUrl.pathname,
+            search: parsedUrl.search,
+          }
           const cookieStr = (init?.headers ?? {})['cookie'] ?? ''
           const jar: Record<string, string> = {}
           cookieStr.split(';').forEach((pair: string) => {
@@ -77,41 +81,41 @@ describe('proxy middleware', () => {
     process.env = savedEnv
   })
 
-  it('redirects to / when access_token cookie is not present at the moment', async () => {
+  it('redirects to login when access_token cookie is not present at the moment', async () => {
     const res = await proxy(makeReq('/citizen/dashboard'))
     expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toBe('http://localhost/')
+    expect(res.headers.get('location')).toBe('http://localhost/login')
   })
 
-  it('redirect to / when JWT_SECRET env is not set yet', async () => {
+  it('redirect to login when JWT_SECRET is not set yet', async () => {
     delete process.env.JWT_SECRET
     const res = await proxy(makeReq('/citizen/dashboard', 'any.token'))
     expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toBe('http://localhost/')
+    expect(res.headers.get('location')).toBe('http://localhost/login')
   })
 
-  it('redirect to / when JWT signature is not valid', async () => {
+  it('redirect to login when JWT signature is not valid', async () => {
     mockJwtVerify.mockRejectedValue(new Error('signature verification failed'))
     const res = await proxy(makeReq('/citizen/dashboard', 'bad.sig.token'))
     expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toBe('http://localhost/')
+    expect(res.headers.get('location')).toBe('http://localhost/login')
   })
 
-  it('redirect to / when token is not there with the sub claim', async () => {
+  it('redirect to login when token is not there with the sub claim', async () => {
     mockPayload({ role: 'Citizen' })
     const res = await proxy(makeReq('/citizen/dashboard', 'valid.token'))
     expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toBe('http://localhost/')
+    expect(res.headers.get('location')).toBe('http://localhost/login')
   })
 
-  it('redirect to / when token is not there with the role claim', async () => {
+  it('redirect to login when token is not there with the role claim', async () => {
     mockPayload({ sub: 'user-one-two-three' })
     const res = await proxy(makeReq('/citizen/dashboard', 'valid.token'))
     expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toBe('http://localhost/')
+    expect(res.headers.get('location')).toBe('http://localhost/login')
   })
 
-  it('redirect to / when the rols is unknown', async () => {
+  it('redirect to home when the role is unknown', async () => {
     mockPayload({ sub: 'user-one-two-three', role: 'SuperAdmin' })
     const res = await proxy(makeReq('/citizen/dashboard', 'valid.token'))
     expect(res.status).toBe(307)
@@ -120,7 +124,9 @@ describe('proxy middleware', () => {
 
   it('Citizen redirects from /officials path back to /citizen', async () => {
     mockPayload({ sub: 'user-one-two-three', role: 'Citizen' })
-    const res = await proxy(makeReq('/officals/onboard-citizen', 'valid.token'))
+    const res = await proxy(
+      makeReq('/officials/onboard-citizen', 'valid.token')
+    )
     expect(res.status).toBe(307)
     expect(res.headers.get('location')).toBe('http://localhost/citizen')
   })
@@ -151,5 +157,15 @@ describe('proxy middleware', () => {
       makeReq('/officials/onboard-citizen', 'valid.token')
     )
     expect(res.status).toBe(200)
+  })
+
+  it('preserves returnTo for the activate credentials route', async () => {
+    const res = await proxy(
+      makeReq('/citizen/activate-credentials?token=abc123')
+    )
+    expect(res.status).toBe(307)
+    expect(res.headers.get('location')).toBe(
+      'http://localhost/login?returnTo=%2Fcitizen%2Factivate-credentials%3Ftoken%3Dabc123'
+    )
   })
 })
