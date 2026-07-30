@@ -7,12 +7,10 @@ describe('AuthSidebar', () => {
     expect(screen.getByAltText('Flash ID')).toBeInTheDocument()
   })
 
-  it('renders the brand name and tagline', () => {
+  it('renders the tagline', () => {
     render(<AuthSidebar />)
-    expect(screen.getByText('Flash ID')).toBeInTheDocument()
-    expect(
-      screen.getByText('Secure Digital Identity Platform')
-    ).toBeInTheDocument()
+    expect(screen.getByText(/prove yourself in a/i)).toBeInTheDocument()
+    expect(screen.getByText('Flash')).toBeInTheDocument()
   })
 
   it('renders the three feature cards', () => {
