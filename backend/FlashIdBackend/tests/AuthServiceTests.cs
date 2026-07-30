@@ -414,4 +414,89 @@ public class AuthServiceTests
         Assert.Equal("Device verification has already been used.", exception.Message);
     }
 
+    [Fact]
+    public async Task VerifyDeviceAsync_ExpiredVerification_ThrowsUnauthorizedAccessException()
+    {
+        var user = ValidUser();
+        var verification = ValidDeviceVerification(user.Id);
+
+        verification.ExpiresAt = DateTime.UtcNow.AddMinutes(-1);
+
+        var fakeRepository = new FakeAuthRepository { UserToReturn = user };
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { VerificationToReturn = verification };
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+        var request = new VerifyDeviceRequestDto
+        {
+            DeviceVerificationId = verification.Id,
+            Otp = "123456",
+            DeviceType = DeviceType.Laptop,
+            OperatingSystem = "Windows",
+            Browser = "Chrome"
+        };
+
+        var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.VerifyDeviceAsync(request, null, "127.0.0.1", CancellationToken.None));
+
+        Assert.Equal("Device verification code has expired.", exception.Message);
+    }
+
+    [Fact]
+    public async Task VerifyDeviceAsync_MaxAttemptsReached_ThrowsUnauthorizedAccessException()
+    {
+        var user = ValidUser();
+        var verification = ValidDeviceVerification(user.Id);
+
+        verification.AttemptCount = 5;
+
+        var fakeRepository = new FakeAuthRepository { UserToReturn = user };
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { VerificationToReturn = verification };
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+        var request = new VerifyDeviceRequestDto
+        {
+            DeviceVerificationId = verification.Id,
+            Otp = "123456",
+            DeviceType = DeviceType.Laptop,
+            OperatingSystem = "Windows",
+            Browser = "Chrome"
+        };
+
+        var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.VerifyDeviceAsync(request, null, "127.0.0.1", CancellationToken.None));
+
+        Assert.Equal("Too many verification attempts. Please log in again.", exception.Message);
+    }
+
+    [Fact]
+    public async Task VerifyDeviceAsync_InvalidOtp_IncrementsAttemptCount_AddThrowsUnauthorizedAccessException()
+    {
+        var user = ValidUser();
+        var verification = ValidDeviceVerification(user.Id);
+
+        verification.OtpHash = "incorrect-stored-hash";
+
+        var fakeRepository = new FakeAuthRepository { UserToReturn = user };
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { VerificationToReturn = verification };
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+        var request = new VerifyDeviceRequestDto
+        {
+            DeviceVerificationId = verification.Id,
+            Otp = "123456",
+            DeviceType = DeviceType.Laptop,
+            OperatingSystem = "Windows",
+            Browser = "Chrome"
+        };
+
+        var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.VerifyDeviceAsync(request, null, "127.0.0.1", CancellationToken.None));
+
+        Assert.Equal("Invalid device verification code.", exception.Message);
+        Assert.Equal(1, verification.AttemptCount);
+        Assert.Equal(verification, fakeTrustedDeviceRepository.VerificationToReturn);
+    }
+
+
+
 }
