@@ -160,7 +160,7 @@ Officials may:
 
 The full epics and user stories, including acceptance criteria and definitions of done for all 12 epics and 49 user stories are documented in:
 
- **[epics_and_user_stories.md](./epics_and_user_stories.md)**
+ **[epics_and_user_stories.md](./epics-and-user-stories-v2.md)**
 
 ### Epic Summary
 
@@ -185,7 +185,7 @@ The full epics and user stories, including acceptance criteria and definitions o
 
 The complete functional requirements, subsystems R1 through R10 are documented in:
 
- **[functional_requirements.md](./functional_requirements.md)**
+ **[functional_requirements.md](./functional-requirements-v2.md)**
 
 ### Subsystem Summary
 
@@ -302,13 +302,13 @@ The architecture should support the onboarding of additional government departme
 
 ## 6. Use Cases
 
-See [use_cases](./use_cases.md) for the Use Cases and their Use Case Diagrams.
+See [use_cases](./use-cases-v2.md) for the Use Cases and their Use Case Diagrams.
 
 ---
 
 ## 7. API Service Contracts
 
-See [API.md](./demo1/API.md) for preliminary API contracts and payloads supporting these use cases.
+See [API.md](./API-v2.md) for preliminary API contracts and payloads supporting these use cases.
 
 ---
 ## 8. Domain Model
@@ -319,7 +319,7 @@ See [API.md](./demo1/API.md) for preliminary API contracts and payloads supporti
 
 # 9. Architectural Requirements
 
-See [architecture.md](./demo1/architecture.md) for the overarching architectural approach, quality requirements, design patterns, and constraints guiding Demo 1 implementation. 
+See [architecture.md](./architecture-v2.md) for the overarching architectural approach, quality requirements, design patterns, and constraints guiding Demo 1 implementation. 
 
 ---
 
