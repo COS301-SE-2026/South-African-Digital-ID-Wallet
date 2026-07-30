@@ -163,6 +163,21 @@ public class AuthServiceTests
         };
     }
 
+    private static DeviceVerification ValidDeviceVerification(Guid userId)
+    {
+        return new DeviceVerification
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            OtpHash = "stored-otp-hash",
+            ExpiresAt = DateTime.UtcNow.AddMinutes(10),
+            AttemptCount = 0,
+            VerifiedAt = null,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+    }
+
     private static AuthService CreateAuthService(FakeAuthRepository fakeAuthRepository, FakeJwtTokenProvider fakeJwtTokenProvider, FakeTrustedDeviceRepository fakeTrustedDeviceRepository)
     {
         var fakePasswordHasher = new FakePasswordHashingProvider();
@@ -221,6 +236,8 @@ public class AuthServiceTests
         Assert.True(result.ExpiresAt < DateTime.UtcNow.AddDays(1));
     }
 
+
+
     [Fact]
     public async Task GetCurrentUserAsync_ReturnsMappedUserProfile()
     {
@@ -268,5 +285,37 @@ public class AuthServiceTests
 
         var result = await authService.GetCurrentUserAsync(Guid.NewGuid());
         Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task LoginAsync_NewDevice_ReturnsRequiresDeviceVerification()
+    {
+        var user = ValidUser();
+
+        var fakeRepository = new FakeAuthRepository
+        {
+            UserToReturn = user,
+        };
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { TrustedDeviceToReturn = null };
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+
+        var request = new LoginRequestDto
+        {
+            Email = user.Email,
+            Password = "correct-password",
+            RememberMe = false,
+        };
+
+        var result = await authService.LoginAsync(request, "null", "127.0.0.1", CancellationToken.None);
+
+        Assert.True(result.RequiresDeviceVerification);
+        Assert.NotNull(result.DeviceVerificationId);
+        Assert.NotEqual(Guid.Empty, result.DeviceVerificationId);
+        Assert.Empty(result.Token);
+        Assert.NotNull(fakeTrustedDeviceRepository.VerificationToReturn);
+        Assert.Equal(user.Id, fakeTrustedDeviceRepository.VerificationToReturn!.UserId);
+        Assert.Equal(result.DeviceVerificationId, fakeTrustedDeviceRepository.VerificationToReturn.Id);
     }
 }

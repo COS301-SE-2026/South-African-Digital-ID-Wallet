@@ -15,6 +15,11 @@ export const pageHeaders: Record<string, PageHeader> = {
       'Verify a citizen, capture consent, and create a pending FlashID account.',
   },
 
+  '/officials/verifications': {
+    title: 'Verifications',
+    description: 'Scan secure QR Code to verify identitities and credentials.',
+  },
+
   '/citizen': {
     title: 'Citizen Dashboard',
     description: 'View and manage your digital identity wallet.',
