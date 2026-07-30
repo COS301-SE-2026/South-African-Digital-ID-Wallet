@@ -1,0 +1,24 @@
+backend/FlashIdBackend/Infrastructure/Data/DbSeeder.cs
+  h_99fca60b892ff4 61-69,545-548,559,568,581,601,605
+government-registry/GovernmentRegistry/Infrastructure/Data/DbSeeder.cs
+  h_99fca60b892ff4 73,89
+web/src/components/organisms/scan-result-card/scan-result-card.tsx
+  h_99fca60b892ff4 6
+government-registry/GovernmentRegistry/Presentation/Program.cs
+  h_99fca60b892ff4 28,53
+backend/FlashIdBackend/Application/Common/Services/DisclosedFieldValueResolver.cs
+  h_99fca60b892ff4 42
+web/src/components/organisms/scan-result-card/test/scan-result-card.test.tsx
+  h_99fca60b892ff4 3,34-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "b13629c7106abe20746d385ef7717fd3111f5faa",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
