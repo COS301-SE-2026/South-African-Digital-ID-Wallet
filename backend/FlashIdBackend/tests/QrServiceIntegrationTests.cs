@@ -9,6 +9,7 @@ using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Data.Sqlite;
+using Application.Common.Interfaces.ProviderInterfaces;
 
 namespace tests;
 
@@ -24,6 +25,11 @@ public class QrServiceIntegrationTests
     private const string DateOfBirthField = "Date of birth";
     private const string HomeAffairsIssuer = "Home Affairs";
     private const string LocalHostIp = "127.0.0.1";
+
+    private sealed class FakePhotoStorageProvider : IPhotoStorageProvider
+    {
+        public Task<string> GenerateReadSasUrlAsync(string blobName, TimeSpan ttl) => Task.FromResult($"https://fake-blob-sas.local/{blobName}");
+    }
 
     private static AppDbContext CreateContext()
     {
@@ -59,8 +65,9 @@ public class QrServiceIntegrationTests
         var configuration = CreateQrConfiguration();
         var signingProvider = new Ed25519SigningProvider(configuration);
         var institutionRepository = new InstitutionRepository(context);
+        var disclosedFieldValueResolver = new DisclosedFieldValueResolver(new FakePhotoStorageProvider());
 
-        return new QrService(credentialRepository, signingProvider, qrDisclosureTokenRepository, institutionRepository);
+        return new QrService(credentialRepository, signingProvider, qrDisclosureTokenRepository, institutionRepository, disclosedFieldValueResolver);
     }
 
     private static (User User, Citizen Citizen) CreateCitizenWithUser()

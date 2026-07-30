@@ -21,3 +21,6 @@ node_modules/
 
 *.swp
 *.swo
+
+__azurite*
+Azurite*

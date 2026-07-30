@@ -11,5 +11,17 @@ services:
       - "1433:1433"
     volumes:
       - sqlserver-data:/var/opt/mssql
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    container_name: flashid-azurite
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    volumes:
+      - azurite-data:/data
+    command: "azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0 --location /data"
 volumes:
   sqlserver-data:
+  azurite-data:
