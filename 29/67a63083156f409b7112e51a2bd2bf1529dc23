@@ -1,0 +1,14 @@
+docs/demo2/SRS-v2.md
+  h_0aff3b71f739b1 163,188,305,311,322
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "2967a63083156f409b7112e51a2bd2bf1529dc23",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
