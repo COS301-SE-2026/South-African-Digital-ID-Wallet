@@ -79,12 +79,100 @@ public static class DbSeeder
         // Government administrators must exist before creating institutions or officials
         await SeedGovernmentAdministratorUsersAsync(context, usedEmails, usedPhones);
         await SeedOfficialUsersAsync(context, usedEmails, usedPhones);
+        await SeedE2ETestUsersAsync(context);
         await RepairInvalidPasswordHashesAsync(context);
         await SeedCredentialsAsync(context);
         await SeedUserPreferencesAsync(context);
         await SeedAuditLogsAsync(context);
         await SeedTrustedDevicesAsync(context);
         await SeedNotificationsAsync(context);
+    }
+
+    internal static async Task SeedE2ETestUsersAsync(AppDbContext context)
+    {
+        var now = DateTime.UtcNow;
+
+        async Task<User> EnsureUserAsync(string email, string phone, UserRole role)
+        {
+            var existing = await context.DomainUsers.FirstOrDefaultAsync(u => u.Email == email);
+            if (existing != null)
+            {
+                return existing;
+            }
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                Email = email,
+                PhoneNumber = phone,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
+                FailedLoginAttempts = 0,
+                IsDeleted = false,
+                IsEmailVerified = true,
+                Role = role,
+                CreatedAt = now,
+                UpdatedAt = now
+            };
+
+            await context.DomainUsers.AddAsync(user);
+            await context.SaveChangesAsync();
+            return user;
+        }
+
+        var citizenUser = await EnsureUserAsync("citizen.e2e@flashid.local", "+27810000001", UserRole.Citizen);
+        if (!await context.Citizens.AnyAsync(c => c.UserId == citizenUser.Id))
+        {
+            await context.Citizens.AddAsync(new Citizen
+            {
+                Id = Guid.NewGuid(),
+                SaId = "0000000000001",
+                Names = "E2E",
+                Surname = "Citizen",
+                DateOfBirth = now.AddYears(-30),
+                Gender = Gender.Other,
+                Status = CitizenStatus.Activated,
+                UserId = citizenUser.Id,
+                CreatedAt = now,
+                UpdatedAt = now
+            });
+            await context.SaveChangesAsync();
+        }
+
+        var govUser = await EnsureUserAsync("govadmin.e2e@flashid.local", "+27810000002", UserRole.GovernmentAdministrator);
+        if (!await context.GovernmentAdministrators.AnyAsync(g => g.UserId == govUser.Id))
+        {
+            await context.GovernmentAdministrators.AddAsync(new GovernmentAdministrator
+            {
+                Id = Guid.NewGuid(),
+                GovernmentId = "GOVE2E01",
+                Names = "E2E",
+                Surname = "GovAdmin",
+                UserId = govUser.Id,
+                CreatedAt = now,
+                UpdatedAt = now
+            });
+            await context.SaveChangesAsync();
+        }
+
+        var officialUser = await EnsureUserAsync("official.e2e@flashid.local", "+27810000003", UserRole.Official);
+        if (!await context.Officials.AnyAsync(o => o.UserId == officialUser.Id))
+        {
+            var institution = await context.Institutions.FirstOrDefaultAsync();
+            if (institution != null)
+            {
+                await context.Officials.AddAsync(new Official
+                {
+                    Id = Guid.NewGuid(),
+                    OfficialId = "OFFE2E01",
+                    Names = "E2E",
+                    Surname = "Official",
+                    UserId = officialUser.Id,
+                    InstitutionId = institution.Id,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                });
+                await context.SaveChangesAsync();
+            }
+        }
     }
 
     private static async Task RepairInvalidPasswordHashesAsync(AppDbContext context)

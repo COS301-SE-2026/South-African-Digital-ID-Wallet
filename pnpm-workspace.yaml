@@ -5,7 +5,6 @@ packages:
   - 'government-registry'
 
 onlyBuiltDependencies:
-  - cypress
   - lefthook
   - sharp
   - unrs-resolver
