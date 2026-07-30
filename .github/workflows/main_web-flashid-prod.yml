@@ -17,7 +17,7 @@ env:
 
 jobs:
   deploy-main:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feature/testing-production-deployment'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
