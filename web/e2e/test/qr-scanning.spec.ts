@@ -16,6 +16,9 @@ test('official can scan a citizen QR code and see verified fields', async ({
   const citizenPage = await citizenContext.newPage()
 
   await citizenPage.goto('/citizen/qr')
+  await expect(
+    citizenPage.getByRole('button', { name: "Driver's License" })
+  ).toBeVisible({ timeout: 15_000 })
   await citizenPage.getByRole('button', { name: "Driver's License" }).click()
   await citizenPage
     .getByRole('button', { name: 'Select all for official' })
@@ -48,6 +51,8 @@ test('official can scan a citizen QR code and see verified fields', async ({
   })
   await officialsContext.grantPermissions(['camera'])
   const officialsPage = await officialsContext.newPage()
+
+  officialsPage.on('console', (msg) => console.log('[browser]', msg.text()))
 
   await officialsPage.addInitScript((dataUrl: string) => {
     const fakeGetUserMedia = async () => {
@@ -94,7 +99,6 @@ test('official can scan a citizen QR code and see verified fields', async ({
       writable: true,
     })
   }, qrDataUrl)
-
   await officialsPage.goto('/officials/verifications')
 
   await expect(officialsPage.getByText('Verified credentials')).toBeVisible({

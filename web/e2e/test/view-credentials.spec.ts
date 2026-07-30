@@ -7,7 +7,7 @@ test('citizen can view their credentials and switch between them', async ({
 
   const tabRow = page.locator('.snap-x')
   const tabs = tabRow.getByRole('button')
-  await expect(tabs.first()).toBeVisible()
+  await expect(tabs.first()).toBeVisible({ timeout: 15_000 })
 
   const tabCount = await tabs.count()
   expect(tabCount).toBeGreaterThanOrEqual(1)

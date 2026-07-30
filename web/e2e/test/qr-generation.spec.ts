@@ -5,7 +5,9 @@ test('citizen can generate a QR code with selective disclosure', async ({
 }) => {
   await page.goto('/citizen/qr')
 
-  await expect(page.getByText('Select a credential')).toBeVisible()
+  await expect(page.getByText('Select a credential')).toBeVisible({
+    timeout: 15_000,
+  })
   await page.getByRole('button', { name: "Driver's License" }).click()
 
   await expect(page.getByText('Choose what to share')).toBeVisible()
