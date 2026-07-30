@@ -1,0 +1,16 @@
+web/src/components/pages/brand-style-guide/logo-section.tsx
+  h_0aff3b71f739b1 1-36
+web/src/components/pages/brand-style-guide/colour-palette-section.tsx
+  h_0aff3b71f739b1 1-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "54532d7bbcbe90ef77f2cf1024c2600e10646c40",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

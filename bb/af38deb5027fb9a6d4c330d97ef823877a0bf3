@@ -1,0 +1,16 @@
+web/src/config/navigation/navigation.ts
+  h_293a8616118f65 120
+backend/FlashIdBackend/Application/Common/Services/CitizenVerificationService.cs
+  h_293a8616118f65 85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "bbaf38deb5027fb9a6d4c330d97ef823877a0bf3",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

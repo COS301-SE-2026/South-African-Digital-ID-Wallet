@@ -1,0 +1,22 @@
+web/src/services/login-service/login-dto.ts
+  h_293a8616118f65 15,18-22
+web/src/types/index.ts
+  h_293a8616118f65 8
+web/src/services/login-service/types.ts
+  h_293a8616118f65 22
+web/src/services/login-service/login-service.ts
+  h_293a8616118f65 25-26,29,37
+web/src/types/device-type.ts
+  h_293a8616118f65 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "467dfe62ce4078ed671556c8a50c6b2d408de6dc",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
