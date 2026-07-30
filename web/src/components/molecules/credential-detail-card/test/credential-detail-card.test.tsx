@@ -32,10 +32,10 @@ describe('CredentialDetailCard', () => {
     expect(screen.getByText('South African')).toBeInTheDocument()
   })
 
-  it('The Share QR code action should render', () => {
+  it('does not render a Share QR code button', () => {
     render(<CredentialDetailCard credential={view} />)
     expect(
-      screen.getByRole('button', { name: /share qr code/i })
-    ).toBeInTheDocument()
+      screen.queryByRole('button', { name: /share qr code/i })
+    ).not.toBeInTheDocument()
   })
 })

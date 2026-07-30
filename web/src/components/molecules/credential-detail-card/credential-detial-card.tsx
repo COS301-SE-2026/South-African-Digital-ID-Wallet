@@ -1,7 +1,7 @@
 'use client'
 
 import { FC } from 'react'
-import { AccountInfoRow, StatusPill, Button, Text } from '@/components/atoms'
+import { AccountInfoRow, StatusPill, Text } from '@/components/atoms'
 
 import { type CredentialDetailCardProps } from './types'
 
@@ -47,10 +47,6 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
             border={index < credential.rows.length - 1}
           />
         ))}
-      </div>
-
-      <div className="mt-6 flex gap-3">
-        <Button variant="secondary">Share QR Code</Button>
       </div>
     </div>
   )

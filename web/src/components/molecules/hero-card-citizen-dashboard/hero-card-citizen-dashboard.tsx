@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import qrCodeImage from '@/assets/images/qrCodeImage.png'
 import { Button } from '@/components/ui/button'
@@ -15,16 +16,17 @@ function formatTime(totalSeconds: number) {
 }
 
 export function WalletHeroCard() {
+  const router = useRouter()
   const [secondsLeft, setSecondsLeft] = useState(qr_duration)
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setSecondsLeft((prev) => (prev <= 1 ? 0 : prev - 1))
+      setSecondsLeft((prev) => (prev <= 1 ? qr_duration : prev - 1))
     }, 1000)
     return () => clearInterval(interval)
   }, [])
 
-  const handleGenerate = () => setSecondsLeft(qr_duration)
+  const handleGenerate = () => router.push('/citizen/qr')
 
   return (
     <div className="bg-deep-green rounded-3xl p-6 flex items-center justify-between gap-6">

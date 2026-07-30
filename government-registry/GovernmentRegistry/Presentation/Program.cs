@@ -24,6 +24,7 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
+
     if (!app.Environment.IsEnvironment("Testing"))
     {
         await context.Database.MigrateAsync();
@@ -37,6 +38,7 @@ using (var scope = app.Services.CreateScope())
                 Console.WriteLine("[SEED] Database seeded successfully!");
             }
         }
+
     }
 }
 
@@ -57,8 +59,4 @@ app.UseMiddleware<ApiKeyMiddleware>();
 app.MapControllers();
 
 
-app.Run();
-
-
-
-
+await app.RunAsync();

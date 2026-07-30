@@ -23,11 +23,16 @@
         <PackageReference Include="MimeKit" Version="4.17.0" />
         <PackageReference Include="NSec.Cryptography" Version="26.4.0" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
+        <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
     </ItemGroup>
     
     <ItemGroup>
         <ProjectReference Include="..\Application\Application.csproj" />
         <ProjectReference Include="..\Domain\Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="tests" />
     </ItemGroup>
 
 </Project>
