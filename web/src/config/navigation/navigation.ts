@@ -21,13 +21,17 @@ export const citizenNavSections: SidebarNavSection[] = [
       { label: 'Verifications', href: '/citizen/verifications', icon: 'users' },
       { label: 'Share QR Code', href: '/citizen/qr', icon: 'qr' },
       {
+        label: 'Activate Credentials',
+        href: '/citizen/activate-credentials',
+        icon: 'shield',
+      },
+      {
         label: 'Notifications',
         href: '/under-construction',
         icon: 'notifications',
       },
     ],
   },
-
   {
     title: 'Security',
     items: [
@@ -35,11 +39,6 @@ export const citizenNavSections: SidebarNavSection[] = [
         label: 'Verification History',
         href: '/under-construction',
         icon: 'history',
-      },
-      {
-        label: 'Privacy Settings',
-        href: '/under-construction',
-        icon: 'settings',
       },
       {
         label: 'Manage Account',
@@ -118,7 +117,7 @@ export const officialsNavSections: SidebarNavSection[] = [
       },
       {
         label: 'Privacy Settings',
-        href: '/under-construction',
+        href: '/privacy-settings',
         icon: 'settings',
       },
     ],
@@ -148,11 +147,6 @@ export const manageUserAccountNavSections: SidebarNavSection[] = [
         label: 'Verification History',
         href: '/verification-history',
         icon: 'history',
-      },
-      {
-        label: 'Privacy Settings',
-        href: '/privacy-settings',
-        icon: 'settings',
       },
       {
         label: 'Security & Recovery',
