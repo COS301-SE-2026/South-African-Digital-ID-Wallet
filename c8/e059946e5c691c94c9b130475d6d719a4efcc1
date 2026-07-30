@@ -1,0 +1,14 @@
+web/src/config/page-headers/page-headers.ts
+  h_293a8616118f65 23-37,44-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "c8e059946e5c691c94c9b130475d6d719a4efcc1",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

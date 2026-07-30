@@ -1,0 +1,24 @@
+backend/FlashIdBackend/Infrastructure/Repositories/DeleteAccountRepository.cs
+  h_293a8616118f65 44
+web/src/services/login-service/types.ts
+  h_293a8616118f65 1-2,21
+web/src/components/organisms/login-form/login-form.tsx
+  h_293a8616118f65 14,32-58,136-149,151-160
+web/src/components/templates/otp-modal/otp-modal.tsx
+  h_293a8616118f65 12
+backend/FlashIdBackend/Application/Common/Services/DeleteAccountService.cs
+  h_293a8616118f65 25
+backend/FlashIdBackend/tests/DeleteAccountServiceTests.cs
+  h_293a8616118f65 38,136
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "5e995ad2a46e141f790ccb3afc4c27702af7e080",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
