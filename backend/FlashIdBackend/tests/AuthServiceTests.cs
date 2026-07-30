@@ -318,4 +318,29 @@ public class AuthServiceTests
         Assert.Equal(user.Id, fakeTrustedDeviceRepository.VerificationToReturn!.UserId);
         Assert.Equal(result.DeviceVerificationId, fakeTrustedDeviceRepository.VerificationToReturn.Id);
     }
+
+    [Fact]
+    public async Task VerifyDeviceAsync_EmptyVerificationId_ThrowsUnauthorizedAccessException()
+    {
+
+        var fakeRepository = new FakeAuthRepository();
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository();
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+        var request = new VerifyDeviceRequestDto
+        {
+            DeviceVerificationId = Guid.Empty,
+            Otp = "123456",
+            DeviceType = DeviceType.Laptop,
+            OperatingSystem = "Windows",
+            Browser = "Chrome"
+        };
+
+        var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.VerifyDeviceAsync(request, null, "127.0.0.1", CancellationToken.None));
+
+        Assert.Equal("Device verification ID is required.", exception.Message);
+    }
+
+
 }
