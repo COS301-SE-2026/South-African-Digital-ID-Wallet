@@ -14,7 +14,7 @@ export const AuthSidebar = () => {
             alt="Flash ID"
             width={280}
             height={90}
-            className="h-20 w-auto object-contain"
+            className="h-28 w-auto object-contain"
             priority
           />
           <div>

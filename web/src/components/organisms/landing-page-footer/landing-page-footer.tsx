@@ -54,6 +54,12 @@ export function LandingPageFooter() {
           >
             User Manual
           </Link>
+          <Link
+            href="/brand-style-guide"
+            className="text-clean-white/70 transition hover:text-clean-white"
+          >
+            Brand Style Guide
+          </Link>
         </div>
       </div>
 
