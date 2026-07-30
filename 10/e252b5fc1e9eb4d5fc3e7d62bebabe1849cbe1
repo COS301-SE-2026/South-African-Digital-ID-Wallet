@@ -1,0 +1,14 @@
+docs/TESTING_POLICY.md
+  h_712d174fc3f309 1-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "10e252b5fc1e9eb4d5fc3e7d62bebabe1849cbe1",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
