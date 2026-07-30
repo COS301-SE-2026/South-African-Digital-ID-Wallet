@@ -1,0 +1,14 @@
+web/src/components/organisms/login-form/login-form.tsx
+  h_99fca60b892ff4 183-184
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "11583b74f57fa6e8d4d746a9cb1c49b9a98d6d83",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
