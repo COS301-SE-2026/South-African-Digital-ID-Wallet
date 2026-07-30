@@ -1,0 +1,18 @@
+web/src/components/pages/index.ts
+  h_0aff3b71f739b1 8
+web/src/components/organisms/landing-page-navbar/landing-page-navbar.tsx
+  h_0aff3b71f739b1 6-7,11-15,19-21,39-50,55
+web/src/components/pages/landing-page/landing-page.tsx
+  h_0aff3b71f739b1 146,200,253
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "65c94e11221f42391149b8cd293100264dbe5308",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
