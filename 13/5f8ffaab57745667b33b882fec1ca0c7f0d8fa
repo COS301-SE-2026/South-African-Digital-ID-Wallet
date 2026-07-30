@@ -1,0 +1,14 @@
+web/e2e/auth.setup.ts
+  h_712d174fc3f309 2-3,5-14,35-52,54-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "135f8ffaab57745667b33b882fec1ca0c7f0d8fa",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
