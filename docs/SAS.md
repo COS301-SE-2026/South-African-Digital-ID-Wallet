@@ -6,6 +6,40 @@
 > Client: Agile Bridge (Pty) Ltd  
 > Version: 0.1
 
+## Table of Contents
+
+1. [Introduction](#1-introduction)
+2. [Architectural Requirements](#2-architectural-requirements)
+    - [2.1 Architectural Patterns](#21-architectural-patterns)
+    - [2.2 Design Patterns](#22-design-patterns)
+    - [2.3 Constraints](#23-constraints)
+    - [2.4 Architectural Diagram](#24-architectural-diagram)
+    - [2.5 Mapping Quality Requirements to Architectural Decisions](#25-mapping-quality-requirements-to-architechtural-decisions)
+3. [Technology Requirements](#3-technology-requirements)
+4. [API Contracts](#4-api-contracts)
+    - [Auth](#auth)
+    - [Citizens](#citizens)
+    - [Credentials](#credentials)
+    - [Credential Activation](#credential-activation)
+    - [Citizen Verify](#citizen-verify)
+    - [Institutions](#institutions)
+    - [Onboarding](#onboarding)
+    - [Activity](#activity)
+    - [Dashboard](#dashboard)
+    - [Account Management](#account-management)
+    - [Notifications](#notifications)
+    - [Officials](#officials)
+    - [Trusted Devices](#trusted-devices)
+    - [Government Registry Service](#government-registry-service)
+5. [Deployment](#5-deployment)
+    - [5.1 Live System](#51-live-system)
+    - [5.2 Environment Parity](#52-environment-parity)
+    - [5.3 Infrastructure as Code / Containerisation](#53-infrastructure-as-code--containerisation)
+    - [5.4 Secrets Management](#54-secrets-management)
+    - [5.5 Rollback Strategy](#55-rollback-strategy)
+    - [5.6 Deployment Diagram](#56-deployment-diagram)
+    - [5.7 CI/CD Pipeline Diagram](#57-cicd-pipeline-diagram)
+
 ## 1. Introduction
 
 This Software Architecture Specification (SAS) describes the technical structure of FlashID (South African Digital ID Wallet). The architectural decisions made to satisfy the requirements defined in the SRS. The SRS specifies *what* the system must do, where as this document *how* the system is built, deployed and operated to meet those requirements.
