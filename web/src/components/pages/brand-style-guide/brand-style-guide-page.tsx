@@ -11,7 +11,7 @@ import { ComponentLibrarySection } from './component-library-section'
 import { ComponentOrganisationSection } from './component-organisation-section'
 import { VoiceToneSection } from './voice-tone-section'
 import { DesignTokensSection } from './design-tokens-section'
-// import { AccessibilitySection } from './accessibility-section'
+import { AccessibilitySection } from './accessibility-section'
 import { ChangelogSection } from './change-log'
 import { LandingPageFooter } from '@/components/organisms/landing-page-footer/landing-page-footer'
 
@@ -71,7 +71,7 @@ export default function BrandStyleGuidePage() {
         <ComponentOrganisationSection />
         <VoiceToneSection />
         <DesignTokensSection />
-        {/* <AccessibilitySection /> */}
+        <AccessibilitySection />
         <ChangelogSection />
       </main>
       <LandingPageFooter />
