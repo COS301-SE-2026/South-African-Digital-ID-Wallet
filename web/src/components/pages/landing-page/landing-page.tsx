@@ -143,7 +143,7 @@ function HeroSection() {
   return (
     <section
       id="home"
-      className="relative w-full overflow-hidden min-h-[calc(100vh-80px)] flex items-center"
+      className="relative w-full overflow-hidden min-h-[calc(100vh-80px)] flex items-center bg-background"
     >
       <div className="relative w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
         <div className="mx-auto max-w-3xl space-y-6 text-center sm:space-y-8">
@@ -197,7 +197,7 @@ function HeroSection() {
 
 function ProblemAndAudienceSection() {
   return (
-    <section id="about" className=" py-12 sm:py-16">
+    <section id="about" className=" py-12 sm:py-16 bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center mt-5">
           <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
@@ -250,7 +250,10 @@ function ProblemAndAudienceSection() {
 
 function FeaturesAndHowItWorksSection() {
   return (
-    <section id="features&how-it-works" className="py-12 sm:py-16">
+    <section
+      id="features&how-it-works"
+      className="py-12 sm:py-16 bg-background"
+    >
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <Text variant="h2" as="h2" className="mb-12 text-center sm:text-4xl">
           Features & How It Works
@@ -347,7 +350,7 @@ function PreviewSection() {
   ]
 
   return (
-    <section id="preview" className="py-16 sm:py-24">
+    <section id="preview" className="py-16 sm:py-24 bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <Text
