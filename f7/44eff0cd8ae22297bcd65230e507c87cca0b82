@@ -1,0 +1,14 @@
+web/src/components/pages/brand-style-guide/brand-style-guide-page.tsx
+  h_0aff3b71f739b1 1-172,174-184
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "f744eff0cd8ae22297bcd65230e507c87cca0b82",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

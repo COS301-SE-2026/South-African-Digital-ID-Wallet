@@ -1,0 +1,22 @@
+web/src/services/login-service/login-dto.ts
+  h_293a8616118f65 1,14-17
+web/src/services/login-service/login-service.ts
+  h_293a8616118f65 3-4
+web/src/components/organisms/login-form/login-form.tsx
+  h_293a8616118f65 36-38,55-63
+web/src/services/login-service/types.ts
+  h_293a8616118f65 12-13,15-22
+web/src/services/login-service/login-urls.ts
+  h_293a8616118f65 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "58a00367939c6decb662529c4af464a4e4076c15",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

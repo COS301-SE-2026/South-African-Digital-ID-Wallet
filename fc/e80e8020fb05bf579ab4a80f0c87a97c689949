@@ -1,0 +1,14 @@
+web/src/components/organisms/registration-form/test/registration-form.test.tsx
+  h_293a8616118f65 126,129
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "fce80e8020fb05bf579ab4a80f0c87a97c689949",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
