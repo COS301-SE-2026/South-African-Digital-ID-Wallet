@@ -41,6 +41,7 @@ jobs:
       Jwt__Key: dev-only-super-secret-key-that-is-long-enough-123456789
       JWT_SECRET: dev-only-super-secret-key-that-is-long-enough-123456789
       Qr__Ed25519PrivateKey: ${{ secrets.QR_ED25519_PRIVATE_KEY }}
+      BlobStorage__ConnectionString: UseDevelopmentStorage=true
       E2E_PASSWORD: password123
       E2E_CITIZEN_EMAIL: citizen.e2e@flashid.local
       E2E_GOVADMIN_EMAIL: govadmin.e2e@flashid.local
