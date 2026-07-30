@@ -208,95 +208,95 @@ The complete functional requirements, subsystems R1 through R10 are documented i
 ### 5.1 Security
 
 #### NFR1.1
-All protected resources shall require a valid JWT access token before granting access to authenticated functionality.
+All protected resources require a valid JWT access token before granting access to authenticated functionality.
 
 #### NFR1.2
-All communication containing sensitive information, including authentication credentials, personal information, and digital credentials, shall be encrypted using HTTPS with TLS 1.2 or later.
+Communication containing sensitive information must be encrypted using HTTPS with TLS 1.2 or later.
 
 #### NFR1.3
-Passwords shall never be stored in plaintext and shall be securely hashed using the ASP.NET Identity password hashing algorithm before being stored in the database.
+Passwords must never be stored in plaintext and has to be securely hashed using ASP.NET Identity password hashing algorithm before being stored in the database.
 
 #### NFR1.4
-All administrative accounts shall require multi-factor authentication (OTP) during authentication.
+All administrative accounts need multi-factor authentication (OTP) during authentication.
 
 #### NFR1.5
-API keys, database connection strings, JWT secrets, and other sensitive configuration values shall be stored using environment variables or GitHub Secrets, with zero secrets committed to the source repository.
+Sensitive configuration values are to be stored using environment variables or GitHub Secrets
 
 ---
 
 ### 5.2 Performance
 
 #### NFR2.1
-The dashboard shall become interactive within **2 seconds** for at least **95%** of requests under normal operating conditions.
+The dashboard must become interactive within 2 seconds for at least 95% of requests under normal operating conditions.
 
 #### NFR2.2
-Authentication operations, including login, registration, and OTP verification, shall complete within **2 seconds** for at least **95%** of requests.
+Authentication operations must be completed within 2 seconds for at least 95% of requests.
 
 #### NFR2.3
-Digital credential retrieval and QR code generation shall complete within **2 seconds** for at least **95%** of requests.
+Digital credential retrieval and QR code generation are to be completed within 2 seconds for at least 95% of requests.
 
 #### NFR2.4
-QR code verification requests shall return a verification result within **3 seconds** under normal operating conditions.
+QR code verification requests must return a verification result within 3 seconds under normal operating conditions.
 
 #### NFR2.5
-The system shall support at least **500 concurrent authenticated users** without significant degradation in response times.
+The system must support at least 500 concurrent authenticated users without degradation in response times.
 
 ---
 
 ### 5.3 Reliability & Availability
 
 #### NFR3.1
-The system shall achieve a minimum service availability of **99.9%**, excluding scheduled maintenance.
+The system must achieve a minimum service availability of 99.9%, not including scheduled maintenance.
 
 #### NFR3.2
-Unexpected application errors shall display a user-friendly error message within **2 seconds** without causing the application to crash.
+Unexpected application errors must display a user-friendly error message within 2 seconds without causing the application to crash.
 
 #### NFR3.3
-Following a temporary network interruption, authenticated users shall be able to continue using the application once connectivity is restored without requiring reinstallation or data recovery.
+Authenticated users must be able to continue using the application once connectivity is restored without requiring reinstallation or data recovery.
 
 #### NFR3.4
-The system shall recover from critical service failures within **5 minutes** through automated deployment or infrastructure recovery mechanisms.
+The system must recover from critical service failures within 5 minutes.
 
 #### NFR3.5
-Credential information and user account data shall remain consistent following page refreshes, browser restarts, or temporary service interruptions.
+Credential information and user account data must remain consistent.
 
 ---
 
-### 5.4 Usability & Accessibility
+### 5.4 Usability
 
 #### NFR4.1
-A first-time citizen shall be able to register an account, verify their email address, and access their digital wallet within **5 minutes** without external assistance.
+A first-time citizen should be able to register an account, verify their email address, and access their digital wallet within 5 minutes without outside help.
 
 #### NFR4.2
-Frequently performed tasks, including viewing credentials, generating QR codes, managing trusted devices, and updating account information, shall require no more than **three user interactions** from the dashboard.
+Frequently performed tasks should not require more than three user interactions from the dashboard.
 
 #### NFR4.3
-The system shall conform to **WCAG 2.1 Level AA** accessibility guidelines for all public-facing web interfaces.
+The system should conform to WCAG 2.1 Level AA accessibility guidelines for all public-facing web interfaces.
 
 #### NFR4.4
-All user-visible validation errors and system notifications shall clearly describe the problem and provide guidance for resolving it.
+All user-visible validation errors and system notifications must clearly describe the problem and provide guidance for resolving it.
 
 #### NFR4.5
-The web application shall provide a responsive interface supporting desktop, tablet, and mobile screen sizes without loss of functionality.
+The web application must provide a responsive interface supporting screen sizes without loss of functionality.
 
 ---
 
-### 5.5 Maintainability & Scalability
+### 5.5 Maintainability
 
 #### NFR5.1
-The application shall follow a modular Clean Architecture separating presentation, application, domain, and infrastructure layers.
+The application must follow a modular Clean Architecture.
 
 #### NFR5.2
-All code merged into the main branch shall successfully pass automated builds, linting, formatting, and continuous integration quality checks.
+All code merged into the main branch has to successfully pass automated builds, linting, formatting, and continuous integration quality checks.
 
 #### NFR5.3
-Critical business logic shall maintain a minimum automated unit test coverage of **80%**.
+Critical business logic must maintain a minimum automated unit test coverage of 80%.
 
 #### NFR5.4
-The deployment pipeline shall be capable of deploying approved changes to the production environment within **30 minutes** of merging into the main branch.
+The deployment pipeline must be able to be deployed with approved changes to the production environment within 30 minutes of merging into the main branch.
 
 #### NFR5.5
-The architecture shall support the onboarding of additional government departments and authorised institutions without requiring major architectural changes.
+The architecture should support the onboarding of additional government departments and authorised institutions.
 
 ---
 
