@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Text } from '@/components/atoms'
 import type { ScanResultCardProps } from './types'
 
-const PHOTO_FIELD_LABELS = new Set(['Photo', 'Photograph'])
+const PHOTO_FIELD_LABELS = new Set(['Photo', 'Photograph', 'Signature'])
 
 export const ScanResultCard = ({
   credentialType,

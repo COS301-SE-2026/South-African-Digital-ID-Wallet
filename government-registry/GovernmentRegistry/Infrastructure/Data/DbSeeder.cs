@@ -70,7 +70,7 @@ public static class DbSeeder
             {
                 Id = Guid.NewGuid(),
                 CitizenId = citizen.Id,
-                Signature = $"mock-signature-id-{saId}",
+                Signature = "mock-photos-signature.png",
                 IssuedBy = "Department of Home Affairs",
                 IssueDate = new DateOnly(2020, 1, 1),
                 CountryOfBirth = "ZA",
@@ -86,7 +86,7 @@ public static class DbSeeder
             {
                 Id = Guid.NewGuid(),
                 CitizenId = citizen.Id,
-                Signature = $"mock-signature-dl-{saId}",
+                Signature = "mock-photos-signature.png",
                 IssuedBy = "Road Traffic Management Corporation",
                 IssueDate = new DateOnly(2021, 6, 1),
                 LicenseNumber = $"DL-{saId[^6..]}",

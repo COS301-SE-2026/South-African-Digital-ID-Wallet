@@ -39,7 +39,7 @@ public class DisclosedFieldValueResolver : IDisclosedFieldsValueResolver
         "Country of birth" => cred.IdentityDocument?.CountryOfBirth ?? string.Empty,
         "Photograph" => await ResolvePhotoAsync(cred.IdentityDocument?.PhotoPath),
         "Photo" => await ResolvePhotoAsync(cred.DriversLicense?.PhotoPath),
-        "Signature" => string.Empty, // placeholder for future implementation
+        "Signature" => await ResolvePhotoAsync(cred.Signature),
         "Card issue date and number" => string.Empty,
         "License number" => cred.DriversLicense?.LicenseNumber ?? string.Empty,
         "License code" => cred.DriversLicense?.LicenseCode.ToString() ?? string.Empty,
