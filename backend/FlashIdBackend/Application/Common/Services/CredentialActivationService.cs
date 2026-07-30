@@ -14,9 +14,9 @@ public class CredentialActivationService : ICredentialActivationService
     private readonly ICredentialRepository _credentialRepository;
     private readonly IGovernmentRegistryGateway _governmentRegistryGateway;
     private readonly ICredentialsActivationRepository _credentialsActivationRepository;
-    private List<CredentialType> _activatedTypes = new List<CredentialType>();
-    private List<CredentialType> _alreadyActivatedTypes = new List<CredentialType>();
-    private List<CredentialType> _unavailableTypes = new List<CredentialType>();
+    private readonly List<CredentialType> _activatedTypes = new List<CredentialType>();
+    private readonly List<CredentialType> _alreadyActivatedTypes = new List<CredentialType>();
+    private readonly List<CredentialType> _unavailableTypes = new List<CredentialType>();
 
     public CredentialActivationService(ICredentialRepository credentialRepository, IGovernmentRegistryGateway governmentRegistryGateway, ICredentialsActivationRepository credentialsActivationRepository)
     {
