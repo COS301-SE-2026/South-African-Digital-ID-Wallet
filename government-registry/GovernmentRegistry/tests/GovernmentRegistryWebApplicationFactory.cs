@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-
+using Microsoft.Extensions.Hosting;
 namespace tests;
 
 public class GovernmentRegistryWebApplicationFactory : WebApplicationFactory<Program>
@@ -38,6 +38,15 @@ public class GovernmentRegistryWebApplicationFactory : WebApplicationFactory<Pro
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlite(_connection));
         });
+    }
+
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
+        var host = base.CreateHost(builder);
+        using var scope = host.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.Database.EnsureCreated();
+        return host;
     }
 
     public async Task SeedAsync(Action<AppDbContext> seed)
