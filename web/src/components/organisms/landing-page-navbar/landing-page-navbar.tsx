@@ -12,8 +12,6 @@ const NAV_LINKS = [
   { label: 'Features and How It Works', href: '/#features&how-it-works' },
   { label: 'Preview', href: '/#preview' },
   { label: 'Help', href: '/#help' },
-  { label: 'User Manual', href: '/help/user-manual' },
-  { label: 'Brand Style Guide', href: '/brand-style-guide' },
 ]
 
 export function LandingPageNavbar() {

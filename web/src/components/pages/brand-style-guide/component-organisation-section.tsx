@@ -53,12 +53,13 @@ export function ComponentOrganisationSection() {
           variant="sub-md"
           className="text-[14px] mb-4 text-muted-foreground"
         >
-          FlashID uses Lucide for modern icon systems paired well with
-          shadcn/ui:{' '}
+          {
+            'FlashID uses Lucide for modern icon systems paired well with shadcn/ui: '
+          }
           <code className="font-mono text-[13px] bg-muted px-1.5 py-0.5 rounded">
             {'import { IconName } from "lucide-react"'}
           </code>
-          . A few of which are:
+          {'. A few of which are:'}
         </Text>
         <div className="flex flex-wrap gap-3">
           {icons.map(({ Icon, name }) => (
