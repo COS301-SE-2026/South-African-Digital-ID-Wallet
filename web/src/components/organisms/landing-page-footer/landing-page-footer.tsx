@@ -42,24 +42,17 @@ export function LandingPageFooter() {
 
         <div className="flex items-center gap-5 text-sm">
           <Link
-            href="#"
+            href="/#help"
             className="text-clean-white/70 transition hover:text-clean-white"
           >
-            Privacy
+            Help
           </Link>
 
           <Link
-            href="#"
+            href="/help/user-manual"
             className="text-clean-white/70 transition hover:text-clean-white"
           >
-            Terms
-          </Link>
-
-          <Link
-            href="#"
-            className="text-clean-white/70 transition hover:text-clean-white"
-          >
-            Cookies
+            User Manual
           </Link>
         </div>
       </div>

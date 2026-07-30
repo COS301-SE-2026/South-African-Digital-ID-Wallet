@@ -1,7 +1,7 @@
 import { LandingPageNavbar } from '../../organisms/landing-page-navbar/landing-page-navbar'
 import { LandingPageFooter } from '../../organisms/landing-page-footer/landing-page-footer'
 import { Text } from '@/components/atoms'
-
+import { HelpMenuSection } from '../../molecules/help-menu-section/help-menu-section'
 import {
   Check,
   ShieldCheck,
@@ -17,6 +17,18 @@ import {
   FileWarning,
   KeyRound,
 } from 'lucide-react'
+import Image from 'next/image'
+import citizenDashboardPic from '@/assets/images/citizen-dashboard-pic.jpeg'
+import manageUserAccountPic from '@/assets/images/manage-user-account-pic.jpeg'
+import credentialWalletPic from '@/assets/images/credential-wallet-pic.jpeg'
+import verifyIdentityPic from '@/assets/images/verify-identity-pic.jpeg'
+
+const screens = [
+  { label: 'Citizen Dashboard', src: citizenDashboardPic },
+  { label: 'Manage Account', src: manageUserAccountPic },
+  { label: 'Credential Wallet', src: credentialWalletPic },
+  { label: 'Verify Identity', src: verifyIdentityPic },
+]
 
 const FEATURES = [
   {
@@ -134,6 +146,7 @@ export function LandingPageContent() {
       <HeroSection />
       <ProblemAndAudienceSection />
       <FeaturesAndHowItWorksSection />
+      <HelpMenuSection />
       <PreviewSection />
     </main>
   )
@@ -342,13 +355,6 @@ function FeaturesAndHowItWorksSection() {
 }
 
 function PreviewSection() {
-  const screens = [
-    'Citizen Dashboard',
-    'Manage Account',
-    'Credential Wallet',
-    'Verification Screen',
-  ]
-
   return (
     <section id="preview" className="py-16 sm:py-24 bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -362,13 +368,11 @@ function PreviewSection() {
           </Text>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {screens.map((label) => (
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+          {screens.map(({ label, src }) => (
             <div key={label} className="space-y-3">
-              <div className="flex aspect-[9/16] items-center justify-center rounded-2xl border border-gray-200 bg-white shadow-sm">
-                <span className="px-4 text-center text-sm text-gray-400">
-                  Screenshot
-                </span>
+              <div className="relative aspect-video overflow-hidden rounded-2xl border-2 border-emerald-600 bg-white shadow-sm">
+                <Image src={src} alt={label} fill className="object-cover" />
               </div>
               <p className="text-center text-sm font-medium text-gray-700">
                 {label}

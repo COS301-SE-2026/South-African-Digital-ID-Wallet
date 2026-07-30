@@ -13,6 +13,7 @@ import { VoiceToneSection } from './voice-tone-section'
 import { DesignTokensSection } from './design-tokens-section'
 import { AccessibilitySection } from './accessibility-section'
 import { ChangelogSection } from './change-log'
+import { LandingPageFooter } from '@/components/organisms/landing-page-footer/landing-page-footer'
 
 export default function BrandStyleGuidePage() {
   return (
@@ -73,6 +74,7 @@ export default function BrandStyleGuidePage() {
         <AccessibilitySection />
         <ChangelogSection />
       </main>
+      <LandingPageFooter />
     </div>
   )
 }
