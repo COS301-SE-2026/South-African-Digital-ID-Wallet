@@ -1,22 +1,32 @@
 using System.Globalization;
 using Domain.Entities;
+using Application.Common.Interfaces.ProviderInterfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
 
 namespace Application.Common.Services;
 
-public static class DisclosedFieldValueResolver
+public class DisclosedFieldValueResolver : IDisclosedFieldsValueResolver
 {
-    public static Dictionary<string, string> Resolve(Credential cred, IEnumerable<string> disclosedFields)
+    private static readonly TimeSpan PhotoSasTtl = TimeSpan.FromMinutes(5);
+    private readonly IPhotoStorageProvider _photoStorageProvider;
+
+    public DisclosedFieldValueResolver(IPhotoStorageProvider photoStorageProvider)
+    {
+        _photoStorageProvider = photoStorageProvider;
+    }
+
+    public async Task<Dictionary<string, string>> ResolveAsync(Credential cred, IEnumerable<string> disclosedFields)
     {
         var res = new Dictionary<string, string>();
         foreach (var dF in disclosedFields)
         {
-            res[dF] = ResolveField(cred, dF);
+            res[dF] = await ResolveFieldAsync(cred, dF);
         }
 
         return res;
     }
 
-    private static string ResolveField(Credential cred, string field) => field switch
+    private async Task<string> ResolveFieldAsync(Credential cred, string field) => field switch
     {
         "Identity number" => cred.Citizen.SaId,
         "SA ID number" => cred.Citizen.SaId,
@@ -27,9 +37,9 @@ public static class DisclosedFieldValueResolver
         "Gender" => cred.Citizen.Gender.ToString(),
         "Citizenship status" => cred.IdentityDocument?.Citizenship ?? string.Empty,
         "Country of birth" => cred.IdentityDocument?.CountryOfBirth ?? string.Empty,
-        "Photograph" => cred.IdentityDocument?.PhotoPath ?? string.Empty,
-        "Photo" => cred.DriversLicense?.PhotoPath ?? string.Empty,
-        "Signature" => string.Empty, // placeholder for future implementation
+        "Photograph" => await ResolvePhotoAsync(cred.IdentityDocument?.PhotoPath),
+        "Photo" => await ResolvePhotoAsync(cred.DriversLicense?.PhotoPath),
+        "Signature" => await ResolvePhotoAsync(cred.Signature),
         "Card issue date and number" => string.Empty,
         "License number" => cred.DriversLicense?.LicenseNumber ?? string.Empty,
         "License code" => cred.DriversLicense?.LicenseCode.ToString() ?? string.Empty,
@@ -39,4 +49,7 @@ public static class DisclosedFieldValueResolver
         "Date of issue" => cred.IssueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
         _ => throw new InvalidOperationException($"No resolver defined for this disclosed field: '{field}'."),
     };
+
+    private async Task<string> ResolvePhotoAsync(string? blobName) =>
+        string.IsNullOrEmpty(blobName) ? string.Empty : await _photoStorageProvider.GenerateReadSasUrlAsync(blobName, PhotoSasTtl);
 }

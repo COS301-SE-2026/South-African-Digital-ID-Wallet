@@ -41,7 +41,7 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const [password, setPassword] = React.useState('')
   const [rememberMe, setRememberMe] = React.useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
-  const [otpModalOpen, setOtpModalOpen] = React.useState(true)
+  const [otpModalOpen, setOtpModalOpen] = React.useState(false)
   const [loginAttemptId, setLoginAttemptId] = React.useState('')
 
   const router = useRouter()
