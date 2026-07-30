@@ -1,10 +1,10 @@
 export function SectionHeading({
   icon: Icon,
   children,
-}: {
+}: Readonly<{
   icon?: React.ElementType
   children: React.ReactNode
-}) {
+}>) {
   return (
     <div className="flex items-center gap-2 mb-2">
       {Icon && <Icon size={22} className="text-primary" />}

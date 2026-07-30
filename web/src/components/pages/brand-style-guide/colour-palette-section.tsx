@@ -6,65 +6,65 @@ const ColorPalette = [
   {
     name: 'Primary Green',
     hex: '#007A4D',
-    usage: 'Primary actions, trusted states, secure accents.',
+    usage: 'Primary actions.',
   },
   {
     name: 'Deep Green',
     hex: '#053B2C',
-    usage: 'Headers, dark surfaces, hover states.',
+    usage: 'hover and active states.',
   },
   {
     name: 'Accent Gold',
     hex: '#FFB81C',
-    usage: 'Speed, emphasis, primary highlight, QR accents.',
+    usage: 'For accents.',
   },
   {
     name: 'National Red',
     hex: '#DE3831',
-    usage: 'Secondary identity accent and SA palette support.',
+    usage: 'Secondary  support.',
   },
   {
     name: 'National Blue',
     hex: '#002395',
-    usage: 'Tertiary identity accent and SA palette support.',
+    usage: 'Tertiary support.',
   },
   {
     name: 'Clean White',
     hex: '#FFFFFF',
-    usage: 'Cards, elevated surfaces, content containers.',
+    usage: 'Cards and containers.',
   },
   { name: 'Cream Background', hex: '#F7F4EA', usage: 'App background.' },
   {
     name: 'Text Primary',
     hex: '#111827',
-    usage: 'Main body text on light backgrounds.',
+    usage: 'Main body text',
   },
   {
     name: 'Muted Text',
     hex: '#6B7280',
-    usage: 'Captions, helper text, secondary labels.',
+    usage: 'Captions and labels.',
   },
   {
     name: 'Border Grey',
     hex: '#E5E7EB',
-    usage: 'Borders, dividers, input outlines.',
+    usage: 'For outlines.',
   },
   {
     name: 'Neutral Mid Grey',
     hex: '#9CA3AF',
-    usage: 'Disabled or inactive interface elements.',
+    usage: 'Disabled elements.',
   },
   { name: 'Success Green', hex: '#16A34A', usage: 'Success feedback.' },
   { name: 'Warning Amber', hex: '#D97706', usage: 'Warning states.' },
   {
     name: 'Danger Red',
     hex: '#DC2626',
-    usage: 'Destructive actions, high-risk warnings.',
+    usage: 'Destructive actions',
   },
 ]
 
 function hexToRgb(hex: string) {
-  const n = parseInt(hex.replace('#', ''), 16)
+  const n = Number.parseInt(hex.replace('#', ''), 16)
   return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`
 }
 
@@ -72,11 +72,11 @@ function ColorSwatch({
   name,
   hex,
   usage,
-}: {
+}: Readonly<{
   name: string
   hex: string
   usage: string
-}) {
+}>) {
   return (
     <div className="flex items-start gap-4 rounded-3xl border border-border bg-card p-4">
       <div

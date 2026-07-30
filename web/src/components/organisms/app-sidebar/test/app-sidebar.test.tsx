@@ -36,7 +36,7 @@ describe('AppSidebar', () => {
         onLogout={mockLogout}
       />
     )
-    expect(screen.getByAltText('Flash ID logo')).toBeInTheDocument()
+    expect(screen.getByAltText('FlashID Logo')).toBeInTheDocument()
   })
 
   it('renders nav section titles when expanded', () => {

@@ -3,7 +3,6 @@
 import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import FlashIdLogo from '@/assets/images/FlashID-green.png'
 import { Text } from '@/components/atoms'
 
@@ -11,14 +10,13 @@ const NAV_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'About', href: '/#about' },
   { label: 'Features and How It Works', href: '/#features&how-it-works' },
-  { label: 'Help', href: '/#help' },
   { label: 'Preview', href: '/#preview' },
+  { label: 'Help', href: '/#help' },
+  { label: 'User Manual', href: '/help/user-manual' },
+  { label: 'Brand Style Guide', href: '/brand-style-guide' },
 ]
 
 export function LandingPageNavbar() {
-  const pathname = usePathname()
-  const isBrandStyleGuide = pathname === '/brand-style-guide'
-
   return (
     <header className="sticky top-0 z-50">
       <div className="border-b border-clean-white bg-deep-green">
@@ -36,23 +34,16 @@ export function LandingPageNavbar() {
 
           <nav className="hidden lg:block">
             <ul className="flex items-center gap-1">
-              {NAV_LINKS.map((link) => {
-                const href = link.href
-                const isAnchorLink = link.href.includes('#')
-                const finalHref =
-                  isBrandStyleGuide && isAnchorLink ? link.href : link.href
-
-                return (
-                  <li key={link.label}>
-                    <Link
-                      href={finalHref}
-                      className="rounded-lg px-4 py-2 text-sm font-medium text-clean-white/90 transition-all duration-200 hover:bg-clean-white/20 hover:text-clean-white"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                )
-              })}
+              {NAV_LINKS.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className="rounded-lg px-4 py-2 text-sm font-medium text-clean-white/90 transition-all duration-200 hover:bg-clean-white/20 hover:text-clean-white"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
 

@@ -2,7 +2,6 @@
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Text } from '@/components/atoms'
-import { History } from 'lucide-react'
 import { SectionHeading } from './section-heading'
 
 const changes = [
