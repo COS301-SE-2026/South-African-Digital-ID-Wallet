@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Mail, Phone, MapPin } from 'lucide-react'
-import FlashIdLogo from '@/assets/images/FlashID-white.png'
 
 export function LandingPageFooter() {
   return (
@@ -18,14 +17,6 @@ export function LandingPageFooter() {
 
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-5 lg:flex-row lg:px-10">
         <div className="flex items-center gap-4">
-          <Image
-            src={FlashIdLogo}
-            alt="Flash ID"
-            width={42}
-            height={42}
-            className="h-10 w-auto"
-          />
-
           <div>
             <h2 className="text-lg font-bold text-clean-white">
               Flash<span className="text-accent-gold">ID</span>
