@@ -18,7 +18,7 @@ export const VerifyEmailForm = () => {
   const email = searchParameters.get('email') ?? ''
 
   const returnTo = searchParameters.get('returnTo')
-  const safeReturnTo = getSafeReturnTo(returnTo, '/')
+  const safeReturnTo = getSafeReturnTo(returnTo, '')
 
   const loginHref = safeReturnTo
     ? `/login?returnTo=${encodeURIComponent(safeReturnTo)}`
