@@ -1,0 +1,16 @@
+web/src/components/pages/brand-style-guide/component-organisation-section.tsx
+  h_0aff3b71f739b1 1-75
+web/src/components/pages/brand-style-guide/component-library-section.tsx
+  h_0aff3b71f739b1 1-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "83a112aa33184cf179282bf686840ed27d8451f2",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
