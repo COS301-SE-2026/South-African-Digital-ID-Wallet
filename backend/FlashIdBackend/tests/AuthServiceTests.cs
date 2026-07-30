@@ -313,7 +313,7 @@ public class AuthServiceTests
         Assert.True(result.RequiresDeviceVerification);
         Assert.NotNull(result.DeviceVerificationId);
         Assert.NotEqual(Guid.Empty, result.DeviceVerificationId);
-        Assert.Empty(result.Token);
+        Assert.True(string.IsNullOrEmpty(result.Token));
         Assert.NotNull(fakeTrustedDeviceRepository.VerificationToReturn);
         Assert.Equal(user.Id, fakeTrustedDeviceRepository.VerificationToReturn!.UserId);
         Assert.Equal(result.DeviceVerificationId, fakeTrustedDeviceRepository.VerificationToReturn.Id);
@@ -342,5 +342,76 @@ public class AuthServiceTests
         Assert.Equal("Device verification ID is required.", exception.Message);
     }
 
+    [Fact]
+    public async Task VerifyDeviceAsync_MisingOtp_ThrowsUnauthorizedAccessException()
+    {
+        var fakeRepository = new FakeAuthRepository();
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository();
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+        var request = new VerifyDeviceRequestDto
+        {
+            DeviceVerificationId = Guid.NewGuid(),
+            Otp = "",
+            DeviceType = DeviceType.Laptop,
+            OperatingSystem = "Windows",
+            Browser = "Chrome"
+        };
+
+        var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.VerifyDeviceAsync(request, null, "127.0.0.1", CancellationToken.None));
+
+        Assert.Equal("Verification OTP is required.", exception.Message);
+
+    }
+
+    [Fact]
+    public async Task VerifyDeviceAsync_VerificationNotFound_ThrowsUnauthorizedAccessException()
+    {
+        var fakeRepository = new FakeAuthRepository();
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { VerificationToReturn = null };
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+        var request = new VerifyDeviceRequestDto
+        {
+            DeviceVerificationId = Guid.NewGuid(),
+            Otp = "123456",
+            DeviceType = DeviceType.Laptop,
+            OperatingSystem = "Windows",
+            Browser = "Chrome"
+        };
+
+        var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.VerifyDeviceAsync(request, null, "127.0.0.1", CancellationToken.None));
+
+        Assert.Equal("Device verification request not found.", exception.Message);
+    }
+
+    [Fact]
+    public async Task VerifyDeviceAsync_AlreadyVerified_ThrowsUnauthorizedAccessException()
+    {
+        var user = ValidUser();
+        var verification = ValidDeviceVerification(user.Id);
+
+        verification.VerifiedAt = DateTime.UtcNow;
+
+        var fakeRepository = new FakeAuthRepository { UserToReturn = user };
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { VerificationToReturn = verification };
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+        var request = new VerifyDeviceRequestDto
+        {
+            DeviceVerificationId = verification.Id,
+            Otp = "123456",
+            DeviceType = DeviceType.Laptop,
+            OperatingSystem = "Windows",
+            Browser = "Chrome"
+        };
+
+        var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.VerifyDeviceAsync(request, null, "127.0.0.1", CancellationToken.None));
+
+        Assert.Equal("Device verification has already been used.", exception.Message);
+    }
 
 }
