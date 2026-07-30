@@ -41,11 +41,6 @@ export const citizenNavSections: SidebarNavSection[] = [
         icon: 'history',
       },
       {
-        label: 'Privacy Settings',
-        href: '/under-construction',
-        icon: 'settings',
-      },
-      {
         label: 'Manage Account',
         href: '/citizen/manage-user-account',
         icon: 'settings',
@@ -122,7 +117,7 @@ export const officialsNavSections: SidebarNavSection[] = [
       },
       {
         label: 'Privacy Settings',
-        href: '/under-construction',
+        href: '/privacy-settings',
         icon: 'settings',
       },
     ],
@@ -152,11 +147,6 @@ export const manageUserAccountNavSections: SidebarNavSection[] = [
         label: 'Verification History',
         href: '/verification-history',
         icon: 'history',
-      },
-      {
-        label: 'Privacy Settings',
-        href: '/privacy-settings',
-        icon: 'settings',
       },
       {
         label: 'Security & Recovery',

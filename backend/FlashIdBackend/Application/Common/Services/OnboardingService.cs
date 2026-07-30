@@ -94,14 +94,6 @@ public class OnboardingService : IOnboardingService
                 , TimeSpan.FromMilliseconds(600)))
             throw new ArgumentException("Invalid email address format.", nameof(email));
 
-        if (email is not null)
-        {
-            var existingUser = await _onboardingRepository.GetUserByEmailAsync(email);
-
-            if (existingUser is not null)
-                throw new DuplicateEmailRegisteredException();
-        }
-
         var existingCitizen = await _onboardingRepository.GetCitizenBySaIdAsync(request.SaId);
 
         if (existingCitizen is not null)
