@@ -180,7 +180,8 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
 
     await refresh()
 
-    router.push(getDashboardRoute(data.role || pendingRole)) //TODO: link using return to logic please
+    const dashboardRoute = getDashboardRoute(data.role || pendingRole)
+    router.push(getSafeReturnTo(returnTo, dashboardRoute)) //TODO: link using return to logic please
   }
 
   return (
