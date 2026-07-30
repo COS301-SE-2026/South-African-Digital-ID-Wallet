@@ -1,0 +1,18 @@
+government-registry/GovernmentRegistry/Infrastructure/DependencyInjection.cs
+  h_99fca60b892ff4 1,16-21
+.github/workflows/main_web-flashid-prod.yml
+  h_99fca60b892ff4 20
+backend/FlashIdBackend/Presentation/Program.cs
+  h_99fca60b892ff4 26-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "948b90e57755f3e677006d521717353ed47533a1",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
