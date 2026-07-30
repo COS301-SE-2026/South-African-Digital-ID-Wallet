@@ -1,0 +1,16 @@
+web/src/components/pages/brand-style-guide/accessibility-section.tsx
+  h_0aff3b71f739b1 1-82
+web/src/components/pages/brand-style-guide/brand-style-guide-page.tsx
+  h_0aff3b71f739b1 74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "2fd1c0977248cb1c93ba692e2358cdb8c92c0899",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
