@@ -82,7 +82,7 @@ public class CitizenVerificationService : ICitizenVerificationService
         {
             Id = Guid.NewGuid(),
             EventType = AuditEventType.CitizenVerified,
-            Details = $"Citizen {citizen.Id} was verified using the activation link verification service.",
+            Details = $"Citizen {citizen.SaId} was verified using the activation link verification service.",
             ActorId = userId,
             CreatedAt = now,
             IpAddress = ipAddress,

@@ -25,16 +25,12 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await context.Database.MigrateAsync();
 
-    if (app.Environment.IsDevelopment())
+    if (/*app.Environment.IsDevelopment() && */!await context.CitizenRecords.AnyAsync())
     {
-        if (!await context.CitizenRecords.AnyAsync())
-        {
-            Console.WriteLine("[SEED] Database is empty, seeding sample data...");
-            await DbSeeder.SeedAsync(context);
-            Console.WriteLine("[SEED] Database seeded successfully!");
-        }
+        Console.WriteLine("[SEED] Database is empty, seeding sample data...");
+        await DbSeeder.SeedAsync(context);
+        Console.WriteLine("[SEED] Database seeded successfully!");
     }
-
 }
 
 if (app.Environment.IsDevelopment())
@@ -54,8 +50,4 @@ app.UseMiddleware<ApiKeyMiddleware>();
 app.MapControllers();
 
 
-app.Run();
-
-
-
-
+await app.RunAsync();

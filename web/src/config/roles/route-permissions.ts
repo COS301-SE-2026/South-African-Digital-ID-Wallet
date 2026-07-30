@@ -2,6 +2,7 @@ import { type UserRole } from '@/types/roles'
 
 export const PERMISSIONS_ROUTING: Record<string, UserRole[]> = {
   '/citizen': ['Citizen'],
+  '/citizen/activate-credentials': ['Citizen'],
   '/citizen/manage-user-account': ['Citizen'],
   '/officials': ['Official'],
   '/officials/onboard-citizen': ['Official'],

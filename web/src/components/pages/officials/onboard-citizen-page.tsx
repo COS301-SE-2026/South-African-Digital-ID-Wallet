@@ -25,32 +25,30 @@ export default function OnboardCitizenPage() {
   const [record, setRecord] = useState<IdentityRecord | null>(null)
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
-  const [idConsent, setConsent] = useState(false)
-  const [contactDetailsConsent, setContactConsent] = useState(false)
+  const [idConsent, setidConsent] = useState(false)
+  const [contactDetailsConsent, setContactDetailsConsent] = useState(false)
   const [accountCreated, setAccountCreated] = useState(false)
   const [activationSent, setActivationSent] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [onboardResponse, setOnboardResponse] =
     useState<OnboardCitizenResponse | null>(null)
 
-  const { mutate: retrieveRecord, isPending: isRetrievingRecord } = useMutation(
-    {
-      mutationFn: (citizenIdNumber: string) =>
-        onboardingService.retrieveIdentityRecord(citizenIdNumber),
-      onSuccess: (data) => {
-        setRecord(data)
-        setAccountCreated(false)
-        setActivationSent(false)
-        toast.success('Identity record retrieved')
-      },
-      onError: (error) => {
-        setRecord(null)
-        handleApiError(error)
-      },
-    }
-  )
+  const { mutate: retrieveRecord } = useMutation({
+    mutationFn: (citizenIdNumber: string) =>
+      onboardingService.retrieveIdentityRecord(citizenIdNumber),
+    onSuccess: (data) => {
+      setRecord(data)
+      setAccountCreated(false)
+      setActivationSent(false)
+      toast.success('Identity record retrieved')
+    },
+    onError: (error) => {
+      setRecord(null)
+      handleApiError(error)
+    },
+  })
 
-  const { mutate: onboardCitizen, isPending: isCreatingAccount } = useMutation({
+  const { mutate: onboardCitizen } = useMutation({
     mutationFn: (formValues: OnboardCitizenFormValues) =>
       onboardingService.onboardCitizen(formValues),
     onSuccess: (data) => {
@@ -140,7 +138,7 @@ export default function OnboardCitizenPage() {
             idNumber={idNumber}
             setIdNumber={setIdNumber}
             idConsent={idConsent}
-            setConsent={setConsent}
+            setConsent={setidConsent}
             record={record}
             retrieveIdentityRecord={retrieveIdentityRecord}
             errors={errors}
@@ -165,7 +163,7 @@ export default function OnboardCitizenPage() {
           email={email}
           setEmail={setEmail}
           contactDetailsConsent={contactDetailsConsent}
-          setContactConsent={setContactConsent}
+          setContactConsent={setContactDetailsConsent}
           idConsent={idConsent}
           createPendingAccount={createPendingAccount}
           accountCreated={accountCreated}

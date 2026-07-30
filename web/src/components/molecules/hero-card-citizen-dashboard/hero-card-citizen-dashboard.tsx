@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import qrCodeImage from '@/assets/images/qrCodeImage.svg'
 import { Button } from '@/components/ui/button'

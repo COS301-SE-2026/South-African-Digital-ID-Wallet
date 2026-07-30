@@ -13,7 +13,7 @@ public static class CitizenRegistrationValidator
         if (string.IsNullOrWhiteSpace(request.Email))
             throw new InvalidCitizenRegistrationRequestException("Email is required.");
 
-        if (!IsValidEmail(request.Email))
+        if (!EmailValidator.IsValid(request.Email))
             throw new InvalidCitizenRegistrationRequestException("Invalid email address");
 
         if (string.IsNullOrWhiteSpace(request.Password))
@@ -38,18 +38,5 @@ public static class CitizenRegistrationValidator
         if (!request.Password.Any(c => AllowedSpecialChars.Contains(c)))
             throw new InvalidCitizenRegistrationRequestException(
                 "Password must contain at least one special character (!@#$%^&*_-+=.<>?~).");
-    }
-
-    private static bool IsValidEmail(string email)
-    {
-        try
-        {
-            var address = new System.Net.Mail.MailAddress(email);
-            return address.Address == email;
-        }
-        catch
-        {
-            return false;
-        }
     }
 }

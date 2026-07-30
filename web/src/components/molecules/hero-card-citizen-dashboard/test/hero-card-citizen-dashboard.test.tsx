@@ -2,6 +2,14 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { act } from 'react'
 import { WalletHeroCard } from '../hero-card-citizen-dashboard'
 
+const pushMock = jest.fn()
+
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: pushMock,
+  }),
+}))
+
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
@@ -12,10 +20,13 @@ jest.mock('next/image', () => ({
 describe('WalletHeroCard', () => {
   beforeEach(() => {
     jest.useFakeTimers()
+    pushMock.mockClear()
   })
 
   afterEach(() => {
-    jest.runOnlyPendingTimers()
+    act(() => {
+      jest.runOnlyPendingTimers()
+    })
     jest.useRealTimers()
   })
 
@@ -59,31 +70,24 @@ describe('WalletHeroCard', () => {
     expect(screen.getByText(/qr expires in 01:59/i)).toBeInTheDocument()
   })
 
-  it('resets the countdown when Generate QR Code is clicked', () => {
+  it('navigates to the QR page when Generate QR Code is clicked', () => {
     render(<WalletHeroCard />)
-
-    act(() => {
-      jest.advanceTimersByTime(5000)
-    })
-
-    expect(screen.getByText(/qr expires in 01:55/i)).toBeInTheDocument()
-
     fireEvent.click(
       screen.getByRole('button', {
         name: /generate qr code/i,
       })
     )
 
-    expect(screen.getByText(/qr expires in 02:00/i)).toBeInTheDocument()
+    expect(pushMock).toHaveBeenCalledWith('/citizen/qr')
   })
 
-  it('never counts below 00:00', () => {
+  it('loops back to the start once the countdown reaches zero', () => {
     render(<WalletHeroCard />)
 
     act(() => {
       jest.advanceTimersByTime(130000)
     })
 
-    expect(screen.getByText(/qr expires in 00:00/i)).toBeInTheDocument()
+    expect(screen.getByText(/qr expires in 01:50/i)).toBeInTheDocument()
   })
 })
