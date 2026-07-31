@@ -3,15 +3,15 @@
 import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-
-import FlashIdLogo from '@/assets/images/FlashID-white.png'
+import FlashIdLogo from '@/assets/images/FlashID-green.png'
 import { Text } from '@/components/atoms'
 
 const NAV_LINKS = [
-  { label: 'Home', href: '#home' },
-  { label: 'About', href: '#about' },
-  { label: 'Features and How It Works', href: '#features&how-it-works' },
-  { label: 'Preview', href: '#preview' },
+  { label: 'Home', href: '/' },
+  { label: 'About', href: '/#about' },
+  { label: 'Features and How It Works', href: '/#features&how-it-works' },
+  { label: 'Preview', href: '/#preview' },
+  { label: 'Help', href: '/#help' },
 ]
 
 export function LandingPageNavbar() {
@@ -27,9 +27,7 @@ export function LandingPageNavbar() {
               height={50}
               className="h-11 w-auto transition-transform duration-300"
             />
-            <Text as="h1" variant="h3" className="text-clean-white">
-              Flash<span className="text-accent-gold">ID</span>
-            </Text>
+            <Text as="h1" variant="h3" className="text-clean-white"></Text>
           </Link>
 
           <nav className="hidden lg:block">
