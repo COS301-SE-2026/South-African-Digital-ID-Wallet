@@ -564,4 +564,4 @@ All three services deploy automatically on push to their respective branches. Th
 
 ### 5.7 CI/CD Pipeline Diagram
 
-![CI/CD Pipeline Diagram](./images/CICDdiagram.svg)
+![CI/CD Pipeline Diagram](../images/CICDdiagram.svg)
