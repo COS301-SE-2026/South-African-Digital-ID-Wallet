@@ -48,9 +48,10 @@ FlashID is composed of four subsystems: Next.js for web portal for citizens, adm
 
 ## 2. Architectural Requirements
 
-The full architectural requirements, including acceptance criteria and definitions of done for all 12 epics and 49 user stories are documented in:
+The full architectural requirements, including architectural patterns, design patterns, constraints and mapping can be found in:
 
- **[epics_and_user_stories.md](./epics-and-user-stories-v2.md)**
+ **[architecture-v2.md](../demo2/architecture-v2.md)**
+
 ### Architectural Diagram
 ![Architectural Diagram](../images/_architecture_diagram_final.drawio.svg)
   
@@ -552,11 +553,36 @@ FlashID distinguishes two environments: **development** and **production**. Both
 All three services deploy automatically on push to their respective branches. There is no manual deployment step for now. Local development is a third, non-deployable environment. Developers will run the stack `pnpm dev` on web, backend and government-registry concurrently. This is with a local SQL Server instance.
 
 ### 5.3 Infrastructure as Code / Containerisation
-Web makes use of containeristaion to deploy.
+FlashID uses Docker containerisation to provide reproducible deployment of the web application and backend services.
+
+Each deployable service contains a Dockerfile that defines its runtime environment, dependency installation, build process, exposed port, and startup command.
+
+GitHub Actions builds the relevant service container when changes are pushed to the configured branch. The resulting container image is published to the configured container registry and deployed to the corresponding Azure App Service.
+
+Containerisation ensures that the same application artefact tested in the CI pipeline is deployed to Azure, reducing differences between developer machines and cloud-hosted environments.
 ### 5.4 Secrets Management
-Secrets are manged using Azure Appsettings in each App service. Locally secrets are managed using app.Settings and dotnet user secrets.
+Secrets and environment-specific configuration are not committed to the Git repository.
+
+In deployed environments, sensitive configuration values are stored using Azure App Service environment variables and connection string settings. These values include:
+
+- SQL Server connection strings
+- JWT signing configuration
+- Government Registry API keys
+- Government Registry service URLs
+- Azure Blob Storage credentials
+- Email provider credentials
+
+Local development uses `.NET User Secrets`, local environment variables, and development configuration files that are excluded from source control.
+
+Public configuration templates may be included in the repository to document the required variable names, but these templates do not contain real secret values.
+
+Application code accesses configuration through ASP.NET Core configuration providers and environment variables. Secret va
 ### 5.5 Rollback Strategy
-Make use of Azures rollback service?
+FlashID uses a previous-version redeployment strategy for rollback.
+
+Each successful CI/CD run produces a deployment artefact or container image associated with a specific Git commit. If a newly deployed version fails, the team identifies the most recent known-good deployment and redeploys that version to the affected Azure App Service.
+
+Where a failure is caused by application code, the responsible commit may also be reverted through a new pull request. Force-pushing or resetting the shared `main` or `dev` branches is not used.
 ### 5.6 Deployment Diagram
 ![Deploymnet Diagram](../images/Deployment_diagram.drawio.svg)
 ### 5.7 CI/CD Pipeline Diagram

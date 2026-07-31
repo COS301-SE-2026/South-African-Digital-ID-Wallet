@@ -32,13 +32,9 @@
    - [5.3 Reliability & Availability](#53-reliability--availability)
    - [5.4 Usability & Accessibility](#54-usability--accessibility)
    - [5.5 Maintainability & Scalability](#55-maintainability--scalability)
-6. [Use Cases](#5-use-cases)
-7. [API Service Contracts](#6-api-service-contracts)
-8. [Domain Model](#7-domain-model)
-9. [Architectural Requirements](#8-architectural-requirements)
-10. [Technology Requirements](#9-technology-requirements)
-11. [Constraints and Assumptions](#10-constraints-and-assumptions)
-12. [Future Enhancements](#11-future-enhancements)
+6. [Use Cases](#6-use-case)
+7. [Domain Model](#7-domain-model)
+8. [Future Enhancements](#8-future-enhancements)
 
 ---
 
@@ -160,7 +156,7 @@ Officials may:
 
 The full epics and user stories, including acceptance criteria and definitions of done for all 12 epics and 49 user stories are documented in:
 
- **[epics_and_user_stories.md](./epics-and-user-stories-v2.md)**
+ **[epics_and_user_stories.md](../demo2/epics-and-user-stories-v2.md)**
 
 ### Epic Summary
 
@@ -185,7 +181,7 @@ The full epics and user stories, including acceptance criteria and definitions o
 
 The complete functional requirements, subsystems R1 through R10 are documented in:
 
- **[functional_requirements.md](./functional-requirements-v2.md)**
+ **[functional_requirements.md](../demo2/functional-requirements-v2.md)**
 
 ### Subsystem Summary
 
@@ -302,48 +298,16 @@ The architecture should support the onboarding of additional government departme
 
 ## 6. Use Cases
 
-See [use_cases](./use-cases-v2.md) for the Use Cases and their Use Case Diagrams.
+See [use_cases](../demo2/use-cases-v2.md) for the Use Cases and their Use Case Diagrams.
+
+---
+## 7. Domain Model
+
+![Domain Model Diagram](../images/Domain_Modeling.svg)
 
 ---
 
-## 7. API Service Contracts
-
-See [API.md](./API-v2.md) for preliminary API contracts and payloads supporting these use cases.
-
----
-## 8. Domain Model
-
-![Domain Model Diagram](images/Domain_Modeling.svg)
-
----
-
-# 9. Architectural Requirements
-
-See [architecture.md](./architecture-v2.md) for the overarching architectural approach, quality requirements, design patterns, and constraints guiding Demo 1 implementation. 
-
----
-
-# 10. Technology Requirements
-
-| Category | Technology | Version |
-|---|---|---|
-| Backend | ASP.NET Core Web API | .NET 10 |
-| Web Frontend | Next.js + React | 16.x + 19.x |
-| Mobile | React Native + Expo | Latest |
-| Relational DB | Azure SQL (SQL Server) | Latest |
-| Document DB | Azure Cosmos DB | Latest |
-| ORM | Entity Framework Latest |
-| Authentication | ASP.NET Identity + JWT Bearer | Latest |
-| Frontend State | React Query (@tanstack) | 5.x |
-| Styling | Tailwind CSS + shadcn/ui | Latest |
-| Testing (Backend) | xUnit v3 | 3.x |
-| Testing (Frontend) | Jest + React Testing Library | Latest |
-| CI/CD | GitHub Actions | Latest |
-| Coverage | Codecov | Latest |
-
----
-
-## 11. Constraints and Assumptions
+## 8. Constraints and Assumptions
 
 ### Constraints
 - No live government integrations during prototype phase
