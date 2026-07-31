@@ -72,7 +72,7 @@ t3chtitansgo@gmail.com
 🔗 [SRS](docs/demo2/SRS-v2.md) <br>
 🔗 [User Manual Doocument](docs/demo2/user-manual%20(1).pdf) <br>
 🔗 [Brand style guide](docs/demo2/FlashID.pdf) <br>
-🔗 [Testing Policy Document](docs/demo2/TESTING_POLICY.md) <br>
+🔗 [Testing Policy Document](docs/demo2/testing_policy.md) <br>
 🔗 [Coding Standards ](docs/demo2/coding_standards.md) <br>
 🔗 [Presentation](docs/demo2/Demo2Presentation.pdf) <br>
 

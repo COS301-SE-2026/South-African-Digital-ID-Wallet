@@ -1,59 +1,112 @@
 # FlashID Testing Policy
-**Tech Titans · COS 301 Capstone 2026**
 
-> This document defines what testing is *required* before code merges. For how to write tests, see [TESTING.md](./TESTING.md).
-
----
-
-## 1. Purpose & Scope
-
-This policy applies to all four services in the monorepo: `backend`, `government-registry`, `web`, and `mobile`. It governs what must pass in CI before a PR can merge, and what test coverage is expected of new code.
+**Tech Titans, COS 301 Capstone 2026**
 
 ---
 
-## 2. Required checks per service
+### 1.Purpose
 
-CI is wired per-service via path-filtered GitHub Actions workflows, triggered on PRs and pushes to `main` and `dev`.
+This document defines the standards, procedures and responsibilities associated with software testing for FlashID, the South African Digital ID Wallet. It estabishes a consistent approach to planning, executing, documenting, and reviewing activitiess across all services (backend, government-registry, web, mobile) to ensure software quality, realibility, and compliance with project requirements -including POPIE-driven data handling rules and identity-verification security guarantees. 
+---
 
-| Service | Workflow | Trigger | Required for merge |
-|---|---|---|---|
-| Backend | `backend.yml` | PR/push touching `backend` | `dotnet test` must pass (unit + integration tests in `backend/FlashIdBackend/tests/`) |
-| Government Registry | `gov_registry.yml` | PR/push touching `government-registry` | `dotnet test` must pass |
-| Web | `web.yml` | PR/push touching `web` | `pnpm run test:web:coverage` must pass |
-| Web E2E | `web-e2e.yml` | PR touching `web` **or** `backend` | Playwright suite must pass against a real backend + ephemeral SQL Server |
-| Mobile | `mobile.yml` | PR/push touching `mobile` | `pnpm test -- --coverage` must pass |
+## 2. Testing Objectives
 
-A PR that touches both `web` and `backend` must pass all four relevant workflows (web unit, backend unit, web-e2e, and backend if changed) and not just the ones for the code it directly edited, since `web-e2e.yml` gates on either path.
+- Verify that each service (backend, government-registry, web frontend, mobile) behaves correctly in isolation and in combination with its real dependencies.
+- Guarantee the integrity of identity-critical flows: citizen registration, credential activation, QR generation/selective disclosure, and credential verification.
+- Enforce security-sensitive invariants through tests, not just code review - e.g. QR token replay protection, credential revocation handling, and audit log correctness.
+- Catch regressions automatically before merge via CI, rather than relying on manual testing.
+- Maintain sufficient coverage on new code so that untested logic doesn't silently reach dev or a demo build
 
 ---
 
-## 3. Definition of done (test-related)
+## 3. Testing Types
 
-A PR is not complete unless:
-
-- **New backend logic** (validator, service, controller) ships with a unit test in `backend/FlashIdBackend/tests/`, following the `{Something}Tests.cs` convention. If it touches the database, it also needs an integration test.
-- **New frontend components/services** ship with a test under `test/{name}.test.tsx|ts` next to the file.
-- **New user-facing flows spanning web + backend** get a Playwright spec added to `web/e2e/test/`, reusing the role-based auth setup in `web/e2e/auth.setup.ts` rather than re-authenticating per test.
-- **New mobile logic** ships with a test under `mobile/src/__tests__/`.
-- **Government Registry** is a known exception.
-
-No PR should reduce test coverage on the files it touches without a stated reason in the PR description.
+| Type | Definitions | Where Used|
+|---|---|---|
+| **Unit Test** | Tests a single function, class, or component in complete isolation. All external dependencies (DB, API, other services) are mocked. No network or DB access. | Backend validators/services (xUnit), frontend components/services (Jest + RTL), government-registry services |
+| **Component Test** | Tests a React component in isolation using a fake browser environment (jsdom). No real HTTP calls , even if the component uses React Query hooks. | Web frontend (e.g. register-institution-form.test.tsx, button.test.tsx) |
+| **Integration Test** | Tests multiple real layers working together - for backend, a real (in-memory or SQLite) database; for government-registry, full controller-to-DB flow via WebApplicationFactory. No mocking of the system under test itself. | BackendIntegrationTests.cs, QrServiceIntegrationTests.cs, government-registry's ControllerIntegrationTests.cs |
+| **E2E** | Tests the full application in a real browser with a real backend and  database, simulating an actual user's click-through flow | Playwright specs in web/e2e/test/ |
 
 ---
 
-## 4. Coverage reporting
+## 4. Tools and Environments
 
-Codecov runs on every backend, web, mobile, and government-registry PR (`codecov/codecov-action@v5`), uploading per-service coverage reports. `codecov.yml` only defines an ignore list (EF migrations, `DbSeeder.cs`, `Program.cs` for both `.NET` services). Also it does not set a committed patch-coverage target. Any pass/fail coverage threshold shown on a PR comes from the Codecov dashboard project settings, not from a file in this repo.
-
-The upload step uses `fail_ci_if_error: false`, meaning a Codecov outage will not fail the build and the test run itself is still the actual gate.
+| Layer | Framework/Tool | Notes |
+|---|---|---|
+| Backend (FlashID) unit + integration | xUnit v3 | dotnet test, in-memory EF Core DB and SQLite in-memory connection used for integration tests |
+| Government-registry unit + integration | xUnt | Separate service, tested independently - controller, repository, and service layers all covered |
+| Frontend unit/component | Jest + React Testing Library | npx jest --coverage , jsdom environment, QueryClientProvider wrapper required for React Query components |
+| E2E | Playwright | 6 specs: auth (via auth.setup.ts global login), activate-credentials, citizen-dashboard, manage-user-account, qr-generation, qr-scanning, view-credentials|
+| Coverage reporting | ReportGenerator (backend), Codecov (all layers) | dotnet-reportgenerator-globaltool; Cobertura XML uploaded to Codecov per PR |
+| Code quality gate | SonarCloud | Quality Gate on new code, covering Security Rating, Reliability Rating, and duplication |
+| CI/CD | GitHub Actions | backend.yml, web.yml, mobile.yml, plus government-registry and Web E2E workflows -all run automatically on every PR |
 
 ---
 
-## 5. Known policy gaps (Will fix these in the coming Demo 3)
+## 5. What Gets Tested
 
-Documenting these honestly rather than implying full coverage:
+**Backend / government-registry:**
+- Validators - every rule (empty, too long, invalid format, valid input)
+- Services - business logic, with dependencies mocked (unit) or real (integration)
+- Controllers - HTTP response codes for success and failure paths
+- Security-critical behavior -e.g. QR token single-use enforcement, credential status checks blocking revoked/expired credentials, audit log writes on login/logout/verification events
 
-- **Government Registry has no real tests.** `government-registry/GovernmentRegistry/tests/` only contains the scaffolded `UnitTest1.cs`, even though `gov_registry.yml` runs `dotnet test` on every PR. The check currently passes trivially. Until real tests are added, this service is not actually covered by the "tests must pass" gate in any meaningful sense.
-- **No committed coverage threshold.** Coverage is visible, not enforced, from the repo's own config.
-- **No CODEOWNERS file** —> merges are gated on CI status, not on required review from a specific owner.
-- **Mobile has no E2E tests** —> only 6 unit test files under `src/__tests__/`; user flows on mobile are untested end-to-end.
+**Frontend:**
+- Components - correct rendering, correct response to user interaction, correct state transitions
+- Services - DTO/model field mapping, URL construction
+- Config - navigation completeness (non-empty hrefs, required nav items per portal)
+
+**E2E:**
+- Full user journeys: citizen login to dashboard to credential view to QR generation to verifier scan/resolve to account management
+
+---
+
+## 6. Naming Conventions
+
+- Backend/government-registry unit: `{ClassName}Tests.cs`
+- Backend/government-registry integration: `{ClassName}IntegrationTests.cs`
+- Frontend: `{filename}.test.tsx` (components) / `{filename}.test.ts`(services, config, utils)
+- E2E: `{flow-name}.spec.ts`
+- Test method naming:`MethodName_Condition_ExpectedResult`
+
+
+---
+
+## 7. Acceptance Criteria (Merge Gate)
+
+A pull request is ready to merge when all of the following pass:
+
+- **Backend CI / Build and Test** :all backend unit + integration tests pass
+- **Government Registry CI / Build and Test** : all government-registry unit + integration tests pass
+- **Web CI / Build and Test**: all frontend unit/component tests pass
+- **Web E2E / Playwright E2E** :all 6 Playwright specs pass
+- **Codecov/patch** : new code meets the current patch coverage target (77.61%)
+- **SonarCloud Code Analysis - Quality Gate passed**, specifically requiring:
+  - Security Rating on New Code >=A
+  - Reliability Rating on New Code >=A
+- **At least 1 approving review** from a reviewer with write access
+
+Our convention is: If any check fails -e.g. SonarCloud flags a B security or C reliability rating on new code-the PR is blocked from merging until it's resolved, regardless of whether the other checks are green.
+
+---
+
+## 8.Defect Management Process
+
+FlashID does not use a formal bug-tracking system or severity classification. When a defect is found (during testing, manual QA, or demo prep):
+
+- If the person who finds it understands the issue and can fix it directly, they do so imediately rather than logging it and waiting.
+- If the fix touches a feature they don't own or don't fully understand, they raise it with the feature owner directly - either via WhatsApp or during the team's Discord daily standup.
+- There is no severity tagging (blocker/major/minor); defects are simply fixed as they're found, prioritizing whatever is blocking the current PR, CI run, or demo.
+
+---
+
+## 9. Roles and Responsibilities
+
+Feature author -Writes unit/integration tests for their own feature in the same PR (or an immediate follow-up testing PR) 
+
+Reviewer -Confirms new code has adequate test coverage and CI/SonarCloud/Codecov checks pass before approving
+
+Any team member-May fix a defect directly upon discovery, or flag the feature owner via WhatsApp/Discord standup if unfamiliar with the code
+
+There is no dedicated QA role- testing responsibility is fully distributed across the team, per feature.
