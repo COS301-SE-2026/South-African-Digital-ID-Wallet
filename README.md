@@ -103,9 +103,9 @@ t3chtitansgo@gmail.com
   </tr>
 
   <tr>
-    <td width="30%" valign="Top">
+    <td width="30%">
       <strong>Unathi Tshakalisa</strong><br>
-      <img src="docs/images/unathi.JPEG" alt="Unathi Tshakalisa" style="width: 100%; height: 300px; style="display: block; object-fit: cover;">
+      <img src="docs/images/unathi.JPEG" alt="Unathi Tshakalisa" style="width: 100%; height: 300px; object-fit: cover; display: block;">
     </td>
     <td width="20%">
       <code>Team Leader</code><br>
@@ -120,9 +120,9 @@ t3chtitansgo@gmail.com
   </tr>
 
   <tr>
-    <td width="30%" valign="Top">
+    <td width="30%">
       <strong>Zaynab Samir</strong><br>
-      <img src="docs/images/zaynab.JPEG" alt="Zaynab Samir" style="width: 100%; height: 300px; style="display: block; object-fit: cover;">
+      <img src="docs/images/zaynab.JPEG" alt="Zaynab Samir" style="width: 100%; height: 300px; object-fit: cover; display: block;">
     </td>
     <td width="20%">
       <code>Cybersecurity</code><br>
@@ -137,9 +137,9 @@ t3chtitansgo@gmail.com
   </tr>
 
   <tr>
-    <td width="30%" valign="Top">
+    <td width="30%">
       <strong>Nathan Chisadza</strong><br>
-      <img src="docs/images/nathan.JPEG" alt="Nathan Chisadza" style="width: 100%; height: 300px; style="display: block; object-fit: cover;">
+      <img src="docs/images/nathan.JPEG" alt="Nathan Chisadza" style="width: 100%; height: 300px; object-fit: cover; display: block;">
     </td>
     <td width="20%">
       <code>Algorithms</code><br>
@@ -154,9 +154,9 @@ t3chtitansgo@gmail.com
   </tr>
 
   <tr>
-    <td width="30%" valign="Top">
+    <td width="30%">
       <strong>Ryan Liao</strong><br>
-      <img src="docs/images/ryan.JPEG" alt="Ryan Liao" style="width: 100%; height: 300px; style="display: block; object-fit: cover;">
+      <img src="docs/images/ryan.JPEG" alt="Ryan Liao" style="width: 100%; height: 300px; object-fit: cover; display: block;">
     </td>
     <td width="20%">
       <code>Mobile Systems</code><br>
@@ -171,9 +171,9 @@ t3chtitansgo@gmail.com
   </tr>
 
   <tr>
-    <td width="30%" valign="Top">
+    <td width="30%">
       <strong>Dominiqu Nigatu</strong><br>
-      <img src="docs/images/dom.PNG" alt="Dominiqu Nigatu" style="width: 100%; height: 300px; style="display: block; object-fit: cover;">
+      <img src="docs/images/dom.PNG" alt="Dominiqu Nigatu" style="width: 100%; height: 300px; object-fit: cover; display: block;">
     </td>
     <td width="20%">
       <code>Integration Systems</code><br>

@@ -1,12 +1,12 @@
 export type CredentialType = 'identityDocument' | 'driversLicense'
 
-export const CREDENTIAL_TYPE_MAP: Record<CredentialType, number> = {
-  identityDocument: 0,
-  driversLicense: 1,
+export const CREDENTIAL_TYPE_MAP: Record<CredentialType, string> = {
+  identityDocument: 'IdentityDocument',
+  driversLicense: 'DriversLicense',
 }
 
 export type ActivateCredentialsRequest = {
-  credentialTypes: number[]
+  credentialTypes: string[]
 }
 
 export type ActivateCredentialsResponse = {

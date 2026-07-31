@@ -27,8 +27,8 @@ namespace Infrastructure.Data;
 // scanning features are built out.
 public static class DbSeeder
 {
-    private sealed record DeviceTemplate(string Name, string Type, string Os, string Browser);
-
+    private sealed record DeviceTemplate(string DeviceType, string OperatingSystem, string Browser);
+    private sealed record LocationTemplate(string City, string Country);
     private sealed record NotificationTemplate(string Title, string Description, string Tone);
 
     private static readonly string[] FirstNames = new[]
@@ -803,65 +803,77 @@ public static class DbSeeder
         // only seed if no trusted devices exist yet
         if (await context.TrustedDevices.AnyAsync()) return;
 
-        var allCitizens = await context.Citizens.ToListAsync();
-        if (allCitizens.Count == 0) return;
+        var allUsers = await context.DomainUsers.ToListAsync();
+        if (allUsers.Count == 0) return;
 
         var deviceTemplates = new[]
         {
-            new DeviceTemplate("iPhone 15 Pro", "Mobile", "iOS 18.1", "Safari"),
-            new DeviceTemplate("Samsung Galaxy S24", "Mobile", "Android 15", "Chrome"),
-            new DeviceTemplate("MacBook Pro", "Desktop", "macOS Sequoia", "Safari"),
-            new DeviceTemplate("Dell XPS 15", "Desktop", "Windows 11", "Edge"),
-            new DeviceTemplate("iPad Air", "Tablet", "iPadOS 18.1", "Safari"),
-            new DeviceTemplate("HP Pavilion", "Desktop", "Windows 11", "Chrome"),
-            new DeviceTemplate("Google Pixel 9", "Mobile", "Android 15", "Chrome"),
+            new DeviceTemplate("Mobile", "iOS 18.1", "Safari"),
+            new DeviceTemplate("Mobile", "Android 15", "Chrome"),
+            new DeviceTemplate("Desktop", "macOS Sequoia", "Safari"),
+            new DeviceTemplate("Desktop", "Windows 11", "Edge"),
+            new DeviceTemplate("Tablet", "iPadOS 18.1", "Safari"),
+            new DeviceTemplate("Desktop", "Windows 11", "Chrome"),
+            new DeviceTemplate("Mobile", "Android 15", "Chrome"),
         };
 
         var locations = new[]
         {
-            "Pretoria, Gauteng", "Johannesburg, Gauteng", "Cape Town, Western Cape",
-            "Durban, KwaZulu-Natal", "Bloemfontein, Free State", "Port Elizabeth, Eastern Cape"
+            new LocationTemplate("Pretoria", "South Africa"),
+            new LocationTemplate("Johannesburg", "South Africa"),
+            new LocationTemplate("Cape Town", "South Africa"),
+            new LocationTemplate("Durban", "South Africa"),
+            new LocationTemplate("Bloemfontein", "South Africa"),
+            new LocationTemplate("Gqeberha", "South Africa")
         };
 
         var devicesToAdd = new List<TrustedDevice>();
 
-        void AddDevicesForCitizen(Citizen citizen, int minDevices, int maxDevicesExclusive, int maxLastActiveDaysAgo, int trustedThreshold)
+        void AddDevicesForCitizen(User citizen, int minDevices, int maxDevicesExclusive, int maxLastActiveDaysAgo, int trustedThreshold)
         {
             var deviceCount = rnd.Next(minDevices, maxDevicesExclusive);
             for (int i = 0; i < deviceCount; i++)
             {
                 var template = deviceTemplates[rnd.Next(deviceTemplates.Length)];
+                var location = locations[rnd.Next(locations.Length)];
+
+                var seedDeviceToken = $"seed-device-{citizen.Id}-{i}";
+                var deviceTokenHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(seedDeviceToken)));
+
                 devicesToAdd.Add(new TrustedDevice
                 {
                     Id = Guid.NewGuid(),
-                    DeviceName = template.Name,
-                    DeviceType = template.Type,
-                    OperatingSystem = template.Os,
+                    DeviceTokenHash = deviceTokenHash,
+                    DeviceType = Enum.Parse<DeviceType>(template.DeviceType),
+                    OperatingSystem = template.OperatingSystem,
                     Browser = template.Browser,
-                    IpAddress = SampleIpAddresses[rnd.Next(SampleIpAddresses.Length)],
-                    Location = locations[rnd.Next(locations.Length)],
+                    LastKnownCity = location.City,
+                    LastKnownCountry = location.Country,
                     LastActive = now.AddDays(-rnd.Next(0, maxLastActiveDaysAgo)),
-                    IsCurrentDevice = i == 0,
                     IsTrusted = rnd.Next(10) > trustedThreshold,
-                    CitizenId = citizen.Id,
+                    UserId = citizen.Id,
                     CreatedAt = now.AddDays(-rnd.Next(30, 365)),
                     UpdatedAt = now
                 });
             }
         }
 
-        // Prioritize Harper Miller (or any Harper/Miller match) with a fuller device history
-        var priorityCitizens = allCitizens
-            .Where(c => c.Names == "Harper" || c.Surname == "Miller")
-            .ToList();
 
-        foreach (var citizen in priorityCitizens)
+
+        var citizens = await context.Citizens.ToListAsync();
+        // Prioritize Harper Miller (or any Harper/Miller match) with a fuller device history
+        var priorityUsersId = citizens
+            .Where(c => c.Names == "Harper" || c.Surname == "Miller").Select(c => c.UserId).ToHashSet();
+
+        var priorityUsers = allUsers.Where(u => priorityUsersId.Contains(u.Id)).ToList();
+
+        foreach (var citizen in priorityUsers)
         {
             AddDevicesForCitizen(citizen, minDevices: 3, maxDevicesExclusive: 5, maxLastActiveDaysAgo: 14, trustedThreshold: 1);
         }
 
         // Give the remaining citizens 1-3 devices each
-        foreach (var citizen in allCitizens.Where(c => !priorityCitizens.Contains(c)))
+        foreach (var citizen in allUsers.Where(c => !priorityUsers.Contains(c)))
         {
             AddDevicesForCitizen(citizen, minDevices: 1, maxDevicesExclusive: 4, maxLastActiveDaysAgo: 30, trustedThreshold: 2);
         }

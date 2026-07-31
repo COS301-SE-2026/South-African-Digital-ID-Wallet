@@ -691,11 +691,12 @@ Future work will connect the layout to authentication, session management, and r
 
 ### Getting SQL Server running
 
-- **Windows** - use your local SQL Server instance. Make sure that IP is enabled on port 1433. Docker Desktop also work if you want to use it.
--**macOS / Linux** - SQL Server has no native build; use the provided container:
+- **Windows** - use your local SQL Server instance. Make sure that IP is enabled on port 1433. Docker Desktop also work if you want to use it. -**macOS / Linux** - SQL Server has no native build; use the provided container:
+
 ```bash
   docker compose -f ../backend/FlashIdBackend/docker-compose.yml up -d
 ```
+
 ### Running the tests
 
 ```bash
