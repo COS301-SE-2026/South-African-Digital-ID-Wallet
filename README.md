@@ -37,7 +37,7 @@ South African Digital ID Wallet - FlashID, is a secure national-scale digital id
 
 - [Demo 1 Video](https://drive.google.com/file/d/1HRZ4kPE6d9CZjKYMcp1lL_AB6-7ywVYP/view?usp=sharing) (Please doownload video due to video size)
 
-- [Demo 2 Video](#)
+- [Demo 2 Video](https://drive.google.com/file/d/1zvqFxAfxtZlVi4LKnHyqWYL7NjBREaG7/view?usp=sharing)
 
 - [Demo 3 Video](#)
 
