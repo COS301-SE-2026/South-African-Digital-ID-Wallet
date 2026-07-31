@@ -87,6 +87,9 @@ jobs:
           done
           echo "Backend failed to start. Log:"; cat backend.log; exit 1
 
+      - name: Seed E2E data
+        run: dotnet run --project backend/FlashIdBackend/Tools/SeedRunner/SeedRunner.csproj -- "${{ env.ConnectionStrings__DefaultConnection }}"
+        
       - name: Verify E2E accounts exist
         run: |
           echo " seeding lines "
@@ -126,3 +129,4 @@ jobs:
           name: backend-log
           path: backend.log
           retention-days: 7
+
