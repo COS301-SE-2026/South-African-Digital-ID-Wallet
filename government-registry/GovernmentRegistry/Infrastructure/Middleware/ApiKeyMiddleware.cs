@@ -41,6 +41,7 @@ public class ApiKeyMiddleware
 
         if (!isValid)
         {
+            context.Response.StatusCode = 401;
             await context.Response.WriteAsync("Invalid API Key.");
             return;
         }
