@@ -15,15 +15,12 @@ import {
   Landmark,
   LogOut,
 } from 'lucide-react'
-
 import { useState } from 'react'
-
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import FlashIdWhite from '@/assets/images/FlashID-white.png'
+import FlashIdLogo from '@/assets/images/FlashID-green.png'
 import { Button } from '@/components/atoms'
-
 import type { SidebarIconName } from '@/types/navigation'
 import type { AppSidebarProps } from './types'
 
@@ -66,37 +63,33 @@ export const AppSidebar = ({
           isCollapsed ? 'justify-center' : 'justify-between'
         }`}
       >
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full">
-            {isCollapsed ? (
-              <div
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white"
-                title={user.name}
-                aria-label={`${user.name} avatar`}
-              >
-                <Image
-                  src={FlashIdWhite}
-                  alt="Flash ID logo"
-                  width={48}
-                  height={48}
-                  className="h-12 w-12 object-contain"
-                  priority
-                />
-              </div>
-            ) : (
+        <div
+          className={`flex items-center ${isCollapsed ? 'h-10 w-10 justify-center' : 'h-10 w-full justify-center'}`}
+        >
+          {isCollapsed ? (
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-clean-white/40 bg-primary-green/30"
+              title={user.name}
+              aria-label={`${user.name} logo`}
+            >
               <Image
-                src={FlashIdWhite}
-                alt="Flash ID logo"
-                width={48}
-                height={48}
-                className="h-12 w-12 object-contain"
+                src={FlashIdLogo}
+                alt="FlashID Logo"
+                width={28}
+                height={28}
+                className="h-7 w-7 object-contain"
                 priority
               />
-            )}
-          </div>
-
-          {!isCollapsed && (
-            <p className="text-xl font-bold whitespace-nowrap">Flash ID</p>
+            </div>
+          ) : (
+            <Image
+              src={FlashIdLogo}
+              alt="FlashID Logo"
+              width={180}
+              height={40}
+              className="h-10 w-auto object-contain"
+              priority
+            />
           )}
         </div>
 
@@ -190,9 +183,7 @@ export const AppSidebar = ({
             {user.initials}
           </div>
 
-          <Button onClick={onLogout} LeftIcon={LogOut}>
-            Logout
-          </Button>
+          <Button onClick={onLogout} LeftIcon={LogOut}></Button>
         </div>
       )}
     </aside>
