@@ -48,15 +48,12 @@ FlashID is composed of four subsystems: Next.js for web portal for citizens, adm
 
 ## 2. Architectural Requirements
 
-### 2.1 Architectural Patterns
+The full architectural requirements, including acceptance criteria and definitions of done for all 12 epics and 49 user stories are documented in:
 
-### 2.2 Design Patterns
-
-### 2.3 Constraints
-
-### 2.4 Architectural Diagram
-
-### 2.5 Mapping Quality Requirements to Architechtural Decisions
+ **[epics_and_user_stories.md](./epics-and-user-stories-v2.md)**
+### Architectural Diagram
+![Architectural Diagram](../images/_architecture_diagram_final.drawio.svg)
+  
 
 ## 3. Technology Requirements
 | Area | Framework | Why
@@ -555,13 +552,13 @@ FlashID distinguishes two environments: **development** and **production**. Both
 All three services deploy automatically on push to their respective branches. There is no manual deployment step for now. Local development is a third, non-deployable environment. Developers will run the stack `pnpm dev` on web, backend and government-registry concurrently. This is with a local SQL Server instance.
 
 ### 5.3 Infrastructure as Code / Containerisation
-
+Web makes use of containeristaion to deploy.
 ### 5.4 Secrets Management
-
+Secrets are manged using Azure Appsettings in each App service. Locally secrets are managed using app.Settings and dotnet user secrets.
 ### 5.5 Rollback Strategy
-
+Make use of Azures rollback service?
 ### 5.6 Deployment Diagram
-
+![Deploymnet Diagram](../images/Deployment_diagram.drawio.svg)
 ### 5.7 CI/CD Pipeline Diagram
 
 ![CI/CD Pipeline Diagram](../images/CICDdiagram.svg)

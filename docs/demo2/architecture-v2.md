@@ -7,8 +7,9 @@
 
 FlashID is a multi-platform digital identity ecosystem built on Clean Architecture principles. The system separates business logic, infrastructure concerns, presentation logic, and data persistence into distinct layers, ensuring maintainability, testability, and scalability.
 
-![FlashID Architecture Diagram](./images/Architecture_Diagram.svg)
+![FlashID Architecture Diagram](../images/_architecture_diagram_final.drawio.svg)
 
+FlashId makes use of an N-Tier architectural pattern. The presentation tier makes use of the Model View ViewModel architectural pattern, with the React App acting as the View and services for integration functioning as the ViewModel and dtos being our model. The Business Tier makes use of CLEAN architecture which is a type of layered architecture to logically seperate business concerns.The Data Tier consists of the FlashID database.
 ---
 
 ## 1. Quality Requirements
