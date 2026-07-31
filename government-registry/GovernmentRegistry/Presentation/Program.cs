@@ -28,7 +28,7 @@ using (var scope = app.Services.CreateScope())
     if (/*app.Environment.IsDevelopment() && */!await context.CitizenRecords.AnyAsync())
     {
         Console.WriteLine("[SEED] Database is empty, seeding sample data...");
-        await DbSeeder.SeedAsync(context);
+        //await DbSeeder.SeedAsync(context);
         Console.WriteLine("[SEED] Database seeded successfully!");
     }
 }
