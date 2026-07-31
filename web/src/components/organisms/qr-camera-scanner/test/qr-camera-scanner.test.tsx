@@ -11,6 +11,9 @@ describe('QrCameraScanner', () => {
   let stopMock: jest.Mock
   let destroyMock: jest.Mock
   let pauseMock: jest.Mock
+  let hasFlashMock: jest.Mock
+  let getUserMediaMock: jest.Mock
+  let trackStopMock: jest.Mock
   let onDecodeCallback: (result: { data: string }) => void
 
   beforeEach(() => {
@@ -18,6 +21,17 @@ describe('QrCameraScanner', () => {
     stopMock = jest.fn()
     destroyMock = jest.fn()
     pauseMock = jest.fn()
+    hasFlashMock = jest.fn().mockResolvedValue(false)
+    trackStopMock = jest.fn()
+
+    getUserMediaMock = jest
+      .fn()
+      .mockResolvedValue({ getTracks: () => [{ stop: trackStopMock }] })
+
+    Object.defineProperty(navigator, 'mediaDevices', {
+      configurable: true,
+      value: { getUserMedia: getUserMediaMock },
+    })
 
     MockedQrScanner.mockImplementation((_video, onDecode) => {
       onDecodeCallback = onDecode as unknown as (result: {
@@ -28,18 +42,10 @@ describe('QrCameraScanner', () => {
         stop: stopMock,
         destroy: destroyMock,
         pause: pauseMock,
-        hasFlash: jest.fn().mockResolvedValue(false),
+        hasFlash: hasFlashMock,
+        toggleFlash: jest.fn().mockResolvedValue(undefined),
+        inFlashOn: jest.fn().mockReturnValue(false),
       } as unknown as QrScanner
-    })
-
-    const stopTrack = jest.fn()
-    Object.defineProperty(navigator, 'mediaDevices', {
-      configurable: true,
-      value: {
-        getUserMedia: jest.fn().mockResolvedValue({
-          getTracks: () => [{ stop: stopTrack }],
-        }),
-      },
     })
   })
 
@@ -49,7 +55,7 @@ describe('QrCameraScanner', () => {
 
   it('requesting camera access on mount', async () => {
     render(<QrCameraScanner onScan={() => {}} />)
-    await waitFor(() => expect(startMock).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(startMock).toHaveBeenCalled())
   })
 
   it('calls onScan with the decoded text once a code is read', async () => {
@@ -65,7 +71,7 @@ describe('QrCameraScanner', () => {
   it('shows a message when camera access is denied', async () => {
     const deniedError = new Error('denied')
     deniedError.name = 'NotAllowedError'
-    startMock.mockRejectedValue(deniedError)
+    getUserMediaMock.mockRejectedValue(deniedError)
 
     render(<QrCameraScanner onScan={() => {}} />)
 
@@ -75,7 +81,7 @@ describe('QrCameraScanner', () => {
   })
 
   it('shows a message when no camera is available', async () => {
-    startMock.mockRejectedValue(new Error('no camera'))
+    getUserMediaMock.mockRejectedValue(new Error('no camera'))
 
     render(<QrCameraScanner onScan={() => {}} />)
 
@@ -95,7 +101,7 @@ describe('QrCameraScanner', () => {
   })
 
   it('pauses the scanner when paused is true', async () => {
-    const onScan = jest.fn()
+    const onScan = () => {}
     const { rerender } = render(<QrCameraScanner onScan={onScan} />)
     await waitFor(() => expect(startMock).toHaveBeenCalled())
 

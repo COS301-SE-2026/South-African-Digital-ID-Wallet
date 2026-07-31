@@ -21,3 +21,11 @@ node_modules/
 
 *.swp
 *.swo
+
+# Test coverage output
+coverage/
+CoverageReport/
+*.cobertura.xml
+
+__azurite*
+Azurite*

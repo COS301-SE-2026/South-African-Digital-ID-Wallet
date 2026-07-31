@@ -4,7 +4,7 @@ on:
   push:
     branches: 
       - main
-      - feature/web-deployment-prod
+      - feature/testing-deployment
     paths:
       - "web/**"
       - "pnpm-lock.yaml"
@@ -18,7 +18,7 @@ env:
 
 jobs:
   deploy-main:
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feature/web-deployment-prod'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feature/testing-deployment'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

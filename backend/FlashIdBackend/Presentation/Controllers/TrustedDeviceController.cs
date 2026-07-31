@@ -30,7 +30,9 @@ public class TrustedDevicesController : ControllerBase
 
             var userId = Guid.Parse(userIdClaim);
 
-            var result = await _trustedDeviceService.GetMyTrustedDevicesAsync(userId);
+            Request.Cookies.TryGetValue("flashid_device", out var currentDeviceToken);
+
+            var result = await _trustedDeviceService.GetMyTrustedDevicesAsync(userId, currentDeviceToken);
 
             return Ok(result);
         }

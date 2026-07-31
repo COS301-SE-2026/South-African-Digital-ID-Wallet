@@ -296,6 +296,44 @@ namespace Infrastructure.Migrations
                     b.ToTable("Credentials");
                 });
 
+            modelBuilder.Entity("Domain.Entities.DeviceVerification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OtpHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("VerifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("DeviceVerifications");
+                });
+
             modelBuilder.Entity("Domain.Entities.DriversLicense", b =>
                 {
                     b.Property<Guid>("Id")
@@ -631,26 +669,16 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CitizenId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DeviceName")
+                    b.Property<string>("DeviceTokenHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
 
-                    b.Property<string>("DeviceType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IpAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsCurrentDevice")
-                        .HasColumnType("bit");
+                    b.Property<int>("DeviceType")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsTrusted")
                         .HasColumnType("bit");
@@ -658,8 +686,10 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("LastActive")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Location")
-                        .IsRequired()
+                    b.Property<string>("LastKnownCity")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastKnownCountry")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OperatingSystem")
@@ -669,9 +699,13 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CitizenId");
+                    b.HasIndex("UserId", "DeviceTokenHash")
+                        .IsUnique();
 
                     b.ToTable("TrustedDevices");
                 });
@@ -764,7 +798,8 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("DomainUsers");
                 });
@@ -1075,6 +1110,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("Citizen");
                 });
 
+            modelBuilder.Entity("Domain.Entities.DeviceVerification", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.DriversLicense", b =>
                 {
                     b.HasOne("Domain.Entities.Credential", "Credential")
@@ -1162,13 +1208,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.TrustedDevice", b =>
                 {
-                    b.HasOne("Domain.Entities.Citizen", "Citizen")
+                    b.HasOne("Domain.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("CitizenId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Citizen");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.UserPreferences", b =>

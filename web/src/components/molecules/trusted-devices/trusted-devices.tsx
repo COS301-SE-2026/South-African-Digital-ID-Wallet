@@ -9,7 +9,8 @@ interface TrustedDeviceResponse {
   id: string
   deviceName: string
   deviceType: string
-  location: string
+  lastKnownCity: string
+  lastKnownCountry: string
   lastActive: string
   isCurrentDevice: boolean
   isTrusted: boolean
@@ -27,19 +28,26 @@ export function TrustedDevices() {
           '/api/trusted-devices/me'
         )
 
-        const mappedDevices: TrustedDevice[] = data.map((device) => ({
-          id: device.id,
-          name: device.deviceName,
-          meta: device.isCurrentDevice
-            ? `Current device • ${device.location}`
-            : `Last active • ${new Date(device.lastActive).toLocaleString()}`,
-          status: device.isCurrentDevice ? 'Active' : 'Known',
-          icon:
-            device.deviceType.toLowerCase().includes('phone') ||
-            device.deviceType.toLowerCase().includes('mobile')
-              ? Smartphone
-              : Monitor,
-        }))
+        const mappedDevices: TrustedDevice[] = data.map((device) => {
+          const location =
+            [device.lastKnownCity, device.lastKnownCountry]
+              .filter((value): value is string => Boolean(value?.trim()))
+              .join(', ') || 'Unknown location'
+
+          return {
+            id: device.id,
+            name: device.deviceName,
+            meta: device.isCurrentDevice
+              ? `Current device • ${location}`
+              : `Last active • ${new Date(device.lastActive).toLocaleString()}`,
+            status: device.isCurrentDevice ? 'Active' : 'Known',
+            icon:
+              device.deviceType.toLowerCase().includes('phone') ||
+              device.deviceType.toLowerCase().includes('mobile')
+                ? Smartphone
+                : Monitor,
+          }
+        })
 
         setDevices(mappedDevices)
       } catch (error) {

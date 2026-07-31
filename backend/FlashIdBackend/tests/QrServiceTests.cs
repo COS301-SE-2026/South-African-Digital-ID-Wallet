@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Services;
@@ -79,6 +80,11 @@ public class QrServiceTests
         public Task SaveChangesAsync() => Task.CompletedTask;
     }
 
+    private sealed class FakePhotoStorageProvider : IPhotoStorageProvider
+    {
+        public Task<string> GenerateReadSasUrlAsync(string blobName, TimeSpan ttl) => Task.FromResult($"https://fake-blob-sas.local/{blobName}");
+    }
+
     private static Credential ValidCredential(Guid userId, CredentialStatus status = CredentialStatus.Active)
     {
         var citizen = new Citizen
@@ -112,7 +118,8 @@ public class QrServiceTests
         var fakeSigningProvider = new FakeQrSigningProvider();
         var fakeQrDisclosureTokenRepo = new FakeQrDisclosureTokenRepository();
         var fakeInstitutionRepo = new FakeInstitutionRepository();
-        var service = new QrService(fakeRepo, fakeSigningProvider, fakeQrDisclosureTokenRepo, fakeInstitutionRepo);
+        var disclosedFieldValueResolver = new DisclosedFieldValueResolver(new FakePhotoStorageProvider());
+        var service = new QrService(fakeRepo, fakeSigningProvider, fakeQrDisclosureTokenRepo, fakeInstitutionRepo, disclosedFieldValueResolver);
 
         return (service, fakeQrDisclosureTokenRepo);
     }

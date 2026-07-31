@@ -35,7 +35,7 @@ public class DeleteAccountServiceTests
 
         repositoryMock.Verify(r => r.DeleteQrDisclosureTokensAsync(citizen.Id), Times.Once);
         repositoryMock.Verify(r => r.DeleteCredentialsAsync(citizen.Id), Times.Once);
-        repositoryMock.Verify(r => r.DeleteTrustedDevicesAsync(citizen.Id), Times.Once);
+        repositoryMock.Verify(r => r.DeleteTrustedDevicesAsync(userId), Times.Once);
         repositoryMock.Verify(r => r.DeleteNotificationsAsync(citizen.Id), Times.Once);
         repositoryMock.Verify(r => r.DeleteCitizenAsync(citizen), Times.Once);
     }
@@ -133,7 +133,7 @@ public class DeleteAccountServiceTests
             .Callback(() => callOrder.Add(nameof(IDeleteAccountRepository.DeleteCredentialsAsync)))
             .Returns(Task.CompletedTask);
         repositoryMock
-            .Setup(r => r.DeleteTrustedDevicesAsync(citizen.Id))
+            .Setup(r => r.DeleteTrustedDevicesAsync(userId))
             .Callback(() => callOrder.Add(nameof(IDeleteAccountRepository.DeleteTrustedDevicesAsync)))
             .Returns(Task.CompletedTask);
         repositoryMock

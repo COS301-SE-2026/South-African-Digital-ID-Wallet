@@ -64,7 +64,9 @@ function getCodeInput() {
 describe('VerifyEmailForm', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockGet.mockReturnValue(VALID_EMAIL)
+    mockGet.mockImplementation((key: string) =>
+      key === 'email' ? VALID_EMAIL : null
+    )
     ;(registerService.verifyEmail as jest.Mock).mockResolvedValue({
       message: 'Email verified successfully',
     })
@@ -95,7 +97,7 @@ describe('VerifyEmailForm', () => {
     })
 
     it('displays "your email" when no email is in the URL', () => {
-      mockGet.mockReturnValue(null)
+      mockGet.mockImplementation(() => null)
       render(<VerifyEmailForm />, { wrapper: createWrapper() })
       expect(screen.getByText(/your email/i)).toBeInTheDocument()
     })

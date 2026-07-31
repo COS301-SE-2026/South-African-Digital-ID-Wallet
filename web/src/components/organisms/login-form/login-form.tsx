@@ -6,12 +6,13 @@ import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/atoms'
 import { useUser } from '@/context/user-context'
 import loginService from '@/services/login-service/login-service'
 import { OtpModal } from '@/components/templates/otp-modal/otp-modal'
 import type { LoginFormProps } from '@/types/login-form'
+import { DeviceType } from '@/types'
 
 const DASHBOARD_ROUTES: Record<string, string> = {
   citizen: '/citizen/citizen-dashboard',
@@ -29,16 +30,59 @@ const getDashboardRoute = (role: string) => {
   return DASHBOARD_ROUTES[normalizedRole] ?? '/citizen/citizen-dashboard'
 }
 
+export function getSafeReturnTo(returnTo: string | null, fallback: string) {
+  if (!returnTo || !returnTo.startsWith('/') || returnTo.startsWith('//')) {
+    return fallback
+  }
+  return returnTo
+}
+
+const getOperatingSystem = () => {
+  const userAgent = window.navigator.userAgent
+  if (userAgent.includes('Windows')) return 'Windows'
+  if (userAgent.includes('Mac OS')) return 'macOS'
+  if (userAgent.includes('Android')) return 'Android'
+  if (userAgent.includes('iPhone') || userAgent.includes('iPad')) return 'iOS'
+  if (userAgent.includes('Linux')) return 'Linux'
+  return 'Unknown'
+}
+
+const getBrowser = () => {
+  const userAgent = window.navigator.userAgent
+  if (userAgent.includes('Edg/')) return 'Microsoft Edge'
+  if (userAgent.includes('Chrome/')) return 'Chrome'
+  if (userAgent.includes('Firefox')) return 'FireFox'
+  if (userAgent.includes('Safari/') && !userAgent.includes('Chrome/'))
+    return 'Safari'
+  return 'Unknown'
+}
+
+const getDeviceType = (): DeviceType => {
+  const userAgent = window.navigator.userAgent
+  if (/iPad|Tablet/i.test(userAgent)) return 'Tablet'
+  if (/Android|iPhone|Mobile/i.test(userAgent)) return 'Mobile'
+  return 'Laptop'
+}
+
 export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [rememberMe, setRememberMe] = React.useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
-  const [otpModalOpen, setOtpModalOpen] = React.useState(true)
-  const [loginAttemptId, setLoginAttemptId] = React.useState('')
+  const [otpModalOpen, setOtpModalOpen] = React.useState(false)
+  const [deviceVerificationId, setDeviceVerificationId] = React.useState('')
+  const [pendingRole, setPendingRole] = React.useState('')
 
   const router = useRouter()
   const { refresh } = useUser()
+
+  const searchParams = useSearchParams()
+  const returnTo = searchParams.get('returnTo')
+  const safeReturnTo = getSafeReturnTo(returnTo, '')
+
+  const registerHref = safeReturnTo
+    ? `/register?returnTo=${encodeURIComponent(safeReturnTo)}`
+    : '/register'
 
   const loginMutation = useMutation<
     Awaited<ReturnType<typeof loginService.login>>,
@@ -52,7 +96,15 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
     mutationFn: (formValues) => loginService.login(formValues),
 
     onSuccess: async (data) => {
-      toast.success('Logged in')
+      if (data.requiresDeviceVerification && data.deviceVerificationId) {
+        setDeviceVerificationId(data.deviceVerificationId)
+        setPendingRole(data.role)
+        setOtpModalOpen(true)
+        toast.success('Enter the verification code sent to your email.')
+        return
+      }
+
+      toast.success('Logged in.')
 
       if (typeof window !== 'undefined') {
         window.localStorage.setItem(
@@ -62,7 +114,9 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
       }
 
       await refresh()
-      router.push(getDashboardRoute(data.role))
+      const dashboardRoute = getDashboardRoute(data.role)
+      const destination = getSafeReturnTo(returnTo, dashboardRoute)
+      router.push(destination)
     },
 
     onError: (err) => {
@@ -71,13 +125,12 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
 
         if (code === 'EMAIL_NOT_VERIFIED') {
           toast.error('Please verify your email address to continue.')
-          router.push(`/verify-email?email=${encodeURIComponent(email)}`)
-          return
-        }
 
-        if (code === 'NEW_DEVICE' && err.response?.data?.loginAttemptId) {
-          setLoginAttemptId(err.response.data.loginAttemptId)
-          setOtpModalOpen(true)
+          const verifyEmailHref = safeReturnTo
+            ? `/verify-email?email=${encodeURIComponent(email)}&returnTo=${encodeURIComponent(safeReturnTo)}`
+            : `/verify-email?email=${encodeURIComponent(email)}`
+
+          router.push(verifyEmailHref)
           return
         }
       }
@@ -103,8 +156,32 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
     loginMutation.mutate(data)
   }
 
-  const handleOtpSuccess = () => {
-    router.push(getDashboardRoute('citizen'))
+  const handleOtpSuccess = async (otp: string) => {
+    if (!deviceVerificationId) {
+      throw new Error('Missing device verification ID.')
+    }
+
+    const data = await loginService.verifyDevice({
+      deviceVerificationId,
+      otp,
+      deviceType: getDeviceType(),
+      operatingSystem: getOperatingSystem(),
+      browser: getBrowser(),
+      rememberMe,
+    })
+    toast.success('Device verified. Logged in.')
+
+    setOtpModalOpen(false)
+    setDeviceVerificationId('')
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('flashid-session-expires-at', data.expiresAt)
+    }
+
+    await refresh()
+
+    const dashboardRoute = getDashboardRoute(data.role || pendingRole)
+    router.push(getSafeReturnTo(returnTo, dashboardRoute)) //TODO: link using return to logic please
   }
 
   return (
@@ -193,8 +270,8 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
             <p>
               Don&apos;t have an account?{' '}
               <Link
-                href="/register"
                 className="font-semibold hover:text-deep-green hover:underline"
+                href={registerHref}
               >
                 Register
               </Link>
@@ -205,7 +282,6 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
 
       <OtpModal
         open={otpModalOpen}
-        loginAttemptId={loginAttemptId}
         onClose={() => setOtpModalOpen(false)}
         onSuccess={handleOtpSuccess}
       />
