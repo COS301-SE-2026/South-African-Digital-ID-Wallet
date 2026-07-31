@@ -74,7 +74,7 @@ t3chtitansgo@gmail.com
 🔗 [Brand style guide](docs/demo2/FlashID.pdf) <br>
 🔗 [Testing Policy Document](docs/demo2/TESTING_POLICY.md) <br>
 🔗 [Coding Standards ](docs/demo2/coding_standards.md) <br>
-🔗 [Presentation](docs/demo2/coding_standards.md) <br>
+🔗 [Presentation](docs/demo2/Demo2Presentation.pdf) <br>
 
 
 </details>
