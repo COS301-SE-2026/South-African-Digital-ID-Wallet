@@ -6,7 +6,7 @@ import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/atoms'
 import { useUser } from '@/context/user-context'
 import loginService from '@/services/login-service/login-service'
@@ -29,6 +29,13 @@ const getDashboardRoute = (role: string) => {
   return DASHBOARD_ROUTES[normalizedRole] ?? '/citizen/citizen-dashboard'
 }
 
+export function getSafeReturnTo(returnTo: string | null, fallback: string) {
+  if (!returnTo || !returnTo.startsWith('/') || returnTo.startsWith('//')) {
+    return fallback
+  }
+  return returnTo
+}
+
 export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
@@ -39,6 +46,14 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
 
   const router = useRouter()
   const { refresh } = useUser()
+
+  const searchParams = useSearchParams()
+  const returnTo = searchParams.get('returnTo')
+  const safeReturnTo = getSafeReturnTo(returnTo, '')
+
+  const registerHref = safeReturnTo
+    ? `/register?returnTo=${encodeURIComponent(safeReturnTo)}`
+    : '/register'
 
   const loginMutation = useMutation<
     Awaited<ReturnType<typeof loginService.login>>,
@@ -62,7 +77,9 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
       }
 
       await refresh()
-      router.push(getDashboardRoute(data.role))
+      const dashboardRoute = getDashboardRoute(data.role)
+      const destination = getSafeReturnTo(returnTo, dashboardRoute)
+      router.push(destination)
     },
 
     onError: (err) => {
@@ -71,7 +88,12 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
 
         if (code === 'EMAIL_NOT_VERIFIED') {
           toast.error('Please verify your email address to continue.')
-          router.push(`/verify-email?email=${encodeURIComponent(email)}`)
+
+          const verifyEmailHref = safeReturnTo
+            ? `/verify-email?email=${encodeURIComponent(email)}&returnTo=${encodeURIComponent(safeReturnTo)}`
+            : `/verify-email?email=${encodeURIComponent(email)}`
+
+          router.push(verifyEmailHref)
           return
         }
 
@@ -193,8 +215,8 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
             <p>
               Don&apos;t have an account?{' '}
               <Link
-                href="/register"
                 className="font-semibold hover:text-deep-green hover:underline"
+                href={registerHref}
               >
                 Register
               </Link>
