@@ -1,0 +1,14 @@
+web/src/components/organisms/verify-email-form/test/verify-email-form.test.tsx
+  h_99fca60b892ff4 67-68,100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "43c7dafea02d70e32beab8fb977e0f6359a4be77",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
