@@ -4,3 +4,5 @@ export type QrDisplayProps = {
   selection: QrDisclosureSelection
   onBack: () => void
 }
+
+export type Status = 'loading' | 'ready' | 'error'

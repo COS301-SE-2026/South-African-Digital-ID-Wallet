@@ -17,12 +17,9 @@ import {
 import { activateCredentialsService } from '@/services/activate-credentials-service'
 import type { CredentialType } from '@/services/activate-credentials-service'
 import { verificationService } from '@/services/verification-service'
+import { VerifyCitizenProps } from './types'
 
 const STEPS = ['Verify Identity', 'Activate Credentials']
-
-type VerifyCitizenProps = {
-  readonly token?: string
-}
 
 export default function VerifyCitizen({ token = '' }: VerifyCitizenProps) {
   const router = useRouter()

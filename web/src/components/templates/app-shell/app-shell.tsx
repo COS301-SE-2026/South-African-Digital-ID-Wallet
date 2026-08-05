@@ -6,8 +6,7 @@ import { useEffect, useState } from 'react'
 import { type UserRole, DEFAULT_USER_ROLE_DASHBOARD } from '@/types/roles'
 import { getAllowedRoles } from '@/config/roles/route-permissions'
 import { useUser } from '@/context/user-context'
-import { AppSidebar } from '../../organisms/app-sidebar/app-sidebar'
-import { AppTopBar } from '../../organisms/app-top-bar/app-top-bar'
+import { AppSidebar, AppTopBar } from '@/components/organisms'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import {
   officialsNavSections,

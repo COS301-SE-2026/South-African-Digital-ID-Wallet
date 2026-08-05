@@ -1,6 +1,5 @@
 import { Text } from '@/components/atoms'
-import { AuthSidebar } from '@/components/organisms'
-import { VerifyEmailForm } from '@/components/organisms/verify-email-form/verify-email-form'
+import { AuthSidebar, VerifyEmailForm } from '@/components/organisms'
 import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import { Suspense } from 'react'
 

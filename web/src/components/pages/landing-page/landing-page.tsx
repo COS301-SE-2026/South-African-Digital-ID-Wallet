@@ -1,12 +1,9 @@
-import { LandingPageNavbar } from '../../organisms/landing-page-navbar/landing-page-navbar'
-import { LandingPageFooter } from '../../organisms/landing-page-footer/landing-page-footer'
+import { LandingPageNavbar, LandingPageFooter } from '@/components/organisms'
 import { Text } from '@/components/atoms'
-import { HelpMenuSection } from '../../molecules/help-menu-section/help-menu-section'
+import { HelpMenuSection } from '@/components/molecules'
 import {
   Check,
   ShieldCheck,
-  Zap,
-  ArrowRight,
   Shield,
   Lock,
   QrCode,
@@ -14,7 +11,6 @@ import {
   UserCheck,
   Building2,
   Landmark,
-  FileWarning,
   KeyRound,
 } from 'lucide-react'
 import Image from 'next/image'

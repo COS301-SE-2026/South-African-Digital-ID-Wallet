@@ -5,7 +5,7 @@ import { toast } from 'react-hot-toast'
 import axios from 'axios'
 import api from '@/lib/api'
 import { Text, Button } from '@/components/atoms'
-import { TextField } from '@/components/molecules'
+import { TextField } from '@/components/molecules/text-field'
 import { UpdatePasswordModalProps } from './types'
 
 export const UpdatePasswordModal: FC<UpdatePasswordModalProps> = ({
@@ -137,5 +137,3 @@ export const UpdatePasswordModal: FC<UpdatePasswordModalProps> = ({
     </div>
   )
 }
-
-export default UpdatePasswordModal

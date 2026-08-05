@@ -7,12 +7,12 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Button } from '@/components/atoms'
 import { useUser } from '@/context/user-context'
 import loginService from '@/services/login-service/login-service'
-import { OtpModal } from '@/components/templates/otp-modal/otp-modal'
-import type { LoginFormProps } from '@/types/login-form'
+import { OtpModal } from '@/components/templates'
+import type { LoginFormProps } from './types'
 import { DeviceType } from '@/types'
+import { getSafeReturnTo } from '@/lib'
 
 const DASHBOARD_ROUTES: Record<string, string> = {
   citizen: '/citizen/citizen-dashboard',
@@ -28,13 +28,6 @@ const getDashboardRoute = (role: string) => {
     .replace(/[_\s-]+/g, '')
 
   return DASHBOARD_ROUTES[normalizedRole] ?? '/citizen/citizen-dashboard'
-}
-
-export function getSafeReturnTo(returnTo: string | null, fallback: string) {
-  if (!returnTo || !returnTo.startsWith('/') || returnTo.startsWith('//')) {
-    return fallback
-  }
-  return returnTo
 }
 
 const getOperatingSystem = () => {

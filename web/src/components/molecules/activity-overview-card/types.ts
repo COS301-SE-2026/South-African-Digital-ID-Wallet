@@ -16,7 +16,7 @@ export type ActivityLogItem = {
   tone: 'green' | 'blue' | 'amber'
 }
 
-export type ActivityItem = {
+export type Activity = {
   id: string
   title: string
   timestamp: string

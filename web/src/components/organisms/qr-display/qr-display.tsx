@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Text } from '@/components/atoms'
 import { qrService } from '@/services/qr-service'
-import type { QrDisplayProps } from './types'
+import type { Status, QrDisplayProps } from './types'
 
 const WARNING_THRESHOLD_SECONDS = 15
 
@@ -17,8 +17,6 @@ function formatTime(seconds: number) {
   const secs = seconds % 60
   return `${mins}:${secs.toString().padStart(2, '0')}`
 }
-
-type Status = 'loading' | 'ready' | 'error'
 
 export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
   const { credentialId, mandatoryFields, selectedOptionalFields } = selection

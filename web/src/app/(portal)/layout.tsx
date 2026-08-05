@@ -1,4 +1,4 @@
-import { AppShell } from '@/components/templates/app-shell/app-shell'
+import { AppShell } from '@/components/templates'
 import { UserProvider } from '@/context/user-context'
 import { SessionTimeoutWatcher } from '@/components/utility/session-timeout-watcher'
 

@@ -34,12 +34,19 @@ const eslintConfig = defineConfig([
         'warn',
         {
           paths: [
-            {name: 'tailwind-merge', message: "Import {cn} from '@/lib/utils'."},
-            {name: 'clsx', message: "Import { cn } from '@/lib/utils'."},
-            {name: 'axios', message: 'axios belongs in services/ only.'},
+            {
+              name: 'tailwind-merge',
+              message: "Import {cn} from '@/lib/utils'.",
+            },
+            { name: 'clsx', message: "Import { cn } from '@/lib/utils'." },
+            { name: 'axios', message: 'axios belongs in services/ only.' },
+            { name: '@/components/ui/button', message: "Use { Button } from '@/components/atoms'."},
           ],
           patterns: [
-            { group: ['../../*'], message: 'Use the @/ alias across folders. '},
+            {
+              group: ['../../*'],
+              message: 'Use the @/ alias across folders. ',
+            },
           ],
         },
       ],

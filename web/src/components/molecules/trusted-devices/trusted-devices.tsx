@@ -2,19 +2,8 @@ import * as React from 'react'
 import { Smartphone, Monitor, Unplug } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import api from '@/lib/api'
-import { DashboardModal } from '@/components/molecules/dashboard-modal/dashboard-modal'
-import type { TrustedDevice } from '@/components/molecules/trusted-devices/types'
-
-interface TrustedDeviceResponse {
-  id: string
-  deviceName: string
-  deviceType: string
-  lastKnownCity: string
-  lastKnownCountry: string
-  lastActive: string
-  isCurrentDevice: boolean
-  isTrusted: boolean
-}
+import { DashboardModal } from '@/components/molecules/dashboard-modal'
+import type { TrustedDevice, TrustedDeviceResponse } from './types'
 
 export function TrustedDevices() {
   const [devices, setDevices] = React.useState<TrustedDevice[]>([])

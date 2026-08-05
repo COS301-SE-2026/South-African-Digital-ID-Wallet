@@ -10,7 +10,7 @@ import React, {
 import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
 import loginService from '@/services/login-service/login-service'
-import type { User, UserContextValue } from '@/types/user-context.types'
+import type { User, UserContextValue } from '@/types/user-context'
 
 const USER_STORAGE_KEY = 'flashid-user'
 

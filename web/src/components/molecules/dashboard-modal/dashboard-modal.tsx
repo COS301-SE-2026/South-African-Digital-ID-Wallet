@@ -1,12 +1,6 @@
-import * as React from 'react'
 import { X } from 'lucide-react'
 
-interface DashboardModalProps {
-  readonly open: boolean
-  readonly title: string
-  readonly children: React.ReactNode
-  readonly onClose: () => void
-}
+import { DashboardModalProps } from './types'
 
 export function DashboardModal({
   open,

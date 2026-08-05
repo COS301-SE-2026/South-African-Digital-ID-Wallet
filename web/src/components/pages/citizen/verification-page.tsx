@@ -3,10 +3,11 @@
 import * as React from 'react'
 import { Text } from '@/components/atoms'
 import { Button } from '@/components/ui/button'
-import { QrCameraScanner } from '@/components/organisms/qr-camera-scanner'
-import { ScanResultCard } from '@/components/organisms/scan-result-card'
-import scanService, { parseScannedToken } from '@/services/scan-service'
-import type { ResolveCredentialResponse } from '@/services/scan-service'
+import { ScanResultCard, QrCameraScanner } from '@/components/organisms'
+import scanService, {
+  parseScannedToken,
+  type ResolveCredentialResponse,
+} from '@/services/scan-service'
 
 type Status = 'scanning' | 'processing' | 'result' | 'error'
 

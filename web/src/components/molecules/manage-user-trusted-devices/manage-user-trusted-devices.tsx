@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { Monitor, Smartphone, Unplug } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { DashboardModal } from '@/components/molecules/dashboard-modal/dashboard-modal'
+import { DashboardModal } from '@/components/molecules/dashboard-modal'
 import api from '@/lib/api'
 
 import type {

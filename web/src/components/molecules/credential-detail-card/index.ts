@@ -1,1 +1,2 @@
-export * from './credential-detial-card'
+export * from './credential-detail-card'
+export * from './types'

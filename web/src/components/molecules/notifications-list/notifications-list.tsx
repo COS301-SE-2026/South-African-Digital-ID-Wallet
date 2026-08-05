@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react'
 import { Bell } from 'lucide-react'
 
 import api from '@/lib/api'
-import type { NotificationItem } from '@/components/molecules/notifications-list/types'
-import { DashboardModal } from '@/components/molecules/dashboard-modal/dashboard-modal'
+import type { NotificationItem } from './types'
+import { DashboardModal } from '@/components/molecules/dashboard-modal'
 import { Button } from '@/components/ui/button'
-import { Text } from '@/components/atoms/text'
+import { Text } from '@/components/atoms'
 
 export function NotificationsList() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([])

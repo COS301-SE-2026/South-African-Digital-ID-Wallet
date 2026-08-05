@@ -1,8 +1,6 @@
 'use client'
 
-import { ManageUserAccount } from '@/components/organisms/manage-user-account'
-import { useUser } from '@/context/user-context'
-import { manageUserAccountNavSections } from '@/config/navigation'
+import { ManageUserAccount } from '@/components/organisms'
 
 export default function ManageUserAccountPage() {
   return <ManageUserAccount />

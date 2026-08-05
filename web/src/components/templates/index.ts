@@ -1,2 +1,2 @@
-export * from './app-shell/app-shell'
-export * from './otp-modal/otp-modal'
+export * from './app-shell'
+export * from './otp-modal'

@@ -15,7 +15,7 @@ jest.mock('@/lib/api', () => ({
   delete: jest.fn(),
 }))
 
-jest.mock('@/components/molecules/dashboard-modal/dashboard-modal', () => ({
+jest.mock('@/components/molecules/dashboard-modal', () => ({
   DashboardModal: ({
     open,
     title,

@@ -1,7 +1,5 @@
 'use client'
 
-import * as React from 'react'
-
 import { ChangePasswordCard } from '@/components/molecules/change-password-card'
 
 import type { ChangePasswordModalProps } from './types'
@@ -41,5 +39,3 @@ export const ChangePasswordModal = ({
     </div>
   )
 }
-
-export default ChangePasswordModal

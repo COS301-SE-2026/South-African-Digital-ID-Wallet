@@ -7,3 +7,14 @@ export type TrustedDevice = {
   status: 'Active' | 'Known'
   icon: LucideIcon
 }
+
+export type TrustedDeviceResponse = {
+  id: string
+  deviceName: string
+  deviceType: string
+  lastKnownCity: string
+  lastKnownCountry: string
+  lastActive: string
+  isCurrentDevice: boolean
+  isTrusted: boolean
+}

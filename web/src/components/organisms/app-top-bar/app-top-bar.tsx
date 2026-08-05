@@ -1,5 +1,5 @@
 import { Bell, ChevronDown, Menu } from 'lucide-react'
-import type { AppTopBarProps } from '@/types/app-top-bar'
+import type { AppTopBarProps } from './types'
 
 export const AppTopBar = ({
   title,

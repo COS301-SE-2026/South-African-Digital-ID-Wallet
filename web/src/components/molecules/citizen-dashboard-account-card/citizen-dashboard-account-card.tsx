@@ -4,7 +4,7 @@ import * as React from 'react'
 import Link from 'next/link'
 import axios from 'axios'
 import api from '@/lib/api'
-import type { AppUser } from '@/components/molecules/citizen-dashboard-account-card/types'
+import type { AppUser } from './types'
 
 export function AccountCardCitizenDashboard() {
   const [user, setUser] = React.useState<AppUser | null>(null)

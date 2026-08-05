@@ -4,13 +4,8 @@ import * as React from 'react'
 import toast from 'react-hot-toast'
 import { RefreshCw, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/atoms'
-import { DashboardModal } from '@/components/molecules/dashboard-modal/dashboard-modal'
-
-type OtpModalProps = {
-  open: boolean
-  onClose: () => void
-  onSuccess: (otp: string) => Promise<void>
-}
+import { DashboardModal } from '@/components/molecules'
+import { OtpModalProps } from './types'
 
 const OTP_LENGTH = 6
 

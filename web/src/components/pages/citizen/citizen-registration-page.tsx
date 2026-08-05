@@ -1,6 +1,5 @@
 import { Text } from '@/components/atoms'
-import { AuthSidebar } from '@/components/organisms'
-import { RegistrationForm } from '@/components/molecules'
+import { AuthSidebar, RegistrationForm } from '@/components/organisms'
 import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'

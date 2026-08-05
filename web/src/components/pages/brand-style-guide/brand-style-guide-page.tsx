@@ -1,7 +1,7 @@
 'use client'
 
 import { Text } from '@/components/atoms'
-import { LandingPageNavbar } from '@/components/organisms/landing-page-navbar/landing-page-navbar'
+import { LandingPageNavbar, LandingPageFooter } from '@/components/organisms'
 import Image from 'next/image'
 import FlashIdLogo from '@/assets/images/flashid.png'
 import { LogoSection } from './logo-section'
@@ -13,7 +13,6 @@ import { VoiceToneSection } from './voice-tone-section'
 import { DesignTokensSection } from './design-tokens-section'
 import { AccessibilitySection } from './accessibility-section'
 import { ChangelogSection } from './change-log'
-import { LandingPageFooter } from '@/components/organisms/landing-page-footer/landing-page-footer'
 
 export default function BrandStyleGuidePage() {
   return (

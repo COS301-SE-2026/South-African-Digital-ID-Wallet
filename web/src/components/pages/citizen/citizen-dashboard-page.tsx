@@ -1,11 +1,13 @@
 'use client'
 
-import { WalletHeroCard } from '@/components/molecules/hero-card-citizen-dashboard/hero-card-citizen-dashboard'
-import { ActivityOverviewCard } from '@/components/molecules/activity-overview-card/activity-overview-card'
-import { CredentialsList } from '@/components/molecules/credentials-list/credentials-list'
-import { TrustedDevices } from '@/components/molecules/trusted-devices/trusted-devices'
-import { NotificationsList } from '@/components/molecules/notifications-list/notifications-list'
-import { AccountCardCitizenDashboard } from '@/components/molecules/citizen-dashboard-account-card/citizen-dashboard-account-card'
+import {
+  AccountCardCitizenDashboard,
+  ActivityOverviewCard,
+  CredentialsList,
+  NotificationsList,
+  TrustedDevices,
+  WalletHeroCard,
+} from '@/components/molecules'
 
 export default function CitizenDashboardPage() {
   return (

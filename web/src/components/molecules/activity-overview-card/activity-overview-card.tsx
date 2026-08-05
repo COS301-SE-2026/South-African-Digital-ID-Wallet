@@ -4,11 +4,8 @@ import { useEffect, useState } from 'react'
 import { CheckCircle2, IdCard, Lock } from 'lucide-react'
 
 import api from '@/lib/api'
-import type {
-  ActivityLogItem,
-  ActivityItem,
-} from '@/components/molecules/activity-overview-card/types'
-import { DashboardModal } from '@/components/molecules/dashboard-modal/dashboard-modal'
+import type { ActivityLogItem, Activity } from './types'
+import { DashboardModal } from '@/components/molecules/dashboard-modal'
 import { Button } from '@/components/ui/button'
 
 export function ActivityOverviewCard() {
@@ -22,7 +19,7 @@ export function ActivityOverviewCard() {
         const { data } = await api.get('/api/activity/me')
 
         const mappedActivity: ActivityLogItem[] = data.map(
-          (activity: ActivityItem) => {
+          (activity: Activity) => {
             let icon = CheckCircle2
             let tone: 'green' | 'blue' | 'amber' = 'green'
 

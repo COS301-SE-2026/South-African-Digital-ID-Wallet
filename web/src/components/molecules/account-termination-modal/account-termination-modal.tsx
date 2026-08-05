@@ -1,7 +1,5 @@
 'use client'
 
-import * as React from 'react'
-
 import type { AccountTerminationModalProps } from './types'
 
 export const AccountTerminationModal = ({
@@ -56,5 +54,3 @@ export const AccountTerminationModal = ({
     </div>
   )
 }
-
-export default AccountTerminationModal

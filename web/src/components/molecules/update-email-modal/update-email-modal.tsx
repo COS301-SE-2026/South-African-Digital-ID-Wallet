@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
 import { Text, Button } from '@/components/atoms'
-import { TextField } from '@/components/molecules'
+import { TextField } from '@/components/molecules/text-field'
 import { manageUserAccountService } from '@/services/manage-user-account-service'
 
 import { UpdateEmailModalProps, Step } from './types'
