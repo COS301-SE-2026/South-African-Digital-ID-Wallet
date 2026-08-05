@@ -1,0 +1,35 @@
+backend/FlashIdBackend/Infrastructure/Infrastructure.csproj
+  h_99fca60b892ff4 27-28
+backend/FlashIdBackend/Presentation/Program.cs
+  h_99fca60b892ff4 158-162,164-167,169
+  s_4a74da681e4f51::t_7ebe4474198c51 155-156,168
+  h_99fca60b892ff4 17,157,163
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_99fca60b892ff4 15-16,45-52,54-56
+  h_99fca60b892ff4 53
+docs/demo2/use-cases-v2.md
+  h_99fca60b892ff4 13,27,44,59,74,89,104
+backend/FlashIdBackend/Presentation/appsettings.json
+  h_99fca60b892ff4 36-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "3312c6b1db92fc7a68c11e788a7523a92305d1f2",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_4a74da681e4f51": {
+      "agent_id": {
+        "tool": "github-copilot-jetbrains",
+        "id": "1785908414624",
+        "model": "unknown"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
