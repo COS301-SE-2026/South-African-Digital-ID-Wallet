@@ -23,7 +23,7 @@ export type ControlledProps = BaseProps & {
   errorMessage?: string
 }
 
-export type FormProps<T extends FieldValues> = BaseProps & {
+export type InnerFormProps<T extends FieldValues> = BaseProps & {
   useFormContext: true
   name: Path<T>
   value?: never
@@ -33,7 +33,7 @@ export type FormProps<T extends FieldValues> = BaseProps & {
 
 export type DropdownProps<T extends FieldValues = FieldValues> =
   | ControlledProps
-  | FormProps<T>
+  | InnerFormProps<T>
 
 export type InnerProps = {
   label?: string
@@ -50,6 +50,6 @@ export type InnerProps = {
   name?: string
 }
 
-export type FormDropdownProps<T extends FieldValues> = FormProps<T> & {
+export type FormDropdownProps<T extends FieldValues> = InnerFormProps<T> & {
   options: DropdownOption[]
 }

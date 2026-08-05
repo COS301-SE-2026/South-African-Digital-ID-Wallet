@@ -1,6 +1,7 @@
 export * from './account-info-row'
 export * from './activity-item'
 export * from './button'
+export * from './form'
 export * from './status-item'
 export * from './status-pill'
 export * from './text'
