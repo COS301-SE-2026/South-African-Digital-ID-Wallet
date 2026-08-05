@@ -40,7 +40,10 @@ const eslintConfig = defineConfig([
             },
             { name: 'clsx', message: "Import { cn } from '@/lib/utils'." },
             { name: 'axios', message: 'axios belongs in services/ only.' },
-            { name: '@/components/ui/button', message: "Use { Button } from '@/components/atoms'."},
+            {
+              name: '@/components/ui/button',
+              message: "Use { Button } from '@/components/atoms'.",
+            },
           ],
           patterns: [
             {
