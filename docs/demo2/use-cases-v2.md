@@ -10,7 +10,7 @@ The following use case diagrams represent the core FlashID workflows develpoed d
 
 The Upload an Institution subsystem allows a government administrator to upload institution data, verify the institution, generate an institution API key, and view the API key after registration.
 
-![Upload Institution Use Case Diagram](./images/Upload_an_Institution.svg)
+![Upload Institution Use Case Diagram](../images/Upload_an_Institution.svg)
 
 ### POPIA Compliance
 
@@ -24,7 +24,7 @@ The Upload an Institution subsystem allows a government administrator to upload 
 
 The Onboard Citizen subsystem allows a Home Affairs official to retrieve a citizen identity record, capture citizen consent, capture contact details, register a pending FlashID account, and send an activation code.
 
-![Onboard Citizen Use Case Diagram](./images/Onboard_Citizen.svg)
+![Onboard Citizen Use Case Diagram](../images/Onboard_Citizen.svg)
 
 ### POPIA Compliance
 
@@ -41,7 +41,7 @@ The Onboard Citizen subsystem allows a Home Affairs official to retrieve a citiz
 
 The Citizen Registration subsystem allows citizens to register for a FlashID account. Registration may occur using an activation code or through physical ID verification.
 
-![Citizen Registration Use Case Diagram](./images/Citizen_Registration.svg)
+![Citizen Registration Use Case Diagram](../images/Citizen_Registration.svg)
 
 ### POPIA Compliance
 
@@ -56,7 +56,7 @@ The Citizen Registration subsystem allows citizens to register for a FlashID acc
 
 The Issue Credentials subsystem allows authorised officials to verify a citizen and issue signed digital credentials. The system supports generating signed digital IDs and signed digital driver’s licences, then notifying the citizen once the credential has been issued.
 
-![Issue Credentials Use Case Diagram](./images/Issue_Credentials.svg)
+![Issue Credentials Use Case Diagram](../images/Issue_Credentials.svg)
 
 ### POPIA Compliance
 
@@ -71,7 +71,7 @@ The Issue Credentials subsystem allows authorised officials to verify a citizen 
 
 The Access Credentials subsystem allows citizens to log in, view their credentials, generate certified copies, generate QR codes, scan QR codes, and control selective disclosure preferences.
 
-![Access Credentials Use Case Diagram](./images/Access_Credentials.svg)
+![Access Credentials Use Case Diagram](../images/Access_Credentials.svg)
 
 ### POPIA Compliance
 
@@ -86,7 +86,7 @@ The Access Credentials subsystem allows citizens to log in, view their credentia
 
 The Account Management subsystem allows citizens to maintain their FlashID account details and security settings. This includes changing passwords, updating usernames, updating contact details, and managing trusted devices.
 
-![Account Management Use Case Diagram](./images/Account_Management.svg)
+![Account Management Use Case Diagram](../images/Account_Management.svg)
 
 ### POPIA Compliance
 
@@ -101,7 +101,7 @@ The Account Management subsystem allows citizens to maintain their FlashID accou
 
 The Credentials Management subsystem allows the system and government administrators to manage the lifecycle of citizen credentials. This includes expiring driver’s licences, reactivating renewed licences, updating citizen credentials, investigating credentials, and viewing audit logs.
 
-![Credentials Management Use Case Diagram](./images/Credentials_Management.svg)
+![Credentials Management Use Case Diagram](../images/Credentials_Management.svg)
 
 ### POPIA Compliance
 

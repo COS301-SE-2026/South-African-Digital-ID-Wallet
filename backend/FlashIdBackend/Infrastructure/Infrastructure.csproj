@@ -24,6 +24,8 @@
         <PackageReference Include="NSec.Cryptography" Version="26.4.0" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
         <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
+        <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.46.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
     
     <ItemGroup>
