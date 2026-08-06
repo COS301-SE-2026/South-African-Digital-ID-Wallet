@@ -1,0 +1,15 @@
+backend/FlashIdBackend/tests/QrServiceIntegrationTests.cs
+  h_99fca60b892ff4 13,35-66,96-101,104,109,111,205,211,214-215,267,298
+  h_99fca60b892ff4 95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "2b1dbdd965ee09152675ffda965dc61baae70ddb",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
