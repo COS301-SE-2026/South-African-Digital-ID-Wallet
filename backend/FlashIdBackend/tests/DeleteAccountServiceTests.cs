@@ -33,7 +33,6 @@ public class DeleteAccountServiceTests
 
         await service.DeleteAccountAsync(userId);
 
-        repositoryMock.Verify(r => r.DeleteQrDisclosureTokensAsync(citizen.Id), Times.Once);
         repositoryMock.Verify(r => r.DeleteCredentialsAsync(citizen.Id), Times.Once);
         repositoryMock.Verify(r => r.DeleteTrustedDevicesAsync(userId), Times.Once);
         repositoryMock.Verify(r => r.DeleteNotificationsAsync(citizen.Id), Times.Once);
@@ -80,7 +79,6 @@ public class DeleteAccountServiceTests
 
         await service.DeleteAccountAsync(userId);
 
-        repositoryMock.Verify(r => r.DeleteQrDisclosureTokensAsync(It.IsAny<Guid>()), Times.Never);
         repositoryMock.Verify(r => r.DeleteCredentialsAsync(It.IsAny<Guid>()), Times.Never);
         repositoryMock.Verify(r => r.DeleteTrustedDevicesAsync(It.IsAny<Guid>()), Times.Never);
         repositoryMock.Verify(r => r.DeleteNotificationsAsync(It.IsAny<Guid>()), Times.Never);
@@ -125,10 +123,6 @@ public class DeleteAccountServiceTests
             .Setup(r => r.GetCitizenByUserIdAsync(userId))
             .ReturnsAsync(citizen);
         repositoryMock
-            .Setup(r => r.DeleteQrDisclosureTokensAsync(citizen.Id))
-            .Callback(() => callOrder.Add(nameof(IDeleteAccountRepository.DeleteQrDisclosureTokensAsync)))
-            .Returns(Task.CompletedTask);
-        repositoryMock
             .Setup(r => r.DeleteCredentialsAsync(citizen.Id))
             .Callback(() => callOrder.Add(nameof(IDeleteAccountRepository.DeleteCredentialsAsync)))
             .Returns(Task.CompletedTask);
@@ -164,7 +158,6 @@ public class DeleteAccountServiceTests
         Assert.Equal(
             new[]
             {
-                nameof(IDeleteAccountRepository.DeleteQrDisclosureTokensAsync),
                 nameof(IDeleteAccountRepository.DeleteCredentialsAsync),
                 nameof(IDeleteAccountRepository.DeleteTrustedDevicesAsync),
                 nameof(IDeleteAccountRepository.DeleteNotificationsAsync),
