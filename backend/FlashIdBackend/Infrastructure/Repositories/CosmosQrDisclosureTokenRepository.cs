@@ -9,7 +9,7 @@ namespace Infrastructure.Repositories;
 
 public class CosmosQrDisclosureTokenRepository : IQrDisclosureTokenRepository
 {
-    private const int ClaimTtlSeconds = 300;
+    private const int ClaimTtlSeconds = 120;
     private readonly Container _container;
     private readonly byte[] _hmacKey;
 
