@@ -1,0 +1,30 @@
+docs/demo3/SRS-v3.md
+  h_99fca60b892ff4 1-321
+docs/demo3/SAS-v2.md
+  h_99fca60b892ff4 1-590
+docs/demo3/architecture-v3.md
+  h_99fca60b892ff4 2-190
+  h_99fca60b892ff4 1
+docs/demo3/functional-requirements-v3.md
+  h_99fca60b892ff4 2-600
+  h_99fca60b892ff4 1
+docs/demo3/TESTING_POLICY.md
+  h_99fca60b892ff4 1-112
+docs/demo3/coding_standards.md
+  h_99fca60b892ff4 1-267
+docs/demo3/epics-and-user-stories-v3.md
+  h_99fca60b892ff4 1-907
+docs/demo3/use-cases-v3.md
+  h_99fca60b892ff4 1-113
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "6178743d0ea741fc9a12043d96d9f7cce3f12b8f",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
