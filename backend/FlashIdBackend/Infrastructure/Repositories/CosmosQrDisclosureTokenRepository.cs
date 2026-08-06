@@ -24,15 +24,15 @@ public class CosmosQrDisclosureTokenRepository : IQrDisclosureTokenRepository
     }
 
     // creates the claim doc at QR generation time
-    public async Task AddAsync(QrDisclosureToken qrDisclosureToken)
+    public async Task AddAsync(QrDisclosureToken token)
     {
         var doc = new QrTokenClaimDocument
         {
-            Id = qrDisclosureToken.Jti.ToString(),
-            Jti = qrDisclosureToken.Jti,
-            CredentialIdHash = HashCredentialId(qrDisclosureToken.CredentialId),
+            Id = token.Jti.ToString(),
+            Jti = token.Jti,
+            CredentialIdHash = HashCredentialId(token.CredentialId),
             UsedAt = null,
-            ExpiresAt = qrDisclosureToken.ExpiresAt,
+            ExpiresAt = token.ExpiresAt,
             Ttl = ClaimTtlSeconds,
         };
 
@@ -64,9 +64,9 @@ public class CosmosQrDisclosureTokenRepository : IQrDisclosureTokenRepository
     }
 
     // called when a new QR is generated for a credential. Kills any active/previous QR for same cred.
-    public async Task InvalidateActiveTokensForCredentialAsync(Guid credId)
+    public async Task InvalidateActiveTokensForCredentialAsync(Guid credentialId)
     {
-        var hash = HashCredentialId(credId);
+        var hash = HashCredentialId(credentialId);
 
         // have to use Microsoft's native Cosmos SDK
         var query = new QueryDefinition(
@@ -94,10 +94,10 @@ public class CosmosQrDisclosureTokenRepository : IQrDisclosureTokenRepository
     }
 
     // keyed hash of raw credentialId, so read access to this container alone can't be joined back to a real credential in SQL
-    private string HashCredentialId(Guid credId)
+    private string HashCredentialId(Guid credentialId)
     {
         using var hmac = new HMACSHA256(_hmacKey);
-        var hash = hmac.ComputeHash(credId.ToByteArray());
+        var hash = hmac.ComputeHash(credentialId.ToByteArray());
 
         return Convert.ToHexString(hash);
     }

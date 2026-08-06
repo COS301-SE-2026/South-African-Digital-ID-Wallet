@@ -42,7 +42,6 @@ public static class DependencyInjection
 
         services.AddScoped<ICredentialRepository, CredentialRepository>();
         services.AddSingleton<IQrSigningProvider, Ed25519SigningProvider>();
-        // services.AddScoped<IQrDisclosureTokenRepository, QrDisclosureTokenRepository>();
         services.AddSingleton(n =>
         {
             var configuration = n.GetRequiredService<IConfiguration>();
