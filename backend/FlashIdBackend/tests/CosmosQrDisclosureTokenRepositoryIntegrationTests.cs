@@ -9,7 +9,7 @@ namespace tests;
 
 public class CosmosQrDisclosureTokenRepositoryIntegrationTests
 {
-    private static (IQrDisclosureTokenRepository Repo, CosmosClient Client)? TryCreateReposirory()
+    private static (IQrDisclosureTokenRepository Repo, CosmosClient Client)? TryCreateRepository()
     {
         var connectonString = Environment.GetEnvironmentVariable("COSMOS_TEST_CONNECTION_STRING");
 
@@ -22,7 +22,7 @@ public class CosmosQrDisclosureTokenRepositoryIntegrationTests
             {
                 ["Cosmos:DatabaseName"] = Environment.GetEnvironmentVariable("COSMOS_TEST_DB_NAME") ?? "FlashIdQrDb",
                 ["Cosmos:ContainerName"] =
-                    Environment.GetEnvironmentVariable("COSMOS_TEST_CONTAINER_NAME") ?? "QrTokenClaim",
+                    Environment.GetEnvironmentVariable("COSMOS_TEST_CONTAINER_NAME") ?? "QrTokenClaims",
                 ["Cosmos:CredentialIdHmacKey"] = hmacKey,
             })
             .Build();
@@ -38,7 +38,7 @@ public class CosmosQrDisclosureTokenRepositoryIntegrationTests
     [Fact]
     public async Task AddAsync_ThenTryMarkUsedAsync_ClaimsExactlyOnce()
     {
-        var setup = TryCreateReposirory();
+        var setup = TryCreateRepository();
         if (setup is null)
         {
             Assert.Skip("COSMOS_TEST_CONNECTION_STRING not set");
@@ -69,7 +69,7 @@ public class CosmosQrDisclosureTokenRepositoryIntegrationTests
     [Fact]
     public async Task InvalidateActiveTokensForCredentialAsync_InvalidatesUnclaimedToken()
     {
-        var setup = TryCreateReposirory();
+        var setup = TryCreateRepository();
 
         if (setup is null)
         {
@@ -85,7 +85,7 @@ public class CosmosQrDisclosureTokenRepositoryIntegrationTests
         {
             Id = Guid.NewGuid(),
             Jti = Guid.NewGuid(),
-            CredentialId = Guid.NewGuid(),
+            CredentialId = credentialId,
             ExpiresAt = DateTime.UtcNow.AddMinutes(1),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
