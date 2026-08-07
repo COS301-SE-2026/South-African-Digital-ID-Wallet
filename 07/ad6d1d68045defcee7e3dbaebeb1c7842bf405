@@ -1,0 +1,14 @@
+web/src/components/molecules/form-checkbox-field/form-checkbox-field.tsx
+  h_712d174fc3f309 1-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "07ad6d1d68045defcee7e3dbaebeb1c7842bf405",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
