@@ -59,7 +59,7 @@ describe('AppSidebar', () => {
 
     expect(
       screen.getByRole('link', {
-        name: /go to home dashboard/i,
+        name: /go to dashboard/i,
       })
     ).toHaveAttribute('href', '/citizen/citizen-dashboard')
   })
