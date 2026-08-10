@@ -13,6 +13,8 @@ public class Institution : BaseEntity
 
     // SHA-256 hash of the current active API key, never the plaintext value
     public string ApiKeyHash { get; set; } = string.Empty;
+    public DateTime ApiKeyGeneratedAt { get; set; }
+
     public string VerificationNumber { get; set; } = string.Empty;
 
     public string ContactEmail { get; set; } = string.Empty;

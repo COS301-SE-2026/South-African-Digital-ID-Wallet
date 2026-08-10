@@ -48,6 +48,7 @@ public class InstitutionService : IInstitutionService
             ContactEmail = request.ContactEmail,
             ApiKeyReference = apiKeyReference,
             ApiKeyHash = HashApiKey(apiKey),
+            ApiKeyGeneratedAt = DateTime.UtcNow,
             RegisteredById = request.AdminId,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
@@ -169,6 +170,7 @@ public class InstitutionService : IInstitutionService
         var newApiKey = GenerateApiKey();
         institution.ApiKeyHash = HashApiKey(newApiKey);
         institution.ApiKeyReference = Guid.NewGuid();
+        institution.ApiKeyGeneratedAt = DateTime.UtcNow;
         institution.UpdatedAt = DateTime.UtcNow;
 
         var auditLog = new AuditLog
