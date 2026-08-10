@@ -47,7 +47,7 @@ export const AppSidebar = ({
 }: Readonly<AppSidebarProps>) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const pathname = usePathname()
-
+  const dashboardHref = navSections[0]?.items[0]?.href ?? '/'
   const css = isCollapsed ? 'w-24' : 'w-64'
 
   return (
@@ -63,35 +63,38 @@ export const AppSidebar = ({
           isCollapsed ? 'justify-center' : 'justify-between'
         }`}
       >
-        <div
-          className={`flex items-center ${isCollapsed ? 'h-10 w-10 justify-center' : 'h-10 w-full justify-center'}`}
+        <Link
+          href={dashboardHref}
+          onClick={() => onNavigate?.()}
+          className={`flex items-center ${
+            isCollapsed
+              ? 'h-10 w-10 justify-center'
+              : 'h-10 w-full justify-center'
+          }`}
+          aria-label="Go to dashboard"
         >
           {isCollapsed ? (
             <div
               className="flex h-10 w-10 items-center justify-center rounded-xl border border-clean-white/40 bg-primary-green/30"
               title={user.name}
-              aria-label={`${user.name} logo`}
             >
               <Image
                 src={FlashIdLogo}
                 alt="FlashID Logo"
-                width={28}
-                height={28}
-                className="h-7 w-7 object-contain"
-                priority
+                width={32}
+                height={32}
               />
             </div>
           ) : (
             <Image
               src={FlashIdLogo}
               alt="FlashID Logo"
-              width={180}
+              width={140}
               height={40}
-              className="h-10 w-auto object-contain"
               priority
             />
           )}
-        </div>
+        </Link>
 
         {variant === 'desktop' && (
           <button
