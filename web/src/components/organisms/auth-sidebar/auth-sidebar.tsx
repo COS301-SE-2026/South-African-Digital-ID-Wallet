@@ -1,28 +1,32 @@
 import Image from 'next/image'
 import { LockKeyhole, Zap, Shield, Share2 } from 'lucide-react'
 
-import FlashIdWhite from '@/assets/images/FlashID-white.png'
+import FlashIdLogo from '@/assets/images/FlashID-green.png'
 import { Text } from '@/components/atoms'
 
 export const AuthSidebar = () => {
   return (
-    <div className="hidden lg:flex w-2/5 bg-linear-to-b from-secure-night to-deep-green text-clean-white p-10 flex-col justify-between min-h-screen rounded-tr-3xl rounded-br-3xl">
+    <div className="hidden lg:flex w-2/5 bg-deep-green text-clean-white p-10 flex-col justify-between min-h-screen rounded-tr-3xl rounded-br-3xl">
       <div>
-        <div className="flex items-center gap-4 mb-8">
-          <div className="rounded-2xl w-14 h-14 overflow-hidden shadow-lg">
-            <Image src={FlashIdWhite} alt="Flash ID" width={56} height={56} />
-          </div>
-
+        <div className="mb-8">
+          <Image
+            src={FlashIdLogo}
+            alt="Flash ID"
+            width={280}
+            height={90}
+            className="h-28 w-auto object-contain"
+            priority
+          />
           <div>
-            <Text variant="h1" className="text-clean-white">
-              Flash ID
-            </Text>
-            <Text variant="sub-md" className="text-primary-white">
-              Secure Digital Identity Platform
+            <Text
+              variant="sub-sm"
+              className="text-clean-white/60 tracking-[0.15em] uppercase font-semibold"
+            >
+              Prove yourself in a{' '}
+              <span className="text-accent-gold">Flash</span>
             </Text>
           </div>
         </div>
-
         <Text variant="h2" className="text-clean-white leading-tight mb-4">
           Fast. Secured.
           <br />

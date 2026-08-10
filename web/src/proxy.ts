@@ -3,18 +3,20 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { DEFAULT_USER_ROLE_DASHBOARD, type UserRole } from '@/types/roles'
 
+const ACTIVATE_CREDENTIALS_ROUTE = '/citizen/activate-credentials'
+
 export async function proxy(req: NextRequest) {
   const token = req.cookies.get('access_token')?.value
 
   if (!token) {
-    return NextResponse.redirect(new URL('/', req.url))
+    return redirectToLogin(req)
   }
 
   try {
     const jwtSecret = process.env.JWT_SECRET
 
     if (!jwtSecret) {
-      return NextResponse.redirect(new URL('/', req.url))
+      return redirectToLogin(req)
     }
 
     const secret = new TextEncoder().encode(jwtSecret)
@@ -27,7 +29,7 @@ export async function proxy(req: NextRequest) {
     const role = payload['role'] as string | undefined
 
     if (!sub || !role) {
-      return NextResponse.redirect(new URL('/', req.url))
+      return redirectToLogin(req)
     }
 
     const dashboardRole = DEFAULT_USER_ROLE_DASHBOARD[role as UserRole]
@@ -35,11 +37,23 @@ export async function proxy(req: NextRequest) {
     if (!dashboardRole || !req.nextUrl.pathname.startsWith(dashboardRole)) {
       return NextResponse.redirect(new URL(dashboardRole ?? '/', req.url))
     }
+    return NextResponse.next()
   } catch {
-    return NextResponse.redirect(new URL('/', req.url))
+    return redirectToLogin(req)
+  }
+}
+
+function redirectToLogin(req: NextRequest) {
+  const loginUrl = new URL('/login', req.url)
+
+  const shouldPreserveReturnTo =
+    req.nextUrl.pathname === ACTIVATE_CREDENTIALS_ROUTE
+  if (shouldPreserveReturnTo) {
+    const requestedPath = `${req.nextUrl.pathname}${req.nextUrl.search ?? ''}`
+    loginUrl.searchParams.set('returnTo', requestedPath)
   }
 
-  return NextResponse.next()
+  return NextResponse.redirect(loginUrl)
 }
 
 export const config = {

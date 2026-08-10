@@ -8,13 +8,23 @@ export const citizenNavSections: SidebarNavSection[] = [
   {
     title: 'Citizen Portal',
     items: [
-      { label: 'Dashboard', href: '/citizen', icon: 'dashboard' },
+      {
+        label: 'Dashboard',
+        href: '/citizen/citizen-dashboard',
+        icon: 'dashboard',
+      },
       {
         label: 'My Credentials',
-        href: '/under-construction',
+        href: '/citizen/my-credentials',
         icon: 'credentials',
       },
-      { label: 'Share QR Code', href: '/under-construction', icon: 'qr' },
+      { label: 'Verifications', href: '/citizen/verifications', icon: 'users' },
+      { label: 'Share QR Code', href: '/citizen/qr', icon: 'qr' },
+      {
+        label: 'Activate Credentials',
+        href: '/citizen/activate-credentials',
+        icon: 'shield',
+      },
       {
         label: 'Notifications',
         href: '/under-construction',
@@ -22,7 +32,6 @@ export const citizenNavSections: SidebarNavSection[] = [
       },
     ],
   },
-
   {
     title: 'Security',
     items: [
@@ -32,8 +41,8 @@ export const citizenNavSections: SidebarNavSection[] = [
         icon: 'history',
       },
       {
-        label: 'Privacy Settings',
-        href: '/under-construction',
+        label: 'Manage Account',
+        href: '/citizen/manage-user-account',
         icon: 'settings',
       },
     ],
@@ -86,6 +95,11 @@ export const officialsNavSections: SidebarNavSection[] = [
         icon: 'onboard',
       },
       {
+        label: 'Verifications',
+        href: '/officials/verifications',
+        icon: 'users',
+      },
+      {
         label: 'Notifications',
         href: '/under-construction',
         icon: 'notifications',
@@ -103,7 +117,7 @@ export const officialsNavSections: SidebarNavSection[] = [
       },
       {
         label: 'Privacy Settings',
-        href: '/under-construction',
+        href: '/privacy-settings',
         icon: 'settings',
       },
     ],
@@ -133,11 +147,6 @@ export const manageUserAccountNavSections: SidebarNavSection[] = [
         label: 'Verification History',
         href: '/verification-history',
         icon: 'history',
-      },
-      {
-        label: 'Privacy Settings',
-        href: '/privacy-settings',
-        icon: 'settings',
       },
       {
         label: 'Security & Recovery',

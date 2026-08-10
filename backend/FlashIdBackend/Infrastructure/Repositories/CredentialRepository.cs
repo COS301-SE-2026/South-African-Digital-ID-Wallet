@@ -14,6 +14,23 @@ public class CredentialRepository : ICredentialRepository
         _context = context;
     }
 
+    public async Task<Citizen?> GetCitizenByUserIdAsync(Guid userId)
+    {
+        return await _context.Citizens
+            .FirstOrDefaultAsync(c => c.UserId == userId);
+    }
+
+    public async Task<List<Credential>> GetCredentialsByCitizenIdAsync(Guid citizenId)
+    {
+        return await _context.Credentials
+            .AsNoTracking()
+            .Include(c => c.IdentityDocument)
+            .Include(c => c.DriversLicense)
+            .Where(c => c.CitizenId == citizenId)
+            .OrderBy(c => c.IssueDate)
+            .ToListAsync();
+    }
+
     public async Task<Credential?> GetByIdAsync(Guid id)
     {
         return await _context.Credentials
@@ -31,5 +48,10 @@ public class CredentialRepository : ICredentialRepository
             .Include(c => c.DriversLicense)
             .Where(c => c.Citizen.UserId == userId)
             .ToListAsync();
+    }
+
+    public async Task<Citizen?> GetCitizenByIdAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        return await _context.Citizens.FirstOrDefaultAsync(c => c.UserId == userId, cancellationToken);
     }
 }

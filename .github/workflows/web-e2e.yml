@@ -1,0 +1,132 @@
+name: Web E2E
+
+on:
+  pull_request:
+    branches: ["main", "dev"]
+    paths: ["web/**", "backend/**"]
+  workflow_dispatch:
+
+concurrency:
+  group: web-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: Playwright E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          MSSQL_SA_PASSWORD: "YourStrong!Passw0rd"
+          MSSQL_PID: "Express"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'YourStrong!Passw0rd' -Q 'SELECT 1' -b -o /dev/null"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 15
+          --health-start-period 30s
+
+    env:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://localhost:5118
+      ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=FlashIdDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;"
+      NEXT_PUBLIC_API_URL: http://localhost:5118
+      E2E_BASE_URL: http://localhost:3000
+      Jwt__Key: dev-only-super-secret-key-that-is-long-enough-123456789
+      JWT_SECRET: dev-only-super-secret-key-that-is-long-enough-123456789
+      Qr__Ed25519PrivateKey: ${{ secrets.QR_ED25519_PRIVATE_KEY }}
+      BlobStorage__ConnectionString: UseDevelopmentStorage=true
+      E2E_PASSWORD: password123
+      E2E_CITIZEN_EMAIL: citizen.e2e@flashid.local
+      E2E_GOVADMIN_EMAIL: govadmin.e2e@flashid.local
+      E2E_OFFICIAL_EMAIL: official.e2e@flashid.local
+
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "20"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+        with:
+          version: 9.15.9
+
+      - name: Install web dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+        working-directory: ./web
+
+      - name: Restore backend
+        run: dotnet restore backend/FlashIdBackend/FlashIdBackend.sln
+
+      - name: Start backend (migrations and seeds)
+        run: |
+          nohup dotnet run --project backend/FlashIdBackend/Presentation/Presentation.csproj \
+            > backend.log 2>&1 &
+
+      - name: Wait for backend
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://localhost:5118/swagger/index.html >/dev/null 2>&1; then
+              echo "Backend up after $((i*3))s"; exit 0
+            fi
+              sleep 3
+          done
+          echo "Backend failed to start. Log:"; cat backend.log; exit 1
+
+      - name: Seed E2E data
+        run: dotnet run --project backend/FlashIdBackend/Tools/SeedRunner/SeedRunner.csproj -- "${{ env.ConnectionStrings__DefaultConnection }}"
+        
+      - name: Verify E2E accounts exist
+        run: |
+          echo " seeding lines "
+          grep -a "\[SEED\]" backend.log || echo "!! NO [SEED] LINES - seeder never ran"
+          echo " smoke test "
+          fail=0
+          for e in citizen govadmin official; do
+            code=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
+              -X POST http://localhost:5118/api/auth/login \
+              -H "Content-Type: application/json" \
+              -d "{\"email\":\"$e.e2e@flashid.local\",\"password\":\"password123\",\"rememberMe\":false}")
+            echo "$e.e2e@flashid.local -> HTTP $code $(cat /tmp/resp.json)"
+            [ "$code" = "200" ] || fail=1
+          done
+          [ $fail -eq 0 ] || { echo "::error::E2E accounts missing or backend rejecting logins"; exit 1; }
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium firefox # NOSONAR - not a package install; no --ignore-scripts option exists
+        working-directory: ./web
+
+      - name: Run Playwright E2E
+        run: pnpm run test:e2e
+        working-directory: ./web
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: web/playwright-report
+          retention-days: 7
+
+      - name: Upload backend log
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: failure()
+        with:
+          name: backend-log
+          path: backend.log
+          retention-days: 7
+

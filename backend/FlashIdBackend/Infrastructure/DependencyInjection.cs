@@ -4,12 +4,15 @@ using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Domain.Entities;
+using Infrastructure.Gateways.GovernmentRegistry;
 using Infrastructure.Providers;
 using Infrastructure.Repositories;
-using Infrastructure.Services.GovernmentRegistry;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Azure.Storage.Blobs;
+using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Common.Services;
 
 namespace Infrastructure;
 
@@ -26,12 +29,32 @@ public static class DependencyInjection
         services.AddScoped<IOnboardingRepository, OnboardingRepository>();
 
         services.AddScoped<ICitizenRepository, CitizenRepository>();
+        services.AddScoped<ICredentialRepository, CredentialRepository>();
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
+        services.AddScoped<ITrustedDeviceRepository, TrustedDeviceRepository>();
+        services.AddScoped<IActivityOverviewRepository, ActivityOverviewRepository>();
+        services.AddScoped<IDashboardAccountCardRepository, DashboardAccountCardRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddSingleton<IDeviceTokenProvider, DeviceTokenProvider>();
 
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
 
         services.AddScoped<ICredentialRepository, CredentialRepository>();
         services.AddSingleton<IQrSigningProvider, Ed25519SigningProvider>();
+        services.AddScoped<IQrDisclosureTokenRepository, QrDisclosureTokenRepository>();
+        services.AddSingleton(n =>
+        {
+            var configuration = n.GetRequiredService<IConfiguration>();
+            var connectionString = configuration["BlobStorage:ConnectionString"] ?? throw new InvalidOperationException("BlobStorage:ConnectionString not configured.");
+            return new BlobServiceClient(connectionString);
+        });
+        services.AddSingleton<IPhotoStorageProvider, AzureBlobPhotoStorageProvider>();
+        services.AddScoped<IDisclosedFieldsValueResolver, DisclosedFieldValueResolver>();
+
+        services.AddScoped<IOfficialRepository, OfficialRepository>();
+        services.AddScoped<IManageUserAccountRepository, ManageUserAccountRepository>();
+        services.AddScoped<IUpdatePasswordRepository, UpdatePasswordRepository>();
+        services.AddScoped<IDeleteAccountRepository, DeleteAccountRepository>();
 
         services.AddHttpClient<IGovernmentRegistryGateway, GovernmentRegistryGateway>((serviceProvider, client) =>
         {
@@ -62,7 +85,8 @@ public static class DependencyInjection
         });
 
         services.AddScoped<ISmsProvider, AzureCommunicationSmsProvider>();
-
+        services.AddScoped<IVerificationRepository, VerificationRepository>();
+        services.AddScoped<ICredentialsActivationRepository, CredentialsActivationRepository>();
         return services;
     }
 }

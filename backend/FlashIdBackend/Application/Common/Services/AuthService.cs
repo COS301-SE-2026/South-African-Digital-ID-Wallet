@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
@@ -7,6 +9,7 @@ using Application.Features.Auth.Exceptions;
 using Application.Features.Citizens.DTOs;
 using Domain.Entities;
 using Domain.Enums;
+using Microsoft.Extensions.Hosting;
 
 namespace Application.Common.Services;
 
@@ -18,21 +21,35 @@ public class AuthService : IAuthService
     private readonly ICitizenService _citizenService;
     private readonly AuthMapper _mapper;
 
+    private readonly ITrustedDeviceRepository _trustedDeviceRepository;
+    private readonly IDeviceTokenProvider _deviceTokenProvider;
+    private readonly IEmailSenderProvider _emailSenderProvider;
+    private readonly IHostEnvironment _environment;
+
     public AuthService(
         IAuthRepository authRepository,
         IJwtTokenProvider jwtTokenProvider,
         IPasswordHashingProvider passwordHashingProvider,
         ICitizenService citizenService,
-        AuthMapper mapper)
+        AuthMapper mapper,
+        ITrustedDeviceRepository trustedDeviceRepository,
+        IDeviceTokenProvider deviceTokenProvider,
+        IEmailSenderProvider emailSenderProvider,
+            IHostEnvironment environment)
     {
         _authRepository = authRepository;
         _jwtTokenProvider = jwtTokenProvider;
         _passwordHashingProvider = passwordHashingProvider;
         _citizenService = citizenService;
         _mapper = mapper;
+        _trustedDeviceRepository = trustedDeviceRepository;
+        _deviceTokenProvider = deviceTokenProvider;
+        _emailSenderProvider = emailSenderProvider;
+        _environment = environment;
+
     }
 
-    public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request, string ipAddress)
+    public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request, string? deviceToken, string ipAddress, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.Email))
             throw new UnauthorizedAccessException("Email is required.");
@@ -40,7 +57,6 @@ public class AuthService : IAuthService
         if (string.IsNullOrWhiteSpace(request.Password))
             throw new UnauthorizedAccessException("Password is required.");
 
-        // Delegate data access to the repository — the service never calls _context directly.
         var user = await _authRepository.GetUserByEmailAsync(request.Email);
 
         if (user == null)
@@ -55,7 +71,6 @@ public class AuthService : IAuthService
 
         if (!_passwordHashingProvider.VerifyPassword(request.Password, user.PasswordHash))
         {
-            // Business rule: lock after 5 failed attempts for 30 minutes.
             user.FailedLoginAttempts++;
             if (user.FailedLoginAttempts >= 5)
                 user.LockoutUntil = DateTime.UtcNow.AddMinutes(30);
@@ -90,6 +105,28 @@ public class AuthService : IAuthService
 
         user.FailedLoginAttempts = 0;
         user.LockoutUntil = null;
+
+        var trustedDevice = await FindTrustedDeviceAsync(user, deviceToken, cancellationToken);
+
+        if (trustedDevice is null)
+        {
+            var verification = await CreateDeviceVerificationAsync(user, ipAddress, cancellationToken);
+
+            await _authRepository.UpdateUserAsync(user);
+            await _authRepository.SaveChangesAsync();
+
+            return new LoginResponseDto
+            {
+                UserId = user.Id,
+                Role = user.Role.ToString(),
+                RequiresDeviceVerification = true,
+                DeviceVerificationId = verification.Id
+            };
+        }
+
+        trustedDevice.LastActive = DateTime.UtcNow;
+        await _trustedDeviceRepository.UpdateTrustedDeviceAsync(trustedDevice, cancellationToken);
+
         user.LastLoginAt = DateTime.UtcNow;
         await _authRepository.UpdateUserAsync(user);
 
@@ -97,7 +134,7 @@ public class AuthService : IAuthService
         {
             Id = Guid.NewGuid(),
             EventType = AuditEventType.UserLoggedIn,
-            Details = $"User {user.Email} logged in successfully.",
+            Details = $"User {user.Email} logged in successfully from a trusted device.",
             IpAddress = ipAddress,
             ActorId = user.Id,
             CreatedAt = DateTime.UtcNow,
@@ -105,7 +142,6 @@ public class AuthService : IAuthService
         await _authRepository.AddAuditLogAsync(auditLog);
         await _authRepository.SaveChangesAsync();
 
-        // Token generation is an Infrastructure concern — the service just calls the provider.
         var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user, request.RememberMe);
 
         return new LoginResponseDto
@@ -114,9 +150,278 @@ public class AuthService : IAuthService
             ExpiresAt = expiresAt,
             UserId = user.Id,
             Role = user.Role.ToString(),
-            // Names = user.Names,
-            // Surname = user.Surname,
+            RequiresDeviceVerification = false,
         };
+    }
+
+    public async Task<LoginResponseDto> VerifyDeviceAsync(VerifyDeviceRequestDto request, string? existingDeviceToken, string? ipAddress,
+        CancellationToken cancellationToken)
+    {
+        if (request.DeviceVerificationId == Guid.Empty)
+        {
+            throw new UnauthorizedAccessException("Device verification ID is required.");
+        }
+
+        if (string.IsNullOrEmpty(request.Otp))
+        {
+            throw new UnauthorizedAccessException("Verification OTP is required.");
+        }
+
+        var verification = await _trustedDeviceRepository.GetDeviceVerificationAsync(request.DeviceVerificationId, cancellationToken);
+
+        if (verification is null)
+        {
+            throw new UnauthorizedAccessException("Device verification request not found.");
+        }
+
+        if (verification.VerifiedAt.HasValue)
+        {
+            throw new UnauthorizedAccessException("Device verification has already been used.");
+        }
+
+        if (verification.ExpiresAt <= DateTime.UtcNow)
+        {
+            throw new UnauthorizedAccessException("Device verification code has expired.");
+        }
+
+        if (verification.AttemptCount >= 5)
+        {
+            throw new UnauthorizedAccessException("Too many verification attempts. Please log in again.");
+        }
+
+        var providedOtpHash = HashOtp(request.Otp);
+
+        if (!string.Equals(verification.OtpHash, providedOtpHash, StringComparison.Ordinal))
+        {
+            verification.AttemptCount++;
+            verification.UpdatedAt = DateTime.UtcNow;
+            await _trustedDeviceRepository.UpdateDeviceVerificationAsync(verification, cancellationToken);
+
+            var auditLog = new AuditLog()
+            {
+                Id = Guid.NewGuid(),
+                EventType = AuditEventType.DeviceVerificationFailed,
+                Details = "Invalid device verification code supplied.",
+                IpAddress = ipAddress,
+                ActorId = verification.UserId,
+                CreatedAt = DateTime.UtcNow,
+            };
+
+            await _authRepository.AddAuditLogAsync(auditLog);
+            await _authRepository.SaveChangesAsync();
+
+            throw new UnauthorizedAccessException("Invalid device verification code.");
+        }
+
+        var user = await _authRepository.GetUserByIdAsync(verification.UserId);
+
+        if (user is null || user.IsDeleted)
+        {
+            throw new UnauthorizedAccessException("The user account could not be found.");
+        }
+
+        var shouldSetDeviceCookie = string.IsNullOrWhiteSpace(existingDeviceToken);
+        var rawDeviceToken = shouldSetDeviceCookie ? _deviceTokenProvider.GenerateToken() : existingDeviceToken!;
+        var hashedToken = _deviceTokenProvider.HashToken(rawDeviceToken);
+
+        var existingTrustedDevice = await _trustedDeviceRepository.GetByTokenHashAsync(user.Id, hashedToken, cancellationToken);
+
+        if (existingTrustedDevice is null)
+        {
+            var trustedDevice = new TrustedDevice
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                DeviceTokenHash = hashedToken,
+                DeviceType = request.DeviceType,
+                OperatingSystem = request.OperatingSystem,
+                Browser = request.Browser,
+                LastKnownCity = null,
+                LastKnownCountry = null,
+                LastActive = DateTime.UtcNow,
+                IsTrusted = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+            };
+
+            await _trustedDeviceRepository.AddTrustedDeviceAsync(trustedDevice, cancellationToken);
+        }
+        else
+        {
+            existingTrustedDevice.IsTrusted = true;
+            existingTrustedDevice.LastActive = DateTime.UtcNow;
+            existingTrustedDevice.UpdatedAt = DateTime.UtcNow;
+
+            await _trustedDeviceRepository.UpdateTrustedDeviceAsync(existingTrustedDevice, cancellationToken);
+        }
+        verification.VerifiedAt = DateTime.UtcNow;
+        verification.UpdatedAt = DateTime.UtcNow;
+
+        await _trustedDeviceRepository.UpdateDeviceVerificationAsync(verification, cancellationToken);
+
+        var verifiedAuditLog = new AuditLog()
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.DeviceVerified,
+            Details = $"User {user.Email} verified and trusted a new device.",
+            IpAddress = ipAddress,
+            ActorId = verification.UserId,
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        await _authRepository.AddAuditLogAsync(verifiedAuditLog);
+
+        user.LastLoginAt = DateTime.UtcNow;
+        await _authRepository.UpdateUserAsync(user);
+        await _authRepository.SaveChangesAsync();
+
+        var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user, request.RememberMe);
+
+        return new LoginResponseDto()
+        {
+            Token = token,
+            ExpiresAt = expiresAt,
+            UserId = user.Id,
+            Role = user.Role.ToString(),
+
+            RequiresDeviceVerification = false,
+            DeviceVerificationId = null,
+
+            DeviceToken = shouldSetDeviceCookie ? rawDeviceToken : null,
+        };
+    }
+
+    private async Task<DeviceVerification> CreateDeviceVerificationAsync(User user, string ipAddress, CancellationToken cancellationToken)
+    {
+        var otp = RandomNumberGenerator.GetInt32(100000, 1_000_000).ToString();
+        var otpHash = HashOtp(otp);
+
+        var verification = new DeviceVerification()
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            OtpHash = otpHash,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(10),
+            AttemptCount = 0,
+            VerifiedAt = null,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+        await _trustedDeviceRepository.AddDeviceVerificationAsync(verification, cancellationToken);
+
+        if (_environment.IsDevelopment())
+        {
+            Console.WriteLine($"Email otp: {otp}.");
+        }
+        else
+        {
+            await SendVerficationOTPAsync(user.Email, otp, cancellationToken);
+        }
+
+        var verificationAuditLog = new AuditLog()
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.DeviceVerificationRequested,
+            Details = $"Device verification requested for {user.Email}.",
+            IpAddress = ipAddress,
+            ActorId = user.Id,
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        await _authRepository.AddAuditLogAsync(verificationAuditLog);
+        await _authRepository.SaveChangesAsync();
+
+        return verification;
+
+    }
+
+    private async Task SendVerficationOTPAsync(string toEmail, string rawOtp, CancellationToken cancellationToken)
+    {
+        await _emailSenderProvider.SendEmailAsync(toEmail, "Your FlashID Device Verification Code",
+        $"""
+        <div style="background-color:#f7f4ea; padding:32px 16px; font-family:Arial, Helvetica, sans-serif;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e5e7eb;">
+                <tr>
+                    <td style="padding:0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:28px 32px 0 32px;">
+                        <span style="font-size:20px; font-weight:700; color:#053b2c; letter-spacing:0.5px;">FlashID</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 0 32px; color:#111827; font-size:15px; line-height:1.6;">
+                        Hi there,
+                        <br /><br />
+                        Use the verification code below to verify the device you wish to link to your FlashID account.
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 0 32px;">
+                        <div style="background-color:#f7f4ea; border:1px solid #ffb81c; border-radius:12px; padding:20px; text-align:center;">
+                            <span style="font-size:32px; font-weight:700; letter-spacing:10px; color:#053b2c;">{rawOtp}</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:20px 32px 0 32px; color:#6b7280; font-size:13px; line-height:1.6;">
+                        This code is active for the next 10 minutes. Once it expires, you will need to request a new one.
+                        <br /><br />
+                        If you did not request this code, you can safely ignore this email.
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 28px 32px; color:#111827; font-size:14px; line-height:1.6;">
+                        Stay secure,<br />
+                        The FlashID Team
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <p style="text-align:center; color:#9ca3af; font-size:12px; margin-top:16px;">
+                &copy; {DateTime.UtcNow.Year} FlashId | South African Digital ID Wallet. All rights reserved.
+            </p>
+        </div>
+        """);
+    }
+
+    private static string HashOtp(string otp)
+    {
+        var otpBytes = Encoding.UTF8.GetBytes(otp);
+        var hashBytes = SHA256.HashData(otpBytes);
+        return Convert.ToHexString(hashBytes);
+    }
+
+    private async Task<TrustedDevice?> FindTrustedDeviceAsync(User user, string? deviceToken, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(deviceToken))
+        {
+            return null;
+        }
+
+        var deviceTokenHash = _deviceTokenProvider.HashToken(deviceToken);
+        return await _trustedDeviceRepository.GetByTokenHashAsync(user.Id, deviceTokenHash, cancellationToken);
     }
 
     public async Task<LogoutResponseDto> LogoutAsync(Guid userId, string ipAddress)
@@ -144,9 +449,11 @@ public class AuthService : IAuthService
     public async Task<UserProfileDto?> GetCurrentUserAsync(Guid userId)
     {
         var user = await _authRepository.GetUserByIdAsync(userId);
-        if (user == null) return null;
-
-        // Mapperly-generated mapper converts User entity to UserProfileDto.
-        return _mapper.UserToUserProfileDto(user);
+        if (user == null)
+        {
+            return null;
+        }
+        var citizen = await _authRepository.GetCitizenByUserIdAsync(userId);
+        return _mapper.UserToUserProfileDto(user, citizen);
     }
 }

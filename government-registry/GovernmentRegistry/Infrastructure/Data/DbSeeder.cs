@@ -6,6 +6,7 @@ namespace Infrastructure.Data;
 
 public static class DbSeeder
 {
+    private static readonly Random PhotoRandom = new(42);
     public static async Task SeedAsync(AppDbContext context)
     {
         await context.Database.MigrateAsync();
@@ -69,13 +70,13 @@ public static class DbSeeder
             {
                 Id = Guid.NewGuid(),
                 CitizenId = citizen.Id,
-                Signature = $"mock-signature-id-{saId}",
+                Signature = "mock-photos-signature.png",
                 IssuedBy = "Department of Home Affairs",
                 IssueDate = new DateOnly(2020, 1, 1),
                 CountryOfBirth = "ZA",
-                CitizenshipStatus = CitizenStatus.CitizenByBirth,
+                CitizenshipStatus = CitizenStatus.Citizen,
                 Nationality = "South African",
-                PhotoBlob = $"mock/photos/{saId}/identity-document.jpg"
+                PhotoBlob = MockPhotoData.PhotoBlobNames[PhotoRandom.Next(MockPhotoData.PhotoBlobNames.Length)]
             });
         }
 
@@ -85,14 +86,14 @@ public static class DbSeeder
             {
                 Id = Guid.NewGuid(),
                 CitizenId = citizen.Id,
-                Signature = $"mock-signature-dl-{saId}",
+                Signature = "mock-photos-signature.png",
                 IssuedBy = "Road Traffic Management Corporation",
                 IssueDate = new DateOnly(2021, 6, 1),
                 LicenseNumber = $"DL-{saId[^6..]}",
                 LicenseCode = LicenseCode.B,
                 Restrictions = null,
                 ExpiryDate = new DateOnly(2029, 6, 1),
-                PhotoBlob = $"mock/photos/{saId}/drivers-license.jpg"
+                PhotoBlob = MockPhotoData.PhotoBlobNames[PhotoRandom.Next(MockPhotoData.PhotoBlobNames.Length)]
             });
         }
 

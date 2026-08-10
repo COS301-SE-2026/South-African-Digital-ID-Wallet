@@ -15,15 +15,12 @@ import {
   Landmark,
   LogOut,
 } from 'lucide-react'
-
 import { useState } from 'react'
-
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import FlashIdWhite from '@/assets/images/FlashID-white.png'
+import FlashIdLogo from '@/assets/images/FlashID-green.png'
 import { Button } from '@/components/atoms'
-
 import type { SidebarIconName } from '@/types/navigation'
 import type { AppSidebarProps } from './types'
 
@@ -45,14 +42,20 @@ export const AppSidebar = ({
   navSections,
   user,
   onLogout,
+  variant = 'desktop',
+  onNavigate,
 }: Readonly<AppSidebarProps>) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const pathname = usePathname()
+  const dashboardHref = navSections[0]?.items[0]?.href ?? '/'
+  const css = isCollapsed ? 'w-24' : 'w-64'
 
   return (
     <aside
-      className={`flex h-screen overflow-hidden flex-col bg-deep-green px-4 py-5 text-clean-white transition-all duration-300 ${
-        isCollapsed ? 'w-24' : 'w-64'
+      className={`flex overflow-hidden flex-col bg-deep-green px-4 py-5 text-clean-white transition-all duration-300 ${
+        variant === 'desktop'
+          ? `hidden lg:flex h-screen ${css}`
+          : 'h-full w-full'
       }`}
     >
       <div
@@ -60,52 +63,53 @@ export const AppSidebar = ({
           isCollapsed ? 'justify-center' : 'justify-between'
         }`}
       >
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full">
-            {isCollapsed ? (
-              <div
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white"
-                title={user.name}
-                aria-label={`${user.name} avatar`}
-              >
-                <Image
-                  src={FlashIdWhite}
-                  alt="Flash ID logo"
-                  width={48}
-                  height={48}
-                  className="h-12 w-12 object-contain"
-                  priority
-                />
-              </div>
-            ) : (
-              <Image
-                src={FlashIdWhite}
-                alt="Flash ID logo"
-                width={48}
-                height={48}
-                className="h-12 w-12 object-contain"
-                priority
-              />
-            )}
-          </div>
-
-          {!isCollapsed && (
-            <p className="text-xl font-bold whitespace-nowrap">Flash ID</p>
-          )}
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setIsCollapsed((prev) => !prev)}
-          className="rounded-xl p-2 text-clean-white/70 transition hover:bg-clean-white/10 hover:text-clean-white"
-          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        <Link
+          href={dashboardHref}
+          onClick={() => onNavigate?.()}
+          className={`flex items-center ${
+            isCollapsed
+              ? 'h-10 w-10 justify-center'
+              : 'h-10 w-full justify-center'
+          }`}
+          aria-label="Go to dashboard"
         >
           {isCollapsed ? (
-            <ChevronRight className="h-5 w-5" />
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-clean-white/40 bg-primary-green/30"
+              title={user.name}
+            >
+              <Image
+                src={FlashIdLogo}
+                alt="FlashID Logo"
+                width={32}
+                height={32}
+              />
+            </div>
           ) : (
-            <ChevronLeft className="h-5 w-5" />
+            <Image
+              src={FlashIdLogo}
+              alt="FlashID Logo"
+              width={140}
+              height={40}
+              priority
+            />
           )}
-        </button>
+        </Link>
+
+        {variant === 'desktop' && (
+          <button
+            type="button"
+            onClick={() => setIsCollapsed((prev) => !prev)}
+            className="rounded-xl p-2 text-clean-white/70 transition hover:bg-clean-white/10 hover:text-clean-white"
+            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {isCollapsed ? (
+              <ChevronRight className="h-5 w-5" />
+            ) : (
+              <ChevronLeft className="h-5 w-5" />
+            )}
+          </button>
+        )}
       </div>
 
       <nav className="space-y-4">
@@ -127,6 +131,7 @@ export const AppSidebar = ({
                     key={`${section.title}-${item.href}-${item.label}`}
                     href={item.href}
                     title={isCollapsed ? item.label : undefined}
+                    onClick={() => onNavigate?.()}
                     className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${
                       isCollapsed ? 'justify-center px-0' : ''
                     } ${
@@ -157,17 +162,17 @@ export const AppSidebar = ({
                 <p className="truncate text-sm font-extrabold text-clean-white">
                   {user.name}
                 </p>
-                <p className="truncate text-xs font-semibold text-accent-gold/80">
-                  {user.idLabel}
-                </p>
               </div>
             </div>
           </div>
-          <div className="mt-2">
-            <Button onClick={onLogout} LeftIcon={LogOut}>
-              Logout
-            </Button>
-          </div>
+          <button
+            type="button"
+            onClick={onLogout}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-clean-white/10 px-3 py-2 text-sm font-semibold text-clean-white/80 transition hover:bg-red-500/10 hover:text-red-300"
+          >
+            <LogOut className="h-4 w-5" />
+            Logout
+          </button>
         </div>
       )}
 
@@ -181,9 +186,7 @@ export const AppSidebar = ({
             {user.initials}
           </div>
 
-          <Button onClick={onLogout} LeftIcon={LogOut}>
-            Logout
-          </Button>
+          <Button onClick={onLogout} LeftIcon={LogOut}></Button>
         </div>
       )}
     </aside>

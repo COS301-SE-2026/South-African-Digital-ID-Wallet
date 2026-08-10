@@ -49,12 +49,25 @@ public class AuthController : ControllerBase
 
     // Login is anonymous — no [Authorize] needed because the user does not have a token yet.
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request, CancellationToken cancellationToken)
     {
         try
         {
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            var result = await _authService.LoginAsync(request, ipAddress);
+            Request.Cookies.TryGetValue("flashid_device", out var deviceToken);
+            var result = await _authService.LoginAsync(request, deviceToken, ipAddress, cancellationToken);
+
+            if (result.RequiresDeviceVerification)
+            {
+                result.Token = string.Empty;
+                return Ok(result);
+            }
+
+            if (string.IsNullOrWhiteSpace(result.Token))
+            {
+                _logger.LogError("Login completed without an access token for {Email}", request.Email);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { error = "The login could not be completed." });
+            }
 
             // The token is set in an HttpOnly cookie so JavaScript cannot read it.
             // Secure = true in production forces HTTPS; in development HTTP is allowed.
@@ -65,6 +78,7 @@ public class AuthController : ControllerBase
                 SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
                 Path = "/",
                 Expires = result.ExpiresAt,
+                IsEssential = true
             };
 
             Response.Cookies.Append("access_token", result.Token, cookieOptions);
@@ -87,6 +101,70 @@ public class AuthController : ControllerBase
             if (_environment.IsDevelopment())
                 return StatusCode(500, new { error = ex.Message, detail = ex.ToString() });
 
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    [HttpPost("verify-device")]
+    public async Task<IActionResult> VerifyDevice([FromBody] VerifyDeviceRequestDto request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            Request.Cookies.TryGetValue("flashid_device", out var deviceToken);
+
+            var result = await _authService.VerifyDeviceAsync(request, deviceToken, ipAddress, cancellationToken);
+
+            if (string.IsNullOrWhiteSpace(result.Token))
+            {
+                _logger.LogError("Device verification completed without an access token.");
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { error = "The login could not be completed." });
+            }
+
+            var accessTokenOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = !_environment.IsDevelopment(),
+                SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
+                Path = "/",
+                Expires = result.ExpiresAt,
+                IsEssential = true
+            };
+            Response.Cookies.Append("access_token", result.Token, accessTokenOptions);
+
+            if (!string.IsNullOrWhiteSpace(result.DeviceToken))
+            {
+                var deviceCookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = !_environment.IsDevelopment(),
+                    SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
+                    Path = "/",
+                    Expires = DateTimeOffset.UtcNow.AddMonths(4),
+                    IsEssential = true
+                };
+
+                Response.Cookies.Append("flashid_device", result.DeviceToken, deviceCookieOptions);
+            }
+
+            result.Token = string.Empty;
+            result.DeviceToken = null;
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError(ex, "Unexpected error during device verification.");
+            if (_environment.IsDevelopment())
+            {
+                return StatusCode(500, new { error = ex.Message, detail = ex.ToString() });
+            }
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }

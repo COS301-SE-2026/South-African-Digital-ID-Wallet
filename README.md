@@ -68,6 +68,13 @@ t3chtitansgo@gmail.com
 <details>
 <summary><strong>Demo 2 Documentation</strong></summary>
 
+🔗 [SAS](docs/demo2/SAS.md) <br>
+🔗 [SRS](docs/demo2/SRS-v2.md) <br>
+🔗 [User Manual Doocument](docs/demo2/user-manual%20(1).pdf) <br>
+🔗 [Brand style guide](docs/demo2/FlashID.pdf) <br>
+🔗 [Testing Policy Document](docs/demo2/testing_policy.md) <br>
+🔗 [Coding Standards ](docs/demo2/coding_standards.md) <br>
+🔗 [Presentation](docs/demo2/Demo2Presentation.pdf) <br>
 
 
 </details>

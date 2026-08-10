@@ -59,3 +59,21 @@ pre-commit:
       - merge
       - rebase
       - cherry-pick
+    government-registry-format:
+      glob: "government-registry/GovernmentRegistry/**/*.cs"
+      root: "government-registry"
+      run: pnpm format
+      stage_fixed: true
+    government-registry-lint:
+      glob: "government-registry/GovernmentRegistry/**/*.cs"
+      root: "government-registry"
+      run: pnpm lint
+      stage_fixed: true
+    government-registry-build:
+      glob: "government-registry/GovernmentRegistry/**/*.cs"
+      root: "government-registry"
+      run: pnpm build
+      skip:
+      - merge
+      - rebase
+      - cherry-pick
