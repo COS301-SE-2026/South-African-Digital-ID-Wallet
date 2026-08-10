@@ -71,9 +71,72 @@ public class InstitutionService : IInstitutionService
         dto.ApiKey = apiKey;
         dto.ApiKeyReference = apiKeyReference;
 
-        var message = $"Your FlashID institution API key has been generated: {apiKey}. " +
-            "Keep this key secure - it will not be shown again.";
-        await _emailSenderProvider.SendEmailAsync(request.ContactEmail, "FlashID API Key", message);
+        var message = $"""
+        <div style="background-color:#f7f4ea; padding:32px 16px; font-family:Arial, Helvetica, sans-serif;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e5e7eb;">
+                <tr>
+                    <td style="padding:0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:28px 32px 0 32px;">
+                        <span style="font-size:20px; font-weight:700; color:#053b2c; letter-spacing:0.5px;">FlashID</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 0 32px; color:#111827; font-size:15px; line-height:1.6;">
+                        Hi there,
+                        <br /><br />
+                        Your institution has been registered on FlashID. Use the API key below to authenticate your integration.
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 0 32px;">
+                        <div style="background-color:#f7f4ea; border:1px solid #ffb81c; border-radius:12px; padding:20px; text-align:center; word-break:break-all;">
+                            <span style="font-size:16px; font-weight:700; letter-spacing:1px; color:#053b2c;">{apiKey}</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:20px 32px 0 32px; color:#6b7280; font-size:13px; line-height:1.6;">
+                        This key will not be shown again. Store it securely.
+                        <br /><br />
+                        If you did not expect this email, please contact the FlashID team immediately.
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 28px 32px; color:#111827; font-size:14px; line-height:1.6;">
+                        Stay secure,<br />
+                        The FlashID Team
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <p style="text-align:center; color:#9ca3af; font-size:12px; margin-top:16px;">
+                &copy; {DateTime.UtcNow.Year} FlashId | South African Digital ID Wallet. All rights reserved.
+            </p>
+        </div>
+        """;
+        await _emailSenderProvider.SendEmailAsync(request.ContactEmail, "Your FlashID Institution API Key", message);
 
         return dto;
     }
@@ -121,9 +184,72 @@ public class InstitutionService : IInstitutionService
         await _institutionRepository.AddAuditLogAsync(auditLog);
         await _institutionRepository.SaveChangesAsync();
 
-        var message = $"Your FlashID institution API key has been regenerated: {newApiKey}. " +
-            "The previous key is no longer valid. Keep this key secure - it will not be shown again.";
-        await _emailSenderProvider.SendEmailAsync(institution.ContactEmail, "FlashID API Key Regenerated", message);
+        var message = $"""
+        <div style="background-color:#f7f4ea; padding:32px 16px; font-family:Arial, Helvetica, sans-serif;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e5e7eb;">
+                <tr>
+                    <td style="padding:0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:28px 32px 0 32px;">
+                        <span style="font-size:20px; font-weight:700; color:#053b2c; letter-spacing:0.5px;">FlashID</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 0 32px; color:#111827; font-size:15px; line-height:1.6;">
+                        Hi there,
+                        <br /><br />
+                        Your institution's API key has been regenerated. The previous key is no longer valid.
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 0 32px;">
+                        <div style="background-color:#f7f4ea; border:1px solid #ffb81c; border-radius:12px; padding:20px; text-align:center; word-break:break-all;">
+                            <span style="font-size:16px; font-weight:700; letter-spacing:1px; color:#053b2c;">{newApiKey}</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:20px 32px 0 32px; color:#6b7280; font-size:13px; line-height:1.6;">
+                        This key will not be shown again. Store it securely.
+                        <br /><br />
+                        If you did not request this regeneration, please contact the FlashID team immediately.
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 28px 32px; color:#111827; font-size:14px; line-height:1.6;">
+                        Stay secure,<br />
+                        The FlashID Team
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <p style="text-align:center; color:#9ca3af; font-size:12px; margin-top:16px;">
+                &copy; {DateTime.UtcNow.Year} FlashId | South African Digital ID Wallet. All rights reserved.
+            </p>
+        </div>
+        """;
+        await _emailSenderProvider.SendEmailAsync(institution.ContactEmail, "Your FlashID Institution API Key Was Regenerated", message);
 
         return new RegenerateApiKeyResponseDto
         {
