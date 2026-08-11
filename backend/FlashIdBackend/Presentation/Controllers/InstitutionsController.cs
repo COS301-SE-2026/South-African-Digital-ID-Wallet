@@ -104,5 +104,22 @@ public class InstitutionsController : ControllerBase
         }
     }
 
-
+    [AllowAnonymous]
+    [HttpGet("reveal-key")]
+    public async Task<IActionResult> RevealApiKey([FromQuery] string token)
+    {
+        try
+        {
+            var apiKey = await _institutionService.RevealApiKeyAsync(token);
+            return Ok(new { apiKey });
+        }
+        catch (InvalidApiKeyRevealTokenException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
 }
