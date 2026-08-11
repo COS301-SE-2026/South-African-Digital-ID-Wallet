@@ -15,7 +15,7 @@ namespace Application.Common.Services;
 
 public class InstitutionService : IInstitutionService
 {
-    private static readonly TimeSpan RevealTokenLifetime = TimeSpan.FromMinutes(30);
+    private static readonly TimeSpan RevealTokenLifetime = TimeSpan.FromHours(24);
     private readonly IInstitutionRepository _institutionRepository;
     private readonly InstitutionMapper _mapper;
     private readonly IEmailSenderProvider _emailSenderProvider;
@@ -105,7 +105,7 @@ public class InstitutionService : IInstitutionService
                 </tr>
                 <tr>
                     <td style="padding:20px 32px 0 32px; color:#6b7280; font-size:13px; line-height:1.6;">
-                        This link can only be used once and expires in 30 minutes. If you don't view it in time, you can request a new key from the FlashID admin portal.
+                        This link can only be used once and expires in 24 hours. If you don't view it in time, you can request a new key from the FlashID admin portal.
                         <br /><br />
                         If you did not expect this email, please contact the FlashID team immediately.
                     </td>
@@ -193,6 +193,13 @@ public class InstitutionService : IInstitutionService
                 $"Institution with ID '{institutionId}' was not found.");
 
         var newApiKey = GenerateApiKey();
+        var reasonMessage = adminId.HasValue
+            ? "Your institution's API key has been regenerated. The previous key is no longer valid."
+            : "Your institution's API key was automatically rotated as part of your 30-day security policy. The previous key is no longer valid.";
+
+        var contactMessage = adminId.HasValue
+            ? "If you did not request this regeneration, please contact the FlashID team immediately."
+            : "If you believe this rotation was unexpected, please contact the FlashID team immediately.";
         var revealTokenId = Guid.NewGuid();
         var encryptedToken = _apiKeyRevealTokenProvider.Protect(revealTokenId, institution.Id, newApiKey, RevealTokenLifetime);
         var revealLink = BuildRevealLink(encryptedToken);
@@ -220,8 +227,8 @@ public class InstitutionService : IInstitutionService
                 <tr>
                     <td style="padding:24px 32px 0 32px; color:#111827; font-size:15px; line-height:1.6;">
                         Hi there,
-                        <br /><br />
-                        Your institution's API key has been regenerated. The previous key is no longer valid.
+                        <br /><br /> 
+                        {reasonMessage}
                     </td>
                 </tr>
                 <tr>
@@ -231,9 +238,9 @@ public class InstitutionService : IInstitutionService
                 </tr>
                 <tr>
                     <td style="padding:20px 32px 0 32px; color:#6b7280; font-size:13px; line-height:1.6;">
-                        This link can only be used once and expires in 30 minutes. If you don't view it in time, you can request a new key from the FlashID admin portal.
+                        This link can only be used once and expires in 24 hours. If you don't view it in time, you can request a new key from the FlashID admin portal.
                         <br /><br />
-                        If you did not request this regeneration, please contact the FlashID team immediately.
+                        {contactMessage}
                     </td>
                 </tr>
                 <tr>
@@ -300,6 +307,21 @@ public class InstitutionService : IInstitutionService
             ApiKey = newApiKey,
             RegeneratedAt = DateTime.UtcNow,
         };
+    }
+
+    public async Task<string> RevealApiKeyAsync(string token)
+    {
+        var payload = _apiKeyRevealTokenProvider.Unprotect(token);
+        if (payload == null)
+            throw new InvalidApiKeyRevealTokenException("This link is invalid or has expired.");
+
+        var consumed = await _institutionRepository.TryConsumeApiKeyRevealTokenAsync(payload.TokenId);
+        if (!consumed)
+            throw new InvalidApiKeyRevealTokenException("This link has already been used or has expired.");
+
+        await _institutionRepository.SaveChangesAsync();
+
+        return payload.ApiKey;
     }
 
     private string BuildRevealLink(string token)

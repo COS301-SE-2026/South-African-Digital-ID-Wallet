@@ -13,5 +13,6 @@ public interface IInstitutionService
     Task<GetInstitutionResponseDto> GetInstitutionByIdAsync(Guid institutionId);
 
     Task<RegenerateApiKeyResponseDto> RegenerateApiKeyAsync(Guid institutionId, Guid? adminId);
+    Task<string> RevealApiKeyAsync(string token);
 
 }
