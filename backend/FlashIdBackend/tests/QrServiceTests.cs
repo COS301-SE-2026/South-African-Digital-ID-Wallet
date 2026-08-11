@@ -77,6 +77,7 @@ public class QrServiceTests
         }
         public Task<List<Institution>> GetAllInstitutionsAsync() => Task.FromResult(new List<Institution>());
         public Task<Institution?> GetInstitutionByIdAsync(Guid id) => Task.FromResult<Institution?>(null);
+        public Task<List<Institution>> GetInstitutionsWithApiKeyOlderThanAsync(DateTime threshold) => Task.FromResult(new List<Institution>());
         public Task SaveChangesAsync() => Task.CompletedTask;
     }
 

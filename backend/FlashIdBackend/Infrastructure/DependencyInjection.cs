@@ -4,6 +4,7 @@ using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Domain.Entities;
+using Infrastructure.BackgroundServices;
 using Infrastructure.Gateways.GovernmentRegistry;
 using Infrastructure.Providers;
 using Infrastructure.Repositories;
@@ -87,6 +88,7 @@ public static class DependencyInjection
         services.AddScoped<ISmsProvider, AzureCommunicationSmsProvider>();
         services.AddScoped<IVerificationRepository, VerificationRepository>();
         services.AddScoped<ICredentialsActivationRepository, CredentialsActivationRepository>();
+        services.AddHostedService<ApiKeyRotationService>();
         return services;
     }
 }

@@ -43,6 +43,8 @@ public class InstitutionServiceTests
         public Task<List<Institution>> GetAllInstitutionsAsync() => Task.FromResult(InstitutionsToReturn);
 
         public Task<Institution?> GetInstitutionByIdAsync(Guid id) => Task.FromResult(InstitutionToReturn);
+        public Task<List<Institution>> GetInstitutionsWithApiKeyOlderThanAsync(DateTime threshold) =>
+            Task.FromResult(InstitutionsToReturn.Where(i => i.ApiKeyGeneratedAt < threshold).ToList());
 
         public Task SaveChangesAsync()
         {
