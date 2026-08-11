@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260811185751_AddJobRun")]
+    [Migration("20260811194145_AddJobRun")]
     partial class AddJobRun
     {
         /// <inheritdoc />
@@ -584,7 +584,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("JobName", "RunDate")
                         .IsUnique();
 
-                    b.ToTable("JobRun");
+                    b.ToTable("JobRuns");
                 });
 
             modelBuilder.Entity("Domain.Entities.Notification", b =>

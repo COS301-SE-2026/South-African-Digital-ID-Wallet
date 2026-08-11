@@ -581,7 +581,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("JobName", "RunDate")
                         .IsUnique();
 
-                    b.ToTable("JobRun");
+                    b.ToTable("JobRuns");
                 });
 
             modelBuilder.Entity("Domain.Entities.Notification", b =>

@@ -12,7 +12,7 @@ namespace Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "JobRun",
+                name: "JobRuns",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -27,12 +27,12 @@ namespace Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_JobRun", x => x.Id);
+                    table.PrimaryKey("PK_JobRuns", x => x.Id);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_JobRun_JobName_RunDate",
-                table: "JobRun",
+                name: "IX_JobRuns_JobName_RunDate",
+                table: "JobRuns",
                 columns: new[] { "JobName", "RunDate" },
                 unique: true);
         }
@@ -41,7 +41,7 @@ namespace Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "JobRun");
+                name: "JobRuns");
         }
     }
 }
