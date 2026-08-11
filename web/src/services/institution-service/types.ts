@@ -23,3 +23,13 @@ export type GetInstitutionResponse = {
   registeredById: string
   createdAt: string
 }
+
+export type RevealApiKeyResponse = {
+  apiKey: string
+}
+
+export type RegenerateApiKeyResponse = {
+  institutionId: string
+  apiKey: string
+  regeneratedAt: string
+}
