@@ -54,24 +54,6 @@ public class InstitutionService : IInstitutionService
             UpdatedAt = DateTime.UtcNow,
         };
 
-        var auditLog = new AuditLog
-        {
-            Id = Guid.NewGuid(),
-            EventType = AuditEventType.InstitutionRegistered,
-            Details = $"Institution '{request.Name}' registered by admin '{request.AdminId}'.",
-            IpAddress = "system",
-            ActorId = admin.UserId,
-            CreatedAt = DateTime.UtcNow,
-        };
-
-        await _institutionRepository.AddInstitutionAsync(institution);
-        await _institutionRepository.AddAuditLogAsync(auditLog);
-        await _institutionRepository.SaveChangesAsync();
-
-        var dto = _mapper.InstitutionToRegisterResponseDto(institution);
-        dto.ApiKey = apiKey;
-        dto.ApiKeyReference = apiKeyReference;
-
         var message = $"""
         <div style="background-color:#f7f4ea; padding:32px 16px; font-family:Arial, Helvetica, sans-serif;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e5e7eb;">
@@ -139,6 +121,24 @@ public class InstitutionService : IInstitutionService
         """;
         await _emailSenderProvider.SendEmailAsync(request.ContactEmail, "Your FlashID Institution API Key", message);
 
+        var auditLog = new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.InstitutionRegistered,
+            Details = $"Institution '{request.Name}' registered by admin '{request.AdminId}'.",
+            IpAddress = "system",
+            ActorId = admin.UserId,
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        await _institutionRepository.AddInstitutionAsync(institution);
+        await _institutionRepository.AddAuditLogAsync(auditLog);
+        await _institutionRepository.SaveChangesAsync();
+
+        var dto = _mapper.InstitutionToRegisterResponseDto(institution);
+        dto.ApiKey = apiKey;
+        dto.ApiKeyReference = apiKeyReference;
+
         return dto;
     }
 
@@ -168,27 +168,6 @@ public class InstitutionService : IInstitutionService
                 $"Institution with ID '{institutionId}' was not found.");
 
         var newApiKey = GenerateApiKey();
-        institution.ApiKeyHash = HashApiKey(newApiKey);
-        institution.ApiKeyReference = Guid.NewGuid();
-        institution.ApiKeyGeneratedAt = DateTime.UtcNow;
-        institution.UpdatedAt = DateTime.UtcNow;
-
-        var details = adminId.HasValue
-            ? $"API key regenerated for institution '{institution.Name}' by admin '{adminId}'."
-            : $"API key automatically regenerated for institution '{institution.Name}' (30-day rotation policy).";
-
-        var auditLog = new AuditLog
-        {
-            Id = Guid.NewGuid(),
-            EventType = AuditEventType.InstitutionApiKeyRegenerated,
-            Details = details,
-            IpAddress = "system",
-            ActorId = adminId,
-            CreatedAt = DateTime.UtcNow,
-        };
-
-        await _institutionRepository.AddAuditLogAsync(auditLog);
-        await _institutionRepository.SaveChangesAsync();
 
         var message = $"""
         <div style="background-color:#f7f4ea; padding:32px 16px; font-family:Arial, Helvetica, sans-serif;">
@@ -256,6 +235,28 @@ public class InstitutionService : IInstitutionService
         </div>
         """;
         await _emailSenderProvider.SendEmailAsync(institution.ContactEmail, "Your FlashID Institution API Key Was Regenerated", message);
+
+        institution.ApiKeyHash = HashApiKey(newApiKey);
+        institution.ApiKeyReference = Guid.NewGuid();
+        institution.ApiKeyGeneratedAt = DateTime.UtcNow;
+        institution.UpdatedAt = DateTime.UtcNow;
+
+        var details = adminId.HasValue
+            ? $"API key regenerated for institution '{institution.Name}' by admin '{adminId}'."
+            : $"API key automatically regenerated for institution '{institution.Name}' (30-day rotation policy).";
+
+        var auditLog = new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.InstitutionApiKeyRegenerated,
+            Details = details,
+            IpAddress = "system",
+            ActorId = adminId,
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        await _institutionRepository.AddAuditLogAsync(auditLog);
+        await _institutionRepository.SaveChangesAsync();
 
         return new RegenerateApiKeyResponseDto
         {
