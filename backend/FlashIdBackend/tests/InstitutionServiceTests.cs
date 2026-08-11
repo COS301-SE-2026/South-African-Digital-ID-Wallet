@@ -9,6 +9,7 @@ using Domain.Enums;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Repositories;
+using Microsoft.Extensions.Configuration;
 
 namespace tests;
 
@@ -21,6 +22,7 @@ public class InstitutionServiceTests
         public Institution? InstitutionToReturn { get; set; }
         public List<Institution> InstitutionsToReturn { get; set; } = new();
         public List<AuditLog> SavedAuditLogs { get; } = new();
+        public List<ApiKeyRevealToken> SavedRevealTokens { get; } = new();
         public bool SaveChangesCalled { get; private set; }
 
         public Task<GovernmentAdministrator?> GetAdminByIdAsync(Guid adminId) => Task.FromResult(AdminToReturn);
@@ -46,6 +48,14 @@ public class InstitutionServiceTests
         public Task<List<Institution>> GetInstitutionsWithApiKeyOlderThanAsync(DateTime threshold) =>
             Task.FromResult(InstitutionsToReturn.Where(i => i.ApiKeyGeneratedAt < threshold).ToList());
 
+        public Task AddApiKeyRevealTokenAsync(ApiKeyRevealToken token)
+        {
+            SavedRevealTokens.Add(token);
+            return Task.CompletedTask;
+        }
+
+        public Task<bool> TryConsumeApiKeyRevealTokenAsync(Guid tokenId) => Task.FromResult(true);
+
         public Task SaveChangesAsync()
         {
             SaveChangesCalled = true;
@@ -68,6 +78,30 @@ public class InstitutionServiceTests
             SendCount++;
             return Task.CompletedTask;
         }
+    }
+    private class FakeApiKeyRevealTokenProvider : IApiKeyRevealTokenProvider
+    {
+        public string Protect(Guid tokenId, Guid institutionId, string apiKey, TimeSpan lifetime) =>
+            $"{tokenId}|{institutionId}|{apiKey}";
+
+        public ApiKeyRevealPayload? Unprotect(string token)
+        {
+            var parts = token.Split('|', 3);
+            if (parts.Length != 3) return null;
+            if (!Guid.TryParse(parts[0], out var tokenId) || !Guid.TryParse(parts[1], out var institutionId))
+                return null;
+
+            return new ApiKeyRevealPayload(tokenId, institutionId, parts[2]);
+        }
+    }
+
+    private static IConfiguration CreateConfiguration()
+    {
+        var settings = new Dictionary<string, string?>
+        {
+            ["Institutions:FrontendBaseUrl"] = "http://localhost:3000",
+        };
+        return new ConfigurationBuilder().AddInMemoryCollection(settings).Build();
     }
 
     private static Institution ValidInstitution(string apiKeyHash = "old-hash")
@@ -96,7 +130,7 @@ public class InstitutionServiceTests
         var fakeEmailSender = new FakeEmailSenderProvider();
         var mapper = new InstitutionMapper();
         var adminId = Guid.NewGuid();
-        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender);
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, new FakeApiKeyRevealTokenProvider(), CreateConfiguration());
 
         var result = await service.RegenerateApiKeyAsync(institution.Id, adminId);
 
@@ -112,7 +146,7 @@ public class InstitutionServiceTests
         var fakeRepository = new FakeInstitutionRepository { InstitutionToReturn = institution };
         var fakeEmailSender = new FakeEmailSenderProvider();
         var mapper = new InstitutionMapper();
-        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender);
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, new FakeApiKeyRevealTokenProvider(), CreateConfiguration());
 
         await service.RegenerateApiKeyAsync(institution.Id, Guid.NewGuid());
 
@@ -127,7 +161,7 @@ public class InstitutionServiceTests
         var fakeEmailSender = new FakeEmailSenderProvider();
         var mapper = new InstitutionMapper();
         var adminId = Guid.NewGuid();
-        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender);
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, new FakeApiKeyRevealTokenProvider(), CreateConfiguration());
 
         await service.RegenerateApiKeyAsync(institution.Id, adminId);
 
@@ -143,7 +177,7 @@ public class InstitutionServiceTests
         var fakeRepository = new FakeInstitutionRepository { InstitutionToReturn = institution };
         var fakeEmailSender = new FakeEmailSenderProvider();
         var mapper = new InstitutionMapper();
-        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender);
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, new FakeApiKeyRevealTokenProvider(), CreateConfiguration());
 
         await service.RegenerateApiKeyAsync(institution.Id, Guid.NewGuid());
 
@@ -157,7 +191,7 @@ public class InstitutionServiceTests
         var fakeRepository = new FakeInstitutionRepository { InstitutionToReturn = null };
         var fakeEmailSender = new FakeEmailSenderProvider();
         var mapper = new InstitutionMapper();
-        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender);
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, new FakeApiKeyRevealTokenProvider(), CreateConfiguration());
 
         await Assert.ThrowsAsync<InvalidInstitutionRequestException>(
             () => service.RegenerateApiKeyAsync(Guid.NewGuid(), Guid.NewGuid()));
@@ -169,7 +203,7 @@ public class InstitutionServiceTests
         var fakeRepository = new FakeInstitutionRepository { InstitutionToReturn = null };
         var fakeEmailSender = new FakeEmailSenderProvider();
         var mapper = new InstitutionMapper();
-        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender);
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, new FakeApiKeyRevealTokenProvider(), CreateConfiguration());
 
         await Assert.ThrowsAsync<InvalidInstitutionRequestException>(
             () => service.RegenerateApiKeyAsync(Guid.NewGuid(), Guid.NewGuid()));
@@ -190,7 +224,10 @@ public class InstitutionServiceTests
         return new InstitutionService(
             new InstitutionRepository(context),
             new InstitutionMapper(),
-            new FakeEmailSenderProvider()
+            new FakeEmailSenderProvider(),
+            new FakeApiKeyRevealTokenProvider(),
+            CreateConfiguration()
+
         );
     }
 

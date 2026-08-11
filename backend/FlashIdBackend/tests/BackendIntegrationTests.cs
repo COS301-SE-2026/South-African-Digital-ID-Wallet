@@ -45,6 +45,34 @@ public class BackendIntegrationTests
             Task.CompletedTask;
     }
 
+    private sealed class StubApiKeyRevealTokenProvider : IApiKeyRevealTokenProvider
+    {
+        public string Protect(Guid tokenId, Guid institutionId, string apiKey, TimeSpan lifetime) =>
+            $"{tokenId}|{institutionId}|{apiKey}";
+
+        public ApiKeyRevealPayload? Unprotect(string token)
+        {
+            var parts = token.Split('|', 3);
+            if (parts.Length != 3) return null;
+            if (!Guid.TryParse(parts[0], out var tokenId) || !Guid.TryParse(parts[1], out var institutionId))
+                return null;
+
+            return new ApiKeyRevealPayload(tokenId, institutionId, parts[2]);
+        }
+    }
+
+    private static IConfiguration CreateInstitutionsConfiguration()
+    {
+        return new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["Institutions:FrontendBaseUrl"] = "http://localhost:3000",
+                }
+            )
+            .Build();
+    }
+
     private sealed class FakeDeviceTokenProvider : IDeviceTokenProvider
     {
         public string GenerateToken()
@@ -126,7 +154,7 @@ public class BackendIntegrationTests
 
     private static InstitutionService CreateInstitutionService(AppDbContext context)
     {
-        return new InstitutionService(new InstitutionRepository(context), new InstitutionMapper(), new StubEmailSenderProvider());
+        return new InstitutionService(new InstitutionRepository(context), new InstitutionMapper(), new StubEmailSenderProvider(), new StubApiKeyRevealTokenProvider(), CreateInstitutionsConfiguration());
     }
 
     private static User CreateCitizenUser(string email, string password)

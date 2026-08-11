@@ -7,20 +7,33 @@ using Application.Features.Institutions.DTOs;
 using Application.Features.Institutions.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
+using Microsoft.Extensions.Configuration;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Application.Common.Services;
 
 public class InstitutionService : IInstitutionService
 {
+    private static readonly TimeSpan RevealTokenLifetime = TimeSpan.FromMinutes(30);
     private readonly IInstitutionRepository _institutionRepository;
     private readonly InstitutionMapper _mapper;
     private readonly IEmailSenderProvider _emailSenderProvider;
+    private readonly IApiKeyRevealTokenProvider _apiKeyRevealTokenProvider;
+    private readonly IConfiguration _configuration;
 
-    public InstitutionService(IInstitutionRepository institutionRepository, InstitutionMapper mapper, IEmailSenderProvider emailSenderProvider)
+    public InstitutionService(
+        IInstitutionRepository institutionRepository,
+        InstitutionMapper mapper,
+        IEmailSenderProvider emailSenderProvider,
+        IApiKeyRevealTokenProvider apiKeyRevealTokenProvider,
+        IConfiguration configuration)
     {
         _institutionRepository = institutionRepository;
         _mapper = mapper;
         _emailSenderProvider = emailSenderProvider;
+        _apiKeyRevealTokenProvider = apiKeyRevealTokenProvider;
+        _configuration = configuration;
     }
 
     public async Task<RegisterInstitutionResponseDto> RegisterInstitutionAsync(
@@ -54,6 +67,10 @@ public class InstitutionService : IInstitutionService
             UpdatedAt = DateTime.UtcNow,
         };
 
+        var revealTokenId = Guid.NewGuid();
+        var encryptedToken = _apiKeyRevealTokenProvider.Protect(revealTokenId, institution.Id, apiKey, RevealTokenLifetime);
+        var revealLink = BuildRevealLink(encryptedToken);
+
         var message = $"""
         <div style="background-color:#f7f4ea; padding:32px 16px; font-family:Arial, Helvetica, sans-serif;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e5e7eb;">
@@ -82,15 +99,13 @@ public class InstitutionService : IInstitutionService
                     </td>
                 </tr>
                 <tr>
-                    <td style="padding:24px 32px 0 32px;">
-                        <div style="background-color:#f7f4ea; border:1px solid #ffb81c; border-radius:12px; padding:20px; text-align:center; word-break:break-all;">
-                            <span style="font-size:16px; font-weight:700; letter-spacing:1px; color:#053b2c;">{apiKey}</span>
-                        </div>
+                    <td style="padding:24px 32px 0 32px; text-align:center;">
+                        <a href="{revealLink}" style="display:inline-block; background-color:#053b2c; color:#ffffff; text-decoration:none; font-weight:700; padding:14px 28px; border-radius:8px;">View Your API Key</a>
                     </td>
                 </tr>
                 <tr>
                     <td style="padding:20px 32px 0 32px; color:#6b7280; font-size:13px; line-height:1.6;">
-                        This key will not be shown again. Store it securely.
+                        This link can only be used once and expires in 30 minutes. If you don't view it in time, you can request a new key from the FlashID admin portal.
                         <br /><br />
                         If you did not expect this email, please contact the FlashID team immediately.
                     </td>
@@ -119,7 +134,7 @@ public class InstitutionService : IInstitutionService
             </p>
         </div>
         """;
-        await _emailSenderProvider.SendEmailAsync(request.ContactEmail, "Your FlashID Institution API Key", message);
+        await _emailSenderProvider.SendEmailAsync(institution.ContactEmail, "Your FlashID Institution API Key", message);
 
         var auditLog = new AuditLog
         {
@@ -131,8 +146,18 @@ public class InstitutionService : IInstitutionService
             CreatedAt = DateTime.UtcNow,
         };
 
+        var revealTokenEntity = new ApiKeyRevealToken
+        {
+            Id = revealTokenId,
+            InstitutionId = institution.Id,
+            ExpiresAt = DateTime.UtcNow.Add(RevealTokenLifetime),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
         await _institutionRepository.AddInstitutionAsync(institution);
         await _institutionRepository.AddAuditLogAsync(auditLog);
+        await _institutionRepository.AddApiKeyRevealTokenAsync(revealTokenEntity);
         await _institutionRepository.SaveChangesAsync();
 
         var dto = _mapper.InstitutionToRegisterResponseDto(institution);
@@ -168,6 +193,9 @@ public class InstitutionService : IInstitutionService
                 $"Institution with ID '{institutionId}' was not found.");
 
         var newApiKey = GenerateApiKey();
+        var revealTokenId = Guid.NewGuid();
+        var encryptedToken = _apiKeyRevealTokenProvider.Protect(revealTokenId, institution.Id, newApiKey, RevealTokenLifetime);
+        var revealLink = BuildRevealLink(encryptedToken);
 
         var message = $"""
         <div style="background-color:#f7f4ea; padding:32px 16px; font-family:Arial, Helvetica, sans-serif;">
@@ -197,15 +225,13 @@ public class InstitutionService : IInstitutionService
                     </td>
                 </tr>
                 <tr>
-                    <td style="padding:24px 32px 0 32px;">
-                        <div style="background-color:#f7f4ea; border:1px solid #ffb81c; border-radius:12px; padding:20px; text-align:center; word-break:break-all;">
-                            <span style="font-size:16px; font-weight:700; letter-spacing:1px; color:#053b2c;">{newApiKey}</span>
-                        </div>
+                    <td style="padding:24px 32px 0 32px;text-align:center;">                       
+                        <a href="{revealLink}" style="display:inline-block; background-color:#053b2c; color:#ffffff; text-decoration:none; font-weight:700; padding:14px 28px; border-radius:8px;">View Your New API Key</a>
                     </td>
                 </tr>
                 <tr>
                     <td style="padding:20px 32px 0 32px; color:#6b7280; font-size:13px; line-height:1.6;">
-                        This key will not be shown again. Store it securely.
+                        This link can only be used once and expires in 30 minutes. If you don't view it in time, you can request a new key from the FlashID admin portal.
                         <br /><br />
                         If you did not request this regeneration, please contact the FlashID team immediately.
                     </td>
@@ -255,7 +281,17 @@ public class InstitutionService : IInstitutionService
             CreatedAt = DateTime.UtcNow,
         };
 
+        var revealTokenEntity = new ApiKeyRevealToken
+        {
+            Id = revealTokenId,
+            InstitutionId = institution.Id,
+            ExpiresAt = DateTime.UtcNow.Add(RevealTokenLifetime),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
         await _institutionRepository.AddAuditLogAsync(auditLog);
+        await _institutionRepository.AddApiKeyRevealTokenAsync(revealTokenEntity);
         await _institutionRepository.SaveChangesAsync();
 
         return new RegenerateApiKeyResponseDto
@@ -264,6 +300,14 @@ public class InstitutionService : IInstitutionService
             ApiKey = newApiKey,
             RegeneratedAt = DateTime.UtcNow,
         };
+    }
+
+    private string BuildRevealLink(string token)
+    {
+        var baseUrl = _configuration["Institutions:FrontendBaseUrl"]
+            ?? throw new InvalidOperationException("Institutions:FrontendBaseUrl is not configured.");
+
+        return $"{baseUrl.TrimEnd('/')}/institutions/reveal-key?token={Uri.EscapeDataString(token)}";
     }
 
     private static string GenerateApiKey()
@@ -275,8 +319,7 @@ public class InstitutionService : IInstitutionService
 
     private static string HashApiKey(string apiKey)
     {
-        var bytes = System.Security.Cryptography.SHA256.HashData(
-            System.Text.Encoding.UTF8.GetBytes(apiKey));
+        var bytes = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(apiKey));
         return Convert.ToHexString(bytes).ToLower();
     }
 }
