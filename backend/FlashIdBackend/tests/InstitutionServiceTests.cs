@@ -54,7 +54,14 @@ public class InstitutionServiceTests
             return Task.CompletedTask;
         }
 
-        public Task<bool> TryConsumeApiKeyRevealTokenAsync(Guid tokenId) => Task.FromResult(true);
+        public bool ConsumeTokenResult { get; set; } = true;
+        public Guid? LastConsumedTokenId { get; private set; }
+
+        public Task<bool> TryConsumeApiKeyRevealTokenAsync(Guid tokenId)
+        {
+            LastConsumedTokenId = tokenId;
+            return Task.FromResult(ConsumeTokenResult);
+        }
 
         public Task SaveChangesAsync()
         {
@@ -210,6 +217,55 @@ public class InstitutionServiceTests
 
         Assert.Equal(0, fakeEmailSender.SendCount);
     }
+
+    [Fact]
+    public async Task RevealApiKeyAsync_ValidToken_ReturnsApiKeyAndConsumesToken()
+    {
+        var fakeRepository = new FakeInstitutionRepository();
+        var fakeEmailSender = new FakeEmailSenderProvider();
+        var mapper = new InstitutionMapper();
+        var tokenProvider = new FakeApiKeyRevealTokenProvider();
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, tokenProvider, CreateConfiguration());
+
+        var tokenId = Guid.NewGuid();
+        var institutionId = Guid.NewGuid();
+        var token = tokenProvider.Protect(tokenId, institutionId, "flashid_live_testkey", TimeSpan.FromHours(24));
+
+        var result = await service.RevealApiKeyAsync(token);
+
+        Assert.Equal("flashid_live_testkey", result);
+        Assert.Equal(tokenId, fakeRepository.LastConsumedTokenId);
+        Assert.True(fakeRepository.SaveChangesCalled);
+    }
+
+    [Fact]
+    public async Task RevealApiKeyAsync_InvalidToken_ThrowsInvalidApiKeyRevealTokenException()
+    {
+        var fakeRepository = new FakeInstitutionRepository();
+        var fakeEmailSender = new FakeEmailSenderProvider();
+        var mapper = new InstitutionMapper();
+        var tokenProvider = new FakeApiKeyRevealTokenProvider();
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, tokenProvider, CreateConfiguration());
+
+        await Assert.ThrowsAsync<InvalidApiKeyRevealTokenException>(
+            () => service.RevealApiKeyAsync("not-a-real-token"));
+    }
+
+    [Fact]
+    public async Task RevealApiKeyAsync_TokenAlreadyConsumedOrExpired_ThrowsInvalidApiKeyRevealTokenException()
+    {
+        var fakeRepository = new FakeInstitutionRepository { ConsumeTokenResult = false };
+        var fakeEmailSender = new FakeEmailSenderProvider();
+        var mapper = new InstitutionMapper();
+        var tokenProvider = new FakeApiKeyRevealTokenProvider();
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, tokenProvider, CreateConfiguration());
+
+        var token = tokenProvider.Protect(Guid.NewGuid(), Guid.NewGuid(), "flashid_live_testkey", TimeSpan.FromHours(24));
+
+        await Assert.ThrowsAsync<InvalidApiKeyRevealTokenException>(
+            () => service.RevealApiKeyAsync(token));
+    }
+
     private static AppDbContext CreateContext()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
