@@ -1,22 +1,49 @@
 'use client'
 
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 import {
   institutionService,
   GetInstitutionResponse,
 } from '@/services/institution-service'
-import { Text } from '@/components/atoms'
+import { Text, Button } from '@/components/atoms'
 import { TextField } from '@/components/molecules'
 import { Card, CardContent } from '@/components/ui/card'
 
 export const ViewInstitutionsPage = () => {
   const [search, setSearch] = useState('')
-
+  const queryClient = useQueryClient()
   const { data, isLoading, isError } = useQuery({
     queryKey: ['institutions'],
     queryFn: () => institutionService.getAll(),
   })
+
+  const { mutate: regenerateKey, isPending: isRegenerating } = useMutation({
+    mutationFn: (institutionId: string) =>
+      institutionService.regenerateApiKey(institutionId),
+    onSuccess: (_data, institutionId) => {
+      toast.success('API key regenerated. A new reveal link has been emailed.')
+      queryClient.invalidateQueries({ queryKey: ['institutions'] })
+      setRegeneratingId(null)
+      void institutionId
+    },
+    onError: () => {
+      toast.error('Could not regenerate the API key. Please try again.')
+      setRegeneratingId(null)
+    },
+  })
+
+  const [regeneratingId, setRegeneratingId] = useState<string | null>(null)
+
+  const handleRegenerate = (institution: GetInstitutionResponse) => {
+    const confirmed = window.confirm(
+      `Regenerate the API key for "${institution.name}"? The current key will stop working immediately, and a new one-time reveal link will be emailed.`
+    )
+    if (!confirmed) return
+    setRegeneratingId(institution.institutionId)
+    regenerateKey(institution.institutionId)
+  }
 
   const filtered = data
     ? data.filter(
@@ -68,6 +95,18 @@ export const ViewInstitutionsPage = () => {
                   Registered:{' '}
                   {new Date(institution.createdAt).toLocaleDateString()}
                 </Text>
+                <div className="mt-2">
+                  <Button
+                    variant="secondary"
+                    isLoading={
+                      isRegenerating &&
+                      regeneratingId === institution.institutionId
+                    }
+                    onClick={() => handleRegenerate(institution)}
+                  >
+                    Regenerate API Key
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
