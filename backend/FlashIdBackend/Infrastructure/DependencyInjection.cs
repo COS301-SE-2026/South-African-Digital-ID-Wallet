@@ -37,9 +37,8 @@ public static class DependencyInjection
         services.AddScoped<IDashboardAccountCardRepository, DashboardAccountCardRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddSingleton<IDeviceTokenProvider, DeviceTokenProvider>();
-
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
-
+        services.AddSingleton<IApiKeyRevealTokenProvider, ApiKeyRevealTokenProvider>();
         services.AddScoped<ICredentialRepository, CredentialRepository>();
         services.AddSingleton<IQrSigningProvider, Ed25519SigningProvider>();
         services.AddScoped<IQrDisclosureTokenRepository, QrDisclosureTokenRepository>();

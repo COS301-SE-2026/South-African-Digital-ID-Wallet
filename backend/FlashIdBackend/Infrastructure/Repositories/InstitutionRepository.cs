@@ -55,7 +55,19 @@ public class InstitutionRepository : IInstitutionRepository
             .Where(i => i.ApiKeyGeneratedAt < threshold)
             .ToListAsync();
     }
+    public Task AddApiKeyRevealTokenAsync(ApiKeyRevealToken token)
+    {
+        _context.ApiKeyRevealTokens.Add(token);
+        return Task.CompletedTask;
+    }
+    public async Task<bool> TryConsumeApiKeyRevealTokenAsync(Guid tokenId)
+    {
+        var rowsUpdated = await _context.ApiKeyRevealTokens
+            .Where(t => t.Id == tokenId && t.ConsumedAt == null && t.ExpiresAt > DateTime.UtcNow)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(t => t.ConsumedAt, DateTime.UtcNow));
 
+        return rowsUpdated == 1;
+    }
     public async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();

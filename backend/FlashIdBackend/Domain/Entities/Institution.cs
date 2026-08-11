@@ -24,4 +24,6 @@ public class Institution : BaseEntity
     public GovernmentAdministrator RegisteredBy { get; set; } = null!;
 
     public ICollection<Official> Officials { get; set; } = new List<Official>();
+    public ICollection<ApiKeyRevealToken> ApiKeyRevealTokens { get; set; } = new List<ApiKeyRevealToken>();
+
 }

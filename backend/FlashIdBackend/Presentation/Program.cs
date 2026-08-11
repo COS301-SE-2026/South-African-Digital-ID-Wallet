@@ -28,6 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddInfrastructure();
 
 builder.Services.AddApplication();
+builder.Services.AddDataProtection();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

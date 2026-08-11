@@ -11,5 +11,7 @@ public interface IInstitutionRepository
     Task<List<Institution>> GetAllInstitutionsAsync();
     Task<Institution?> GetInstitutionByIdAsync(Guid id);
     Task<List<Institution>> GetInstitutionsWithApiKeyOlderThanAsync(DateTime threshold);
+    Task AddApiKeyRevealTokenAsync(ApiKeyRevealToken token);
+    Task<bool> TryConsumeApiKeyRevealTokenAsync(Guid tokenId);
     Task SaveChangesAsync();
 }
