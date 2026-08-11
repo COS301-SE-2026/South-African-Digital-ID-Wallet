@@ -159,7 +159,7 @@ public class InstitutionService : IInstitutionService
         return _mapper.InstitutionToGetResponseDto(institution);
     }
 
-    public async Task<RegenerateApiKeyResponseDto> RegenerateApiKeyAsync(Guid institutionId, Guid adminId)
+    public async Task<RegenerateApiKeyResponseDto> RegenerateApiKeyAsync(Guid institutionId, Guid? adminId)
     {
         var institution = await _institutionRepository.GetInstitutionByIdAsync(institutionId);
 
@@ -173,11 +173,15 @@ public class InstitutionService : IInstitutionService
         institution.ApiKeyGeneratedAt = DateTime.UtcNow;
         institution.UpdatedAt = DateTime.UtcNow;
 
+        var details = adminId.HasValue
+            ? $"API key regenerated for institution '{institution.Name}' by admin '{adminId}'."
+            : $"API key automatically regenerated for institution '{institution.Name}' (30-day rotation policy).";
+
         var auditLog = new AuditLog
         {
             Id = Guid.NewGuid(),
             EventType = AuditEventType.InstitutionApiKeyRegenerated,
-            Details = $"API key regenerated for institution '{institution.Name}' by admin '{adminId}'.",
+            Details = details,
             IpAddress = "system",
             ActorId = adminId,
             CreatedAt = DateTime.UtcNow,

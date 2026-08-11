@@ -10,5 +10,6 @@ public interface IInstitutionRepository
     Task AddAuditLogAsync(AuditLog auditLog);
     Task<List<Institution>> GetAllInstitutionsAsync();
     Task<Institution?> GetInstitutionByIdAsync(Guid id);
+    Task<List<Institution>> GetInstitutionsWithApiKeyOlderThanAsync(DateTime threshold);
     Task SaveChangesAsync();
 }

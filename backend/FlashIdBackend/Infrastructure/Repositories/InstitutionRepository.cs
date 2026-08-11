@@ -49,6 +49,13 @@ public class InstitutionRepository : IInstitutionRepository
         return await _context.Institutions.FirstOrDefaultAsync(i => i.Id == id);
     }
 
+    public async Task<List<Institution>> GetInstitutionsWithApiKeyOlderThanAsync(DateTime threshold)
+    {
+        return await _context.Institutions
+            .Where(i => i.ApiKeyGeneratedAt < threshold)
+            .ToListAsync();
+    }
+
     public async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();
