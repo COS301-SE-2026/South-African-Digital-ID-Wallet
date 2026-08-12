@@ -2,14 +2,15 @@ using Domain.Entities;
 
 namespace Application.Common.Interfaces.RepositoryInterfaces;
 
-public interface ICredentialsExpiryRepository
+public interface ICredentialExpiryRepository
 {
     Task<List<Credential>> GetExpiredActiveCredentialsPageAsync(DateTime asOfUtc, Guid afterId, int pageSize, CancellationToken cancellationToken);
     Task<Guid?> TryClaimJobRunAsync(string jobName, DateTime runDate, CancellationToken cancellationToken);
     Task<bool> HasCompletedJobRunTodayAsync(string jobName, DateTime runDate, CancellationToken cancellationToken);
-    Task MarkJobRunCompeletedAsync(Guid jobRunId, int processedCount, CancellationToken cancellationToken);
+    Task MarkJobRunCompletedAsync(Guid jobRunId, int processedCount, CancellationToken cancellationToken);
     Task MarkJobRunFailedAsync(Guid jobRunId, string errorMessage, int processedCount, CancellationToken cancellationToken);
     Task AddAuditLogAsync(AuditLog auditLog, CancellationToken cancellationToken);
     Task AddNotificationAsync(Notification notification, CancellationToken cancellationToken);
-    Task SaveChangesAsync(CancellationToken cancellationToken);
+    Task<JobRun?> GetJobRunAsync(string jobName, DateTime runDate, CancellationToken cancellationToken);
+    Task SaveChangesWithRetryAsync(int maxAttempts, CancellationToken cancellationToken);
 }

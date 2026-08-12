@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class CredentialExpiryRepository : ICredentialsExpiryRepository
+public class CredentialExpiryRepository : ICredentialExpiryRepository
 {
     private readonly AppDbContext _context;
 
@@ -95,7 +95,7 @@ public class CredentialExpiryRepository : ICredentialsExpiryRepository
                 cancellationToken);
     }
 
-    public async Task MarkJobRunCompeletedAsync(Guid jobRunId, int processedCount, CancellationToken cancellationToken)
+    public async Task MarkJobRunCompletedAsync(Guid jobRunId, int processedCount, CancellationToken cancellationToken)
     {
         var jobRun = await _context.JobRuns.SingleAsync(j => j.Id == jobRunId, cancellationToken);
         jobRun.Status = JobRunStatus.Completed;
@@ -126,8 +126,28 @@ public class CredentialExpiryRepository : ICredentialsExpiryRepository
         await _context.Notifications.AddAsync(notification, cancellationToken);
     }
 
-    public async Task SaveChangesAsync(CancellationToken cancellationToken)
+    public async Task<JobRun?> GetJobRunAsync(string jobName, DateTime runDate, CancellationToken cancellationToken)
     {
-        await _context.SaveChangesAsync(cancellationToken);
+        return await _context.JobRuns
+            .AsNoTracking()
+            .SingleOrDefaultAsync(j => j.JobName == jobName
+                && j.RunDate == runDate,
+                cancellationToken);
+    }
+
+    public async Task SaveChangesWithRetryAsync(int maxAttempts, CancellationToken cancellationToken)
+    {
+        for (var atttempt = 1; ; atttempt++)
+        {
+            try
+            {
+                await _context.SaveChangesAsync(cancellationToken);
+                return;
+            }
+            catch (DbUpdateException) when (atttempt < maxAttempts)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(200 * atttempt), cancellationToken);
+            }
+        }
     }
 }
