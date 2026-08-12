@@ -56,12 +56,6 @@ public class QrServiceTests
             }
             return Task.CompletedTask;
         }
-
-        public Task<int> PurgeExpiredAsync(DateTime olderThan)
-        {
-            var removed = Tokens.RemoveAll(q => q.ExpiresAt < olderThan);
-            return Task.FromResult(removed);
-        }
     }
 
     private sealed class FakeInstitutionRepository : IInstitutionRepository
