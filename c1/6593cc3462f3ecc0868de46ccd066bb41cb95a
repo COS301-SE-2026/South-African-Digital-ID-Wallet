@@ -1,0 +1,20 @@
+backend/FlashIdBackend/Infrastructure/Data/AppDbContext.cs
+  h_99fca60b892ff4 30
+backend/FlashIdBackend/Infrastructure/Migrations/20260811185751_AddJobRun.Designer.cs
+  h_99fca60b892ff4 1-1320
+backend/FlashIdBackend/Infrastructure/Migrations/20260811185751_AddJobRun.cs
+  h_99fca60b892ff4 1-47
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_99fca60b892ff4 540-586
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c16593cc3462f3ecc0868de46ccd066bb41cb95a",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
