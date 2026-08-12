@@ -41,6 +41,17 @@ namespace Infrastructure.Migrations
                 table: "TrustedDevices",
                 newName: "IX_TrustedDevices_UserId");
 
+            migrationBuilder.Sql(@"
+                UPDATE [TrustedDevices]
+                SET [DeviceType] = CASE [DeviceType]
+                    WHEN 'Desktop' THEN '0'
+                    WHEN 'Mobile' THEN '1'
+                    WHEN 'Tablet' THEN '2'
+                    WHEN 'Laptop' THEN '3'
+                    WHEN 'Unknown' THEN '4'
+                    ELSE '4'
+                END;");
+
             migrationBuilder.AlterColumn<int>(
                 name: "DeviceType",
                 table: "TrustedDevices",
@@ -64,6 +75,11 @@ namespace Infrastructure.Migrations
                 maxLength: 64,
                 nullable: false,
                 defaultValue: "");
+
+            migrationBuilder.Sql(@"
+                UPDATE [TrustedDevices]
+                SET [DeviceTokenHash] = CONVERT(nvarchar(64), NEWID())
+                WHERE [DeviceTokenHash] = '';");
 
             migrationBuilder.AddColumn<string>(
                 name: "LastKnownCity",
@@ -116,6 +132,16 @@ namespace Infrastructure.Migrations
                 name: "IX_DeviceVerifications_UserId",
                 table: "DeviceVerifications",
                 column: "UserId");
+
+            migrationBuilder.Sql(@"
+                UPDATE td
+                SET td.[UserId] = c.[UserId]
+                FROM [TrustedDevices] td
+                INNER JOIN [Citizens] c ON td.[UserId] = c.[Id]
+                WHERE c.[UserId] IS NOT NULL;
+
+                DELETE FROM [TrustedDevices]
+                WHERE [UserId] NOT IN (SELECT [Id] FROM [DomainUsers]);");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_TrustedDevices_DomainUsers_UserId",

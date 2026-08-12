@@ -12,5 +12,4 @@ public interface IDeleteAccountRepository
     Task DeleteCitizenAsync(Citizen citizen);
     Task DeleteUserAsync(Guid userId);
     Task SaveChangesAsync();
-    Task DeleteQrDisclosureTokensAsync(Guid citizenId);
 }

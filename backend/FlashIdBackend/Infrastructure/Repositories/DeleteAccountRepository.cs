@@ -96,18 +96,4 @@ public class DeleteAccountRepository : IDeleteAccountRepository
     {
         await _context.SaveChangesAsync();
     }
-
-    public async Task DeleteQrDisclosureTokensAsync(Guid citizenId)
-    {
-        var credentialIds = await _context.Credentials
-            .Where(c => c.CitizenId == citizenId)
-            .Select(c => c.Id)
-            .ToListAsync();
-
-        var tokens = await _context.QrDisclosureTokens
-            .Where(t => credentialIds.Contains(t.CredentialId))
-            .ToListAsync();
-
-        _context.QrDisclosureTokens.RemoveRange(tokens);
-    }
 }
