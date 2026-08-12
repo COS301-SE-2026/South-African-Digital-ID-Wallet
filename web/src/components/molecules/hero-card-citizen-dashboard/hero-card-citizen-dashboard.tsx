@@ -6,7 +6,7 @@ import { Text } from '@/components/atoms/text'
 
 export function WalletHeroCard() {
   return (
-    <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+    <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-r from-accent-gold via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
       <div className="relative overflow-hidden rounded-[26px] bg-deep-green px-6 py-7 md:px-8 md:py-8">
         <div className="relative z-10 flex flex-col items-center justify-between gap-8 md:flex-row">
           <div className="max-w-xl">
