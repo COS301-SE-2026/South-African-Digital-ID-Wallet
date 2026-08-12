@@ -1,0 +1,17 @@
+web/src/components/molecules/hero-card-citizen-dashboard/hero-card-citizen-dashboard.tsx
+  h_0aff3b71f739b1 9
+web/src/components/molecules/citizen-dashboard-account-card/citizen-dashboard-account-card.tsx
+  h_0aff3b71f739b1 37-39,42,49-56,59-61,71,73,76,86-98,104-124,126-131
+  h_0aff3b71f739b1 41,57,62,69-70,74-75,99-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "8b7e9c592b49bb655021b90c44922481168b1264",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
