@@ -1,0 +1,14 @@
+web/src/components/organisms/onboarding-status-card/test/onboarding-status-card.test.tsx
+  h_712d174fc3f309 1-71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "3873f7e7aa3757ed330ffadaa9e165e845f5d1d6",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
