@@ -1,0 +1,14 @@
+web/src/components/molecules/activity-overview-card/activity-overview-card.tsx
+  h_0aff3b71f739b1 103,144
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c875a915e13274d0863ec2a286f98c78148f7aff",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
