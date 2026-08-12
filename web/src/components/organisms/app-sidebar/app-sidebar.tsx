@@ -45,35 +45,73 @@ export const AppSidebar = ({
   variant = 'desktop',
   onNavigate,
 }: Readonly<AppSidebarProps>) => {
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isPinned, setIsPinned] = useState(true)
+  const [isHovered, setIsHovered] = useState(false)
   const pathname = usePathname()
   const dashboardHref = navSections[0]?.items[0]?.href ?? '/'
-  const css = isCollapsed ? 'w-24' : 'w-64'
+  const isExpanded = isPinned || isHovered
+  const css = isExpanded ? 'w-64' : 'w-24'
+
+  const handleSidebarClick = () => {
+    if (!isPinned) {
+      setIsPinned(true)
+    }
+  }
+
+  const handleCollapse = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    setIsPinned(false)
+    setIsHovered(false)
+  }
 
   return (
     <aside
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        if (!isPinned) {
+          setIsHovered(false)
+        }
+      }}
+      onClick={handleSidebarClick}
       className={`relative flex overflow-hidden flex-col bg-deep-green px-4 py-5 text-clean-white transition-all duration-300 ${
         variant === 'desktop'
           ? `hidden lg:flex h-screen ${css}`
           : 'h-full w-full'
       }`}
     >
+      <div className="pointer-events-none absolute right-0 top-0 z-20 flex h-full w-1 flex-col">
+        <div className="flex-1 bg-black" />
+        <div className="flex-1 bg-accent-gold" />
+        <div className="flex-1 bg-national-red" />
+        <div className="flex-1 bg-national-blue" />
+        <div className="flex-1 bg-clean-white" />
+        <div className="flex-1 bg-primary-green" />
+      </div>
+      <div className="pointer-events-none absolute right-1 top-0 z-20 h-full w-px bg-clean-white/80" />
       <div
         className={`relative z-10 mb-5 flex items-center ${
-          isCollapsed ? 'justify-center' : 'justify-between'
+          isExpanded ? 'justify-between' : 'justify-center'
         }`}
       >
         <Link
           href={dashboardHref}
           onClick={() => onNavigate?.()}
           className={`flex items-center ${
-            isCollapsed
-              ? 'h-10 w-10 justify-center'
-              : 'h-10 w-full justify-center'
+            isExpanded
+              ? 'h-10 w-full justify-center'
+              : 'h-10 w-10 justify-center'
           }`}
           aria-label="Go to dashboard"
         >
-          {isCollapsed ? (
+          {isExpanded ? (
+            <Image
+              src={FlashIdLogo}
+              alt="FlashID Logo"
+              width={140}
+              height={40}
+              priority
+            />
+          ) : (
             <div
               className="flex h-10 w-10 items-center justify-center rounded-xl border border-accent-gold/50 bg-primary-green/30"
               title={user.name}
@@ -85,37 +123,39 @@ export const AppSidebar = ({
                 height={32}
               />
             </div>
-          ) : (
-            <Image
-              src={FlashIdLogo}
-              alt="FlashID Logo"
-              width={140}
-              height={40}
-              priority
-            />
           )}
         </Link>
 
-        {variant === 'desktop' && (
+        {variant === 'desktop' && isPinned && (
           <button
             type="button"
-            onClick={() => setIsCollapsed((prev) => !prev)}
+            onClick={handleCollapse}
             className="rounded-xl p-2 text-clean-white/70 transition hover:bg-accent-gold/10 hover:text-accent-gold"
-            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-label="Collapse sidebar"
           >
-            {isCollapsed ? (
-              <ChevronRight className="h-5 w-5" />
-            ) : (
-              <ChevronLeft className="h-5 w-5" />
-            )}
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+        )}
+
+        {variant === 'desktop' && !isPinned && isHovered && (
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation()
+              setIsPinned(true)
+            }}
+            className="absolute right-2 rounded-xl p-2 text-clean-white/70 transition hover:bg-accent-gold/10 hover:text-accent-gold"
+            aria-label="Keep sidebar open"
+          >
+            <ChevronRight className="h-5 w-5" />
           </button>
         )}
       </div>
       <nav className="relative z-10 space-y-4">
         {navSections.map((section) => (
           <div key={section.title}>
-            {!isCollapsed && (
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-muted-gray">
+            {isExpanded && (
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-clean-white/40">
                 {section.title}
               </p>
             )}
@@ -132,17 +172,17 @@ export const AppSidebar = ({
                   <Link
                     key={`${section.title}-${item.href}-${item.label}`}
                     href={item.href}
-                    title={isCollapsed ? item.label : undefined}
+                    title={!isExpanded ? item.label : undefined}
                     onClick={() => onNavigate?.()}
                     className={`group relative flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${
-                      isCollapsed ? 'justify-center px-0' : ''
+                      !isExpanded ? 'justify-center px-0' : ''
                     } ${
                       isActive
                         ? 'bg-clean-white/15 text-clean-white'
                         : 'text-clean-white/75 hover:bg-clean-white/10 hover:text-clean-white'
                     }`}
                   >
-                    {isActive && !isCollapsed && (
+                    {isActive && isExpanded && (
                       <span className="absolute left-0 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-accent-gold" />
                     )}
 
@@ -150,7 +190,7 @@ export const AppSidebar = ({
                       className={`h-5 w-5 shrink-0 transition-colors ${iconColor}`}
                     />
 
-                    {!isCollapsed && item.label}
+                    {isExpanded && item.label}
                   </Link>
                 )
               })}
@@ -159,7 +199,7 @@ export const AppSidebar = ({
         ))}
       </nav>
 
-      {!isCollapsed && (
+      {isExpanded && (
         <div className="relative z-10 mt-auto rounded-[26px] bg-gradient-to-r from-accent-gold via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
           <div className="rounded-[24px] bg-deep-green p-3">
             <div className="flex items-center justify-between gap-3">
@@ -178,7 +218,10 @@ export const AppSidebar = ({
 
             <button
               type="button"
-              onClick={onLogout}
+              onClick={(event) => {
+                event.stopPropagation()
+                onLogout()
+              }}
               className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-clean-white/10 px-3 py-2 text-sm font-semibold text-clean-white/80 transition hover:border-national-red/30 hover:bg-national-red/10 hover:text-national-red"
             >
               <LogOut className="h-5 w-5" />
@@ -188,7 +231,7 @@ export const AppSidebar = ({
         </div>
       )}
 
-      {isCollapsed && (
+      {!isExpanded && (
         <div className="relative z-10 mt-auto flex flex-col items-center gap-2">
           <div
             className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-accent-gold/70 bg-primary-green/30 text-sm font-extrabold text-clean-white"
@@ -198,7 +241,13 @@ export const AppSidebar = ({
             {user.initials}
           </div>
 
-          <Button onClick={onLogout} LeftIcon={LogOut} />
+          <Button
+            onClick={(event) => {
+              event.stopPropagation()
+              onLogout()
+            }}
+            LeftIcon={LogOut}
+          />
         </div>
       )}
     </aside>
