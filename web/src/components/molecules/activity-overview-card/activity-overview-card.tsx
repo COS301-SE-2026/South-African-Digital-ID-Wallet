@@ -100,7 +100,7 @@ export function ActivityOverviewCard() {
                 {lastActivity.map((item) => (
                   <li
                     key={item.id}
-                    className="group flex items-start gap-3 rounded-2xl border border-border-grey bg-clean-white p-3 transition hover:border-accent-gold/50 hover:shadow-sm"
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-black p-3"
                   >
                     <div
                       className={`mt-0.5 h-8 w-1 shrink-0 rounded-full ${
@@ -141,7 +141,7 @@ export function ActivityOverviewCard() {
             {lastActivity.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center gap-4 rounded-2xl border border-border-grey bg-clean-white p-5 transition hover:border-accent-gold/50"
+                className="flex items-center justify-between gap-3 rounded-2xl border border-black p-3"
               >
                 <div
                   className={`rounded-2xl p-4 ${
