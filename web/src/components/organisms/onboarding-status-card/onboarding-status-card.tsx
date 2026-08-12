@@ -8,9 +8,6 @@ import { OnboardingStatusCardProps } from './types'
 export const OnboardingStatusCard = ({
   record,
   idConsent,
-  contactDetailsConsent,
-  phone,
-  email,
   accountCreated,
   activationSent,
 }: OnboardingStatusCardProps) => {
@@ -27,12 +24,9 @@ export const OnboardingStatusCard = ({
         <StatusItem label="Identity record retrieved" done={!!record} />
         <StatusItem
           label="Consent captured"
-          done={idConsent && contactDetailsConsent}
+          done={idConsent && accountCreated}
         />
-        <StatusItem
-          label="Contact details captured"
-          done={!!phone || !!email}
-        />
+        <StatusItem label="Contact details captured" done={accountCreated} />
         <StatusItem label="Pending account created" done={accountCreated} />
         <StatusItem label="Activation link sent" done={activationSent} />
       </CardContent>

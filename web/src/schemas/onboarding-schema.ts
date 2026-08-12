@@ -13,25 +13,21 @@ export const retrivalSchema = z.object({
   }),
 })
 
-export const onboardingSchema = z.object({
+export const contactDetailsSchema = z.object({
+  contactDetailsConsent: z.boolean().refine((value) => value, {
+    error: 'Citizen consent is required to capture contact details.',
+  }),
+  email: z
+    .string()
+    .trim()
+    .pipe(z.email({ error: 'Enter a valid email address.' })),
   phone: z
     .string()
     .trim()
     .regex(/^(?:\+27[678]\d{8}|0[678]\d{8})$/, {
-      error:
-        'Enter a valid South African mobile number.\n(e.g. +27612345678 or 0612345678).',
+      error: 'Enter a valid South African mobile number.',
     }),
-
-  email: z.string().trim().email({ error: 'Enter a valid email address.' }),
-
-  contactDetailsConsent: z.literal(true, {
-    error: 'Citizen consent is required to capture contact details.',
-  }),
-
-  idConsent: z.literal(true, {
-    error: 'Citizen consent is required to retreive ID record.',
-  }),
 })
 
+export type ContactDetailsFormData = z.infer<typeof contactDetailsSchema>
 export type RetriveIDRecordFormData = z.infer<typeof retrivalSchema>
-export type OnboardingFormData = z.infer<typeof onboardingSchema>

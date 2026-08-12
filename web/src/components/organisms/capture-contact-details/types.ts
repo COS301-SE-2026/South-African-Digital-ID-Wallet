@@ -1,19 +1,7 @@
-import { OnboardCitizenResponse } from '@/services/onboarding-service'
-import { IdentityRecord } from '@/types'
+import type { ContactDetailsFormData } from '@/schemas'
 
 export type CaptureContactDetailsProps = {
-  record: IdentityRecord | null
-  phone: string
-  setPhone: (v: string) => void
-  email: string
-  setEmail: (v: string) => void
-  contactDetailsConsent: boolean
-  setContactConsent: (v: boolean) => void
-  idConsent: boolean
-  createPendingAccount: () => void
-  accountCreated: boolean
-  //sendActivationCode: () => void
-  errors: Record<string, string>
-  setErrors: (r: Record<string, string>) => void
-  onboardResponse: OnboardCitizenResponse | null
+  className?: string
+  onSubmitForm: (formData: ContactDetailsFormData) => Promise<unknown>
+  onSuccess?: () => void
 }

@@ -5,9 +5,8 @@ import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
 import { IdentityRecord } from '@/types'
-import { onboardingSchema, retrivalSchema } from '@/schemas'
+import { retrivalSchema, type ContactDetailsFormData } from '@/schemas'
 import {
-  OnboardCitizenFormValues,
   OnboardCitizenResponse,
   onboardingService,
 } from '@/services/onboarding-service'
@@ -15,6 +14,7 @@ import {
 import {
   AuditLogPreview,
   CaptureContactDetails,
+  OnboardSuccessPanel,
   OnboardingStatusCard,
   RetrieveIdentityRecord,
 } from '@/components/organisms'
@@ -23,10 +23,7 @@ import { handleApiError } from '@/lib/exceptionhandler'
 export default function OnboardCitizenPage() {
   const [idNumber, setIdNumber] = useState('')
   const [record, setRecord] = useState<IdentityRecord | null>(null)
-  const [phone, setPhone] = useState('')
-  const [email, setEmail] = useState('')
   const [idConsent, setidConsent] = useState(false)
-  const [contactDetailsConsent, setContactDetailsConsent] = useState(false)
   const [accountCreated, setAccountCreated] = useState(false)
   const [activationSent, setActivationSent] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -44,20 +41,6 @@ export default function OnboardCitizenPage() {
     },
     onError: (error) => {
       setRecord(null)
-      handleApiError(error)
-    },
-  })
-
-  const { mutate: onboardCitizen } = useMutation({
-    mutationFn: (formValues: OnboardCitizenFormValues) =>
-      onboardingService.onboardCitizen(formValues),
-    onSuccess: (data) => {
-      setOnboardResponse(data)
-      setAccountCreated(true)
-      toast.success('Pending FlashID account created')
-    },
-    onError: (error) => {
-      setOnboardResponse(null)
       handleApiError(error)
     },
   })
@@ -86,49 +69,30 @@ export default function OnboardCitizenPage() {
     await retrieveRecord(result.data.idNumber)
   }
 
-  const createPendingAccount = async () => {
+  const handleCaptureContactDetails = (formData: ContactDetailsFormData) => {
     if (!record) {
       toast.error('Retrieve the citizen record first')
-      return
+      return Promise.reject(new Error('No identity record'))
     }
 
-    const nameParts = record.fullName.trim().split(' ')
-    const firstName = nameParts[0] ?? ''
-    const lastName = nameParts.slice(1).join(' ') || 'Unknown'
-
-    setErrors({})
-
-    const result = onboardingSchema.safeParse({
-      phone,
-      email,
-      contactDetailsConsent,
-      idConsent,
-    })
-
-    if (!result.success) {
-      const fieldErrors = result.error.flatten().fieldErrors
-
-      setErrors({
-        phone: fieldErrors.phone?.[0] ?? '',
-        email: fieldErrors.email?.[0] ?? '',
-        contactDetailsConsent: fieldErrors.contactDetailsConsent?.[0] ?? '',
-        idConsent: fieldErrors.idConsent?.[0] ?? '',
+    return onboardingService
+      .onboardCitizen({
+        consentProvided: formData.contactDetailsConsent,
+        email: formData.email,
+        idNumber: record.saId,
+        phoneNumber: formData.phone,
       })
-
-      return
-    }
-
-    await onboardCitizen({
-      idNumber: record.saId,
-      email: result.data.email,
-      phoneNumber: result.data.phone,
-      consentProvided: result.data.contactDetailsConsent,
-    })
+      .then((data) => {
+        setOnboardResponse(data)
+        setAccountCreated(true)
+        toast.success('Pending FlashID account created')
+      })
+      .catch((error) => {
+        setOnboardResponse(null)
+        handleApiError(error)
+        throw error
+      })
   }
-
-  // function sendActivationCode() {
-  //   setActivationSent(true)
-  // }
 
   return (
     <main className="min-h-full bg-background p-6 pb-10">
@@ -148,30 +112,16 @@ export default function OnboardCitizenPage() {
           <OnboardingStatusCard
             record={record}
             idConsent={idConsent}
-            contactDetailsConsent={contactDetailsConsent}
-            phone={phone}
-            email={email}
             accountCreated={accountCreated}
             activationSent={activationSent}
           />
         </div>
 
-        <CaptureContactDetails
-          record={record}
-          phone={phone}
-          setPhone={setPhone}
-          email={email}
-          setEmail={setEmail}
-          contactDetailsConsent={contactDetailsConsent}
-          setContactConsent={setContactDetailsConsent}
-          idConsent={idConsent}
-          createPendingAccount={createPendingAccount}
-          accountCreated={accountCreated}
-          //sendActivationCode={sendActivationCode}
-          errors={errors}
-          setErrors={setErrors}
-          onboardResponse={onboardResponse}
-        />
+        <CaptureContactDetails onSubmitForm={handleCaptureContactDetails} />
+
+        {accountCreated && onboardResponse && (
+          <OnboardSuccessPanel response={onboardResponse}></OnboardSuccessPanel>
+        )}
 
         <AuditLogPreview
           recordName={record?.fullName}
