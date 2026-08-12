@@ -1,0 +1,23 @@
+web/src/components/organisms/index.ts
+  h_712d174fc3f309 14
+web/src/components/organisms/onboard-success-panel/types.ts
+  h_712d174fc3f309 2-3
+  h_712d174fc3f309 1,4-6
+web/src/components/organisms/onboard-success-panel/onboard-success-panel.tsx
+  h_712d174fc3f309 1-12,15,20,31
+  h_712d174fc3f309 13-14,16-19,21-30,32-90
+web/src/components/organisms/onboard-success-panel/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "b5e0d855a69702a3f96f0d4a540673a09971e77d",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

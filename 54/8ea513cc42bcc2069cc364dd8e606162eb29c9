@@ -1,0 +1,18 @@
+web/src/components/molecules/credentials-list/credentials-list.tsx
+  h_0aff3b71f739b1 28-31,33-34,36-40,42-46,48-52,54-56,58-65,67-82,84-92,95-101,104-106
+  h_0aff3b71f739b1 32
+web/src/components/molecules/activity-overview-card/activity-overview-card.tsx
+  h_0aff3b71f739b1 64-66,79-82,85,89,96-99,106-122,125,147,150-154
+  h_0aff3b71f739b1 67-68,70-71,78,83-84,86-88,90-93,95,100-105,124,126-129,144,146,148-149,159-161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "548ea513cc42bcc2069cc364dd8e606162eb29c9",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
