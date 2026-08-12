@@ -1,0 +1,14 @@
+web/src/components/molecules/hero-card-citizen-dashboard/hero-card-citizen-dashboard.tsx
+  h_0aff3b71f739b1 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "33d89c2a7d69d981a88ec0f40eb1a9610b2daace",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
