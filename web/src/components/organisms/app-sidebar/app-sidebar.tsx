@@ -52,14 +52,14 @@ export const AppSidebar = ({
 
   return (
     <aside
-      className={`flex overflow-hidden flex-col bg-deep-green px-4 py-5 text-clean-white transition-all duration-300 ${
+      className={`relative flex overflow-hidden flex-col bg-deep-green px-4 py-5 text-clean-white transition-all duration-300 ${
         variant === 'desktop'
           ? `hidden lg:flex h-screen ${css}`
           : 'h-full w-full'
       }`}
     >
       <div
-        className={`mb-5 flex items-center ${
+        className={`relative z-10 mb-5 flex items-center ${
           isCollapsed ? 'justify-center' : 'justify-between'
         }`}
       >
@@ -75,7 +75,7 @@ export const AppSidebar = ({
         >
           {isCollapsed ? (
             <div
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-clean-white/40 bg-primary-green/30"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-accent-gold/50 bg-primary-green/30"
               title={user.name}
             >
               <Image
@@ -100,7 +100,7 @@ export const AppSidebar = ({
           <button
             type="button"
             onClick={() => setIsCollapsed((prev) => !prev)}
-            className="rounded-xl p-2 text-clean-white/70 transition hover:bg-clean-white/10 hover:text-clean-white"
+            className="rounded-xl p-2 text-clean-white/70 transition hover:bg-accent-gold/10 hover:text-accent-gold"
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {isCollapsed ? (
@@ -111,12 +111,11 @@ export const AppSidebar = ({
           </button>
         )}
       </div>
-
-      <nav className="space-y-4">
+      <nav className="relative z-10 space-y-4">
         {navSections.map((section) => (
           <div key={section.title}>
             {!isCollapsed && (
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-clean-white/40">
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-muted-gray">
                 {section.title}
               </p>
             )}
@@ -125,6 +124,9 @@ export const AppSidebar = ({
               {section.items.map((item) => {
                 const Icon = sidebarIcons[item.icon]
                 const isActive = pathname === item.href
+                const iconColor = isActive
+                  ? 'text-clean-white'
+                  : 'text-accent-gold'
 
                 return (
                   <Link
@@ -132,7 +134,7 @@ export const AppSidebar = ({
                     href={item.href}
                     title={isCollapsed ? item.label : undefined}
                     onClick={() => onNavigate?.()}
-                    className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${
+                    className={`group relative flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${
                       isCollapsed ? 'justify-center px-0' : ''
                     } ${
                       isActive
@@ -140,7 +142,14 @@ export const AppSidebar = ({
                         : 'text-clean-white/75 hover:bg-clean-white/10 hover:text-clean-white'
                     }`}
                   >
-                    <Icon className="h-4 w-4 shrink-0" />
+                    {isActive && !isCollapsed && (
+                      <span className="absolute left-0 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-accent-gold" />
+                    )}
+
+                    <Icon
+                      className={`h-5 w-5 shrink-0 transition-colors ${iconColor}`}
+                    />
+
                     {!isCollapsed && item.label}
                   </Link>
                 )
@@ -151,42 +160,45 @@ export const AppSidebar = ({
       </nav>
 
       {!isCollapsed && (
-        <div className="mt-auto rounded-3xl border border-clean-white/10 bg-clean-white/10 p-3">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white">
-                {user.initials}
-              </div>
+        <div className="relative z-10 mt-auto rounded-[26px] bg-gradient-to-r from-accent-gold via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+          <div className="rounded-[24px] bg-deep-green p-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-accent-gold/70 bg-primary-green/40 text-sm font-extrabold text-clean-white">
+                  {user.initials}
+                </div>
 
-              <div className="min-w-0">
-                <p className="truncate text-sm font-extrabold text-clean-white">
-                  {user.name}
-                </p>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-extrabold text-clean-white">
+                    {user.name}
+                  </p>
+                </div>
               </div>
             </div>
+
+            <button
+              type="button"
+              onClick={onLogout}
+              className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-clean-white/10 px-3 py-2 text-sm font-semibold text-clean-white/80 transition hover:border-national-red/30 hover:bg-national-red/10 hover:text-national-red"
+            >
+              <LogOut className="h-5 w-5" />
+              Logout
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={onLogout}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-clean-white/10 px-3 py-2 text-sm font-semibold text-clean-white/80 transition hover:bg-red-500/10 hover:text-red-300"
-          >
-            <LogOut className="h-4 w-5" />
-            Logout
-          </button>
         </div>
       )}
 
       {isCollapsed && (
-        <div className="mt-auto flex flex-col items-center gap-2">
+        <div className="relative z-10 mt-auto flex flex-col items-center gap-2">
           <div
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white"
+            className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-accent-gold/70 bg-primary-green/30 text-sm font-extrabold text-clean-white"
             title={user.name}
             aria-label={`${user.name} avatar`}
           >
             {user.initials}
           </div>
 
-          <Button onClick={onLogout} LeftIcon={LogOut}></Button>
+          <Button onClick={onLogout} LeftIcon={LogOut} />
         </div>
       )}
     </aside>
