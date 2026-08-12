@@ -33,9 +33,9 @@ describe('FormSubmitButton', () => {
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
   })
 
-  it('Should disable while the form has errors', () => {
+  it('Should stay clickable while form has error so they can be surfaced', () => {
     renderButton({ initialErrors: { email: 'Enter a valid email address.' } })
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
   })
 
   it('Should submit the form when clicked', async () => {

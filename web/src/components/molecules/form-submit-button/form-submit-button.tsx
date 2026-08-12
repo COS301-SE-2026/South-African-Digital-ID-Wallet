@@ -10,12 +10,12 @@ export const FormSubmitButton = ({
   children,
   className,
 }: FormSubmitButtonProps) => {
-  const { isSubmitting, isValid } = useFormikContext()
+  const { isSubmitting } = useFormikContext()
 
   return (
     <Button
       className={className}
-      disabled={isSubmitting || !isValid}
+      disabled={isSubmitting}
       isLoading={isSubmitting}
       type="submit"
       variant="primary"
