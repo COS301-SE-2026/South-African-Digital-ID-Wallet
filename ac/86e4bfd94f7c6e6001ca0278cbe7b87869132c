@@ -1,0 +1,15 @@
+web/src/components/pages/landing-page/landing-page.tsx
+  h_0aff3b71f739b1 161-194,409-413
+  h_0aff3b71f739b1 408,414
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ac86e4bfd94f7c6e6001ca0278cbe7b87869132c",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

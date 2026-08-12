@@ -1,0 +1,14 @@
+backend/FlashIdBackend/tests/CosmosQrDisclosureTokenRepositoryIntegrationTests.cs
+  h_99fca60b892ff4 12,25,41,72,88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "7133fb702b904468a7a6a194d0fa485ca172445b",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

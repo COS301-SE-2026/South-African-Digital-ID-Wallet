@@ -1,0 +1,16 @@
+web/src/services/activate-credentials-service/types.ts
+  h_99fca60b892ff4 3-5,9
+web/src/components/organisms/verify-email-form/verify-email-form.tsx
+  h_99fca60b892ff4 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "3fedefd2156e3ce9ab45fb800db77c6c028eda41",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

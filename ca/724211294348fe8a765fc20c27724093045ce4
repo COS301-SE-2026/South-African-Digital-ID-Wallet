@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Infrastructure/Repositories/CosmosQrDisclosureTokenRepository.cs
+  h_99fca60b892ff4 12
+.github/workflows/main_web-flashid-prod.yml
+  h_99fca60b892ff4 20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "ca724211294348fe8a765fc20c27724093045ce4",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

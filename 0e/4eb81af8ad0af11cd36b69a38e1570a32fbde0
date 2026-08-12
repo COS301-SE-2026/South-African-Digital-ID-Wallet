@@ -1,0 +1,16 @@
+web/src/components/pages/brand-style-guide/component-organisation-section.tsx
+  h_0aff3b71f739b1 56
+web/src/components/molecules/hero-card-citizen-dashboard/test/hero-card-citizen-dashboard.test.tsx
+  h_0aff3b71f739b1 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "0e4eb81af8ad0af11cd36b69a38e1570a32fbde0",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

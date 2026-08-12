@@ -1,0 +1,184 @@
+web/src/components/templates/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/trusted-devices/types.ts
+  h_712d174fc3f309 10-19
+  h_712d174fc3f309 20
+web/src/components/molecules/activity-overview-card/types.ts
+  h_712d174fc3f309 19
+web/src/components/molecules/update-password-modal/update-password-modal.tsx
+  h_712d174fc3f309 8
+web/package.json
+  h_712d174fc3f309 46-47,58
+web/src/components/molecules/dashboard-modal/dashboard-modal.tsx
+  h_712d174fc3f309 3
+web/src/components/pages/citizen/citizen-dashboard-page.tsx
+  h_712d174fc3f309 10
+  h_712d174fc3f309 3-9
+web/src/components/organisms/qr-display/qr-display.tsx
+  h_712d174fc3f309 11
+web/src/components/molecules/hero-card-citizen-dashboard/hero-card-citizen-dashboard.tsx
+  h_712d174fc3f309 6
+web/src/components/pages/activation/verify-citizen-page.tsx
+  h_712d174fc3f309 20
+web/src/components/molecules/credential-detail-card/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+web/src/components/organisms/login-form/login-form.tsx
+  h_712d174fc3f309 12,15
+  h_712d174fc3f309 13
+web/src/components/templates/otp-modal/otp-modal.tsx
+  h_712d174fc3f309 7-8
+web/src/app/(portal)/layout.tsx
+  h_712d174fc3f309 1
+web/src/components/molecules/index.ts
+  h_712d174fc3f309 1-19,21-26
+web/src/components/molecules/notifications-list/notifications-list.tsx
+  h_712d174fc3f309 7-8,10
+web/src/components/organisms/verify-email-form/verify-email-form.tsx
+  h_712d174fc3f309 8
+  h_712d174fc3f309 7
+web/src/components/pages/verify-email/verify-email-page.tsx
+  h_712d174fc3f309 2
+web/src/lib/navigation.ts
+  h_712d174fc3f309 1-6
+web/src/components/molecules/manage-user-trusted-devices/manage-user-trusted-devices.tsx
+  h_712d174fc3f309 6
+web/src/components/molecules/manage-user-trusted-devices/test/manage-user-trusted-devices.test.tsx
+  h_712d174fc3f309 18
+web/src/components/organisms/registration-form/registration-form.tsx
+  h_712d174fc3f309 9
+  h_712d174fc3f309 8,10
+web/src/components/templates/app-shell/app-shell.tsx
+  h_712d174fc3f309 9
+web/jest.config.ts
+  h_712d174fc3f309 11
+web/src/components/pages/brand-style-guide/brand-style-guide-page.tsx
+  h_712d174fc3f309 4
+web/src/components/molecules/dashboard-modal/types.ts
+  h_712d174fc3f309 1-5
+  h_712d174fc3f309 6
+web/src/components/molecules/update-email-modal/update-email-modal.tsx
+  h_712d174fc3f309 9
+web/src/components/pages/landing-page/landing-page.tsx
+  h_712d174fc3f309 1,3
+web/src/components/molecules/citizen-dashboard-account-card/citizen-dashboard-account-card.tsx
+  h_712d174fc3f309 7
+web/src/components/molecules/change-password-modal/test/change-password-modal.test.tsx
+  h_712d174fc3f309 2
+web/src/components/atoms/index.ts
+  h_712d174fc3f309 4-5
+web/eslint.config.mjs
+  h_712d174fc3f309 43
+  h_712d174fc3f309 37-42,46-49
+web/src/components/molecules/trusted-devices/trusted-devices.tsx
+  h_712d174fc3f309 5-6
+web/src/components/pages/activation/types.ts
+  h_712d174fc3f309 1-2
+  h_712d174fc3f309 3
+web/src/components/pages/citizen/verification-page.tsx
+  h_712d174fc3f309 6
+  h_712d174fc3f309 7-10
+web/src/lib/index.ts
+  h_712d174fc3f309 1-3
+  h_712d174fc3f309 4
+web/src/components/organisms/index.ts
+  h_712d174fc3f309 2-21
+web/src/components/pages/citizen/citizen-registration-page.tsx
+  h_712d174fc3f309 2
+web/src/components/templates/otp-modal/types.ts
+  h_712d174fc3f309 1-4
+  h_712d174fc3f309 5
+web/src/components/organisms/qr-display/types.ts
+  h_712d174fc3f309 7
+  h_712d174fc3f309 8
+web/src/components/molecules/activity-overview-card/activity-overview-card.tsx
+  h_712d174fc3f309 8
+  h_712d174fc3f309 7,22
+web/src/components/pages/citizen/manage-user-account-page.tsx
+  h_712d174fc3f309 3
+.npmrc
+  h_712d174fc3f309 1
+pnpm-lock.yaml
+  h_712d174fc3f309 206,209,242,12311-12312,12338-12352,12364,12368,12375,12399,12410
+web/src/components/atoms/status-item/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/account-card/index.ts
+  h_712d174fc3f309 2
+web/src/components/molecules/activity-overview-card/index.ts
+  h_712d174fc3f309 2
+web/src/components/molecules/citizen-dashboard-account-card/index.ts
+  h_712d174fc3f309 2
+web/src/components/molecules/credentials-list/index.ts
+  h_712d174fc3f309 2
+web/src/components/molecules/dashboard-modal/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/dropdown/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/help-menu-section/index.ts
+  h_712d174fc3f309 1
+web/src/components/molecules/manage-user-trusted-devices/index.ts
+  h_712d174fc3f309 2
+web/src/components/molecules/notifications-list/index.ts
+  h_712d174fc3f309 2
+web/src/components/molecules/progress-stepper/index.ts
+  h_712d174fc3f309 2
+web/src/components/molecules/text-field/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/trusted-devices/index.ts
+  h_712d174fc3f309 2
+web/src/components/molecules/update-email-card/index.ts
+  h_712d174fc3f309 2
+web/src/components/molecules/update-email-modal/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/update-password-card/index.ts
+  h_712d174fc3f309 2
+web/src/components/molecules/update-password-modal/index.ts
+  h_712d174fc3f309 2
+web/src/components/organisms/app-sidebar/index.ts
+  h_712d174fc3f309 2
+web/src/components/organisms/app-top-bar/app-top-bar.tsx
+  h_712d174fc3f309 2
+web/src/components/organisms/app-top-bar/index.ts
+  h_712d174fc3f309 2
+web/src/components/organisms/audit-log-preview/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/organisms/auth-sidebar/index.ts
+  h_712d174fc3f309 1
+web/src/components/organisms/capture-contact-details/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/organisms/landing-page-footer/index.ts
+  h_712d174fc3f309 1
+web/src/components/organisms/landing-page-navbar/index.ts
+  h_712d174fc3f309 1
+web/src/components/organisms/login-form/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/organisms/onboarding-status-card/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/organisms/register-institution-form/index.ts
+  h_712d174fc3f309 1
+web/src/components/organisms/registration-form/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/organisms/retrieve-identity-record/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/organisms/verify-email-form/index.ts
+  h_712d174fc3f309 1
+web/src/components/templates/app-shell/index.ts
+  h_712d174fc3f309 1
+web/src/components/templates/otp-modal/index.ts
+  h_712d174fc3f309 1-2
+web/src/context/user-context.tsx
+  h_712d174fc3f309 13
+web/src/types/index.ts
+  h_712d174fc3f309 2-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "c5035ab5b4fcccb238b09dcb7183508bd5c6f496",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

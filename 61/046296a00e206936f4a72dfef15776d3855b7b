@@ -1,0 +1,20 @@
+web/src/components/molecules/form-submit-button/form-submit-button.tsx
+  h_712d174fc3f309 1-26
+web/src/components/molecules/form-submit-button/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/index.ts
+  h_712d174fc3f309 16
+web/src/components/molecules/form-submit-button/types.ts
+  h_712d174fc3f309 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "61046296a00e206936f4a72dfef15776d3855b7b",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

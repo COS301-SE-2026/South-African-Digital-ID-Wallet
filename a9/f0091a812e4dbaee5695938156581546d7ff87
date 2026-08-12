@@ -1,0 +1,14 @@
+docs/SAS.md
+  h_712d174fc3f309 9-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "a9f0091a812e4dbaee5695938156581546d7ff87",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

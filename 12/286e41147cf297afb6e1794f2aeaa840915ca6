@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Infrastructure/Migrations/20260806034724_DropQrDisclosureTokens.Designer.cs
+  h_99fca60b892ff4 1-1273
+backend/FlashIdBackend/Infrastructure/Migrations/20260806034724_DropQrDisclosureTokens.cs
+  h_99fca60b892ff4 1-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "12286e41147cf297afb6e1794f2aeaa840915ca6",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

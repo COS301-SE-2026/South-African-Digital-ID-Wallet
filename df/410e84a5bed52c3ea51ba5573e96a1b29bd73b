@@ -1,0 +1,27 @@
+backend/FlashIdBackend/Domain/Enums/JobRunStatus.cs
+  h_99fca60b892ff4 1-7
+  s_5f2329a459ea59::t_6ba8a14ade47ce 8
+backend/FlashIdBackend/Domain/Entities/JobRun.cs
+  h_99fca60b892ff4 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "df410e84a5bed52c3ea51ba5573e96a1b29bd73b",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_5f2329a459ea59": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6a47c20-2dc4-46df-bce2-6e707a5a910d",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
