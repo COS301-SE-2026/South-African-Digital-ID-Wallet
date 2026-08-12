@@ -1,0 +1,15 @@
+web/src/components/organisms/app-sidebar/app-sidebar.tsx
+  h_0aff3b71f739b1 48,52-65,69-74,82-87,93,106,129,132,134,136-142,149-150,193,202,222,234
+  h_0aff3b71f739b1 49,75,88-90,100-102,107-114,143-148,157-158,175,178,185,221,223-224,244-250
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "fefc52a8f309e5ca482f1cb5e5a9d979b18bb529",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
