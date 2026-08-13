@@ -1,0 +1,15 @@
+web/src/components/organisms/app-sidebar/app-sidebar.tsx
+  h_0aff3b71f739b1 23
+  h_0aff3b71f739b1 117,121,123-125,205
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "4743949a4b1b18ed121139c2582c3ec7ea6a452e",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
