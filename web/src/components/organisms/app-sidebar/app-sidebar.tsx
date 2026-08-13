@@ -20,6 +20,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import FlashIdLogo from '@/assets/images/FlashID-green.png'
+import GreenCircleLogo from '@/assets/images/green-circle-logo.ico'
 import { Button } from '@/components/atoms'
 import type { SidebarIconName } from '@/types/navigation'
 import type { AppSidebarProps } from './types'
@@ -113,14 +114,15 @@ export const AppSidebar = ({
             />
           ) : (
             <div
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-accent-gold/50 bg-primary-green/30"
+              className="flex h-10 w-10 items-center justify-center rounded-full"
               title={user.name}
             >
               <Image
-                src={FlashIdLogo}
+                src={GreenCircleLogo}
                 alt="FlashID Logo"
-                width={32}
-                height={32}
+                width={40}
+                height={40}
+                className="h-10 w-10 object-contain"
               />
             </div>
           )}
@@ -200,7 +202,7 @@ export const AppSidebar = ({
       </nav>
 
       {isExpanded && (
-        <div className="relative z-10 mt-auto rounded-[26px] bg-gradient-to-r from-accent-gold via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+        <div className="relative z-10 mt-auto rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
           <div className="rounded-[24px] bg-deep-green p-3">
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">
