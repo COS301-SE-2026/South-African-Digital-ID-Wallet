@@ -1,0 +1,18 @@
+mobile/src/components/atoms/button/button.tsx
+  h_712d174fc3f309 2-3,7-8,28,37,59,71-80,83-92
+  h_712d174fc3f309 81-82
+mobile/src/components/atoms/button/types.ts
+  h_712d174fc3f309 5,15-17
+  h_712d174fc3f309 18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "12c6fed89e10f9c42a7c09d8e0eb4cd98fb826b7",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
