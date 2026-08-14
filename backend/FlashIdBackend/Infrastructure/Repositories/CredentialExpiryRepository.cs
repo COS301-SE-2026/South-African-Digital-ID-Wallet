@@ -135,19 +135,8 @@ public class CredentialExpiryRepository : ICredentialExpiryRepository
                 cancellationToken);
     }
 
-    public async Task SaveChangesWithRetryAsync(int maxAttempts, CancellationToken cancellationToken)
+    public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
-        for (var atttempt = 1; ; atttempt++)
-        {
-            try
-            {
-                await _context.SaveChangesAsync(cancellationToken);
-                return;
-            }
-            catch (DbUpdateException) when (atttempt < maxAttempts)
-            {
-                await Task.Delay(TimeSpan.FromMilliseconds(200 * atttempt), cancellationToken);
-            }
-        }
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

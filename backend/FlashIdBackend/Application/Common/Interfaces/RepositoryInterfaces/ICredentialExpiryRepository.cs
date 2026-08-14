@@ -12,5 +12,5 @@ public interface ICredentialExpiryRepository
     Task AddAuditLogAsync(AuditLog auditLog, CancellationToken cancellationToken);
     Task AddNotificationAsync(Notification notification, CancellationToken cancellationToken);
     Task<JobRun?> GetJobRunAsync(string jobName, DateTime runDate, CancellationToken cancellationToken);
-    Task SaveChangesWithRetryAsync(int maxAttempts, CancellationToken cancellationToken);
+    Task SaveChangesAsync(CancellationToken cancellationToken);
 }
