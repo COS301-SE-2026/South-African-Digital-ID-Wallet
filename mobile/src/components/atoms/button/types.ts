@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react-native'
 
 export type ButtonVariant = 'primary' | 'secondary' | 'text'
 
-export type ButtonProps = {
+export type BaseButtonProps = {
   className?: string
   disabled?: boolean
   isLoading?: boolean
@@ -11,4 +11,8 @@ export type ButtonProps = {
   onPress: () => void
   testID?: string
   variant?: ButtonVariant
+}
+
+export type ButtonProps = BaseButtonProps & {
+  type?: 'button' | 'submit'
 }
