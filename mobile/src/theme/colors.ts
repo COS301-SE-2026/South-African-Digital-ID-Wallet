@@ -21,6 +21,8 @@ export const colors = {
   border: '#E5E1D8',
   surface: '#FFFFFF',
   background: '#F7F4EA',
+
+  primaryGreen: '#007A4D',
 } as const
 
 export type ColorToken = keyof typeof colors
