@@ -15,8 +15,17 @@ describe('WalletHeroCard', () => {
   it('renders the dashboard heading', () => {
     render(<WalletHeroCard />)
 
+    const hasFullHeadingText = (element: Element | null) =>
+      element?.textContent?.replace(/\s+/g, ' ').trim().toLowerCase() ===
+      'this is your flashid wallet dashboard.'
+
     expect(
-      screen.getByText(/this is your flashid wallet dashboard/i)
+      screen.getByText((_, element) => {
+        if (!hasFullHeadingText(element)) return false
+        return Array.from(element?.children ?? []).every(
+          (child) => !hasFullHeadingText(child)
+        )
+      })
     ).toBeInTheDocument()
   })
 
