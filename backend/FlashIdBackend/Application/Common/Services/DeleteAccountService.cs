@@ -20,7 +20,6 @@ public class DeleteAccountService : IDeleteAccountService
 
         if (citizen != null)
         {
-            await _repository.DeleteQrDisclosureTokensAsync(citizen.Id);
             await _repository.DeleteCredentialsAsync(citizen.Id);
             await _repository.DeleteTrustedDevicesAsync(userId);
             await _repository.DeleteNotificationsAsync(citizen.Id);

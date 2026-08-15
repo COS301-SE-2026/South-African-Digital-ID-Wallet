@@ -14,6 +14,7 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Services;
 using Infrastructure.Repositories;
 using System.Security.Claims;
+using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -150,6 +151,21 @@ using (var scope = app.Services.CreateScope())
         //await DbSeeder.SeedAsync(db);
         Console.WriteLine("[SEED] Database seeded successfully!");
     }
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var cosmosClient = scope.ServiceProvider.GetRequiredService<CosmosClient>();
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var dbName = configuration["Cosmos:DatabaseName"];
+    var containerName = configuration["Cosmos:ContainerName"];
+
+    var dbResponse = await cosmosClient.CreateDatabaseIfNotExistsAsync(dbName);
+
+    await dbResponse.Database.CreateContainerIfNotExistsAsync(new ContainerProperties(containerName, "/id")
+    {
+        DefaultTimeToLive = -1
+    });
 }
 
 app.UseExceptionHandler();

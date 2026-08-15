@@ -3,8 +3,10 @@ using System.Text;
 using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
+
 using Domain.Entities;
 using Infrastructure.BackgroundServices;
+
 using Infrastructure.Gateways.GovernmentRegistry;
 using Infrastructure.Providers;
 using Infrastructure.Repositories;
@@ -14,6 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Azure.Storage.Blobs;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Services;
+using Microsoft.Azure.Cosmos;
+using User = Domain.Entities.User;
 
 namespace Infrastructure;
 
@@ -41,7 +45,17 @@ public static class DependencyInjection
         services.AddSingleton<IApiKeyRevealTokenProvider, ApiKeyRevealTokenProvider>();
         services.AddScoped<ICredentialRepository, CredentialRepository>();
         services.AddSingleton<IQrSigningProvider, Ed25519SigningProvider>();
-        services.AddScoped<IQrDisclosureTokenRepository, QrDisclosureTokenRepository>();
+        services.AddSingleton(n =>
+        {
+            var configuration = n.GetRequiredService<IConfiguration>();
+            var connectionString = configuration["Cosmos:ConnectionString"] ?? throw new InvalidOperationException("Cosmos:ConnectionString is not configured.");
+            return new CosmosClient(connectionString, new CosmosClientOptions
+            {
+                SerializerOptions = new CosmosSerializationOptions
+                { PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase },
+            });
+        });
+        services.AddScoped<IQrDisclosureTokenRepository, CosmosQrDisclosureTokenRepository>();
         services.AddSingleton(n =>
         {
             var configuration = n.GetRequiredService<IConfiguration>();
