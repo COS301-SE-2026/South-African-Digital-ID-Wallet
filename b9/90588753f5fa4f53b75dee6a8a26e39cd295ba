@@ -1,0 +1,14 @@
+mobile/metro.config.js
+  h_712d174fc3f309 16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "b990588753f5fa4f53b75dee6a8a26e39cd295ba",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
