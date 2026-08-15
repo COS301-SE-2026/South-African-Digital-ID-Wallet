@@ -20,7 +20,13 @@ function formatTime(seconds: number) {
 
 type Status = 'loading' | 'ready' | 'error'
 
-export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
+export const QrDisplay = ({
+  selection,
+  onBack,
+  embedded = false,
+  compact = false,
+  showBackButton = false,
+}: Readonly<QrDisplayProps>) => {
   const { credentialId, mandatoryFields, selectedOptionalFields } = selection
 
   const [status, setStatus] = React.useState<Status>('loading')
@@ -93,15 +99,37 @@ export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
 
   if (status === 'loading') {
     return (
-      <div className="flex flex-col items-center gap-4 py-12">
-        <Text variant="sub-md">Generating your QR code...</Text>
+      <div
+        className={
+          embedded
+            ? 'flex flex-col items-center gap-3 py-4'
+            : 'flex min-h-screen items-center justify-center px-6 py-12'
+        }
+      >
+        <Card
+          className={
+            embedded
+              ? 'w-full rounded-[28px] border border-border-grey bg-card p-4 shadow-none sm:p-6'
+              : 'w-full max-w-3xl rounded-[32px] border border-gray-200 bg-white p-10 shadow-2xl'
+          }
+        >
+          <div className="flex flex-col items-center gap-4 py-8 text-center">
+            <Text variant="sub-md">Generating your QR code...</Text>
+          </div>
+        </Card>
       </div>
     )
   }
 
   if (status === 'error') {
     return (
-      <Card className="flex flex-col items-center gap-4 p-6 text-center">
+      <Card
+        className={
+          embedded
+            ? 'flex flex-col items-center gap-4 rounded-[28px] border border-border-grey bg-card p-4 text-center shadow-none sm:p-6'
+            : 'flex flex-col items-center gap-4 p-6 text-center'
+        }
+      >
         <Text variant="sub-lg">Something went wrong</Text>
         <Text variant="sub-sm" className="text-muted-foreground">
           {errorMessage}
@@ -115,10 +143,22 @@ export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center  px-6 py-12">
-      <Card className="w-full max-w-3xl rounded-[32px] border border-gray-200 bg-white p-10 shadow-2xl">
-        <div className=" text-center">
-          <Text variant="h2">Your QR Code</Text>
+    <div
+      className={
+        embedded
+          ? 'flex flex-col gap-4'
+          : 'flex min-h-screen items-center justify-center px-6 py-12'
+      }
+    >
+      <Card
+        className={
+          embedded
+            ? 'w-full rounded-[28px] border border-border-grey bg-card p-4 shadow-none sm:p-6'
+            : 'w-full max-w-3xl rounded-[32px] border border-gray-200 bg-white p-10 shadow-2xl'
+        }
+      >
+        <div className="text-center">
+          <Text variant="h2">QR Preview</Text>
 
           <Text variant="sub-md" className="mt-1">
             Share your identity securely
@@ -126,16 +166,20 @@ export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
         </div>
 
         <div className="flex justify-center">
-          <div className="relative p-6">
+          <div className={compact ? 'relative p-3 sm:p-4' : 'relative p-6'}>
             <div className="absolute left-3 top-3 h-8 w-8 border-l-4 border-t-4 border-emerald-600" />
             <div className="absolute right-3 top-3 h-8 w-8 border-r-4 border-t-4 border-amber-500" />
             <div className="absolute bottom-3 left-3 h-8 w-8 border-b-4 border-l-4 border-red-500" />
             <div className="absolute bottom-3 right-3 h-8 w-8 border-b-4 border-r-4 border-blue-600" />
-            <QRCodeSVG value={qrValue} size={300} includeMargin />
+            <QRCodeSVG
+              value={qrValue}
+              size={compact ? 220 : 300}
+              includeMargin
+            />
           </div>
         </div>
 
-        <div className=" flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-2">
           <div
             className={`h-3 w-3 rounded-full ${isWarning ? 'bg-red-500' : 'bg-emerald-500'}`}
           />
@@ -161,14 +205,16 @@ export const QrDisplay = ({ selection, onBack }: Readonly<QrDisplayProps>) => {
           Refresh QR Code
         </Button>
 
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={onBack}
-          className=" h-12 w-full rounded-2xl"
-        >
-          Back
-        </Button>
+        {showBackButton && (
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onBack}
+            className="h-12 w-full rounded-2xl"
+          >
+            Back
+          </Button>
+        )}
 
         <div className="mt-8 border-t border-gray-200 pt-6 text-center">
           <Text variant="sub-sm" className="text-gray-500">
