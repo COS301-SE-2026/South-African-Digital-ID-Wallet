@@ -1,0 +1,26 @@
+web/src/components/templates/app-shell/app-shell.tsx
+  s_d0a01d4355c98b::t_f8e38508fb2b73 76,96
+web/src/components/pages/citizen/citizen-dashboard-page.tsx
+  s_d0a01d4355c98b::t_f8e38508fb2b73 12-15,21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "6b92d8e4463b73ae5d1b5be025b332861f91a7a5",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_d0a01d4355c98b": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "7fa90e7c-f047-4d0b-9253-8d90871541d3",
+        "model": "gpt-5.4-mini"
+      },
+      "human_author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
