@@ -1,0 +1,44 @@
+web/src/services/credential-service/types.ts
+  s_d0a01d4355c98b::t_5e472bfff524b4 47
+web/src/components/molecules/credential-detail-card/credential-detial-card.tsx
+  s_d0a01d4355c98b::t_b0f3f14cff5e6a 28-30,36-38,40-43,53-57,59-68
+  s_d0a01d4355c98b::t_0d5473a5940b40 15,129-130,135-138,140,142,145,148,150
+  s_d0a01d4355c98b::t_ef9f2e387424ac 26,32-34,46-50
+  s_d0a01d4355c98b::t_accc5fa7a0c2d2 27,39
+  s_d0a01d4355c98b::t_c2b52b2eb5a1e1 25,69-82
+  h_0aff3b71f739b1 3,52,58,83
+  s_d0a01d4355c98b::t_5e472bfff524b4 5-7,14,16-21,24,51,86-87,89-91,93-96,98,102-109,115-128,131-134,139,141,143-144,146,149,151-155
+  s_d0a01d4355c98b::t_e5df3f543d7a37 2
+  s_d0a01d4355c98b::t_a07a388d5f81ab 31,35
+  s_d0a01d4355c98b::t_c9104e8ed5f531 88,99-101,110-114,147
+web/src/services/credential-service/credential-model.ts
+  s_d0a01d4355c98b::t_5e472bfff524b4 50-51
+web/src/components/organisms/qr-display/types.ts
+  s_d0a01d4355c98b::t_c9104e8ed5f531 7
+  s_d0a01d4355c98b::t_0d5473a5940b40 8
+  s_d0a01d4355c98b::t_5e472bfff524b4 6
+web/src/components/organisms/field-selection-form/types.ts
+  s_d0a01d4355c98b::t_5e472bfff524b4 11
+  s_d0a01d4355c98b::t_0d5473a5940b40 12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "f564907e65b50ed706b948929dfe3a6aafafa349",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_d0a01d4355c98b": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "7fa90e7c-f047-4d0b-9253-8d90871541d3",
+        "model": "gpt-5.4-mini"
+      },
+      "human_author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
