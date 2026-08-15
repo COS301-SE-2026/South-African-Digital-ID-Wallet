@@ -148,9 +148,13 @@ describe('AppSidebar', () => {
       })
     )
 
+    expect(screen.queryByText('Citizen Portal')).not.toBeInTheDocument()
+
+    await user.hover(screen.getByRole('complementary'))
+
     await user.click(
       screen.getByRole('button', {
-        name: /expand sidebar/i,
+        name: /keep sidebar open/i,
       })
     )
 

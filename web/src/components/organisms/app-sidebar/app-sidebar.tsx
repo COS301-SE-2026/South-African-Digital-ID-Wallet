@@ -53,12 +53,6 @@ export const AppSidebar = ({
   const isExpanded = isPinned || isHovered
   const css = isExpanded ? 'w-64' : 'w-24'
 
-  const handleSidebarClick = () => {
-    if (!isPinned) {
-      setIsPinned(true)
-    }
-  }
-
   const handleCollapse = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
     setIsPinned(false)
@@ -73,7 +67,6 @@ export const AppSidebar = ({
           setIsHovered(false)
         }
       }}
-      onClick={handleSidebarClick}
       className={`relative flex overflow-hidden flex-col bg-deep-green px-4 py-5 text-clean-white transition-all duration-300 ${
         variant === 'desktop'
           ? `hidden lg:flex h-screen ${css}`
