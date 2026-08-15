@@ -1,0 +1,25 @@
+mobile/src/services/login-service/test/login-errors.test.ts
+  h_712d174fc3f309 1-17,19,24-26,28,33-53
+  s_54c3c180b45564::t_14bda86618dd19 18,20-23,27,29-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "d2b97aa876715cc36250f42176976dc05b76d12f",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_54c3c180b45564": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ac1b53f0-967a-467e-beda-44017fe1d121",
+        "model": "unknown"
+      },
+      "human_author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
