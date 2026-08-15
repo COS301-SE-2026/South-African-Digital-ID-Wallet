@@ -1,0 +1,19 @@
+backend/FlashIdBackend/Presentation/Controllers/AuthController.cs
+  h_712d174fc3f309 52,86
+mobile/babel.config.js
+  h_712d174fc3f309 1
+mobile/src/stores/test/auth-store.test.ts
+  h_712d174fc3f309 3,5-26,34-45,53-60
+  h_712d174fc3f309 1-2,4,27-33,46-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "60d46ae4e60bc29f13dad4aafe60b720bced3390",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
