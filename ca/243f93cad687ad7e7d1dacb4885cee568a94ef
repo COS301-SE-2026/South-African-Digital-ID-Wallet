@@ -1,0 +1,22 @@
+mobile/src/components/molecules/index.ts
+  h_712d174fc3f309 1
+mobile/src/components/molecules/text-field/types.ts
+  h_712d174fc3f309 3-13
+  h_712d174fc3f309 1-2
+mobile/src/components/molecules/text-field/text-field.tsx
+  h_712d174fc3f309 1-22,24-32,34-39,42-53,55-85,87
+  h_712d174fc3f309 23,33,40-41,54,86
+mobile/src/components/molecules/text-field/index.ts
+  h_712d174fc3f309 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ca243f93cad687ad7e7d1dacb4885cee568a94ef",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
