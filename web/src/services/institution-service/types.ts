@@ -3,13 +3,13 @@ export type RegisterInstitutionFormValues = {
   institutionType: string
   verificationNumber: string
   adminId: string
+  contactEmail: string
 }
 
 export type RegisterInstitutionResponse = {
   institutionId: string
   name: string
   type: string
-  apiKey: string
   apiKeyReference: string
   verificationNumber: string
   createdAt: string
@@ -30,6 +30,5 @@ export type RevealApiKeyResponse = {
 
 export type RegenerateApiKeyResponse = {
   institutionId: string
-  apiKey: string
   regeneratedAt: string
 }

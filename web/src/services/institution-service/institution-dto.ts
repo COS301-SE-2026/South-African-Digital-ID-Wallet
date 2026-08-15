@@ -8,5 +8,6 @@ export const registerInstitutionDto = (
     type: formData.institutionType === 'HomeAffairs' ? 0 : 1,
     verificationNumber: formData.verificationNumber,
     adminId: formData.adminId,
+    contactEmail: formData.contactEmail,
   }
 }
