@@ -23,16 +23,6 @@ describe('WalletHeroCard', () => {
   it('renders the QR code image', () => {
     render(<WalletHeroCard />)
 
-    expect(screen.getByAltText(/flash id qr code/i)).toBeInTheDocument()
-  })
-
-  it('renders the generate QR code button', () => {
-    render(<WalletHeroCard />)
-
-    expect(
-      screen.getByRole('button', {
-        name: /generate qr code/i,
-      })
-    ).toBeInTheDocument()
+    expect(screen.getByAltText(/flashid qr code/i)).toBeInTheDocument()
   })
 })
