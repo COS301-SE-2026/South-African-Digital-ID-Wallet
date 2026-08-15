@@ -1,0 +1,16 @@
+web/src/components/organisms/qr-camera-scanner/test/qr-camera-scanner.test.tsx
+  h_0aff3b71f739b1 79,89
+web/src/components/organisms/app-sidebar/test/app-sidebar.test.tsx
+  h_0aff3b71f739b1 151-154,157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "8b59bfcfa10ece84797dc78e08446842337e5c16",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
