@@ -1,0 +1,14 @@
+docs/demo3/architecture-v3.md
+  h_99fca60b892ff4 173-183
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "d027e40576395754164dedafb273a2b26d936ca9",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+web/src/components/pages/citizen/verification-page.tsx
+  h_0aff3b71f739b1 56,58-63,67-73,76-78,80,88,93-94,96-97
+  h_0aff3b71f739b1 79,81,95
+web/src/components/organisms/qr-camera-scanner/qr-camera-scanner.tsx
+  h_0aff3b71f739b1 4-5,19,21,50-52,58-60,63-65,111-114,124-139,145-159,164-209
+  h_0aff3b71f739b1 20,118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "49960935d942551a5f8c9893480cc7c11f28ed24",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

@@ -1,0 +1,32 @@
+web/src/components/pages/citizen/my-credentials-page.tsx
+  s_d0a01d4355c98b::t_e5df3f543d7a37 77-79
+  s_d0a01d4355c98b::t_c4288748230ae9 29-31,33-37,39-41,43-48,50-75,80-82
+web/src/components/organisms/qr-display/qr-display.tsx
+  s_d0a01d4355c98b::t_0d5473a5940b40 27,212
+  s_d0a01d4355c98b::t_5e472bfff524b4 23-25,28,116-119,126-127,129-132,159,208-211,213-216
+  s_d0a01d4355c98b::t_c9104e8ed5f531 26,102-115,128,146-158,160-161,169,174-177
+  s_d0a01d4355c98b::t_2e4aa277f2c040 29
+  s_d0a01d4355c98b::t_ccb7dec1054235 178
+  s_d0a01d4355c98b::t_e767ea675fcf33 217
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "2f5ef74f9835d27fcb7474d4b640f4004dbebcab",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_d0a01d4355c98b": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "7fa90e7c-f047-4d0b-9253-8d90871541d3",
+        "model": "gpt-5.4-mini"
+      },
+      "human_author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
