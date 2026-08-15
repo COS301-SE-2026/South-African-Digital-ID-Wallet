@@ -3,13 +3,17 @@ using System.Text;
 using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
-using Domain.Entities;
 using Infrastructure.Gateways.GovernmentRegistry;
 using Infrastructure.Providers;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Azure.Storage.Blobs;
+using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Common.Services;
+using Microsoft.Azure.Cosmos;
+using User = Domain.Entities.User;
 
 namespace Infrastructure;
 
@@ -32,14 +36,36 @@ public static class DependencyInjection
         services.AddScoped<IActivityOverviewRepository, ActivityOverviewRepository>();
         services.AddScoped<IDashboardAccountCardRepository, DashboardAccountCardRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddSingleton<IDeviceTokenProvider, DeviceTokenProvider>();
 
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
 
         services.AddScoped<ICredentialRepository, CredentialRepository>();
         services.AddSingleton<IQrSigningProvider, Ed25519SigningProvider>();
-        services.AddScoped<IQrDisclosureTokenRepository, QrDisclosureTokenRepository>();
+        services.AddSingleton(n =>
+        {
+            var configuration = n.GetRequiredService<IConfiguration>();
+            var connectionString = configuration["Cosmos:ConnectionString"] ?? throw new InvalidOperationException("Cosmos:ConnectionString is not configured.");
+            return new CosmosClient(connectionString, new CosmosClientOptions
+            {
+                SerializerOptions = new CosmosSerializationOptions
+                { PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase },
+            });
+        });
+        services.AddScoped<IQrDisclosureTokenRepository, CosmosQrDisclosureTokenRepository>();
+        services.AddSingleton(n =>
+        {
+            var configuration = n.GetRequiredService<IConfiguration>();
+            var connectionString = configuration["BlobStorage:ConnectionString"] ?? throw new InvalidOperationException("BlobStorage:ConnectionString not configured.");
+            return new BlobServiceClient(connectionString);
+        });
+        services.AddSingleton<IPhotoStorageProvider, AzureBlobPhotoStorageProvider>();
+        services.AddScoped<IDisclosedFieldsValueResolver, DisclosedFieldValueResolver>();
 
         services.AddScoped<IOfficialRepository, OfficialRepository>();
+        services.AddScoped<IManageUserAccountRepository, ManageUserAccountRepository>();
+        services.AddScoped<IUpdatePasswordRepository, UpdatePasswordRepository>();
+        services.AddScoped<IDeleteAccountRepository, DeleteAccountRepository>();
 
         services.AddHttpClient<IGovernmentRegistryGateway, GovernmentRegistryGateway>((serviceProvider, client) =>
         {

@@ -16,5 +16,13 @@ public enum AuditEventType
     ConsentRecorded,
     OnboardCitizen,
     OnboardCitizenFailed,
+    EmailAddressChanged,
     CitizenVerified,
+    CitizenVerificationFailed,
+    CitizenCredentialsActivated,
+    CitizenCredentialsDeactivated,
+    CitizenCredentialsActivationFailed,
+    DeviceVerificationRequested,
+    DeviceVerificationFailed,
+    DeviceVerified,
 }

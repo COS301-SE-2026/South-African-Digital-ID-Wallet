@@ -27,8 +27,8 @@ namespace Infrastructure.Data;
 // scanning features are built out.
 public static class DbSeeder
 {
-    private sealed record DeviceTemplate(string Name, string Type, string Os, string Browser);
-
+    private sealed record DeviceTemplate(string DeviceType, string OperatingSystem, string Browser);
+    private sealed record LocationTemplate(string City, string Country);
     private sealed record NotificationTemplate(string Title, string Description, string Tone);
 
     private static readonly string[] FirstNames = new[]
@@ -58,6 +58,15 @@ public static class DbSeeder
         "102.65.30.9", "196.15.45.7", "41.205.20.11" // NOSONAR
     };
 
+    private static readonly string[] MockPhotoBlobNames = new[]
+    {
+        "mock-photos-robin.png",
+        "mock-photos-raven.png",
+        "mock-photos-beast-boy.png",
+        "mock-photos-cyborg.png",
+        "mock-photos-starfire.png",
+    };
+
     public static async Task SeedAsync(AppDbContext context)
     {
         await context.Database.MigrateAsync();
@@ -70,12 +79,100 @@ public static class DbSeeder
         // Government administrators must exist before creating institutions or officials
         await SeedGovernmentAdministratorUsersAsync(context, usedEmails, usedPhones);
         await SeedOfficialUsersAsync(context, usedEmails, usedPhones);
+        await SeedE2ETestUsersAsync(context);
         await RepairInvalidPasswordHashesAsync(context);
         await SeedCredentialsAsync(context);
         await SeedUserPreferencesAsync(context);
         await SeedAuditLogsAsync(context);
         await SeedTrustedDevicesAsync(context);
         await SeedNotificationsAsync(context);
+    }
+
+    internal static async Task SeedE2ETestUsersAsync(AppDbContext context)
+    {
+        var now = DateTime.UtcNow;
+
+        async Task<User> EnsureUserAsync(string email, string phone, UserRole role)
+        {
+            var existing = await context.DomainUsers.FirstOrDefaultAsync(u => u.Email == email);
+            if (existing != null)
+            {
+                return existing;
+            }
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                Email = email,
+                PhoneNumber = phone,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
+                FailedLoginAttempts = 0,
+                IsDeleted = false,
+                IsEmailVerified = true,
+                Role = role,
+                CreatedAt = now,
+                UpdatedAt = now
+            };
+
+            await context.DomainUsers.AddAsync(user);
+            await context.SaveChangesAsync();
+            return user;
+        }
+
+        var citizenUser = await EnsureUserAsync("citizen.e2e@flashid.local", "+27810000001", UserRole.Citizen);
+        if (!await context.Citizens.AnyAsync(c => c.UserId == citizenUser.Id))
+        {
+            await context.Citizens.AddAsync(new Citizen
+            {
+                Id = Guid.NewGuid(),
+                SaId = "0000000000001",
+                Names = "E2E",
+                Surname = "Citizen",
+                DateOfBirth = now.AddYears(-30),
+                Gender = Gender.Other,
+                Status = CitizenStatus.Activated,
+                UserId = citizenUser.Id,
+                CreatedAt = now,
+                UpdatedAt = now
+            });
+            await context.SaveChangesAsync();
+        }
+
+        var govUser = await EnsureUserAsync("govadmin.e2e@flashid.local", "+27810000002", UserRole.GovernmentAdministrator);
+        if (!await context.GovernmentAdministrators.AnyAsync(g => g.UserId == govUser.Id))
+        {
+            await context.GovernmentAdministrators.AddAsync(new GovernmentAdministrator
+            {
+                Id = Guid.NewGuid(),
+                GovernmentId = "GOVE2E01",
+                Names = "E2E",
+                Surname = "GovAdmin",
+                UserId = govUser.Id,
+                CreatedAt = now,
+                UpdatedAt = now
+            });
+            await context.SaveChangesAsync();
+        }
+
+        var officialUser = await EnsureUserAsync("official.e2e@flashid.local", "+27810000003", UserRole.Official);
+        if (!await context.Officials.AnyAsync(o => o.UserId == officialUser.Id))
+        {
+            var institution = await context.Institutions.FirstOrDefaultAsync();
+            if (institution != null)
+            {
+                await context.Officials.AddAsync(new Official
+                {
+                    Id = Guid.NewGuid(),
+                    OfficialId = "OFFE2E01",
+                    Names = "E2E",
+                    Surname = "Official",
+                    UserId = officialUser.Id,
+                    InstitutionId = institution.Id,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                });
+                await context.SaveChangesAsync();
+            }
+        }
     }
 
     private static async Task RepairInvalidPasswordHashesAsync(AppDbContext context)
@@ -533,7 +630,10 @@ public static class DbSeeder
             var age = now.Year - citizen.DateOfBirth.Year;
             if (citizen.DateOfBirth > now.AddYears(-age)) age--;
 
-            var idCredential = NewCredential(citizen.Id, idIssuer, now);
+            var photoPath = citizen.Status == CitizenStatus.Activated ? MockPhotoBlobNames[rnd.Next(MockPhotoBlobNames.Length)] : string.Empty;
+            var signature = citizen.Status == CitizenStatus.Activated ? "mock-photos-signature.png" : Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N");
+
+            var idCredential = NewCredential(citizen.Id, idIssuer, now, signature);
             credentialsToAdd.Add(idCredential);
 
             // every citizen 16+ gets an identity document
@@ -544,6 +644,7 @@ public static class DbSeeder
                 CountryOfBirth = countries[rnd.Next(countries.Length)],
                 Nationality = nationalities[rnd.Next(nationalities.Length)],
                 Status = idStatuses[rnd.Next(idStatuses.Length)],
+                PhotoPath = photoPath,
                 CredentialId = idCredential.Id,
                 CreatedAt = now,
                 UpdatedAt = now
@@ -552,7 +653,7 @@ public static class DbSeeder
             // only citizens 18+ get a drivers license
             if (age >= 18)
             {
-                var licenseCredential = NewCredential(citizen.Id, licenseIssuer, now);
+                var licenseCredential = NewCredential(citizen.Id, licenseIssuer, now, signature);
                 credentialsToAdd.Add(licenseCredential);
                 var startDate = now.AddYears(-rnd.Next(1, 10));
                 driversLicensesToAdd.Add(new DriversLicense
@@ -565,6 +666,7 @@ public static class DbSeeder
                     // Restrictions max 2 chars
                     Restrictions = "00",
                     ExpiryDate = startDate.AddYears(5),
+                    PhotoPath = photoPath,
                     CredentialId = licenseCredential.Id,
                     CreatedAt = now,
                     UpdatedAt = now
@@ -584,11 +686,11 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
     }
-    private static Credential NewCredential(Guid citizenId, string issuedBy, DateTime now) => new()
+    private static Credential NewCredential(Guid citizenId, string issuedBy, DateTime now, string signature) => new()
     {
         Id = Guid.NewGuid(),
         Status = CredentialStatus.Active,
-        Signature = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"),
+        Signature = signature,
         IssuedBy = issuedBy,
         IssueDate = now,
         CitizenId = citizenId,
@@ -701,65 +803,77 @@ public static class DbSeeder
         // only seed if no trusted devices exist yet
         if (await context.TrustedDevices.AnyAsync()) return;
 
-        var allCitizens = await context.Citizens.ToListAsync();
-        if (allCitizens.Count == 0) return;
+        var allUsers = await context.DomainUsers.ToListAsync();
+        if (allUsers.Count == 0) return;
 
         var deviceTemplates = new[]
         {
-            new DeviceTemplate("iPhone 15 Pro", "Mobile", "iOS 18.1", "Safari"),
-            new DeviceTemplate("Samsung Galaxy S24", "Mobile", "Android 15", "Chrome"),
-            new DeviceTemplate("MacBook Pro", "Desktop", "macOS Sequoia", "Safari"),
-            new DeviceTemplate("Dell XPS 15", "Desktop", "Windows 11", "Edge"),
-            new DeviceTemplate("iPad Air", "Tablet", "iPadOS 18.1", "Safari"),
-            new DeviceTemplate("HP Pavilion", "Desktop", "Windows 11", "Chrome"),
-            new DeviceTemplate("Google Pixel 9", "Mobile", "Android 15", "Chrome"),
+            new DeviceTemplate("Mobile", "iOS 18.1", "Safari"),
+            new DeviceTemplate("Mobile", "Android 15", "Chrome"),
+            new DeviceTemplate("Desktop", "macOS Sequoia", "Safari"),
+            new DeviceTemplate("Desktop", "Windows 11", "Edge"),
+            new DeviceTemplate("Tablet", "iPadOS 18.1", "Safari"),
+            new DeviceTemplate("Desktop", "Windows 11", "Chrome"),
+            new DeviceTemplate("Mobile", "Android 15", "Chrome"),
         };
 
         var locations = new[]
         {
-            "Pretoria, Gauteng", "Johannesburg, Gauteng", "Cape Town, Western Cape",
-            "Durban, KwaZulu-Natal", "Bloemfontein, Free State", "Port Elizabeth, Eastern Cape"
+            new LocationTemplate("Pretoria", "South Africa"),
+            new LocationTemplate("Johannesburg", "South Africa"),
+            new LocationTemplate("Cape Town", "South Africa"),
+            new LocationTemplate("Durban", "South Africa"),
+            new LocationTemplate("Bloemfontein", "South Africa"),
+            new LocationTemplate("Gqeberha", "South Africa")
         };
 
         var devicesToAdd = new List<TrustedDevice>();
 
-        void AddDevicesForCitizen(Citizen citizen, int minDevices, int maxDevicesExclusive, int maxLastActiveDaysAgo, int trustedThreshold)
+        void AddDevicesForCitizen(User citizen, int minDevices, int maxDevicesExclusive, int maxLastActiveDaysAgo, int trustedThreshold)
         {
             var deviceCount = rnd.Next(minDevices, maxDevicesExclusive);
             for (int i = 0; i < deviceCount; i++)
             {
                 var template = deviceTemplates[rnd.Next(deviceTemplates.Length)];
+                var location = locations[rnd.Next(locations.Length)];
+
+                var seedDeviceToken = $"seed-device-{citizen.Id}-{i}";
+                var deviceTokenHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(seedDeviceToken)));
+
                 devicesToAdd.Add(new TrustedDevice
                 {
                     Id = Guid.NewGuid(),
-                    DeviceName = template.Name,
-                    DeviceType = template.Type,
-                    OperatingSystem = template.Os,
+                    DeviceTokenHash = deviceTokenHash,
+                    DeviceType = Enum.Parse<DeviceType>(template.DeviceType),
+                    OperatingSystem = template.OperatingSystem,
                     Browser = template.Browser,
-                    IpAddress = SampleIpAddresses[rnd.Next(SampleIpAddresses.Length)],
-                    Location = locations[rnd.Next(locations.Length)],
+                    LastKnownCity = location.City,
+                    LastKnownCountry = location.Country,
                     LastActive = now.AddDays(-rnd.Next(0, maxLastActiveDaysAgo)),
-                    IsCurrentDevice = i == 0,
                     IsTrusted = rnd.Next(10) > trustedThreshold,
-                    CitizenId = citizen.Id,
+                    UserId = citizen.Id,
                     CreatedAt = now.AddDays(-rnd.Next(30, 365)),
                     UpdatedAt = now
                 });
             }
         }
 
-        // Prioritize Harper Miller (or any Harper/Miller match) with a fuller device history
-        var priorityCitizens = allCitizens
-            .Where(c => c.Names == "Harper" || c.Surname == "Miller")
-            .ToList();
 
-        foreach (var citizen in priorityCitizens)
+
+        var citizens = await context.Citizens.ToListAsync();
+        // Prioritize Harper Miller (or any Harper/Miller match) with a fuller device history
+        var priorityUsersId = citizens
+            .Where(c => c.Names == "Harper" || c.Surname == "Miller").Select(c => c.UserId).ToHashSet();
+
+        var priorityUsers = allUsers.Where(u => priorityUsersId.Contains(u.Id)).ToList();
+
+        foreach (var citizen in priorityUsers)
         {
             AddDevicesForCitizen(citizen, minDevices: 3, maxDevicesExclusive: 5, maxLastActiveDaysAgo: 14, trustedThreshold: 1);
         }
 
         // Give the remaining citizens 1-3 devices each
-        foreach (var citizen in allCitizens.Where(c => !priorityCitizens.Contains(c)))
+        foreach (var citizen in allUsers.Where(c => !priorityUsers.Contains(c)))
         {
             AddDevicesForCitizen(citizen, minDevices: 1, maxDevicesExclusive: 4, maxLastActiveDaysAgo: 30, trustedThreshold: 2);
         }

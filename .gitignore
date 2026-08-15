@@ -22,3 +22,12 @@ node_modules/
 *.swp
 *.swobin/
 obj/
+*.swo
+
+# Test coverage output
+coverage/
+CoverageReport/
+*.cobertura.xml
+
+__azurite*
+Azurite*

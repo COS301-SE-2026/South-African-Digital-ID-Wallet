@@ -15,14 +15,46 @@ export const pageHeaders: Record<string, PageHeader> = {
       'Verify a citizen, capture consent, and create a pending FlashID account.',
   },
 
+  '/officials/verifications': {
+    title: 'Verifications',
+    description: 'Scan secure QR Code to verify identitities and credentials.',
+  },
+
   '/citizen': {
     title: 'Citizen Dashboard',
     description: 'View and manage your digital identity wallet.',
   },
 
+  '/citizen/citizen-dashboard': {
+    title: 'Citizen Dashboard',
+    description: 'View and manage your digital identity wallet.',
+  },
+
+  '/citizen/verifications': {
+    title: 'Verifications',
+    description: 'Scan secure QR Code to verify identitities and credentials.',
+  },
+
+  '/citizen/qr': {
+    title: 'Share QR codes',
+    description:
+      'Generate secure QR codes to share selected identity information.',
+  },
+
   '/citizen/my-credentials': {
     title: 'My Credentials',
     description: 'View and manage your issued digital credentials. ',
+  },
+
+  '/citizen/activate-credentials': {
+    title: 'Activate Credentials',
+    description:
+      'Verify your identity and add your credentials to your wallet.',
+  },
+
+  '/citizen/manage-user-account': {
+    title: 'Manage Account',
+    description: 'Manage your profile, security settings, and trusted devices.',
   },
 
   '/gov-admin': {

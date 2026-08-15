@@ -5,6 +5,7 @@ using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Credentials;
 using Application.Features.Credentials.DTOs;
+using Application.Features.Credentials.Enums;
 using Application.Features.Credentials.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
@@ -19,18 +20,20 @@ public class QrService : IQrService
     private readonly IQrSigningProvider _qrSigningProvider;
     private readonly IQrDisclosureTokenRepository _qrDisclosureTokenRepository;
     private readonly IInstitutionRepository _institutionRepository;
+    private readonly IDisclosedFieldsValueResolver _disclosedFieldsValueResolver;
 
     private static readonly JsonSerializerOptions CamelCaseOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    public QrService(ICredentialRepository credentialRepository, IQrSigningProvider qrSigningProvider, IQrDisclosureTokenRepository qrDisclosureTokenRepository, IInstitutionRepository institutionRepository)
+    public QrService(ICredentialRepository credentialRepository, IQrSigningProvider qrSigningProvider, IQrDisclosureTokenRepository qrDisclosureTokenRepository, IInstitutionRepository institutionRepository, IDisclosedFieldsValueResolver disclosedFieldsValueResolver)
     {
         _credentialRepository = credentialRepository;
         _qrSigningProvider = qrSigningProvider;
         _qrDisclosureTokenRepository = qrDisclosureTokenRepository;
         _institutionRepository = institutionRepository;
+        _disclosedFieldsValueResolver = disclosedFieldsValueResolver;
     }
 
     public async Task<GenerateQrResponseDto> GenerateQrAsync(Guid credentialId, Guid requestingUserId, GenerateQrRequestDto request)
@@ -63,6 +66,8 @@ public class QrService : IQrService
         var issuedAt = DateTime.UtcNow;
         var expiresAt = issuedAt.AddSeconds(QrLifetimeSeconds);
         var jti = Guid.NewGuid();
+
+        await _qrDisclosureTokenRepository.InvalidateActiveTokensForCredentialAsync(credential.Id);
 
         await _qrDisclosureTokenRepository.AddAsync(new QrDisclosureToken
         {
@@ -168,7 +173,7 @@ public class QrService : IQrService
             throw new InvalidDisclosureTokenException();
 
         var credType = cred.IdentityDocument != null ? "Identity Document" : "Driver's License";
-        var disclosedFields = DisclosedFieldValueResolver.Resolve(cred, payload.DisclosedFields);
+        var disclosedFields = await _disclosedFieldsValueResolver.ResolveAsync(cred, payload.DisclosedFields);
 
         await _institutionRepository.AddAuditLogAsync(new AuditLog
         {

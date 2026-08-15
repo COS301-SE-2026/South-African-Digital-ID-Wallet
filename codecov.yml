@@ -1,0 +1,7 @@
+ignore:
+  - "**/Migrations/**"
+  - "backend/FlashIdBackend/Infrastructure/Data/DbSeeder.cs"
+  - "government-registry/GovernmentRegistry/Infrastructure/DbSeeder.cs"
+  - "backend/FlashIdBackend/Presentation/Program.cs"
+  - "government-registry/GovernmentRegistry/Presentation/Program.cs"
+  - "**/obj/**"

@@ -10,11 +10,10 @@ public class AuditLog
 
     public string Details { get; set; } = string.Empty;
 
-    public string IpAddress { get; set; } = string.Empty;
+    public string? IpAddress { get; set; } = string.Empty;
 
     public DateTime CreatedAt { get; set; }
 
-    // navigation properties
-    public Guid ActorId { get; set; }
-    public User Actor { get; set; } = null!;
+    public Guid? ActorId { get; set; }
+    public User? Actor { get; set; } = null;
 }

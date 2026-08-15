@@ -57,12 +57,12 @@ pre-commit:
       run: pnpm format
       stage_fixed: true
     government-registry-lint:
-      glob: "backend/GovernmentRegistry/**/*.cs"
+      glob: "government-registry/GovernmentRegistry/**/*.cs"
       root: "government-registry"
       run: pnpm lint
       stage_fixed: true
     government-registry-build:
-      glob: "backend/GovernmentRegistry/**/*.cs"
+      glob: "government-registry/GovernmentRegistry/**/*.cs"
       root: "government-registry"
       run: pnpm build
       skip:

@@ -4,25 +4,23 @@ namespace Domain.Entities;
 
 public class TrustedDevice : BaseEntity
 {
-    public string DeviceName { get; set; } = string.Empty;
+    public string DeviceTokenHash { get; set; } = string.Empty;
 
-    public string DeviceType { get; set; } = string.Empty;
+    public DeviceType DeviceType { get; set; }
 
     public string OperatingSystem { get; set; } = string.Empty;
 
     public string Browser { get; set; } = string.Empty;
 
-    public string IpAddress { get; set; } = string.Empty;
+    public string? LastKnownCity { get; set; }
 
-    public string Location { get; set; } = string.Empty;
+    public string? LastKnownCountry { get; set; }
 
     public DateTime LastActive { get; set; }
 
-    public bool IsCurrentDevice { get; set; }
-
     public bool IsTrusted { get; set; }
 
-    public Guid CitizenId { get; set; }
+    public Guid UserId { get; set; }
 
-    public Citizen Citizen { get; set; }
+    public User User { get; set; } = null!;
 }

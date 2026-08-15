@@ -24,11 +24,19 @@ const DEFAULT_NAV_SECTIONS = [
   },
 ]
 
-const DEFAULT_USER = { name: 'John Doe', initials: 'JD', idLabel: 'ID: 123456' }
+const DEFAULT_USER = {
+  name: 'John Doe',
+  initials: 'JD',
+}
+
 const mockLogout = jest.fn()
 
 describe('AppSidebar', () => {
-  it('renders the Flash ID logo', () => {
+  beforeEach(() => {
+    mockLogout.mockClear()
+  })
+
+  it('renders the FlashID logo', () => {
     render(
       <AppSidebar
         navSections={DEFAULT_NAV_SECTIONS}
@@ -36,7 +44,24 @@ describe('AppSidebar', () => {
         onLogout={mockLogout}
       />
     )
-    expect(screen.getByAltText('Flash ID logo')).toBeInTheDocument()
+
+    expect(screen.getByAltText('FlashID Logo')).toBeInTheDocument()
+  })
+
+  it('logo links to the dashboard', () => {
+    render(
+      <AppSidebar
+        navSections={DEFAULT_NAV_SECTIONS}
+        user={DEFAULT_USER}
+        onLogout={mockLogout}
+      />
+    )
+
+    expect(
+      screen.getByRole('link', {
+        name: /go to dashboard/i,
+      })
+    ).toHaveAttribute('href', '/citizen/citizen-dashboard')
   })
 
   it('renders nav section titles when expanded', () => {
@@ -47,6 +72,7 @@ describe('AppSidebar', () => {
         onLogout={mockLogout}
       />
     )
+
     expect(screen.getByText('Citizen Portal')).toBeInTheDocument()
   })
 
@@ -58,13 +84,21 @@ describe('AppSidebar', () => {
         onLogout={mockLogout}
       />
     )
-    expect(screen.getByRole('link', { name: /dashboard/i })).toBeInTheDocument()
+
     expect(
-      screen.getByRole('link', { name: /my credentials/i })
+      screen.getByRole('link', {
+        name: /^Dashboard$/,
+      })
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByRole('link', {
+        name: /my credentials/i,
+      })
     ).toBeInTheDocument()
   })
 
-  it('renders user name and idLabel when expanded', () => {
+  it('renders user name when expanded', () => {
     render(
       <AppSidebar
         navSections={DEFAULT_NAV_SECTIONS}
@@ -72,12 +106,13 @@ describe('AppSidebar', () => {
         onLogout={mockLogout}
       />
     )
+
     expect(screen.getByText('John Doe')).toBeInTheDocument()
-    expect(screen.getByText('ID: 123456')).toBeInTheDocument()
   })
 
   it('collapses when the toggle button is clicked', async () => {
-    const userEvent_ = userEvent.setup()
+    const user = userEvent.setup()
+
     render(
       <AppSidebar
         navSections={DEFAULT_NAV_SECTIONS}
@@ -85,15 +120,20 @@ describe('AppSidebar', () => {
         onLogout={mockLogout}
       />
     )
-    await userEvent_.click(
-      screen.getByRole('button', { name: 'Collapse sidebar' })
+
+    await user.click(
+      screen.getByRole('button', {
+        name: /collapse sidebar/i,
+      })
     )
+
     expect(screen.queryByText('Citizen Portal')).not.toBeInTheDocument()
     expect(screen.queryByText('John Doe')).not.toBeInTheDocument()
   })
 
   it('expands again after collapsing', async () => {
-    const userEvent_ = userEvent.setup()
+    const user = userEvent.setup()
+
     render(
       <AppSidebar
         navSections={DEFAULT_NAV_SECTIONS}
@@ -101,18 +141,26 @@ describe('AppSidebar', () => {
         onLogout={mockLogout}
       />
     )
-    await userEvent_.click(
-      screen.getByRole('button', { name: 'Collapse sidebar' })
+
+    await user.click(
+      screen.getByRole('button', {
+        name: /collapse sidebar/i,
+      })
     )
-    await userEvent_.click(
-      screen.getByRole('button', { name: 'Expand sidebar' })
+
+    await user.click(
+      screen.getByRole('button', {
+        name: /expand sidebar/i,
+      })
     )
+
     expect(screen.getByText('Citizen Portal')).toBeInTheDocument()
     expect(screen.getByText('John Doe')).toBeInTheDocument()
   })
 
   it('still shows user initials when collapsed', async () => {
-    const userEvent_ = userEvent.setup()
+    const user = userEvent.setup()
+
     render(
       <AppSidebar
         navSections={DEFAULT_NAV_SECTIONS}
@@ -120,14 +168,19 @@ describe('AppSidebar', () => {
         onLogout={mockLogout}
       />
     )
-    await userEvent_.click(
-      screen.getByRole('button', { name: 'Collapse sidebar' })
+
+    await user.click(
+      screen.getByRole('button', {
+        name: /collapse sidebar/i,
+      })
     )
+
     expect(screen.getByText('JD')).toBeInTheDocument()
   })
 
   it('calls logout when the logout button is clicked', async () => {
-    const userEvent_ = userEvent.setup()
+    const user = userEvent.setup()
+
     render(
       <AppSidebar
         navSections={DEFAULT_NAV_SECTIONS}
@@ -136,8 +189,8 @@ describe('AppSidebar', () => {
       />
     )
 
-    await userEvent_.click(screen.getByRole('button', { name: /logout/i }))
+    await user.click(screen.getByRole('button', { name: /logout/i }))
 
-    expect(mockLogout).toHaveBeenCalled()
+    expect(mockLogout).toHaveBeenCalledTimes(1)
   })
 })

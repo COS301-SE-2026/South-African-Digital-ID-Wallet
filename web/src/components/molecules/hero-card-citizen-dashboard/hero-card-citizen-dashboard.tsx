@@ -1,31 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import qrCodeImage from '@/assets/images/qrCodeImage.png'
+import qrCodeImage from '@/assets/images/qrCodeImage.svg'
 import { Button } from '@/components/ui/button'
 import { Text } from '@/components/atoms/text'
 
-const qr_duration = 120
-
-function formatTime(totalSeconds: number) {
-  const minutes = Math.floor(totalSeconds / 60)
-  const seconds = totalSeconds % 60
-  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-}
-
 export function WalletHeroCard() {
-  const [secondsLeft, setSecondsLeft] = useState(qr_duration)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSecondsLeft((prev) => (prev <= 1 ? 0 : prev - 1))
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [])
-
-  const handleGenerate = () => setSecondsLeft(qr_duration)
-
   return (
     <div className="bg-deep-green rounded-3xl p-6 flex items-center justify-between gap-6">
       <div>
@@ -42,10 +24,7 @@ export function WalletHeroCard() {
           verify your identity.
         </p>
         <div className="mt-4 flex gap-3">
-          <Button
-            onClick={handleGenerate}
-            className="bg-white text-deep-green hover:bg-white/90"
-          >
+          <Button className="bg-white text-deep-green hover:bg-white/90">
             Generate QR Code
           </Button>
         </div>
@@ -60,9 +39,6 @@ export function WalletHeroCard() {
             priority
           />
         </div>
-        <span className="text-xs font-semibold text-white/80">
-          QR expires in {formatTime(secondsLeft)}
-        </span>
       </div>
     </div>
   )

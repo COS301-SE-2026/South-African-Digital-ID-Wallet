@@ -15,15 +15,12 @@ import {
   Landmark,
   LogOut,
 } from 'lucide-react'
-
 import { useState } from 'react'
-
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import FlashIdWhite from '@/assets/images/FlashID-white.png'
+import FlashIdLogo from '@/assets/images/FlashID-green.png'
 import { Button } from '@/components/atoms'
-
 import type { SidebarIconName } from '@/types/navigation'
 import type { AppSidebarProps } from './types'
 
@@ -50,12 +47,14 @@ export const AppSidebar = ({
 }: Readonly<AppSidebarProps>) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const pathname = usePathname()
+  const dashboardHref = navSections[0]?.items[0]?.href ?? '/'
+  const css = isCollapsed ? 'w-24' : 'w-64'
 
   return (
     <aside
       className={`flex overflow-hidden flex-col bg-deep-green px-4 py-5 text-clean-white transition-all duration-300 ${
         variant === 'desktop'
-          ? `hidden lg:flex h-screen ${isCollapsed ? 'w-24' : 'w-64'}`
+          ? `hidden lg:flex h-screen ${css}`
           : 'h-full w-full'
       }`}
     >
@@ -64,39 +63,38 @@ export const AppSidebar = ({
           isCollapsed ? 'justify-center' : 'justify-between'
         }`}
       >
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full">
-            {isCollapsed ? (
-              <div
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white"
-                title={user.name}
-                aria-label={`${user.name} avatar`}
-              >
-                <Image
-                  src={FlashIdWhite}
-                  alt="Flash ID logo"
-                  width={48}
-                  height={48}
-                  className="h-12 w-12 object-contain"
-                  priority
-                />
-              </div>
-            ) : (
+        <Link
+          href={dashboardHref}
+          onClick={() => onNavigate?.()}
+          className={`flex items-center ${
+            isCollapsed
+              ? 'h-10 w-10 justify-center'
+              : 'h-10 w-full justify-center'
+          }`}
+          aria-label="Go to dashboard"
+        >
+          {isCollapsed ? (
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-clean-white/40 bg-primary-green/30"
+              title={user.name}
+            >
               <Image
-                src={FlashIdWhite}
-                alt="Flash ID logo"
-                width={48}
-                height={48}
-                className="h-12 w-12 object-contain"
-                priority
+                src={FlashIdLogo}
+                alt="FlashID Logo"
+                width={32}
+                height={32}
               />
-            )}
-          </div>
-
-          {!isCollapsed && (
-            <p className="text-xl font-bold whitespace-nowrap">Flash ID</p>
+            </div>
+          ) : (
+            <Image
+              src={FlashIdLogo}
+              alt="FlashID Logo"
+              width={140}
+              height={40}
+              priority
+            />
           )}
-        </div>
+        </Link>
 
         {variant === 'desktop' && (
           <button
@@ -164,9 +162,6 @@ export const AppSidebar = ({
                 <p className="truncate text-sm font-extrabold text-clean-white">
                   {user.name}
                 </p>
-                <p className="truncate text-xs font-semibold text-accent-gold/80">
-                  {user.idLabel}
-                </p>
               </div>
             </div>
           </div>
@@ -191,9 +186,7 @@ export const AppSidebar = ({
             {user.initials}
           </div>
 
-          <Button onClick={onLogout} LeftIcon={LogOut}>
-            Logout
-          </Button>
+          <Button onClick={onLogout} LeftIcon={LogOut}></Button>
         </div>
       )}
     </aside>
