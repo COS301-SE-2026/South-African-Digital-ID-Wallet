@@ -1,0 +1,15 @@
+mobile/src/services/login-service/test/login-dto.test.ts
+  h_712d174fc3f309 2-9,11-12
+  h_712d174fc3f309 1,10,13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ae5d612dde6abe2b83ec5a8fd4c21d390537b601",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
