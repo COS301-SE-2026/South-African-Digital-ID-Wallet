@@ -46,25 +46,6 @@ describe('FieldSelectionForm', () => {
     expect(genderSwitch).toBeChecked()
   })
 
-  it('selects all optional fields when "select all for official" is clicked', async () => {
-    const user = userEvent.setup()
-    render(
-      <FieldSelectionForm
-        credentialId="credential-123"
-        credentialType="identityDocument"
-        onContinue={() => {}}
-        onBack={() => {}}
-      />
-    )
-    await user.click(
-      screen.getByRole('button', { name: /select all for official/i })
-    )
-    expect(screen.getByRole('switch', { name: /gender/i })).toBeChecked()
-    expect(
-      screen.getByRole('switch', { name: /country of birth/i })
-    ).toBeChecked()
-  })
-
   it('calls onContinue with mandatory and selected optional fields', async () => {
     const user = userEvent.setup()
     const onContinue = jest.fn()

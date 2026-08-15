@@ -1,12 +1,31 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { IdCard } from 'lucide-react'
 import { CredentialDetailCard } from '@/components/molecules'
 import type { CredentialView } from '@/services/credential-service'
+
+jest.mock('@/components/organisms', () => {
+  const actual = jest.requireActual('@/components/organisms')
+
+  return {
+    __esModule: true,
+    ...actual,
+    QrDisplay: ({ onBack }: { onBack: () => void }) => (
+      <div>
+        <div>qr-display-panel</div>
+        <button type="button" onClick={onBack}>
+          back-to-disclosure
+        </button>
+      </div>
+    ),
+  }
+})
 
 const view: CredentialView = {
   id: 'id-1',
   title: 'National ID Card',
   issuer: 'Department of Home Affairs',
+  qrCredentialType: 'identityDocument',
   icon: IdCard,
   statusLabel: 'Verified',
   statusIntent: 'active',
@@ -32,10 +51,30 @@ describe('CredentialDetailCard', () => {
     expect(screen.getByText('South African')).toBeInTheDocument()
   })
 
-  it('does not render a Share QR code button', () => {
+  it('moves from disclosure to QR and back again', async () => {
+    const user = userEvent.setup()
     render(<CredentialDetailCard credential={view} />)
+
+    await user.click(screen.getByRole('button', { name: /share/i }))
+
+    const dialog = screen.getByRole('dialog', {
+      name: /share national id card/i,
+    })
+    expect(dialog).toBeInTheDocument()
     expect(
-      screen.queryByRole('button', { name: /share qr code/i })
-    ).not.toBeInTheDocument()
+      within(dialog).getByText(/choose what to share/i)
+    ).toBeInTheDocument()
+
+    await user.click(
+      within(dialog).getByRole('button', { name: /generate qr code/i })
+    )
+
+    expect(within(dialog).getByText(/qr-display-panel/i)).toBeInTheDocument()
+
+    await user.click(within(dialog).getByRole('button', { name: /back/i }))
+
+    expect(
+      within(dialog).getByText(/choose what to share/i)
+    ).toBeInTheDocument()
   })
 })
