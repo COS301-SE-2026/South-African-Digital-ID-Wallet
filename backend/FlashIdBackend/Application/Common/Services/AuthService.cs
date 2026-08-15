@@ -25,6 +25,7 @@ public class AuthService : IAuthService
     private readonly IDeviceTokenProvider _deviceTokenProvider;
     private readonly IEmailSenderProvider _emailSenderProvider;
     private readonly IHostEnvironment _environment;
+    private readonly IIpGeolocationProvider _ipGeolocationProvider;
 
     public AuthService(
         IAuthRepository authRepository,
@@ -35,7 +36,7 @@ public class AuthService : IAuthService
         ITrustedDeviceRepository trustedDeviceRepository,
         IDeviceTokenProvider deviceTokenProvider,
         IEmailSenderProvider emailSenderProvider,
-            IHostEnvironment environment)
+            IHostEnvironment environment, IIpGeolocationProvider ipGeolocationProvider)
     {
         _authRepository = authRepository;
         _jwtTokenProvider = jwtTokenProvider;
@@ -46,6 +47,7 @@ public class AuthService : IAuthService
         _deviceTokenProvider = deviceTokenProvider;
         _emailSenderProvider = emailSenderProvider;
         _environment = environment;
+        _ipGeolocationProvider = ipGeolocationProvider;
 
     }
 
@@ -225,9 +227,10 @@ public class AuthService : IAuthService
         var hashedToken = _deviceTokenProvider.HashToken(rawDeviceToken);
 
         var existingTrustedDevice = await _trustedDeviceRepository.GetByTokenHashAsync(user.Id, hashedToken, cancellationToken);
-
+        var location = await _ipGeolocationProvider.GetLocationAsync(ipAddress, cancellationToken);
         if (existingTrustedDevice is null)
         {
+
             var trustedDevice = new TrustedDevice
             {
                 Id = Guid.NewGuid(),
@@ -236,8 +239,8 @@ public class AuthService : IAuthService
                 DeviceType = request.DeviceType,
                 OperatingSystem = request.OperatingSystem,
                 Browser = request.Browser,
-                LastKnownCity = null,
-                LastKnownCountry = null,
+                LastKnownCity = location?.City,
+                LastKnownCountry = location?.Country,
                 LastActive = DateTime.UtcNow,
                 IsTrusted = true,
                 CreatedAt = DateTime.UtcNow,
@@ -250,6 +253,8 @@ public class AuthService : IAuthService
         {
             existingTrustedDevice.IsTrusted = true;
             existingTrustedDevice.LastActive = DateTime.UtcNow;
+            existingTrustedDevice.LastKnownCity = location?.City;
+            existingTrustedDevice.LastKnownCountry = location?.Country;
             existingTrustedDevice.UpdatedAt = DateTime.UtcNow;
 
             await _trustedDeviceRepository.UpdateTrustedDeviceAsync(existingTrustedDevice, cancellationToken);
