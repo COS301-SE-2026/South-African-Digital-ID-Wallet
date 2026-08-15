@@ -17,6 +17,5 @@ public partial class InstitutionMapper
         nameof(Institution.Id),
         nameof(RegisterInstitutionResponseDto.InstitutionId)
     )]
-    [MapperIgnoreTarget(nameof(RegisterInstitutionResponseDto.ApiKey))]
     public partial RegisterInstitutionResponseDto InstitutionToRegisterResponseDto(Institution institution);
 }

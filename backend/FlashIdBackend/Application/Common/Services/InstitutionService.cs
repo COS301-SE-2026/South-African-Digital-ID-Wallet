@@ -161,7 +161,6 @@ public class InstitutionService : IInstitutionService
         await _institutionRepository.SaveChangesAsync();
 
         var dto = _mapper.InstitutionToRegisterResponseDto(institution);
-        dto.ApiKey = apiKey;
         dto.ApiKeyReference = apiKeyReference;
 
         return dto;
@@ -304,7 +303,6 @@ public class InstitutionService : IInstitutionService
         return new RegenerateApiKeyResponseDto
         {
             InstitutionId = institution.Id,
-            ApiKey = newApiKey,
             RegeneratedAt = DateTime.UtcNow,
         };
     }
