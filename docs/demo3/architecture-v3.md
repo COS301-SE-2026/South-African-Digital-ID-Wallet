@@ -170,6 +170,17 @@ During the prototype phase, external government registry integrations are simula
 ### 3.8 Keyed Hash Reference Pattern
 The Cosmos backed QR replay-guard ledger never stores a credential's raw identifier. It stores `HMAC-SHA256(credentialId, serverSecretKey)` instead, computed with a secret that only the backend holds. This lets the system still query "all active tokens for this credential" without the data store itself ever holding a directly-joinable identifier back to Azure SQL.
 
+### 3.9 Decorator Pattern (Retry Resilience)
+The credential expiry background job separates persistence from resilience: `CredentialExpiryRepository` implements plain EF Core persistence, and `RetryingCredentialExpiryRepositoryDecorator` wraps it behind the same `ICredentialsExpiryRepository` interface to add retry-with-backoff around `SaveChangesAsync` for transient database failures. The service layer and DI container are unaware retry is happening. Resilience is composed on top of persistence rather than baked into it.
+
+### 3.10 Template Method Pattern (Scheduled Jobs)
+`DailyScheduledBackgroundService` defines the fixed algorithm for a once-daily scheduled job:
+- Startup catch-up check
+- Wait until the next SAST midnight
+- Execute
+- Repeat
+All while leaving the 2 variant steps (`HasCompletedTodayAsync`, `RunOnceAsync`) abstract. `CredentialExpiryBackgroundService` is the first concrete subclass; any future daily job can extend the same base class without reimplementing the scheduling and catch-up logic.
+
 ---
 
 ## 4. Architectural Constraints
