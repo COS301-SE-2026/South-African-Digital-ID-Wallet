@@ -1,0 +1,32 @@
+web/src/components/molecules/credential-detail-card/test/credential-detail-card.test.tsx
+  s_d0a01d4355c98b::t_f264685a27cc43 23,63
+  s_d0a01d4355c98b::t_5e472bfff524b4 2,28,55,57-59
+  s_d0a01d4355c98b::t_b2eaada1d2a074 13-20,54,67-71,73-75,77-78
+  s_d0a01d4355c98b::t_8a0cad5de3bcfd 1,7-12,21,72
+  h_0aff3b71f739b1 61
+  s_d0a01d4355c98b::t_ec2dd07764a8bb 22
+  s_d0a01d4355c98b::t_22e542f754b52c 60,62,64-66
+web/src/services/credential-service/test/credential-model.test.ts
+  s_d0a01d4355c98b::t_5e472bfff524b4 49,74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "b842eec47cecd4371ccae63ad1dbdd1eb992ba84",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_d0a01d4355c98b": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "7fa90e7c-f047-4d0b-9253-8d90871541d3",
+        "model": "gpt-5.4-mini"
+      },
+      "human_author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
