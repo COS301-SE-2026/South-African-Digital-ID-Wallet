@@ -25,9 +25,9 @@ export function CredentialsList() {
   }
 
   return (
-    <div className="bg-card rounded-3xl border p-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold">Credential list</h2>
+    <div className="rounded-3xl border bg-card p-4 sm:p-6">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-base font-bold sm:text-lg">Credential list</h2>
       </div>
 
       {isLoading && <Text variant="sub-md">Loading credentials.</Text>}
@@ -42,17 +42,17 @@ export function CredentialsList() {
         <Text variant="sub-md">No credentials.</Text>
       )}
 
-      <div className="mt-4 grid grid-cols-2 gap-4">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {credentials.map((credential) => {
           const Icon = credential.icon
 
           return (
             <div
               key={credential.id}
-              className="bg-card rounded-2xl border p-4 h-30 flex flex-col justify-between"
+              className="bg-card flex min-h-[9rem] flex-col justify-between rounded-2xl border p-4"
             >
-              <div className="flex items-start justify-between">
-                <Icon className="h-8 w-8 mb-3" />
+              <div className="flex items-start justify-between gap-3">
+                <Icon className="mb-3 h-8 w-8 shrink-0" />
 
                 <button
                   type="button"
@@ -63,12 +63,12 @@ export function CredentialsList() {
                 </button>
               </div>
 
-              <div className="mt-3">
-                <div className="font-semibold text-sm leading-snug">
+              <div className="mt-3 min-w-0">
+                <div className="text-sm font-semibold leading-snug">
                   {credential.title}
                 </div>
 
-                <div className="text-muted-text text-xs mt-1">
+                <div className="text-muted-text mt-1 text-xs">
                   {credential.issuer}
                 </div>
               </div>

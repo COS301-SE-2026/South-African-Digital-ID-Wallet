@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Text } from '@/components/atoms'
@@ -14,6 +13,8 @@ export const FieldSelectionForm = ({
   onBack,
   credentialType,
   onContinue,
+  onSelectionChange,
+  continueLabel = 'Review and continue',
 }: Readonly<FieldSelectionFormProps>) => {
   const [selectedFields, setSelectedFields] = React.useState<
     Record<string, boolean>
@@ -24,31 +25,24 @@ export const FieldSelectionForm = ({
   const selectedCount = optionalFields.filter(
     (field) => selectedFields[field]
   ).length
-  const allSelected = optionalFields.every((field) => selectedFields[field])
+
+  const buildSelection = (fields: Record<string, boolean>) => ({
+    credentialId,
+    credentialType,
+    mandatoryFields,
+    selectedOptionalFields: optionalFields.filter((field) => fields[field]),
+  })
 
   const toggleField = (field: string) => {
-    setSelectedFields((prev) => ({ ...prev, [field]: !prev[field] }))
-  }
-
-  const handleSelectAll = () => {
-    setSelectedFields((prev) => {
-      const next = { ...prev }
-      optionalFields.forEach((field) => {
-        next[field] = true
-      })
-      return next
-    })
+    const nextFields = { ...selectedFields, [field]: !selectedFields[field] }
+    setSelectedFields(nextFields)
+    onSelectionChange?.(buildSelection(nextFields))
   }
 
   const handleContinue = () => {
-    onContinue({
-      credentialId,
-      credentialType,
-      mandatoryFields,
-      selectedOptionalFields: optionalFields.filter(
-        (field) => selectedFields[field]
-      ),
-    })
+    const selection = buildSelection(selectedFields)
+    onSelectionChange?.(selection)
+    onContinue(selection)
   }
 
   return (
@@ -56,24 +50,6 @@ export const FieldSelectionForm = ({
       <Text variant="sub-lg" className="font-bold">
         Choose what to share
       </Text>
-
-      <div className="rounded-lg border border-amber-400 bg-amber-100 p-4">
-        <Text variant="sub-sm" className="font-bold">
-          Is an official requesting your details?
-        </Text>
-        <Text variant="sub-sm" className="mb-3 mt-1 text-muted-foreground">
-          Officials such as police officers are legally entitled to see every
-          field. Select all before showing your QR code.
-        </Text>
-        <Button
-          type="button"
-          onClick={handleSelectAll}
-          className="w-full gap-2 bg-amber-400 font-bold text-amber-950 hover:bg-amber-500"
-        >
-          {allSelected && <Check className="h-4 w-4" />}
-          {allSelected ? 'All fields selected' : 'Select all for official'}
-        </Button>
-      </div>
 
       <Card className="p-0">
         <div className="px-4 pt-4">
@@ -131,7 +107,7 @@ export const FieldSelectionForm = ({
           Go back
         </Button>
         <Button type="button" onClick={handleContinue} className="flex-[2]">
-          Review and continue
+          {continueLabel}
         </Button>
       </div>
     </div>
