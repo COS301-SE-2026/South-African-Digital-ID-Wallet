@@ -19,7 +19,7 @@ public class IpGeolocationProvider : IIpGeolocationProvider
 
     public async Task<IpLocationResult?> GetLocationAsync(string ipAddress, CancellationToken cancellationToken)
     {
-        var apiKey = _configuration["IpGeolocationApiKey"];
+        var apiKey = _configuration["IpGeolocation:ApiKey"];
         if (string.IsNullOrWhiteSpace(apiKey))
         {
             throw new InvalidOperationException("IP Geolocation API key is missing");
