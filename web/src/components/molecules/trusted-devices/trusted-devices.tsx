@@ -60,18 +60,6 @@ export function TrustedDevices() {
     fetchTrustedDevices()
   }, [])
 
-  if (loading) {
-    return (
-      <div className="bg-card rounded-3xl border p-6">
-        <h2 className="text-lg font-bold">Trusted Devices</h2>
-
-        <p className="mt-4 text-sm text-muted-text">
-          Loading trusted devices...
-        </p>
-      </div>
-    )
-  }
-
   const unlinkDevice = async (deviceId: string) => {
     try {
       await api.delete(`/api/trusted-devices/${deviceId}`)
@@ -86,62 +74,68 @@ export function TrustedDevices() {
 
   return (
     <>
-      <div className="bg-card rounded-3xl border p-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold">Trusted Devices</h2>
+      <div className="relative rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+        <div className="rounded-[24px] bg-card p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-deep-green">
+              Trusted Devices
+            </h2>
 
-          <Button
-            variant="link"
-            size="sm"
-            onClick={() => setShowDevices(true)}
-            className="text-green-700 hover:text-green-800"
-          >
-            Manage devices
-          </Button>
-        </div>
+            <Button
+              variant="link"
+              size="sm"
+              onClick={() => setShowDevices(true)}
+              className="text-primary-green text-deep-green"
+            >
+              Manage devices
+            </Button>
+          </div>
 
-        {devices.length === 0 ? (
-          <p className="mt-4 text-sm text-muted-text">
-            No trusted devices found.
-          </p>
-        ) : (
-          <ul className="mt-4 space-y-4">
-            {devices.map((device) => {
-              const Icon = device.icon
+          {devices.length === 0 ? (
+            <p className="mt-4 text-sm text-muted-text">
+              No trusted devices found.
+            </p>
+          ) : (
+            <ul className="mt-4 max-h-[210px] space-y-4 overflow-y-auto pr-2">
+              {devices.map((device) => {
+                const Icon = device.icon
 
-              return (
-                <li
-                  key={device.id}
-                  className="flex items-center justify-between gap-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-xl bg-muted p-2">
-                      <Icon className="h-5 w-5" />
-                    </div>
+                return (
+                  <li
+                    key={device.id}
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-black p-3"
+                  >
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-green/10">
+                        <Icon className="h-5 w-5 text-deep-green" />
+                      </div>
 
-                    <div>
-                      <div className="text-sm font-semibold">{device.name}</div>
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-semibold text-text-primary">
+                          {device.name}
+                        </div>
 
-                      <div className="text-muted-text mt-0.5 text-xs">
-                        {device.meta}
+                        <div className="mt-0.5 truncate text-xs text-muted-text">
+                          {device.meta}
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {device.status === 'Active' ? (
-                    <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
-                      Active
-                    </span>
-                  ) : (
-                    <span className="text-muted-text text-xs font-semibold">
-                      Known
-                    </span>
-                  )}
-                </li>
-              )
-            })}
-          </ul>
-        )}
+                    {device.status === 'Active' ? (
+                      <span className="shrink-0 rounded-full bg-success-green/10 px-2.5 py-1 text-xs font-semibold text-success-green">
+                        Active
+                      </span>
+                    ) : (
+                      <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-text">
+                        Known
+                      </span>
+                    )}
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </div>
       </div>
 
       <DashboardModal
@@ -152,32 +146,34 @@ export function TrustedDevices() {
         {devices.length === 0 ? (
           <p className="text-muted-text">No trusted devices were found.</p>
         ) : (
-          <div className="space-y-4">
+          <div className="max-h-[500px] space-y-4 overflow-y-auto pr-2">
             {devices.map((device) => {
               const Icon = device.icon
 
               return (
                 <div
                   key={device.id}
-                  className="flex items-center justify-between rounded-2xl border p-5"
+                  className="flex items-center justify-between rounded-2xl border border-border-grey bg-card p-5"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="rounded-2xl bg-muted p-4">
-                      <Icon className="h-7 w-7 text-green-700" />
+                  <div className="flex min-w-0 items-center gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary-green/10">
+                      <Icon className="h-6 w-6 text-deep-green" />
                     </div>
 
-                    <div>
-                      <h3 className="text-lg font-semibold">{device.name}</h3>
+                    <div className="min-w-0">
+                      <h3 className="truncate text-lg font-semibold text-deep-green">
+                        {device.name}
+                      </h3>
 
-                      <p className="text-muted-text mt-1 text-sm">
+                      <p className="mt-1 text-sm text-muted-text">
                         {device.meta}
                       </p>
 
                       <span
                         className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
                           device.status === 'Active'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-gray-100 text-gray-600'
+                            ? 'bg-success-green/10 text-success-green'
+                            : 'bg-muted text-muted-text'
                         }`}
                       >
                         {device.status}
@@ -191,7 +187,7 @@ export function TrustedDevices() {
                       variant="destructive"
                       size="lg"
                       onClick={() => unlinkDevice(device.id)}
-                      className="rounded-xl"
+                      className="ml-4 shrink-0 rounded-xl"
                     >
                       <Unplug className="h-4 w-4" />
                       Unlink Device

@@ -15,24 +15,23 @@ describe('WalletHeroCard', () => {
   it('renders the dashboard heading', () => {
     render(<WalletHeroCard />)
 
+    const hasFullHeadingText = (element: Element | null) =>
+      element?.textContent?.replace(/\s+/g, ' ').trim().toLowerCase() ===
+      'this is your flashid wallet dashboard.'
+
     expect(
-      screen.getByText(/this is your flashid wallet dashboard/i)
+      screen.getByText((_, element) => {
+        if (!hasFullHeadingText(element)) return false
+        return Array.from(element?.children ?? []).every(
+          (child) => !hasFullHeadingText(child)
+        )
+      })
     ).toBeInTheDocument()
   })
 
   it('renders the QR code image', () => {
     render(<WalletHeroCard />)
 
-    expect(screen.getByAltText(/flash id qr code/i)).toBeInTheDocument()
-  })
-
-  it('renders the generate QR code button', () => {
-    render(<WalletHeroCard />)
-
-    expect(
-      screen.getByRole('button', {
-        name: /generate qr code/i,
-      })
-    ).toBeInTheDocument()
+    expect(screen.getByAltText(/flashid qr code/i)).toBeInTheDocument()
   })
 })

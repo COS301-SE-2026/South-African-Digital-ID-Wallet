@@ -73,7 +73,7 @@ export function AppShell({
     : ''
 
   return (
-    <div className=" flex h-screen overflow-hidden">
+    <div className="flex min-h-screen overflow-hidden lg:h-screen">
       <AppSidebar
         navSections={navSections}
         user={{ name: displayName, initials }}
@@ -93,7 +93,7 @@ export function AppShell({
         </SheetContent>
       </Sheet>
 
-      <div className="flex h-screen flex-1 flex-col overflow-hidden">
+      <div className="flex min-h-screen flex-1 flex-col overflow-hidden">
         <AppTopBar
           title={header.title}
           description={header.description}
