@@ -68,7 +68,12 @@ public class AuthController : ControllerBase
             };
 
             Response.Cookies.Append("access_token", result.Token, cookieOptions);
-            result.Token = string.Empty;
+
+            var isNativeClient = Request.Headers["X-Client"] == "mobile";
+            if (!isNativeClient)
+            {
+                result.Token = string.Empty;
+            }
 
             return Ok(result);
         }
