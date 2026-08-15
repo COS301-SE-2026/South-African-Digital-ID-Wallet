@@ -12,7 +12,6 @@ public class CredentialExpiryService : ICredentialExpiryService
 {
     private const string JobName = "CredentialExpiry";
     private const int PageSize = 500;
-    private const int MaxSaveAttempts = 3;
 
     private readonly ICredentialExpiryRepository _repo;
     private readonly CredentialExpiryMapper _mapper;
@@ -113,7 +112,7 @@ public class CredentialExpiryService : ICredentialExpiryService
             CitizenId = credential.CitizenId,
             Title = "Driver's license expired",
             Description = "Your driver's license has expired. Please renew it as soon as possible.",
-            Tone = "warninng",
+            Tone = "warning",
             CreatedAt = DateTime.UtcNow,
         };
     }
