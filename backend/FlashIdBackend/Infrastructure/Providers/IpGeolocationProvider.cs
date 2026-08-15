@@ -37,7 +37,7 @@ public class IpGeolocationProvider : IIpGeolocationProvider
             return null;
         }
 
-        if (!json.RootElement.TryGetProperty("result", out var location))
+        if (!json.RootElement.TryGetProperty("location", out var location))
         {
             return null;
         }
