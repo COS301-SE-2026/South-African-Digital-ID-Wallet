@@ -8,7 +8,7 @@ export type BaseButtonProps = {
   isLoading?: boolean
   label: string
   LeftIcon?: LucideIcon
-  onPress: () => void
+  onPress?: () => void
   testID?: string
   variant?: ButtonVariant
 }
