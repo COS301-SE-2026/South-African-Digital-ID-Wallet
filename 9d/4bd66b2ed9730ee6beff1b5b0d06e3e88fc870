@@ -1,0 +1,14 @@
+mobile/src/services/login-service/test/login-service.test.ts
+  h_712d174fc3f309 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "9d4bd66b2ed9730ee6beff1b5b0d06e3e88fc870",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
