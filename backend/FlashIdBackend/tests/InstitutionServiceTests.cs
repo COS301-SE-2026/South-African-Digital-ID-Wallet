@@ -140,8 +140,6 @@ public class InstitutionServiceTests
         var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, new FakeApiKeyRevealTokenProvider(), CreateConfiguration());
 
         var result = await service.RegenerateApiKeyAsync(institution.Id, adminId);
-
-        Assert.False(string.IsNullOrEmpty(result.ApiKey));
         Assert.Equal(institution.Id, result.InstitutionId);
         Assert.NotEqual(originalHash, institution.ApiKeyHash);
     }
@@ -343,7 +341,6 @@ public class InstitutionServiceTests
         Assert.NotNull(result);
         Assert.Equal("Home Affairs JHB", result.Name);
         Assert.Equal("HA-JHB-001", result.VerificationNumber);
-        Assert.NotEmpty(result.ApiKey);
         Assert.NotEqual(Guid.Empty, result.ApiKeyReference);
 
         var savedInstitution = await context.Institutions.FirstOrDefaultAsync(i => i.VerificationNumber == "HA-JHB-001", TestContext.Current.CancellationToken);

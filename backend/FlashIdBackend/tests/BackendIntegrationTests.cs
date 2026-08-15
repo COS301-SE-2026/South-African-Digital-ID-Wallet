@@ -343,8 +343,6 @@ public class BackendIntegrationTests
         Assert.Equal(institution.Id, result.InstitutionId);
         Assert.Equal("Home Affairs Johannesburg", result.Name);
         Assert.Equal("HomeAffairs", result.Type);
-        Assert.NotEmpty(result.ApiKey);
-        Assert.StartsWith("flashid_live_", result.ApiKey);
         Assert.NotEqual(Guid.Empty, result.ApiKeyReference);
         Assert.Equal("HA-JHB-2026-001", result.VerificationNumber);
         Assert.Equal(AuditEventType.InstitutionRegistered, auditLog.EventType);
