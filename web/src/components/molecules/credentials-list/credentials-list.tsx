@@ -25,56 +25,85 @@ export function CredentialsList() {
   }
 
   return (
-    <div className="rounded-3xl border bg-card p-4 sm:p-6">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-base font-bold sm:text-lg">Credential list</h2>
-      </div>
+    <div className="rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+      <div className="rounded-[24px] bg-card p-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-extrabold text-deep-green">
+            Credential list
+          </h2>
+        </div>
 
-      {isLoading && <Text variant="sub-md">Loading credentials.</Text>}
+        {isLoading && (
+          <Text variant="sub-md" className="mt-4 text-muted-text">
+            Loading credentials.
+          </Text>
+        )}
 
-      {isError && (
-        <Text variant="sub-md" className="text-red">
-          Failed to load the credentials.
-        </Text>
-      )}
+        {isError && (
+          <Text variant="sub-md" className="mt-4 text-national-red">
+            Failed to load the credentials.
+          </Text>
+        )}
 
-      {data && credentials.length === 0 && (
-        <Text variant="sub-md">No credentials.</Text>
-      )}
+        {data && credentials.length === 0 && (
+          <Text variant="sub-md" className="mt-4 text-muted-text">
+            No credentials.
+          </Text>
+        )}
 
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {credentials.map((credential) => {
-          const Icon = credential.icon
+        <div className="mt-5 grid grid-cols-2 gap-4">
+          {credentials.map((credential, index) => {
+            const Icon = credential.icon
 
-          return (
-            <div
-              key={credential.id}
-              className="bg-card flex min-h-[9rem] flex-col justify-between rounded-2xl border p-4"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <Icon className="mb-3 h-8 w-8 shrink-0" />
+            const accent =
+              index % 4 === 0
+                ? 'text-deep-green'
+                : index % 4 === 1
+                  ? 'text-deep-green'
+                  : index % 4 === 2
+                    ? 'text-primary-green'
+                    : 'text-national-red'
 
-                <button
-                  type="button"
-                  className="text-xs font-semibold text-green-700 hover:text-green-800"
-                  onClick={() => viewOnClick(credential.id)}
-                >
-                  View credential
-                </button>
-              </div>
+            return (
+              <div
+                key={credential.id}
+                className="relative flex h-32 flex-col justify-between overflow-hidden rounded-2xl border border-border-grey bg-clean-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-deep-green/50 hover:shadow-md"
+              >
+                <div
+                  className={`absolute left-0 top-0 h-full w-1 ${
+                    index % 4 === 0
+                      ? 'bg-deep-green'
+                      : index % 4 === 1
+                        ? 'bg-deep-green'
+                        : index % 4 === 2
+                          ? 'bg-primary-green'
+                          : 'bg-national-red'
+                  }`}
+                />
 
-              <div className="mt-3 min-w-0">
-                <div className="text-sm font-semibold leading-snug">
-                  {credential.title}
+                <div className="flex items-start justify-between">
+                  <Icon className={`h-7 w-7 ${accent}`} />
+                  <button
+                    type="button"
+                    className="text-xs font-bold text-deep-green transition-colors hover:text-primary-green"
+                    onClick={() => viewOnClick(credential.id)}
+                  >
+                    View credential
+                  </button>
                 </div>
 
-                <div className="text-muted-text mt-1 text-xs">
-                  {credential.issuer}
+                <div className="mt-3">
+                  <div className="text-sm font-bold leading-snug text-text-primary">
+                    {credential.title}
+                  </div>
+                  <div className="mt-1 text-xs text-muted-text">
+                    {credential.issuer}
+                  </div>
                 </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
+        </div>
       </div>
     </div>
   )

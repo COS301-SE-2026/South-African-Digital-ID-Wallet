@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { AppSidebar } from '../app-sidebar'
 
@@ -148,9 +148,21 @@ describe('AppSidebar', () => {
       })
     )
 
+    expect(screen.queryByText('Citizen Portal')).not.toBeInTheDocument()
+
+    fireEvent.mouseEnter(screen.getByRole('complementary'))
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {
+          name: /keep sidebar open/i,
+        })
+      ).toBeInTheDocument()
+    })
+
     await user.click(
       screen.getByRole('button', {
-        name: /expand sidebar/i,
+        name: /keep sidebar open/i,
       })
     )
 
