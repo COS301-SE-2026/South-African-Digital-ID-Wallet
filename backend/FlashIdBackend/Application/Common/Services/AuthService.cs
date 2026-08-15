@@ -36,7 +36,8 @@ public class AuthService : IAuthService
         ITrustedDeviceRepository trustedDeviceRepository,
         IDeviceTokenProvider deviceTokenProvider,
         IEmailSenderProvider emailSenderProvider,
-            IHostEnvironment environment, IIpGeolocationProvider ipGeolocationProvider)
+            IHostEnvironment environment,
+        IIpGeolocationProvider ipGeolocationProvider)
     {
         _authRepository = authRepository;
         _jwtTokenProvider = jwtTokenProvider;

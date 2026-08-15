@@ -4,6 +4,7 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Mapping;
 using Application.Common.Services;
 using Application.Features.Auth.DTOs;
+using Application.Features.ManageUserAccountCard.DTOs;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Providers;
@@ -136,6 +137,19 @@ public class AuthServiceTests
         public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
     }
 
+    private class IpGeolocationProvider : IIpGeolocationProvider
+    {
+        public Task<IpLocationResult?> GetLocationAsync(string ipAddress,
+            CancellationToken cancellationToken)
+        {
+            return Task.FromResult<IpLocationResult?>(new IpLocationResult
+            {
+                City = "Play",
+                Country = "Played"
+            });
+        }
+    }
+
     private static User ValidUser() => new()
     {
         Id = Guid.NewGuid(),
@@ -185,7 +199,8 @@ public class AuthServiceTests
         var fakeEmailSenderProvider = new FakeEmailSenderProvider();
         var fakeDeviceTokenProvider = new FakeDeviceTokenProvider();
         var mapper = new AuthMapper();
-        return new AuthService(fakeAuthRepository, fakeJwtTokenProvider, fakePasswordHasher, null!, mapper, fakeTrustedDeviceRepository, fakeDeviceTokenProvider, fakeEmailSenderProvider, fakeHostEnvironment);
+        var fakeIpGeolocationProvider = new IpGeolocationProvider();
+        return new AuthService(fakeAuthRepository, fakeJwtTokenProvider, fakePasswordHasher, null!, mapper, fakeTrustedDeviceRepository, fakeDeviceTokenProvider, fakeEmailSenderProvider, fakeHostEnvironment, fakeIpGeolocationProvider);
     }
 
     [Fact]
