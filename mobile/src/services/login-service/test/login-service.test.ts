@@ -1,8 +1,7 @@
-import api, { setAuthToken } from '@/lib/api'
+import api from '@/lib/api'
 
 import loginService from '../login-service'
 import type { LoginResponse } from '../types'
-import { log } from 'console'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
