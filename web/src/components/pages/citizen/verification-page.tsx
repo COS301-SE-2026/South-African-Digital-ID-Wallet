@@ -53,41 +53,48 @@ export const VerificationPage = () => {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col gap-4 p-4 sm:gap-6 sm:p-6">
-      <Text variant="h3">Scan the QR Code</Text>
-
+    <div className="relative mx-auto flex min-h-full w-full max-w-3xl flex-col items-center px-4 py-6 sm:px-6 sm:py-10">
       {(status === 'scanning' || status === 'processing') && (
-        <>
-          <div className="mx-auto aspect-square w-full max-w-sm">
-            <QrCameraScanner
-              onScan={handleScan}
-              paused={status === 'processing'}
-            />
-          </div>
-          {status === 'processing' && (
-            <Text variant="sub-md">Checking QR Code...</Text>
-          )}
-        </>
+        <div className="w-full">
+          <QrCameraScanner
+            onScan={handleScan}
+            paused={status === 'processing'}
+          />
+        </div>
       )}
 
       {status === 'error' && (
-        <div className="flex flex-col items-center gap-4 py-6 text-center">
-          <Text variant="sub-md" className="text-destructive">
+        <div className="w-full max-w-md rounded-3xl border border-gray-200 bg-white p-8 text-center shadow-lg">
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
+            <div className="h-3 w-3 rounded-full bg-red-500" />
+          </div>
+
+          <Text variant="h3">Verification failed</Text>
+          <Text variant="sub-md" className="mt-2 text-muted-foreground">
             {errorMessage}
           </Text>
-          <Button type="button" onClick={handleScanAgain}>
+
+          <Button
+            type="button"
+            onClick={handleScanAgain}
+            className="mt-6 w-full"
+          >
             Scan again
           </Button>
         </div>
       )}
 
       {status === 'result' && result && (
-        <div className="flex flex-col gap-4">
+        <div className="w-full max-w-md">
           <ScanResultCard
             credentialType={result.credentialType}
             disclosedFields={result.disclosedFields}
           />
-          <Button type="button" onClick={handleScanAgain}>
+          <Button
+            type="button"
+            onClick={handleScanAgain}
+            className="mt-5 w-full"
+          >
             Scan another code
           </Button>
         </div>
