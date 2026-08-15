@@ -1,4 +1,4 @@
-import axios from 'axios'
+import { create } from 'axios'
 import { Platform } from 'react-native'
 
 const fallbackBaseUrl =
@@ -6,7 +6,7 @@ const fallbackBaseUrl =
 
 export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? fallbackBaseUrl
 
-const api = axios.create({
+const api = create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',

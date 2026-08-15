@@ -1,9 +1,9 @@
-import axios from 'axios'
+import { isAxiosError } from 'axios'
 
 export const EMAIL_NOT_VERIFIED = 'EMAIL_NOT_VERIFIED'
 
 export const resolveLoginError = (error: unknown): string => {
-  if (axios.isAxiosError(error)) {
+  if (isAxiosError(error)) {
     if (error.response?.data?.code === EMAIL_NOT_VERIFIED) {
       return 'Please verify your email address to continue.'
     }

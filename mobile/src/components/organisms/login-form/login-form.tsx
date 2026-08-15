@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router'
 import { Lock, Mail } from 'lucide-react-native'
 import { Pressable, View } from 'react-native'
 
-import { Button, Divider, Form, Text } from '@/components/atoms'
+import { Button, Form, Text } from '@/components/atoms'
 import { TextField } from '@/components/molecules'
 import { loginSchema, type LoginFormData } from '@/services/login-service'
 import loginService from '@/services/login-service/login-service'
