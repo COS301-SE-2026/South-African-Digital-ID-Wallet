@@ -98,6 +98,20 @@ public static class DependencyInjection
         services.AddScoped<ISmsProvider, AzureCommunicationSmsProvider>();
         services.AddScoped<IVerificationRepository, VerificationRepository>();
         services.AddScoped<ICredentialsActivationRepository, CredentialsActivationRepository>();
+
+        services.AddHttpClient<IIpGeolocationProvider, IpGeolocationProvider>((serviceProvider, client) =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["IpGeolocation:BaseUrl"];
+
+            if (string.IsNullOrWhiteSpace(baseUrl))
+            {
+                throw new InvalidOperationException("IpGeolocation BaseUrl configuration is missing.");
+            }
+
+            client.BaseAddress = new Uri(baseUrl);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        });
         return services;
     }
 }
