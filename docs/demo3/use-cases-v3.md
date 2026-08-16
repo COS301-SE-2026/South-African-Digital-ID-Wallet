@@ -6,6 +6,16 @@
 The following use case diagrams represent the core FlashID workflows develpoed during sprint 1. These diagrams show the main system actors, system boundaries, and user-facing functions currently being implemented or demonstrated.
 
 ---
+## 1. Authentication, Verification and Access Management
+
+The Authentication, Verification and Access Management subsystem allows a user to authenticate ...
+
+![Authentication, Verification and Access Management Use Case Diagram](../images/access_management.drawio.svg)
+
+### POPIA Compliance
+...
+
+---
 ## 1. Upload an Institution
 
 The Upload an Institution subsystem allows a government administrator to upload institution data, verify the institution, generate an institution API key, and view the API key after registration.

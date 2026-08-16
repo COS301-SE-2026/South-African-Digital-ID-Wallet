@@ -93,21 +93,130 @@ Return the currently authenticated user's profile
 ```
 
 #### POST /api/auth/login
-Authenticates a user and sets a JWT token in an HttpOnly cookie.
+Authenticates a user. If the device is already trusted, authentication completes immediately and an access token is issued through an HttpOnly cookie. If the device is not trusted, a device verification request is created and OTP verification is required before authentication can complete.
 
 **Authentication:** None
+
+**Cookies:**
+- `flashid_device` - optional HttpOnly cookie containing the existing trusted-device token.
+- `access_token` - set by the server after successful authentication from a trusted device.
 
 **Request Body:**
 ```json
 {
     "email": "string",
-    "password": "string"
+    "password": "string",
+    "rememberMe": false
 }
 ```
 
-**Response 200:** JWT token set in HttpOnly cookie, user profile returned
-**Response 401:** Invalid credentials
-**Reponse 423:** Account locked out
+**Response 200 — Trusted Device:**
+```json
+{
+    "token": "",
+    "expiresAt": "2026-08-16T21:30:00Z",
+    "userId": "00000000-0000-0000-0000-000000000000",
+    "role": "Citizen",
+    "requiresDeviceVerification": false,
+    "deviceVerificationId": null,
+    "deviceToken": null
+}
+```
+
+The JWT access token is returned through the `access_token` HttpOnly cookie and is therefore not exposed in the response body.
+
+**Response 200 — Untrusted Device:**
+```json
+{
+    "token": "",
+    "userId": "00000000-0000-0000-0000-000000000000",
+    "role": "Citizen",
+    "requiresDeviceVerification": true,
+    "deviceVerificationId": "00000000-0000-0000-0000-000000000000"
+}
+```
+
+When `requiresDeviceVerification` is `true`, the client must continue authentication using `POST /api/auth/verify-device`.
+
+**Response 401:** Invalid credentials, deleted account, or locked account  
+**Response 403:** Email address has not been verified  
+**Response 500:** Authentication could not be completed
+
+#### POST /api/auth/verify-device
+Verifies the OTP issued during login for an untrusted device. Successful verification marks the device as trusted and completes authentication.
+
+**Authentication:** None
+
+**Cookies:**
+- `flashid_device` - optional. If an existing device token is supplied, the corresponding trusted-device record is updated. If no device token exists, a new trusted-device token is generated and returned through an HttpOnly cookie.
+- `access_token` - set after successful device verification.
+
+**Request Body:**
+```json
+{
+    "deviceVerificationId": "00000000-0000-0000-0000-000000000000",
+    "otp": "123456",
+    "rememberMe": false,
+    "deviceType": "Desktop",
+    "operatingSystem": "Windows",
+    "browser": "Chrome"
+}
+```
+
+**Request Fields:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `deviceVerificationId` | UUID | Yes | Identifier returned by `POST /api/auth/login` when device verification is required |
+| `otp` | string | Yes | One-time verification code sent to the user's email |
+| `rememberMe` | boolean | Yes | Determines the JWT expiry behaviour |
+| `deviceType` | enum | Yes | Type of device being verified |
+| `operatingSystem` | string | Yes | Client operating system |
+| `browser` | string | Yes | Client browser |
+
+**Device Types:**
+- `Desktop`
+- `Mobile`
+- `Tablet`
+- `Laptop`
+- `Unknown`
+
+**Response 200:**
+```json
+{
+    "token": "",
+    "expiresAt": "2026-08-16T21:30:00Z",
+    "userId": "00000000-0000-0000-0000-000000000000",
+    "role": "Citizen",
+    "requiresDeviceVerification": false,
+    "deviceVerificationId": null,
+    "deviceToken": null
+}
+```
+
+On success:
+- The OTP verification is marked as used.
+- The device is stored or updated as a trusted device.
+- The device's last active time is updated.
+- The approximate city and country associated with the request IP address are stored where available.
+- An `access_token` HttpOnly cookie is set.
+- If the client did not already have a device token, a `flashid_device` HttpOnly cookie is set.
+- Device verification is recorded in the audit log.
+
+Sensitive access and device tokens are not returned to frontend JavaScript in the response body.
+
+**Response 401:** Device verification failed. This includes:
+- Missing device verification ID
+- Missing OTP
+- Verification request not found
+- Verification request already used
+- Verification code expired
+- Maximum verification attempts exceeded
+- Invalid verification code
+- Associated user account no longer exists
+
+**Response 500:** Device verification completed without an access token or an unexpected server error occurred.
+
 
 #### Post /api/auth/logout
 Clears the JWT cookie and ends the user session.
