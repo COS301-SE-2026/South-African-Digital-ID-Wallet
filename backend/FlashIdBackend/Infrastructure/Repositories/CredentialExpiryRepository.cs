@@ -107,7 +107,10 @@ public class CredentialExpiryRepository : ICredentialExpiryRepository
 
     public async Task MarkJobRunFailedAsync(Guid jobRunId, string errorMessage, int processedCount, CancellationToken cancellationToken)
     {
+        _context.ChangeTracker.Clear();
+
         var jobRun = await _context.JobRuns.SingleAsync(j => j.Id == jobRunId, cancellationToken);
+
         jobRun.Status = JobRunStatus.Failed;
         jobRun.CompletedAt = DateTime.UtcNow;
         jobRun.ErrorMessage = errorMessage;

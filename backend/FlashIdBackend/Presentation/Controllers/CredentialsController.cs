@@ -14,15 +14,18 @@ public class CredentialsController : ControllerBase
     private readonly ICredentialService _credentialService;
     private readonly IQrService _qrService;
     private readonly ICredentialActivationService _credentialActivationService;
+    private readonly ICredentialExpiryService _credentialExpiryService;
 
     public CredentialsController(
       ICredentialService credentialService,
       IQrService qrService,
-      ICredentialActivationService credentialActivationService)
+      ICredentialActivationService credentialActivationService,
+      ICredentialExpiryService credentialExpiryService)
     {
         _credentialService = credentialService;
         _qrService = qrService;
         _credentialActivationService = credentialActivationService;
+        _credentialExpiryService = credentialExpiryService;
     }
 
 
@@ -124,6 +127,28 @@ public class CredentialsController : ControllerBase
         catch (InvalidDisclosureTokenException idte)
         {
             return BadRequest(new { error = idte.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    [HttpPost("expiry-check")]
+    [Authorize(Roles = "GovernmentAdministrator")]
+    [ProducesResponseType(typeof(CredentialExpiryCheckResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> TriggerExpiryCheck(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var res = await _credentialExpiryService.RunExpiryCheckAsync(cancellationToken);
+            return Ok(res);
+        }
+        catch (CredentialExpiryJobAlreadyRunningException cejare)
+        {
+            return Conflict(new { error = cejare.Message });
         }
         catch (Exception)
         {
