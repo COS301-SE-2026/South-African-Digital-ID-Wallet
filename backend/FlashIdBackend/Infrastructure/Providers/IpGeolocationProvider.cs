@@ -32,7 +32,7 @@ public class IpGeolocationProvider : IIpGeolocationProvider
         }
 
         var json = await response.Content.ReadFromJsonAsync<JsonDocument>(cancellationToken);
-        if (json is null)
+        if (json is null || json.RootElement.ValueKind != JsonValueKind.Object)
         {
             return null;
         }

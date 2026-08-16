@@ -61,3 +61,6 @@ secrets.json
 **/appsettings.Development.json
 **/appsettings.Staging.json
 **/appsettings.Production.json
+
+#coverage
+**/coverage-report

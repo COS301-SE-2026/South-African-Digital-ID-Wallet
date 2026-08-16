@@ -1,6 +1,5 @@
 using System.Net;
 using System.Text;
-using Azure;
 using Infrastructure.Providers;
 using Microsoft.Extensions.Configuration;
 
@@ -95,6 +94,35 @@ public class IpGeolocationProviderTests
         {
             Content = new StringContent(json, Encoding.UTF8, "application/json")
         };
+        var handler = new FakeHttpMessageHandler(response);
+        var httpClient = new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://api.ipgeolocation.io/v3/ipgeo")
+        };
+        var provider = new IpGeolocationProvider(httpClient, CreateConfiguration());
+        var result = await provider.GetLocationAsync("192.25.1.1", CancellationToken.None);
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetLocationAsync_MissingApiKey_ThrowsInvalidOperationException()
+    {
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>()).Build();
+        var response = new HttpResponseMessage(HttpStatusCode.OK);
+        var handler = new FakeHttpMessageHandler(response);
+        var httpClient = new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://api.ipgeolocation.io/v3/ipgeo")
+        };
+        var provider = new IpGeolocationProvider(httpClient, configuration);
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => provider.GetLocationAsync("192.25.1.1", CancellationToken.None));
+        Assert.Equal("IP Geolocation API key is missing", exception.Message);
+    }
+
+    [Fact]
+    public async Task GetLocationAsync_NullJsonResponse_ReturnsNull()
+    {
+        var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("null", Encoding.UTF8, "application/json") };
         var handler = new FakeHttpMessageHandler(response);
         var httpClient = new HttpClient(handler)
         {
