@@ -1,0 +1,15 @@
+backend/FlashIdBackend/tests/IpGeolocationProviderTests.cs
+  h_293a8616118f65 1-69
+  h_293a8616118f65 70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "d77b8d1342c902287ea960874fbe2f6dddfe8fa0",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

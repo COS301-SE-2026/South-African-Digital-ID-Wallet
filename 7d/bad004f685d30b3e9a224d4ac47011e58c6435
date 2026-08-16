@@ -1,0 +1,17 @@
+backend/FlashIdBackend/Infrastructure/Providers/IpGeolocationProvider.cs
+  h_293a8616118f65 1-54
+  h_293a8616118f65 55
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_293a8616118f65 101-114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "7dbad004f685d30b3e9a224d4ac47011e58c6435",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
