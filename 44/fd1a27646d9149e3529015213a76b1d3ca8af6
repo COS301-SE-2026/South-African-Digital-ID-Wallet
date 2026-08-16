@@ -1,0 +1,18 @@
+backend/FlashIdBackend/Presentation/Program.cs
+  h_99fca60b892ff4 18-19,53-71
+backend/FlashIdBackend/Presentation/Presentation.csproj
+  h_99fca60b892ff4 8-9
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_99fca60b892ff4 137-144
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "44fd1a27646d9149e3529015213a76b1d3ca8af6",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

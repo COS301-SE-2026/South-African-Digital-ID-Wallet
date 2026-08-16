@@ -1,0 +1,19 @@
+backend/FlashIdBackend/Presentation/Program.cs
+  h_99fca60b892ff4 27-28,31,164,168-172,176,181,183,186,188-189,204-205
+  h_99fca60b892ff4 29-30,166,173-175,179-180,182,184,190-192
+backend/FlashIdBackend/tests/tests.csproj
+  h_99fca60b892ff4 26
+backend/FlashIdBackend/Infrastructure/Repositories/CredentialExpiryRepository.cs
+  h_99fca60b892ff4 40-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c19053891d34d9427b46f323436f0b07f344e54f",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

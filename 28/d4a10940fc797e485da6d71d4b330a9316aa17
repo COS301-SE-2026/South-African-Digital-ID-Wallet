@@ -1,0 +1,20 @@
+backend/FlashIdBackend/Infrastructure/Data/Configurations/AuditLogConfiguration.cs
+  h_99fca60b892ff4 48
+backend/FlashIdBackend/Infrastructure/Migrations/20260816004736_FixAuditLogActorIdNullable.Designer.cs
+  h_99fca60b892ff4 1-1319
+backend/FlashIdBackend/Infrastructure/Migrations/20260816004736_FixAuditLogActorIdNullable.cs
+  h_99fca60b892ff4 1-37
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_99fca60b892ff4 31,1073
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "28d4a10940fc797e485da6d71d4b330a9316aa17",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
