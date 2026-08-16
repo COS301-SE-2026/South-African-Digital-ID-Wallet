@@ -15,7 +15,8 @@ using Application.Common.Services;
 using Infrastructure.Repositories;
 using System.Security.Claims;
 using Microsoft.Azure.Cosmos;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.AspNetCore.Components.Web;
+using System.ComponentModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,7 +50,25 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.OpenApiInfo
+    {
+        Title = "FlashID API",
+        Version = "v1",
+        Description = "South African Digital ID Wallet backend API.",
+    });
+
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
+});
+
 builder.Services.AddScoped<IDeleteAccountService, DeleteAccountService>();
 builder.Services.AddScoped<IDeleteAccountRepository, DeleteAccountRepository>();
 builder.Services.AddProblemDetails();

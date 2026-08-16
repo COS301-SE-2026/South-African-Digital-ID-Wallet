@@ -134,6 +134,14 @@ public class CredentialsController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Manually triggers the daily credential-expiry check. Government Administrator only.
+    /// Idempotent. If today's check already completed or is currently running, returns that result instead of reprocessing.
+    /// </summary>
+    /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
+    /// <response code="200">The check ran, or had already completed for today.</response>
+    /// <response code="409">Another expiry check is currently running for today.</response>
+    /// <response code="403">The caller is not a Government Administrator.</response>
     [HttpPost("expiry-check")]
     [Authorize(Roles = "GovernmentAdministrator")]
     [ProducesResponseType(typeof(CredentialExpiryCheckResponseDto), StatusCodes.Status200OK)]
