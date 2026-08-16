@@ -24,8 +24,11 @@ const string FrontendCorsPolicy = "FrontendCorsPolicy";
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
 
 builder.Services.AddInfrastructure();
 
@@ -158,32 +161,35 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-using (var scope = app.Services.CreateScope())
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.MigrateAsync();
-
-    if (/*app.Environment.IsDevelopment() && */!await db.DomainUsers.AnyAsync())
+    using (var scope = app.Services.CreateScope())
     {
-        Console.WriteLine("[SEED] Database is empty, seeding sample data ...");
-        //await DbSeeder.SeedAsync(db);
-        Console.WriteLine("[SEED] Database seeded successfully!");
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await db.Database.MigrateAsync();
+
+        if (/*app.Environment.IsDevelopment() && */!await db.DomainUsers.AnyAsync())
+        {
+            Console.WriteLine("[SEED] Database is empty, seeding sample data ...");
+            //await DbSeeder.SeedAsync(db);
+            Console.WriteLine("[SEED] Database seeded successfully!");
+        }
     }
-}
 
-using (var scope = app.Services.CreateScope())
-{
-    var cosmosClient = scope.ServiceProvider.GetRequiredService<CosmosClient>();
-    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-    var dbName = configuration["Cosmos:DatabaseName"];
-    var containerName = configuration["Cosmos:ContainerName"];
-
-    var dbResponse = await cosmosClient.CreateDatabaseIfNotExistsAsync(dbName);
-
-    await dbResponse.Database.CreateContainerIfNotExistsAsync(new ContainerProperties(containerName, "/id")
+    using (var scope = app.Services.CreateScope())
     {
-        DefaultTimeToLive = -1
-    });
+        var cosmosClient = scope.ServiceProvider.GetRequiredService<CosmosClient>();
+        var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+        var dbName = configuration["Cosmos:DatabaseName"];
+        var containerName = configuration["Cosmos:ContainerName"];
+
+        var dbResponse = await cosmosClient.CreateDatabaseIfNotExistsAsync(dbName);
+
+        await dbResponse.Database.CreateContainerIfNotExistsAsync(new ContainerProperties(containerName, "/id")
+        {
+            DefaultTimeToLive = -1
+        });
+    }
 }
 
 app.UseExceptionHandler();
@@ -195,3 +201,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 await app.RunAsync();
+
+public partial class Program { }

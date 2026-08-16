@@ -37,6 +37,8 @@ public class CredentialExpiryRepository : ICredentialExpiryRepository
             JobName = jobName,
             RunDate = runDate,
             Status = JobRunStatus.Running,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
         };
 
         _context.JobRuns.Add(jobRun);

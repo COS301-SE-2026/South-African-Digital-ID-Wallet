@@ -1,10 +1,8 @@
-using System.Diagnostics;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Mapping;
 using Application.Common.Services;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Exceptions;
-using Castle.Components.DictionaryAdapter;
 using Domain.Entities;
 using Domain.Enums;
 
