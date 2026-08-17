@@ -28,7 +28,7 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
           <div className="pointer-events-none absolute -bottom-20 -left-16 h-40 w-40 rounded-full bg-national-blue/5" />
           <div className="relative grid gap-6 lg:grid-cols-[1fr_180px]">
             <div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 mb-6">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-primary-green/20 bg-gradient-to-br from-primary-green/10 to-national-blue/10 shadow-sm sm:h-16 sm:w-16">
                   <Icon className="h-7 w-7 text-primary-green sm:h-8 sm:w-8" />
                 </div>
@@ -54,8 +54,6 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
                   </Text>
                 </div>
               </div>
-
-              <div className="my-5 h-1 w-20 rounded-full bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green" />
 
               <div>
                 <Text
