@@ -1,4 +1,5 @@
 ﻿'use client'
+
 import * as React from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { RefreshCw } from 'lucide-react'
@@ -18,7 +19,12 @@ function formatTime(seconds: number) {
 }
 
 type Status = 'loading' | 'ready' | 'error'
-function QrLoadingCard({ embedded }: { embedded: boolean }) {
+
+function QrLoadingCard({
+  embedded,
+}: Readonly<{
+  embedded: boolean
+}>) {
   return (
     <div
       className={
@@ -46,11 +52,11 @@ function QrErrorCard({
   embedded,
   errorMessage,
   onRetry,
-}: {
+}: Readonly<{
   embedded: boolean
   errorMessage: string
   onRetry: () => void
-}) {
+}>) {
   return (
     <Card
       className={
@@ -63,6 +69,7 @@ function QrErrorCard({
       <Text variant="sub-sm" className="text-muted-foreground">
         {errorMessage}
       </Text>
+
       <Button type="button" onClick={onRetry} className="gap-2">
         <RefreshCw className="h-4 w-4" />
         Try again
@@ -74,10 +81,10 @@ function QrErrorCard({
 function QrCountdownIndicator({
   isWarning,
   secondsRemaining,
-}: {
+}: Readonly<{
   isWarning: boolean
   secondsRemaining: number
-}) {
+}>) {
   return (
     <div className="flex items-center justify-center gap-2">
       <div
@@ -108,7 +115,7 @@ function QrReadyCard({
   secondsRemaining,
   onRetry,
   onBack,
-}: {
+}: Readonly<{
   embedded: boolean
   compact: boolean
   showBackButton: boolean
@@ -117,7 +124,7 @@ function QrReadyCard({
   secondsRemaining: number
   onRetry: () => void
   onBack?: () => void
-}) {
+}>) {
   return (
     <div
       className={
@@ -135,6 +142,7 @@ function QrReadyCard({
       >
         <div className="shrink-0 text-center">
           <Text variant="h2">QR Preview</Text>
+
           <Text variant="sub-md" className="mt-1 pb-4">
             Share your identity securely
           </Text>
@@ -196,6 +204,7 @@ export const QrDisplay = ({
   showBackButton = false,
 }: Readonly<QrDisplayProps>) => {
   const { credentialId, mandatoryFields, selectedOptionalFields } = selection
+
   const [status, setStatus] = React.useState<Status>('loading')
   const [errorMessage, setErrorMessage] = React.useState('')
   const [qrValue, setQrValue] = React.useState('')
@@ -205,6 +214,7 @@ export const QrDisplay = ({
   const [retryToken, setRetryToken] = React.useState(0)
 
   const isExpired = status === 'ready' && secondsRemaining <= 0
+
   const isWarning =
     status === 'ready' &&
     secondsRemaining <= WARNING_THRESHOLD_SECONDS &&
@@ -216,9 +226,15 @@ export const QrDisplay = ({
     const load = async () => {
       try {
         const disclosedFields = [...mandatoryFields, ...selectedOptionalFields]
+
         const response = await qrService.generate(credentialId, disclosedFields)
-        if (cancelled) return
+
+        if (cancelled) {
+          return
+        }
+
         const expiresAt = new Date(response.expiresAt).getTime()
+
         setQrValue(response.token)
         setExpiresAtMs(expiresAt)
         setSecondsRemaining(
@@ -229,6 +245,7 @@ export const QrDisplay = ({
       } catch {
         if (!cancelled) {
           setErrorMessage('Could not generate your QR code. Please try again.')
+
           setStatus('error')
         }
       }
@@ -243,11 +260,14 @@ export const QrDisplay = ({
   const handleRetry = () => {
     setStatus('loading')
     setErrorMessage('')
-    setRetryToken((t) => t + 1)
+    setRetryToken((token) => token + 1)
   }
 
   React.useEffect(() => {
-    if (status !== 'ready' || isExpired || expiresAtMs === null) return
+    if (status !== 'ready' || isExpired || expiresAtMs === null) {
+      return
+    }
+
     const interval = setInterval(() => {
       setSecondsRemaining(
         Math.max(Math.round((expiresAtMs - Date.now()) / 1000), 0)
@@ -259,6 +279,7 @@ export const QrDisplay = ({
   React.useEffect(() => {
     if (isWarning && !hasShownWarningToast.current) {
       hasShownWarningToast.current = true
+
       toast.error('15 seconds left - your QR code is about to expire')
     }
   }, [isWarning])

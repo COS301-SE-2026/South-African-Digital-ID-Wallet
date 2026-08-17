@@ -1,4 +1,5 @@
 'use client'
+
 import { FC, useEffect, useRef, useState } from 'react'
 import { Share2 } from 'lucide-react'
 import { StatusPill, Text } from '@/components/atoms'
@@ -11,19 +12,26 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
   credential,
 }) => {
   const Icon = credential.icon
+
   const [isShareOpen, setIsShareOpen] = useState(false)
+
   const [shareStep, setShareStep] = useState<'disclosure' | 'qr'>('disclosure')
+
   const [selection, setSelection] = useState<QrDisclosureSelection>(() => ({
     credentialId: credential.id,
     credentialType: credential.qrCredentialType,
     mandatoryFields: MANDATORY_FIELDS[credential.qrCredentialType],
     selectedOptionalFields: [],
   }))
+
   const dialogRef = useRef<HTMLDialogElement>(null)
 
   useEffect(() => {
     const dialog = dialogRef.current
-    if (!dialog) return
+
+    if (!dialog) {
+      return
+    }
 
     if (isShareOpen && !dialog.open) {
       dialog.showModal()
@@ -37,13 +45,16 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
       <div className="rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
         <div className="relative overflow-hidden rounded-[24px] bg-card p-5 sm:p-6">
           <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary-green/5" />
+
           <div className="pointer-events-none absolute -bottom-20 -left-16 h-40 w-40 rounded-full bg-national-blue/5" />
+
           <div className="relative grid gap-6 lg:grid-cols-[1fr_180px]">
             <div>
-              <div className="flex items-center gap-4 mb-6">
+              <div className="mb-6 flex items-center gap-4">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-primary-green/20 bg-gradient-to-br from-primary-green/10 to-national-blue/10 shadow-sm sm:h-16 sm:w-16">
                   <Icon className="h-7 w-7 text-primary-green sm:h-8 sm:w-8" />
                 </div>
+
                 <div className="min-w-0">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-muted-text sm:text-xs">
                     Digital Credential
@@ -101,7 +112,6 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
               </StatusPill>
             </div>
           </div>
-
           <div className="relative mt-5 flex justify-end border-t border-border-grey pt-5">
             <button
               type="button"
@@ -125,18 +135,8 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
         onCancel={() => setIsShareOpen(false)}
         className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none bg-transparent p-0 backdrop:bg-black/60 backdrop:backdrop-blur-sm"
       >
-        <div
-          className="flex h-full items-end justify-center px-0 sm:items-center sm:px-4 sm:py-6"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setIsShareOpen(false)
-            }
-          }}
-        >
-          <div
-            className="relative z-10 flex h-[100dvh] w-full max-w-6xl flex-col overflow-hidden rounded-none border border-border-grey bg-card shadow-2xl sm:h-[min(92dvh,900px)] sm:rounded-[32px]"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="flex h-full items-end justify-center px-0 sm:items-center sm:px-4 sm:py-6">
+          <div className="relative z-10 flex h-[100dvh] w-full max-w-6xl flex-col overflow-hidden rounded-none border border-border-grey bg-card shadow-2xl sm:h-[min(92dvh,900px)] sm:rounded-[32px]">
             <div className="flex items-start justify-between gap-4 border-b border-border-grey px-4 py-4 sm:px-6 sm:py-5">
               <div className="space-y-1">
                 <Text

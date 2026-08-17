@@ -1,23 +1,71 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { IdCard } from 'lucide-react'
 import { CredentialDetailCard } from '@/components/molecules'
 import type { CredentialView } from '@/services/credential-service'
 
-jest.mock('@/components/organisms', () => {
-  const actual = jest.requireActual('@/components/organisms')
+jest.mock('@/components/organisms', () => ({
+  __esModule: true,
 
-  return {
-    __esModule: true,
-    ...actual,
-    QrDisplay: ({ onBack }: { onBack: () => void }) => (
-      <div>
-        <div>qr-display-panel</div>
-        <button type="button" onClick={onBack}>
-          back-to-disclosure
-        </button>
-      </div>
-    ),
+  FieldSelectionForm: ({
+    onContinue,
+  }: {
+    credentialId: string
+    credentialType: string
+    onBack: () => void
+    onContinue: (selection: unknown) => void
+    onSelectionChange: (selection: unknown) => void
+    continueLabel?: string
+  }) => (
+    <div>
+      <h3>Choose what to share</h3>
+
+      <button
+        type="button"
+        onClick={() =>
+          onContinue({
+            credentialId: 'id-1',
+            credentialType: 'identityDocument',
+            mandatoryFields: [],
+            selectedOptionalFields: [],
+          })
+        }
+      >
+        Generate QR code
+      </button>
+    </div>
+  ),
+
+  QrDisplay: ({
+    onBack,
+  }: {
+    selection: unknown
+    onBack: () => void
+    embedded?: boolean
+    compact?: boolean
+    showBackButton?: boolean
+  }) => (
+    <div>
+      <div>qr-display-panel</div>
+
+      <button type="button" onClick={onBack}>
+        back-to-disclosure
+      </button>
+    </div>
+  ),
+}))
+
+beforeAll(() => {
+  if (!HTMLDialogElement.prototype.showModal) {
+    HTMLDialogElement.prototype.showModal = function () {
+      this.setAttribute('open', '')
+    }
+  }
+
+  if (!HTMLDialogElement.prototype.close) {
+    HTMLDialogElement.prototype.close = function () {
+      this.removeAttribute('open')
+    }
   }
 })
 
@@ -42,12 +90,17 @@ const view: CredentialView = {
 }
 
 describe('CredentialDetailCard', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
   it('renders the credential title, issuer and status', () => {
     render(<CredentialDetailCard credential={view} />)
 
     expect(screen.getByText('National ID Card')).toBeInTheDocument()
 
-    expect(screen.getByText('Department of Home Affairs')).toBeInTheDocument()
+    expect(
+      screen.getByText(/issued by department of home affairs/i)
+    ).toBeInTheDocument()
 
     expect(screen.getByText('Verified')).toBeInTheDocument()
   })
@@ -84,11 +137,12 @@ describe('CredentialDetailCard', () => {
       })
     )
 
-    const dialog = screen.getByRole('dialog', {
+    const dialog = await screen.findByRole('dialog', {
       name: /share national id card/i,
     })
 
     expect(dialog).toBeInTheDocument()
+    expect(dialog).toHaveAttribute('aria-labelledby', 'share-credential-title')
 
     expect(
       within(dialog).getByText(/choose what to share/i)
@@ -106,7 +160,7 @@ describe('CredentialDetailCard', () => {
       })
     )
 
-    const dialog = screen.getByRole('dialog', {
+    const dialog = await screen.findByRole('dialog', {
       name: /share national id card/i,
     })
 
@@ -118,24 +172,25 @@ describe('CredentialDetailCard', () => {
       })
     )
 
-    expect(
-      screen.queryByRole('dialog', {
-        name: /share national id card/i,
-      })
-    ).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(
+        screen.queryByRole('dialog', {
+          name: /share national id card/i,
+        })
+      ).not.toBeInTheDocument()
+    })
   })
 
   it('moves from disclosure to QR and back again', async () => {
     const user = userEvent.setup()
     render(<CredentialDetailCard credential={view} />)
-
     await user.click(
       screen.getByRole('button', {
         name: /share credential/i,
       })
     )
 
-    const dialog = screen.getByRole('dialog', {
+    const dialog = await screen.findByRole('dialog', {
       name: /share national id card/i,
     })
 
@@ -151,14 +206,22 @@ describe('CredentialDetailCard', () => {
 
     expect(within(dialog).getByText(/qr-display-panel/i)).toBeInTheDocument()
 
+    expect(
+      within(dialog).getByRole('button', {
+        name: /back-to-disclosure/i,
+      })
+    ).toBeInTheDocument()
+
     await user.click(
       within(dialog).getByRole('button', {
         name: /back-to-disclosure/i,
       })
     )
 
-    expect(
-      within(dialog).getByText(/choose what to share/i)
-    ).toBeInTheDocument()
+    await waitFor(() => {
+      expect(
+        within(dialog).getByText(/choose what to share/i)
+      ).toBeInTheDocument()
+    })
   })
 })
