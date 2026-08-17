@@ -3,6 +3,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
 using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
@@ -84,7 +85,12 @@ public class CredentialExpiryRepository : ICredentialExpiryRepository
 
     private static bool IsUniqueConstraintViolation(DbUpdateException due)
     {
-        return due.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627);
+        return due.InnerException switch
+        {
+            SqlException sqlEx => sqlEx.Number == 2601 || sqlEx.Number == 2627,
+            SqliteException sqliteEx => sqliteEx.SqliteErrorCode == 19,
+            _ => false,
+        };
     }
 
     public async Task<bool> HasCompletedJobRunTodayAsync(string jobName, DateTime runDate, CancellationToken cancellationToken)
