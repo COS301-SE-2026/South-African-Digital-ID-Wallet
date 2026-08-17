@@ -1,0 +1,20 @@
+mobile/src/lib/secure-session.ts
+  h_712d174fc3f309 1-31
+mobile/src/stores/auth-store.ts
+  h_712d174fc3f309 4,17-18,25-27,34-46,51-52,56-59,64
+  h_712d174fc3f309 28,31,47,49,53,60-61,65
+mobile/src/lib/roles.ts
+  h_712d174fc3f309 1-17
+  h_712d174fc3f309 18-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ba793a0d6019c5adacf92facb53b32f3453f6de7",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
