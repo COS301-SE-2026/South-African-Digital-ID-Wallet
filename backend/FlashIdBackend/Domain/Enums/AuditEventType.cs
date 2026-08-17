@@ -25,4 +25,5 @@ public enum AuditEventType
     DeviceVerificationRequested,
     DeviceVerificationFailed,
     DeviceVerified,
+    DeviceVerificationResent,
 }

@@ -415,7 +415,51 @@ public class AuthService : IAuthService
     public async Task ResendDeviceVerificationOtpAsync(Guid deviceVerificationId, string ipAddress,
         CancellationToken cancellationToken)
     {
+        var verification = await _trustedDeviceRepository.GetDeviceVerificationAsync(deviceVerificationId, cancellationToken);
 
+        if (verification is null)
+        {
+            throw new UnauthorizedAccessException("Device verification request not found.");
+        }
+
+        if (verification.VerifiedAt.HasValue)
+        {
+            throw new UnauthorizedAccessException("Device verification has already been completed.");
+        }
+
+        if (verification.ExpiresAt <= DateTime.UtcNow)
+        {
+            throw new UnauthorizedAccessException("Device verification code has expired. Please resend the code.");
+        }
+
+        var user = await _authRepository.GetUserByIdAsync(verification.UserId);
+        if (user is null || user.IsDeleted)
+        {
+            throw new UnauthorizedAccessException("User account not found or has been deleted.");
+        }
+
+        var newOtp = RandomNumberGenerator.GetInt32(100000, 1_000_000).ToString();
+        var otpHash = HashOtp(newOtp);
+
+        verification.OtpHash = otpHash;
+        verification.UpdatedAt = DateTime.UtcNow;
+        verification.ExpiresAt = DateTime.UtcNow.AddMinutes(10);
+
+        await _trustedDeviceRepository.UpdateDeviceVerificationAsync(verification, cancellationToken);
+        await SendVerficationOTPAsync(user.Email, newOtp, cancellationToken);
+
+        var auditLog = new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.DeviceVerificationResent,
+            Details = $"Device verification code resent for user {user.Email}.",
+            IpAddress = ipAddress,
+            ActorId = user.Id,
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        await _authRepository.AddAuditLogAsync(auditLog);
+        await _authRepository.SaveChangesAsync();
     }
 
     private static string HashOtp(string otp)
