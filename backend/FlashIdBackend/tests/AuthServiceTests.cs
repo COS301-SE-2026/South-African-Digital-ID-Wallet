@@ -526,6 +526,35 @@ public class AuthServiceTests
 
     }
 
+    [Fact]
+    public async Task ResendDeviceVerificationOtpAsync_AlreadyCompleted_ThrowsUnauthorizedAccessException()
+    {
+        var user = ValidUser();
+        var verification = ValidDeviceVerification(user.Id);
+        verification.VerifiedAt = DateTime.UtcNow;
+        var fakeRepository = new FakeAuthRepository { UserToReturn = user };
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { VerificationToReturn = verification };
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+        var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.ResendDeviceVerificationOtpAsync(verification.Id, "127.0.0.1", CancellationToken.None));
+        Assert.Equal("Device verification has already been completed.", exception.Message);
+    }
+
+    [Fact]
+    public async Task ResendDeviceVerificationOtpAsync_ExpiredVerification_ThrowsUnauthorizedAccessException()
+    {
+        var user = ValidUser();
+        var verification = ValidDeviceVerification(user.Id);
+        verification.ExpiresAt = DateTime.UtcNow.AddMinutes(-1);
+        var fakeRepository = new FakeAuthRepository { UserToReturn = user };
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { VerificationToReturn = verification };
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+        var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.ResendDeviceVerificationOtpAsync(verification.Id, "127.0.0.1", CancellationToken.None));
+        Assert.Equal("Device verification code has expired. Please resend the code.", exception.Message);
+    }
 
 
 }
