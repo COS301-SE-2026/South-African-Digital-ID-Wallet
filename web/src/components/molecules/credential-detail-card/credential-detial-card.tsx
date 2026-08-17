@@ -1,5 +1,5 @@
 'use client'
-import { FC, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { Share2 } from 'lucide-react'
 import { StatusPill, Text } from '@/components/atoms'
 import { FieldSelectionForm, QrDisplay } from '@/components/organisms'
@@ -19,6 +19,18 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
     mandatoryFields: MANDATORY_FIELDS[credential.qrCredentialType],
     selectedOptionalFields: [],
   }))
+  const dialogRef = useRef<HTMLDialogElement>(null)
+
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (!dialog) return
+
+    if (isShareOpen && !dialog.open) {
+      dialog.showModal()
+    } else if (!isShareOpen && dialog.open) {
+      dialog.close()
+    }
+  }, [isShareOpen])
 
   return (
     <>
@@ -105,20 +117,26 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
           </div>
         </div>
       </div>
-      {isShareOpen && (
+
+      <dialog
+        ref={dialogRef}
+        aria-labelledby="share-credential-title"
+        onClose={() => setIsShareOpen(false)}
+        onCancel={() => setIsShareOpen(false)}
+        className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none bg-transparent p-0 backdrop:bg-black/60 backdrop:backdrop-blur-sm"
+      >
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 px-0 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="share-credential-title"
+          className="flex h-full items-end justify-center px-0 sm:items-center sm:px-4 sm:py-6"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsShareOpen(false)
+            }
+          }}
         >
           <div
-            className="absolute inset-0"
-            aria-hidden="true"
-            onClick={() => setIsShareOpen(false)}
-          />
-
-          <div className="relative z-10 flex h-[100dvh] w-full max-w-6xl flex-col overflow-hidden rounded-none border border-border-grey bg-card shadow-2xl sm:h-[min(92dvh,900px)] sm:rounded-[32px]">
+            className="relative z-10 flex h-[100dvh] w-full max-w-6xl flex-col overflow-hidden rounded-none border border-border-grey bg-card shadow-2xl sm:h-[min(92dvh,900px)] sm:rounded-[32px]"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-start justify-between gap-4 border-b border-border-grey px-4 py-4 sm:px-6 sm:py-5">
               <div className="space-y-1">
                 <Text
@@ -165,7 +183,7 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
             </div>
           </div>
         </div>
-      )}
+      </dialog>
     </>
   )
 }
