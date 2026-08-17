@@ -429,7 +429,7 @@ public class AuthService : IAuthService
 
         if (verification.ExpiresAt <= DateTime.UtcNow)
         {
-            throw new UnauthorizedAccessException("Device verification code has expired. Please resend the code.");
+            throw new UnauthorizedAccessException("Device verification code has expired. Please request an OTP resend.");
         }
 
         var user = await _authRepository.GetUserByIdAsync(verification.UserId);
@@ -446,7 +446,15 @@ public class AuthService : IAuthService
         verification.ExpiresAt = DateTime.UtcNow.AddMinutes(10);
 
         await _trustedDeviceRepository.UpdateDeviceVerificationAsync(verification, cancellationToken);
-        await SendVerficationOTPAsync(user.Email, newOtp, cancellationToken);
+
+        if (_environment.IsDevelopment())
+        {
+            Console.WriteLine($"Email otp: {newOtp}.");
+        }
+        else
+        {
+            await SendVerficationOTPAsync(user.Email, newOtp, cancellationToken);
+        }
 
         var auditLog = new AuditLog
         {

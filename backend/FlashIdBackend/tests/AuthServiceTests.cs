@@ -512,6 +512,20 @@ public class AuthServiceTests
         Assert.Equal(verification, fakeTrustedDeviceRepository.VerificationToReturn);
     }
 
+    [Fact]
+    public async Task ResendDeviceVerificationOtpAsync_VerificationNotFound_ThrowsUnauthorizedAccessException()
+    {
+        var deviceVerificationId = Guid.NewGuid();
+        var fakeRepository = new FakeAuthRepository();
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { VerificationToReturn = null };
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+
+        var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.ResendDeviceVerificationOtpAsync(deviceVerificationId, "127.0.0.1", CancellationToken.None));
+        Assert.Equal("Device verification request not found.", exception.Message);
+
+    }
+
 
 
 }

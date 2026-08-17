@@ -178,9 +178,22 @@ public class AuthController : ControllerBase
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(request.DeviceVerificationId))
+            {
+                return BadRequest(
+                    new { error = "Device verification ID is required." });
+            }
+
+            if (!Guid.TryParse(request.DeviceVerificationId, out var deviceVerificationId))
+            {
+                return BadRequest(new
+                {
+                    error = "Invalid device verification ID."
+                });
+            }
+
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            await _authService.ResendDeviceVerificationOtpAsync(request.DeviceVerificationId, ipAddress,
-                cancellationToken);
+            await _authService.ResendDeviceVerificationOtpAsync(deviceVerificationId, ipAddress, cancellationToken);
             return Ok(new { message = "Verification code has been resent to your email." });
         }
         catch (UnauthorizedAccessException ex)
@@ -189,7 +202,7 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexected error during device verification OTP resend.");
+            _logger.LogError(ex, "Unexpected error during device verification OTP resend.");
             if (_environment.IsDevelopment())
                 return StatusCode(500, new { error = ex.Message, detail = ex.ToString() });
             return StatusCode(500, new { error = "An unexpected error occurred." });
