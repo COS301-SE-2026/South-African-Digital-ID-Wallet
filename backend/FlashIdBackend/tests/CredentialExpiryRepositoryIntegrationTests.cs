@@ -202,7 +202,7 @@ public class CredentialExpiryRepositoryIntegrationTests
         Assert.NotNull(reclaim);
         Assert.Equal(firstClaim, reclaim);
 
-        var jobRun = await context.JobRuns.SingleAsync(j => j.Id == firstClaim.Value, TestContext.Current.CancellationToken);
+        var jobRun = await context.JobRuns.AsNoTracking().SingleAsync(j => j.Id == firstClaim.Value, TestContext.Current.CancellationToken);
 
         Assert.Equal(JobRunStatus.Running, jobRun.Status);
         Assert.Null(jobRun.ErrorMessage);

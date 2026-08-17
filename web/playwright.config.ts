@@ -46,8 +46,7 @@ export default defineConfig({
   webServer: {
     command:
       'pnpm run build && ' +
-      'cp -r .next/static .next/standalone/web/.next/static && ' +
-      'cp -r public .next/standalone/web/public && ' +
+      'node scripts/copy-standalone-assets.mjs && ' + 
       'node .next/standalone/web/server.js',
     url: baseURL,
     reuseExistingServer: !process.env.CI,
