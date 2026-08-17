@@ -1,0 +1,19 @@
+web/src/components/molecules/field-toggle-row/field-toggle-row.tsx
+  h_0aff3b71f739b1 16
+web/src/components/organisms/field-selection-form/field-selection-form.tsx
+  h_0aff3b71f739b1 47-89,91-142,144,146,148-150,154-158,160-169
+  h_0aff3b71f739b1 143,151-152,159,170-171
+web/src/components/molecules/credential-detail-card/credential-detial-card.tsx
+  h_0aff3b71f739b1 31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c44a0d8594c40ad627907ea819665ed9ba9fcb35",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
