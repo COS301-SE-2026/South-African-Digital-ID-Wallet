@@ -195,7 +195,7 @@ export const AppSidebar = ({
       </nav>
 
       {isExpanded && (
-        <div className="relative z-10 mt-auto rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+        <div className="relative z-10 mt-auto rounded-[26px] bg-accent-gold p-[2px]">
           <div className="rounded-[24px] bg-deep-green p-3">
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">
