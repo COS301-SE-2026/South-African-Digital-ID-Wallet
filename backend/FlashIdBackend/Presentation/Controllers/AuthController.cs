@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Application.Features.Auth.Exceptions;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Presentation.Controllers;
 
@@ -165,6 +166,32 @@ public class AuthController : ControllerBase
             {
                 return StatusCode(500, new { error = ex.Message, detail = ex.ToString() });
             }
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    [HttpPost("resend-device-verification")]
+    [EnableRateLimiting("resend-device-verification")]
+    public async Task<IActionResult> ResendDeviceVerification(
+        [FromBody] ResendDeviceVerificationRequestDto request, CancellationToken cancellationToken
+    )
+    {
+        try
+        {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            await _authService.ResendDeviceVerificationOtpAsync(request.DeviceVerificationId, ipAddress,
+                cancellationToken);
+            return Ok(new { message = "Verification code has been resent to your email." });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexected error during device verification OTP resend.");
+            if (_environment.IsDevelopment())
+                return StatusCode(500, new { error = ex.Message, detail = ex.ToString() });
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }

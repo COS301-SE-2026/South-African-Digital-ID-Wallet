@@ -412,6 +412,12 @@ public class AuthService : IAuthService
         """);
     }
 
+    public async Task ResendDeviceVerificationOtpAsync(Guid deviceVerificationId, string ipAddress,
+        CancellationToken cancellationToken)
+    {
+
+    }
+
     private static string HashOtp(string otp)
     {
         var otpBytes = Encoding.UTF8.GetBytes(otp);
