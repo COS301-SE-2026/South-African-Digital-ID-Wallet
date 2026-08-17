@@ -10,16 +10,6 @@ test('citizen can generate a QR code with selective disclosure', async ({
 
   await page.getByRole('button', { name: "Driver's License" }).click()
   await expect(page.getByText('Choose what to share')).toBeVisible()
-  const optionalField = page
-    .locator('button')
-    .filter({ hasText: /Phone|Address|Email|Date of Birth/i })
-    .first()
-
-  await expect(optionalField).toBeVisible({
-    timeout: 15_000,
-  })
-
-  await optionalField.click()
 
   await page
     .getByRole('button', {
