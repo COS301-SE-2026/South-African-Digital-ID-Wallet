@@ -1,0 +1,22 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IAuthService.cs
+  h_293a8616118f65 11
+backend/FlashIdBackend/Application/Features/Auth/DTOs/ResendDeviceVerificationRequestDto.cs
+  h_293a8616118f65 1-6
+backend/FlashIdBackend/Presentation/Controllers/AuthController.cs
+  h_293a8616118f65 7,173-194
+  h_293a8616118f65 195-198
+backend/FlashIdBackend/Application/Common/Services/AuthService.cs
+  h_293a8616118f65 415-418,420
+  h_293a8616118f65 419
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "409a88c288a301539a7340b442d6079a4cdd3339",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
