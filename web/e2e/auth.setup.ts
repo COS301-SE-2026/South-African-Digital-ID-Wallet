@@ -30,6 +30,11 @@ const roles = [
     email: process.env.E2E_OFFICIAL_EMAIL,
     landing: '/officials',
   },
+  {
+    name: 'citizen-expiry',
+    email: process.env.E2E_EXPIRY_CITIZEN_EMAIL,
+    landing: '/citizen',
+  },
 ]
 
 setup.describe.serial('device-verified logins', () => {
