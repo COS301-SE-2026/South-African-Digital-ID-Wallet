@@ -4,29 +4,22 @@ test('citizen can generate a QR code with selective disclosure', async ({
   page,
 }) => {
   await page.goto('/citizen/qr')
-
   await expect(page.getByText('Select a credential')).toBeVisible({
     timeout: 15_000,
   })
 
   await page.getByRole('button', { name: "Driver's License" }).click()
   await expect(page.getByText('Choose what to share')).toBeVisible()
+  const optionalField = page
+    .locator('button')
+    .filter({ hasText: /Phone|Address|Email|Date of Birth/i })
+    .first()
 
-  const selectAllButton = page.getByRole('button', {
-    name: /Select all(?: for official)?/i,
-  })
-
-  await expect(selectAllButton).toBeVisible({
+  await expect(optionalField).toBeVisible({
     timeout: 15_000,
   })
 
-  await selectAllButton.click()
-
-  await expect(
-    page.getByRole('button', {
-      name: /All fields selected/i,
-    })
-  ).toBeVisible()
+  await optionalField.click()
 
   await page
     .getByRole('button', {
@@ -35,11 +28,13 @@ test('citizen can generate a QR code with selective disclosure', async ({
     .click()
 
   await expect(page.getByText("Confirm what you're sharing")).toBeVisible()
+
   await page
     .getByRole('button', {
       name: /Confirm and generate QR/i,
     })
     .click()
+
   await expect(page.getByText(/QR Preview|Your QR Code/i)).toBeVisible({
     timeout: 15_000,
   })

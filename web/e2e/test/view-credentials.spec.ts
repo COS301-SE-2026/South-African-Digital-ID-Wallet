@@ -17,8 +17,8 @@ test('citizen can view their credentials and switch between them', async ({
   expect(tabCount).toBeGreaterThanOrEqual(1)
 
   await expect(page.getByText('Details')).toBeVisible()
-  await expect(page.getByText('Issued by')).toBeVisible()
-  await expect(page.getByText('Issue date')).toBeVisible()
+  await expect(page.getByText('Issued by', { exact: true })).toBeVisible()
+  await expect(page.getByText('Issue date', { exact: true })).toBeVisible()
 
   if (tabCount > 1) {
     const detailHeading = page.getByRole('heading', {

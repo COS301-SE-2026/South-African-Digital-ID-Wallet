@@ -35,21 +35,16 @@ test('official can scan a citizen QR code and see verified fields', async ({
     timeout: 15_000,
   })
 
-  const selectAllButton = citizenPage.getByRole('button', {
-    name: /Select all(?: for official)?/i,
-  })
+  const optionalField = citizenPage
+    .locator('button')
+    .filter({ hasText: /Phone|Address|Email|Date of Birth/i })
+    .first()
 
-  await expect(selectAllButton).toBeVisible({
+  await expect(optionalField).toBeVisible({
     timeout: 15_000,
   })
 
-  await selectAllButton.click()
-
-  await expect(
-    citizenPage.getByRole('button', {
-      name: /All fields selected/i,
-    })
-  ).toBeVisible()
+  await optionalField.click()
 
   await citizenPage
     .getByRole('button', {
