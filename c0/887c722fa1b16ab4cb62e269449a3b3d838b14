@@ -1,0 +1,14 @@
+docs/demo3/use-cases-v3.md
+  h_293a8616118f65 6,11,15-38,40-52,55,69,86,101,116,131,146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c0887c722fa1b16ab4cb62e269449a3b3d838b14",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
