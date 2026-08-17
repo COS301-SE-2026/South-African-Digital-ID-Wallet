@@ -1,7 +1,7 @@
 'use client'
 import { FC, useState } from 'react'
 import { Share2 } from 'lucide-react'
-import { AccountInfoRow, StatusPill, Text } from '@/components/atoms'
+import { StatusPill, Text } from '@/components/atoms'
 import { FieldSelectionForm, QrDisplay } from '@/components/organisms'
 import { MANDATORY_FIELDS } from '@/services/qr-service/qr-field-definitions'
 import type { QrDisclosureSelection } from '@/services/qr-service'
@@ -22,67 +22,91 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
 
   return (
     <>
-      <div className="relative rounded-3xl border border-border-grey bg-card p-5 pb-20 sm:p-6 sm:pb-24">
-        <div className="pr-24 sm:pr-28">
-          <div className="flex min-w-0 items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-green/10">
-              <Icon className="h-7 w-7 text-primary-green" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <Text as="h2" variant="h4" className="truncate text-deep-green">
-                {credential.title}
-              </Text>
+      <div className="rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+        <div className="relative overflow-hidden rounded-[24px] bg-card p-5 sm:p-6">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary-green/5" />
+          <div className="pointer-events-none absolute -bottom-20 -left-16 h-40 w-40 rounded-full bg-national-blue/5" />
+          <div className="relative grid gap-6 lg:grid-cols-[1fr_180px]">
+            <div>
+              <div className="flex items-center gap-4">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-primary-green/20 bg-gradient-to-br from-primary-green/10 to-national-blue/10 shadow-sm sm:h-16 sm:w-16">
+                  <Icon className="h-7 w-7 text-primary-green sm:h-8 sm:w-8" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-text sm:text-xs">
+                    Digital Credential
+                  </p>
 
-              <Text
-                as="p"
-                variant="sub-sm"
-                className="truncate text-muted-text"
-              >
-                {credential.issuer}
-              </Text>
+                  <Text
+                    as="h2"
+                    variant="h4"
+                    className="mt-1 truncate text-deep-green"
+                  >
+                    {credential.title}
+                  </Text>
+
+                  <Text
+                    as="p"
+                    variant="sub-sm"
+                    className="mt-1 truncate text-muted-text"
+                  >
+                    Issued by {credential.issuer}
+                  </Text>
+                </div>
+              </div>
+
+              <div className="my-5 h-1 w-20 rounded-full bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green" />
+
+              <div>
+                <Text
+                  as="h3"
+                  variant="sub-sm"
+                  className="mb-3 font-bold text-deep-green"
+                >
+                  Credential Details
+                </Text>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {credential.rows.map((row) => (
+                    <div
+                      key={row.label}
+                      className="rounded-xl border border-border-grey bg-muted/30 px-4 py-3 transition hover:bg-primary-green/5"
+                    >
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-muted-text">
+                        {row.label}
+                      </p>
+
+                      <p className="mt-1 truncate text-sm font-semibold text-deep-green">
+                        {row.value}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start justify-start lg:justify-end">
+              <StatusPill intent={credential.statusIntent}>
+                {credential.statusLabel}
+              </StatusPill>
             </div>
           </div>
-        </div>
 
-        <div className="absolute right-5 top-5 sm:right-6 sm:top-6">
-          <StatusPill intent={credential.statusIntent}>
-            {credential.statusLabel}
-          </StatusPill>
-        </div>
-
-        <div className="mt-6">
-          <Text
-            as="h3"
-            variant="sub-sm"
-            className="px-4 pb-2 font-semibold text-deep-green"
-          >
-            Details
-          </Text>
-          {credential.rows.map((row, index) => (
-            <AccountInfoRow
-              key={row.label}
-              label={row.label}
-              value={row.value}
-              border={index < credential.rows.length - 1}
-            />
-          ))}
-        </div>
-
-        <div className="mt-4 flex justify-end sm:absolute sm:bottom-6 sm:right-6 sm:mt-0">
-          <button
-            type="button"
-            onClick={() => {
-              setShareStep('disclosure')
-              setIsShareOpen(true)
-            }}
-            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-deep-green bg-card px-4 text-sm font-semibold text-deep-green shadow-sm transition hover:border-national-blue hover:bg-national-blue/5 hover:text-national-blue"
-          >
-            <Share2 className="h-4 w-4" />
-            Share
-          </button>
+          <div className="relative mt-5 flex justify-end border-t border-border-grey pt-5">
+            <button
+              type="button"
+              onClick={() => {
+                setShareStep('disclosure')
+                setIsShareOpen(true)
+              }}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-deep-green bg-primary-green/5 px-5 text-sm font-semibold text-deep-green shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-national-blue hover:bg-national-blue/5 hover:text-national-blue hover:shadow-md sm:w-auto"
+            >
+              <Share2 className="h-4 w-4" />
+              Share Credential
+            </button>
+          </div>
         </div>
       </div>
-
       {isShareOpen && (
         <div
           className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 px-0 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6"
@@ -107,20 +131,12 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
                 >
                   Share {credential.title}
                 </Text>
-                <Text
-                  as="p"
-                  variant="sub-sm"
-                  className="max-w-xl text-muted-text"
-                >
-                  Select the fields you want to disclose and preview the QR
-                  code.
-                </Text>
               </div>
 
               <button
                 type="button"
                 onClick={() => setIsShareOpen(false)}
-                className="rounded-xl border border-border-grey px-3 py-2 text-sm font-semibold text-deep-green transition hover:bg-muted"
+                className="shrink-0 rounded-xl border border-border-grey px-3 py-2 text-sm font-semibold text-deep-green transition hover:bg-muted"
               >
                 Close
               </button>
