@@ -1,15 +1,12 @@
 'use client'
-
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
-
 import { Button } from '@/components/ui/button'
 import api from '@/lib/api'
 
 export const DeleteAccountCard = () => {
   const router = useRouter()
-
   const [open, setOpen] = React.useState(false)
   const [confirmDelete, setConfirmDelete] = React.useState(false)
   const [confirmationText, setConfirmationText] = React.useState('')
@@ -43,27 +40,28 @@ export const DeleteAccountCard = () => {
 
   return (
     <>
-      <div className="bg-card border rounded-3xl px-5 py-4 flex items-center justify-between">
-        <div className="max-w-3xl">
-          <h2 className="text-base font-semibold text-destructive">
+      <div className="rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+        <div className="flex items-center justify-between rounded-[24px] bg-card px-5 py-4">
+          <div className="max-w-3xl">
+            <h2 className="text-base font-semibold text-destructive">
+              Delete Account
+            </h2>
+
+            <p className="mt-1 text-xs leading-5 text-muted-text">
+              Permanently deleting your FlashID account will remove your
+              personal information, issued credentials, trusted devices and
+              account history from our system. This action cannot be undone.
+            </p>
+          </div>
+
+          <Button variant="destructive" onClick={() => setOpen(true)}>
             Delete Account
-          </h2>
-
-          <p className="mt-1 text-xs leading-5 text-muted-text">
-            Permanently deleting your FlashID account will remove your personal
-            information, issued credentials, trusted devices and account history
-            from our system. This action cannot be undone.
-          </p>
+          </Button>
         </div>
-
-        <Button variant="destructive" onClick={() => setOpen(true)}>
-          Delete Account
-        </Button>
       </div>
-
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-card w-full max-w-md rounded-3xl p-6 shadow-xl">
+          <div className="w-full max-w-md rounded-3xl bg-card p-6 shadow-xl">
             {!confirmDelete ? (
               <>
                 <h2 className="text-2xl font-bold">Delete Account</h2>

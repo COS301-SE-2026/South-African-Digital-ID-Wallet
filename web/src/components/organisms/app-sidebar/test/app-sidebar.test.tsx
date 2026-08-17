@@ -98,6 +98,42 @@ describe('AppSidebar', () => {
     ).toBeInTheDocument()
   })
 
+  it('applies the accent gold border to the active tab', () => {
+    render(
+      <AppSidebar
+        navSections={DEFAULT_NAV_SECTIONS}
+        user={DEFAULT_USER}
+        onLogout={mockLogout}
+      />
+    )
+
+    const dashboardLink = screen.getByRole('link', {
+      name: /^Dashboard$/,
+    })
+
+    expect(dashboardLink).toHaveClass('border-accent-gold')
+    expect(dashboardLink).toHaveClass('bg-clean-white/10')
+    expect(dashboardLink).toHaveClass('text-clean-white')
+  })
+
+  it('does not apply the accent gold border to inactive tabs', () => {
+    render(
+      <AppSidebar
+        navSections={DEFAULT_NAV_SECTIONS}
+        user={DEFAULT_USER}
+        onLogout={mockLogout}
+      />
+    )
+
+    const credentialsLink = screen.getByRole('link', {
+      name: /my credentials/i,
+    })
+
+    expect(credentialsLink).toHaveClass('border-transparent')
+    expect(credentialsLink).toHaveClass('text-clean-white/75')
+    expect(credentialsLink).not.toHaveClass('border-accent-gold')
+  })
+
   it('renders user name when expanded', () => {
     render(
       <AppSidebar
@@ -109,7 +145,6 @@ describe('AppSidebar', () => {
 
     expect(screen.getByText('John Doe')).toBeInTheDocument()
   })
-
   it('collapses when the toggle button is clicked', async () => {
     const user = userEvent.setup()
 
