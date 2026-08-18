@@ -553,7 +553,42 @@ public class AuthServiceTests
 
         var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
         var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.ResendDeviceVerificationOtpAsync(verification.Id, "127.0.0.1", CancellationToken.None));
-        Assert.Equal("Device verification code has expired. Please resend the code.", exception.Message);
+        Assert.Equal("Device verification code has expired. Please request an OTP resend.", exception.Message);
+    }
+
+    [Fact]
+    public async Task ResendDeviceVerificationOtpAsync_UserNotFound_ThrowsUnauthorizedAccessException()
+    {
+        var verification = ValidDeviceVerification(Guid.NewGuid());
+        var fakeRepository = new FakeAuthRepository { UserToReturn = null };
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { VerificationToReturn = verification };
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+        var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.ResendDeviceVerificationOtpAsync(verification.Id, "127.0.0.1", CancellationToken.None));
+        Assert.Equal("User account not found or has been deleted.", exception.Message);
+    }
+
+    [Fact]
+    public async Task ResendDeviceVerificationOtpAsync_ValidRequest_UpdatesVerificationAndCreatesAuditLog()
+    {
+        var user = ValidUser();
+        var verification = ValidDeviceVerification(user.Id);
+        var oldOtpHash = verification.OtpHash;
+        var oldExpiryDate = verification.ExpiresAt;
+        var oldUpdatedAt = verification.UpdatedAt;
+
+        var fakeRepository = new FakeAuthRepository { UserToReturn = user };
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { VerificationToReturn = verification };
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+
+        await authService.ResendDeviceVerificationOtpAsync(verification.Id, "127.0.0.1", CancellationToken.None);
+        Assert.NotEqual(oldOtpHash, verification.OtpHash);
+        Assert.True(verification.UpdatedAt >= oldUpdatedAt);
+        Assert.True(verification.ExpiresAt >= oldExpiryDate);
+        Assert.Equal(verification, fakeTrustedDeviceRepository.VerificationToReturn); ;
     }
 
 
