@@ -128,14 +128,18 @@ public class CredentialExpiryRepositoryIntegrationTests
         var (user1, citizen1) = CreateCitizenWithUser("9001015800081");
         var (user2, citizen2) = CreateCitizenWithUser("9001015800082");
         var (user3, citizen3) = CreateCitizenWithUser("9001015800083");
+        var (user4, citizen4) = CreateCitizenWithUser("9001015800084");
+        var (user5, citizen5) = CreateCitizenWithUser("9001015800085");
 
         var expiredActive = BuildCredentialWithDriversLicense(citizen1, CredentialStatus.Active, DateTime.UtcNow.AddDays(-1));
         var futureActive = BuildCredentialWithDriversLicense(citizen2, CredentialStatus.Active, DateTime.UtcNow.AddYears(1));
         var expiredRevoked = BuildCredentialWithDriversLicense(citizen3, CredentialStatus.Revoked, DateTime.UtcNow.AddDays(-1));
+        var expiredInvestigation = BuildCredentialWithDriversLicense(citizen4, CredentialStatus.Investigation, DateTime.UtcNow.AddDays(-1));
+        var expiredInactive = BuildCredentialWithDriversLicense(citizen5, CredentialStatus.Inactive, DateTime.UtcNow.AddDays(-1));
 
-        await context.DomainUsers.AddRangeAsync([user1, user2, user3], TestContext.Current.CancellationToken);
-        await context.Citizens.AddRangeAsync([citizen1, citizen2, citizen3], TestContext.Current.CancellationToken);
-        await context.Credentials.AddRangeAsync([expiredActive, futureActive, expiredRevoked], TestContext.Current.CancellationToken);
+        await context.DomainUsers.AddRangeAsync([user1, user2, user3, user4, user5], TestContext.Current.CancellationToken);
+        await context.Citizens.AddRangeAsync([citizen1, citizen2, citizen3, citizen4, citizen5], TestContext.Current.CancellationToken);
+        await context.Credentials.AddRangeAsync([expiredActive, futureActive, expiredRevoked, expiredInvestigation, expiredInactive], TestContext.Current.CancellationToken);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var page = await repo.GetExpiredActiveCredentialsPageAsync(DateTime.UtcNow, Guid.Empty, 500, TestContext.Current.CancellationToken);

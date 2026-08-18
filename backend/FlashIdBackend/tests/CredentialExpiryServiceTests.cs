@@ -166,6 +166,8 @@ public class CredentialExpiryServiceTests
         var notification = Assert.Single(c.Repo.Notifications);
         Assert.Equal(cred.CitizenId, notification.CitizenId);
         Assert.Equal("Driver's license expired", notification.Title);
+        Assert.DoesNotContain(cred.DriversLicense!.LicenseNumber, auditLog.Details);
+        Assert.DoesNotContain(cred.DriversLicense!.PhotoPath, notification.Description);
     }
 
     [Fact]
