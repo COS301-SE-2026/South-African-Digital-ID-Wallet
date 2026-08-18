@@ -1,0 +1,23 @@
+docs/demo3/epics-and-user-stories-v3.md
+  h_99fca60b892ff4 620,623-629,631-632,909
+  h_99fca60b892ff4 8-619,621-622,630,633-908,910
+docs/demo3/SAS-v2.md
+  h_99fca60b892ff4 226-249
+docs/demo3/use-cases-v3.md
+  h_99fca60b892ff4 108
+web/playwright.config.ts
+  h_99fca60b892ff4 49
+web/scripts/copy-standalone-assets.mjs
+  h_99fca60b892ff4 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "705efd0bb4fdbd6826f59854e1246c2ee8bc81ea",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

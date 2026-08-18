@@ -1,0 +1,22 @@
+backend/FlashIdBackend/Infrastructure/Data/DbSeeder.cs
+  h_99fca60b892ff4 89,141-182,221-265,267-307
+  h_99fca60b892ff4 266,308-309
+web/e2e/test/credential-expiry.spec.ts
+  h_99fca60b892ff4 1-32
+  h_99fca60b892ff4 33-34
+web/e2e/.env.e2e.example
+  h_99fca60b892ff4 7-8
+web/e2e/auth.setup.ts
+  h_99fca60b892ff4 33-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "9ec626fe19a62b8665d899e0ef823490d34ce9a6",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
