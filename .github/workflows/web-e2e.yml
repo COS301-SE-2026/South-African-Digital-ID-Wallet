@@ -77,6 +77,9 @@ jobs:
       - name: Restore backend
         run: dotnet restore backend/FlashIdBackend/FlashIdBackend.sln
 
+      - name: Seed E2E data
+        run: dotnet run --project backend/FlashIdBackend/Tools/SeedRunner/SeedRunner.csproj -- "${{ env.ConnectionStrings__DefaultConnection }}"
+
       - name: Start backend (migrations and seeds)
         run: |
           nohup dotnet run --project backend/FlashIdBackend/Presentation/Presentation.csproj \
@@ -91,9 +94,6 @@ jobs:
               sleep 3
           done
           echo "Backend failed to start. Log:"; cat backend.log; exit 1
-
-      - name: Seed E2E data
-        run: dotnet run --project backend/FlashIdBackend/Tools/SeedRunner/SeedRunner.csproj -- "${{ env.ConnectionStrings__DefaultConnection }}"
         
       - name: Verify E2E accounts exist
         run: |
