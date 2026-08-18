@@ -46,6 +46,7 @@ describe('toCredentialView for identity docs', () => {
   it('it should map title and icon to correct variables', () => {
     expect(view.title).toBe('National ID Card')
     expect(view.icon).toBe(IdCard)
+    expect(view.qrCredentialType).toBe('identityDocument')
   })
 
   it('show the identity doc detail rows', () => {
@@ -70,6 +71,7 @@ describe('toCredentialView for drivers licence', () => {
   it('it should map title and the icon correctly', () => {
     expect(view.title).toBe("Driver's Licence")
     expect(view.icon).toBe(Car)
+    expect(view.qrCredentialType).toBe('driversLicense')
   })
 
   it('show the licence detail rows', () => {

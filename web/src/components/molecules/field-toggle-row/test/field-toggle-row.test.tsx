@@ -14,6 +14,18 @@ describe('FieldToggleRow', () => {
     expect(screen.getByText('Identity number')).toBeInTheDocument()
   })
 
+  it('renders the label with black text', () => {
+    render(
+      <FieldToggleRow
+        label="Identity number"
+        checked={true}
+        onCheckedChange={() => {}}
+      />
+    )
+
+    expect(screen.getByText('Identity number')).toHaveClass('text-black')
+  })
+
   it('renders as checked when checked is true', () => {
     render(
       <FieldToggleRow
