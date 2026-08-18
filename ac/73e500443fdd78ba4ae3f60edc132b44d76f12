@@ -1,0 +1,14 @@
+web/src/components/molecules/delete-account-card/test/delete-account-card.test.tsx
+  h_0aff3b71f739b1 1-172
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ac73e500443fdd78ba4ae3f60edc132b44d76f12",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
