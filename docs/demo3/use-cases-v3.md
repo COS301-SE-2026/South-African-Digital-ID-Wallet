@@ -103,6 +103,12 @@ The Credentials Management subsystem allows the system and government administra
 
 ![Credentials Management Use Case Diagram](../images/Credentials_Management.svg)
 
+### Automatically Expire Credential
+
+**TUCBW:** This use case begins when the system's scheduled credential-expiry check runs (automatically every day at 00:00 SAST, or manually triggered by a Government Administrator as a recovery/testing action) and identifies an Active driver's license credential whose expiry date has passed.
+
+**TUCEW:** This use case ends when the credential's status has been updated to Expired, an audit log entry has been recorded, and the citizen has been notified in-app.
+
 ### POPIA Compliance
 
 - **Section 8 — Accountability:** Administrative actions must be audit logged, system-triggered actions (e.g. automatic credential expiry) are logged without a human actor, since accountability for automated processing still applies under POPIA.
