@@ -1,0 +1,25 @@
+web/src/components/molecules/row-actions-menu/row-actions-menu.tsx
+  h_0aff3b71f739b1 1-33,38-55
+  h_0aff3b71f739b1 34-37
+web/src/components/molecules/index.ts
+  h_0aff3b71f739b1 28
+web/src/components/molecules/row-actions-menu/test/row-actions-menu.test.tsx
+  h_0aff3b71f739b1 1-12
+web/src/components/atoms/index.ts
+  h_0aff3b71f739b1 13
+web/src/components/molecules/row-actions-menu/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/molecules/row-actions-menu/types.ts
+  h_0aff3b71f739b1 1-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "f15ee1ae6dcb0dd5c80e047f9ccc1f6537d09977",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
