@@ -30,7 +30,7 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
             .ValueGeneratedOnAdd();
 
         builder.Property(a => a.ActorId)
-            .IsRequired();
+            .IsRequired(false);
 
         builder.HasOne(a => a.Actor)
             .WithMany(u => u.AuditLogs)
@@ -47,7 +47,6 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
 
         builder.HasIndex(a => new { a.EventType, a.CreatedAt });
 
-        //for soft deletion
-        builder.HasQueryFilter(a => !a.Actor.IsDeleted);
+        builder.HasQueryFilter(a => a.Actor == null || !a.Actor.IsDeleted);
     }
 }

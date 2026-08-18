@@ -20,3 +20,9 @@ public class InvalidInstitutionRequestException : Exception
     public InvalidInstitutionRequestException(string message)
         : base(message) { }
 }
+
+public class InvalidApiKeyRevealTokenException : Exception
+{
+    public InvalidApiKeyRevealTokenException(string message)
+        : base(message) { }
+}

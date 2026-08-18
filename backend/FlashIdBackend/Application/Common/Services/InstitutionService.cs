@@ -1,3 +1,4 @@
+using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Mapping;
@@ -6,18 +7,33 @@ using Application.Features.Institutions.DTOs;
 using Application.Features.Institutions.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
+using Microsoft.Extensions.Configuration;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Application.Common.Services;
 
 public class InstitutionService : IInstitutionService
 {
+    private static readonly TimeSpan RevealTokenLifetime = TimeSpan.FromHours(24);
     private readonly IInstitutionRepository _institutionRepository;
     private readonly InstitutionMapper _mapper;
+    private readonly IEmailSenderProvider _emailSenderProvider;
+    private readonly IApiKeyRevealTokenProvider _apiKeyRevealTokenProvider;
+    private readonly IConfiguration _configuration;
 
-    public InstitutionService(IInstitutionRepository institutionRepository, InstitutionMapper mapper)
+    public InstitutionService(
+        IInstitutionRepository institutionRepository,
+        InstitutionMapper mapper,
+        IEmailSenderProvider emailSenderProvider,
+        IApiKeyRevealTokenProvider apiKeyRevealTokenProvider,
+        IConfiguration configuration)
     {
         _institutionRepository = institutionRepository;
         _mapper = mapper;
+        _emailSenderProvider = emailSenderProvider;
+        _apiKeyRevealTokenProvider = apiKeyRevealTokenProvider;
+        _configuration = configuration;
     }
 
     public async Task<RegisterInstitutionResponseDto> RegisterInstitutionAsync(
@@ -42,11 +58,83 @@ public class InstitutionService : IInstitutionService
             Name = request.Name,
             Type = request.Type,
             VerificationNumber = request.VerificationNumber,
+            ContactEmail = request.ContactEmail,
             ApiKeyReference = apiKeyReference,
+            ApiKeyHash = HashApiKey(apiKey),
+            ApiKeyGeneratedAt = DateTime.UtcNow,
             RegisteredById = request.AdminId,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
+
+        var revealTokenId = Guid.NewGuid();
+        var encryptedToken = _apiKeyRevealTokenProvider.Protect(revealTokenId, institution.Id, apiKey, RevealTokenLifetime);
+        var revealLink = BuildRevealLink(encryptedToken);
+
+        var message = $"""
+        <div style="background-color:#f7f4ea; padding:32px 16px; font-family:Arial, Helvetica, sans-serif;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e5e7eb;">
+                <tr>
+                    <td style="padding:0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:28px 32px 0 32px;">
+                        <span style="font-size:20px; font-weight:700; color:#053b2c; letter-spacing:0.5px;">FlashID</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 0 32px; color:#111827; font-size:15px; line-height:1.6;">
+                        Hi there,
+                        <br /><br />
+                        Your institution has been registered on FlashID. Use the API key below to authenticate your integration.
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 0 32px; text-align:center;">
+                        <a href="{revealLink}" style="display:inline-block; background-color:#053b2c; color:#ffffff; text-decoration:none; font-weight:700; padding:14px 28px; border-radius:8px;">View Your API Key</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:20px 32px 0 32px; color:#6b7280; font-size:13px; line-height:1.6;">
+                        This link can only be used once and expires in 24 hours. If you don't view it in time, you can request a new key from the FlashID admin portal.
+                        <br /><br />
+                        If you did not expect this email, please contact the FlashID team immediately.
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 28px 32px; color:#111827; font-size:14px; line-height:1.6;">
+                        Stay secure,<br />
+                        The FlashID Team
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <p style="text-align:center; color:#9ca3af; font-size:12px; margin-top:16px;">
+                &copy; {DateTime.UtcNow.Year} FlashId | South African Digital ID Wallet. All rights reserved.
+            </p>
+        </div>
+        """;
+        await _emailSenderProvider.SendEmailAsync(institution.ContactEmail, "Your FlashID Institution API Key", message);
 
         var auditLog = new AuditLog
         {
@@ -58,13 +146,23 @@ public class InstitutionService : IInstitutionService
             CreatedAt = DateTime.UtcNow,
         };
 
+        var revealTokenEntity = new ApiKeyRevealToken
+        {
+            Id = revealTokenId,
+            InstitutionId = institution.Id,
+            ExpiresAt = DateTime.UtcNow.Add(RevealTokenLifetime),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
         await _institutionRepository.AddInstitutionAsync(institution);
         await _institutionRepository.AddAuditLogAsync(auditLog);
+        await _institutionRepository.AddApiKeyRevealTokenAsync(revealTokenEntity);
         await _institutionRepository.SaveChangesAsync();
 
         var dto = _mapper.InstitutionToRegisterResponseDto(institution);
-        dto.ApiKey = apiKey;
         dto.ApiKeyReference = apiKeyReference;
+
         return dto;
     }
 
@@ -85,10 +183,163 @@ public class InstitutionService : IInstitutionService
         return _mapper.InstitutionToGetResponseDto(institution);
     }
 
+    public async Task<RegenerateApiKeyResponseDto> RegenerateApiKeyAsync(Guid institutionId, Guid? adminId)
+    {
+        var institution = await _institutionRepository.GetInstitutionByIdAsync(institutionId);
+
+        if (institution == null)
+            throw new InvalidInstitutionRequestException(
+                $"Institution with ID '{institutionId}' was not found.");
+
+        var newApiKey = GenerateApiKey();
+        var reasonMessage = adminId.HasValue
+            ? "Your institution's API key has been regenerated. The previous key is no longer valid."
+            : "Your institution's API key was automatically rotated as part of your 30-day security policy. The previous key is no longer valid.";
+
+        var contactMessage = adminId.HasValue
+            ? "If you did not request this regeneration, please contact the FlashID team immediately."
+            : "If you believe this rotation was unexpected, please contact the FlashID team immediately.";
+        var revealTokenId = Guid.NewGuid();
+        var encryptedToken = _apiKeyRevealTokenProvider.Protect(revealTokenId, institution.Id, newApiKey, RevealTokenLifetime);
+        var revealLink = BuildRevealLink(encryptedToken);
+
+        var message = $"""
+        <div style="background-color:#f7f4ea; padding:32px 16px; font-family:Arial, Helvetica, sans-serif;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e5e7eb;">
+                <tr>
+                    <td style="padding:0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:28px 32px 0 32px;">
+                        <span style="font-size:20px; font-weight:700; color:#053b2c; letter-spacing:0.5px;">FlashID</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 0 32px; color:#111827; font-size:15px; line-height:1.6;">
+                        Hi there,
+                        <br /><br /> 
+                        {reasonMessage}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 0 32px;text-align:center;">                       
+                        <a href="{revealLink}" style="display:inline-block; background-color:#053b2c; color:#ffffff; text-decoration:none; font-weight:700; padding:14px 28px; border-radius:8px;">View Your New API Key</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:20px 32px 0 32px; color:#6b7280; font-size:13px; line-height:1.6;">
+                        This link can only be used once and expires in 24 hours. If you don't view it in time, you can request a new key from the FlashID admin portal.
+                        <br /><br />
+                        {contactMessage}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 32px 28px 32px; color:#111827; font-size:14px; line-height:1.6;">
+                        Stay secure,<br />
+                        The FlashID Team
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                                <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <p style="text-align:center; color:#9ca3af; font-size:12px; margin-top:16px;">
+                &copy; {DateTime.UtcNow.Year} FlashId | South African Digital ID Wallet. All rights reserved.
+            </p>
+        </div>
+        """;
+        await _emailSenderProvider.SendEmailAsync(institution.ContactEmail, "Your FlashID Institution API Key Was Regenerated", message);
+
+        institution.ApiKeyHash = HashApiKey(newApiKey);
+        institution.ApiKeyReference = Guid.NewGuid();
+        institution.ApiKeyGeneratedAt = DateTime.UtcNow;
+        institution.UpdatedAt = DateTime.UtcNow;
+
+        var details = adminId.HasValue
+            ? $"API key regenerated for institution '{institution.Name}' by admin '{adminId}'."
+            : $"API key automatically regenerated for institution '{institution.Name}' (30-day rotation policy).";
+
+        var auditLog = new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.InstitutionApiKeyRegenerated,
+            Details = details,
+            IpAddress = "system",
+            ActorId = adminId,
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        var revealTokenEntity = new ApiKeyRevealToken
+        {
+            Id = revealTokenId,
+            InstitutionId = institution.Id,
+            ExpiresAt = DateTime.UtcNow.Add(RevealTokenLifetime),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+        await _institutionRepository.AddAuditLogAsync(auditLog);
+        await _institutionRepository.AddApiKeyRevealTokenAsync(revealTokenEntity);
+        await _institutionRepository.SaveChangesAsync();
+
+        return new RegenerateApiKeyResponseDto
+        {
+            InstitutionId = institution.Id,
+            RegeneratedAt = DateTime.UtcNow,
+        };
+    }
+
+    public async Task<string> RevealApiKeyAsync(string token)
+    {
+        var payload = _apiKeyRevealTokenProvider.Unprotect(token);
+        if (payload == null)
+            throw new InvalidApiKeyRevealTokenException("This link is invalid or has expired.");
+
+        var consumed = await _institutionRepository.TryConsumeApiKeyRevealTokenAsync(payload.TokenId);
+        if (!consumed)
+            throw new InvalidApiKeyRevealTokenException("This link has already been used or has expired.");
+
+        await _institutionRepository.SaveChangesAsync();
+
+        return payload.ApiKey;
+    }
+
+    private string BuildRevealLink(string token)
+    {
+        var baseUrl = _configuration["Institutions:FrontendBaseUrl"]
+            ?? throw new InvalidOperationException("Institutions:FrontendBaseUrl is not configured.");
+
+        return $"{baseUrl.TrimEnd('/')}/institutions/reveal-key?token={Uri.EscapeDataString(token)}";
+    }
+
     private static string GenerateApiKey()
     {
         var bytes = new byte[16];
         System.Security.Cryptography.RandomNumberGenerator.Fill(bytes);
         return $"flashid_live_{Convert.ToHexString(bytes).ToLower()}";
+    }
+
+    private static string HashApiKey(string apiKey)
+    {
+        var bytes = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(apiKey));
+        return Convert.ToHexString(bytes).ToLower();
     }
 }

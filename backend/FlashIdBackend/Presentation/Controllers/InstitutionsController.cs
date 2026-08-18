@@ -79,4 +79,47 @@ public class InstitutionsController : ControllerBase
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
+
+    [Authorize(Roles = "GovernmentAdministrator")]
+    [HttpPost("{institutionId}/regenerate-key")]
+    public async Task<IActionResult> RegenerateApiKey(Guid institutionId)
+    {
+        try
+        {
+            var adminIdClaim = User.FindFirst("userId")?.Value;
+
+            if (!Guid.TryParse(adminIdClaim, out var adminId))
+                return Unauthorized(new { error = "Unable to identify the requesting administrator." });
+
+            var result = await _institutionService.RegenerateApiKeyAsync(institutionId, adminId);
+            return Ok(result);
+        }
+        catch (InvalidInstitutionRequestException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    [AllowAnonymous]
+    [HttpGet("reveal-key")]
+    public async Task<IActionResult> RevealApiKey([FromQuery] string token)
+    {
+        try
+        {
+            var apiKey = await _institutionService.RevealApiKeyAsync(token);
+            return Ok(new { apiKey });
+        }
+        catch (InvalidApiKeyRevealTokenException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
 }

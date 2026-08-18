@@ -1,6 +1,7 @@
 'use client'
 
 import { type SyntheticEvent, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Landmark } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
@@ -12,6 +13,7 @@ import {
 } from '@/services/institution-service'
 
 export const RegisterInstitutionForm = () => {
+  const router = useRouter()
   const [typeValue, setTypeValue] = useState('')
   const [registeredInstitution, setRegisteredInstitution] =
     useState<RegisterInstitutionResponse | null>(null)
@@ -22,6 +24,7 @@ export const RegisterInstitutionForm = () => {
       institutionType: string
       verificationNumber: string
       adminId: string
+      contactEmail: string
     }) => institutionService.register(formData),
     onSuccess: (data: RegisterInstitutionResponse) => {
       setRegisteredInstitution(data)
@@ -44,6 +47,7 @@ export const RegisterInstitutionForm = () => {
       institutionType: typeValue,
       verificationNumber: formData.get('verificationNumber') as string,
       adminId: formData.get('adminId') as string,
+      contactEmail: formData.get('contactEmail') as string,
     })
   }
 
@@ -75,14 +79,10 @@ export const RegisterInstitutionForm = () => {
             </Text>
           </div>
           <div>
-            <Text variant="sub-sm" className="text-gray-500 font-semibold">
-              API Key — Copy this now, it will not be shown again
-            </Text>
-            <Text
-              variant="sub-md"
-              className="break-all font-mono text-sm bg-gray-100 rounded p-2"
-            >
-              {registeredInstitution.apiKey}
+            <Text variant="sub-sm" className="text-gray-500">
+              A one-time reveal link has been emailed to the institution&apos;s
+              contact address. The API key will be available there for the next
+              24 hours.
             </Text>
           </div>
         </div>
@@ -93,6 +93,14 @@ export const RegisterInstitutionForm = () => {
           onClick={() => setRegisteredInstitution(null)}
         >
           Register Another Institution
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-full lg:w-full"
+          onClick={() => router.push('/gov-admin/view-institutions')}
+        >
+          View Institutions
         </Button>
       </div>
     )
@@ -133,6 +141,14 @@ export const RegisterInstitutionForm = () => {
         name="adminId"
         label="Admin ID"
         placeholder="Enter admin ID"
+        required
+      />
+
+      <TextField
+        name="contactEmail"
+        label="Contact Email"
+        placeholder="Enter institution contact email"
+        type="email"
         required
       />
 

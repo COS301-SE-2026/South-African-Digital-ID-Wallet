@@ -23,6 +23,10 @@ public class InstitutionConfiguration : IEntityTypeConfiguration<Institution>
         builder.Property(i => i.ApiKeyReference)
             .IsRequired();
 
+        builder.Property(i => i.ApiKeyGeneratedAt)
+            .IsRequired()
+            .HasColumnType("datetime2");
+
         builder.Property(i => i.VerificationNumber)
             .IsRequired()
             .HasMaxLength(100);

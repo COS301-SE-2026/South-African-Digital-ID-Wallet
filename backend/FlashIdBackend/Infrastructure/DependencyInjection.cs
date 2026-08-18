@@ -3,6 +3,10 @@ using System.Text;
 using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
+
+using Domain.Entities;
+using Infrastructure.BackgroundServices;
+
 using Infrastructure.Gateways.GovernmentRegistry;
 using Infrastructure.Providers;
 using Infrastructure.Repositories;
@@ -37,9 +41,8 @@ public static class DependencyInjection
         services.AddScoped<IDashboardAccountCardRepository, DashboardAccountCardRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddSingleton<IDeviceTokenProvider, DeviceTokenProvider>();
-
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
-
+        services.AddSingleton<IApiKeyRevealTokenProvider, ApiKeyRevealTokenProvider>();
         services.AddScoped<ICredentialRepository, CredentialRepository>();
         services.AddSingleton<IQrSigningProvider, Ed25519SigningProvider>();
         services.AddSingleton(n =>
@@ -98,6 +101,7 @@ public static class DependencyInjection
         services.AddScoped<ISmsProvider, AzureCommunicationSmsProvider>();
         services.AddScoped<IVerificationRepository, VerificationRepository>();
         services.AddScoped<ICredentialsActivationRepository, CredentialsActivationRepository>();
+        services.AddHostedService<ApiKeyRotationService>();
         return services;
     }
 }

@@ -11,6 +11,7 @@ public class InstitutionValidatorTests
         Name = "Home Affairs Johannesburg",
         VerificationNumber = "HA-JHB-2026-001",
         AdminId = Guid.NewGuid(),
+        ContactEmail = "contact@homeaffairs-jhb.gov.za",
     };
 
     [Fact]

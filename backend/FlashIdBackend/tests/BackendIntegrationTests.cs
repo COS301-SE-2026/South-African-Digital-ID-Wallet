@@ -1,4 +1,4 @@
-using Application.Common.Interfaces.ProviderInterfaces;
+﻿using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Features.Auth.DTOs;
 using Application.Features.Citizens.DTOs;
 using Application.Features.Institutions.DTOs;
@@ -39,6 +39,40 @@ public class BackendIntegrationTests
         public Task ResendOtpAsync(ResendOtpRequestDto request) => Task.CompletedTask;
     }
 
+    private sealed class StubEmailSenderProvider : IEmailSenderProvider
+    {
+        public Task SendEmailAsync(string toEmail, string subject, string message, CancellationToken ct = default) =>
+            Task.CompletedTask;
+    }
+
+    private sealed class StubApiKeyRevealTokenProvider : IApiKeyRevealTokenProvider
+    {
+        public string Protect(Guid tokenId, Guid institutionId, string apiKey, TimeSpan lifetime) =>
+            $"{tokenId}|{institutionId}|{apiKey}";
+
+        public ApiKeyRevealPayload? Unprotect(string token)
+        {
+            var parts = token.Split('|', 3);
+            if (parts.Length != 3) return null;
+            if (!Guid.TryParse(parts[0], out var tokenId) || !Guid.TryParse(parts[1], out var institutionId))
+                return null;
+
+            return new ApiKeyRevealPayload(tokenId, institutionId, parts[2]);
+        }
+    }
+
+    private static IConfiguration CreateInstitutionsConfiguration()
+    {
+        return new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["Institutions:FrontendBaseUrl"] = "http://localhost:3000",
+                }
+            )
+            .Build();
+    }
+
     private sealed class FakeDeviceTokenProvider : IDeviceTokenProvider
     {
         public string GenerateToken()
@@ -69,6 +103,7 @@ public class BackendIntegrationTests
         public string ContentRootPath { get; set; } = Directory.GetCurrentDirectory();
 
         public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
+
     }
 
     private static AppDbContext CreateContext()
@@ -119,7 +154,7 @@ public class BackendIntegrationTests
 
     private static InstitutionService CreateInstitutionService(AppDbContext context)
     {
-        return new InstitutionService(new InstitutionRepository(context), new InstitutionMapper());
+        return new InstitutionService(new InstitutionRepository(context), new InstitutionMapper(), new StubEmailSenderProvider(), new StubApiKeyRevealTokenProvider(), CreateInstitutionsConfiguration());
     }
 
     private static User CreateCitizenUser(string email, string password)
@@ -297,6 +332,7 @@ public class BackendIntegrationTests
             Type = InstitutionType.HomeAffairs,
             VerificationNumber = "HA-JHB-2026-001",
             AdminId = admin.Id,
+            ContactEmail = "contact@homeaffairs-jhb.gov.za",
         };
 
         var result = await service.RegisterInstitutionAsync(request);
@@ -307,8 +343,6 @@ public class BackendIntegrationTests
         Assert.Equal(institution.Id, result.InstitutionId);
         Assert.Equal("Home Affairs Johannesburg", result.Name);
         Assert.Equal("HomeAffairs", result.Type);
-        Assert.NotEmpty(result.ApiKey);
-        Assert.StartsWith("flashid_live_", result.ApiKey);
         Assert.NotEqual(Guid.Empty, result.ApiKeyReference);
         Assert.Equal("HA-JHB-2026-001", result.VerificationNumber);
         Assert.Equal(AuditEventType.InstitutionRegistered, auditLog.EventType);

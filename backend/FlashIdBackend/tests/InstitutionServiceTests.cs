@@ -1,3 +1,5 @@
+using Application.Common.Interfaces.ProviderInterfaces;
+using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Mapping;
 using Application.Common.Services;
 using Application.Features.Institutions.DTOs;
@@ -7,11 +9,261 @@ using Domain.Enums;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Repositories;
+using Microsoft.Extensions.Configuration;
 
 namespace tests;
 
 public class InstitutionServiceTests
 {
+    private class FakeInstitutionRepository : IInstitutionRepository
+    {
+        public GovernmentAdministrator? AdminToReturn { get; set; }
+        public bool InstitutionExists { get; set; }
+        public Institution? InstitutionToReturn { get; set; }
+        public List<Institution> InstitutionsToReturn { get; set; } = new();
+        public List<AuditLog> SavedAuditLogs { get; } = new();
+        public List<ApiKeyRevealToken> SavedRevealTokens { get; } = new();
+        public bool SaveChangesCalled { get; private set; }
+
+        public Task<GovernmentAdministrator?> GetAdminByIdAsync(Guid adminId) => Task.FromResult(AdminToReturn);
+
+        public Task<bool> InstitutionExistsByVerificationNumberAsync(string verificationNumber) =>
+            Task.FromResult(InstitutionExists);
+
+        public Task AddInstitutionAsync(Institution institution)
+        {
+            InstitutionToReturn = institution;
+            return Task.CompletedTask;
+        }
+
+        public Task AddAuditLogAsync(AuditLog auditLog)
+        {
+            SavedAuditLogs.Add(auditLog);
+            return Task.CompletedTask;
+        }
+
+        public Task<List<Institution>> GetAllInstitutionsAsync() => Task.FromResult(InstitutionsToReturn);
+
+        public Task<Institution?> GetInstitutionByIdAsync(Guid id) => Task.FromResult(InstitutionToReturn);
+        public Task<List<Institution>> GetInstitutionsWithApiKeyOlderThanAsync(DateTime threshold) =>
+            Task.FromResult(InstitutionsToReturn.Where(i => i.ApiKeyGeneratedAt < threshold).ToList());
+
+        public Task AddApiKeyRevealTokenAsync(ApiKeyRevealToken token)
+        {
+            SavedRevealTokens.Add(token);
+            return Task.CompletedTask;
+        }
+
+        public bool ConsumeTokenResult { get; set; } = true;
+        public Guid? LastConsumedTokenId { get; private set; }
+
+        public Task<bool> TryConsumeApiKeyRevealTokenAsync(Guid tokenId)
+        {
+            LastConsumedTokenId = tokenId;
+            return Task.FromResult(ConsumeTokenResult);
+        }
+
+        public Task SaveChangesAsync()
+        {
+            SaveChangesCalled = true;
+            return Task.CompletedTask;
+        }
+    }
+
+    private class FakeEmailSenderProvider : IEmailSenderProvider
+    {
+        public string? LastToEmail { get; private set; }
+        public string? LastSubject { get; private set; }
+        public string? LastMessage { get; private set; }
+        public int SendCount { get; private set; }
+
+        public Task SendEmailAsync(string toEmail, string subject, string message, CancellationToken ct = default)
+        {
+            LastToEmail = toEmail;
+            LastSubject = subject;
+            LastMessage = message;
+            SendCount++;
+            return Task.CompletedTask;
+        }
+    }
+    private class FakeApiKeyRevealTokenProvider : IApiKeyRevealTokenProvider
+    {
+        public string Protect(Guid tokenId, Guid institutionId, string apiKey, TimeSpan lifetime) =>
+            $"{tokenId}|{institutionId}|{apiKey}";
+
+        public ApiKeyRevealPayload? Unprotect(string token)
+        {
+            var parts = token.Split('|', 3);
+            if (parts.Length != 3) return null;
+            if (!Guid.TryParse(parts[0], out var tokenId) || !Guid.TryParse(parts[1], out var institutionId))
+                return null;
+
+            return new ApiKeyRevealPayload(tokenId, institutionId, parts[2]);
+        }
+    }
+
+    private static IConfiguration CreateConfiguration()
+    {
+        var settings = new Dictionary<string, string?>
+        {
+            ["Institutions:FrontendBaseUrl"] = "http://localhost:3000",
+        };
+        return new ConfigurationBuilder().AddInMemoryCollection(settings).Build();
+    }
+
+    private static Institution ValidInstitution(string apiKeyHash = "old-hash")
+    {
+        return new Institution
+        {
+            Id = Guid.NewGuid(),
+            Name = "Test Home Affairs Office",
+            Type = InstitutionType.HomeAffairs,
+            VerificationNumber = "VN123456",
+            ContactEmail = "contact@testhomeaffairs.co.za",
+            ApiKeyReference = Guid.NewGuid(),
+            ApiKeyHash = apiKeyHash,
+            RegisteredById = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+    }
+
+    [Fact]
+    public async Task RegenerateApiKeyAsync_InstitutionExists_ReturnsNewKeyAndUpdatesHash()
+    {
+        var institution = ValidInstitution();
+        var originalHash = institution.ApiKeyHash;
+        var fakeRepository = new FakeInstitutionRepository { InstitutionToReturn = institution };
+        var fakeEmailSender = new FakeEmailSenderProvider();
+        var mapper = new InstitutionMapper();
+        var adminId = Guid.NewGuid();
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, new FakeApiKeyRevealTokenProvider(), CreateConfiguration());
+
+        var result = await service.RegenerateApiKeyAsync(institution.Id, adminId);
+        Assert.Equal(institution.Id, result.InstitutionId);
+        Assert.NotEqual(originalHash, institution.ApiKeyHash);
+    }
+
+    [Fact]
+    public async Task RegenerateApiKeyAsync_InstitutionExists_SavesChanges()
+    {
+        var institution = ValidInstitution();
+        var fakeRepository = new FakeInstitutionRepository { InstitutionToReturn = institution };
+        var fakeEmailSender = new FakeEmailSenderProvider();
+        var mapper = new InstitutionMapper();
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, new FakeApiKeyRevealTokenProvider(), CreateConfiguration());
+
+        await service.RegenerateApiKeyAsync(institution.Id, Guid.NewGuid());
+
+        Assert.True(fakeRepository.SaveChangesCalled);
+    }
+
+    [Fact]
+    public async Task RegenerateApiKeyAsync_InstitutionExists_WritesAuditLogWithCorrectEventType()
+    {
+        var institution = ValidInstitution();
+        var fakeRepository = new FakeInstitutionRepository { InstitutionToReturn = institution };
+        var fakeEmailSender = new FakeEmailSenderProvider();
+        var mapper = new InstitutionMapper();
+        var adminId = Guid.NewGuid();
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, new FakeApiKeyRevealTokenProvider(), CreateConfiguration());
+
+        await service.RegenerateApiKeyAsync(institution.Id, adminId);
+
+        var auditLog = Assert.Single(fakeRepository.SavedAuditLogs);
+        Assert.Equal(AuditEventType.InstitutionApiKeyRegenerated, auditLog.EventType);
+        Assert.Equal(adminId, auditLog.ActorId);
+    }
+
+    [Fact]
+    public async Task RegenerateApiKeyAsync_InstitutionExists_SendsEmailToContactAddress()
+    {
+        var institution = ValidInstitution();
+        var fakeRepository = new FakeInstitutionRepository { InstitutionToReturn = institution };
+        var fakeEmailSender = new FakeEmailSenderProvider();
+        var mapper = new InstitutionMapper();
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, new FakeApiKeyRevealTokenProvider(), CreateConfiguration());
+
+        await service.RegenerateApiKeyAsync(institution.Id, Guid.NewGuid());
+
+        Assert.Equal(1, fakeEmailSender.SendCount);
+        Assert.Equal(institution.ContactEmail, fakeEmailSender.LastToEmail);
+    }
+
+    [Fact]
+    public async Task RegenerateApiKeyAsync_InstitutionNotFound_ThrowsInvalidInstitutionRequestException()
+    {
+        var fakeRepository = new FakeInstitutionRepository { InstitutionToReturn = null };
+        var fakeEmailSender = new FakeEmailSenderProvider();
+        var mapper = new InstitutionMapper();
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, new FakeApiKeyRevealTokenProvider(), CreateConfiguration());
+
+        await Assert.ThrowsAsync<InvalidInstitutionRequestException>(
+            () => service.RegenerateApiKeyAsync(Guid.NewGuid(), Guid.NewGuid()));
+    }
+
+    [Fact]
+    public async Task RegenerateApiKeyAsync_InstitutionNotFound_DoesNotSendEmail()
+    {
+        var fakeRepository = new FakeInstitutionRepository { InstitutionToReturn = null };
+        var fakeEmailSender = new FakeEmailSenderProvider();
+        var mapper = new InstitutionMapper();
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, new FakeApiKeyRevealTokenProvider(), CreateConfiguration());
+
+        await Assert.ThrowsAsync<InvalidInstitutionRequestException>(
+            () => service.RegenerateApiKeyAsync(Guid.NewGuid(), Guid.NewGuid()));
+
+        Assert.Equal(0, fakeEmailSender.SendCount);
+    }
+
+    [Fact]
+    public async Task RevealApiKeyAsync_ValidToken_ReturnsApiKeyAndConsumesToken()
+    {
+        var fakeRepository = new FakeInstitutionRepository();
+        var fakeEmailSender = new FakeEmailSenderProvider();
+        var mapper = new InstitutionMapper();
+        var tokenProvider = new FakeApiKeyRevealTokenProvider();
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, tokenProvider, CreateConfiguration());
+
+        var tokenId = Guid.NewGuid();
+        var institutionId = Guid.NewGuid();
+        var token = tokenProvider.Protect(tokenId, institutionId, "flashid_live_testkey", TimeSpan.FromHours(24));
+
+        var result = await service.RevealApiKeyAsync(token);
+
+        Assert.Equal("flashid_live_testkey", result);
+        Assert.Equal(tokenId, fakeRepository.LastConsumedTokenId);
+        Assert.True(fakeRepository.SaveChangesCalled);
+    }
+
+    [Fact]
+    public async Task RevealApiKeyAsync_InvalidToken_ThrowsInvalidApiKeyRevealTokenException()
+    {
+        var fakeRepository = new FakeInstitutionRepository();
+        var fakeEmailSender = new FakeEmailSenderProvider();
+        var mapper = new InstitutionMapper();
+        var tokenProvider = new FakeApiKeyRevealTokenProvider();
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, tokenProvider, CreateConfiguration());
+
+        await Assert.ThrowsAsync<InvalidApiKeyRevealTokenException>(
+            () => service.RevealApiKeyAsync("not-a-real-token"));
+    }
+
+    [Fact]
+    public async Task RevealApiKeyAsync_TokenAlreadyConsumedOrExpired_ThrowsInvalidApiKeyRevealTokenException()
+    {
+        var fakeRepository = new FakeInstitutionRepository { ConsumeTokenResult = false };
+        var fakeEmailSender = new FakeEmailSenderProvider();
+        var mapper = new InstitutionMapper();
+        var tokenProvider = new FakeApiKeyRevealTokenProvider();
+        var service = new InstitutionService(fakeRepository, mapper, fakeEmailSender, tokenProvider, CreateConfiguration());
+
+        var token = tokenProvider.Protect(Guid.NewGuid(), Guid.NewGuid(), "flashid_live_testkey", TimeSpan.FromHours(24));
+
+        await Assert.ThrowsAsync<InvalidApiKeyRevealTokenException>(
+            () => service.RevealApiKeyAsync(token));
+    }
+
     private static AppDbContext CreateContext()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
@@ -25,7 +277,11 @@ public class InstitutionServiceTests
     {
         return new InstitutionService(
             new InstitutionRepository(context),
-            new InstitutionMapper()
+            new InstitutionMapper(),
+            new FakeEmailSenderProvider(),
+            new FakeApiKeyRevealTokenProvider(),
+            CreateConfiguration()
+
         );
     }
 
@@ -66,6 +322,7 @@ public class InstitutionServiceTests
         Type = InstitutionType.HomeAffairs,
         VerificationNumber = "HA-JHB-001",
         AdminId = adminId,
+        ContactEmail = "contact@homeaffairs-jhb.gov.za",
     };
 
     [Fact]
@@ -84,7 +341,6 @@ public class InstitutionServiceTests
         Assert.NotNull(result);
         Assert.Equal("Home Affairs JHB", result.Name);
         Assert.Equal("HA-JHB-001", result.VerificationNumber);
-        Assert.NotEmpty(result.ApiKey);
         Assert.NotEqual(Guid.Empty, result.ApiKeyReference);
 
         var savedInstitution = await context.Institutions.FirstOrDefaultAsync(i => i.VerificationNumber == "HA-JHB-001", TestContext.Current.CancellationToken);
@@ -212,5 +468,6 @@ public class InstitutionServiceTests
 
         await Assert.ThrowsAsync<InvalidInstitutionRequestException>(
             () => service.GetInstitutionByIdAsync(Guid.NewGuid()));
+
     }
 }
