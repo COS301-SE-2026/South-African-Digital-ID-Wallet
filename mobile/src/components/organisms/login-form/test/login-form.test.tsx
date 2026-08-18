@@ -81,7 +81,7 @@ describe('<LoginForm/>', () => {
       expect(useAuthStore.getState().isAuthenticated).toBe(true)
     )
     expect(useAuthStore.getState().token).toBe('jwt-token')
-    expect(mockReplace).toHaveBeenCalledWith('/home')
+    expect(mockReplace).toHaveBeenCalledWith('/citizen/home')
   })
   it('Should show the resolved error and stays put then login fails', async () => {
     loginMock.mockRejectedValue(

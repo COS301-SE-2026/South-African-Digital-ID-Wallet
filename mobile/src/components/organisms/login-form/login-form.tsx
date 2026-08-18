@@ -8,6 +8,7 @@ import { TextField } from '@/components/molecules'
 import { loginSchema, type LoginFormData } from '@/services/login-service'
 import loginService from '@/services/login-service/login-service'
 import { resolveLoginError } from '@/services/login-service'
+import { normalizeRole, ROLE_HOME } from '@/lib/roles'
 import { useAuthStore } from '@/stores/auth-store'
 
 import type { LoginFormProps } from './types'
@@ -25,7 +26,8 @@ export const LoginForm = ({ onForgotPassword, onRegister }: LoginFormProps) => {
     try {
       const session = await loginService.login(values)
       signIn(session)
-      router.replace('/home')
+      const role = normalizeRole(session.role)
+      router.replace(role ? ROLE_HOME[role] : '/unsupported-role')
     } catch (error) {
       setSubmitError(resolveLoginError(error))
     }
