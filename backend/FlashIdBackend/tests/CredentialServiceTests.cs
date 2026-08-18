@@ -5,6 +5,8 @@ using Domain.Enums;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Application.Features.Credentials.DTOs;
+using Application.Features.Credentials.Exceptions;
 
 namespace tests;
 
@@ -84,5 +86,111 @@ public class CredentialServiceTests
         Assert.Equal("National ID Card", result[0].Title);
         Assert.Equal("Active", result[0].Status);
         Assert.Equal("South African", result[0].IdentityDocument.Nationality);
+    }
+
+    private static (Citizen Citizen, Credential Credential) SeedCredential(AppDbContext context, CredentialStatus status = CredentialStatus.Active)
+    {
+        var citizen = new Citizen
+        {
+            Id = Guid.NewGuid(),
+            UserId = Guid.NewGuid(),
+            Names = "Sipho",
+            Surname = "Nkosi",
+        };
+        var credential = new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Status = status,
+            Signature = "sig",
+            IssuedBy = "Department of Home Affairs",
+            IssueDate = DateTime.UtcNow,
+        };
+        context.Citizens.Add(citizen);
+        context.Credentials.Add(credential);
+        context.SaveChanges();
+        return (citizen, credential);
+    }
+
+    [Fact]
+    public async Task RevokeCredentialAsync_ValidRevoke_UpdatesStatus()
+    {
+        using var context = CreateContext();
+        var (_, credential) = SeedCredential(context);
+        var service = CreateService(context);
+
+        var result = await service.RevokeCredentialAsync(
+            credential.Id,
+            Guid.NewGuid(),
+            new RevokeCredentialRequestDto { NewStatus = CredentialStatus.Revoked, Reason = "Suspected forgery" },
+            "127.0.0.1"
+        );
+
+        Assert.Equal(credential.Id, result.CredentialId);
+        Assert.Equal(CredentialStatus.Revoked, result.Status);
+    }
+
+    [Fact]
+    public async Task RevokeCredentialAsync_ValidInvestigation_UpdatesStatus()
+    {
+        using var context = CreateContext();
+        var (_, credential) = SeedCredential(context);
+        var service = CreateService(context);
+
+        var result = await service.RevokeCredentialAsync(
+            credential.Id,
+            Guid.NewGuid(),
+            new RevokeCredentialRequestDto { NewStatus = CredentialStatus.Investigation, Reason = "Under review" },
+            "127.0.0.1"
+        );
+
+        Assert.Equal(CredentialStatus.Investigation, result.Status);
+    }
+
+    [Fact]
+    public async Task RevokeCredentialAsync_CredentialNotFound_ThrowsCredentialNotFoundException()
+    {
+        using var context = CreateContext();
+        var service = CreateService(context);
+
+        await Assert.ThrowsAsync<CredentialNotFoundException>(() =>
+            service.RevokeCredentialAsync(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                new RevokeCredentialRequestDto { NewStatus = CredentialStatus.Revoked, Reason = "test" },
+                "127.0.0.1"
+            ));
+    }
+
+    [Fact]
+    public async Task RevokeCredentialAsync_DisallowedTargetStatus_ThrowsInvalidCredentialStatusTransitionException()
+    {
+        using var context = CreateContext();
+        var (_, credential) = SeedCredential(context);
+        var service = CreateService(context);
+
+        await Assert.ThrowsAsync<InvalidCredentialStatusTransitionException>(() =>
+            service.RevokeCredentialAsync(
+                credential.Id,
+                Guid.NewGuid(),
+                new RevokeCredentialRequestDto { NewStatus = CredentialStatus.Active, Reason = "test" },
+                "127.0.0.1"
+            ));
+    }
+
+    [Fact]
+    public async Task RevokeCredentialAsync_AlreadyInTargetStatus_ThrowsInvalidCredentialStatusTransitionException()
+    {
+        using var context = CreateContext();
+        var (_, credential) = SeedCredential(context, CredentialStatus.Revoked);
+        var service = CreateService(context);
+
+        await Assert.ThrowsAsync<InvalidCredentialStatusTransitionException>(() =>
+            service.RevokeCredentialAsync(
+                credential.Id,
+                Guid.NewGuid(),
+                new RevokeCredentialRequestDto { NewStatus = CredentialStatus.Revoked, Reason = "test" },
+                "127.0.0.1"
+            ));
     }
 }
