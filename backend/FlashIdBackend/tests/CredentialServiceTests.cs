@@ -23,6 +23,8 @@ public class CredentialServiceTests
     {
         return new CredentialService(
             new CredentialRepository(context),
+            new NotificationRepository(context),
+            new InstitutionRepository(context),
             new CredentialMapper()
         );
     }
