@@ -79,7 +79,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     context.Token = context.Request.Cookies["access_token"];
                 }
                 return Task.CompletedTask;
-            }
+            },
+            OnTokenValidated = async context =>
+            {
+                var userId = context.Principal?.FindFirstValue("userId");
+                var tokenVersion = context.Principal?.FindFirstValue("tv");
+                if (userId is null || tokenVersion is null || !Guid.TryParse(userId, out var id))
+                {
+                    context.Fail("Missing identity claims.");
+                    return;
+                }
+                var repository = context.HttpContext.RequestServices.GetRequiredService<IAuthRepository>();
+                var user = await repository.GetUserByIdAsync(id);
+                if (user is null || user.TokenVersion.ToString() != tokenVersion)
+                {
+                    context.Fail("Token has been revoked.");
+                }
+            },
         };
     });
 
