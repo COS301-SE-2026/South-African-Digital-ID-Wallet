@@ -19,7 +19,8 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.mobile"
+      "package": "com.anonymous.mobile",
+      "usesCleartextTraffic": false
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -28,7 +29,10 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      ["expo-local-authentication", { "faceIDPermission": "Confirm your identity to show your digital ID." }]
+      [
+        "expo-local-authentication",
+        { "faceIDPermission": "Confirm your identity to show your digital ID." }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

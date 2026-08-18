@@ -19,6 +19,7 @@
     "expo-screen-capture": "~56.0.5",
     "expo-secure-store": "56.0.4",
     "expo-status-bar": "~56.0.4",
+    "expo-system-ui": "~56.0.5",
     "formik": "2.4.9",
     "lucide-react-native": "1.22.0",
     "nativewind": "4.2.6",
