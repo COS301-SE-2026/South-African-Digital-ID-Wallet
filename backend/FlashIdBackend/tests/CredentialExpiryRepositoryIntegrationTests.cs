@@ -234,4 +234,84 @@ public class CredentialExpiryRepositoryIntegrationTests
         Assert.Equal(3, inner.SaveChangesCalls);
     }
 
+    [Fact]
+    public async Task RetryingDecorator_DelegatesPassthroughMethodsToInner()
+    {
+        var inner = new FakeInnerRepository();
+        var decorator = new RetryingCredentialExpiryRepositoryDecorator(inner);
+
+        Assert.False(await decorator.HasCompletedJobRunTodayAsync("CredentialExpiry", DateTime.UtcNow.Date, TestContext.Current.CancellationToken));
+
+        await decorator.MarkJobRunFailedAsync(Guid.NewGuid(), "boom", 0, TestContext.Current.CancellationToken);
+        await decorator.AddAuditLogAsync(new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.CredentialExpired,
+            Details = "x",
+            CreatedAt = DateTime.UtcNow
+        }, TestContext.Current.CancellationToken);
+        await decorator.AddNotificationAsync(new Notification
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = Guid.NewGuid(),
+            Title = "x",
+            Description = "x",
+            Tone = "warning",
+            CreatedAt = DateTime.UtcNow
+        }, TestContext.Current.CancellationToken);
+    }
+
+    [Fact]
+    public async Task RunExpiryCheckAsync_ProcessesRealCredential_WritesAuditLogAndNotificationAndCompletesAun()
+    {
+        using var context = CreateContext();
+        var repo = new CredentialExpiryRepository(context);
+        var (user, citizen) = CreateCitizenWithUser("9001015800095");
+        var credential = BuildCredentialWithDriversLicense(citizen, CredentialStatus.Active, DateTime.UtcNow.AddDays(-1));
+
+        await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
+        await context.Citizens.AddAsync(citizen, TestContext.Current.CancellationToken);
+        await context.Credentials.AddAsync(credential, TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var runDate = DateTime.UtcNow.Date;
+        var jobRunId = await repo.TryClaimJobRunAsync("CredentialExpiry", runDate, TestContext.Current.CancellationToken);
+
+        Assert.NotNull(jobRunId);
+        Assert.False(await repo.HasCompletedJobRunTodayAsync("CredentialExpiry", runDate, TestContext.Current.CancellationToken));
+
+        credential.Status = CredentialStatus.Expired;
+        await repo.AddAuditLogAsync(new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.CredentialExpired,
+            Details = $"CredentialId={credential.Id}",
+            ActorId = null,
+            CreatedAt = DateTime.UtcNow,
+        }, TestContext.Current.CancellationToken);
+
+        await repo.AddNotificationAsync(new Notification
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = credential.CitizenId,
+            Title = "Driver's license expired",
+            Description = "Your driver's license has expired.",
+            Tone = "warning",
+            CreatedAt = DateTime.UtcNow,
+        }, TestContext.Current.CancellationToken);
+
+        await repo.SaveChangesAsync(TestContext.Current.CancellationToken);
+        await repo.MarkJobRunCompletedAsync(jobRunId!.Value, 1, TestContext.Current.CancellationToken);
+
+        Assert.True(await repo.HasCompletedJobRunTodayAsync("CredentialExpiry", runDate, TestContext.Current.CancellationToken));
+
+        var persistedCredential = await context.Credentials.AsNoTracking().SingleAsync(c => c.Id == credential.Id, TestContext.Current.CancellationToken);
+        Assert.Equal(CredentialStatus.Expired, persistedCredential.Status);
+
+        var auditLog = await context.AuditLogs.AsNoTracking().SingleAsync(a => a.EventType == AuditEventType.CredentialExpired, TestContext.Current.CancellationToken);
+        Assert.Equal(credential.Id.ToString(), auditLog.Details);
+
+        var notification = await context.Notifications.AsNoTracking().SingleAsync(n => n.CitizenId == credential.CitizenId, TestContext.Current.CancellationToken);
+        Assert.Equal("Driver's license expired", notification.Title);
+    }
 }
