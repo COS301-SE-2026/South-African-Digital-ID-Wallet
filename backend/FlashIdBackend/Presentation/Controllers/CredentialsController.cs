@@ -130,4 +130,32 @@ public class CredentialsController : ControllerBase
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
+
+    [HttpPost("{credentialId}/revoke")]
+    [Authorize(Roles = "GovernmentAdministrator")]
+    public async Task<IActionResult> RevokeCredential(Guid credentialId, [FromBody] RevokeCredentialRequestDto request)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
+
+            var adminUserId = Guid.Parse(userIdClaim);
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var result = await _credentialService.RevokeCredentialAsync(credentialId, adminUserId, request, ipAddress);
+            return Ok(result);
+        }
+        catch (CredentialNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (InvalidCredentialStatusTransitionException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
 }
