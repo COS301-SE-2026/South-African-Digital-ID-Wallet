@@ -1,5 +1,6 @@
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Credentials.DTOs;
+using Application.Features.Credentials.Exceptions;
 using Domain.Enums;
 using Infrastructure.BackgroundJobs;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,6 +34,12 @@ public class CredentialExpiryBackgroundServiceTests
         }
 
         public Task WaitForRunAsync(TimeSpan timeout) => _runSignal.Task.WaitAsync(timeout);
+    }
+
+    private sealed class ThrowingCredentialExpiryService : ICredentialExpiryService
+    {
+        public Task<bool> HasCompletedTodayAsync(CancellationToken cancellationToken) => Task.FromResult(false);
+        public Task<CredentialExpiryCheckResponseDto> RunExpiryCheckAsync(CancellationToken cancellationToken) => throw new CredentialExpiryJobAlreadyRunningException();
     }
 
     private static (CredentialExpiryBackgroundService Service, FakeCredentialExpiryService Fake) BuildService(bool hasCompletedToday)
@@ -70,5 +77,21 @@ public class CredentialExpiryBackgroundServiceTests
         await service.StopAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(0, fake.RunCount);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_InnerServiceThrowsAlreadyRunning_DoesNotCrashBackgroundService()
+    {
+        var fake = new ThrowingCredentialExpiryService();
+        var services = new ServiceCollection();
+
+        services.AddSingleton<ICredentialExpiryService>(fake);
+
+        var provider = services.BuildServiceProvider();
+        var service = new CredentialExpiryBackgroundService(provider.GetRequiredService<IServiceScopeFactory>(), NullLogger<CredentialExpiryBackgroundService>.Instance);
+
+        await service.StartAsync(TestContext.Current.CancellationToken);
+        await Task.Delay(300, TestContext.Current.CancellationToken);
+        await service.StopAsync(TestContext.Current.CancellationToken);
     }
 }

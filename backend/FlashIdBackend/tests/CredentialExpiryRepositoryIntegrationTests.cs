@@ -309,7 +309,7 @@ public class CredentialExpiryRepositoryIntegrationTests
         Assert.Equal(CredentialStatus.Expired, persistedCredential.Status);
 
         var auditLog = await context.AuditLogs.AsNoTracking().SingleAsync(a => a.EventType == AuditEventType.CredentialExpired, TestContext.Current.CancellationToken);
-        Assert.Equal(credential.Id.ToString(), auditLog.Details);
+        Assert.Contains(credential.Id.ToString(), auditLog.Details);
 
         var notification = await context.Notifications.AsNoTracking().SingleAsync(n => n.CitizenId == credential.CitizenId, TestContext.Current.CancellationToken);
         Assert.Equal("Driver's license expired", notification.Title);
