@@ -13,7 +13,7 @@ export const FieldToggleRow = ({
 }: Readonly<FieldToggleRowProps>) => {
   return (
     <div className="flex items-center justify-between border-b border-border py-3 last:border-b-0">
-      <Text variant="sub-sm" className={locked ? 'text-muted-foreground' : ''}>
+      <Text variant="sub-sm" className="text-black">
         {label}
       </Text>
       <Switch
