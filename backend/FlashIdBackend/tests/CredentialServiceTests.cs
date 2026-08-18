@@ -85,7 +85,7 @@ public class CredentialServiceTests
         Assert.Equal("IdentityDocument", result[0].Type);
         Assert.Equal("National ID Card", result[0].Title);
         Assert.Equal("Active", result[0].Status);
-        Assert.Equal("South African", result[0].IdentityDocument.Nationality);
+        Assert.Equal("South African", result[0].IdentityDocument!.Nationality);
     }
 
     private static (Citizen Citizen, Credential Credential) SeedCredential(AppDbContext context, CredentialStatus status = CredentialStatus.Active)
