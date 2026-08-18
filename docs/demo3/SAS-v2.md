@@ -217,6 +217,57 @@ Sensitive access and device tokens are not returned to frontend JavaScript in th
 
 **Response 500:** Device verification completed without an access token or an unexpected server error occurred.
 
+#### POST /api/auth/resend-device-verification
+
+Generates and sends a new OTP for an existing device verification request.
+
+**Authentication:** None
+
+**Rate Limit:** `resend-device-verification`
+
+**Request Body:**
+
+```json
+{
+    "deviceVerificationId": "00000000-0000-0000-0000-000000000000"
+}
+```
+
+**Request Fields:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `deviceVerificationId` | string (UUID) | Yes | Identifier returned by `POST /api/auth/login` when device verification is required |
+
+**Response 200:**
+
+```json
+{
+    "message": "Verification code has been resent to your email."
+}
+```
+
+On success:
+
+- A new six-digit OTP is generated.
+- The previous OTP is replaced with the newly generated OTP.
+- The OTP expiry period is refreshed.
+- The new OTP is sent to the User's registered email address.
+- The resend action is recorded in the audit log.
+
+**Response 400:** Invalid request. This includes:
+- Missing `deviceVerificationId`
+- Invalid `deviceVerificationId` format
+
+**Response 401:** Device verification resend failed. This includes:
+- Device verification request not found
+- Device verification has already been completed
+- Device verification request has expired
+- Associated user account does not exist or has been deleted
+
+**Response 429:** Too many resend requests. The configured resend rate limit has been exceeded.
+
+**Response 500:** An unexpected server error occurred while attempting to resend the verification OTP.
 
 #### Post /api/auth/logout
 Clears the JWT cookie and ends the user session.

@@ -10,7 +10,7 @@ The following use case diagrams represent the core FlashID workflows develpoed. 
 
 The Authentication, Verification and Access Management subsystem allows users to securely register, authenticate and verify their identity before accessing FlashID. The subsystem also provides additional device verification when a user attempts to access their account from an untrusted device.
 
-![Authentication, Verification and Access Management Use Case Diagram](../images/access_management.drawio.svg)
+![Authentication, Verification and Access Management Use Case Diagram](../images/authentication_use_case.drawio.svg)
 
 ### Register User Account
 
@@ -35,6 +35,12 @@ The Authentication, Verification and Access Management subsystem allows users to
 **TUCBW:** This use case begins when a User attempting to log in from an untrusted device submits the device verification OTP sent to their registered email address.
 
 **TUCEW:** This use case ends when the OTP has been successfully validated, the device has been recorded as trusted, and the User's authenticated session is established.
+
+### Resend OTP 
+
+**TUCBW:** This use case begins when a User requests a new OTP after the original code has not been received or can no longer be used.
+
+**TUCEW:** This use case ends when a new OTP has been generated, the verification expiry period has been refreshed, and the new OTP has been sent to the User's registered email address.
 
 ### POPIA Compliance
 - **Section 8 — Accountability:** FlashID must ensure that authentication, email verification, and device verification processes comply with POPIA and that access to user accounts is appropriately controlled.
