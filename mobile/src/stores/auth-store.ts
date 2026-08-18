@@ -56,7 +56,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   signIn: ({ expiresAt, names, role, surname, token, userId }) => {
     const user = { names, role, surname, userId }
     setAuthToken(token)
-    void saveSession({ expiresAt, token, user })
+    void saveSession({ expiresAt, token, user }).catch(() => {})
     set({ expiresAt, isAuthenticated: true, isRestoring: false, token, user })
   },
   signOut: () => {

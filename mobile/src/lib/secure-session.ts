@@ -8,11 +8,10 @@ export type PersistedSession = {
   user: { names: string; role: string; surname: string; userId: string }
 }
 
-export const saveSession = (session: PersistedSession) => {
+export const saveSession = (session: PersistedSession) =>
   SecureStore.setItemAsync(SESSION_KEY, JSON.stringify(session), {
     keychainAccessible: SecureStore.WHEN_PASSCODE_SET_THIS_DEVICE_ONLY,
   })
-}
 
 export const clearSession = () => SecureStore.deleteItemAsync(SESSION_KEY)
 

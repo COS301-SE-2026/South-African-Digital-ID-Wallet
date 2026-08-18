@@ -1,14 +1,14 @@
 export type AppRole = 'citizen' | 'official'
 
 export const normalizeRole = (role: string | undefined): AppRole | null => {
-  const normailzed = (role ?? '')
+  const normalized = (role ?? '')
     .trim()
     .toLowerCase()
     .replace(/[_\s-]+/g, '')
-  if (normailzed === 'citizen') {
+  if (normalized === 'citizen') {
     return 'citizen'
   }
-  if (normailzed === 'official') {
+  if (normalized === 'official') {
     return 'official'
   }
   return null
