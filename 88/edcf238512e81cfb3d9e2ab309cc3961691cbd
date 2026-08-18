@@ -1,0 +1,14 @@
+.github/workflows/web-e2e.yml
+  h_99fca60b892ff4 53,112-117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "88edcf238512e81cfb3d9e2ab309cc3961691cbd",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
