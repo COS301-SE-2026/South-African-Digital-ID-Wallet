@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IIssueCredentialService.cs
+  h_99fca60b892ff4 1-10
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/CitizenCredentialStatusResponseDto.cs
+  h_99fca60b892ff4 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c317037d36b97a4b3155bca35e4c78bd95f2cbde",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
