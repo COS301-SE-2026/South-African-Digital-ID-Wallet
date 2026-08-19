@@ -17,5 +17,5 @@ public class CitizenCredentialStatusResponseDto
     public DateTime? ActivatedAt { get; set; }
     public string? PhoneNumber { get; set; } = string.Empty;
     public string? Email { get; set; }
-    public List<ExistingCredentialSummaryDto> Existing { get; set; } = [];
+    public List<ExistingCredentialSummaryDto> ExistingCredentials { get; set; } = [];
 }
