@@ -1,0 +1,21 @@
+web/src/services/login-service/login-urls.ts
+  h_293a8616118f65 5
+web/src/services/login-service/login-service.ts
+  h_293a8616118f65 33-41,47
+web/src/components/organisms/login-form/login-form.tsx
+  h_293a8616118f65 16,288
+web/src/components/templates/otp-modal/otp-modal.tsx
+  h_293a8616118f65 8-9,15,24,27,83-88,90,92-105,107-108,164,175,185-186,189-190
+  h_293a8616118f65 191-192
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "4b86b013e0b4cfd8bbe1c1cb9132589b022cbe0e",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+mobile/src/stores/test/auth-store.test.ts
+  h_712d174fc3f309 5,7-11,68-112
+  h_712d174fc3f309 6,113-114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c0fb21bb777b72b30ae90da0b9ba11fdc1e52e94",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

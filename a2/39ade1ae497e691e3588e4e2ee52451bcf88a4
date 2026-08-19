@@ -1,0 +1,33 @@
+mobile/src/components/templates/biometric-gate/test/biometric-gate.test.tsx
+  h_712d174fc3f309 1-21,23-35,37,39-63
+  h_712d174fc3f309 22,36,38
+mobile/src/components/atoms/button/test/button.test.tsx
+  h_712d174fc3f309 1-32
+  h_712d174fc3f309 33-37
+mobile/src/components/molecules/text-field/test/text-field.test.tsx
+  h_712d174fc3f309 1-15
+  h_712d174fc3f309 16-17
+mobile/src/components/pages/login/test/login-page.test.tsx
+  h_712d174fc3f309 1-15
+  h_712d174fc3f309 16-18
+mobile/src/components/atoms/divider/test/divider.test.tsx
+  h_712d174fc3f309 1-14
+mobile/jest.config.js
+  h_712d174fc3f309 13
+mobile/src/app/test/role-layouts.test.tsx
+  h_712d174fc3f309 1-75
+  h_712d174fc3f309 76-78
+mobile/src/components/templates/auth-screen/test/auth-screen.test.tsx
+  h_712d174fc3f309 1-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "a239ade1ae497e691e3588e4e2ee52451bcf88a4",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
