@@ -50,7 +50,7 @@ public class AuthController : ControllerBase
 
     // Login is anonymous — no [Authorize] needed because the user does not have a token yet.
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequestDto request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request, [FromHeader(Name = "X-Client")] string? client, CancellationToken cancellationToken)
     {
         try
         {
@@ -83,7 +83,12 @@ public class AuthController : ControllerBase
             };
 
             Response.Cookies.Append("access_token", result.Token, cookieOptions);
-            result.Token = string.Empty;
+
+            var isNativeClient = string.Equals(client, "mobile", StringComparison.Ordinal);
+            if (!isNativeClient)
+            {
+                result.Token = string.Empty;
+            }
 
             return Ok(result);
         }

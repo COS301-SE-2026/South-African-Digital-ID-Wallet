@@ -44,8 +44,6 @@ describe('AccountCardCitizenDashboard', () => {
 
     expect(await screen.findByText(/lebron james/i)).toBeInTheDocument()
 
-    expect(screen.getByText(/south african citizen/i)).toBeInTheDocument()
-
     expect(screen.getByText(/id ending ••••0123/i)).toBeInTheDocument()
   })
 

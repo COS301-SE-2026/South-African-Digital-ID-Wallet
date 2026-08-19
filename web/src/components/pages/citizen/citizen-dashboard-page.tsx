@@ -9,16 +9,16 @@ import { AccountCardCitizenDashboard } from '@/components/molecules/citizen-dash
 
 export default function CitizenDashboardPage() {
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f6f2ea]">
-      <main className="flex-1 p-6 flex flex-col min-h-0 overflow-auto">
-        <div className="grid grid-cols-12 gap-6 mt-6 flex-1 min-h-0">
-          <section className="col-span-8 space-y-6 min-h-0">
+    <div className="flex min-h-full overflow-x-hidden bg-[#f6f2ea]">
+      <main className="flex flex-1 min-h-0 flex-col overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">
+        <div className="mt-4 grid flex-1 min-h-0 grid-cols-1 gap-4 lg:mt-6 lg:grid-cols-12 lg:gap-6">
+          <section className="min-w-0 space-y-4 lg:col-span-8 lg:space-y-6">
             <WalletHeroCard />
             <CredentialsList />
             <NotificationsList />
           </section>
 
-          <aside className="col-span-4 space-y-6 min-h-0">
+          <aside className="min-w-0 space-y-4 lg:col-span-4 lg:space-y-6">
             <AccountCardCitizenDashboard />
             <ActivityOverviewCard />
             <TrustedDevices />
