@@ -1,3 +1,5 @@
+namespace Application.Features.Credentials.DTOs;
+
 public class ExistingCredentialSummaryDto
 {
     public string Type { get; set; } = string.Empty;
