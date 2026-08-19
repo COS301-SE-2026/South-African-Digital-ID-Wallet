@@ -1,0 +1,17 @@
+mobile/src/config/navigation/tabs.ts
+  h_712d174fc3f309 11-15,21-23,29-31
+  h_712d174fc3f309 1-10,16-20,24-28,32-34
+mobile/src/config/navigation/index.ts
+  h_712d174fc3f309 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "510c96db4de6f43bb68eae45ef599c6ea35c8652",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

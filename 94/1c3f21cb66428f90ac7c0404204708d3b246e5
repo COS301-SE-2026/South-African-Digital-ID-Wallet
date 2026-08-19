@@ -1,0 +1,23 @@
+mobile/src/components/molecules/nav-tab-item/types.ts
+  h_712d174fc3f309 2-5,10-12
+  h_712d174fc3f309 1,6-9,13-16
+mobile/src/components/molecules/nav-tab-item/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/components/molecules/nav-tab-item/nav-tab-item.tsx
+  h_712d174fc3f309 1-9,16,23
+  h_712d174fc3f309 10-15,17-22,24-52
+mobile/src/components/molecules/index.ts
+  h_712d174fc3f309 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "941c3f21cb66428f90ac7c0404204708d3b246e5",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
