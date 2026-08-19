@@ -8,8 +8,6 @@ import * as LocalAuthentication from 'expo-local-authentication'
 import { Text } from 'react-native'
 
 import { BiometricGate } from '../biometric-gate'
-import { useFocusEffect } from 'expo-router'
-import { success } from 'zod'
 
 jest.mock('expo-local-authentication', () => ({ authenticateAsync: jest.fn() }))
 jest.mock('expo-router', () => ({
