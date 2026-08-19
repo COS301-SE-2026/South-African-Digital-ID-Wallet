@@ -3,6 +3,17 @@ import { Button } from '@/components/atoms/button'
 import { Text } from '@/components/atoms/text'
 import type { TablePaginationProps } from './types'
 
+function getPagesToShow(currentPage: number, totalPages: number): number[] {
+  const maxVisible = 3
+  if (totalPages <= maxVisible) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1)
+  }
+  let start = Math.max(1, currentPage - 1)
+  const end = Math.min(totalPages, start + maxVisible - 1)
+  start = Math.max(1, end - maxVisible + 1)
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i)
+}
+
 export const TablePagination = ({
   currentPage,
   totalPages,
@@ -10,10 +21,11 @@ export const TablePagination = ({
   resultsPerPage,
   onPageChange,
 }: TablePaginationProps) => {
-  const start = (currentPage - 1) * resultsPerPage + 1
+  const start = totalResults === 0 ? 0 : (currentPage - 1) * resultsPerPage + 1
   const end = Math.min(currentPage * resultsPerPage, totalResults)
-
-  const pagesToShow = [1, 2, 3]
+  const pagesToShow = getPagesToShow(currentPage, totalPages)
+  const showLeadingEllipsis = pagesToShow[0] > 1
+  const showTrailingEllipsis = pagesToShow[pagesToShow.length - 1] < totalPages
 
   return (
     <div className="flex items-center justify-between">
@@ -32,30 +44,36 @@ export const TablePagination = ({
           <span className="sr-only">Previous page</span>
         </Button>
 
+        {showLeadingEllipsis && (
+          <>
+            <PageButton page={1} isActive={false} onClick={onPageChange} />
+            <Text as="span" variant="sub-sm" className="text-muted-text px-1">
+              ...
+            </Text>
+          </>
+        )}
+
         {pagesToShow.map((page) => (
-          <button
+          <PageButton
             key={page}
-            onClick={() => onPageChange(page)}
-            className={`h-8 w-8 rounded-md text-sm ${
-              page === currentPage
-                ? 'bg-deep-green text-clean-white'
-                : 'text-deep-green hover:bg-deep-green/10'
-            }`}
-          >
-            {page}
-          </button>
+            page={page}
+            isActive={page === currentPage}
+            onClick={onPageChange}
+          />
         ))}
 
-        <Text as="span" variant="sub-sm" className="text-muted-text px-1">
-          ...
-        </Text>
-
-        <button
-          onClick={() => onPageChange(totalPages)}
-          className="h-8 w-8 rounded-md text-sm text-deep-green hover:bg-deep-green/10"
-        >
-          {totalPages}
-        </button>
+        {showTrailingEllipsis && (
+          <>
+            <Text as="span" variant="sub-sm" className="text-muted-text px-1">
+              ...
+            </Text>
+            <PageButton
+              page={totalPages}
+              isActive={false}
+              onClick={onPageChange}
+            />
+          </>
+        )}
 
         <Button
           variant="text"
@@ -69,5 +87,28 @@ export const TablePagination = ({
         </Button>
       </div>
     </div>
+  )
+}
+
+function PageButton({
+  page,
+  isActive,
+  onClick,
+}: {
+  page: number
+  isActive: boolean
+  onClick: (page: number) => void
+}) {
+  return (
+    <button
+      onClick={() => onClick(page)}
+      className={`h-8 w-8 rounded-md text-sm ${
+        isActive
+          ? 'bg-deep-green text-clean-white'
+          : 'text-deep-green hover:bg-deep-green/10'
+      }`}
+    >
+      {page}
+    </button>
   )
 }

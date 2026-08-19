@@ -1,10 +1,29 @@
 import type { StatCardProps, StatCardTone } from './types'
 
-const toneStyles: Record<StatCardTone, { bg: string; text: string }> = {
-  green: { bg: 'bg-primary-green/10', text: 'text-primary-green' },
-  gold: { bg: 'bg-accent-gold/10', text: 'text-accent-gold' },
-  red: { bg: 'bg-national-red/10', text: 'text-national-red' },
-  neutral: { bg: 'bg-deep-green/10', text: 'text-deep-green' },
+const toneStyles: Record<
+  StatCardTone,
+  { bg: string; text: string; ring: string }
+> = {
+  green: {
+    bg: 'bg-primary-green/10',
+    text: 'text-primary-green',
+    ring: 'ring-primary-green',
+  },
+  gold: {
+    bg: 'bg-accent-gold/10',
+    text: 'text-accent-gold',
+    ring: 'ring-accent-gold',
+  },
+  red: {
+    bg: 'bg-national-red/10',
+    text: 'text-national-red',
+    ring: 'ring-national-red',
+  },
+  neutral: {
+    bg: 'bg-deep-green/10',
+    text: 'text-deep-green',
+    ring: 'ring-deep-green',
+  },
 }
 
 export function StatCard({
@@ -13,10 +32,33 @@ export function StatCard({
   label,
   value,
   subtext,
-}: StatCardProps) {
+  isActive = false,
+  onClick,
+}: Readonly<StatCardProps>) {
   const styles = toneStyles[tone]
+  const isInteractive = typeof onClick === 'function'
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!isInteractive) return
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onClick?.()
+    }
+  }
+
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-border-grey bg-clean-white p-5">
+    <div
+      role={isInteractive ? 'button' : undefined}
+      tabIndex={isInteractive ? 0 : undefined}
+      aria-pressed={isInteractive ? isActive : undefined}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      className={`flex items-center gap-4 rounded-xl border bg-clean-white p-5 transition-shadow ${
+        isActive
+          ? `border-transparent ring-2 ${styles.ring}`
+          : 'border-border-grey'
+      } ${isInteractive ? 'cursor-pointer' : ''}`}
+    >
       <div
         className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${styles.bg}`}
       >

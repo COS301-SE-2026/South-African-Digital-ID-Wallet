@@ -7,6 +7,7 @@ export type SearchResultRow = {
   surname: string
   idNumber: string
   dateJoined: string
+  expiresOn: string
   status: CredentialStatus
 }
 
@@ -18,6 +19,4 @@ export type SearchResultsTableProps = {
   resultsPerPage: number
   onPageChange: (page: number) => void
   onViewCredentials: (row: SearchResultRow) => void
-  onSuspend: (row: SearchResultRow) => void
-  onRevoke: (row: SearchResultRow) => void
 }

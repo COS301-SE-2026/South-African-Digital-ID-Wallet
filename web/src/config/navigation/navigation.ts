@@ -1,9 +1,5 @@
 import type { SidebarNavSection } from '@/types/navigation'
 
-{
-  /*TODO: Unstub hrefs */
-}
-
 export const citizenNavSections: SidebarNavSection[] = [
   {
     title: 'Citizen Portal',
@@ -65,6 +61,11 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
       {
         label: 'View Institutions',
         href: '/gov-admin/view-institutions',
+        icon: 'institutions',
+      },
+      {
+        label: 'Manage Credentials',
+        href: '/gov-admin/manage-credentials',
         icon: 'institutions',
       },
       {
