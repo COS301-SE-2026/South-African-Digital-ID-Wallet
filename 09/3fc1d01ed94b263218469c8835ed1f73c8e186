@@ -1,0 +1,22 @@
+backend/FlashIdBackend/Domain/Enums/AuditEventType.cs
+  h_99fca60b892ff4 10
+backend/FlashIdBackend/Domain/Entities/DriversLicense.cs
+  h_99fca60b892ff4 23
+backend/FlashIdBackend/Infrastructure/Data/Configurations/IdentityDocumentConfiguration.cs
+  h_99fca60b892ff4 56-57
+backend/FlashIdBackend/Infrastructure/Data/Configurations/DriversLicenseConfiguration.cs
+  h_99fca60b892ff4 60-61
+backend/FlashIdBackend/Domain/Entities/IdentityDocument.cs
+  h_99fca60b892ff4 26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "093fc1d01ed94b263218469c8835ed1f73c8e186",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
