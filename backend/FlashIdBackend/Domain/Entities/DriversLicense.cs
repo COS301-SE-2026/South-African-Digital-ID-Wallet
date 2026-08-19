@@ -20,4 +20,5 @@ public class DriversLicense : BaseEntity
     // Navigation property back to Credential
     public Guid CredentialId { get; set; }
     public Credential Credential { get; set; } = null!;
+    public Guid CitizenId { get; set; }
 }

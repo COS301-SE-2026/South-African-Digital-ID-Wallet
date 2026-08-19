@@ -57,5 +57,7 @@ public class DriversLicenseConfiguration : IEntityTypeConfiguration<DriversLicen
             .WithOne(c => c.DriversLicense)
             .HasForeignKey<DriversLicense>(d => d.CredentialId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(dl => dl.CitizenId).IsUnique();
     }
 }

@@ -7,6 +7,7 @@ public enum AuditEventType
     UserLoggedOut,
     FailedLoginAttempt,
     CredentialIssued,
+    CredentialIssueFailed,
     CredentialRevoked,
     CredentialVerified,
     CredentialExpired,
