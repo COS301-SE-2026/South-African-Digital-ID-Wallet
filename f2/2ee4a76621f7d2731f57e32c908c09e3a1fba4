@@ -1,0 +1,14 @@
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/IssueCredentialRequestDto.cs
+  h_99fca60b892ff4 1-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "f22ee4a76621f7d2731f57e32c908c09e3a1fba4",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
