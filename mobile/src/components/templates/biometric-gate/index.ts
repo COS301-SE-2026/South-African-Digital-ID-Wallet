@@ -1,2 +1,2 @@
-export * from './auth-screen'
 export * from './biometric-gate'
+export * from './types'
