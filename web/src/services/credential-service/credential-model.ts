@@ -47,6 +47,8 @@ export const toCredentialView = (c: CredentialResponse): CredentialView => {
     id: c.id,
     title: c.title,
     issuer: c.issuedBy,
+    qrCredentialType:
+      c.type === 'DriversLicense' ? 'driversLicense' : 'identityDocument',
     icon: c.type === 'DriversLicense' ? Car : IdCard,
     statusLabel: statusLabel(c.status),
     statusIntent: statusIntent(c.status),

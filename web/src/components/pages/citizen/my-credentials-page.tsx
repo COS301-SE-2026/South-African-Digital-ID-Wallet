@@ -26,54 +26,60 @@ export const MyCredentialsPage: FC = () => {
   const selected = views.find((v) => v.id === selectedId) ?? views[0]
 
   return (
-    <main className="h-full bg-cream-background text-deep-green p-6">
-      {isLoading && <Text variant="sub-md">Loading credentials.</Text>}
+    <main className="min-h-screen bg-cream-background px-4 py-4 text-deep-green sm:px-6 lg:px-8 lg:py-6">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 sm:gap-6">
+        {isLoading && <Text variant="sub-md">Loading credentials.</Text>}
 
-      {isError && (
-        <Text variant="sub-md" className="text-red">
-          Failed to load the credentials.
-        </Text>
-      )}
+        {isError && (
+          <Text variant="sub-md" className="text-red">
+            Failed to load the credentials.
+          </Text>
+        )}
 
-      {data && views.length === 0 && (
-        <Text variant="sub-md">No credentials.</Text>
-      )}
+        {data && views.length === 0 && (
+          <Text variant="sub-md">No credentials.</Text>
+        )}
 
-      {views.length > 0 && (
-        <div className="space-y-1">
-          <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2">
-            {views.map((view) => {
-              const Icon = view.icon
-              const isActive = view.id === selected?.id
+        {views.length > 0 && (
+          <div className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {views.map((view) => {
+                const Icon = view.icon
+                const isActive = view.id === selected?.id
 
-              return (
-                <button
-                  key={view.id}
-                  type="button"
-                  onClick={() => setSelectedId(view.id)}
-                  className={`bg-card flex w-auto shrink-0 snap-start items-center gap-3 rounded-2xl border p-4 text-left transition ${isActive ? 'border-deep-green' : 'hover:border-deep-green'}`}
-                >
-                  <Icon className="h-6 w-6" />
-                  <div>
-                    <Text
-                      as="p"
-                      variant="sub-sm"
-                      className="text-deep-green font-semibold"
-                    >
-                      {view.title}
-                    </Text>
-                    <Text as="p" variant="sub-sm">
-                      {view.issuer}
-                    </Text>
-                  </div>
-                </button>
-              )
-            })}
+                return (
+                  <button
+                    key={view.id}
+                    type="button"
+                    onClick={() => setSelectedId(view.id)}
+                    className={`bg-card flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition ${isActive ? 'border-deep-green shadow-sm' : 'hover:border-deep-green'}`}
+                  >
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-green/10">
+                      <Icon className="h-6 w-6 text-primary-green" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <Text
+                        as="p"
+                        variant="sub-sm"
+                        className="truncate font-semibold text-deep-green"
+                      >
+                        {view.title}
+                      </Text>
+                      <Text as="p" variant="sub-sm" className="truncate">
+                        {view.issuer}
+                      </Text>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+
+            {selected && (
+              <CredentialDetailCard key={selected.id} credential={selected} />
+            )}
           </div>
-
-          {selected && <CredentialDetailCard credential={selected} />}
-        </div>
-      )}
+        )}
+      </div>
     </main>
   )
 }

@@ -20,6 +20,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import FlashIdLogo from '@/assets/images/FlashID-green.png'
+import GreenCircleLogo from '@/assets/images/green-circle-logo.ico'
 import { Button } from '@/components/atoms'
 import type { SidebarIconName } from '@/types/navigation'
 import type { AppSidebarProps } from './types'
@@ -45,74 +46,101 @@ export const AppSidebar = ({
   variant = 'desktop',
   onNavigate,
 }: Readonly<AppSidebarProps>) => {
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isPinned, setIsPinned] = useState(true)
+  const [isHovered, setIsHovered] = useState(false)
   const pathname = usePathname()
+  const dashboardHref = navSections[0]?.items[0]?.href ?? '/'
+  const isExpanded = isPinned || isHovered
+  const css = isExpanded ? 'w-64' : 'w-24'
 
-  const css = isCollapsed ? 'w-24' : 'w-64'
+  const handleCollapse = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    setIsPinned(false)
+    setIsHovered(false)
+  }
 
   return (
     <aside
-      className={`flex overflow-hidden flex-col bg-deep-green px-4 py-5 text-clean-white transition-all duration-300 ${
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        if (!isPinned) {
+          setIsHovered(false)
+        }
+      }}
+      className={`relative flex overflow-hidden flex-col bg-deep-green px-4 py-5 text-clean-white transition-all duration-300 ${
         variant === 'desktop'
           ? `hidden lg:flex h-screen ${css}`
           : 'h-full w-full'
       }`}
     >
       <div
-        className={`mb-5 flex items-center ${
-          isCollapsed ? 'justify-center' : 'justify-between'
+        className={`relative z-10 mb-5 flex items-center ${
+          isExpanded ? 'justify-between' : 'justify-center'
         }`}
       >
-        <div
-          className={`flex items-center ${isCollapsed ? 'h-10 w-10 justify-center' : 'h-10 w-full justify-center'}`}
+        <Link
+          href={dashboardHref}
+          onClick={() => onNavigate?.()}
+          className={`flex items-center ${
+            isExpanded
+              ? 'h-10 w-full justify-center'
+              : 'h-10 w-10 justify-center'
+          }`}
+          aria-label="Go to dashboard"
         >
-          {isCollapsed ? (
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-clean-white/40 bg-primary-green/30"
-              title={user.name}
-              aria-label={`${user.name} logo`}
-            >
-              <Image
-                src={FlashIdLogo}
-                alt="FlashID Logo"
-                width={28}
-                height={28}
-                className="h-7 w-7 object-contain"
-                priority
-              />
-            </div>
-          ) : (
+          {isExpanded ? (
             <Image
               src={FlashIdLogo}
               alt="FlashID Logo"
-              width={180}
+              width={140}
               height={40}
-              className="h-10 w-auto object-contain"
               priority
             />
+          ) : (
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-full"
+              title={user.name}
+            >
+              <Image
+                src={GreenCircleLogo}
+                alt="FlashID Logo"
+                width={40}
+                height={40}
+                className="h-10 w-10 object-contain"
+              />
+            </div>
           )}
-        </div>
+        </Link>
 
-        {variant === 'desktop' && (
+        {variant === 'desktop' && isPinned && (
           <button
             type="button"
-            onClick={() => setIsCollapsed((prev) => !prev)}
-            className="rounded-xl p-2 text-clean-white/70 transition hover:bg-clean-white/10 hover:text-clean-white"
-            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            onClick={handleCollapse}
+            className="rounded-xl p-2 text-clean-white/70 transition hover:bg-accent-gold/10 hover:text-accent-gold"
+            aria-label="Collapse sidebar"
           >
-            {isCollapsed ? (
-              <ChevronRight className="h-5 w-5" />
-            ) : (
-              <ChevronLeft className="h-5 w-5" />
-            )}
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+        )}
+
+        {variant === 'desktop' && !isPinned && isHovered && (
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation()
+              setIsPinned(true)
+            }}
+            className="absolute right-2 rounded-xl p-2 text-clean-white/70 transition hover:bg-accent-gold/10 hover:text-accent-gold"
+            aria-label="Keep sidebar open"
+          >
+            <ChevronRight className="h-5 w-5" />
           </button>
         )}
       </div>
-
-      <nav className="space-y-4">
+      <nav className="relative z-10 space-y-4">
         {navSections.map((section) => (
           <div key={section.title}>
-            {!isCollapsed && (
+            {isExpanded && (
               <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-clean-white/40">
                 {section.title}
               </p>
@@ -122,23 +150,29 @@ export const AppSidebar = ({
               {section.items.map((item) => {
                 const Icon = sidebarIcons[item.icon]
                 const isActive = pathname === item.href
+                const iconColor = isActive
+                  ? 'text-clean-white'
+                  : 'text-accent-gold'
 
                 return (
                   <Link
                     key={`${section.title}-${item.href}-${item.label}`}
                     href={item.href}
-                    title={isCollapsed ? item.label : undefined}
+                    title={!isExpanded ? item.label : undefined}
                     onClick={() => onNavigate?.()}
-                    className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${
-                      isCollapsed ? 'justify-center px-0' : ''
+                    className={`group relative flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${
+                      !isExpanded ? 'justify-center px-0' : ''
                     } ${
                       isActive
-                        ? 'bg-clean-white/15 text-clean-white'
-                        : 'text-clean-white/75 hover:bg-clean-white/10 hover:text-clean-white'
+                        ? 'border border-accent-gold bg-clean-white/10 text-clean-white'
+                        : 'border border-transparent text-clean-white/75 hover:bg-clean-white/10 hover:text-clean-white'
                     }`}
                   >
-                    <Icon className="h-4 w-4 shrink-0" />
-                    {!isCollapsed && item.label}
+                    <Icon
+                      className={`h-5 w-5 shrink-0 transition-colors ${iconColor}`}
+                    />
+
+                    {isExpanded && item.label}
                   </Link>
                 )
               })}
@@ -147,43 +181,55 @@ export const AppSidebar = ({
         ))}
       </nav>
 
-      {!isCollapsed && (
-        <div className="mt-auto rounded-3xl border border-clean-white/10 bg-clean-white/10 p-3">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white">
-                {user.initials}
-              </div>
+      {isExpanded && (
+        <div className="relative z-10 mt-auto rounded-[26px] bg-accent-gold p-[2px]">
+          <div className="rounded-[24px] bg-deep-green p-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-accent-gold/70 bg-primary-green/40 text-sm font-extrabold text-clean-white">
+                  {user.initials}
+                </div>
 
-              <div className="min-w-0">
-                <p className="truncate text-sm font-extrabold text-clean-white">
-                  {user.name}
-                </p>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-extrabold text-clean-white">
+                    {user.name}
+                  </p>
+                </div>
               </div>
             </div>
+
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation()
+                onLogout()
+              }}
+              className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-clean-white/10 px-3 py-2 text-sm font-semibold text-clean-white/80 transition hover:border-national-red/30 hover:bg-national-red/10 hover:text-national-red"
+            >
+              <LogOut className="h-5 w-5" />
+              Logout
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={onLogout}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-clean-white/10 px-3 py-2 text-sm font-semibold text-clean-white/80 transition hover:bg-red-500/10 hover:text-red-300"
-          >
-            <LogOut className="h-4 w-5" />
-            Logout
-          </button>
         </div>
       )}
 
-      {isCollapsed && (
-        <div className="mt-auto flex flex-col items-center gap-2">
+      {!isExpanded && (
+        <div className="relative z-10 mt-auto flex flex-col items-center gap-2">
           <div
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-clean-white/40 bg-primary-green/30 text-sm font-extrabold text-clean-white"
+            className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-accent-gold/70 bg-primary-green/30 text-sm font-extrabold text-clean-white"
             title={user.name}
             aria-label={`${user.name} avatar`}
           >
             {user.initials}
           </div>
 
-          <Button onClick={onLogout} LeftIcon={LogOut}></Button>
+          <Button
+            onClick={(event) => {
+              event.stopPropagation()
+              onLogout()
+            }}
+            LeftIcon={LogOut}
+          />
         </div>
       )}
     </aside>

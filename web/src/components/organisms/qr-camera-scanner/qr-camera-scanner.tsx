@@ -1,8 +1,8 @@
 'use client'
-
 import { FC, useEffect, useRef, useState } from 'react'
 import QrScanner from 'qr-scanner'
-import { FlashlightIcon, FlashlightOffIcon } from 'lucide-react'
+import { CameraOff, Loader2, ShieldAlert } from 'lucide-react'
+import { Card } from '@/components/ui/card'
 import { Text } from '@/components/atoms'
 import type { QrCameraScannerProps, CameraState } from './types'
 
@@ -14,14 +14,12 @@ export const QrCameraScanner: FC<QrCameraScannerProps> = ({
   const scannerRef = useRef<QrScanner | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const [state, setState] = useState<CameraState>('requesting')
-  const [hasTorch, setHasTorch] = useState(false)
-  const [torchOn, setTorchOn] = useState(false)
 
   useEffect(() => {
-    if (!videoRef.current) return
-
+    if (!videoRef.current) {
+      return
+    }
     let cancelled = false
-
     const setup = async () => {
       let stream: MediaStream
       try {
@@ -49,17 +47,22 @@ export const QrCameraScanner: FC<QrCameraScannerProps> = ({
       }
 
       streamRef.current = stream
-      if (!videoRef.current) return
+      if (!videoRef.current) {
+        return
+      }
       videoRef.current.srcObject = stream
 
       const scanner = new QrScanner(
         videoRef.current,
         (result) => {
-          if (!cancelled) onScan(result.data)
+          if (!cancelled) {
+            onScan(result.data)
+          }
         },
         {
-          highlightScanRegion: true,
-          highlightCodeOutline: true,
+          highlightScanRegion: false,
+          highlightCodeOutline: false,
+
           calculateScanRegion: (video) => {
             const smallerDimension = Math.min(
               video.videoWidth,
@@ -92,19 +95,8 @@ export const QrCameraScanner: FC<QrCameraScannerProps> = ({
         }
         return
       }
-
-      scanner
-        .hasFlash()
-        .then((available) => {
-          if (!cancelled) setHasTorch(available)
-        })
-        .catch(() => {
-          // torch detection failing should not affect the scan flow
-        })
     }
-
     setup()
-
     return () => {
       cancelled = true
       scannerRef.current?.stop()
@@ -116,60 +108,105 @@ export const QrCameraScanner: FC<QrCameraScannerProps> = ({
   }, [onScan])
 
   useEffect(() => {
-    if (!scannerRef.current || state !== 'active') return
+    if (!scannerRef.current || state !== 'active') {
+      return
+    }
+
     if (paused) {
       scannerRef.current.pause()
     } else {
-      scannerRef.current.start().catch(() => {
-        // camera lifestyle handled by mount above
-      })
+      scannerRef.current.start().catch(() => {})
     }
   }, [paused, state])
 
-  const toggleTorch = async () => {
-    if (!scannerRef.current) return
-    await scannerRef.current.toggleFlash()
-    setTorchOn(scannerRef.current.isFlashOn())
-  }
-
   if (state === 'denied') {
     return (
-      <Text variant="sub-md">
-        Camera access was denied. Please allow camera access in your browser
-        settings to scan a QR code.
-      </Text>
+      <div className="flex min-h-[100dvh] items-center justify-center px-4 py-8 sm:min-h-0 sm:px-6 sm:py-12">
+        <Card className="flex w-full max-w-md flex-col items-center gap-3 rounded-3xl border border-gray-200 bg-white p-8 text-center shadow-xl sm:rounded-[32px] sm:p-10 sm:shadow-2xl">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50">
+            <ShieldAlert className="h-7 w-7 text-red-500" />
+          </div>
+
+          <Text variant="h2" className="mt-1">
+            Camera access denied
+          </Text>
+
+          <Text variant="sub-md" className="text-muted-foreground">
+            Please allow camera access in your browser settings to scan a QR
+            code.
+          </Text>
+        </Card>
+      </div>
     )
   }
 
   if (state === 'unavailable') {
     return (
-      <Text variant="sub-md">
-        A camera could not be found on this device. Please use a device with a
-        camera to be able to scan a QR code.
-      </Text>
+      <div className="flex min-h-[100dvh] items-center justify-center px-4 py-8 sm:min-h-0 sm:px-6 sm:py-12">
+        <Card className="flex w-full max-w-md flex-col items-center gap-3 rounded-3xl border border-gray-200 bg-white p-8 text-center shadow-xl sm:rounded-[32px] sm:p-10 sm:shadow-2xl">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100">
+            <CameraOff className="h-7 w-7 text-gray-500" />
+          </div>
+
+          <Text variant="h2" className="mt-1">
+            No camera found
+          </Text>
+
+          <Text variant="sub-md" className="text-muted-foreground">
+            Please use a device with a camera to scan a QR code.
+          </Text>
+        </Card>
+      </div>
     )
   }
 
   return (
-    <div className="relative overflow-hidden rounded-md">
-      <video ref={videoRef} className="w-full" muted playsInline />
-      {state === 'requesting' && (
-        <Text variant="sub-sm">Requesting camera access...</Text>
-      )}
-      {hasTorch && state === 'active' && (
-        <button
-          type="button"
-          onClick={toggleTorch}
-          className="absolute bottom-3 right-3 rounded-full bg-black/50 p-2 text-white transition hover:bg-black/70"
-          aria-label={torchOn ? 'Turn off flashlight' : 'Turn on flashlight'}
-        >
-          {torchOn ? (
-            <FlashlightIcon className="h-5 w-5" />
-          ) : (
-            <FlashlightOffIcon className="h-5 w-5" />
-          )}
-        </button>
-      )}
+    <div className="mx-auto w-full">
+      <Card className="w-full max-w-3xl overflow-hidden rounded-[32px] border border-gray-200 bg-white p-6 shadow-2xl sm:p-10">
+        <div className="mb-8 text-center">
+          <Text variant="h1">Scan QR Code</Text>
+
+          <Text variant="sub-md" className="mt-1 text-muted-foreground">
+            Position the QR code inside the frame
+          </Text>
+        </div>
+
+        <div className="flex justify-center">
+          <div className="relative w-full max-w-[500px] p-5 sm:p-6">
+            <div className="pointer-events-none absolute left-1 top-1 h-12 w-12 border-l-4 border-t-4 border-emerald-600" />
+            <div className="pointer-events-none absolute right-1 top-1 h-12 w-12 border-r-4 border-t-4 border-amber-500" />
+            <div className="pointer-events-none absolute bottom-1 left-1 h-12 w-12 border-b-4 border-l-4 border-red-500" />
+            <div className="pointer-events-none absolute bottom-1 right-1 h-12 w-12 border-b-4 border-r-4 border-blue-600" />
+
+            <div className="relative aspect-square w-full overflow-hidden rounded-[24px] bg-black shadow-lg">
+              <video
+                ref={videoRef}
+                className="h-full w-full object-cover"
+                muted
+                playsInline
+              />
+
+              {state === 'requesting' && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/70">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm">
+                    <Loader2 className="h-7 w-7 animate-spin text-white" />
+                  </div>
+
+                  <Text variant="sub-sm" className="text-white">
+                    Requesting camera access...
+                  </Text>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 border-t border-gray-200 pt-6 text-center">
+          <Text variant="sub-sm" className="text-gray-500">
+            Secure • Signed • Controlled by You
+          </Text>
+        </div>
+      </Card>
     </div>
   )
 }

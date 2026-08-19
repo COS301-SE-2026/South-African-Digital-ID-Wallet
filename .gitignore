@@ -20,6 +20,8 @@ node_modules/
 .DS_Store
 
 *.swp
+*.swobin/
+obj/
 *.swo
 
 # Test coverage output

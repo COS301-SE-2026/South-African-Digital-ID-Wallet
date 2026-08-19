@@ -8,4 +8,6 @@ export type FieldSelectionFormProps = {
   credentialType: CredentialType
   onBack: () => void
   onContinue: (selection: QrDisclosureSelection) => void
+  onSelectionChange?: (selection: QrDisclosureSelection) => void
+  continueLabel?: string
 }
