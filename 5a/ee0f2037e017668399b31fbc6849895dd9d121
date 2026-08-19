@@ -1,0 +1,22 @@
+mobile/src/components/templates/biometric-gate/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/components/templates/biometric-gate/types.ts
+  h_712d174fc3f309 2-5
+  h_712d174fc3f309 1,6-8
+mobile/src/components/templates/biometric-gate/biometric-gate.tsx
+  h_712d174fc3f309 1-65
+mobile/src/components/templates/index.ts
+  h_712d174fc3f309 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "5aee0f2037e017668399b31fbc6849895dd9d121",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
