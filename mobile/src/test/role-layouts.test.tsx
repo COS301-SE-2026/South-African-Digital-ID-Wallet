@@ -3,8 +3,8 @@ import { Redirect, Tabs } from 'expo-router'
 
 import { useAuthStore } from '@/stores/auth-store'
 
-import CitizenLayout from '../app/'
-import OfficialLayout from '../app/'
+import CitizenLayout from '@/app/citizen/_layout'
+import OfficialLayout from '@/app/official/_layout'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
