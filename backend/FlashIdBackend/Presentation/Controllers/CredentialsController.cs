@@ -14,15 +14,18 @@ public class CredentialsController : ControllerBase
     private readonly ICredentialService _credentialService;
     private readonly IQrService _qrService;
     private readonly ICredentialActivationService _credentialActivationService;
+    private readonly ICredentialExpiryService _credentialExpiryService;
 
     public CredentialsController(
       ICredentialService credentialService,
       IQrService qrService,
-      ICredentialActivationService credentialActivationService)
+      ICredentialActivationService credentialActivationService,
+      ICredentialExpiryService credentialExpiryService)
     {
         _credentialService = credentialService;
         _qrService = qrService;
         _credentialActivationService = credentialActivationService;
+        _credentialExpiryService = credentialExpiryService;
     }
 
 
@@ -124,6 +127,36 @@ public class CredentialsController : ControllerBase
         catch (InvalidDisclosureTokenException idte)
         {
             return BadRequest(new { error = idte.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    /// <summary>
+    /// Manually triggers the daily credential-expiry check. Government Administrator only.
+    /// Idempotent. If today's check already completed or is currently running, returns that result instead of reprocessing.
+    /// </summary>
+    /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
+    /// <response code="200">The check ran, or had already completed for today.</response>
+    /// <response code="409">Another expiry check is currently running for today.</response>
+    /// <response code="403">The caller is not a Government Administrator.</response>
+    [HttpPost("expiry-check")]
+    [Authorize(Roles = "GovernmentAdministrator")]
+    [ProducesResponseType(typeof(CredentialExpiryCheckResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> TriggerExpiryCheck(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var res = await _credentialExpiryService.RunExpiryCheckAsync(cancellationToken);
+            return Ok(res);
+        }
+        catch (CredentialExpiryJobAlreadyRunningException cejare)
+        {
+            return Conflict(new { error = cejare.Message });
         }
         catch (Exception)
         {

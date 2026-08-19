@@ -29,9 +29,6 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
             .HasDefaultValueSql("GETUTCDATE()")
             .ValueGeneratedOnAdd();
 
-        builder.Property(a => a.ActorId)
-            .IsRequired();
-
         builder.HasOne(a => a.Actor)
             .WithMany(u => u.AuditLogs)
             .HasForeignKey(a => a.ActorId)
@@ -48,6 +45,6 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
         builder.HasIndex(a => new { a.EventType, a.CreatedAt });
 
         //for soft deletion
-        builder.HasQueryFilter(a => !a.Actor.IsDeleted);
+        builder.HasQueryFilter(a => a.Actor == null || !a.Actor.IsDeleted);
     }
 }

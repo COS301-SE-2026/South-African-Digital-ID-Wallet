@@ -27,6 +27,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<TrustedDevice> TrustedDevices => Set<TrustedDevice>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<DeviceVerification> DeviceVerifications => Set<DeviceVerification>();
+    public DbSet<JobRun> JobRuns => Set<JobRun>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

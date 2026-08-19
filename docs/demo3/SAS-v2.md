@@ -223,6 +223,30 @@ Activates a citizen's credentials after register.
 **Response 200:** Credentials activated
 **Response 401:** Account could not be identified from token
 
+### Credential Expiry Check
+
+#### POST /api/credentials/expiry-check
+Manually runs the daily credential-expiry check. Idempotent per SAST calendar date (If today's check already completed, returns that result without reprocessing. If another instance is currently running today's check, returns `409`.)
+
+**Authentication:** Required for Government Administrator
+
+**Request Body:** None
+
+**Response 200:**
+```json
+{
+    "runDate": "date",
+    "status": "string",
+    "processedCount": 0,
+    "startedAt": "date",
+    "completedAt": "date",
+    "errorMessage": "string"
+}
+```
+
+**Response 403:** Caller is not a Government Administrator
+**Response 409:** Another expiry check is currently running for today
+
 ### Citizen Verify
 
 #### POST /api/citizen-verification/activate-token
