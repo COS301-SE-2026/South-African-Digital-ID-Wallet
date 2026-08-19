@@ -1,0 +1,14 @@
+mobile/src/components/utility/test/utility.test.tsx
+  h_712d174fc3f309 1-102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "a92d60d2434f6add0a6f96148adf574be9217b93",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

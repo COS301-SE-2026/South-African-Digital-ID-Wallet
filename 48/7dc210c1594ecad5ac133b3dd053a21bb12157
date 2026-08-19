@@ -1,0 +1,25 @@
+backend/FlashIdBackend/Application/Common/Mapping/CitizenMapper.cs
+  h_99fca60b892ff4 16-18
+  s_b63a658158754f::t_f11002a04ea42d 4,15,19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "487dc210c1594ecad5ac133b3dd053a21bb12157",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_b63a658158754f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ad1d1f58c4ec0adab",
+        "model": "unknown"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
