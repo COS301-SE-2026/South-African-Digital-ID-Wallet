@@ -50,6 +50,9 @@ jobs:
       E2E_CITIZEN_EMAIL: citizen.e2e@flashid.local
       E2E_GOVADMIN_EMAIL: govadmin.e2e@flashid.local
       E2E_OFFICIAL_EMAIL: official.e2e@flashid.local
+      IPGEOLOCATION__APIKEY: ${{secrets.IPGEOLOCATION_APIKEY}}
+      IPGEOLOCATION__BASEURL: ${{secrets.IPGEOLOCATION_BASEURL}}
+      
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
