@@ -1,0 +1,37 @@
+web/src/components/molecules/table-pagination/table-pagination.tsx
+  h_0aff3b71f739b1 6-16,26-28,47-51,53-54,70-72,92-100
+  h_0aff3b71f739b1 24,52,55,57,59-62,65-69,73-76,101-114
+web/src/config/navigation/navigation.ts
+  h_0aff3b71f739b1 67-68
+  h_0aff3b71f739b1 69-71
+web/src/components/atoms/stat-card/stat-card.tsx
+  h_0aff3b71f739b1 3-7,16-18,20-26,35-37,39-41
+  h_0aff3b71f739b1 8-15,19,42-48,50-61
+web/src/components/organisms/search-results-table/types.ts
+  h_0aff3b71f739b1 10
+web/src/components/organisms/credential-stats-filter/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/atoms/status-pill/types.ts
+  h_0aff3b71f739b1 3-4,7
+web/src/components/atoms/stat-card/types.ts
+  h_0aff3b71f739b1 4,11-12
+web/src/components/molecules/table-pagination/test/table-pagination.test.tsx
+  h_0aff3b71f739b1 1-67
+  h_0aff3b71f739b1 68-83
+web/src/components/organisms/credential-stats-filter/types.ts
+  h_0aff3b71f739b1 1-9
+web/src/components/atoms/status-pill/status-pill.tsx
+  h_0aff3b71f739b1 1-7,14
+  h_0aff3b71f739b1 8,15-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "62c6e38b950127b882c6b3806d58e4c3791bccff",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
