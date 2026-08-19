@@ -1,0 +1,23 @@
+mobile/src/components/utility/privacy-screen-overlay.tsx
+  h_712d174fc3f309 3,6-7,13
+  h_712d174fc3f309 1-2,4-5,8-12,14-29
+mobile/src/components/utility/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/components/utility/session-lock-watcher.tsx
+  h_712d174fc3f309 2-3,5-8
+  h_712d174fc3f309 1,4,9-39
+mobile/src/config/index.ts
+  h_712d174fc3f309 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "4fd914fe03a0158eb1bd9a27090cb14beed6d34b",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
