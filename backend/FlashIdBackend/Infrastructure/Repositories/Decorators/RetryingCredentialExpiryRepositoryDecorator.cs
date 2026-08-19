@@ -26,7 +26,7 @@ public class RetryingCredentialExpiryRepositoryDecorator : ICredentialExpiryRepo
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
-        for (var attempt = 1; ; attempt++)
+        for (var attempt = 1; attempt <= _maxAttempts; attempt++)
         {
             try
             {

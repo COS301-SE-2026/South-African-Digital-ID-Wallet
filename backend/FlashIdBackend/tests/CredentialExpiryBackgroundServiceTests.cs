@@ -38,8 +38,13 @@ public class CredentialExpiryBackgroundServiceTests
 
     private sealed class ThrowingCredentialExpiryService : ICredentialExpiryService
     {
+        public int CallCount;
         public Task<bool> HasCompletedTodayAsync(CancellationToken cancellationToken) => Task.FromResult(false);
-        public Task<CredentialExpiryCheckResponseDto> RunExpiryCheckAsync(CancellationToken cancellationToken) => throw new CredentialExpiryJobAlreadyRunningException();
+        public Task<CredentialExpiryCheckResponseDto> RunExpiryCheckAsync(CancellationToken cancellationToken)
+        {
+            CallCount++;
+            throw new CredentialExpiryJobAlreadyRunningException();
+        }
     }
 
     private static (CredentialExpiryBackgroundService Service, FakeCredentialExpiryService Fake) BuildService(bool hasCompletedToday)
@@ -93,5 +98,7 @@ public class CredentialExpiryBackgroundServiceTests
         await service.StartAsync(TestContext.Current.CancellationToken);
         await Task.Delay(300, TestContext.Current.CancellationToken);
         await service.StopAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(fake.CallCount > 0);
     }
 }
