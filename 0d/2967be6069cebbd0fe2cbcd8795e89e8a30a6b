@@ -1,0 +1,15 @@
+mobile/src/app/unsupported-role.tsx
+  h_712d174fc3f309 3-4,6-7,10
+  h_712d174fc3f309 1-2,5,8-9,11-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "0d2967be6069cebbd0fe2cbcd8795e89e8a30a6b",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
