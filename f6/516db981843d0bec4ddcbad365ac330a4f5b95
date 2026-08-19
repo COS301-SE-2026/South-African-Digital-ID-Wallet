@@ -1,0 +1,15 @@
+mobile/src/components/organisms/bottom-nav-bar/test/bottom-nav-bar.test.tsx
+  h_712d174fc3f309 1-73
+  h_712d174fc3f309 74-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "f6516db981843d0bec4ddcbad365ac330a4f5b95",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
