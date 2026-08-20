@@ -123,13 +123,7 @@ builder.Services.AddRateLimiter(options =>
         opt.QueueLimit = 0;
     });
 
-    options.AddFixedWindowLimiter("resend-device-verification", opt =>
-    {
-        opt.PermitLimit = 3;
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opt.QueueLimit = 0;
-    });
+    AddUserPartitionedPolicy(options, "resend-device-verification", permitLimit: 3, window: TimeSpan.FromMinutes(1));
 
 
     AddUserPartitionedPolicy(options, "verify-password", permitLimit: 5, window: TimeSpan.FromMinutes(1));

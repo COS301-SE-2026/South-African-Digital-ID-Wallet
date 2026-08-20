@@ -10,7 +10,7 @@ using Domain.Enums;
 using Infrastructure.Providers;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using Org.BouncyCastle.Bcpg;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace tests;
 
@@ -200,7 +200,7 @@ public class AuthServiceTests
         var fakeDeviceTokenProvider = new FakeDeviceTokenProvider();
         var mapper = new AuthMapper();
         var fakeIpGeolocationProvider = new IpGeolocationProvider();
-        return new AuthService(fakeAuthRepository, fakeJwtTokenProvider, fakePasswordHasher, null!, mapper, fakeTrustedDeviceRepository, fakeDeviceTokenProvider, fakeEmailSenderProvider, fakeHostEnvironment, fakeIpGeolocationProvider);
+        return new AuthService(fakeAuthRepository, fakeJwtTokenProvider, fakePasswordHasher, null!, mapper, fakeTrustedDeviceRepository, fakeDeviceTokenProvider, fakeEmailSenderProvider, fakeHostEnvironment, fakeIpGeolocationProvider, NullLogger<AuthService>.Instance);
     }
 
     [Fact]

@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace tests;
 
@@ -129,7 +130,7 @@ public class BackendIntegrationTests
             citizenService,
             mapper,
             trustedDevicesRepository,
-            deviceTokenProvider, emailSenderProvider, environment, ipGeolocationProvider);
+            deviceTokenProvider, emailSenderProvider, environment, ipGeolocationProvider, NullLogger<AuthService>.Instance);
     }
 
     private static InstitutionService CreateInstitutionService(AppDbContext context)

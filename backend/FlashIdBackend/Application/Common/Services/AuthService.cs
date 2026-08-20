@@ -7,9 +7,11 @@ using Application.Common.Mapping;
 using Application.Features.Auth.DTOs;
 using Application.Features.Auth.Exceptions;
 using Application.Features.Citizens.DTOs;
+using Application.Features.ManageUserAccountCard.DTOs;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Common.Services;
 
@@ -26,6 +28,7 @@ public class AuthService : IAuthService
     private readonly IEmailSenderProvider _emailSenderProvider;
     private readonly IHostEnvironment _environment;
     private readonly IIpGeolocationProvider _ipGeolocationProvider;
+    private readonly ILogger<AuthService> _logger;
 
     public AuthService(
         IAuthRepository authRepository,
@@ -37,7 +40,8 @@ public class AuthService : IAuthService
         IDeviceTokenProvider deviceTokenProvider,
         IEmailSenderProvider emailSenderProvider,
             IHostEnvironment environment,
-        IIpGeolocationProvider ipGeolocationProvider)
+        IIpGeolocationProvider ipGeolocationProvider,
+        ILogger<AuthService> logger)
     {
         _authRepository = authRepository;
         _jwtTokenProvider = jwtTokenProvider;
@@ -49,6 +53,7 @@ public class AuthService : IAuthService
         _emailSenderProvider = emailSenderProvider;
         _environment = environment;
         _ipGeolocationProvider = ipGeolocationProvider;
+        _logger = logger;
 
     }
 
@@ -228,7 +233,22 @@ public class AuthService : IAuthService
         var hashedToken = _deviceTokenProvider.HashToken(rawDeviceToken);
 
         var existingTrustedDevice = await _trustedDeviceRepository.GetByTokenHashAsync(user.Id, hashedToken, cancellationToken);
-        var location = await _ipGeolocationProvider.GetLocationAsync(ipAddress, cancellationToken);
+        IpLocationResult? location = null;
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(ipAddress))
+            {
+                location = await _ipGeolocationProvider.GetLocationAsync(ipAddress, cancellationToken);
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "IP geolocation lookup failed for device verification. Continuing without location data.");
+        }
         if (existingTrustedDevice is null)
         {
 
@@ -254,8 +274,12 @@ public class AuthService : IAuthService
         {
             existingTrustedDevice.IsTrusted = true;
             existingTrustedDevice.LastActive = DateTime.UtcNow;
-            existingTrustedDevice.LastKnownCity = location?.City;
-            existingTrustedDevice.LastKnownCountry = location?.Country;
+            if (location is not null)
+            {
+                existingTrustedDevice.LastKnownCity = location.City;
+                existingTrustedDevice.LastKnownCountry = location.Country;
+            }
+
             existingTrustedDevice.UpdatedAt = DateTime.UtcNow;
 
             await _trustedDeviceRepository.UpdateTrustedDeviceAsync(existingTrustedDevice, cancellationToken);
