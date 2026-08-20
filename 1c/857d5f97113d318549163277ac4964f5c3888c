@@ -1,0 +1,16 @@
+backend/FlashIdBackend/.config/dotnet-tools.json
+  h_99fca60b892ff4 11-17
+docs/demo3/openapi.yaml
+  h_99fca60b892ff4 1-968
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "1c857d5f97113d318549163277ac4964f5c3888c",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

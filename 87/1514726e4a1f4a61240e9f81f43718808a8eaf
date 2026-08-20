@@ -1,0 +1,19 @@
+backend/FlashIdBackend/Domain/Enums/AuditEventType.cs
+  h_293a8616118f65 28
+backend/FlashIdBackend/Application/Common/Services/AuthService.cs
+  h_293a8616118f65 418,420-461
+  h_293a8616118f65 462
+backend/FlashIdBackend/Presentation/Program.cs
+  h_293a8616118f65 126-134
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "871514726e4a1f4a61240e9f81f43718808a8eaf",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

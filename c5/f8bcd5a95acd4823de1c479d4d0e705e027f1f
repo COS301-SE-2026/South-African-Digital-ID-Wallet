@@ -1,0 +1,14 @@
+backend/FlashIdBackend/tests/CredentialControllerIntegrationTests.cs
+  h_99fca60b892ff4 1-183
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c5f8bcd5a95acd4823de1c479d4d0e705e027f1f",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

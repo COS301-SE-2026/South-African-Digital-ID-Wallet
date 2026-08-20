@@ -1,0 +1,18 @@
+docs/demo3/SAS-v2.md
+  h_293a8616118f65 96,100-103,108-135,139-219
+docs/demo3/use-cases-v3.md
+  h_293a8616118f65 8-17
+docs/images/access_management.drawio.svg
+  h_293a8616118f65 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "767dc30aade775807a1d04edeb80a57cd2cae8fc",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

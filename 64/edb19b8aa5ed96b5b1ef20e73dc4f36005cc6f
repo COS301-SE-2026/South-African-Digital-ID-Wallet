@@ -1,0 +1,19 @@
+backend/FlashIdBackend/Infrastructure/Migrations/20260819123856_AddCitizenIdToCredentialChildEntities.cs
+  h_99fca60b892ff4 1-38,43-52,57-75
+  h_99fca60b892ff4 39-42,53-56
+backend/FlashIdBackend/Infrastructure/Migrations/20260819123856_AddCitizenIdToCredentialChildEntities.Designer.cs
+  h_99fca60b892ff4 1-1331
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_99fca60b892ff4 343-345,391-393,451-453,494-496
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "64edb19b8aa5ed96b5b1ef20e73dc4f36005cc6f",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

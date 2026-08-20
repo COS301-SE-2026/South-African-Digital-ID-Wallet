@@ -1,0 +1,17 @@
+mobile/app.json
+  h_712d174fc3f309 22-23
+  h_712d174fc3f309 32-35
+mobile/package.json
+  h_712d174fc3f309 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ae5d7b4940c4825999f902efd32651f18c6320b9",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

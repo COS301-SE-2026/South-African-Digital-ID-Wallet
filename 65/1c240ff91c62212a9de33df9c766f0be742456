@@ -1,0 +1,14 @@
+.github/workflows/web-e2e.yml
+  h_293a8616118f65 53-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "651c240ff91c62212a9de33df9c766f0be742456",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

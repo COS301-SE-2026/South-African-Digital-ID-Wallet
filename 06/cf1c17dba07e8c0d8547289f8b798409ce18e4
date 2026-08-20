@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Infrastructure/Repositories/CredentialExpiryRepository.cs
+  h_99fca60b892ff4 110-111,113
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_99fca60b892ff4 17,22-23,28,136-157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "06cf1c17dba07e8c0d8547289f8b798409ce18e4",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
