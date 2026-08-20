@@ -1,0 +1,19 @@
+web/src/components/molecules/table-pagination/table-pagination.tsx
+  h_0aff3b71f739b1 23,28,97,101,104
+web/src/components/molecules/stats-row/stats-row.tsx
+  h_0aff3b71f739b1 14
+web/src/components/atoms/stat-card/stat-card.tsx
+  h_0aff3b71f739b1 41-43,46,60-73
+  h_0aff3b71f739b1 45,57,59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "efb784cc766c40752437d463a5356687f43243e0",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
