@@ -1,0 +1,30 @@
+web/src/components/molecules/account-card/account-card.tsx
+  h_293a8616118f65 20-24,31-37,44-48,94-97,99-102,104-127
+web/src/components/molecules/delete-account-card/delete-account-card.tsx
+  h_293a8616118f65 43-57,59,64
+web/src/components/molecules/delete-account-card/test/delete-account-card.test.tsx
+  h_293a8616118f65 1-172
+web/src/components/molecules/manage-user-trusted-devices/manage-user-trusted-devices.tsx
+  h_293a8616118f65 63-67,74-83,87-95,97-126,129-141,143-144,147
+web/src/components/molecules/update-email-card/update-email-card.tsx
+  h_293a8616118f65 7-9,11-13,15-19,21-28
+web/src/components/molecules/update-password-card/update-password-card.tsx
+  h_293a8616118f65 9-27,29-32,34-38,40-47
+web/src/components/organisms/app-sidebar/app-sidebar.tsx
+  h_293a8616118f65 167-168
+web/src/components/organisms/app-sidebar/test/app-sidebar.test.tsx
+  h_293a8616118f65 101-136
+web/src/components/organisms/manage-user-account/manage-user-account.tsx
+  h_293a8616118f65 18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "dc90e3e05db035772b1dd71ed03f915f405ea8f9",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
