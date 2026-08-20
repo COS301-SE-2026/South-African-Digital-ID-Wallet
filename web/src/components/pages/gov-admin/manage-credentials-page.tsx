@@ -9,58 +9,91 @@ import type { CredentialFilter } from '@/components/organisms/credential-stats-f
 const RESULTS_PER_PAGE = 15
 const EXPIRING_SOON_DAYS = 30
 
-const MOCK_ROWS: SearchResultRow[] = [
-  {
-    id: '1',
-    initials: 'TS',
-    firstName: 'Thabo',
-    surname: 'Ndlovu',
-    idNumber: '860101 5385 088',
-    dateJoined: '2023-01-15',
-    expiresOn: '2034-01-15',
-    status: 'active',
-  },
-  {
-    id: '2',
-    initials: 'NP',
-    firstName: 'Nomsa',
-    surname: 'Dlamini',
-    idNumber: '900215 1122 065',
-    dateJoined: '2023-01-15',
-    expiresOn: '2026-09-05',
-    status: 'active',
-  },
-  {
-    id: '3',
-    initials: 'JM',
-    firstName: 'Jabulani',
-    surname: 'Mthembu',
-    idNumber: '920303 5678 083',
-    dateJoined: '2023-01-15',
-    expiresOn: '2034-03-03',
-    status: 'suspended',
-  },
-  {
-    id: '4',
-    initials: 'LP',
-    firstName: 'Lerato',
-    surname: 'Pheko',
-    idNumber: '880808 3344 090',
-    dateJoined: '2023-01-15',
-    expiresOn: '2026-08-30',
-    status: 'active',
-  },
-  {
-    id: '5',
-    initials: 'SK',
-    firstName: 'Sipho',
-    surname: 'Khumalo',
-    idNumber: '870707 2211 087',
-    dateJoined: '2023-01-15',
-    expiresOn: '2034-07-07',
-    status: 'revoked',
-  },
+type MockRowSeed = [
+  id: string,
+  initials: string,
+  firstName: string,
+  surname: string,
+  idNumber: string,
+  dateJoined: string,
+  expiresOn: string,
+  status: SearchResultRow['status'],
 ]
+
+const MOCK_ROW_SEEDS: MockRowSeed[] = [
+  [
+    '1',
+    'TS',
+    'Thabo',
+    'Ndlovu',
+    '860101 5385 088',
+    '2023-01-15',
+    '2034-01-15',
+    'active',
+  ],
+  [
+    '2',
+    'NP',
+    'Nomsa',
+    'Dlamini',
+    '900215 1122 065',
+    '2023-01-15',
+    '2026-09-05',
+    'active',
+  ],
+  [
+    '3',
+    'JM',
+    'Jabulani',
+    'Mthembu',
+    '920303 5678 083',
+    '2023-01-15',
+    '2034-03-03',
+    'suspended',
+  ],
+  [
+    '4',
+    'LP',
+    'Lerato',
+    'Pheko',
+    '880808 3344 090',
+    '2023-01-15',
+    '2026-08-30',
+    'active',
+  ],
+  [
+    '5',
+    'SK',
+    'Sipho',
+    'Khumalo',
+    '870707 2211 087',
+    '2023-01-15',
+    '2034-07-07',
+    'revoked',
+  ],
+]
+
+const MOCK_ROWS: SearchResultRow[] = MOCK_ROW_SEEDS.map(
+  ([
+    id,
+    initials,
+    firstName,
+    surname,
+    idNumber,
+    dateJoined,
+    expiresOn,
+    status,
+  ]) => ({
+    id,
+    initials,
+    firstName,
+    surname,
+    idNumber,
+    dateJoined,
+    expiresOn,
+    status,
+  })
+)
 
 function isExpiringSoon(expiresOn: string, withinDays: number): boolean {
   const daysUntilExpiry =

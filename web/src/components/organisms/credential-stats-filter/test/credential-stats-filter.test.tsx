@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { CredentialStatsFilter } from '../credential-stats-filter'
 import type { SearchResultRow } from '@/components/organisms/search-results-table/types'
 
@@ -30,21 +31,33 @@ describe('CredentialStatsFilter', () => {
     render(
       <CredentialStatsFilter rows={mockRows} value="all" onChange={jest.fn()} />
     )
-    expect(screen.getByText('2')).toBeInTheDocument()
-    expect(screen.getByText('1', { exact: true })).toBeInTheDocument()
+    const totalCard = screen
+      .getByText('Total Credentials')
+      .closest('button') as HTMLElement
+    expect(within(totalCard).getByText('2')).toBeInTheDocument()
+    const activeCard = screen
+      .getByText('Active Credentials')
+      .closest('button') as HTMLElement
+    expect(within(activeCard).getByText('1')).toBeInTheDocument()
+    const suspendedCard = screen
+      .getByText('Suspended Credentials')
+      .closest('button') as HTMLElement
+    expect(within(suspendedCard).getByText('1')).toBeInTheDocument()
   })
 
-  it('calls onChange with the clicked filter', () => {
+  it('calls onChange with the clicked filter', async () => {
     const onChange = jest.fn()
+    const user = userEvent.setup()
     render(
       <CredentialStatsFilter rows={mockRows} value="all" onChange={onChange} />
     )
-    fireEvent.click(screen.getByText('Active Credentials'))
+    await user.click(screen.getByText('Active Credentials'))
     expect(onChange).toHaveBeenCalledWith('active')
   })
 
-  it('clears back to "all" when the active filter is clicked again', () => {
+  it('clears back to "all" when the active filter is clicked again', async () => {
     const onChange = jest.fn()
+    const user = userEvent.setup()
     render(
       <CredentialStatsFilter
         rows={mockRows}
@@ -52,7 +65,7 @@ describe('CredentialStatsFilter', () => {
         onChange={onChange}
       />
     )
-    fireEvent.click(screen.getByText('Active Credentials'))
+    await user.click(screen.getByText('Active Credentials'))
     expect(onChange).toHaveBeenCalledWith('all')
   })
 
@@ -67,23 +80,23 @@ describe('CredentialStatsFilter', () => {
 
     const suspendedCard = screen
       .getByText('Suspended Credentials')
-      .closest('[role="button"]')
-    const activeCard = screen
-      .getByText('Active Credentials')
-      .closest('[role="button"]')
+      .closest('button')
+    const activeCard = screen.getByText('Active Credentials').closest('button')
     expect(suspendedCard).toHaveAttribute('aria-pressed', 'true')
     expect(activeCard).toHaveAttribute('aria-pressed', 'false')
   })
 
-  it('supports keyboard activation via Enter', () => {
+  it('supports keyboard activation via Enter', async () => {
     const onChange = jest.fn()
+    const user = userEvent.setup()
     render(
       <CredentialStatsFilter rows={mockRows} value="all" onChange={onChange} />
     )
     const expiringCard = screen
       .getByText('Expiring Soon')
-      .closest('[role="button"]') as HTMLElement
-    fireEvent.keyDown(expiringCard, { key: 'Enter' })
+      .closest('button') as HTMLElement
+    expiringCard.focus()
+    await user.keyboard('{Enter}')
     expect(onChange).toHaveBeenCalledWith('expiring')
   })
 })
