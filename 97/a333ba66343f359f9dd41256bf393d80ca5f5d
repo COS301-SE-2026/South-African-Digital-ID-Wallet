@@ -1,0 +1,23 @@
+web/src/components/organisms/stats-row/test/stats-row.test.tsx
+  h_0aff3b71f739b1 1-39
+  h_0aff3b71f739b1 40-44
+web/src/components/organisms/stats-row/types.ts
+  h_0aff3b71f739b1 1-10
+web/src/components/organisms/stats-row/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/organisms/stats-row/stats-row.tsx
+  h_0aff3b71f739b1 1-47
+web/src/components/organisms/index.ts
+  h_0aff3b71f739b1 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "97a333ba66343f359f9dd41256bf393d80ca5f5d",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

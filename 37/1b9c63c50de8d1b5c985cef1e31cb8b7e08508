@@ -1,0 +1,18 @@
+web/src/components/molecules/credential-detail-card/credential-detial-card.tsx
+  h_0aff3b71f739b1 25-49,51-85,88-91,95-107,139
+  h_0aff3b71f739b1 4,50
+web/src/components/organisms/qr-display/qr-display.tsx
+  h_0aff3b71f739b1 181-183,185,195-196,203,206,210-217,219
+  h_0aff3b71f739b1 145,152,156,159,164,170,173,179-180,184,187-194,197-198,200,204,207,218
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "371b9c63c50de8d1b5c985cef1e31cb8b7e08508",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

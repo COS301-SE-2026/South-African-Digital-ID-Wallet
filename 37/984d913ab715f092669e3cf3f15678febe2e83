@@ -1,0 +1,18 @@
+backend/FlashIdBackend/Infrastructure/Repositories/CredentialsActivationRepository.cs
+  h_99fca60b892ff4 17-25,56-60
+backend/FlashIdBackend/Application/Common/Services/IssueCredentialService.cs
+  h_99fca60b892ff4 1-134
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/ICredentialsActivationRepository.cs
+  h_99fca60b892ff4 7,14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "37984d913ab715f092669e3cf3f15678febe2e83",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

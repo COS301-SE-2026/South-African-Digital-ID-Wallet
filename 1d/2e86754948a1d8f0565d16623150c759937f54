@@ -1,0 +1,21 @@
+web/e2e/test/qr-scanning.spec.ts
+  h_0aff3b71f739b1 19-47,51,53,57,60-62,71,76,78-79,98-100,107-113,130,132
+  h_0aff3b71f739b1 49-50,52,55-56,59,70,72,77,80-81
+web/e2e/test/view-credentials.spec.ts
+  h_0aff3b71f739b1 8-10,12-16,25,28
+  h_0aff3b71f739b1 24,26
+web/e2e/test/qr-generation.spec.ts
+  h_0aff3b71f739b1 12,15-24,26-28,30-31,34,39,43
+  h_0aff3b71f739b1 14,32-33,35,38,40-42,44-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "1d2e86754948a1d8f0565d16623150c759937f54",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

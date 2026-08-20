@@ -1,0 +1,21 @@
+web/src/components/atoms/search-bar/test/search-bar.test.tsx
+  h_0aff3b71f739b1 1-48
+  h_0aff3b71f739b1 49-56
+web/src/components/atoms/search-bar/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/atoms/search-bar/types.ts
+  h_0aff3b71f739b1 1-9
+web/src/components/atoms/search-bar/search-bar.tsx
+  h_0aff3b71f739b1 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "6467e7c0fea242bfcaf4e217d52b30c1cdbfc9d6",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
