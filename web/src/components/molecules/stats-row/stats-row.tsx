@@ -11,7 +11,7 @@ function percentOfTotal(part: number, total: number) {
   return `${((part / total) * 100).toFixed(1)}% of total`
 }
 
-export function StatsRow({ stats }: StatsRowProps) {
+export function StatsRow({ stats }: Readonly<StatsRowProps>) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard

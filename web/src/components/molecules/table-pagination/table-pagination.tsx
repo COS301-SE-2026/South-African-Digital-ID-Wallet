@@ -20,12 +20,12 @@ export const TablePagination = ({
   totalResults,
   resultsPerPage,
   onPageChange,
-}: TablePaginationProps) => {
+}: Readonly<TablePaginationProps>) => {
   const start = totalResults === 0 ? 0 : (currentPage - 1) * resultsPerPage + 1
   const end = Math.min(currentPage * resultsPerPage, totalResults)
   const pagesToShow = getPagesToShow(currentPage, totalPages)
   const showLeadingEllipsis = pagesToShow[0] > 1
-  const showTrailingEllipsis = pagesToShow[pagesToShow.length - 1] < totalPages
+  const showTrailingEllipsis = (pagesToShow.at(-1) ?? 0) < totalPages
 
   return (
     <div className="flex items-center justify-between">
@@ -94,13 +94,14 @@ function PageButton({
   page,
   isActive,
   onClick,
-}: {
+}: Readonly<{
   page: number
   isActive: boolean
   onClick: (page: number) => void
-}) {
+}>) {
   return (
     <button
+      type="button"
       onClick={() => onClick(page)}
       className={`h-8 w-8 rounded-md text-sm ${
         isActive

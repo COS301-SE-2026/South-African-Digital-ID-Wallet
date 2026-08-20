@@ -38,27 +38,12 @@ export function StatCard({
   const styles = toneStyles[tone]
   const isInteractive = typeof onClick === 'function'
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (!isInteractive) return
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      onClick?.()
-    }
-  }
+  const cardClassName = `flex items-center gap-4 rounded-xl border bg-clean-white p-5 text-left transition-shadow ${
+    isActive ? `border-transparent ring-2 ${styles.ring}` : 'border-border-grey'
+  } ${isInteractive ? 'w-full cursor-pointer' : ''}`
 
-  return (
-    <div
-      role={isInteractive ? 'button' : undefined}
-      tabIndex={isInteractive ? 0 : undefined}
-      aria-pressed={isInteractive ? isActive : undefined}
-      onClick={onClick}
-      onKeyDown={handleKeyDown}
-      className={`flex items-center gap-4 rounded-xl border bg-clean-white p-5 transition-shadow ${
-        isActive
-          ? `border-transparent ring-2 ${styles.ring}`
-          : 'border-border-grey'
-      } ${isInteractive ? 'cursor-pointer' : ''}`}
-    >
+  const content = (
+    <>
       <div
         className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${styles.bg}`}
       >
@@ -69,6 +54,21 @@ export function StatCard({
         <p className="text-2xl font-semibold text-deep-green">{value}</p>
         <p className="text-xs text-muted-text">{subtext}</p>
       </div>
-    </div>
+    </>
   )
+
+  if (isInteractive) {
+    return (
+      <button
+        type="button"
+        aria-pressed={isActive}
+        onClick={onClick}
+        className={cardClassName}
+      >
+        {content}
+      </button>
+    )
+  }
+
+  return <div className={cardClassName}>{content}</div>
 }
