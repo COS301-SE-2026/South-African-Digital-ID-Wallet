@@ -14,6 +14,15 @@ public class CredentialsActivationRepository : ICredentialsActivationRepository
         _context = context;
     }
 
+    public async Task<Citizen?> GetCitizenBySaIdAsync(string saId, CancellationToken cancellationToken)
+    {
+        return await _context.Citizens
+            .Include(c => c.User)
+            .Include(c => c.Credentials).ThenInclude(ct => ct.IdentityDocument)
+            .Include(c => c.Credentials).ThenInclude(ct => ct.DriversLicense)
+            .FirstOrDefaultAsync(c => c.SaId == saId, cancellationToken);
+    }
+
     public async Task AddIdentityDocumentAsync(IdentityDocument identityDocument, CancellationToken cancellationToken)
     {
         await _context.IdentityDocuments.AddAsync(identityDocument, cancellationToken);
@@ -42,6 +51,11 @@ public class CredentialsActivationRepository : ICredentialsActivationRepository
     public async Task AddAuditLogAsync(AuditLog auditLog, CancellationToken cancellationToken)
     {
         await _context.AuditLogs.AddAsync(auditLog, cancellationToken);
+    }
+
+    public async Task AddNotificationAsync(Notification notification, CancellationToken cancellationToken)
+    {
+        await _context.Notifications.AddAsync(notification, cancellationToken);
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
