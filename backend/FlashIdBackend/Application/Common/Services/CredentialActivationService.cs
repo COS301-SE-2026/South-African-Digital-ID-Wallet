@@ -24,6 +24,7 @@ public class CredentialActivationService : ICredentialActivationService
         _governmentRegistryGateway = governmentRegistryGateway;
         _credentialsActivationRepository = credentialsActivationRepository;
     }
+
     public async Task<ActivateCredentialsResponseDto> ActivateCredentialsAsync(ActivateCredentialsRequestDto request, Guid userId,
         string ipAddress, CancellationToken cancellationToken)
     {
@@ -130,6 +131,7 @@ public class CredentialActivationService : ICredentialActivationService
         var identityDocument = new IdentityDocument()
         {
             Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
 
             CredentialId = credential.Id,
             Credential = credential,
@@ -183,6 +185,7 @@ public class CredentialActivationService : ICredentialActivationService
         var driversLicense = new DriversLicense()
         {
             Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
 
             CredentialId = credential.Id,
             Credential = credential,

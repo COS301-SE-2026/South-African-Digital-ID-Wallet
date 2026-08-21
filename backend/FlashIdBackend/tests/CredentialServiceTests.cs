@@ -63,6 +63,7 @@ public class CredentialServiceTests
             IdentityDocument = new IdentityDocument
             {
                 Id = Guid.NewGuid(),
+                CitizenId = citizen.Id,
                 Nationality = "South African",
                 Citizenship = "South African",
                 CountryOfBirth = "South Africa",
