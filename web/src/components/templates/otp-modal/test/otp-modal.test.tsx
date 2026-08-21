@@ -71,4 +71,79 @@ describe('OtpModal', () => {
       expect(toast.error).toHaveBeenCalledWith('Invalid verification code.')
     })
   })
+
+  it('shows an error when resend has no verification ID', async () => {
+    renderModal('')
+
+    fireEvent.click(screen.getByRole('button', { name: /resend code/i }))
+
+    expect(toast.error).toHaveBeenCalledWith(
+      'Device verifictaion ID is missing.'
+    )
+
+    expect(loginService.resendDeviceVerificationOtp).not.toHaveBeenCalled()
+  })
+
+  it('successfully resends the OTP', async () => {
+    ;(loginService.resendDeviceVerificationOtp as jest.Mock).mockResolvedValue(
+      undefined
+    )
+
+    renderModal()
+
+    fireEvent.click(screen.getByRole('button', { name: /resend code/i }))
+
+    await waitFor(() => {
+      expect(loginService.resendDeviceVerificationOtp).toHaveBeenCalledWith(
+        'verification-id'
+      )
+
+      expect(toast.success).toHaveBeenCalledWith(
+        'A new verification code has been sent.'
+      )
+    })
+  })
+
+  it('shows backend error when resend returns an Axios error', async () => {
+    const error = {
+      response: {
+        status: 401,
+        data: {
+          error: 'Device verification session is invalid.',
+        },
+      },
+    }
+
+    ;(loginService.resendDeviceVerificationOtp as jest.Mock).mockRejectedValue(
+      error
+    )
+    ;(axios.isAxiosError as unknown as jest.Mock).mockReturnValue(true)
+
+    renderModal()
+
+    fireEvent.click(screen.getByRole('button', { name: /resend code/i }))
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        'Device verification session is invalid.'
+      )
+    })
+  })
+
+  it('shows fallback error for a non-Axios resend failure', async () => {
+    ;(loginService.resendDeviceVerificationOtp as jest.Mock).mockRejectedValue(
+      new Error('boom')
+    )
+    ;(axios.isAxiosError as unknown as jest.Mock).mockReturnValue(false)
+
+    renderModal()
+
+    fireEvent.click(screen.getByRole('button', { name: /resend code/i }))
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        'Could not resend verification code.'
+      )
+    })
+  })
 })
