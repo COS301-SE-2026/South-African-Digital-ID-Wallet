@@ -36,9 +36,13 @@ public class IssueCredentialService : IIssueCredentialService
         }
     }
 
-    private async Task<Credential> BuildDriversLicenseCredential(Citizen citizen, CancellationToken cancellationToken)
+    private async Task<Credential> BuildDriversLicenseCredential(Citizen citizen, Guid officialId, string ipAddress, CancellationToken cancellationToken)
     {
-        if (await _repo.HasDriversLicenseAsync(citizen.Id, cancellationToken)) throw new CredentialAlreadyIssuedException(citizen.SaId, CredentialType.DriversLicense);
+        if (await _repo.HasDriversLicenseAsync(citizen.Id, cancellationToken))
+        {
+            await LogIssueFailureAsync(citizen.SaId, "DriversLicense already active", officialId, ipAddress, cancellationToken);
+            throw new CredentialAlreadyIssuedException(citizen.SaId, CredentialType.DriversLicense);
+        }
 
         var dL = await _govRegGateway.GetDriversLicenseBySaIdAsync(citizen.SaId, cancellationToken) ?? throw new GovernmentRegistryRecordNotFoundException(citizen.SaId, CredentialType.DriversLicense);
 
@@ -71,9 +75,13 @@ public class IssueCredentialService : IIssueCredentialService
         return credential;
     }
 
-    private async Task<Credential> BuildIdentityDocumentCredential(Citizen citizen, CancellationToken cancellationToken)
+    private async Task<Credential> BuildIdentityDocumentCredential(Citizen citizen, Guid officialId, string ipAddress, CancellationToken cancellationToken)
     {
-        if (await _repo.HasIdentityDocumentAsync(citizen.Id, cancellationToken)) throw new CredentialAlreadyIssuedException(citizen.SaId, CredentialType.IdentityDocument);
+        if (await _repo.HasIdentityDocumentAsync(citizen.Id, cancellationToken))
+        {
+            await LogIssueFailureAsync(citizen.SaId, "IdentityDocument already active", officialId, ipAddress, cancellationToken);
+            throw new CredentialAlreadyIssuedException(citizen.SaId, CredentialType.IdentityDocument);
+        }
 
         var iD = await _govRegGateway.GetIdentityDocumentBySaIdAsync(citizen.SaId, cancellationToken) ?? throw new GovernmentRegistryRecordNotFoundException(citizen.SaId, CredentialType.IdentityDocument);
 
@@ -106,6 +114,21 @@ public class IssueCredentialService : IIssueCredentialService
         return credential;
     }
 
+    private async Task LogIssueFailureAsync(string saId, string reason, Guid officialId, string ipAddress, CancellationToken cancellationToken)
+    {
+        await _repo.AddAuditLogAsync(new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.CredentialIssueFailed,
+            Details = $"Credential issuance for citizen {saId} declined: {reason}.",
+            ActorId = officialId,
+            IpAddress = ipAddress,
+            CreatedAt = DateTime.UtcNow,
+        }, cancellationToken);
+
+        await _repo.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task<CitizenCredentialStatusResponseDto> GetCitizenStatusAsync(string saId, CancellationToken cancellationToken)
     {
         ValidateSaId(saId);
@@ -133,6 +156,7 @@ public class IssueCredentialService : IIssueCredentialService
     {
         if (!request.ConsentGiven)
         {
+            await LogIssueFailureAsync(request.SaId, "consent not given", officialId, ipAddress, cancellationToken);
             throw new CitizenConsentRequiredException();
         }
 
@@ -144,8 +168,8 @@ public class IssueCredentialService : IIssueCredentialService
 
         Credential credential = request.CredentialType switch
         {
-            CredentialType.DriversLicense => await BuildDriversLicenseCredential(citizen, cancellationToken),
-            CredentialType.IdentityDocument => await BuildIdentityDocumentCredential(citizen, cancellationToken),
+            CredentialType.DriversLicense => await BuildDriversLicenseCredential(citizen, officialId, ipAddress, cancellationToken),
+            CredentialType.IdentityDocument => await BuildIdentityDocumentCredential(citizen, officialId, ipAddress, cancellationToken),
             _ => throw new ArgumentOutOfRangeException(nameof(request.CredentialType), request.CredentialType, "The selected credential type is not supported."),
         };
 
