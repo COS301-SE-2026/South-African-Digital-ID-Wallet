@@ -1,0 +1,15 @@
+web/eslint.config.mjs
+  h_0aff3b71f739b1 14-18
+  h_0aff3b71f739b1 10-13,19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "21ce5784205545c1805976425e9c42ac5c26383e",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

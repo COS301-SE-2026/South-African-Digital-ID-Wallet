@@ -1,0 +1,15 @@
+web/src/components/molecules/credential-detail-card/test/credential-detail-card.test.tsx
+  h_0aff3b71f739b1 33-40,45,47,49,51,55,57,59,61,63,67,70,72-76,82-85,90,92,96-101,106-110,115,117-123,125-145,156-158
+  h_0aff3b71f739b1 68-69,71,78,81,104-105,111-114,116,124,146-149,154-155
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "e60c2117c499d45c863e3a3565713654647bf31e",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
