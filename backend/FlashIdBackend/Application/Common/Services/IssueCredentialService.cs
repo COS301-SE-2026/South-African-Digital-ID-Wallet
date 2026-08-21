@@ -36,6 +36,76 @@ public class IssueCredentialService : IIssueCredentialService
         }
     }
 
+    private async Task<Credential> BuildDriversLicenseCredential(Citizen citizen, CancellationToken cancellationToken)
+    {
+        if (await _repo.HasDriversLicenseAsync(citizen.Id, cancellationToken)) throw new CredentialAlreadyIssuedException(citizen.SaId, CredentialType.DriversLicense);
+
+        var dL = await _govRegGateway.GetDriversLicenseBySaIdAsync(citizen.SaId, cancellationToken) ?? throw new GovernmentRegistryRecordNotFoundException(citizen.SaId, CredentialType.DriversLicense);
+
+        var credential = new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Citizen = citizen,
+            Status = CredentialStatus.Active,
+            Signature = dL.Signature,
+            IssuedBy = dL.IssuedBy,
+            IssueDate = dL.IssueDate.ToDateTime(TimeOnly.MinValue),
+        };
+
+        credential.DriversLicense = new DriversLicense
+        {
+            Id = Guid.NewGuid(),
+            CredentialId = credential.Id,
+            Credential = credential,
+            CitizenId = citizen.Id,
+            LicenseCode = Enum.Parse<LicenseCode>(dL.LicenseCode),
+            LicenseNumber = dL.LicenseNumber,
+            Restrictions = dL.Restrictions,
+            ExpiryDate = dL.ExpiryDate.ToDateTime(TimeOnly.MinValue),
+            PhotoPath = dL.PhotoBlob,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+        return credential;
+    }
+
+    private async Task<Credential> BuildIdentityDocumentCredential(Citizen citizen, CancellationToken cancellationToken)
+    {
+        if (await _repo.HasIdentityDocumentAsync(citizen.Id, cancellationToken)) throw new CredentialAlreadyIssuedException(citizen.SaId, CredentialType.IdentityDocument);
+
+        var iD = await _govRegGateway.GetIdentityDocumentBySaIdAsync(citizen.SaId, cancellationToken) ?? throw new GovernmentRegistryRecordNotFoundException(citizen.SaId, CredentialType.IdentityDocument);
+
+        var credential = new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Citizen = citizen,
+            Status = CredentialStatus.Active,
+            Signature = iD.Signature,
+            IssuedBy = iD.IssuedBy,
+            IssueDate = iD.IssueDate.ToDateTime(TimeOnly.MinValue),
+        };
+
+        credential.IdentityDocument = new IdentityDocument
+        {
+            Id = Guid.NewGuid(),
+            CredentialId = credential.Id,
+            Credential = credential,
+            CitizenId = citizen.Id,
+            Citizenship = iD.CountryOfBirth,
+            CountryOfBirth = iD.CountryOfBirth,
+            Status = Enum.Parse<IdentityDocumentStatus>(iD.CitizenshipStatus),
+            Nationality = iD.Nationality,
+            PhotoPath = iD.PhotoBlob,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+        return credential;
+    }
+
     public async Task<CitizenCredentialStatusResponseDto> GetCitizenStatusAsync(string saId, CancellationToken cancellationToken)
     {
         ValidateSaId(saId);
@@ -74,8 +144,8 @@ public class IssueCredentialService : IIssueCredentialService
 
         Credential credential = request.CredentialType switch
         {
-            // CredentialType.DriversLicense => await BuildDriversLicenseCredential(citizen, cancellationToken),
-            // CredentialType.IdentityDocument => await BuildIdentityDocumentCredential(citizen, cancellationToken),
+            CredentialType.DriversLicense => await BuildDriversLicenseCredential(citizen, cancellationToken),
+            CredentialType.IdentityDocument => await BuildIdentityDocumentCredential(citizen, cancellationToken),
             _ => throw new ArgumentOutOfRangeException(nameof(request.CredentialType), request.CredentialType, "The selected credential type is not supported."),
         };
 
