@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Application.Features.Auth.Exceptions;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace Presentation.Controllers;
 
@@ -15,15 +16,18 @@ public class AuthController : ControllerBase
     private readonly IAuthService _authService;
     private readonly ILogger<AuthController> _logger;
     private readonly IHostEnvironment _environment;
+    private readonly IDataProtector _deviceVerificationProtector;
 
     public AuthController(
         IAuthService authService,
         ILogger<AuthController> logger,
-        IHostEnvironment environment)
+        IHostEnvironment environment,
+        IDataProtectionProvider dataProtectionProvider)
     {
         _authService = authService;
         _logger = logger;
         _environment = environment;
+        _deviceVerificationProtector = dataProtectionProvider.CreateProtector("FlashID.DeviceVerification");
     }
 
     [Authorize]
@@ -58,8 +62,21 @@ public class AuthController : ControllerBase
             Request.Cookies.TryGetValue("flashid_device", out var deviceToken);
             var result = await _authService.LoginAsync(request, deviceToken, ipAddress, cancellationToken);
 
-            if (result.RequiresDeviceVerification)
+
+            if (result.RequiresDeviceVerification && result.DeviceVerificationId.HasValue)
             {
+                var protectedVerificationId = _deviceVerificationProtector.Protect(result.DeviceVerificationId.Value.ToString());
+                Response.Cookies.Append("flashid_device_verification", protectedVerificationId,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = !_environment.IsDevelopment(),
+                    SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
+                    Path = "/api/auth",
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(10),
+                    IsEssential = true
+                });
+
                 result.Token = string.Empty;
                 return Ok(result);
             }
@@ -157,6 +174,16 @@ public class AuthController : ControllerBase
 
             result.Token = string.Empty;
             result.DeviceToken = null;
+            Response.Cookies.Delete(
+    "flashid_device_verification",
+    new CookieOptions
+    {
+        Path = "/api/auth",
+        Secure = !_environment.IsDevelopment(),
+        SameSite = _environment.IsDevelopment()
+            ? SameSiteMode.Lax
+            : SameSiteMode.None
+    });
             return Ok(result);
         }
         catch (UnauthorizedAccessException ex)
@@ -194,6 +221,51 @@ public class AuthController : ControllerBase
                 return BadRequest(new
                 {
                     error = "Invalid device verification ID."
+                });
+            }
+
+            if (!Request.Cookies.TryGetValue(
+        "flashid_device_verification",
+        out var verificationCookie))
+            {
+                return Unauthorized(new
+                {
+                    error = "Device verification session is missing."
+                });
+            }
+
+            Guid cookieVerificationId;
+
+            try
+            {
+                var unprotectedValue =
+                    _deviceVerificationProtector.Unprotect(
+                        verificationCookie);
+
+                if (!Guid.TryParse(
+                        unprotectedValue,
+                        out cookieVerificationId))
+                {
+                    return Unauthorized(new
+                    {
+                        error = "Invalid device verification session."
+                    });
+                }
+            }
+            catch
+            {
+                return Unauthorized(new
+                {
+                    error = "Invalid device verification session."
+                });
+            }
+
+            if (cookieVerificationId != deviceVerificationId)
+            {
+                return Unauthorized(new
+                {
+                    error =
+                        "Device verification session does not match this request."
                 });
             }
 
