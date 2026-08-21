@@ -46,4 +46,29 @@ describe('OtpModal', () => {
       })
     })
   }
+
+  it('submits a complete OTP', async () => {
+    onSuccess.mockResolvedValue(undefined)
+
+    renderModal()
+    enterOtp()
+
+    fireEvent.click(screen.getByRole('button', { name: /log in/i }))
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalledWith('123456')
+    })
+  })
+
+  it('shows an error when verification fails', async () => {
+    onSuccess.mockRejectedValue(new Error('Invalid OTP'))
+
+    renderModal()
+    enterOtp()
+
+    fireEvent.click(screen.getByRole('button', { name: /log in/i }))
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Invalid verification code.')
+    })
+  })
 })
