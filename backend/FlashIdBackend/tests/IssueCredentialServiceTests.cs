@@ -2,6 +2,7 @@ using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Mapping;
 using Application.Common.Services;
+using Application.Features.Citizens.Exceptions;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Enums;
 using Application.Features.Onboarding.Dtos;
@@ -117,5 +118,38 @@ public class IssueCredentialServiceTests
         await context.SaveChangesAsync();
 
         return citizen;
+    }
+
+    [Fact]
+    public async Task GetCitizenStatusAsync_InvalidSaId_ThrowsArgumentException()
+    {
+        using var context = CreateContext();
+        var service = CreateService(context, new FakeGovernmentRegistryGateway());
+
+        await Assert.ThrowsAsync<ArgumentException>(() => service.GetCitizenStatusAsync("12345", TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task GetCitizenStatusAsync_UnknownSaId_ThrowsCitizenNotFoundException()
+    {
+        using var context = CreateContext();
+        var service = CreateService(context, new FakeGovernmentRegistryGateway());
+
+        await Assert.ThrowsAsync<CitizenNotFoundException>(() => service.GetCitizenStatusAsync(KnownSaId, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task GetCitizenStatusAsync_ActivatedCitizenWithUser_ReturnsContactInfo()
+    {
+        using var context = CreateContext();
+        await SeedActivatedCitizenAsync(context);
+        var service = CreateService(context, new FakeGovernmentRegistryGateway());
+
+        var response = await service.GetCitizenStatusAsync(KnownSaId, TestContext.Current.CancellationToken);
+
+        Assert.Equal("Activated", response.Status);
+        Assert.Equal("+27123456789", response.PhoneNumber);
+        Assert.Equal("lebron.james@example.com", response.Email);
+        Assert.Empty(response.ExistingCredentials);
     }
 }
