@@ -3,6 +3,8 @@ using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Presentation.Controllers;
 
@@ -15,19 +17,21 @@ public class CredentialsController : ControllerBase
     private readonly IQrService _qrService;
     private readonly ICredentialActivationService _credentialActivationService;
     private readonly ICredentialExpiryService _credentialExpiryService;
+    private readonly IIssueCredentialService _issueCredentialService;
 
     public CredentialsController(
       ICredentialService credentialService,
       IQrService qrService,
       ICredentialActivationService credentialActivationService,
-      ICredentialExpiryService credentialExpiryService)
+      ICredentialExpiryService credentialExpiryService,
+      IIssueCredentialService issueCredentialService)
     {
         _credentialService = credentialService;
         _qrService = qrService;
         _credentialActivationService = credentialActivationService;
         _credentialExpiryService = credentialExpiryService;
+        _issueCredentialService = issueCredentialService;
     }
-
 
     [HttpGet("me")]
     [Authorize(Roles = "Citizen")]
@@ -162,5 +166,32 @@ public class CredentialsController : ControllerBase
         {
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
+    }
+
+    [HttpGet("citizens/{saId}/status")]
+    [Authorize(Roles = "Official")]
+    public async Task<IActionResult> GetCitizenStatus(string saId, CancellationToken cancellationToken)
+    {
+        var response = await _issueCredentialService.GetCitizenStatusAsync(saId, cancellationToken);
+
+        return Ok(response);
+    }
+
+    [HttpPost("issue")]
+    [Authorize(Roles = "Official")]
+    [EnableRateLimiting("issue-credential")]
+    public async Task<IActionResult> IssueCredential([FromBody] IssueCredentialRequestDto request, CancellationToken cancellationToken)
+    {
+        var officialIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(officialIdValue, out var officialId))
+        {
+            return Unauthorized(new { message = "The authenticated official could not be identified." });
+        }
+
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var response = await _issueCredentialService.IssueCredentialAsync(request, officialId, ipAddress, cancellationToken);
+
+        return StatusCode(201, response);
     }
 }

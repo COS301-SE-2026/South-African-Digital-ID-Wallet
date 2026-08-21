@@ -149,6 +149,7 @@ builder.Services.AddRateLimiter(options =>
     AddUserPartitionedPolicy(options, "email-change-request", permitLimit: 5, window: TimeSpan.FromMinutes(1));
     AddUserPartitionedPolicy(options, "email-change-resend-otp", permitLimit: 3, window: TimeSpan.FromMinutes(1));
     AddUserPartitionedPolicy(options, "email-change-confirm", permitLimit: 5, window: TimeSpan.FromMinutes(1));
+    AddUserPartitionedPolicy(options, "issue-credential", permitLimit: 5, window: TimeSpan.FromMinutes(1));
 
     options.RejectionStatusCode = 429;
 });
