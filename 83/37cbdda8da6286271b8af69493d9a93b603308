@@ -1,0 +1,28 @@
+backend/FlashIdBackend/Application/Common/Services/CredentialActivationService.cs
+  h_99fca60b892ff4 27,134,188
+backend/FlashIdBackend/tests/CredentialActivationServiceTests.cs
+  h_99fca60b892ff4 1,40,43,50
+backend/FlashIdBackend/tests/QrServiceIntegrationTests.cs
+  h_99fca60b892ff4 273
+backend/FlashIdBackend/Infrastructure/Data/DbSeeder.cs
+  h_99fca60b892ff4 166,293,777,797
+backend/FlashIdBackend/tests/DisclosedFieldValueResolverTests.cs
+  h_99fca60b892ff4 42,77
+backend/FlashIdBackend/tests/CredentialServiceTests.cs
+  h_99fca60b892ff4 66
+backend/FlashIdBackend/tests/CredentialExpiryServiceTests.cs
+  h_99fca60b892ff4 115-116,120,129
+backend/FlashIdBackend/tests/CredentialExpiryRepositoryIntegrationTests.cs
+  h_99fca60b892ff4 111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "8337cbdda8da6286271b8af69493d9a93b603308",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
