@@ -1,0 +1,26 @@
+web/src/components/molecules/manage-user-trusted-devices/manage-user-trusted-devices.tsx
+  h_0aff3b71f739b1 63-64,78,83,87-88,90,93-94,99-126,129-141,143-144,147
+  h_0aff3b71f739b1 65-67,74-77,79-82,89,91-92,95,97-98
+web/src/components/molecules/delete-account-card/delete-account-card.tsx
+  h_0aff3b71f739b1 43-45,48-55,57,59,64
+  h_0aff3b71f739b1 46-47,56
+web/src/components/organisms/app-sidebar/test/app-sidebar.test.tsx
+  h_0aff3b71f739b1 101,110-111,114-116,119,128-129,132-134
+  h_0aff3b71f739b1 102-109,112-113,117-118,120-127,130-131,135-136
+web/src/components/molecules/account-card/account-card.tsx
+  h_0aff3b71f739b1 20-22,32-34,37,45-48,94-97,99-102,104-127
+  h_0aff3b71f739b1 23-24,31,35-36,44
+web/src/components/organisms/app-sidebar/app-sidebar.tsx
+  h_0aff3b71f739b1 167-168
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "921576d616f9ee41d7b1104b9687a8f448e51a8e",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

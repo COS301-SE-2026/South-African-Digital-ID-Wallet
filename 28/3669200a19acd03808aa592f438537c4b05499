@@ -1,0 +1,20 @@
+web/src/components/organisms/manage-user-account/manage-user-account.tsx
+  h_0aff3b71f739b1 18
+web/src/components/molecules/update-password-card/update-password-card.tsx
+  h_0aff3b71f739b1 9-13,15-19,22-25,29-30,34-35,43,46-47
+  h_0aff3b71f739b1 14,20-21,26-27,31-32,36-38,40-42,44-45
+web/src/components/molecules/update-email-card/update-email-card.tsx
+  h_0aff3b71f739b1 7-8,11,15,24,27-28
+  h_0aff3b71f739b1 9,12-13,16-19,21-23,25-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "283669200a19acd03808aa592f438537c4b05499",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

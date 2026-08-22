@@ -1,0 +1,14 @@
+web/src/components/pages/index.ts
+  h_0aff3b71f739b1 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "3e78793d41d64b5f792a9ac6bda5f01397368862",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

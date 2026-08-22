@@ -1,0 +1,24 @@
+web/src/components/atoms/index.ts
+  h_0aff3b71f739b1 11-12
+web/src/components/atoms/stat-card/test/stat-card.test.tsx
+  h_0aff3b71f739b1 1-33
+  h_0aff3b71f739b1 34-39
+web/src/components/atoms/stat-card/types.ts
+  h_0aff3b71f739b1 1-10
+web/src/components/atoms/stat-card/stat-card.tsx
+  h_0aff3b71f739b1 1-24
+  h_0aff3b71f739b1 25-32
+web/src/components/atoms/stat-card/index.ts
+  h_0aff3b71f739b1 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "7b98d81801e92edc29daae38b2368a1017169f13",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

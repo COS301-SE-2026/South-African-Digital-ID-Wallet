@@ -1,0 +1,30 @@
+web/src/components/organisms/search-results-table/index.ts
+  h_0aff3b71f739b1 1-2
+  h_0aff3b71f739b1 3-6
+web/src/app/(portal)/gov-admin/manage-credentials/page.tsx
+  h_0aff3b71f739b1 1-5
+web/src/components/molecules/table-pagination/table-pagination.tsx
+  h_0aff3b71f739b1 1-2,4-16,19-30,32-50,52-61
+  h_0aff3b71f739b1 31,51,62-70
+web/src/components/molecules/index.ts
+  h_0aff3b71f739b1 28-29
+web/src/components/organisms/index.ts
+  h_0aff3b71f739b1 21
+web/src/components/molecules/table-pagination/types.ts
+  h_0aff3b71f739b1 1-7
+web/src/components/organisms/search-results-table/types.ts
+  h_0aff3b71f739b1 1-4,6-7,9-22
+web/src/components/molecules/table-pagination/index.ts
+  h_0aff3b71f739b1 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "392bdd2e8b29253af036d6565272ada85bdbf357",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
