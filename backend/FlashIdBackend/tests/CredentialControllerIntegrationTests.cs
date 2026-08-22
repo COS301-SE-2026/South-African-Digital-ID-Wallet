@@ -17,6 +17,10 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Application.Features.Citizens.Exceptions;
+using Application.Features.Credentials.Exceptions;
+using Application.Features.Credentials.Enums;
+using Application.Features.Onboarding.Exceptions;
 
 namespace tests;
 
@@ -38,9 +42,37 @@ public class CredentialControllerIntegrationTests
         public Task<ActivateCredentialsResponseDto> ActivateCredentialsAsync(ActivateCredentialsRequestDto request, Guid userId, string ipAddress, CancellationToken cancellationToken) => throw new NotImplementedException("Not exercised by these tests.");
     }
 
+    private sealed class StubIssueCredentialService : IIssueCredentialService
+    {
+        public CitizenCredentialStatusResponseDto? StatusToReturn { get; set; }
+        public Exception? StatusException { get; set; }
+        public CredentialResponseDto? IssueResultToReturn { get; set; }
+        public Exception? IssueException { get; set; }
+
+        public Task<CitizenCredentialStatusResponseDto> GetCitizenStatusAsync(string saId, CancellationToken cancellationToken)
+        {
+            if (StatusException is not null) throw StatusException;
+
+            return Task.FromResult(StatusToReturn!);
+        }
+
+        public Task<CredentialResponseDto> IssueCredentialAsync(IssueCredentialRequestDto request, Guid officialId, string ipAddress, CancellationToken cancellationToken)
+        {
+            if (IssueException is not null) throw IssueException;
+
+            return Task.FromResult(IssueResultToReturn!);
+        }
+    }
+
     private sealed class TestApiFactory : WebApplicationFactory<Program>
     {
         private readonly SqliteConnection _connection = new("DataSource=:memory:");
+        private readonly IIssueCredentialService? _issueCredentialService;
+
+        public TestApiFactory(IIssueCredentialService? issueCredentialService = null)
+        {
+            _issueCredentialService = issueCredentialService;
+        }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -67,6 +99,12 @@ public class CredentialControllerIntegrationTests
 
                 services.RemoveAll(typeof(ICredentialActivationService));
                 services.AddScoped<ICredentialActivationService, StubCredentialActivationService>();
+
+                if (_issueCredentialService is not null)
+                {
+                    services.RemoveAll(typeof(IIssueCredentialService));
+                    services.AddScoped(_ => _issueCredentialService);
+                }
 
                 services.RemoveAll(typeof(IHostedService));
             });
