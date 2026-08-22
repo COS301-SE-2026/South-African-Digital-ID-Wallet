@@ -1,0 +1,15 @@
+web/src/components/templates/otp-modal/test/otp-modal.test.tsx
+  h_293a8616118f65 75-109,111-121,123-125,127,129-130,132,134,136-137,140,142-145,147
+  h_293a8616118f65 74,110,122,126,128,131,133,135,138-139,141,146,148
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "dd06f5258de70fb691a95858a692831285659ec6",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
