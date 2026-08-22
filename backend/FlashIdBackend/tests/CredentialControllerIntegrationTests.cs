@@ -322,4 +322,99 @@ public class CredentialControllerIntegrationTests
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
+
+    [Fact]
+    public async Task IssueCredential_ConsentNotGiven_ReturnsBadRequest()
+    {
+        var stub = new StubIssueCredentialService
+        {
+            IssueException = new CitizenConsentRequiredException()
+        };
+
+        await using var factory = new TestApiFactory(stub);
+
+        var db = await factory.CreateInitializedContextAsync();
+        var official = BuildUser(UserRole.Official);
+
+        await db.DomainUsers.AddAsync(official, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(official));
+
+        var request = new IssueCredentialRequestDto { SaId = "9001015800086", CredentialType = CredentialType.DriversLicense, ConsentGiven = false };
+        var response = await client.PostAsJsonAsync("/api/credentials/issue", request, JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task IssueCredential_AlreadyIssued_ReturnsConflict()
+    {
+        var stub = new StubIssueCredentialService
+        {
+            IssueException = new CredentialAlreadyIssuedException("9001015800086", CredentialType.DriversLicense)
+        };
+
+        await using var factory = new TestApiFactory(stub);
+
+        var db = await factory.CreateInitializedContextAsync();
+        var official = BuildUser(UserRole.Official);
+
+        await db.DomainUsers.AddAsync(official, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(official));
+
+        var request = new IssueCredentialRequestDto { SaId = "9001015800086", CredentialType = CredentialType.DriversLicense, ConsentGiven = true };
+        var response = await client.PostAsJsonAsync("/api/credentials/issue", request, JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task IssueCredential_RegistryRecordNotFound_ReturnsNotFound()
+    {
+        var stub = new StubIssueCredentialService
+        {
+            IssueException = new GovernmentRegistryRecordNotFoundException("9001015800086", CredentialType.DriversLicense)
+        };
+
+        await using var factory = new TestApiFactory(stub);
+
+        var db = await factory.CreateInitializedContextAsync();
+        var official = BuildUser(UserRole.Official);
+
+        await db.DomainUsers.AddAsync(official, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(official));
+
+        var request = new IssueCredentialRequestDto { SaId = "9001015800086", CredentialType = CredentialType.DriversLicense, ConsentGiven = true };
+        var response = await client.PostAsJsonAsync("/api/credentials/issue", request, JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task IssueCredential_AsCitizen_ReturnsForbidden()
+    {
+        await using var factory = new TestApiFactory(new StubIssueCredentialService());
+
+        var db = await factory.CreateInitializedContextAsync();
+        var citizen = BuildUser(UserRole.Citizen);
+
+        await db.DomainUsers.AddAsync(citizen, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(citizen));
+
+        var request = new IssueCredentialRequestDto { SaId = "9001015800086", CredentialType = CredentialType.DriversLicense, ConsentGiven = true };
+        var response = await client.PostAsJsonAsync("/api/credentials/issue", request, JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
 }
