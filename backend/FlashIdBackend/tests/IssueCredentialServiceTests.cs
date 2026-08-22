@@ -10,6 +10,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 
 namespace tests;
@@ -151,5 +152,52 @@ public class IssueCredentialServiceTests
         Assert.Equal("+27123456789", response.PhoneNumber);
         Assert.Equal("lebron.james@example.com", response.Email);
         Assert.Empty(response.ExistingCredentials);
+    }
+
+    [Fact]
+    public async Task GetCitizenStatusAsync_ActivatedCitizenWithoutUser_ReturnsNullContactInfo()
+    {
+        using var context = CreateContext();
+        await SeedActivatedCitizenAsync(context, withUser: false);
+        var service = CreateService(context, new FakeGovernmentRegistryGateway());
+
+        var response = await service.GetCitizenStatusAsync(KnownSaId, TestContext.Current.CancellationToken);
+
+        Assert.Null(response.PhoneNumber);
+        Assert.Null(response.Email);
+    }
+
+    [Fact]
+    public async Task GetCitizenStatusAsync_CitizenWithExistingDriversLicense_ReturnsCredentialSummary()
+    {
+        using var context = CreateContext();
+        var citizen = await SeedActivatedCitizenAsync(context);
+
+        var credential = new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Status = CredentialStatus.Active,
+            Signature = "sig",
+            IssuedBy = "RMTC",
+            IssueDate = new DateTime(2020, 3, 15, 0, 0, 0, DateTimeKind.Utc),
+            DriversLicense = new DriversLicense
+            {
+                Id = Guid.NewGuid(),
+                CitizenId = citizen.Id,
+                LicenseNumber = "DL1234567",
+                LicenseCode = LicenseCode.EB,
+                Restrictions = "None",
+                ExpiryDate = new DateTime(2030, 3, 15, 0, 0, 0, DateTimeKind.Utc),
+                PhotoPath = "dl-photo",
+            },
+        };
+
+        var service = CreateService(context, new FakeGovernmentRegistryGateway());
+        var response = await service.GetCitizenStatusAsync(KnownSaId, TestContext.Current.CancellationToken);
+        var summary = Assert.Single(response.ExistingCredentials);
+
+        Assert.Equal("DriversLicense", summary.Type);
+        Assert.Equal("Active", summary.Status);
     }
 }
