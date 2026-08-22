@@ -381,7 +381,7 @@ Onboards a citizen after identity verification and generate an activation code.
 
 ### Issue Credentials
 
-#### GET /api/credentials/citizen/{saId}/status
+#### GET /api/credentials/citizens/{saId}/status
 Looks up a citizen already known to FlashID (via SA ID) and returns their onboarding status and any credentials already issued, so the admin portal can decide whether to enable "Issue Driver's License" or route to onboarding.
 
 **Authentication:** Required for Officials
@@ -400,7 +400,7 @@ Looks up a citizen already known to FlashID (via SA ID) and returns their onboar
     "activatedAt": "date",
     "phoneNumber": "string",
     "email": "string",
-    "existingCredntials": [
+    "existingCredentials": [
         { 
             "type": "string",
             "status": "string",
@@ -418,7 +418,7 @@ Credential Status Values (existingCredentials[].status): Active | Inactive | Inv
 **Response 400:** Invalid SA ID format
 **Response 404:** No FlashID citizen record found for this SA ID. Official should route to onboarding
 
-**POST /api/credentials/issue**
+#### POST /api/credentials/issue
 Fetches a citizen's credential from the government registry and issue it into FlashID, after recording POPIA consent for this specific issuance.
 
 **Authentication:** Required for Officials
@@ -434,8 +434,9 @@ Fetches a citizen's credential from the government registry and issue it into Fl
 
 **Credential Types:**
 | Value | Type |
-| IdentityDocument | IdentityDocument |
-| DriversLicense | DriversLicense |
+|---|---|
+| IdentityDocument | Identity document |
+| DriversLicense | Driver's license |
 
 **Response 201:**
 ```json
