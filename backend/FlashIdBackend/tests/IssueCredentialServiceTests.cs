@@ -5,7 +5,9 @@ using Application.Common.Services;
 using Application.Features.Citizens.Exceptions;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Enums;
+using Application.Features.Credentials.Exceptions;
 using Application.Features.Onboarding.Dtos;
+using Application.Features.Onboarding.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
@@ -202,5 +204,190 @@ public class IssueCredentialServiceTests
 
         Assert.Equal("DriversLicense", summary.Type);
         Assert.Equal("Active", summary.Status);
+    }
+
+    [Fact]
+    public async Task IssueCredentialAsync_ConsentNotGiven_ThrowsCitizenConsentRequiredExceptionAndLogsFailure()
+    {
+        using var context = CreateContext();
+        var citizen = await SeedActivatedCitizenAsync(context);
+        var gateway = new FakeGovernmentRegistryGateway { DlToReturn = KnownDriversLicense() };
+        var service = CreateService(context, gateway);
+        var request = new IssueCredentialRequestDto { SaId = KnownSaId, CredentialType = CredentialType.DriversLicense, ConsentGiven = false };
+        var officialId = Guid.NewGuid();
+
+        await Assert.ThrowsAsync<CitizenConsentRequiredException>(() => service.IssueCredentialAsync(request, officialId, TestIpAddress, TestContext.Current.CancellationToken));
+
+        Assert.Empty(gateway.RequestedSaIds);
+        Assert.Empty(context.Credentials);
+
+        var log = Assert.Single(context.AuditLogs);
+
+        Assert.Equal(AuditEventType.CredentialIssueFailed, log.EventType);
+        Assert.Equal(officialId, log.ActorId);
+    }
+
+    [Fact]
+    public async Task IssueCredentialAsync_InvalidSaId_ThrowsArgumentException()
+    {
+        using var context = CreateContext();
+        var service = CreateService(context, new FakeGovernmentRegistryGateway());
+        var request = new IssueCredentialRequestDto { SaId = "12345", CredentialType = CredentialType.DriversLicense, ConsentGiven = true };
+
+        await Assert.ThrowsAsync<ArgumentException>(() => service.IssueCredentialAsync(request, Guid.NewGuid(), TestIpAddress, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task IssueCredentialAsync_CitizenNotFound_ThrowsCitizenNotFoundException()
+    {
+        using var context = CreateContext();
+        var service = CreateService(context, new FakeGovernmentRegistryGateway());
+        var request = new IssueCredentialRequestDto { SaId = KnownSaId, CredentialType = CredentialType.DriversLicense, ConsentGiven = true };
+
+        await Assert.ThrowsAsync<CitizenNotFoundException>(() => service.IssueCredentialAsync(request, Guid.NewGuid(), TestIpAddress, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task IssueCredentialAsync_CitizenNotActivated_ThrowsCitizenNotOnboardedException()
+    {
+        using var context = CreateContext();
+
+        await context.Citizens.AddAsync(new Citizen
+        {
+            Id = Guid.NewGuid(),
+            SaId = KnownSaId,
+            Names = "Test",
+            Surname = "Test",
+            Status = CitizenStatus.Pending,
+        }, TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var service = CreateService(context, new FakeGovernmentRegistryGateway());
+        var request = new IssueCredentialRequestDto { SaId = KnownSaId, CredentialType = CredentialType.DriversLicense, ConsentGiven = true };
+
+        await Assert.ThrowsAsync<CitizenNotOnboardedException>(() => service.IssueCredentialAsync(request, Guid.NewGuid(), TestIpAddress, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task IssueCredentialAsync_AlreadyHasActivatedDriversLicense_ThrowsCredentialAlreadyIssuedExceptionAndLogsFailure()
+    {
+        using var context = CreateContext();
+        var citizen = await SeedActivatedCitizenAsync(context);
+
+        var existing = new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Status = CredentialStatus.Active,
+            Signature = "sig",
+            IssuedBy = "RMTC",
+            IssueDate = DateTime.UtcNow,
+            DriversLicense = new DriversLicense
+            {
+                Id = Guid.NewGuid(),
+                CitizenId = citizen.Id,
+                LicenseNumber = "DL1234567",
+                LicenseCode = LicenseCode.EB,
+                Restrictions = "None",
+                ExpiryDate = DateTime.UtcNow.AddYears(5),
+                PhotoPath = "dl-photo",
+            },
+        };
+
+        await context.Credentials.AddAsync(existing, TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var gateway = new FakeGovernmentRegistryGateway { DlToReturn = KnownDriversLicense() };
+        var service = CreateService(context, gateway);
+        var request = new IssueCredentialRequestDto { SaId = KnownSaId, CredentialType = CredentialType.DriversLicense, ConsentGiven = true };
+        var officialId = Guid.NewGuid();
+
+        await Assert.ThrowsAsync<CredentialAlreadyIssuedException>(() => service.IssueCredentialAsync(request, officialId, TestIpAddress, TestContext.Current.CancellationToken));
+
+        Assert.Empty(gateway.RequestedSaIds);
+
+        var log = Assert.Single(context.AuditLogs);
+
+        Assert.Equal(AuditEventType.CredentialIssueFailed, log.EventType);
+    }
+
+    [Fact]
+    public async Task IssueCredentialAsync_RegistryReturnsNull_ThrowsGovernmentRegistryRecordNotFoundException()
+    {
+        using var context = CreateContext();
+
+        await SeedActivatedCitizenAsync(context);
+
+        var gateway = new FakeGovernmentRegistryGateway { DlToReturn = null };
+        var service = CreateService(context, gateway);
+        var request = new IssueCredentialRequestDto { SaId = KnownSaId, CredentialType = CredentialType.DriversLicense, ConsentGiven = true };
+
+        await Assert.ThrowsAsync<GovernmentRegistryRecordNotFoundException>(() => service.IssueCredentialAsync(request, Guid.NewGuid(), TestIpAddress, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task IssueCredentialAsync_DriversLicenseHappyPath_PersistsCredentialAndRetursMappedDto()
+    {
+        using var context = CreateContext();
+        var citizen = await SeedActivatedCitizenAsync(context);
+        var gateway = new FakeGovernmentRegistryGateway { DlToReturn = KnownDriversLicense() };
+        var service = CreateService(context, gateway);
+        var request = new IssueCredentialRequestDto { SaId = KnownSaId, CredentialType = CredentialType.DriversLicense, ConsentGiven = true };
+        var officialId = Guid.NewGuid();
+        var response = await service.IssueCredentialAsync(request, officialId, TestIpAddress, TestContext.Current.CancellationToken);
+
+        Assert.Equal("DriversLicense", response.Type);
+        Assert.Equal("Driver's Licence", response.Title);
+        Assert.Equal("Active", response.Status);
+        Assert.Equal("Road Traffic Management Corporation", response.IssuedBy);
+        Assert.NotNull(response.DriversLicense);
+        Assert.Equal("DL1234567", response.DriversLicense!.LicenseNumber);
+
+        var saved = Assert.Single(context.Credentials);
+
+        Assert.Equal(citizen.Id, saved.CitizenId);
+        Assert.Equal(citizen.Id, saved.DriversLicense!.CitizenId);
+    }
+
+    [Fact]
+    public async Task IssueCredentialAsync_IdentityDocumentHappyPath_PersistsCredentialAndRetursMappedDto()
+    {
+        using var context = CreateContext();
+        var citizen = await SeedActivatedCitizenAsync(context);
+        var gateway = new FakeGovernmentRegistryGateway { IdToReturn = KnownIdentityDocument() };
+        var service = CreateService(context, gateway);
+        var request = new IssueCredentialRequestDto { SaId = KnownSaId, CredentialType = CredentialType.IdentityDocument, ConsentGiven = true };
+        var officialId = Guid.NewGuid();
+        var response = await service.IssueCredentialAsync(request, officialId, TestIpAddress, TestContext.Current.CancellationToken);
+
+        Assert.Equal("IdentityDocument", response.Type);
+        Assert.Equal("National ID Card", response.Title);
+        Assert.NotNull(response.IdentityDocument);
+        Assert.Equal(KnownSaId, response.IdentityDocument!.IdNumber);
+
+        var saved = Assert.Single(context.Credentials);
+
+        Assert.Equal(citizen.Id, saved.IdentityDocument!.CitizenId);
+    }
+
+    [Fact]
+    public async Task IssueCredentialAsync_HappyPath_WritesConsentAndIssuedAuditLogsAndNotification()
+    {
+        using var context = CreateContext();
+        var citizen = await SeedActivatedCitizenAsync(context);
+        var gateway = new FakeGovernmentRegistryGateway { DlToReturn = KnownDriversLicense() };
+        var service = CreateService(context, gateway);
+        var request = new IssueCredentialRequestDto { SaId = KnownSaId, CredentialType = CredentialType.DriversLicense, ConsentGiven = true };
+        var officialId = Guid.NewGuid();
+        await service.IssueCredentialAsync(request, officialId, TestIpAddress, TestContext.Current.CancellationToken);
+
+        Assert.Equal(2, context.AuditLogs.Count());
+        Assert.Contains(context.AuditLogs, l => l.EventType == AuditEventType.ConsentRecorded && l.Details.Contains("DriversLicense"));
+        Assert.Contains(context.AuditLogs, l => l.EventType == AuditEventType.CredentialIssued);
+
+        var notification = Assert.Single(context.Notifications);
+
+        Assert.Equal(citizen.Id, notification.CitizenId);
+        Assert.Equal("Success", notification.Tone);
     }
 }
