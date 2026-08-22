@@ -58,6 +58,12 @@ The Issue Credentials subsystem allows authorised officials to verify a citizen 
 
 ![Issue Credentials Use Case Diagram](../images/Issue_Credentials.svg)
 
+### Issue Driver's License or Identity Document Credential
+
+**TUCBW:** This use case begins when a government Official, having confirmed the citizen is Activated in FlashID, selects "Issue Driver's License" or "Issue Identity Document" for that citizen and confirms POPIA Section 11 consent.
+
+**TUCEW:** This use case ends when the driver's license or identity document credential has been retrieved from the government registry, stored as an Active credential linked to the citizen, an audit log entry has been recorded, the citizen has been notified in-app that a new credential was added to their wallet, and the Official sees the newly issued credential in the citizen's profile.
+
 ### POPIA Compliance
 
 - **Section 10 — Minimality:** Only the data required to issue the credential should be processed.
