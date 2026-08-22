@@ -25,6 +25,12 @@ export const LoginForm = ({ onForgotPassword, onRegister }: LoginFormProps) => {
 
     try {
       const session = await loginService.login(values)
+      if (session.requiresDeviceVerification) {
+        setSubmitError(
+          'This device needs to be verified. Log in on the web portal to approve it, then try again.'
+        )
+        return
+      }
       signIn(session)
       const role = normalizeRole(session.role)
       router.replace(role ? ROLE_HOME[role] : '/unsupported-role')

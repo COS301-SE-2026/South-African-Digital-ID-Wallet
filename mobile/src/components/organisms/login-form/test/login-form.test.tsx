@@ -113,4 +113,24 @@ describe('<LoginForm/>', () => {
     expect(onForgotPassword).toHaveBeenCalledTimes(1)
     expect(onRegister).toHaveBeenCalledTimes(1)
   })
+  it('Should refuse to sign in when the device needs verification', async () => {
+    loginMock.mockResolvedValue({
+      ...session,
+      token: '',
+      requiresDeviceVerification: true,
+      deviceVerificationId: 'dv-1',
+    })
+    await render(<LoginForm />)
+    await fillIn('thabo@flashid.co.za', 'hunter2')
+    await waitFor(() =>
+      expect(
+        screen.getByTestId('login-submit').props.accessibilityState.disabled
+      ).toBe(false)
+    )
+    await fireEvent.press(screen.getByTestId('login-submit'))
+    expect(await screen.findByText(/device needs to be verified/i)).toBeTruthy()
+    expect(useAuthStore.getState().isAuthenticated).toBe(false)
+    expect(useAuthStore.getState().token).toBeNull()
+    expect(mockReplace).not.toHaveBeenCalled()
+  })
 })
