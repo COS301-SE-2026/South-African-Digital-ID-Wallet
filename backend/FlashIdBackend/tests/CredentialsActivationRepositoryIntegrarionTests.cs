@@ -34,6 +34,8 @@ public class CredentialsActivationRepositoryIntegrationTests
             Names = "Test",
             Surname = "Test",
             Status = CitizenStatus.Activated,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
         };
 
         await context.Citizens.AddAsync(citizen, TestContext.Current.CancellationToken);
@@ -50,6 +52,8 @@ public class CredentialsActivationRepositoryIntegrationTests
         IssuedBy = "Licensing Dept Durban",
         IssueDate = DateTime.UtcNow,
         CitizenId = citizenId,
+        CreatedAt = DateTime.UtcNow,
+        UpdatedAt = DateTime.UtcNow,
         DriversLicense = new DriversLicense
         {
             Id = Guid.NewGuid(),
@@ -59,6 +63,8 @@ public class CredentialsActivationRepositoryIntegrationTests
             Restrictions = "None",
             ExpiryDate = DateTime.UtcNow.AddYears(5),
             PhotoPath = "photo.png",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
         },
     };
 
@@ -70,6 +76,8 @@ public class CredentialsActivationRepositoryIntegrationTests
         IssuedBy = "Home Affairs Durban",
         IssueDate = DateTime.UtcNow,
         CitizenId = citizenId,
+        CreatedAt = DateTime.UtcNow,
+        UpdatedAt = DateTime.UtcNow,
         IdentityDocument = new IdentityDocument
         {
             Id = Guid.NewGuid(),
@@ -79,6 +87,8 @@ public class CredentialsActivationRepositoryIntegrationTests
             Nationality = "South African",
             Status = IdentityDocumentStatus.Citizen,
             PhotoPath = "photo.png",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
         },
     };
 
@@ -137,6 +147,8 @@ public class CredentialsActivationRepositoryIntegrationTests
             PhoneNumber = "+27821234567",
             PasswordHash = "hash",
             Role = UserRole.Citizen,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
         };
 
         await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
