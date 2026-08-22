@@ -193,6 +193,9 @@ public class IssueCredentialServiceTests
             },
         };
 
+        await context.Credentials.AddAsync(credential, TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
         var service = CreateService(context, new FakeGovernmentRegistryGateway());
         var response = await service.GetCitizenStatusAsync(KnownSaId, TestContext.Current.CancellationToken);
         var summary = Assert.Single(response.ExistingCredentials);
