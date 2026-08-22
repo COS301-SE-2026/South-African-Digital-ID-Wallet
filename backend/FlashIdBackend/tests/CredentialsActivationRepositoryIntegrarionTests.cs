@@ -81,4 +81,116 @@ public class CredentialsActivationRepositoryIntegrationTests
             PhotoPath = "photo.png",
         },
     };
+
+    [Fact]
+    public async Task AddCredential_SecondDriversLicenseForSameCitizen_ViolatesUniqueIndex()
+    {
+        using var context = CreateContext();
+        var citizen = await SeedCitizenAsync(context);
+        var repo = new CredentialsActivationRepository(context);
+
+        await repo.AddCredentialAsync(BuildDriversLicenseCredential(citizen.Id, "DL0000001"), TestContext.Current.CancellationToken);
+        await repo.SaveChangesAsync(TestContext.Current.CancellationToken);
+        await repo.AddCredentialAsync(BuildDriversLicenseCredential(citizen.Id, "DL0000002"), TestContext.Current.CancellationToken);
+        await Assert.ThrowsAsync<DbUpdateException>(() => repo.SaveChangesAsync(TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task AddCredential_DriversLicenseAndIdentityDocumentForSameCitizen_BothSucceed()
+    {
+        using var context = CreateContext();
+        var citizen = await SeedCitizenAsync(context);
+        var repo = new CredentialsActivationRepository(context);
+
+        await repo.AddCredentialAsync(BuildDriversLicenseCredential(citizen.Id, "DL0000001"), TestContext.Current.CancellationToken);
+        await repo.AddCredentialAsync(BuildIdentityDocumentCredential(citizen.Id), TestContext.Current.CancellationToken);
+        await repo.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(2, context.Credentials.Count());
+    }
+
+    [Fact]
+    public async Task HasDriversLicenseAsync_ReturnsTrueOnlyAfterOneExists()
+    {
+        using var context = CreateContext();
+        var citizen = await SeedCitizenAsync(context);
+        var repo = new CredentialsActivationRepository(context);
+
+        Assert.False(await repo.HasDriversLicenseAsync(citizen.Id, TestContext.Current.CancellationToken));
+
+        await repo.AddCredentialAsync(BuildDriversLicenseCredential(citizen.Id, "DL0000001"), TestContext.Current.CancellationToken);
+        await repo.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(await repo.HasDriversLicenseAsync(citizen.Id, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task GetCitizenBySaIdAsync_ReturnsCitizenWithUserAndCredentialsIncluded()
+    {
+        using var context = CreateContext();
+        var citizen = await SeedCitizenAsync(context);
+
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = "lebron@example.com",
+            PhoneNumber = "+27821234567",
+            PasswordHash = "hash",
+            Role = UserRole.Citizen,
+        };
+
+        await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
+        citizen.UserId = user.Id;
+
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var repo = new CredentialsActivationRepository(context);
+
+        await repo.AddCredentialAsync(BuildDriversLicenseCredential(citizen.Id, "DL0000001"), TestContext.Current.CancellationToken);
+        await repo.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var reloaded = await repo.GetCitizenBySaIdAsync(KnownSaId, TestContext.Current.CancellationToken);
+
+        Assert.NotNull(reloaded);
+        Assert.NotNull(reloaded!.User);
+        Assert.Equal("lebron@example.com", reloaded.User!.Email);
+
+        var credential = Assert.Single(reloaded.Credentials);
+
+        Assert.NotNull(credential.DriversLicense);
+    }
+
+    [Fact]
+    public async Task GetCitizenBySaIdAsync_UnknownSaId_ReturnsNull()
+    {
+        using var context = CreateContext();
+        var repo = new CredentialsActivationRepository(context);
+        var result = await repo.GetCitizenBySaIdAsync(KnownSaId, TestContext.Current.CancellationToken);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task AddNotificationAsync_PersistsNotification()
+    {
+        using var context = CreateContext();
+        var citizen = await SeedCitizenAsync(context);
+        var repo = new CredentialsActivationRepository(context);
+
+        await repo.AddNotificationAsync(new Notification
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Title = "New credential added",
+            Description = "A DriversLicense has been added to your FlashID wallet.",
+            Tone = "Success",
+            CreatedAt = DateTime.UtcNow,
+        }, TestContext.Current.CancellationToken);
+
+        await repo.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var notification = Assert.Single(context.Notifications);
+
+        Assert.Equal(citizen.Id, notification.CitizenId);
+    }
 }
