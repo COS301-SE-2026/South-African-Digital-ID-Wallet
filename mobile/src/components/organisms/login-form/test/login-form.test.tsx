@@ -81,7 +81,7 @@ describe('<LoginForm/>', () => {
       expect(useAuthStore.getState().isAuthenticated).toBe(true)
     )
     expect(useAuthStore.getState().token).toBe('jwt-token')
-    expect(mockReplace).toHaveBeenCalledWith('/home')
+    expect(mockReplace).toHaveBeenCalledWith('/citizen/home')
   })
   it('Should show the resolved error and stays put then login fails', async () => {
     loginMock.mockRejectedValue(
@@ -112,5 +112,25 @@ describe('<LoginForm/>', () => {
     await fireEvent.press(screen.getByText('Sign up'))
     expect(onForgotPassword).toHaveBeenCalledTimes(1)
     expect(onRegister).toHaveBeenCalledTimes(1)
+  })
+  it('Should refuse to sign in when the device needs verification', async () => {
+    loginMock.mockResolvedValue({
+      ...session,
+      token: '',
+      requiresDeviceVerification: true,
+      deviceVerificationId: 'dv-1',
+    })
+    await render(<LoginForm />)
+    await fillIn('thabo@flashid.co.za', 'hunter2')
+    await waitFor(() =>
+      expect(
+        screen.getByTestId('login-submit').props.accessibilityState.disabled
+      ).toBe(false)
+    )
+    await fireEvent.press(screen.getByTestId('login-submit'))
+    expect(await screen.findByText(/device needs to be verified/i)).toBeTruthy()
+    expect(useAuthStore.getState().isAuthenticated).toBe(false)
+    expect(useAuthStore.getState().token).toBeNull()
+    expect(mockReplace).not.toHaveBeenCalled()
   })
 })
