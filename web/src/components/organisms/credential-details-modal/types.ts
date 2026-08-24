@@ -1,6 +1,6 @@
 export type CredentialType = 'drivers-licence' | 'id-card'
 export type CredentialStatus = 'active' | 'suspended' | 'revoked'
-
+import type { RevocationReason } from '@/components/organisms/revoke-credentials-modal'
 export interface CredentialDetail {
   id: string
   type: CredentialType
@@ -36,5 +36,8 @@ export interface CredentialDetailsModalProps {
   onClose: () => void
   citizenName: string
   credentials: CredentialDetail[]
-  onRevoke?: (credential: CredentialDetail) => void
+  onRevoke?: (
+    credential: CredentialDetail,
+    payload: { reason: RevocationReason; notes: string }
+  ) => void | Promise<void>
 }
