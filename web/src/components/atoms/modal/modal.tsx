@@ -33,7 +33,7 @@ export const Modal = ({
         aria-modal="true"
         onClick={(event) => event.stopPropagation()}
         className={cn(
-          'relative flex min-h-screen w-full flex-col bg-[#f6f2ea] sm:min-h-0 sm:max-h-[92vh] sm:w-[95vw] sm:max-w-5xl sm:rounded-2xl',
+          'relative flex min-h-screen w-full flex-col bg-[#f6f2ea] sm:min-h-0 sm:max-h-[95vh] sm:w-[98vw] sm:max-w-5xl sm:rounded-2xl',
           className
         )}
       >

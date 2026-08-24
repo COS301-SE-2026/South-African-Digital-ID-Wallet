@@ -3,8 +3,10 @@ import { useMemo, useState } from 'react'
 import { SearchBar } from '@/components/atoms/search-bar'
 import { CredentialStatsFilter } from '@/components/organisms/credential-stats-filter'
 import { SearchResultsTable } from '@/components/organisms/search-results-table'
+import { CredentialDetailsModal } from '@/components/organisms/credential-details-modal'
 import type { SearchResultRow } from '@/components/organisms/search-results-table/types'
 import type { CredentialFilter } from '@/components/organisms/credential-stats-filter/types'
+import type { CredentialDetail } from '@/components/organisms/credential-details-modal/types'
 
 const RESULTS_PER_PAGE = 15
 const EXPIRING_SOON_DAYS = 30
@@ -120,11 +122,60 @@ function applyStatFilter(
       return rows
   }
 }
+function getCredentialsForRow(row: SearchResultRow): CredentialDetail[] {
+  const fullName = `${row.firstName} ${row.surname}`
+
+  const shared = {
+    status: row.status,
+    issuedOn: '02 June 2024',
+    expiresOn: '02 June 2029',
+    citizen: {
+      fullName,
+      idNumber: row.idNumber,
+      dateOfBirth: '15 February 1990',
+      email: `${row.firstName.toLowerCase()}.${row.surname.toLowerCase()}@email.com`,
+      phone: '+27 73 123 4567',
+      address: '123 Mkhize Street, Umlazi, Durban, 4031',
+    },
+    issuedBy: {
+      administrator: 'Thandi Mokoena',
+      department: 'Home Affairs - KZN',
+      office: 'Umlazi Branch Office',
+      reference: `HA-KZN-2024-${row.id.padStart(5, '0')}`,
+    },
+    activity: {
+      verifications: 24,
+      lastVerifiedOn: '29 Aug 2026',
+      lastVerifiedAt: '10:24 AM',
+      devicesUsed: 3,
+    },
+  }
+
+  return [
+    {
+      id: `${row.id}-dl`,
+      type: 'drivers-licence',
+      label: "Driver's Licence",
+      credentialId: `DL-2024-${row.id.padStart(7, '0')}`,
+      ...shared,
+    },
+    {
+      id: `${row.id}-id`,
+      type: 'id-card',
+      label: 'ID Card',
+      credentialId: `ID-2024-${row.id.padStart(7, '0')}`,
+      ...shared,
+    },
+  ]
+}
 
 export function ManageCredentialsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statFilter, setStatFilter] = useState<CredentialFilter>('all')
   const [currentPage, setCurrentPage] = useState(1)
+  const [activeModalRow, setActiveModalRow] = useState<SearchResultRow | null>(
+    null
+  )
 
   const searchedRows = useMemo(() => {
     if (!searchQuery.trim()) return MOCK_ROWS
@@ -161,7 +212,15 @@ export function ManageCredentialsPage() {
   }
 
   const handleViewCredentials = (row: SearchResultRow) => {
-    console.log('view credentials', row.id)
+    setActiveModalRow(row)
+  }
+
+  const handleCloseModal = () => {
+    setActiveModalRow(null)
+  }
+
+  const handleRevoke = (credential: CredentialDetail) => {
+    console.log('revoke credential', credential.id)
   }
 
   return (
@@ -192,6 +251,18 @@ export function ManageCredentialsPage() {
           />
         </div>
       </main>
+
+      <CredentialDetailsModal
+        isOpen={activeModalRow !== null}
+        onClose={handleCloseModal}
+        citizenName={
+          activeModalRow
+            ? `${activeModalRow.firstName} ${activeModalRow.surname}`
+            : ''
+        }
+        credentials={activeModalRow ? getCredentialsForRow(activeModalRow) : []}
+        onRevoke={handleRevoke}
+      />
     </div>
   )
 }
