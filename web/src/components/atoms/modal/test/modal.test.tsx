@@ -66,10 +66,10 @@ describe('Modal', () => {
 
   it('applies the provided data-cy attribute', () => {
     render(
-      <Modal isOpen={true} onClose={onClose} dataCy="test-modal">
+      <Modal isOpen={true} onClose={jest.fn()} dataCy="test-modal">
         <div>Modal content</div>
       </Modal>
     )
-    expect(screen.getByTestId('test-modal')).toBeInTheDocument()
+    expect(document.querySelector('[data-cy="test-modal"]')).toBeInTheDocument()
   })
 })
