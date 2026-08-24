@@ -161,7 +161,7 @@ export function CredentialDetailsModal({
                         Credential ID:
                       </span>
                       <span className="text-sm font-semibold text-deep-green">
-                        {selected.credentialId}
+                        {selected.displayReference}
                       </span>
                     </div>
                     <div className="flex items-center gap-10">
@@ -295,7 +295,7 @@ export function CredentialDetailsModal({
         onConfirm={handleConfirmRevoke}
         citizenName={selected.citizen.fullName}
         credentialLabel={selected.label}
-        credentialId={selected.credentialId}
+        credentialId={selected.displayReference}
         isSubmitting={isRevoking}
       />
     </>

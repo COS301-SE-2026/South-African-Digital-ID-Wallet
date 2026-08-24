@@ -7,7 +7,7 @@ export interface CredentialDetail {
   id: string
   type: CredentialType
   label: string
-  credentialId: string
+  displayReference: string
   status: CredentialStatus
   issuedOn: string
   expiresOn: string
