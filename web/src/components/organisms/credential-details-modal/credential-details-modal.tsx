@@ -65,7 +65,160 @@ export function CredentialDetailsModal({
             </Button>
           </div>
         </div>
-        {/* still adding info cards. issued by, user cred info with image,and user ifno */}
+        <div className="mt-6 grid grid-cols-[0.8fr_1.2fr] gap-6">
+          <div className="relative rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+            <div className="h-full rounded-[24px] bg-clean-white p-6">
+              <div className="flex justify-center">
+                <div className="relative h-48 w-48 overflow-hidden rounded-xl border-2 border-primary-green">
+                  <Image
+                    src="/images/mock-citizen.jpg"
+                    alt={`${selected.citizen.fullName} profile`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <Text
+                  as="h3"
+                  variant="sub-md"
+                  className="mb-4 font-semibold text-deep-green"
+                >
+                  Credential Information
+                </Text>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-10">
+                    <span className="text-sm text-muted-text">
+                      Credential Type:
+                    </span>
+                    <span className="text-sm font-semibold text-deep-green">
+                      {selected.label}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-10">
+                    <span className="text-sm text-muted-text">
+                      Credential ID:
+                    </span>
+                    <span className="text-sm font-semibold text-deep-green">
+                      {selected.credentialId}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-10">
+                    <span className="text-sm text-muted-text">Status:</span>
+                    <StatusPill intent={selected.status}>
+                      {selected.status}
+                    </StatusPill>
+                  </div>
+                  <div className="flex items-center gap-10">
+                    <span className="text-sm text-muted-text">Issued On:</span>
+                    <span className="text-sm font-semibold text-deep-green">
+                      {selected.issuedOn}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-10">
+                    <span className="text-sm text-muted-text">Expires On:</span>
+                    <span className="text-sm font-semibold text-deep-green">
+                      {selected.expiresOn}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-6">
+            <div className="relative rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+              <div className="rounded-[24px] bg-clean-white p-6">
+                <Text
+                  as="h3"
+                  variant="sub-md"
+                  className="mb-4 font-semibold text-deep-green"
+                >
+                  Citizen Information
+                </Text>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-muted-text">Full Name:</span>
+                    <span className="text-sm font-semibold text-deep-green">
+                      {selected.citizen.fullName}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-muted-text">ID Number:</span>
+                    <span className="text-sm font-semibold text-deep-green">
+                      {selected.citizen.idNumber}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-muted-text">
+                      Date of Birth:
+                    </span>
+                    <span className="text-sm font-semibold text-deep-green">
+                      {selected.citizen.dateOfBirth}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-muted-text">Contact:</span>
+                    <span className="text-sm font-semibold text-deep-green">
+                      {selected.citizen.email}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-muted-text">Address:</span>
+                    <span className="text-sm font-semibold text-deep-green">
+                      {selected.citizen.address}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+              <div className="rounded-[24px] bg-clean-white p-6">
+                <Text
+                  as="h3"
+                  variant="sub-md"
+                  className="mb-4 font-semibold text-deep-green"
+                >
+                  Issued By
+                </Text>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-muted-text">
+                      Administrator:
+                    </span>
+
+                    <span className="text-sm font-semibold text-deep-green">
+                      {selected.issuedBy.administrator}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-muted-text">Department:</span>
+
+                    <span className="text-sm font-semibold text-deep-green">
+                      {selected.issuedBy.department}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-muted-text">Office:</span>
+                    <span className="text-sm font-semibold text-deep-green">
+                      {selected.issuedBy.office}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-muted-text">Reference:</span>
+                    <span className="text-sm font-semibold text-deep-green">
+                      {selected.issuedBy.reference}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </Modal>
   )
