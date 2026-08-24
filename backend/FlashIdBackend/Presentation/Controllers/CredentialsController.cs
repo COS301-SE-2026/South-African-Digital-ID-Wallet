@@ -152,7 +152,7 @@ public class CredentialsController : ControllerBase
         try
         {
             var res = await _credentialExpiryService.RunExpiryCheckAsync(cancellationToken);
-            return Ok(res);
+            return res.Failed ? StatusCode(500, res) : Ok(res);
         }
         catch (CredentialExpiryJobAlreadyRunningException cejare)
         {
