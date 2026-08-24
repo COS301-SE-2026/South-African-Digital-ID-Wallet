@@ -1,0 +1,17 @@
+web/src/components/organisms/credential-details-modal/credential-details-modal.tsx
+  h_0aff3b71f739b1 3,19,24,45-58,95-103,105-107
+  h_0aff3b71f739b1 104,111-112
+web/src/components/organisms/credential-details-modal/types.ts
+  h_0aff3b71f739b1 39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "13f7f41874fade22cc8a9b945cfd15967ea31047",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
