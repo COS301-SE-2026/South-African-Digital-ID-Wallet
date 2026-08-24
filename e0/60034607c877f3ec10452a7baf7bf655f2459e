@@ -1,0 +1,17 @@
+web/src/components/organisms/revoke-credentials-modal/revoke-credentials-modal.tsx
+  h_0aff3b71f739b1 1-109
+  h_0aff3b71f739b1 110-122
+web/src/components/atoms/search-bar/types.ts
+  h_0aff3b71f739b1 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "e060034607c877f3ec10452a7baf7bf655f2459e",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+web/src/components/atoms/modal/test/modal.test.tsx
+  h_0aff3b71f739b1 1-75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "99f60a590816339337194adcd3cf11d84ad4f912",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
