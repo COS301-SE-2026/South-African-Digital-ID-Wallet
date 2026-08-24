@@ -1,6 +1,6 @@
 import type { ChangeEvent } from 'react'
 
-export interface SearchBarProps {
+export type SearchBarProps = {
   value?: string
   placeholder?: string
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void
