@@ -1,6 +1,8 @@
-export type CredentialType = 'drivers-licence' | 'id-card'
-export type CredentialStatus = 'active' | 'suspended' | 'revoked'
+import type { CredentialStatus } from '@/services/credential-service'
 import type { RevocationReason } from '@/components/organisms/revoke-credentials-modal'
+export type CredentialType = 'drivers-licence' | 'id-card'
+export type { CredentialStatus }
+
 export interface CredentialDetail {
   id: string
   type: CredentialType

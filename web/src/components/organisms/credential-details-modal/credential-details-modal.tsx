@@ -8,7 +8,17 @@ import { StatusPill } from '@/components/atoms/status-pill'
 import { RevokeCredentialModal } from '@/components/organisms/revoke-credentials-modal'
 import { cn } from '@/lib/utils'
 import type { CredentialDetailsModalProps } from './types'
+import type { StatusPillIntent } from '@/components/atoms/status-pill/types'
+import type { CredentialStatus } from '@/services/credential-service'
 import Image from 'next/image'
+
+const statusIntentMap: Record<CredentialStatus, StatusPillIntent> = {
+  Active: 'active',
+  Inactive: 'inactive',
+  Investigation: 'suspended',
+  Revoked: 'revoked',
+  Expired: 'inactive',
+}
 
 export function CredentialDetailsModal({
   isOpen,
@@ -96,7 +106,7 @@ export function CredentialDetailsModal({
               <Button
                 variant="custom"
                 onClick={handleReinstate}
-                disabled={selected.status !== 'revoked' || isReinstating}
+                disabled={selected.status !== 'Revoked' || isReinstating}
                 isLoading={isReinstating}
                 LeftIcon={RotateCcw}
                 className="!h-auto !w-auto gap-2 border border-primary-green px-4 py-2 text-sm text-primary-green hover:bg-primary-green hover:text-clean-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-primary-green"
@@ -108,7 +118,7 @@ export function CredentialDetailsModal({
               <Button
                 variant="secondary"
                 onClick={() => setIsRevokeModalOpen(true)}
-                disabled={selected.status === 'revoked'}
+                disabled={selected.status === 'Revoked'}
                 className="!h-auto !w-auto !border-national-red px-4 py-2 text-sm !text-national-red hover:!bg-national-red hover:!text-clean-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:!bg-transparent disabled:hover:!text-national-red"
                 dataCy="revoke-credential"
               >
@@ -156,7 +166,7 @@ export function CredentialDetailsModal({
                     </div>
                     <div className="flex items-center gap-10">
                       <span className="text-sm text-muted-text">Status:</span>
-                      <StatusPill intent={selected.status}>
+                      <StatusPill intent={statusIntentMap[selected.status]}>
                         {selected.status}
                       </StatusPill>
                     </div>
