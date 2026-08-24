@@ -60,6 +60,11 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
         icon: 'institutions',
       },
       {
+        label: 'Manage Credentials',
+        href: '/gov-admin/manage-credentials',
+        icon: 'institutions',
+      },
+      {
         label: 'Notifications',
         href: '/under-construction',
         icon: 'notifications',

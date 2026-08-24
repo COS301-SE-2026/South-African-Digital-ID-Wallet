@@ -29,3 +29,9 @@ public class InvalidDisclosureTokenException : Exception
     public InvalidDisclosureTokenException()
         : base("This QR Code is expired, invalid, or has already been used.") { }
 }
+
+public class InvalidCredentialStatusTransitionException : Exception
+{
+    public InvalidCredentialStatusTransitionException(string message)
+        : base(message) { }
+}
