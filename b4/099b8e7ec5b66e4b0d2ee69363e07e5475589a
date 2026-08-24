@@ -1,0 +1,20 @@
+web/src/components/organisms/credential-details-modal/credential-details-modal.tsx
+  h_0aff3b71f739b1 68-72
+web/src/components/atoms/modal/modal.tsx
+  h_0aff3b71f739b1 15,17,19,21,24,26,32-34,36,54
+  h_0aff3b71f739b1 16,20,25
+web/src/components/pages/gov-admin/manage-credentials-page.tsx
+  h_0aff3b71f739b1 12
+  h_0aff3b71f739b1 35,38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "b4099b8e7ec5b66e4b0d2ee69363e07e5475589a",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
