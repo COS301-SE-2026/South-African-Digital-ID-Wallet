@@ -2,7 +2,7 @@
 **Tech Titans · COS 301 Capstone 2026**
 
 > This document contains all epics and user stories for the FlashID system, including acceptance criteria and definition of done for each story.
-> See [SRS.md](./SRS.md) for the full Software Requirements Specification.
+> See [SRS](./SRS-v3.md) for the full Software Requirements Specification.
 
 ---
 ## 3.2 Epics and User Stories
@@ -266,12 +266,12 @@ As a government administrator, I want to view and search for institutions that h
 ---
 
 #### US-4.1
-As a government administrator, I want to issue a digital National ID credential to a registered citizen, so that the citizen can use their digital ID for secure identity verification.
+As an Official, I want to issue a digital National ID credential/Driver's License to a registered citizen, so that the citizen can use their digital credential for secure identity verification.
 
 **Acceptance Criteria:**
-- Admin can search for a citizen by SA ID number before issuing
-- Identity fields are sourced from the MockGov registry — admin cannot manually edit them
-- System blocks issuance if an active National ID credential already exists for the citizen
+- Official can search for a citizen by SA ID number before issuing
+- Identity fields are sourced from the Government registry.
+- System blocks issuance if an active National ID credential/Driver's License already exists for the citizen
 - Credential is signed with Ed25519 at the point of issuance
 - Citizen wallet is updated immediately after issuance
 - Issuance is logged to the audit trail
@@ -282,16 +282,16 @@ As a government administrator, I want to issue a digital National ID credential 
 
 ---
 #### US-4.2
-As a government administrator, I want to search for a citizen by ID number or name before issuing a credential, so that I can confirm I am issuing to the correct person.
+As an Official, I want to search for a citizen by SA ID number before issuing a credential, so that I can confirm I am issuing to the correct person.
 
 **Acceptance Criteria:**
-- Search supports full SA ID number and partial name
+- Search supports full SA ID number
 - Results display citizen name, SA ID, and account activation status
-- Admin sees a clear error if no matching citizen is found or the citizen is not activated
-- Admin must explicitly confirm the correct citizen before proceeding to issuance
+- Official sees a clear error if no matching citizen is found or the citizen is not activated
+- Official must explicitly confirm the correct citizen before proceeding to issuance
 
 **Definition of Done:**
-- Search returns accurate results by both SA ID and name
+- Search returns accurate results by both SA ID
 
 ---
 #### US-4.3
