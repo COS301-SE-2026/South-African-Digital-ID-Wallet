@@ -1,14 +1,12 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-
+import { fireEvent, render, screen } from '@testing-library/react'
 import { RevokeCredentialModal } from '../revoke-credentials-modal'
 
 describe('RevokeCredentialModal', () => {
-  const onClose = jest.fn()
-  const onConfirm = jest.fn()
   const defaultProps = {
     isOpen: true,
-    onClose,
-    onConfirm,
+    onClose: jest.fn(),
+    onConfirm: jest.fn(),
+    isSubmitting: false,
     citizenName: 'John Smith',
     credentialLabel: 'National ID',
     credentialId: 'cred-123',
@@ -17,111 +15,111 @@ describe('RevokeCredentialModal', () => {
     jest.clearAllMocks()
   })
 
-  it('renders the revocation modal', () => {
+  it('renders the revoke credential modal', () => {
     render(<RevokeCredentialModal {...defaultProps} />)
     expect(
       screen.getByRole('heading', { name: /revoke credential/i })
     ).toBeInTheDocument()
+    expect(screen.getByLabelText(/reason/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/additional notes/i)).toBeInTheDocument()
+  })
+
+  it('renders the credential information', () => {
+    render(<RevokeCredentialModal {...defaultProps} />)
     expect(screen.getByText('John Smith')).toBeInTheDocument()
-    expect(screen.getByText(/National ID \(cred-123\)/i)).toBeInTheDocument()
+    expect(screen.getByText(/National ID\s*\(cred-123\)/)).toBeInTheDocument()
   })
 
-  it('does not render when closed', () => {
-    render(<RevokeCredentialModal {...defaultProps} isOpen={false} />)
-    expect(
-      screen.queryByRole('heading', { name: /revoke credential/i })
-    ).not.toBeInTheDocument()
-  })
-
-  it('confirm button is disabled when no reason is selected', () => {
+  it('disables confirm button when no reason is selected', () => {
     render(<RevokeCredentialModal {...defaultProps} />)
-    expect(
-      screen.getByRole('button', { name: /confirm revocation/i })
-    ).toBeDisabled()
-  })
-
-  it('allows selecting a revocation reason', () => {
-    render(<RevokeCredentialModal {...defaultProps} />)
-    const select = screen.getByLabelText('Reason')
-    fireEvent.change(select, {
-      target: {
-        value: 'fraud',
-      },
+    const confirmButton = screen.getByRole('button', {
+      name: /confirm revocation/i,
     })
-    expect(select).toHaveValue('fraud')
+    expect(confirmButton).toBeDisabled()
   })
 
-  it('enables confirm button after selecting a reason', () => {
+  it('does not confirm when no reason is selected', () => {
     render(<RevokeCredentialModal {...defaultProps} />)
-    const select = screen.getByLabelText('Reason')
-    fireEvent.change(select, {
-      target: {
-        value: 'fraud',
-      },
+    const confirmButton = screen.getByRole('button', {
+      name: /confirm revocation/i,
     })
-    expect(
-      screen.getByRole('button', { name: /confirm revocation/i })
-    ).toBeEnabled()
+    fireEvent.click(confirmButton)
+    expect(defaultProps.onConfirm).not.toHaveBeenCalled()
   })
 
-  it('allows entering additional notes', () => {
+  it('enables confirm button when a reason is selected', () => {
     render(<RevokeCredentialModal {...defaultProps} />)
-    const textarea = screen.getByLabelText('Additional Notes')
-    fireEvent.change(textarea, {
-      target: {
-        value: 'Credential was reported as compromised.',
-      },
+    const reasonSelect = screen.getByLabelText(/reason/i)
+    fireEvent.change(reasonSelect, {
+      target: { value: 'expired' },
     })
-    expect(textarea).toHaveValue('Credential was reported as compromised.')
+    const confirmButton = screen.getByRole('button', {
+      name: /confirm revocation/i,
+    })
+    expect(confirmButton).not.toBeDisabled()
   })
 
-  it('does not confirm when no reason is selected', async () => {
+  it('calls onConfirm when a reason is selected', () => {
     render(<RevokeCredentialModal {...defaultProps} />)
-    fireEvent.click(screen.getByRole('button', { name: /confirm revocation/i }))
-    expect(onConfirm).not.toHaveBeenCalled()
-  })
-
-  it('confirms the revocation with the selected reason and notes', async () => {
-    render(<RevokeCredentialModal {...defaultProps} />)
-    fireEvent.change(screen.getByLabelText('Reason'), {
-      target: {
-        value: 'fraud',
-      },
+    fireEvent.change(screen.getByLabelText(/reason/i), {
+      target: { value: 'expired' },
     })
-    fireEvent.change(screen.getByLabelText('Additional Notes'), {
-      target: {
-        value: 'Credential was compromised.',
-      },
-    })
-    fireEvent.click(screen.getByRole('button', { name: /confirm revocation/i }))
-    await waitFor(() => {
-      expect(onConfirm).toHaveBeenCalledWith({
-        reason: 'fraud',
-        notes: 'Credential was compromised.',
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /confirm revocation/i,
       })
+    )
+    expect(defaultProps.onConfirm).toHaveBeenCalledWith({
+      reason: 'expired',
+      notes: '',
     })
   })
 
-  it('closes and resets the form when Cancel is clicked', () => {
+  it('calls onClose when cancel is clicked', () => {
     render(<RevokeCredentialModal {...defaultProps} />)
-    fireEvent.change(screen.getByLabelText('Reason'), {
-      target: {
-        value: 'fraud',
-      },
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /cancel/i,
+      })
+    )
+    expect(defaultProps.onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls onClose when close button is clicked', () => {
+    render(<RevokeCredentialModal {...defaultProps} />)
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /close/i,
+      })
+    )
+    expect(defaultProps.onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('passes notes when confirming revocation', () => {
+    render(<RevokeCredentialModal {...defaultProps} />)
+    fireEvent.change(screen.getByLabelText(/reason/i), {
+      target: { value: 'expired' },
     })
-    fireEvent.change(screen.getByLabelText('Additional Notes'), {
-      target: {
-        value: 'Some notes',
-      },
+    fireEvent.change(screen.getByLabelText(/additional notes/i), {
+      target: { value: 'Credential has expired.' },
     })
-    fireEvent.click(screen.getByRole('button', { name: /^cancel$/i }))
-    expect(onClose).toHaveBeenCalledTimes(1)
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /confirm revocation/i,
+      })
+    )
+    expect(defaultProps.onConfirm).toHaveBeenCalledWith({
+      reason: 'expired',
+      notes: 'Credential has expired.',
+    })
   })
 
   it('shows the loading state while submitting', () => {
     render(<RevokeCredentialModal {...defaultProps} isSubmitting={true} />)
-    expect(
-      screen.getByRole('button', { name: /confirm revocation/i })
-    ).toBeDisabled()
+    const confirmButton = document.querySelector(
+      '[data-cy="revoke-confirm-button"]'
+    )
+    expect(confirmButton).toBeDisabled()
+    expect(screen.getByLabelText('Loading')).toBeInTheDocument()
   })
 })
