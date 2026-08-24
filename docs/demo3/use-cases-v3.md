@@ -72,17 +72,23 @@ The Issue Credentials subsystem allows authorised officials to verify a citizen 
 
 **TUCEW:** This use case ends with the Official confirming POPIA Section 11 consent and the consent is recorded to the audit trail, or the action is blocked and the Official is shown an error because consent was not given.
 
+---
+
 ### Generate Signed Identity Document Credential
 
 **TUCBW:** This use case begins with an Official initiating the issuance of a identity document credential.
 
 **TUCEW:** This use case ends with the citizen's identity document record retrieved from the government registry (POPIA Section 10 & 16), signed (POPIA Section 19-22) and stored in FlashID as an Active credential linked to the citizen (POPIA Section 13) and an audit log entry has been recorded.
 
+---
+
 ### Generate Signed Driver's License Credential
 
 **TUCBW:** This use case begins with an Official initiating the issuance of a driver's license credential.
 
 **TUCEW:** This use case ends with the citizen's driver's license record retrieved from the government registry (POPIA Section 10 & 16), signed (POPIA Section 19-22) and stored in FlashID as an Active credential linked to the citizen (POPIA Section 13) and an audit log entry has been recorded.
+
+---
 
 ### Notify Citizen
 
@@ -99,6 +105,7 @@ The Issue Credentials subsystem allows authorised officials to verify a citizen 
 - **Sections 19–22 — Security Safeguards:** Credentials must be digitally signed and protected from tampering.
 
 ---
+
 ## 5. Access Credentials
 
 The Access Credentials subsystem allows citizens to log in, view their credentials, generate certified copies, generate QR codes, scan QR codes, and control selective disclosure preferences.

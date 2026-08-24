@@ -291,7 +291,7 @@ As an Official, I want to search for a citizen by SA ID number before issuing a 
 - Official must explicitly confirm the correct citizen before proceeding to issuance
 
 **Definition of Done:**
-- Search returns accurate results by both SA ID
+- Search returns accurate results by SA ID
 
 ---
 #### US-4.3
