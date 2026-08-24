@@ -33,6 +33,7 @@ public class JwtTokenProvider : IJwtTokenProvider
             new Claim(ClaimTypes.Role, user.Role.ToString()),
             new Claim("userId", user.Id.ToString()),
             new Claim("role", user.Role.ToString()),
+            new Claim("tv", user.TokenVersion.ToString()),
         };
 
         var token = new JwtSecurityToken(
