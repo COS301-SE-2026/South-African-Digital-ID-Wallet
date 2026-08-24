@@ -8,4 +8,6 @@ public interface INotificationRepository
     Task<Citizen?> GetCitizenByUserIdAsync(Guid userId);
 
     Task<List<NotificationDto>> GetNotificationsByCitizenIdAsync(Guid citizenId);
+    Task CreateNotificationAsync(Notification notification);
+
 }
