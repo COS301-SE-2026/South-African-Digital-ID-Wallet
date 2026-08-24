@@ -1,0 +1,15 @@
+web/src/components/pages/gov-admin/manage-credentials-page.tsx
+  h_0aff3b71f739b1 49-50,53,92
+  h_0aff3b71f739b1 17,42,51,54-55,57-58,64,72,74,97,106-107,141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "e385dec7eb628e279f6a2b42a43f3d065ad5b5d1",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

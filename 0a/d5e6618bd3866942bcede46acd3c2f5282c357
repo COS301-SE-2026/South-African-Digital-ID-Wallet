@@ -1,0 +1,26 @@
+web/src/components/atoms/modal/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/atoms/modal/modal.tsx
+  h_0aff3b71f739b1 1-52
+web/src/components/organisms/index.ts
+  h_0aff3b71f739b1 22-23
+web/src/components/atoms/index.ts
+  h_0aff3b71f739b1 14
+web/src/components/atoms/modal/types.ts
+  h_0aff3b71f739b1 1-9
+web/src/components/organisms/credential-details-modal/types.ts
+  h_0aff3b71f739b1 1-40
+web/src/components/organisms/credential-details-modal/index.ts
+  h_0aff3b71f739b1 1-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "0ad5e6618bd3866942bcede46acd3c2f5282c357",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

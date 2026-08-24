@@ -1,0 +1,14 @@
+web/src/components/organisms/credential-details-modal/credential-details-modal.tsx
+  h_0aff3b71f739b1 68-221
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "66277eae83773ec446667ab66abf1818e5f509a6",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
