@@ -83,16 +83,6 @@ export const SearchResultsTable = ({
                   </Text>
                 </th>
 
-                <th className="px-6 py-4 text-left">
-                  <Text
-                    as="span"
-                    variant="caption"
-                    className="font-bold uppercase tracking-wide text-white"
-                  >
-                    Status
-                  </Text>
-                </th>
-
                 <th className="px-6 py-4 text-left last:rounded-tr-[22px]">
                   <Text
                     as="span"
@@ -155,10 +145,6 @@ export const SearchResultsTable = ({
                     >
                       {row.dateJoined}
                     </Text>
-                  </td>
-
-                  <td className="px-6 py-4">
-                    <StatusPill intent={row.status}>{row.status}</StatusPill>
                   </td>
 
                   <td className="px-6 py-4">

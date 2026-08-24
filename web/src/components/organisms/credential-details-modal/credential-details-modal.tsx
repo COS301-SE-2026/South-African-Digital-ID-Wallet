@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { RotateCcw } from 'lucide-react'
 import { Modal } from '@/components/atoms/modal'
 import { Button } from '@/components/atoms/button'
 import { Text } from '@/components/atoms/text'
@@ -15,11 +16,12 @@ export function CredentialDetailsModal({
   citizenName,
   credentials,
   onRevoke,
+  onReinstate,
 }: Readonly<CredentialDetailsModalProps>) {
   const [selectedId, setSelectedId] = useState(credentials[0]?.id)
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false)
   const [isRevoking, setIsRevoking] = useState(false)
-
+  const [isReinstating, setIsReinstating] = useState(false)
   const selected =
     credentials.find((credential) => credential.id === selectedId) ??
     credentials[0]
@@ -37,6 +39,20 @@ export function CredentialDetailsModal({
       setIsRevokeModalOpen(false)
     } finally {
       setIsRevoking(false)
+    }
+  }
+
+  const handleReinstate = async () => {
+    const confirmed = window.confirm(
+      `Reinstate ${selected.label} for ${selected.citizen.fullName}? This will restore it to active status.`
+    )
+    if (!confirmed) return
+
+    try {
+      setIsReinstating(true)
+      await onReinstate?.(selected)
+    } finally {
+      setIsReinstating(false)
     }
   }
 
@@ -76,11 +92,24 @@ export function CredentialDetailsModal({
               ))}
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="custom"
+                onClick={handleReinstate}
+                disabled={selected.status !== 'revoked' || isReinstating}
+                isLoading={isReinstating}
+                LeftIcon={RotateCcw}
+                className="!h-auto !w-auto gap-2 border border-primary-green px-4 py-2 text-sm text-primary-green hover:bg-primary-green hover:text-clean-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-primary-green"
+                dataCy="reinstate-credential"
+              >
+                Reinstate Credential
+              </Button>
+
               <Button
                 variant="secondary"
-                className="!h-auto !w-auto !border-national-red px-4 py-2 text-sm !text-national-red hover:!bg-national-red hover:!text-clean-white"
                 onClick={() => setIsRevokeModalOpen(true)}
+                disabled={selected.status === 'revoked'}
+                className="!h-auto !w-auto !border-national-red px-4 py-2 text-sm !text-national-red hover:!bg-national-red hover:!text-clean-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:!bg-transparent disabled:hover:!text-national-red"
                 dataCy="revoke-credential"
               >
                 Revoke Credential
@@ -215,12 +244,10 @@ export function CredentialDetailsModal({
                       <span className="text-sm text-muted-text">
                         Administrator:
                       </span>
-
                       <span className="text-sm font-semibold text-deep-green">
                         {selected.issuedBy.administrator}
                       </span>
                     </div>
-
                     <div className="flex items-center gap-3">
                       <span className="text-sm text-muted-text">
                         Department:

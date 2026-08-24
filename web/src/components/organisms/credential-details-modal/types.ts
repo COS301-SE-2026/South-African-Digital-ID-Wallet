@@ -36,6 +36,7 @@ export interface CredentialDetailsModalProps {
   onClose: () => void
   citizenName: string
   credentials: CredentialDetail[]
+  onReinstate?: (credential: CredentialDetail) => void | Promise<void>
   onRevoke?: (
     credential: CredentialDetail,
     payload: { reason: RevocationReason; notes: string }

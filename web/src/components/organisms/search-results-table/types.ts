@@ -8,7 +8,6 @@ export type SearchResultRow = {
   idNumber: string
   dateJoined: string
   expiresOn: string
-  status: CredentialStatus
 }
 
 export type SearchResultsTableProps = {
