@@ -1,0 +1,14 @@
+docs/demo3/SAS-v2.md
+  h_99fca60b892ff4 384,403,421,437-439
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "654f88f35faf848c1e66d7c3879a924612df4ff4",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
