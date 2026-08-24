@@ -12,26 +12,30 @@ export const Modal = ({
   dataCy,
 }: Readonly<ModalProps>) => {
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) {
+      return
+    }
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape') {
+        onClose()
+      }
     }
     document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
   }, [isOpen, onClose])
 
   if (!isOpen) return null
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 sm:items-center sm:px-6 sm:py-8"
-      onClick={onClose}
+    <dialog
+      open
+      aria-modal="true"
       data-cy={dataCy}
+      className="fixed inset-0 z-50 m-0 flex h-full w-full items-start justify-center overflow-y-auto border-0 bg-black/50 p-0 sm:items-center sm:px-6 sm:py-8"
     >
       <div
-        role="dialog"
-        aria-modal="true"
-        onClick={(event) => event.stopPropagation()}
         className={cn(
           'relative flex min-h-screen w-full flex-col bg-[#f6f2ea] sm:min-h-0 sm:max-h-[95vh] sm:w-[98vw] sm:max-w-5xl sm:rounded-2xl',
           className
@@ -47,6 +51,6 @@ export const Modal = ({
         </button>
         {children}
       </div>
-    </div>
+    </dialog>
   )
 }

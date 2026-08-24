@@ -1,7 +1,6 @@
 import { Button } from '@/components/atoms/button'
 import { Text } from '@/components/atoms/text'
 import { Avatar } from '@/components/atoms/avatar/avatar'
-import { StatusPill } from '@/components/atoms/status-pill'
 import { TablePagination } from '@/components/molecules/table-pagination'
 import type { SearchResultsTableProps } from './types'
 

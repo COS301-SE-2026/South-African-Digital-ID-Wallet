@@ -65,11 +65,11 @@ export function CredentialDetailsModal({
       >
         <div className="flex-1 overflow-y-auto p-6 sm:p-8">
           <Text as="span" variant="sub-sm" className="text-muted-text">
-            Credentials
-            <span className="mx-1">›</span>
-            {citizenName}
-            <span className="mx-1">›</span>
-            {selected.label}
+            <span>Credentials</span>
+            <span className="mx-1">/</span>
+            <span>{citizenName}</span>
+            <span className="mx-1">/</span>
+            <span>{selected.label}</span>
           </Text>
 
           <div className="mt-2 grid grid-cols-2 items-center gap-6">
