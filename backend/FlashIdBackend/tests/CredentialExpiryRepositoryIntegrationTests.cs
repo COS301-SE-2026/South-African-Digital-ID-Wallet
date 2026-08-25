@@ -314,4 +314,33 @@ public class CredentialExpiryRepositoryIntegrationTests
         var notification = await context.Notifications.AsNoTracking().SingleAsync(n => n.CitizenId == credential.CitizenId, TestContext.Current.CancellationToken);
         Assert.Equal("Driver's license expired", notification.Title);
     }
+
+    [Fact]
+    public async Task TryClaimJobRunAsync_ReclaimsStaleRunningRow()
+    {
+        using var context = CreateContext();
+        var runDate = DateTime.UtcNow.Date;
+        var repo = new CredentialExpiryRepository(context);
+        var firstClaim = await repo.TryClaimJobRunAsync(JobName, runDate, TestContext.Current.CancellationToken);
+
+        Assert.NotNull(firstClaim);
+
+        var staleRow = await context.JobRuns.SingleAsync(j => j.Id == firstClaim!.Value, TestContext.Current.CancellationToken);
+        staleRow.CreatedAt = DateTime.UtcNow.AddHours(-2);
+        staleRow.UpdatedAt = DateTime.UtcNow.AddHours(-2);
+
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+        context.ChangeTracker.Clear();
+
+        var reclaim = await repo.TryClaimJobRunAsync(JobName, runDate, TestContext.Current.CancellationToken);
+
+        Assert.NotNull(reclaim);
+        Assert.Equal(firstClaim, reclaim);
+
+        var jobRun = await context.JobRuns.AsNoTracking().SingleAsync(j => j.Id == firstClaim!.Value, TestContext.Current.CancellationToken);
+
+        Assert.Equal(JobRunStatus.Running, jobRun.Status);
+        Assert.Null(jobRun.ErrorMessage);
+        Assert.True(jobRun.CreatedAt > DateTime.UtcNow.AddMinutes(-1));
+    }
 }
