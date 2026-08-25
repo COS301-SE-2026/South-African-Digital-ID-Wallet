@@ -1,0 +1,15 @@
+web/src/components/organisms/revoke-credentials-modal/test/revoke-credentials-modal.test.tsx
+  h_0aff3b71f739b1 1,7-9,18,23-24,27-30,35-38,41,43-44,46-47,52-54,56-59,62,64-74
+  h_0aff3b71f739b1 33,50,78,80-85,88,90-92,94-95,98,100-104,106-113,119-123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "b58ab26d414d16a711da1a212076d2517032f76c",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
