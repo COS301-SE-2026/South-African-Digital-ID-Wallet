@@ -36,4 +36,9 @@ public class NotificationRepository : INotificationRepository
             })
             .ToListAsync();
     }
+    public async Task CreateNotificationAsync(Notification notification)
+    {
+        _context.Notifications.Add(notification);
+        await _context.SaveChangesAsync();
+    }
 }

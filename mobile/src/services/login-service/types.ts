@@ -9,4 +9,6 @@ export type LoginResponse = {
   surname: string
   token: string
   expiresAt: string
+  requiresDeviceVerification?: boolean
+  deviceVerificationId?: string | null
 }

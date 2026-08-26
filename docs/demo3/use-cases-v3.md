@@ -140,13 +140,37 @@ The Account Management subsystem allows citizens to maintain their FlashID accou
 
 The Credentials Management subsystem allows the system and government administrators to manage the lifecycle of citizen credentials. This includes expiring driver’s licences, reactivating renewed licences, updating citizen credentials, investigating credentials, and viewing audit logs.
 
-![Credentials Management Use Case Diagram](../images/Credentials_Management.svg)
+![Credentials Management Use Case Diagram](../images/Credentials_Management_v2.svg)
 
 ### Automatically Expire Credential
 
-**TUCBW:** This use case begins when the system's scheduled credential-expiry check runs (automatically every day at 00:00 SAST, or manually triggered by a Government Administrator as a recovery/testing action) and identifies an Active driver's license credential whose expiry date has passed.
+**TUCBW:** This use case begins with the system's scheduled credential expiry check running (automatically every day at 00:00 SAST, or manually triggered by a Government Administrator as a testing action) and identifying an Active driver's license credential whose expiry date has passed.
 
-**TUCEW:** This use case ends when the credential's status has been updated to Expired, an audit log entry has been recorded, and the citizen has been notified in-app.
+**TUCEW:** This use case ends with the credential's status being updated to Expired, an audit log entry being recorded, and the citizen being notified in-app.
+
+### Update Citizen Credentials
+
+**TUCBW:** This use case begins with the system's scheduled update citizen credentials check running (automatically every day at 00:00 SAST, or manually triggered by a Government Administrator as a testing action) and updating any credentials in FlashID that have been updated in the Government Registry.
+
+**TUCEW:** This use case ends with the credential being updated and re-signed with a fresh Ed25519 signature, and the citizen being notified of the update.
+
+### Reactivate Driver's License
+
+**TUCBW:** This use case begins with a Government Administrator selecting a credential currently under Investigation or Revoked, and choosing to lift that status.
+
+**TUCEW:** This use case ends with the credential's status being restored to Active and the credential resigned. The status change being logged to the audit log, and the citizen being notified.
+
+### Revoke Credential
+
+**TUCBW:** This use case begins with a Government Administrator selecting a credential to revoke or put under investigation, and providing a mandatory revocation reason.
+
+**TUCEW:** This use case ends with the credential's status being set to Revoked/Under Investigation, QR verification for that credential immediately returning INVALID, the revocation being logged to the audit log, and the citizen being notified.
+
+### View Audit Log
+
+**TUCBW:** This use case begins with the Government Admin clicking on the view audit log page.
+
+**TUCEW:** This use case ends with the Government admin being able to view the immutable audit logs in a table format.
 
 ### POPIA Compliance
 

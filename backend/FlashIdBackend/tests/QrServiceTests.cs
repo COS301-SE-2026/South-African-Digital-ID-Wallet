@@ -22,6 +22,7 @@ public class QrServiceTests
         public Task<Citizen?> GetCitizenByIdAsync(Guid citizenId, CancellationToken cancellationToken) => Task.FromResult(CitizenToReturn);
         public Task<Citizen?> GetCitizenByUserIdAsync(Guid userId) => Task.FromResult(CitizenToReturn);
         public Task<List<Credential>> GetCredentialsByCitizenIdAsync(Guid citizenId) => Task.FromResult(CredentialsToReturn);
+        public Task SaveChangesAsync() => Task.CompletedTask;
     }
 
     private sealed class FakeQrSigningProvider : IQrSigningProvider

@@ -156,7 +156,7 @@ public class CredentialsController : ControllerBase
         try
         {
             var res = await _credentialExpiryService.RunExpiryCheckAsync(cancellationToken);
-            return Ok(res);
+            return res.Failed ? StatusCode(500, res) : Ok(res);
         }
         catch (CredentialExpiryJobAlreadyRunningException cejare)
         {
@@ -216,5 +216,33 @@ public class CredentialsController : ControllerBase
         var response = await _issueCredentialService.IssueCredentialAsync(request, officialId, ipAddress, cancellationToken);
 
         return StatusCode(201, response);
+    }
+
+    [HttpPost("{credentialId}/revoke")]
+    [Authorize(Roles = "GovernmentAdministrator")]
+    public async Task<IActionResult> RevokeCredential(Guid credentialId, [FromBody] RevokeCredentialRequestDto request)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
+
+            var adminUserId = Guid.Parse(userIdClaim);
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var result = await _credentialService.RevokeCredentialAsync(credentialId, adminUserId, request, ipAddress);
+            return Ok(result);
+        }
+        catch (CredentialNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (InvalidCredentialStatusTransitionException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
     }
 }

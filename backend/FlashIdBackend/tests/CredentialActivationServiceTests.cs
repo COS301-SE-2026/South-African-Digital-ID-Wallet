@@ -23,6 +23,7 @@ public class CredentialActivationServiceTests
         public Task<Credential?> GetByIdAsync(Guid i) => Task.FromResult<Credential?>(null);
         public Task<List<Credential>> GetByUserIdAsync(Guid u) => Task.FromResult(new List<Credential>());
         public Task<List<Credential>> GetCredentialsByCitizenIdAsync(Guid c) => Task.FromResult(new List<Credential>());
+        public Task SaveChangesAsync() => Task.CompletedTask;
     }
 
     private sealed class FakeGateway : IGovernmentRegistryGateway

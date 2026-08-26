@@ -11,6 +11,7 @@ namespace Infrastructure.Repositories;
 public class CredentialExpiryRepository : ICredentialExpiryRepository
 {
     private readonly AppDbContext _context;
+    private static readonly TimeSpan StaleRunningThreshold = TimeSpan.FromHours(1);
 
     public CredentialExpiryRepository(AppDbContext context)
     {
@@ -52,21 +53,25 @@ public class CredentialExpiryRepository : ICredentialExpiryRepository
         catch (DbUpdateException due) when (IsUniqueConstraintViolation(due))
         {
             _context.Entry(jobRun).State = EntityState.Detached;
-            return await TryReclaimFailedRunAsync(jobName, runDate, cancellationToken);
+            return await TryReclaimFailedOrStaleRunAsync(jobName, runDate, cancellationToken);
         }
     }
 
-    private async Task<Guid?> TryReclaimFailedRunAsync(string jobName, DateTime runDate, CancellationToken cancellationToken)
+    private async Task<Guid?> TryReclaimFailedOrStaleRunAsync(string jobName, DateTime runDate, CancellationToken cancellationToken)
     {
+        var staleCutoff = DateTime.UtcNow - StaleRunningThreshold;
+
         var reclaimed = await _context.JobRuns
             .Where(j => j.JobName == jobName
                 && j.RunDate == runDate
-                && j.Status == JobRunStatus.Failed)
+                && (j.Status == JobRunStatus.Failed || (j.Status == JobRunStatus.Running && j.CreatedAt < staleCutoff)))
             .ExecuteUpdateAsync(setters => setters
                 .SetProperty(j => j.Status, JobRunStatus.Running)
                 .SetProperty(j => j.ErrorMessage, (string?)null)
                 .SetProperty(j => j.ProcessedCount, 0)
-                .SetProperty(j => j.CompletedAt, (DateTime?)null),
+                .SetProperty(j => j.CompletedAt, (DateTime?)null)
+                .SetProperty(j => j.CreatedAt, DateTime.UtcNow)
+                .SetProperty(j => j.UpdatedAt, DateTime.UtcNow),
                 cancellationToken);
 
         if (reclaimed == 0)
