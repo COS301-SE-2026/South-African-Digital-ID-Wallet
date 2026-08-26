@@ -41,6 +41,12 @@ public class CredentialControllerIntegrationTests
     private sealed class TestApiFactory : WebApplicationFactory<Program>
     {
         private readonly SqliteConnection _connection = new("DataSource=:memory:");
+        private readonly bool _useFailingExpiryService;
+
+        public TestApiFactory(bool useFailingExpiryService = false)
+        {
+            _useFailingExpiryService = useFailingExpiryService;
+        }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -69,6 +75,12 @@ public class CredentialControllerIntegrationTests
                 services.AddScoped<ICredentialActivationService, StubCredentialActivationService>();
 
                 services.RemoveAll(typeof(IHostedService));
+
+                if (_useFailingExpiryService)
+                {
+                    services.RemoveAll(typeof(ICredentialExpiryService));
+                    services.AddScoped<ICredentialExpiryService, StubFailingCredentialExpiryService>();
+                }
             });
         }
 
@@ -90,6 +102,21 @@ public class CredentialControllerIntegrationTests
                 _connection.Dispose();
             }
         }
+    }
+
+    private sealed class StubFailingCredentialExpiryService : ICredentialExpiryService
+    {
+        public Task<bool> HasCompletedTodayAsync(CancellationToken cancellationToken) => Task.FromResult(false);
+
+        public Task<CredentialExpiryCheckResponseDto> RunExpiryCheckAsync(CancellationToken cancellationToken) => Task.FromResult(new CredentialExpiryCheckResponseDto
+        {
+            RunDate = DateTime.UtcNow.Date,
+            Status = JobRunStatus.Failed,
+            ProcessedCount = 0,
+            StartedAt = DateTime.UtcNow,
+            CompletedAt = DateTime.UtcNow,
+            ErrorMessage = "Simulated failure",
+        });
     }
 
     private static string GenerateTokenFor(User user)
@@ -179,5 +206,30 @@ public class CredentialControllerIntegrationTests
         var response = await client.PostAsync("/api/credentials/expiry-check", null, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task ExpiryCheck_WhenServiceReportsFailure_ReturnsInternalServerError()
+    {
+        await using var factory = new TestApiFactory(useFailingExpiryService: true);
+
+        var db = await factory.CreateInitializedContextAsync();
+        var admin = BuildUser(UserRole.GovernmentAdministrator);
+
+        await db.DomainUsers.AddAsync(admin, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(admin));
+
+        var response = await client.PostAsync("/api/credentials/expiry-check", null, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+
+        var body = await response.Content.ReadFromJsonAsync<CredentialExpiryCheckResponseDto>(JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.NotNull(body);
+        Assert.Equal(JobRunStatus.Failed, body.Status);
+        Assert.True(body.Failed);
     }
 }
