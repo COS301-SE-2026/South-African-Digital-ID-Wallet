@@ -58,4 +58,33 @@ public class CredentialRepository : ICredentialRepository
     {
         await _context.SaveChangesAsync();
     }
+    public async Task<(List<Citizen> Citizens, int TotalCount)> SearchCitizensAsync(string? query, int page, int pageSize)
+    {
+        var citizensQuery = _context.Citizens
+            .AsNoTracking()
+            .Include(c => c.Credentials)
+                .ThenInclude(cr => cr.DriversLicense)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(query))
+        {
+            var normalizedQuery = query.Trim().ToLower();
+            citizensQuery = citizensQuery.Where(c =>
+                c.Names.ToLower().Contains(normalizedQuery) ||
+                c.Surname.ToLower().Contains(normalizedQuery) ||
+                c.SaId.Contains(normalizedQuery));
+        }
+
+        var totalCount = await citizensQuery.CountAsync();
+
+        var citizens = await citizensQuery
+            .OrderBy(c => c.Surname)
+            .ThenBy(c => c.Names)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (citizens, totalCount);
+    }
+
 }

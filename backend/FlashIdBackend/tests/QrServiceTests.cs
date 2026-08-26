@@ -22,6 +22,8 @@ public class QrServiceTests
         public Task<Citizen?> GetCitizenByIdAsync(Guid citizenId, CancellationToken cancellationToken) => Task.FromResult(CitizenToReturn);
         public Task<Citizen?> GetCitizenByUserIdAsync(Guid userId) => Task.FromResult(CitizenToReturn);
         public Task<List<Credential>> GetCredentialsByCitizenIdAsync(Guid citizenId) => Task.FromResult(CredentialsToReturn);
+        public Task<(List<Citizen> Citizens, int TotalCount)> SearchCitizensAsync(string? query, int page, int pageSize) => Task.FromResult((new List<Citizen>(), 0));
+
         public Task SaveChangesAsync() => Task.CompletedTask;
     }
 
