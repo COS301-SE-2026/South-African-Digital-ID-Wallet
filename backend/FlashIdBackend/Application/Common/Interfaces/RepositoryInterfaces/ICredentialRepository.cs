@@ -11,5 +11,5 @@ public interface ICredentialRepository
     Task<Citizen?> GetCitizenByIdAsync(Guid userId, CancellationToken cancellationToken);
     Task SaveChangesAsync();
     Task<(List<Citizen> Citizens, int TotalCount)> SearchCitizensAsync(string? query, int page, int pageSize);
-
+    Task<Citizen?> GetCitizenByCitizenIdAsync(Guid citizenId);
 }

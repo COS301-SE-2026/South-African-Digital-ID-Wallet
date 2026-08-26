@@ -6,5 +6,6 @@ public interface ICredentialService
 {
     Task<IEnumerable<CredentialResponseDto>> GetMyCredentialsAsync(Guid userId);
     Task<RevokeCredentialResponseDto> RevokeCredentialAsync(Guid credentialId, Guid adminUserId, RevokeCredentialRequestDto request, string ipAddress);
-
+    Task<SearchCitizensResponseDto> SearchCitizensAsync(string? query, int page, int pageSize);
+    Task<IEnumerable<CredentialResponseDto>> GetCredentialsForCitizenAsync(Guid citizenId);
 }

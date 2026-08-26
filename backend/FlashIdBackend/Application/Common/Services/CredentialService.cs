@@ -33,6 +33,40 @@ public class CredentialService : ICredentialService
         var credentials = await _credentialRepository.GetCredentialsByCitizenIdAsync(citizen.Id);
         return credentials.Select(c => MapToDto(c, citizen));
     }
+    public async Task<SearchCitizensResponseDto> SearchCitizensAsync(string? query, int page, int pageSize)
+    {
+        var (citizens, totalCount) = await _credentialRepository.SearchCitizensAsync(query, page, pageSize);
+
+        var results = citizens.Select(citizen => new CitizenSearchResultDto
+        {
+            CitizenId = citizen.Id,
+            FirstName = citizen.Names,
+            Surname = citizen.Surname,
+            IdNumber = citizen.SaId,
+            DateJoined = citizen.ActivatedAt,
+            ExpiresOn = citizen.Credentials
+                .Select(c => c.DriversLicense)
+                .FirstOrDefault(dl => dl != null)?.ExpiryDate,
+        }).ToList();
+
+        return new SearchCitizensResponseDto
+        {
+            Results = results,
+            TotalResults = totalCount,
+            Page = page,
+            PageSize = pageSize,
+        };
+    }
+
+    public async Task<IEnumerable<CredentialResponseDto>> GetCredentialsForCitizenAsync(Guid citizenId)
+    {
+        var citizen = await _credentialRepository.GetCitizenByCitizenIdAsync(citizenId);
+        if (citizen == null)
+            throw new CitizenNotFoundException(citizenId);
+
+        var credentials = await _credentialRepository.GetCredentialsByCitizenIdAsync(citizen.Id);
+        return credentials.Select(c => MapToDto(c, citizen));
+    }
 
     public async Task<RevokeCredentialResponseDto> RevokeCredentialAsync(Guid credentialId, Guid adminUserId, RevokeCredentialRequestDto request, string ipAddress)
     {
