@@ -35,3 +35,9 @@ public class InvalidCredentialStatusTransitionException : Exception
     public InvalidCredentialStatusTransitionException(string message)
         : base(message) { }
 }
+
+public class CitizenNotFoundException : Exception
+{
+    public CitizenNotFoundException(Guid citizenId)
+        : base($"No citizen with ID '{citizenId}' was found.") { }
+}
