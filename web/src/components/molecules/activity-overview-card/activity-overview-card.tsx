@@ -1,8 +1,6 @@
 'use client'
-
 import { useEffect, useState } from 'react'
 import { CheckCircle2, IdCard, Lock } from 'lucide-react'
-
 import api from '@/lib/api'
 import type {
   ActivityLogItem,
@@ -63,54 +61,72 @@ export function ActivityOverviewCard() {
 
   if (loading) {
     return (
-      <div className="bg-card rounded-3xl border p-6">
-        <h2 className="text-lg font-bold">Activity Overview</h2>
+      <div className="rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+        <div className="rounded-[24px] bg-card p-6">
+          <h2 className="text-lg font-extrabold text-deep-green">
+            Activity Overview
+          </h2>
 
-        <p className="mt-4 text-sm text-muted-text">Loading activity...</p>
+          <p className="mt-4 text-sm text-muted-text">Loading activity...</p>
+        </div>
       </div>
     )
   }
 
   return (
     <>
-      <div className="bg-card rounded-3xl border p-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold">Activity Overview</h2>
+      <div className="rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+        <div className="rounded-[24px] bg-card p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-extrabold text-deep-green">
+              Activity Overview
+            </h2>
 
-          <Button
-            variant="link"
-            size="sm"
-            className="text-green-700 hover:text-green-800"
-            onClick={() => setShowAllActivity(true)}
-          >
-            View all
-          </Button>
-        </div>
-
-        {lastActivity.length === 0 ? (
-          <p className="mt-4 text-sm text-muted-text">No activity found.</p>
-        ) : (
-          <div className="mt-4 h-[150px] overflow-y-auto pr-2">
-            <ul className="space-y-3">
-              {lastActivity.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex items-start gap-3 rounded-2xl border bg-muted/20 p-3"
-                >
-                  <div className="min-w-0">
-                    <div className="text-xs font-medium leading-4">
-                      {item.title}
-                    </div>
-
-                    <div className="mt-1 text-[11px] text-muted-text">
-                      {item.timestamp}
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <Button
+              variant="link"
+              size="sm"
+              className="font-bold text-deep-green hover:text-deep-green"
+              onClick={() => setShowAllActivity(true)}
+            >
+              View all
+            </Button>
           </div>
-        )}
+
+          {lastActivity.length === 0 ? (
+            <p className="mt-4 text-sm text-muted-text">No activity found.</p>
+          ) : (
+            <div className="mt-4 h-[150px] overflow-y-auto pr-2">
+              <ul className="space-y-3">
+                {lastActivity.map((item) => (
+                  <li
+                    key={item.id}
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-black p-3"
+                  >
+                    <div
+                      className={`mt-0.5 h-8 w-1 shrink-0 rounded-full ${
+                        item.tone === 'blue'
+                          ? 'bg-national-blue'
+                          : item.tone === 'amber'
+                            ? 'bg-accent-gold'
+                            : 'bg-primary-green'
+                      }`}
+                    />
+
+                    <div className="min-w-0">
+                      <div className="text-xs font-semibold leading-4 text-text-primary">
+                        {item.title}
+                      </div>
+
+                      <div className="mt-1 text-[11px] text-muted-text">
+                        {item.timestamp}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
 
       <DashboardModal
@@ -125,14 +141,24 @@ export function ActivityOverviewCard() {
             {lastActivity.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center gap-4 rounded-2xl border p-5"
+                className="flex items-center justify-between gap-3 rounded-2xl border border-black p-3"
               >
-                <div className="rounded-2xl bg-muted p-4">
+                <div
+                  className={`rounded-2xl p-4 ${
+                    item.tone === 'blue'
+                      ? 'bg-national-blue/10 text-national-blue'
+                      : item.tone === 'amber'
+                        ? 'bg-accent-gold/15 text-accent-gold'
+                        : 'bg-primary-green/10 text-primary-green'
+                  }`}
+                >
                   <item.icon className="h-6 w-6" />
                 </div>
 
                 <div className="flex-1">
-                  <h3 className="font-semibold">{item.title}</h3>
+                  <h3 className="font-semibold text-text-primary">
+                    {item.title}
+                  </h3>
 
                   <p className="mt-1 text-sm text-muted-text">
                     {item.timestamp}

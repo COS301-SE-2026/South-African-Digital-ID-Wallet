@@ -53,7 +53,14 @@ const credentialsTemp: CredentialResponse[] = [
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+      mutations: {
+        retry: false,
+      },
+    },
   })
   const Wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
@@ -69,28 +76,85 @@ describe('CredentialsList', () => {
   afterEach(() => {
     jest.restoreAllMocks()
   })
-  it('Just renders the credential list heading', () => {
-    render(<CredentialsList />, { wrapper: createWrapper() })
+
+  it('renders the credential list heading', () => {
+    render(<CredentialsList />, {
+      wrapper: createWrapper(),
+    })
+
     expect(
-      screen.getByRole('heading', { name: /credential list/i })
+      screen.getByRole('heading', {
+        name: /credential list/i,
+      })
     ).toBeInTheDocument()
   })
-  it('Just renders all credentials', async () => {
-    render(<CredentialsList />, { wrapper: createWrapper() })
+  it('renders all credentials', async () => {
+    render(<CredentialsList />, {
+      wrapper: createWrapper(),
+    })
+
     expect(await screen.findByText(/national id card/i)).toBeInTheDocument()
+
     expect(await screen.findByText(/driver's licence/i)).toBeInTheDocument()
   })
-  it('Just renders the credential issuers', async () => {
-    render(<CredentialsList />, { wrapper: createWrapper() })
+
+  it('renders all credential issuers', async () => {
+    render(<CredentialsList />, {
+      wrapper: createWrapper(),
+    })
+
     expect(
       await screen.findByText(/department of home affairs/i)
     ).toBeInTheDocument()
+
     expect(await screen.findByText(/road traffic manager/i)).toBeInTheDocument()
   })
-  it('Just renders a view credential button for each credential', async () => {
-    render(<CredentialsList />, { wrapper: createWrapper() })
+
+  it('renders a view credential button for each credential', async () => {
+    render(<CredentialsList />, {
+      wrapper: createWrapper(),
+    })
+
+    const buttons = await screen.findAllByRole('button', {
+      name: /view credential/i,
+    })
+
+    expect(buttons).toHaveLength(2)
+  })
+
+  it('shows loading state while credentials are being fetched', async () => {
+    jest
+      .spyOn(credentialService, 'getMine')
+      .mockImplementation(() => new Promise(() => {}))
+
+    render(<CredentialsList />, {
+      wrapper: createWrapper(),
+    })
+
+    expect(screen.getByText(/loading credentials/i)).toBeInTheDocument()
+  })
+
+  it('shows an error message when credentials fail to load', async () => {
+    jest
+      .spyOn(credentialService, 'getMine')
+      .mockRejectedValue(new Error('Failed to load'))
+
+    render(<CredentialsList />, {
+      wrapper: createWrapper(),
+    })
+
     expect(
-      await screen.findAllByRole('button', { name: /view credential/i })
-    ).toHaveLength(2)
+      await screen.findByText(/failed to load the credentials/i)
+    ).toBeInTheDocument()
+  })
+
+  it('shows an empty state when there are no credentials', async () => {
+    jest.spyOn(credentialService, 'getMine').mockResolvedValue([])
+
+    render(<CredentialsList />, {
+      wrapper: createWrapper(),
+    })
+
+    expect(await screen.findByText(/no credentials/i)).toBeInTheDocument()
   })
 })

@@ -213,6 +213,22 @@ Resolves a scanned QR token into disclosed credential data.
 **Response 200:** Disclosed credential data
 **Response 400:** Invalid or expired disclosure token
 
+#### POST /api/credentials/{credentialId}/revoke
+Admin marks a credential as revoked or under investigation.
+**Authentication:** Required for GovernmentAdministrator
+**Path Parameter:** `credentialId` - UUID
+**Request Body:**
+```json
+{
+    "newStatus": "string",
+    "reason": "string"
+}
+```
+**Response 200:** Status updated
+**Response 400:** Invalid status transition
+**Response 403:** Access denied
+**Response 404:** Credential not found
+
 ### Credential Activation
 
 #### POST /api/activate-credentials
