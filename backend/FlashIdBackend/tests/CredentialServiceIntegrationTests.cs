@@ -223,4 +223,159 @@ public class CredentialServiceIntegrationTests
         var storedCredential = await context.Credentials.FirstAsync(c => c.Id == credential.Id, TestContext.Current.CancellationToken);
         Assert.Equal(CredentialStatus.Active, storedCredential.Status);
     }
+
+    private static async Task<Citizen> SeedCitizenWithOptionalLicenseAsync(
+        AppDbContext context, string names, string surname, string saId, DriversLicense? driversLicense = null)
+    {
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = $"{Guid.NewGuid()}@example.com",
+            PhoneNumber = "0821234567",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("TestPwd123!"), // NOSONAR -test-only dummy credential, not a real secret(tells Sonar its fake)
+            PasswordSet = true,
+            IsDeleted = false,
+            IsEmailVerified = true,
+            Role = UserRole.Citizen,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+        await context.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
+
+        var citizen = new Citizen
+        {
+            Id = Guid.NewGuid(),
+            SaId = saId,
+            Names = names,
+            Surname = surname,
+            DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            Status = CitizenStatus.Activated,
+            ActivatedAt = DateTime.UtcNow,
+            UserId = user.Id,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+        await context.Citizens.AddAsync(citizen, TestContext.Current.CancellationToken);
+
+        if (driversLicense != null)
+        {
+            var credential = new Credential
+            {
+                Id = Guid.NewGuid(),
+                CitizenId = citizen.Id,
+                Status = CredentialStatus.Active,
+                Signature = "sig",
+                IssuedBy = "RTMC",
+                IssueDate = DateTime.UtcNow,
+                DriversLicense = driversLicense,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+            };
+            await context.Credentials.AddAsync(credential, TestContext.Current.CancellationToken);
+        }
+
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+        return citizen;
+    }
+
+    [Fact]
+    public async Task SearchCitizensAsync_MatchingQuery_ReturnsOnlyMatchingCitizen()
+    {
+        using var context = CreateContext();
+        var service = CreateCredentialService(context);
+        await SeedCitizenWithOptionalLicenseAsync(context, "Sipho", "Nkosi", "9001015800086");
+        await SeedCitizenWithOptionalLicenseAsync(context, "Thandiwe", "Mokoena", "8505124800081");
+
+        var result = await service.SearchCitizensAsync("Nkosi", 1, 15);
+
+        Assert.Single(result.Results);
+        Assert.Equal("Nkosi", result.Results[0].Surname);
+    }
+
+    [Fact]
+    public async Task SearchCitizensAsync_Pagination_ReturnsCorrectPageAndTotalCount()
+    {
+        using var context = CreateContext();
+        var service = CreateCredentialService(context);
+        await SeedCitizenWithOptionalLicenseAsync(context, "Amara", "Adams", "9001015800001");
+        await SeedCitizenWithOptionalLicenseAsync(context, "Bongani", "Bhengu", "9001015800002");
+        await SeedCitizenWithOptionalLicenseAsync(context, "Chloe", "Cele", "9001015800003");
+
+        var firstPage = await service.SearchCitizensAsync(null, 1, 2);
+        var secondPage = await service.SearchCitizensAsync(null, 2, 2);
+
+        Assert.Equal(3, firstPage.TotalResults);
+        Assert.Equal(2, firstPage.Results.Count);
+        Assert.Single(secondPage.Results);
+        Assert.Equal("Cele", secondPage.Results[0].Surname);
+    }
+
+    [Fact]
+    public async Task SearchCitizensAsync_MatchesOnSaId()
+    {
+        using var context = CreateContext();
+        var service = CreateCredentialService(context);
+        await SeedCitizenWithOptionalLicenseAsync(context, "Sipho", "Nkosi", "9001015800086");
+
+        var result = await service.SearchCitizensAsync("9001015800086", 1, 15);
+
+        Assert.Single(result.Results);
+    }
+
+    [Fact]
+    public async Task SearchCitizensAsync_WithDriversLicense_ReturnsExpiresOn()
+    {
+        using var context = CreateContext();
+        var service = CreateCredentialService(context);
+        var expiry = new DateTime(2030, 6, 1, 0, 0, 0, DateTimeKind.Utc);
+        await SeedCitizenWithOptionalLicenseAsync(context, "Sipho", "Nkosi", "9001015800086", new DriversLicense
+        {
+            Id = Guid.NewGuid(),
+            LicenseNumber = "4589161234567",
+            LicenseCode = LicenseCode.EB,
+            Restrictions = "None",
+            ExpiryDate = expiry,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        });
+
+        var result = await service.SearchCitizensAsync("Nkosi", 1, 15);
+
+        Assert.Equal(expiry, result.Results[0].ExpiresOn);
+    }
+
+    [Fact]
+    public async Task GetCredentialsForCitizenAsync_ExistingCitizen_ReturnsTheirCredentials()
+    {
+        using var context = CreateContext();
+        var service = CreateCredentialService(context);
+        var citizen = await SeedCitizenWithOptionalLicenseAsync(context, "Sipho", "Nkosi", "9001015800086");
+        var credential = new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Status = CredentialStatus.Active,
+            Signature = "sig",
+            IssuedBy = "Home Affairs",
+            IssueDate = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+        await context.Credentials.AddAsync(credential, TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var result = (await service.GetCredentialsForCitizenAsync(citizen.Id)).ToList();
+
+        Assert.Single(result);
+    }
+
+    [Fact]
+    public async Task GetCredentialsForCitizenAsync_UnknownCitizen_ThrowsCitizenNotFoundException()
+    {
+        using var context = CreateContext();
+        var service = CreateCredentialService(context);
+
+        await Assert.ThrowsAsync<CitizenNotFoundException>(
+            () => service.GetCredentialsForCitizenAsync(Guid.NewGuid()));
+    }
 }
