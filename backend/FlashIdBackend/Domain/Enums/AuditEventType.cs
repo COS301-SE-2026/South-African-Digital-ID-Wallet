@@ -8,6 +8,7 @@ public enum AuditEventType
     FailedLoginAttempt,
     CredentialIssued,
     CredentialRevoked,
+    CredentialReinstated,
     CredentialVerified,
     CredentialExpired,
     InstitutionRegistered,
