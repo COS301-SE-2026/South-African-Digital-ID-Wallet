@@ -223,4 +223,80 @@ public class CredentialServiceIntegrationTests
         var storedCredential = await context.Credentials.FirstAsync(c => c.Id == credential.Id, TestContext.Current.CancellationToken);
         Assert.Equal(CredentialStatus.Active, storedCredential.Status);
     }
+
+    [Fact]
+    public async Task ReinstateCredentialAsync_ValidRevokedCredential_UpdatesStatusWritesAuditLogAndNotifiesCitizen()
+    {
+        using var context = CreateContext();
+        var service = CreateCredentialService(context);
+        var (_, citizen, credential, admin) = await SeedAsync(context, CredentialStatus.Revoked);
+
+        var request = new ReinstateCredentialRequestDto
+        {
+            Reason = "Investigation cleared the citizen of wrongdoing.",
+        };
+
+        var result = await service.ReinstateCredentialAsync(credential.Id, admin.UserId, request, LocalHostIp);
+
+        var storedCredential = await context.Credentials.FirstAsync(c => c.Id == credential.Id, TestContext.Current.CancellationToken);
+        var auditLog = await context.AuditLogs.SingleAsync(TestContext.Current.CancellationToken);
+        var notification = await context.Notifications.SingleAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(CredentialStatus.Active, result.Status);
+        Assert.Equal(CredentialStatus.Active, storedCredential.Status);
+        Assert.Equal(AuditEventType.CredentialReinstated, auditLog.EventType);
+        Assert.Equal(admin.UserId, auditLog.ActorId);
+        Assert.Equal(LocalHostIp, auditLog.IpAddress);
+        Assert.Contains("Investigation cleared", auditLog.Details);
+        Assert.Equal(citizen.Id, notification.CitizenId);
+        Assert.Equal("success", notification.Tone);
+    }
+
+    [Fact]
+    public async Task ReinstateCredentialAsync_ValidInvestigationCredential_UpdatesStatusToActive()
+    {
+        using var context = CreateContext();
+        var service = CreateCredentialService(context);
+        var (_, _, credential, admin) = await SeedAsync(context, CredentialStatus.Investigation);
+
+        var request = new ReinstateCredentialRequestDto { Reason = "Cleared" };
+
+        var result = await service.ReinstateCredentialAsync(credential.Id, admin.UserId, request, LocalHostIp);
+
+        var storedCredential = await context.Credentials.FirstAsync(c => c.Id == credential.Id, TestContext.Current.CancellationToken);
+        Assert.Equal(CredentialStatus.Active, result.Status);
+        Assert.Equal(CredentialStatus.Active, storedCredential.Status);
+    }
+
+    [Fact]
+    public async Task ReinstateCredentialAsync_CredentialNotFound_ThrowsAndPersistsNothing()
+    {
+        using var context = CreateContext();
+        var service = CreateCredentialService(context);
+        var admin = (await SeedAsync(context)).Admin;
+
+        var request = new ReinstateCredentialRequestDto { Reason = "test" };
+
+        await Assert.ThrowsAsync<CredentialNotFoundException>(
+            () => service.ReinstateCredentialAsync(Guid.NewGuid(), admin.UserId, request, LocalHostIp));
+
+        Assert.Empty(context.AuditLogs);
+        Assert.Empty(context.Notifications);
+    }
+
+    [Fact]
+    public async Task ReinstateCredentialAsync_AlreadyActive_ThrowsAndDoesNotDuplicateSideEffects()
+    {
+        using var context = CreateContext();
+        var service = CreateCredentialService(context);
+        var (_, _, credential, admin) = await SeedAsync(context, CredentialStatus.Active);
+
+        var request = new ReinstateCredentialRequestDto { Reason = "Duplicate attempt" };
+
+        await Assert.ThrowsAsync<InvalidCredentialStatusTransitionException>(
+            () => service.ReinstateCredentialAsync(credential.Id, admin.UserId, request, LocalHostIp));
+
+        Assert.Empty(context.AuditLogs);
+        Assert.Empty(context.Notifications);
+    }
 }
