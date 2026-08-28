@@ -106,7 +106,11 @@ export function CredentialDetailsModal({
               <Button
                 variant="custom"
                 onClick={handleReinstate}
-                disabled={selected.status !== 'Revoked' || isReinstating}
+                disabled={
+                  (selected.status !== 'Revoked' &&
+                    selected.status !== 'Investigation') ||
+                  isReinstating
+                }
                 isLoading={isReinstating}
                 LeftIcon={RotateCcw}
                 className="!h-auto !w-auto gap-2 border border-primary-green px-4 py-2 text-sm text-primary-green hover:bg-primary-green hover:text-clean-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-primary-green"
