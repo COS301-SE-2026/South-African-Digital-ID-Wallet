@@ -6,7 +6,7 @@ export default (phase: string): NextConfig => ({
   output: 'standalone',
   ...(phase === PHASE_DEVELOPMENT_SERVER
     ? {}
-    : { outputFileTracingRoot: path.join(__dirname, '../')}),
+    : { outputFileTracingRoot: path.join(__dirname, '../') }),
   async rewrites() {
     return [
       {
