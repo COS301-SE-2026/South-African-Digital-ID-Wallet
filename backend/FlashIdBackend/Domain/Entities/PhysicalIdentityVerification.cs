@@ -5,7 +5,7 @@ namespace Domain.Entities;
 public class PhysicalIdentityVerification : BaseEntity
 {
     public Guid UserId { get; set; }
-    public IdentityVerificationStatus Status { get; set; }
+    public IdentityVerificationStatus Status { get; set; } = IdentityVerificationStatus.AwaitingConsent;
     public DateTime ExpiresAt { get; set; }
     public DateTime? ConsentGrantedAt { get; set; }
     public string? SubmittedIdNumberHash { get; set; }
@@ -17,5 +17,5 @@ public class PhysicalIdentityVerification : BaseEntity
     public bool? RegistryFaceMatched { get; set; }
     public DateTime? VerifiedAt { get; set; }
     public string? FailureReason { get; set; }
-    public int AttemptCount { get; set; }
+    public int AttemptCount { get; set; } = 0;
 }
