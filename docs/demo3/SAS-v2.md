@@ -213,6 +213,22 @@ Resolves a scanned QR token into disclosed credential data.
 **Response 200:** Disclosed credential data
 **Response 400:** Invalid or expired disclosure token
 
+#### POST /api/credentials/{credentialId}/revoke
+Admin marks a credential as revoked or under investigation.
+**Authentication:** Required for GovernmentAdministrator
+**Path Parameter:** `credentialId` - UUID
+**Request Body:**
+```json
+{
+    "newStatus": "string",
+    "reason": "string"
+}
+```
+**Response 200:** Status updated
+**Response 400:** Invalid status transition
+**Response 403:** Access denied
+**Response 404:** Credential not found
+
 ### Credential Activation
 
 #### POST /api/activate-credentials
@@ -222,6 +238,30 @@ Activates a citizen's credentials after register.
 
 **Response 200:** Credentials activated
 **Response 401:** Account could not be identified from token
+
+### Credential Expiry Check
+
+#### POST /api/credentials/expiry-check
+Manually runs the daily credential-expiry check. Idempotent per SAST calendar date (If today's check already completed, returns that result without reprocessing. If another instance is currently running today's check, returns `409`.)
+
+**Authentication:** Required for Government Administrator
+
+**Request Body:** None
+
+**Response 200:**
+```json
+{
+    "runDate": "date",
+    "status": "string",
+    "processedCount": 0,
+    "startedAt": "date",
+    "completedAt": "date",
+    "errorMessage": "string"
+}
+```
+
+**Response 403:** Caller is not a Government Administrator
+**Response 409:** Another expiry check is currently running for today
 
 ### Citizen Verify
 

@@ -15,7 +15,8 @@ using Application.Common.Services;
 using Infrastructure.Repositories;
 using System.Security.Claims;
 using Microsoft.Azure.Cosmos;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.AspNetCore.Components.Web;
+using System.ComponentModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,8 +24,11 @@ const string FrontendCorsPolicy = "FrontendCorsPolicy";
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
 
 builder.Services.AddInfrastructure();
 
@@ -49,7 +53,25 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.OpenApiInfo
+    {
+        Title = "FlashID API",
+        Version = "v1",
+        Description = "South African Digital ID Wallet backend API.",
+    });
+
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
+});
+
 builder.Services.AddScoped<IDeleteAccountService, DeleteAccountService>();
 builder.Services.AddScoped<IDeleteAccountRepository, DeleteAccountRepository>();
 builder.Services.AddProblemDetails();
@@ -79,7 +101,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     context.Token = context.Request.Cookies["access_token"];
                 }
                 return Task.CompletedTask;
-            }
+            },
+            OnTokenValidated = async context =>
+            {
+                var userId = context.Principal?.FindFirstValue("userId");
+                var tokenVersion = context.Principal?.FindFirstValue("tv");
+                if (userId is null || tokenVersion is null || !Guid.TryParse(userId, out var id))
+                {
+                    context.Fail("Missing identity claims.");
+                    return;
+                }
+                var repository = context.HttpContext.RequestServices.GetRequiredService<IAuthRepository>();
+                var user = await repository.GetUserByIdAsync(id);
+                if (user is null || user.TokenVersion.ToString() != tokenVersion)
+                {
+                    context.Fail("Token has been revoked.");
+                }
+            },
         };
     });
 
@@ -139,32 +177,35 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-using (var scope = app.Services.CreateScope())
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.MigrateAsync();
-
-    if (/*app.Environment.IsDevelopment() && */!await db.DomainUsers.AnyAsync())
+    using (var scope = app.Services.CreateScope())
     {
-        Console.WriteLine("[SEED] Database is empty, seeding sample data ...");
-        //await DbSeeder.SeedAsync(db);
-        Console.WriteLine("[SEED] Database seeded successfully!");
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await db.Database.MigrateAsync();
+
+        if (/*app.Environment.IsDevelopment() && */!await db.DomainUsers.AnyAsync())
+        {
+            Console.WriteLine("[SEED] Database is empty, seeding sample data ...");
+            //await DbSeeder.SeedAsync(db);
+            Console.WriteLine("[SEED] Database seeded successfully!");
+        }
     }
-}
 
-using (var scope = app.Services.CreateScope())
-{
-    var cosmosClient = scope.ServiceProvider.GetRequiredService<CosmosClient>();
-    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-    var dbName = configuration["Cosmos:DatabaseName"];
-    var containerName = configuration["Cosmos:ContainerName"];
-
-    var dbResponse = await cosmosClient.CreateDatabaseIfNotExistsAsync(dbName);
-
-    await dbResponse.Database.CreateContainerIfNotExistsAsync(new ContainerProperties(containerName, "/id")
+    using (var scope = app.Services.CreateScope())
     {
-        DefaultTimeToLive = -1
-    });
+        var cosmosClient = scope.ServiceProvider.GetRequiredService<CosmosClient>();
+        var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+        var dbName = configuration["Cosmos:DatabaseName"];
+        var containerName = configuration["Cosmos:ContainerName"];
+
+        var dbResponse = await cosmosClient.CreateDatabaseIfNotExistsAsync(dbName);
+
+        await dbResponse.Database.CreateContainerIfNotExistsAsync(new ContainerProperties(containerName, "/id")
+        {
+            DefaultTimeToLive = -1
+        });
+    }
 }
 
 app.UseExceptionHandler();
@@ -176,3 +217,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 await app.RunAsync();
+
+public partial class Program { }

@@ -16,6 +16,7 @@
     "type-check:web": "pnpm --filter ./web type-check",
     "test:web": "pnpm --filter ./web run test",
     "test:web:coverage": "pnpm --filter ./web run test:coverage",
+    "clean:web": "rm -rf web/.next && mkdir -p web/.next && touch web/.next/.metadata_never_index",
 
     "install:backend": "pnpm --filter ./backend restore",
     "start:backend": "pnpm --filter ./backend start",

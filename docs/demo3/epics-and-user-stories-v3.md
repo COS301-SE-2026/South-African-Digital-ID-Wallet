@@ -618,16 +618,19 @@ As a registered institution, I want the system to update the credential via the 
 
 ---
 #### US-9.3
-As a citizen, I want the system to automatically update the status of my credentials that have reached their expiry date to Expired, so that expired credentials can no longer be used for verification.
+As a citizen, I want the system to automatically update the status of my driver's license credential to Expired once it reaches its expiry date, so that expired credentials can no longer be used for verification.
 
 **Acceptance Criteria:**
-- A scheduled job runs daily to check expiry dates across all active credentials
+- A background job runs daily at 00:00 SAST to check expiry dates on Active driver's license credentials
 - Credentials past their expiry date are set to status Expired
-- QR verification returns INVALID with reason expired immediately after status update
+- Qr verification returns INVALID with reason expired immediately after status update
 - Expiry update is logged as a system event
+- Citizen is notified in-app when their credential expires
+- If the daily run is missed (e.g. the service was down at midnight), the check runs automatically on the next service startup
 
 **Definition of Done:**
-- Automatic expiry job runs on schedule and updates all due credentials
+- Automatic expiry job runs on schedule (with startup catch-up) and updates all due driver's license credentials
+- Citizen receives an in-app notification on expiry
 
 ---
 #### US-9.4
@@ -904,4 +907,4 @@ As a citizen, I want to configure which information is included in my emergency 
 - Mandatory identification fields cannot be removed
 
 ---
-
+
