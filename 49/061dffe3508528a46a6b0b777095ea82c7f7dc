@@ -1,0 +1,17 @@
+docs/demo3/epics-and-user-stories-v3.md
+  h_99fca60b892ff4 294
+docs/demo3/use-cases-v3.md
+  h_99fca60b892ff4 75,83-84,91-92,108
+  h_99fca60b892ff4 76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "49061dffe3508528a46a6b0b777095ea82c7f7dc",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_99fca60b892ff4 171-178,181-183,191-198,202-205
+docs/demo3/openapi.yaml
+  s_e6366b4ec39417::t_69781229adb08b 53-57,252-366,805-838,876-901,915-943,953-971,980-990
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "41ceab727d1ef0347359454dce9a58229348881f",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_e6366b4ec39417": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3fd11c4-4d2c-4b9d-994c-3c481f2b50f0",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

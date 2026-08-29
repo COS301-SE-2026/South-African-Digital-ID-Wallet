@@ -1,0 +1,29 @@
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_99fca60b892ff4 155
+backend/FlashIdBackend/Infrastructure/Repositories/CredentialExpiryRepository.cs
+  h_99fca60b892ff4 14,56,60,62-63,67,73-74
+  s_e6366b4ec39417::t_4344e389bbbcf8 72
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/CredentialExpiryCheckResponseDto.cs
+  h_99fca60b892ff4 13-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "5b38e5e2c53a87c276c3c95e1387888383c423eb",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_e6366b4ec39417": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3fd11c4-4d2c-4b9d-994c-3c481f2b50f0",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
