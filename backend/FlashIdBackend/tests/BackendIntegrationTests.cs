@@ -1,4 +1,4 @@
-using Application.Common.Interfaces.ProviderInterfaces;
+﻿using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Features.Auth.DTOs;
 using Application.Features.Citizens.DTOs;
 using Application.Features.Institutions.DTOs;
@@ -241,7 +241,7 @@ public class BackendIntegrationTests
 
         Assert.NotNull(result);
         Assert.False(result.RequiresDeviceVerification);
-        Assert.NotEmpty(result.Token);
+        Assert.NotEmpty(result.Token!);
         Assert.Equal(user.Id, result.UserId);
         Assert.Equal(UserRole.Citizen.ToString(), result.Role);
         Assert.True(result.ExpiresAt > DateTime.UtcNow);

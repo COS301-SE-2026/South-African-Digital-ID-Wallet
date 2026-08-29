@@ -14,7 +14,7 @@ jobs:
   e2e:
     name: Playwright E2E
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     services:
       sqlserver:
@@ -52,7 +52,7 @@ jobs:
       E2E_OFFICIAL_EMAIL: official.e2e@flashid.local
       IPGEOLOCATION__APIKEY: ${{secrets.IPGEOLOCATION_APIKEY}}
       IPGEOLOCATION__BASEURL: ${{secrets.IPGEOLOCATION_BASEURL}}
-      
+      E2E_EXPIRY_CITIZEN_EMAIL: citizen.expiry.e2e@flashid.local
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
@@ -79,6 +79,9 @@ jobs:
       - name: Restore backend
         run: dotnet restore backend/FlashIdBackend/FlashIdBackend.sln
 
+      - name: Seed E2E data
+        run: dotnet run --project backend/FlashIdBackend/Tools/SeedRunner/SeedRunner.csproj -- "${{ env.ConnectionStrings__DefaultConnection }}"
+
       - name: Start backend (migrations and seeds)
         run: |
           nohup dotnet run --project backend/FlashIdBackend/Presentation/Presentation.csproj \
@@ -93,9 +96,6 @@ jobs:
               sleep 3
           done
           echo "Backend failed to start. Log:"; cat backend.log; exit 1
-
-      - name: Seed E2E data
-        run: dotnet run --project backend/FlashIdBackend/Tools/SeedRunner/SeedRunner.csproj -- "${{ env.ConnectionStrings__DefaultConnection }}"
         
       - name: Verify E2E accounts exist
         run: |
@@ -111,6 +111,12 @@ jobs:
             echo "$e.e2e@flashid.local -> HTTP $code $(cat /tmp/resp.json)"
             [ "$code" = "200" ] || fail=1
           done
+          code=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
+            -X POST http://localhost:5118/api/auth/login \
+            -H "Content-Type: application/json" \
+            -d '{"email":"citizen.expiry.e2e@flashid.local","password":"password123","rememberMe":false}')
+          echo "citizen.expiry.e2e@flashid.local -> HTTP $code $(cat /tmp/resp.json)"
+          [ "$code" = "200" ] || fail=1
           [ $fail -eq 0 ] || { echo "::error::E2E accounts missing or backend rejecting logins"; exit 1; }
 
       - name: Install Playwright browsers

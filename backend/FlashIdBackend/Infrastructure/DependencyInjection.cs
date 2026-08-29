@@ -14,6 +14,9 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Services;
 using Microsoft.Azure.Cosmos;
 using User = Domain.Entities.User;
+using Infrastructure.Repositories.Decorators;
+using Infrastructure.BackgroundJobs;
+using Microsoft.Extensions.Hosting;
 
 namespace Infrastructure;
 
@@ -112,6 +115,11 @@ public static class DependencyInjection
             client.BaseAddress = new Uri(baseUrl);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         });
+      
+        services.AddScoped<CredentialExpiryRepository>();
+        services.AddScoped<ICredentialExpiryRepository>(sp => new RetryingCredentialExpiryRepositoryDecorator(sp.GetRequiredService<CredentialExpiryRepository>()));
+        services.AddHostedService<CredentialExpiryBackgroundService>();
+
         return services;
     }
 }

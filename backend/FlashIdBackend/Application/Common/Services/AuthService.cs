@@ -518,6 +518,7 @@ public class AuthService : IAuthService
 
         if (user != null)
         {
+            user.TokenVersion++;
             var auditLog = new AuditLog
             {
                 Id = Guid.NewGuid(),

@@ -86,6 +86,7 @@ public static class DbSeeder
         await SeedAuditLogsAsync(context);
         await SeedTrustedDevicesAsync(context);
         await SeedNotificationsAsync(context);
+        await SeedExpiryE2ECitizenAsync(context);
     }
 
     internal static async Task SeedE2ETestUsersAsync(AppDbContext context)
@@ -137,6 +138,48 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
 
+        var citizen = await context.Citizens.SingleAsync(c => c.UserId == citizenUser.Id);
+        var citizenLicense = await context.DriversLicenses
+            .Include(dl => dl.Credential)
+            .FirstOrDefaultAsync(dl => dl.Credential.CitizenId == citizen.Id);
+
+        if (citizenLicense == null)
+        {
+            var licenseCred = new Credential
+            {
+                Id = Guid.NewGuid(),
+                Status = CredentialStatus.Active,
+                Signature = "e2e-seed-sig",
+                IssuedBy = "Licensing Dept Cape Town",
+                IssueDate = now.AddYears(-2),
+                CitizenId = citizen.Id,
+                CreatedAt = now,
+                UpdatedAt = now,
+            };
+
+            await context.Credentials.AddAsync(licenseCred);
+            await context.SaveChangesAsync();
+
+            citizenLicense = new DriversLicense
+            {
+                Id = Guid.NewGuid(),
+                LicenseNumber = "E2EACTIVE001",
+                LicenseCode = LicenseCode.EB,
+                Restrictions = "00",
+                PhotoPath = "mock-photos-raven.png",
+                CredentialId = licenseCred.Id,
+                CreatedAt = now,
+                UpdatedAt = now,
+            };
+
+            await context.DriversLicenses.AddAsync(citizenLicense);
+        }
+
+        citizenLicense.ExpiryDate = now.AddYears(5);
+        citizenLicense.Credential.Status = CredentialStatus.Active;
+
+        await context.SaveChangesAsync();
+
         var govUser = await EnsureUserAsync("govadmin.e2e@flashid.local", "+27810000002", UserRole.GovernmentAdministrator);
         if (!await context.GovernmentAdministrators.AnyAsync(g => g.UserId == govUser.Id))
         {
@@ -173,6 +216,95 @@ public static class DbSeeder
                 await context.SaveChangesAsync();
             }
         }
+    }
+
+    private static async Task SeedExpiryE2ECitizenAsync(AppDbContext context)
+    {
+        var now = DateTime.UtcNow;
+        var user = await context.DomainUsers.FirstOrDefaultAsync(u => u.Email == "citizen.expiry.e2e@flashid.local");
+
+        if (user == null)
+        {
+            user = new User
+            {
+                Id = Guid.NewGuid(),
+                Email = "citizen.expiry.e2e@flashid.local",
+                PhoneNumber = "+27810000004",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
+                FailedLoginAttempts = 0,
+                IsDeleted = false,
+                IsEmailVerified = true,
+                Role = UserRole.Citizen,
+                CreatedAt = now,
+                UpdatedAt = now,
+            };
+
+            await context.DomainUsers.AddAsync(user);
+            await context.SaveChangesAsync();
+        }
+
+        var citizen = await context.Citizens.FirstOrDefaultAsync(c => c.UserId == user.Id);
+
+        if (citizen == null)
+        {
+            citizen = new Citizen
+            {
+                Id = Guid.NewGuid(),
+                SaId = "0000000000099",
+                Names = "Expiry",
+                Surname = "Citizen",
+                DateOfBirth = now.AddYears(-30),
+                Gender = Gender.Other,
+                Status = CitizenStatus.Activated,
+                UserId = user.Id,
+                CreatedAt = now,
+                UpdatedAt = now,
+            };
+
+            await context.Citizens.AddAsync(citizen);
+            await context.SaveChangesAsync();
+        }
+
+        var license = await context.DriversLicenses
+            .Include(dl => dl.Credential)
+            .FirstOrDefaultAsync(dl => dl.Credential.CitizenId == citizen.Id);
+
+        if (license == null)
+        {
+            var licenseCred = new Credential
+            {
+                Id = Guid.NewGuid(),
+                Status = CredentialStatus.Active,
+                Signature = "e2e-sig",
+                IssuedBy = "Licensing Dept Durban",
+                IssueDate = now.AddYears(-5),
+                CitizenId = citizen.Id,
+                CreatedAt = now,
+                UpdatedAt = now,
+            };
+
+            await context.Credentials.AddAsync(licenseCred);
+            await context.SaveChangesAsync();
+
+            license = new DriversLicense
+            {
+                Id = Guid.NewGuid(),
+                LicenseNumber = "E2EEXPIRED001",
+                LicenseCode = LicenseCode.EB,
+                Restrictions = "00",
+                PhotoPath = "mock-photos-robin.png",
+                CredentialId = licenseCred.Id,
+                CreatedAt = now,
+                UpdatedAt = now,
+            };
+
+            await context.DriversLicenses.AddAsync(license);
+        }
+
+        license.ExpiryDate = now.AddDays(-30);
+        license.Credential.Status = CredentialStatus.Active;
+
+        await context.SaveChangesAsync();
     }
 
     private static async Task RepairInvalidPasswordHashesAsync(AppDbContext context)

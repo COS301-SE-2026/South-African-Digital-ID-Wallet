@@ -14,6 +14,8 @@ public class User : BaseEntity
 
     public int FailedLoginAttempts { get; set; }
 
+    public int TokenVersion { get; set; }
+
     // account lockout and audit fields
     public DateTime? LockoutUntil { get; set; }
     public DateTime? LastLoginAt { get; set; }
