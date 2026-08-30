@@ -1,0 +1,14 @@
+backend/FlashIdBackend/Infrastructure/Repositories/OfficialActivityRepository.cs
+  h_99fca60b892ff4 1-130
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "1d6a6bd16376219e4a35370fb26fd5c7d76f6147",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
