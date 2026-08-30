@@ -1,7 +1,6 @@
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Mapping;
 using Application.Features.Officials.DTOs;
-using Doamin.Enums;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
@@ -63,10 +62,10 @@ public class OfficialActivityRepository : IOfficialActivityRepository
             query = query.Where(x => x.log.EventType == action.Value);
 
         if (dateFrom.HasValue)
-            query = query.Where(x => x.log.CreatedAt == dateFrom.Value);
+            query = query.Where(x => x.log.CreatedAt >= dateFrom.Value);
 
         if (dateTo.HasValue)
-            query = query.Where(x => x.log.CreatedAt == dateTo.Value);
+            query = query.Where(x => x.log.CreatedAt <= dateTo.Value);
 
         if (!string.IsNullOrWhiteSpace(type))
         {
@@ -97,10 +96,10 @@ public class OfficialActivityRepository : IOfficialActivityRepository
                 CreatedAt = DateTime.SpecifyKind(x.log.CreatedAt, DateTimeKind.Utc),
                 x.log.EventType,
                 CitizenNames = x.citizen != null ? x.citizen.Names : null,
-                CitizenSurname = x.citizen != null ? x.citizen.Names : null,
-                CitizenSaId = x.citizen != null ? x.citizen.Names : null,
-                OfficialNames = x.citizen != null ? x.citizen.Names : null,
-                OfficialSurname = x.citizen != null ? x.citizen.Names : null,
+                CitizenSurname = x.citizen != null ? x.citizen.Surname : null,
+                CitizenSaId = x.citizen != null ? x.citizen.SaId : null,
+                OfficialNames = x.official.Names,
+                OfficialSurname = x.official.Surname,
             })
             .ToListAsync();
 
