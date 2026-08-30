@@ -183,6 +183,7 @@ public class QrService : IQrService
             Details = $"Credential {cred.Id} verified via QR disclosure ({disclosedFields.Count} field(s)).",
             IpAddress = ipAddress,
             CreatedAt = DateTime.UtcNow,
+            CitizenId = cred.CitizenId,
         });
         await _institutionRepository.SaveChangesAsync();
 
