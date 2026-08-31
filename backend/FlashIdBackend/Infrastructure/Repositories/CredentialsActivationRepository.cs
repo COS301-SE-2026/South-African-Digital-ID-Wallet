@@ -1,5 +1,6 @@
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,7 +41,7 @@ public class CredentialsActivationRepository : ICredentialsActivationRepository
 
     public async Task<bool> HasDriversLicenseAsync(Guid citizenId, CancellationToken cancellationToken)
     {
-        return await _context.DriversLicenses.AnyAsync(d => d.Credential.CitizenId == citizenId, cancellationToken);
+        return await _context.DriversLicenses.AnyAsync(d => d.Credential.CitizenId == citizenId && d.Credential.Status == CredentialStatus.Active, cancellationToken);
     }
 
     public async Task AddCredentialAsync(Credential credential, CancellationToken cancellationToken)
