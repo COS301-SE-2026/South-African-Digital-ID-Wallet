@@ -62,10 +62,10 @@ public class OfficialsController : ControllerBase
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
-
+    
     [HttpGet("activity/me")]
     [Authorize(Roles = "Official")]
-    public async Task<IActionResult> GetMyActivity([FromBody] int? limit)
+    public async Task<IActionResult> GetMyActivity([FromQuery] int? limit)
     {
         var userIdClaim = User.FindFirst("userId")?.Value;
 
