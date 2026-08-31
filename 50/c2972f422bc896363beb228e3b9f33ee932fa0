@@ -1,0 +1,32 @@
+web/src/components/molecules/quick-action-card/types.ts
+  h_0aff3b71f739b1 1-9
+web/src/config/navigation/navigation.ts
+  h_0aff3b71f739b1 88
+  h_0aff3b71f739b1 89-92
+web/src/components/molecules/index.ts
+  h_0aff3b71f739b1 29
+web/src/components/molecules/quick-action-card/test/quick-action-card.test.tsx
+  h_0aff3b71f739b1 1-39
+  h_0aff3b71f739b1 40-41
+web/src/components/organisms/index.ts
+  h_0aff3b71f739b1 24
+web/src/components/molecules/quick-action-card/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/molecules/quick-action-card/quick-action-card.tsx
+  h_0aff3b71f739b1 1-47
+web/src/components/pages/index.ts
+  h_0aff3b71f739b1 11
+web/src/app/(portal)/officials/officials-dashboard/page.tsx
+  h_0aff3b71f739b1 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "50c2972f422bc896363beb228e3b9f33ee932fa0",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
