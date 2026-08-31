@@ -4,7 +4,7 @@ namespace Application.Common.Interfaces.ServiceInterfaces;
 
 public interface IPhysicalIdentityVerificationService
 {
-    Task<StartPhysicalVerificationResponseDto> StartAsync(Guid verificationId, Guid userId, CancellationToken cancellationToken);
+    Task<StartPhysicalVerificationResponseDto> StartAsync(Guid userId, CancellationToken cancellationToken);
 
     Task<PhysicalVerificationResponseDto> GrantConsentAsync(Guid verificationId, Guid userId, CancellationToken cancellationToken);
 

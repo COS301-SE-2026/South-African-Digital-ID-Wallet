@@ -20,7 +20,7 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
         _faceLivenessServiceProvider = faceLivenessServiceProvider;
     }
 
-    public async Task<StartPhysicalVerificationResponseDto> StartAsync(Guid verificationId, Guid userId,
+    public async Task<StartPhysicalVerificationResponseDto> StartAsync(Guid userId,
         CancellationToken cancellationToken)
     {
         var existing = await _repository.GetActiveForUserAsync(userId, cancellationToken);
@@ -28,7 +28,7 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
         {
             return new StartPhysicalVerificationResponseDto
             {
-                VerificationId = verificationId,
+                VerificationId = existing.Id,
                 Status = existing.Status,
                 ExpiresAt = existing.ExpiresAt,
             };
@@ -38,7 +38,6 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
         {
             existing.Status = IdentityVerificationStatus.Expired;
             existing.UpdatedAt = DateTime.UtcNow;
-            existing.ExpiresAt = existing.ExpiresAt;
 
             await _repository.SaveChangesAsync(cancellationToken);
         }
@@ -154,7 +153,18 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
     public async Task<PhysicalVerificationResponseDto> GetAsync(Guid verificationId, Guid userId,
         CancellationToken cancellationToken)
     {
-        return new PhysicalVerificationResponseDto();
+        var verification = await GetOwnedVerificationAsync(verificationId, userId, cancellationToken);
+
+        if (verification.ExpiresAt <= DateTime.UtcNow &&
+            verification.Status != IdentityVerificationStatus.Verified &&
+            verification.Status != IdentityVerificationStatus.Failed)
+        {
+            verification.Status = IdentityVerificationStatus.Expired;
+            verification.UpdatedAt = DateTime.UtcNow;
+            await _repository.SaveChangesAsync(cancellationToken);
+        }
+
+        return Map(verification);
     }
 
     private async Task<PhysicalIdentityVerification> GetOwnedVerificationAsync(Guid verificationId, Guid userId,
