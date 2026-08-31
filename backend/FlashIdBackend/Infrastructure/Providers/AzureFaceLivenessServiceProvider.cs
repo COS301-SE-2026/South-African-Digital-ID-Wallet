@@ -1,8 +1,10 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 using Application.Common.Interfaces.ProviderInterfaces;
+using Application.Features.ManageUserAccountCard.Exceptions;
 using Application.Features.Verification.Dtos;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Providers;
 
@@ -56,6 +58,88 @@ public class AzureFaceLivenessServiceProvider : IFaceLivenessServiceProvider
             SessionId = root.GetProperty("sessionId").GetString() ?? string.Empty,
             AuthToken = root.GetProperty("authToken").GetString() ?? string.Empty,
             Status = root.TryGetProperty("status", out var status) ? status.GetString() : null
+        };
+    }
+
+    public async Task<LivenessVerificationResult> GetLivenessWithVerifyResultAsync(string sessionId,
+        CancellationToken cancellationToken)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get,
+            $"{_endpoint.TrimEnd('/')}/face/v1.2/detectLivenessWithVerify-sessions/{sessionId}");
+
+        request.Headers.Add("Ocp-Apim-Subscription-Key", _apiKey);
+
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+
+        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException(
+                $"Azure Face result retrieval failed. Status :{(int)response.StatusCode}. Response:{responseBody}");
+        }
+
+        using var json = JsonDocument.Parse(responseBody);
+
+        var root = json.RootElement;
+
+        var status = root.GetProperty("status").GetString() ?? string.Empty;
+
+        if (!string.Equals(status, "Succeeded", StringComparison.OrdinalIgnoreCase))
+        {
+            return new LivenessVerificationResult()
+            {
+                Status = status,
+                IsComplete = false
+            };
+        }
+
+        if (!root.TryGetProperty("results", out var results) || !results.TryGetProperty("attempts", out var attempts))
+        {
+            return new LivenessVerificationResult()
+            {
+                Status = status,
+                IsComplete = false
+            };
+        }
+
+        var successfulAttempt = attempts.EnumerateArray().FirstOrDefault(x => string.Equals(x.GetProperty("attemptStatus").GetString(), "Succeeded", StringComparison.OrdinalIgnoreCase));
+
+        if (successfulAttempt.ValueKind == JsonValueKind.Undefined ||
+            !successfulAttempt.TryGetProperty("result", out var result))
+        {
+            return new LivenessVerificationResult()
+            {
+                Status = status,
+                IsComplete = false
+            };
+        }
+
+        var livenessDecision = result.GetProperty("livenessDecision").GetString();
+
+        bool? faceMatched = null;
+        double? matchConfidence = null;
+
+        if (result.TryGetProperty("verifyResult", out var verifyResult))
+        {
+            if (verifyResult.TryGetProperty("isIdentical", out var isIdentical))
+            {
+                faceMatched = isIdentical.GetBoolean();
+            }
+
+            if (verifyResult.TryGetProperty("matchConfidence", out var confidence))
+            {
+                matchConfidence = confidence.GetDouble();
+            }
+        }
+
+        return new LivenessVerificationResult()
+        {
+            Status = status,
+            LivenessPassed = string.Equals(livenessDecision, "realface", StringComparison.OrdinalIgnoreCase),
+            FaceMatched = faceMatched,
+            MatchConfidence = matchConfidence,
+            IsComplete = true
         };
     }
 }
