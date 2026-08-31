@@ -37,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<ICredentialExpiryService, CredentialExpiryService>();
         services.AddSingleton<CredentialExpiryMapper>();
         services.AddScoped<IIssueCredentialService, IssueCredentialService>();
+        services.AddScoped<IAdminDashboardService, AdminDashboardService>();
         return services;
     }
 }

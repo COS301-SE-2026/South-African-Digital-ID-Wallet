@@ -23,7 +23,7 @@ public class AdminDashboardController : ControllerBase
     /// credentials issued), and a system wide recent activity feed. The feed is restricted to an explicit allow
     /// list of institution/system-level event types so it never surfaces citizen-level data across institution boundaries.
     /// </summary>
-    /// <response code="200">The dashboard summary</response>
+    /// <response code="200">The dashboard summary.</response>
     /// <response code="403">The caller is not a Government Administrator.</response>
     [HttpGet("dashboard-summary")]
     [ProducesResponseType(typeof(DashboardSummaryDto), StatusCodes.Status200OK)]
