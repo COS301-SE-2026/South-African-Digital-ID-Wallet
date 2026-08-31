@@ -1,0 +1,15 @@
+web/src/components/organisms/credential-details-modal/credential-details-modal.tsx
+  h_712d174fc3f309 10-11,14-19
+  h_712d174fc3f309 20-22,169-171
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "7be7aa697827139ed9890075b00b639e48e25633",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
