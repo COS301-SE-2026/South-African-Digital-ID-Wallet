@@ -27,4 +27,6 @@ public class Citizen : BaseEntity
 
     public ICollection<Credential> Credentials { get; set; } = new List<Credential>();
     public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+
+    public FaceEnrollment? FaceEnrollment { get; set; }
 }

@@ -5,6 +5,8 @@ public enum AuditEventType
     UserRegistered,
     UserLoggedIn,
     UserLoggedOut,
+    FaceVerificationSucceeded,
+    FaceVerificationFailed,
     FailedLoginAttempt,
     CredentialIssued,
     CredentialIssueFailed,
