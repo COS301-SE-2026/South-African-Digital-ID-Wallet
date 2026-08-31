@@ -7,8 +7,8 @@ public interface IAdminDashboardRepository
 {
     Task<DashboardCountsDto> GetCountsAsync();
     Task<List<AdminActivityItemDto>> GetGlobalActivityFeedAsync(int limit);
-    Task<List<DailyPointDto>> GetEventSeriesAsync(AuditEventType eventType, DateTime from, DateTime to);
-    Task<List<DailyPointDto>> GetCredentialsIssuedSeriesAsync(DateTime from, DateTime to);
-    Task<List<DailyPointDto>> GetActiveOfficialsSeriesAsync(DateTime from, DateTime to);
-    Task<List<DailyPointDto>> GetActiveInstitutionsSeriesAsync(DateTime from, DateTime to);
+    Task<List<DailyPointDto>> GetEventSeriesAsync(AuditEventType eventType, DateTime fromDate, DateTime toDate);
+    Task<List<DailyPointDto>> GetCredentialsIssuedSeriesAsync(DateTime fromDate, DateTime toDate);
+    Task<List<DailyPointDto>> GetActiveOfficialsSeriesAsync(DateTime fromDate, DateTime toDate);
+    Task<List<DailyPointDto>> GetActiveInstitutionsSeriesAsync(DateTime fromDate, DateTime toDate);
 }
