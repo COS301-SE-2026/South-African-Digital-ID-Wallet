@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260831142001_AddFaceEnrollment")]
+    [Migration("20260831151139_AddFaceEnrollment")]
     partial class AddFaceEnrollment
     {
         /// <inheritdoc />
