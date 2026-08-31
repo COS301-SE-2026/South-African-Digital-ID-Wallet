@@ -1,12 +1,12 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
-using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Features.Verification.Dtos;
 using Microsoft.Extensions.Configuration;
 
 namespace Infrastructure.Providers;
 
-public class AzureFaceLivenessServiceProvider : IFaceLivenessService
+public class AzureFaceLivenessServiceProvider : IFaceLivenessServiceProvider
 {
     private readonly HttpClient _httpClient;
     private readonly string _endpoint;
