@@ -85,7 +85,11 @@ export const officialsNavSections: SidebarNavSection[] = [
   {
     title: 'Officials',
     items: [
-      { label: 'Dashboard', href: '/officials', icon: 'dashboard' },
+      {
+        label: 'Dashboard',
+        href: '/officials/officials-dashboard',
+        icon: 'dashboard',
+      },
       {
         label: 'Onboard Citizen',
         href: '/officials/onboard-citizen',
