@@ -7,8 +7,18 @@ import { Text } from '@/components/atoms/text'
 import { StatusPill } from '@/components/atoms/status-pill'
 import { RevokeCredentialModal } from '@/components/organisms/revoke-credentials-modal'
 import { cn } from '@/lib/utils'
-import type { CredentialDetailsModalProps } from './types'
+import type { StatusPillIntent } from '@/components/atoms/status-pill'
+import type { CredentialDetailsModalProps, CredentialStatus } from './types'
 import Image from 'next/image'
+
+const CREDENTIAL_STATUS_PILL_INTENTS: Record<
+  CredentialStatus,
+  StatusPillIntent
+> = {
+  active: 'active',
+  revoked: 'danger',
+  suspended: 'warning',
+}
 
 export function CredentialDetailsModal({
   isOpen,
@@ -156,7 +166,9 @@ export function CredentialDetailsModal({
                     </div>
                     <div className="flex items-center gap-10">
                       <span className="text-sm text-muted-text">Status:</span>
-                      <StatusPill intent={selected.status}>
+                      <StatusPill
+                        intent={CREDENTIAL_STATUS_PILL_INTENTS[selected.status]}
+                      >
                         {selected.status}
                       </StatusPill>
                     </div>
