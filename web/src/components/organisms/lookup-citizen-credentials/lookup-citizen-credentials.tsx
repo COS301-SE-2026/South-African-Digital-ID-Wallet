@@ -38,17 +38,21 @@ export const LookupCitizenCredentials = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        <TextField
-          error={errors.saId}
-          id="saId"
-          label="Citizen SA ID number"
-          onChange={(event) => {
-            setSaId(event.target.value)
-            setErrors({ ...errors, saId: '' })
-          }}
-          placeholder="Enter 13 digit South African ID number"
-          value={saId}
-        />
+        <div className="flex flex-col gap-1.5">
+          <Text as="label" htmlFor="saId" variant="sub-sm">
+            Citizen SA ID number
+          </Text>
+          <TextField
+            error={errors.saId}
+            id="saId"
+            onChange={(event) => {
+              setSaId(event.target.value)
+              setErrors({ ...errors, saId: '' })
+            }}
+            placeholder="Enter 13 digit South African ID number"
+            value={saId}
+          />
+        </div>
         <Button
           className="lg:w-auto"
           disabled={!saId}
