@@ -17,6 +17,10 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Application.Features.Citizens.Exceptions;
+using Application.Features.Credentials.Exceptions;
+using Application.Features.Credentials.Enums;
+using Application.Features.Onboarding.Exceptions;
 
 namespace tests;
 
@@ -38,13 +42,38 @@ public class CredentialControllerIntegrationTests
         public Task<ActivateCredentialsResponseDto> ActivateCredentialsAsync(ActivateCredentialsRequestDto request, Guid userId, string ipAddress, CancellationToken cancellationToken) => throw new NotImplementedException("Not exercised by these tests.");
     }
 
+    private sealed class StubIssueCredentialService : IIssueCredentialService
+    {
+        public CitizenCredentialStatusResponseDto? StatusToReturn { get; set; }
+        public Exception? StatusException { get; set; }
+        public CredentialResponseDto? IssueResultToReturn { get; set; }
+        public Exception? IssueException { get; set; }
+
+        public Task<CitizenCredentialStatusResponseDto> GetCitizenStatusAsync(string saId, Guid officialId, string ipAddress, CancellationToken cancellationToken)
+        {
+            if (StatusException is not null) throw StatusException;
+
+            return Task.FromResult(StatusToReturn!);
+        }
+
+        public Task<CredentialResponseDto> IssueCredentialAsync(IssueCredentialRequestDto request, Guid officialId, string ipAddress, CancellationToken cancellationToken)
+        {
+            if (IssueException is not null) throw IssueException;
+
+            return Task.FromResult(IssueResultToReturn!);
+        }
+    }
+
     private sealed class TestApiFactory : WebApplicationFactory<Program>
     {
         private readonly SqliteConnection _connection = new("DataSource=:memory:");
+        private readonly IIssueCredentialService? _issueCredentialService;
         private readonly bool _useFailingExpiryService;
 
-        public TestApiFactory(bool useFailingExpiryService = false)
+
+        public TestApiFactory(IIssueCredentialService? issueCredentialService = null, bool useFailingExpiryService = false)
         {
+            _issueCredentialService = issueCredentialService;
             _useFailingExpiryService = useFailingExpiryService;
         }
 
@@ -73,6 +102,12 @@ public class CredentialControllerIntegrationTests
 
                 services.RemoveAll(typeof(ICredentialActivationService));
                 services.AddScoped<ICredentialActivationService, StubCredentialActivationService>();
+
+                if (_issueCredentialService is not null)
+                {
+                    services.RemoveAll(typeof(IIssueCredentialService));
+                    services.AddScoped(_ => _issueCredentialService);
+                }
 
                 services.RemoveAll(typeof(IHostedService));
 
@@ -206,6 +241,205 @@ public class CredentialControllerIntegrationTests
         var response = await client.PostAsync("/api/credentials/expiry-check", null, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetCitizenStatus_AsOfficial_ReturnsOk()
+    {
+        var stub = new StubIssueCredentialService
+        {
+            StatusToReturn = new CitizenCredentialStatusResponseDto
+            {
+                SaId = "9001015800086",
+                Names = "Test",
+                Surname = "Test",
+                Status = "Activated",
+                ExistingCredentials = [],
+            },
+        };
+
+        await using var factory = new TestApiFactory(stub);
+
+
+        var db = await factory.CreateInitializedContextAsync();
+        var official = BuildUser(UserRole.Official);
+
+        await db.DomainUsers.AddAsync(official, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(official));
+
+        var response = await client.GetAsync("/api/credentials/citizens/9001015800086/status", TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetCitizenStatus_AsCitizen_ReturnsForbidden()
+    {
+        await using var factory = new TestApiFactory(new StubIssueCredentialService());
+
+        var db = await factory.CreateInitializedContextAsync();
+        var citizen = BuildUser(UserRole.Citizen);
+
+        await db.DomainUsers.AddAsync(citizen, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(citizen));
+
+        var response = await client.GetAsync("/api/credentials/citizens/9001015800086/status", TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetCitizenStatus_CitizenNotFound_ReturnsNotFound()
+    {
+        var stub = new StubIssueCredentialService { StatusException = new CitizenNotFoundException("9001015800086") };
+        await using var factory = new TestApiFactory(stub);
+
+        var db = await factory.CreateInitializedContextAsync();
+        var official = BuildUser(UserRole.Official);
+
+        await db.DomainUsers.AddAsync(official, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(official));
+
+        var response = await client.GetAsync("/api/credentials/citizens/9001015800086/status", TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task IssueCredential_HappyPath_ReturnsCreated()
+    {
+        var stub = new StubIssueCredentialService
+        {
+            IssueResultToReturn = new CredentialResponseDto
+            {
+                Id = Guid.NewGuid(),
+                Type = "DriversLicense",
+                Title = "Driver's Licence",
+                IssuedBy = "RMTC",
+                IssueDate = DateTime.UtcNow,
+                Status = "Active",
+            },
+        };
+
+        await using var factory = new TestApiFactory(stub);
+
+        var db = await factory.CreateInitializedContextAsync();
+        var official = BuildUser(UserRole.Official);
+
+        await db.DomainUsers.AddAsync(official, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(official));
+
+        var request = new IssueCredentialRequestDto { SaId = "9001015800086", CredentialType = CredentialType.DriversLicense, ConsentGiven = true };
+        var response = await client.PostAsJsonAsync("/api/credentials/issue", request, JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task IssueCredential_ConsentNotGiven_ReturnsBadRequest()
+    {
+        var stub = new StubIssueCredentialService
+        {
+            IssueException = new CitizenConsentRequiredException()
+        };
+
+        await using var factory = new TestApiFactory(stub);
+
+        var db = await factory.CreateInitializedContextAsync();
+        var official = BuildUser(UserRole.Official);
+
+        await db.DomainUsers.AddAsync(official, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(official));
+
+        var request = new IssueCredentialRequestDto { SaId = "9001015800086", CredentialType = CredentialType.DriversLicense, ConsentGiven = false };
+        var response = await client.PostAsJsonAsync("/api/credentials/issue", request, JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task IssueCredential_AlreadyIssued_ReturnsConflict()
+    {
+        var stub = new StubIssueCredentialService
+        {
+            IssueException = new CredentialAlreadyIssuedException("9001015800086", CredentialType.DriversLicense)
+        };
+
+        await using var factory = new TestApiFactory(stub);
+
+        var db = await factory.CreateInitializedContextAsync();
+        var official = BuildUser(UserRole.Official);
+
+        await db.DomainUsers.AddAsync(official, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(official));
+
+        var request = new IssueCredentialRequestDto { SaId = "9001015800086", CredentialType = CredentialType.DriversLicense, ConsentGiven = true };
+        var response = await client.PostAsJsonAsync("/api/credentials/issue", request, JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task IssueCredential_RegistryRecordNotFound_ReturnsNotFound()
+    {
+        var stub = new StubIssueCredentialService
+        {
+            IssueException = new GovernmentRegistryRecordNotFoundException("9001015800086", CredentialType.DriversLicense)
+        };
+
+        await using var factory = new TestApiFactory(stub);
+
+        var db = await factory.CreateInitializedContextAsync();
+        var official = BuildUser(UserRole.Official);
+
+        await db.DomainUsers.AddAsync(official, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(official));
+
+        var request = new IssueCredentialRequestDto { SaId = "9001015800086", CredentialType = CredentialType.DriversLicense, ConsentGiven = true };
+        var response = await client.PostAsJsonAsync("/api/credentials/issue", request, JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task IssueCredential_AsCitizen_ReturnsForbidden()
+    {
+        await using var factory = new TestApiFactory(new StubIssueCredentialService());
+
+        var db = await factory.CreateInitializedContextAsync();
+        var citizen = BuildUser(UserRole.Citizen);
+
+        await db.DomainUsers.AddAsync(citizen, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(citizen));
+
+        var request = new IssueCredentialRequestDto { SaId = "9001015800086", CredentialType = CredentialType.DriversLicense, ConsentGiven = true };
+        var response = await client.PostAsJsonAsync("/api/credentials/issue", request, JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     [Fact]

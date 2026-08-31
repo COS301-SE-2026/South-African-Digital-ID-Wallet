@@ -56,7 +56,45 @@ The Citizen Registration subsystem allows citizens to register for a FlashID acc
 
 The Issue Credentials subsystem allows authorised officials to verify a citizen and issue signed digital credentials. The system supports generating signed digital IDs and signed digital driver’s licences, then notifying the citizen once the credential has been issued.
 
-![Issue Credentials Use Case Diagram](../images/Issue_Credentials.svg)
+![Issue Credentials Use Case Diagram](../images/Issue_Credentials_UC_Diagram.svg)
+
+### Search & View Citizen Status
+
+**TUCBW:** This use case begins with an Official entering a citizen's SA ID number into the admin portal to look them up.
+
+**TUCEW:** This use case ends with the citizen's FlashID status, profile detials, and any existing credentials being displayed to the Official or an error if no matching citizen is found.
+
+---
+
+### Capture Citizen Consent
+
+**TUCBW:** This use case begins with an Official confirming the citizen is Activated in FlashID and selecting a credential type to issue to the citizen.
+
+**TUCEW:** This use case ends with the Official confirming POPIA Section 11 consent and the consent is recorded to the audit trail, or the action is blocked and the Official is shown an error because consent was not given.
+
+---
+
+### Generate Signed Identity Document Credential
+
+**TUCBW:** This use case begins with an Official initiating the issuance of a identity document credential.
+
+**TUCEW:** This use case ends with the citizen's identity document record retrieved from the government registry (POPIA Section 10 & 16), signed (POPIA Section 19-22) and stored in FlashID as an Active credential linked to the citizen (POPIA Section 13) and an audit log entry has been recorded.
+
+---
+
+### Generate Signed Driver's License Credential
+
+**TUCBW:** This use case begins with an Official initiating the issuance of a driver's license credential.
+
+**TUCEW:** This use case ends with the citizen's driver's license record retrieved from the government registry (POPIA Section 10 & 16), signed (POPIA Section 19-22) and stored in FlashID as an Active credential linked to the citizen (POPIA Section 13) and an audit log entry has been recorded.
+
+---
+
+### Notify Citizen
+
+**TUCBW:** This use case begins with a new credential having been successfully persisted for a citizen.
+
+**TUCEW:** This use case ends with an in-app notification created for the citizen, indicating that their new credential has been added to their FlashID wallet.
 
 ### POPIA Compliance
 
@@ -67,6 +105,7 @@ The Issue Credentials subsystem allows authorised officials to verify a citizen 
 - **Sections 19–22 — Security Safeguards:** Credentials must be digitally signed and protected from tampering.
 
 ---
+
 ## 5. Access Credentials
 
 The Access Credentials subsystem allows citizens to log in, view their credentials, generate certified copies, generate QR codes, scan QR codes, and control selective disclosure preferences.

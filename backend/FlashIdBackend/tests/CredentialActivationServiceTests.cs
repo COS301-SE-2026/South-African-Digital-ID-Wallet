@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Services;
@@ -37,14 +38,17 @@ public class CredentialActivationServiceTests
     private sealed class FakeActivationRepo : ICredentialsActivationRepository
     {
         public bool HasId, HasDl;
+        public Citizen? CitizenToReturn;
         public List<Credential> Added = new();
         public int Saves;
+        public Task<Citizen?> GetCitizenBySaIdAsync(string saId, CancellationToken n) => Task.FromResult(CitizenToReturn);
         public Task<bool> HasIdentityDocumentAsync(Guid c, CancellationToken t) => Task.FromResult(HasId);
         public Task<bool> HasDriversLicenseAsync(Guid c, CancellationToken t) => Task.FromResult(HasDl);
         public Task AddCredentialAsync(Credential c, CancellationToken t) { Added.Add(c); return Task.CompletedTask; }
         public Task AddIdentityDocumentAsync(IdentityDocument d, CancellationToken t) => Task.CompletedTask;
         public Task AddDriversLicenseAsync(DriversLicense d, CancellationToken t) => Task.CompletedTask;
         public Task AddAuditLogAsync(AuditLog a, CancellationToken t) => Task.CompletedTask;
+        public Task AddNotificationAsync(Notification n, CancellationToken t) => Task.CompletedTask;
         public Task SaveChangesAsync(CancellationToken t) { Saves++; return Task.CompletedTask; }
     }
 

@@ -50,6 +50,11 @@ paths:
     post:
       tags:
       - Auth
+      parameters:
+      - name: X-Client
+        in: header
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
@@ -234,6 +239,121 @@ paths:
                 $ref: '#/components/schemas/ProblemDetails'
         '403':
           description: The caller is not a Government Administrator.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/credentials/citizens/{saId}/status:
+    get:
+      tags:
+      - Credentials
+      summary: Looks up a citizen in FlashID by SA ID and returns their onboarding status and existing
+        credentials.
+      parameters:
+      - name: saId
+        in: path
+        description: The citizen's 13 digit SA ID number
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The citizen was found.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/CitizenCredentialStatusResponseDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CitizenCredentialStatusResponseDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/CitizenCredentialStatusResponseDto'
+        '400':
+          description: The SA ID is not a valid 13 digit SA ID number.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: No FlashID citizen record exists for this SA ID.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/credentials/issue:
+    post:
+      tags:
+      - Credentials
+      summary: Fetches a citizen's credential from the government registry and issues it into FlashID.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueCredentialRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/IssueCredentialRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/IssueCredentialRequestDto'
+      responses:
+        '201':
+          description: The credential was issued.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/CredentialResponseDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialResponseDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/CredentialResponseDto'
+        '400':
+          description: Validation error, or consent not given.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Citizen not found in FlashID, or no matching record at the government registry.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Citizen is not Activated, or already has an active credential of that type.
           content:
             text/plain:
               schema:
@@ -682,6 +802,40 @@ components:
           type: string
           nullable: true
       additionalProperties: false
+    CitizenCredentialStatusResponseDto:
+      type: object
+      properties:
+        saId:
+          type: string
+          nullable: true
+        names:
+          type: string
+          nullable: true
+        surname:
+          type: string
+          nullable: true
+        dateOfBirth:
+          type: string
+          format: date-time
+        status:
+          type: string
+          nullable: true
+        activatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        phoneNumber:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        existingCredentials:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExistingCredentialSummaryDto'
+          nullable: true
+      additionalProperties: false
     CitizenStatus:
       enum:
       - Pending
@@ -719,6 +873,32 @@ components:
           type: string
           nullable: true
       additionalProperties: false
+    CredentialResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        issuedBy:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        issueDate:
+          type: string
+          format: date-time
+        identityDocument:
+          $ref: '#/components/schemas/IdentityDocumentDetailDto'
+        driversLicense:
+          $ref: '#/components/schemas/DriversLicenseDetailDto'
+      additionalProperties: false
     CredentialType:
       enum:
       - IdentityDocument
@@ -732,6 +912,35 @@ components:
       - Laptop
       - Unknown
       type: string
+    DriversLicenseDetailDto:
+      type: object
+      properties:
+        licenseNumber:
+          type: string
+          nullable: true
+        licenseCode:
+          type: string
+          nullable: true
+        restrictions:
+          type: string
+          nullable: true
+        expiryDate:
+          type: string
+          format: date-time
+      additionalProperties: false
+    ExistingCredentialSummaryDto:
+      type: object
+      properties:
+        type:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        issueDate:
+          type: string
+          format: date-time
+      additionalProperties: false
     GenerateQrRequestDto:
       type: object
       properties:
@@ -739,6 +948,25 @@ components:
           type: array
           items:
             type: string
+          nullable: true
+      additionalProperties: false
+    IdentityDocumentDetailDto:
+      type: object
+      properties:
+        nationality:
+          type: string
+          nullable: true
+        citizenship:
+          type: string
+          nullable: true
+        countryOfBirth:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        idNumber:
+          type: string
           nullable: true
       additionalProperties: false
     InstitutionType:
@@ -749,6 +977,17 @@ components:
       - Healthcare
       - FinancialInstitution
       type: string
+    IssueCredentialRequestDto:
+      type: object
+      properties:
+        saId:
+          type: string
+          nullable: true
+        credentialType:
+          $ref: '#/components/schemas/CredentialType'
+        consentGiven:
+          type: boolean
+      additionalProperties: false
     JobRunStatus:
       enum:
       - Running

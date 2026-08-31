@@ -7,6 +7,7 @@ public enum AuditEventType
     UserLoggedOut,
     FailedLoginAttempt,
     CredentialIssued,
+    CredentialIssueFailed,
     CredentialRevoked,
     CredentialVerified,
     CredentialExpired,
@@ -25,4 +26,5 @@ public enum AuditEventType
     DeviceVerificationRequested,
     DeviceVerificationFailed,
     DeviceVerified,
+    CitizenStatusViewed,
 }
