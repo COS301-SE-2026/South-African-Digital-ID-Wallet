@@ -32,7 +32,7 @@ public class AdminDashboardRepository : IAdminDashboardRepository
         {
             Users = await _context.DomainUsers.CountAsync(),
             Institutions = await _context.Institutions.CountAsync(),
-            CredentialIssued = await _context.Credentials.CountAsync(),
+            CredentialsIssued = await _context.Credentials.CountAsync(),
         };
     }
 
@@ -70,7 +70,7 @@ public class AdminDashboardRepository : IAdminDashboardRepository
 
     public async Task<List<DailyPointDto>> GetCredentialsIssuedSeriesAsync(DateTime fromDate, DateTime toDate)
     {
-        return await _context.AuditLogs
+        return await _context.Credentials
             .AsNoTracking()
             .Where(a => a.CreatedAt >= fromDate && a.CreatedAt <= toDate)
             .GroupBy(c => c.CreatedAt.Date)

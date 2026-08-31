@@ -50,17 +50,17 @@ public class AdminDashboardService : IAdminDashboardService
         return new AnalyticsResponseDto
         {
             Verifications = await BuildMetricAsync(
-                () => _repository.GetEventSeriesAsync(AuditEventType.CitizenVerified, currentFrom, now),
-                () => _repository.GetEventSeriesAsync(AuditEventType.CitizenVerified, previousFrom, previousTo)),
+                () => _repository.GetEventSeriesAsync(AuditEventType.CredentialVerified, currentFrom, now),
+                () => _repository.GetEventSeriesAsync(AuditEventType.CredentialVerified, previousFrom, previousTo)),
             CredentialsIssued = await BuildMetricAsync(
                 () => _repository.GetCredentialsIssuedSeriesAsync(currentFrom, now),
-                () => _repository.GetCredentialsIssuedSeriesAsync(currentFrom, now)),
+                () => _repository.GetCredentialsIssuedSeriesAsync(previousFrom, previousTo)),
             ActiveOfficials = await BuildMetricAsync(
                 () => _repository.GetActiveOfficialsSeriesAsync(currentFrom, now),
-                () => _repository.GetActiveOfficialsSeriesAsync(currentFrom, now)),
+                () => _repository.GetActiveOfficialsSeriesAsync(previousFrom, previousTo)),
             ActiveInstitutions = await BuildMetricAsync(
                 () => _repository.GetActiveInstitutionsSeriesAsync(currentFrom, now),
-                () => _repository.GetActiveInstitutionsSeriesAsync(currentFrom, now)),
+                () => _repository.GetActiveInstitutionsSeriesAsync(previousFrom, previousTo)),
         };
     }
 
@@ -86,6 +86,6 @@ public class AdminDashboardService : IAdminDashboardService
     {
         if (previousValue == 0) return currentValue == 0 ? 0 : null;
 
-        return Math.Round((currentValue - previousValue) / (double)previousValue + 100, 1);
+        return Math.Round((currentValue - previousValue) / (double)previousValue * 100, 1);
     }
 }
