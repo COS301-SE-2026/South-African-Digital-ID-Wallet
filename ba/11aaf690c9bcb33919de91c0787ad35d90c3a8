@@ -1,0 +1,24 @@
+web/src/components/organisms/audit-log-preview/types.ts
+  h_712d174fc3f309 3-5,7
+  h_712d174fc3f309 6
+web/src/components/organisms/issue-credential-form/issue-credential-form.tsx
+  h_712d174fc3f309 1-2,4,6,9,11-14,20-22,33,42
+  h_712d174fc3f309 3,5,7-8,10,15-19,23-32,34-41,43-134
+web/src/components/organisms/issue-credential-form/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+web/src/components/organisms/audit-log-preview/audit-log-preview.tsx
+  h_712d174fc3f309 3,5,8,11,14-16,19
+  h_712d174fc3f309 9-10,12,20-26,28-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "ba11aaf690c9bcb33919de91c0787ad35d90c3a8",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
