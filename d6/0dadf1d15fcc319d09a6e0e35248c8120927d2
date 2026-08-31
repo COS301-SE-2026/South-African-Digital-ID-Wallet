@@ -1,0 +1,16 @@
+mobile/src/hooks/use-citizen-dashboard.ts
+  h_712d174fc3f309 1-37
+mobile/src/hooks/index.ts
+  h_712d174fc3f309 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "d60dadf1d15fcc319d09a6e0e35248c8120927d2",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
