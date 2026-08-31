@@ -53,7 +53,5 @@ public class IdentityDocumentConfiguration : IEntityTypeConfiguration<IdentityDo
             .WithOne(c => c.IdentityDocument)
             .HasForeignKey<IdentityDocument>(i => i.CredentialId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasIndex(dl => dl.CitizenId).IsUnique();
     }
 }

@@ -62,7 +62,6 @@ public class IssueCredentialService : IIssueCredentialService
             Id = Guid.NewGuid(),
             CredentialId = credential.Id,
             Credential = credential,
-            CitizenId = citizen.Id,
             LicenseCode = Enum.Parse<LicenseCode>(dL.LicenseCode),
             LicenseNumber = dL.LicenseNumber,
             Restrictions = dL.Restrictions,
@@ -101,7 +100,6 @@ public class IssueCredentialService : IIssueCredentialService
             Id = Guid.NewGuid(),
             CredentialId = credential.Id,
             Credential = credential,
-            CitizenId = citizen.Id,
             Citizenship = iD.CountryOfBirth,
             CountryOfBirth = iD.CountryOfBirth,
             Status = Enum.Parse<IdentityDocumentStatus>(iD.CitizenshipStatus),
@@ -154,13 +152,13 @@ public class IssueCredentialService : IIssueCredentialService
 
     public async Task<CredentialResponseDto> IssueCredentialAsync(IssueCredentialRequestDto request, Guid officialId, string ipAddress, CancellationToken cancellationToken)
     {
+        ValidateSaId(request.SaId);
+
         if (!request.ConsentGiven)
         {
             await LogIssueFailureAsync(request.SaId, "consent not given", officialId, ipAddress, cancellationToken);
             throw new CitizenConsentRequiredException();
         }
-
-        ValidateSaId(request.SaId);
 
         var citizen = await _repo.GetCitizenBySaIdAsync(request.SaId, cancellationToken) ?? throw new CitizenNotFoundException(request.SaId);
 

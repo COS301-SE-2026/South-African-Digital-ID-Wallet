@@ -163,7 +163,6 @@ public static class DbSeeder
             citizenLicense = new DriversLicense
             {
                 Id = Guid.NewGuid(),
-                CitizenId = citizen.Id,
                 LicenseNumber = "E2EACTIVE001",
                 LicenseCode = LicenseCode.EB,
                 Restrictions = "00",
@@ -290,7 +289,6 @@ public static class DbSeeder
             license = new DriversLicense
             {
                 Id = Guid.NewGuid(),
-                CitizenId = citizen.Id,
                 LicenseNumber = "E2EEXPIRED001",
                 LicenseCode = LicenseCode.EB,
                 Restrictions = "00",
@@ -774,7 +772,6 @@ public static class DbSeeder
             identityDocsToAdd.Add(new IdentityDocument
             {
                 Id = Guid.NewGuid(),
-                CitizenId = citizen.Id,
                 Citizenship = citizenships[rnd.Next(citizenships.Length)],
                 CountryOfBirth = countries[rnd.Next(countries.Length)],
                 Nationality = nationalities[rnd.Next(nationalities.Length)],
@@ -794,7 +791,6 @@ public static class DbSeeder
                 driversLicensesToAdd.Add(new DriversLicense
                 {
                     Id = Guid.NewGuid(),
-                    CitizenId = citizen.Id,
                     // LicenseNumber max 13 chars
                     LicenseNumber = Guid.NewGuid().ToString("N").Substring(0, 13).ToUpper(),
                     // LicenseCode max 3 chars - B or EB from enum

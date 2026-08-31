@@ -108,7 +108,6 @@ public class CredentialExpiryRepositoryIntegrationTests
             {
                 Id = Guid.NewGuid(),
                 CredentialId = credentialId,
-                CitizenId = citizen.Id,
                 LicenseNumber = Guid.NewGuid().ToString("N")[..13],
                 LicenseCode = LicenseCode.EB,
                 Restrictions = "00",

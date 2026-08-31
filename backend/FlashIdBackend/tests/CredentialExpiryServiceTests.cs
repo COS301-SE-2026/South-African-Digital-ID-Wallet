@@ -126,7 +126,6 @@ public class CredentialExpiryServiceTests
             {
                 Id = Guid.NewGuid(),
                 CredentialId = credentialId,
-                CitizenId = citizenId,
                 LicenseNumber = "ABC1234567",
                 LicenseCode = LicenseCode.EB,
                 Restrictions = "00",

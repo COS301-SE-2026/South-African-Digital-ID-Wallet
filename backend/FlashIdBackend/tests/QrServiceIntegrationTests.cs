@@ -270,7 +270,6 @@ public class QrServiceIntegrationTests
         var driversL = new DriversLicense
         {
             Id = Guid.NewGuid(),
-            CitizenId = cred.CitizenId,
             LicenseNumber = "4589161234567",
             LicenseCode = LicenseCode.C,
             Restrictions = "01",

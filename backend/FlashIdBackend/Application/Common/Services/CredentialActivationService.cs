@@ -131,7 +131,6 @@ public class CredentialActivationService : ICredentialActivationService
         var identityDocument = new IdentityDocument()
         {
             Id = Guid.NewGuid(),
-            CitizenId = citizen.Id,
 
             CredentialId = credential.Id,
             Credential = credential,
@@ -185,7 +184,6 @@ public class CredentialActivationService : ICredentialActivationService
         var driversLicense = new DriversLicense()
         {
             Id = Guid.NewGuid(),
-            CitizenId = citizen.Id,
 
             CredentialId = credential.Id,
             Credential = credential,

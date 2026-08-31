@@ -39,7 +39,6 @@ public class DisclosedFieldValueResolverTests
         cred.IdentityDocument = new IdentityDocument
         {
             Id = Guid.NewGuid(),
-            CitizenId = citizen.Id,
             CredentialId = cred.Id,
             Credential = cred,
             Citizenship = "Citizen",
@@ -74,7 +73,6 @@ public class DisclosedFieldValueResolverTests
         {
             Id = Guid.NewGuid(),
             CredentialId = cred.Id,
-            CitizenId = citizen.Id,
             Credential = cred,
             LicenseNumber = "4589161234567",
             LicenseCode = LicenseCode.C,

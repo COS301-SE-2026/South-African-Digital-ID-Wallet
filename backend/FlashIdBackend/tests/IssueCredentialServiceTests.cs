@@ -186,7 +186,6 @@ public class IssueCredentialServiceTests
             DriversLicense = new DriversLicense
             {
                 Id = Guid.NewGuid(),
-                CitizenId = citizen.Id,
                 LicenseNumber = "DL1234567",
                 LicenseCode = LicenseCode.EB,
                 Restrictions = "None",
@@ -285,7 +284,6 @@ public class IssueCredentialServiceTests
             DriversLicense = new DriversLicense
             {
                 Id = Guid.NewGuid(),
-                CitizenId = citizen.Id,
                 LicenseNumber = "DL1234567",
                 LicenseCode = LicenseCode.EB,
                 Restrictions = "None",
@@ -346,7 +344,6 @@ public class IssueCredentialServiceTests
         var saved = Assert.Single(context.Credentials);
 
         Assert.Equal(citizen.Id, saved.CitizenId);
-        Assert.Equal(citizen.Id, saved.DriversLicense!.CitizenId);
     }
 
     [Fact]
@@ -367,7 +364,7 @@ public class IssueCredentialServiceTests
 
         var saved = Assert.Single(context.Credentials);
 
-        Assert.Equal(citizen.Id, saved.IdentityDocument!.CitizenId);
+        Assert.Equal(citizen.Id, saved.CitizenId);
     }
 
     [Fact]

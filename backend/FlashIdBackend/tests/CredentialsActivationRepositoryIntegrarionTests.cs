@@ -57,7 +57,6 @@ public class CredentialsActivationRepositoryIntegrationTests
         DriversLicense = new DriversLicense
         {
             Id = Guid.NewGuid(),
-            CitizenId = citizenId,
             LicenseNumber = licenseNumber,
             LicenseCode = LicenseCode.EB,
             Restrictions = "None",
@@ -81,7 +80,6 @@ public class CredentialsActivationRepositoryIntegrationTests
         IdentityDocument = new IdentityDocument
         {
             Id = Guid.NewGuid(),
-            CitizenId = citizenId,
             Citizenship = "South Africa",
             CountryOfBirth = "South Africa",
             Nationality = "South African",
@@ -91,19 +89,6 @@ public class CredentialsActivationRepositoryIntegrationTests
             UpdatedAt = DateTime.UtcNow,
         },
     };
-
-    [Fact]
-    public async Task AddCredential_SecondDriversLicenseForSameCitizen_ViolatesUniqueIndex()
-    {
-        using var context = CreateContext();
-        var citizen = await SeedCitizenAsync(context);
-        var repo = new CredentialsActivationRepository(context);
-
-        await repo.AddCredentialAsync(BuildDriversLicenseCredential(citizen.Id, "DL0000001"), TestContext.Current.CancellationToken);
-        await repo.SaveChangesAsync(TestContext.Current.CancellationToken);
-        await repo.AddCredentialAsync(BuildDriversLicenseCredential(citizen.Id, "DL0000002"), TestContext.Current.CancellationToken);
-        await Assert.ThrowsAsync<DbUpdateException>(() => repo.SaveChangesAsync(TestContext.Current.CancellationToken));
-    }
 
     [Fact]
     public async Task AddCredential_DriversLicenseAndIdentityDocumentForSameCitizen_BothSucceed()
