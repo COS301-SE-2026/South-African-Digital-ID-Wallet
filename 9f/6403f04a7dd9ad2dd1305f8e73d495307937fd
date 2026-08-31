@@ -1,0 +1,33 @@
+backend/FlashIdBackend/Infrastructure/Providers/AzureBlobPhotoStorageProvider.cs
+  h_712d174fc3f309 37-42
+  h_712d174fc3f309 43
+backend/FlashIdBackend/Infrastructure/Providers/MockLivenessSessionProvider.cs
+  h_712d174fc3f309 1-13
+backend/FlashIdBackend/Infrastructure/Repositories/FaceEnrollmentRepository.cs
+  h_712d174fc3f309 1-34
+  h_712d174fc3f309 35
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IFaceEnrollmentRepository.cs
+  h_712d174fc3f309 1-11
+  h_712d174fc3f309 12
+backend/FlashIdBackend/Infrastructure/Data/AppDbContext.cs
+  h_712d174fc3f309 31
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/IPhotoStorageProvider.cs
+  h_712d174fc3f309 6
+backend/FlashIdBackend/Infrastructure/Migrations/20260831183418_AddFaceEnrollment.Designer.cs
+  h_712d174fc3f309 15,442
+backend/FlashIdBackend/Infrastructure/Migrations/20260831183418_AddFaceEnrollment.cs
+  h_712d174fc3f309 15,33,35,43-44,53
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_712d174fc3f309 439
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "9f6403f04a7dd9ad2dd1305f8e73d495307937fd",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
