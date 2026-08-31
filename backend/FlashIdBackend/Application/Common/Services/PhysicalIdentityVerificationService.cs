@@ -68,6 +68,7 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
         CancellationToken cancellationToken)
     {
 
+
         return new PhysicalVerificationResponseDto();
 
     }
@@ -88,5 +89,46 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
         CancellationToken cancellationToken)
     {
         return new PhysicalVerificationResponseDto();
+    }
+
+    private async Task<PhysicalIdentityVerification> GetOwnedVerificationAsync(Guid verificationId, Guid userId,
+        CancellationToken cancellationToken)
+    {
+        var verification = await _repository.GetByIdAsync(verificationId, cancellationToken);
+
+        if (verification is null || verification.UserId != userId)
+        {
+            throw new InvalidOperationException("Verification session could not be found.");
+        }
+
+        return verification;
+    }
+
+    private static void EnsureNotExpired(PhysicalIdentityVerification verification)
+    {
+        if (verification.ExpiresAt < DateTime.UtcNow || verification.Status == IdentityVerificationStatus.Expired)
+        {
+            throw new InvalidOperationException("Verification session has expired.");
+        }
+
+        if (verification.Status == IdentityVerificationStatus.Verified ||
+            verification.Status == IdentityVerificationStatus.Failed)
+        {
+            throw new InvalidOperationException("Verification session has already completed.");
+        }
+    }
+
+    private static PhysicalVerificationResponseDto Map(PhysicalIdentityVerification verification)
+    {
+        return new PhysicalVerificationResponseDto
+        {
+            VerificationId = verification.Id,
+            Status = verification.Status,
+            LivenessPassed = verification.LivenessPassed,
+            CardFaceMatchedLiveFace = verification.CardFaceMatchedLiveFace,
+            ExpiresAt = verification.ExpiresAt,
+            VerifiedAt = verification.CreatedAt,
+            FailureReason = verification.FailureReason,
+        };
     }
 }
