@@ -1,0 +1,18 @@
+mobile/src/components/molecules/activity-row/activity-row.tsx
+  h_712d174fc3f309 1-43
+mobile/src/components/molecules/activity-row/types.ts
+  h_712d174fc3f309 1-14
+mobile/src/components/molecules/index.ts
+  h_712d174fc3f309 3-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "55e01e1cdf0f0af48fb95c792217ac4f26015c3d",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
