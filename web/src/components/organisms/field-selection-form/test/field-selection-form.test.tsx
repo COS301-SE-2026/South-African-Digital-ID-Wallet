@@ -28,7 +28,12 @@ describe('FieldSelectionForm', () => {
         onBack={() => {}}
       />
     )
-    expect(screen.getByRole('switch', { name: /gender/i })).not.toBeChecked()
+
+    expect(
+      screen.getByRole('switch', {
+        name: /gender/i,
+      })
+    ).not.toBeChecked()
   })
 
   it('toggles an optional field when clicked', async () => {
@@ -41,28 +46,13 @@ describe('FieldSelectionForm', () => {
         onBack={() => {}}
       />
     )
-    const genderSwitch = screen.getByRole('switch', { name: /gender/i })
+
+    const genderSwitch = screen.getByRole('switch', {
+      name: /gender/i,
+    })
+
     await user.click(genderSwitch)
     expect(genderSwitch).toBeChecked()
-  })
-
-  it('selects all optional fields when "select all for official" is clicked', async () => {
-    const user = userEvent.setup()
-    render(
-      <FieldSelectionForm
-        credentialId="credential-123"
-        credentialType="identityDocument"
-        onContinue={() => {}}
-        onBack={() => {}}
-      />
-    )
-    await user.click(
-      screen.getByRole('button', { name: /select all for official/i })
-    )
-    expect(screen.getByRole('switch', { name: /gender/i })).toBeChecked()
-    expect(
-      screen.getByRole('switch', { name: /country of birth/i })
-    ).toBeChecked()
   })
 
   it('calls onContinue with mandatory and selected optional fields', async () => {
@@ -76,9 +66,17 @@ describe('FieldSelectionForm', () => {
         onBack={() => {}}
       />
     )
-    await user.click(screen.getByRole('switch', { name: /gender/i }))
+
     await user.click(
-      screen.getByRole('button', { name: /review and continue/i })
+      screen.getByRole('switch', {
+        name: /gender/i,
+      })
+    )
+
+    await user.click(
+      screen.getByRole('button', {
+        name: /review and continue/i,
+      })
     )
     expect(onContinue).toHaveBeenCalledWith({
       credentialId: 'credential-123',
@@ -98,7 +96,58 @@ describe('FieldSelectionForm', () => {
       />
     )
     expect(
-      screen.getByRole('switch', { name: /license number/i })
+      screen.getByRole('switch', {
+        name: /license number/i,
+      })
     ).toBeInTheDocument()
+  })
+  it('calls onBack when Go back is clicked', async () => {
+    const user = userEvent.setup()
+    const onBack = jest.fn()
+
+    render(
+      <FieldSelectionForm
+        credentialId="credential-123"
+        credentialType="identityDocument"
+        onContinue={() => {}}
+        onBack={onBack}
+      />
+    )
+
+    await user.click(
+      screen.getByRole('button', {
+        name: /go back/i,
+      })
+    )
+
+    expect(onBack).toHaveBeenCalledTimes(1)
+  })
+
+  it('updates the selected fields through onSelectionChange', async () => {
+    const user = userEvent.setup()
+    const onSelectionChange = jest.fn()
+
+    render(
+      <FieldSelectionForm
+        credentialId="credential-123"
+        credentialType="identityDocument"
+        onContinue={() => {}}
+        onBack={() => {}}
+        onSelectionChange={onSelectionChange}
+      />
+    )
+
+    await user.click(
+      screen.getByRole('switch', {
+        name: /gender/i,
+      })
+    )
+
+    expect(onSelectionChange).toHaveBeenCalledWith({
+      credentialId: 'credential-123',
+      credentialType: 'identityDocument',
+      mandatoryFields: ['Date of birth', 'Photograph'],
+      selectedOptionalFields: ['Gender'],
+    })
   })
 })

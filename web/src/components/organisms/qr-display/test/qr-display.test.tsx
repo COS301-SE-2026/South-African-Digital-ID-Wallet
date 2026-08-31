@@ -30,7 +30,9 @@ describe('QrDisplay', () => {
   })
   it('shows a loading state initially', () => {
     ;(qrService.generate as jest.Mock).mockReturnValue(new Promise(() => {}))
+
     render(<QrDisplay selection={baseSelection} onBack={() => {}} />)
+
     expect(screen.getByText(/generating your qr code/i)).toBeInTheDocument()
   })
   it('shows the QR code once generated', async () => {
@@ -38,26 +40,46 @@ describe('QrDisplay', () => {
       token: 'qr-token-123',
       expiresAt: new Date(Date.now() + 60000).toISOString(),
     })
+
     render(<QrDisplay selection={baseSelection} onBack={() => {}} />)
+
     await waitFor(() => {
       expect(screen.getByText(/valid for/i)).toBeInTheDocument()
     })
+    expect(
+      screen.getByRole('button', {
+        name: /refresh qr code/i,
+      })
+    ).toBeInTheDocument()
   })
   it('shows an error state when generation fails', async () => {
     ;(qrService.generate as jest.Mock).mockRejectedValue(new Error('failed'))
+
     render(<QrDisplay selection={baseSelection} onBack={() => {}} />)
+
     await waitFor(() => {
       expect(
         screen.getByText(/could not generate your qr code/i)
       ).toBeInTheDocument()
     })
+
+    expect(
+      screen.getByRole('button', {
+        name: /try again/i,
+      })
+    ).toBeInTheDocument()
   })
-  it('shows the expired state once the countdown reaches zero', async () => {
+
+  it('shows zero seconds once the countdown expires', async () => {
+    const expiresAt = new Date(Date.now() + 2000).toISOString()
+
     ;(qrService.generate as jest.Mock).mockResolvedValue({
       token: 'qr-token-123',
-      expiresAt: new Date(Date.now() + 2000).toISOString(),
+      expiresAt,
     })
+
     render(<QrDisplay selection={baseSelection} onBack={() => {}} />)
+
     await waitFor(() => {
       expect(screen.getByText(/valid for/i)).toBeInTheDocument()
     })
@@ -74,12 +96,25 @@ describe('QrDisplay', () => {
       expiresAt: new Date(Date.now() + 60000).toISOString(),
     })
     const onBack = jest.fn()
-    const user = userEvent.setup({ delay: null })
-    render(<QrDisplay selection={baseSelection} onBack={onBack} />)
+
+    const user = userEvent.setup({
+      delay: null,
+    })
+
+    render(
+      <QrDisplay selection={baseSelection} onBack={onBack} showBackButton />
+    )
+
     await waitFor(() => {
       expect(screen.getByText(/valid for/i)).toBeInTheDocument()
     })
-    await user.click(screen.getByRole('button', { name: /^back$/i }))
+
+    await user.click(
+      screen.getByRole('button', {
+        name: /^back$/i,
+      })
+    )
+
     expect(onBack).toHaveBeenCalledTimes(1)
   })
 
@@ -93,7 +128,11 @@ describe('QrDisplay', () => {
         token: 'qr-token-second',
         expiresAt: new Date(Date.now() + 60000).toISOString(),
       })
-    const user = userEvent.setup({ delay: null })
+
+    const user = userEvent.setup({
+      delay: null,
+    })
+
     render(<QrDisplay selection={baseSelection} onBack={() => {}} />)
 
     await waitFor(() => {
@@ -101,7 +140,11 @@ describe('QrDisplay', () => {
     })
     expect(qrService.generate).toHaveBeenCalledTimes(1)
 
-    await user.click(screen.getByRole('button', { name: /refresh qr code/i }))
+    await user.click(
+      screen.getByRole('button', {
+        name: /refresh qr code/i,
+      })
+    )
 
     await waitFor(() => {
       expect(qrService.generate).toHaveBeenCalledTimes(2)

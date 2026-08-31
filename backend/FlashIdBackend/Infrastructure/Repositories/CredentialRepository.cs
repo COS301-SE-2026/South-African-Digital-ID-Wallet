@@ -54,4 +54,8 @@ public class CredentialRepository : ICredentialRepository
     {
         return await _context.Citizens.FirstOrDefaultAsync(c => c.UserId == userId, cancellationToken);
     }
+    public async Task SaveChangesAsync()
+    {
+        await _context.SaveChangesAsync();
+    }
 }

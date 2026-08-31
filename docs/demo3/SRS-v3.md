@@ -156,7 +156,7 @@ Officials may:
 
 The full epics and user stories, including acceptance criteria and definitions of done for all 12 epics and 49 user stories are documented in:
 
- **[epics_and_user_stories.md](../demo3/epics-and-user-stories-v3.md)**
+ **[Epics and User Stories](../demo3/epics-and-user-stories-v3.md)**
 
 ### Epic Summary
 
@@ -181,22 +181,22 @@ The full epics and user stories, including acceptance criteria and definitions o
 
 The complete functional requirements, subsystems R1 through R10 are documented in:
 
- **[functional_requirements.md](../demo3/functional-requirements-v3.md)**
+ **[Functional Requirements](../demo3/functional-requirements-v3.md)**
 
 ### Subsystem Summary
 
 | Subsystem | Covers |
 |---|---|
-| 4.1 — R1: Authentication & User Management | Citizen registration, login, gov admin registration, official auth |
-| 4.2 — R2: Credential Management | Issuance, revocation, lifecycle, API-based issuance, updates |
-| 4.3 — R3: QR Verification | QR generation, one-time use, selective disclosure, additional disclosure |
-| 4.4 — R4: Role-Based Access Control | Role separation, admin permissions, emergency responder access |
-| 4.5 — R5: Audit Logging & POPIA | Immutable audit trail, POPIA compliance |
-| 4.6 — R6: Notifications | Credential and push notification requirements |
-| 4.7 — R7: Analytics & Reporting | Verification analytics, admin report export |
-| 4.8 — R8: Institution Registration & API Keys | Institution onboarding, API key generation and management |
-| 4.9 — R9: Cryptographic Security | Ed25519 signing, key vault, signature verification, key rotation |
-| 4.10 — R10: Account Management & Device Security | Password management, device trust, account deletion, duress PIN |
+| 4.1 - R1: Authentication & User Management | Citizen registration, login, gov admin registration, official auth |
+| 4.2 - R2: Credential Management | Issuance, revocation, lifecycle, API-based issuance, updates |
+| 4.3 - R3: QR Verification | QR generation, one-time use, selective disclosure, additional disclosure |
+| 4.4 - R4: Role-Based Access Control | Role separation, admin permissions, emergency responder access |
+| 4.5 - R5: Audit Logging & POPIA | Immutable audit trail, POPIA compliance |
+| 4.6 - R6: Notifications | Credential and push notification requirements |
+| 4.7 - R7: Analytics & Reporting | Verification analytics, admin report export |
+| 4.8 - R8: Institution Registration & API Keys | Institution onboarding, API key generation and management |
+| 4.9 - R9: Cryptographic Security | Ed25519 signing, key vault, signature verification, key rotation |
+| 4.10 - R10: Account Management & Device Security | Password management, device trust, account deletion, duress PIN |
 
 ---
 ## 5. Non-Functional requirements
@@ -298,7 +298,7 @@ The architecture should support the onboarding of additional government departme
 
 ## 6. Use Cases
 
-See [use_cases](../demo3/use-cases-v3.md) for the Use Cases and their Use Case Diagrams.
+See [Use Cases](../demo3/use-cases-v3.md) for the Use Cases and their Use Case Diagrams.
 
 ---
 ## 7. Domain Model

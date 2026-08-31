@@ -73,15 +73,6 @@ export const AppSidebar = ({
           : 'h-full w-full'
       }`}
     >
-      <div className="pointer-events-none absolute right-0 top-0 z-20 flex h-full w-1 flex-col">
-        <div className="flex-1 bg-black" />
-        <div className="flex-1 bg-accent-gold" />
-        <div className="flex-1 bg-national-red" />
-        <div className="flex-1 bg-national-blue" />
-        <div className="flex-1 bg-clean-white" />
-        <div className="flex-1 bg-primary-green" />
-      </div>
-      <div className="pointer-events-none absolute right-1 top-0 z-20 h-full w-px bg-clean-white/80" />
       <div
         className={`relative z-10 mb-5 flex items-center ${
           isExpanded ? 'justify-between' : 'justify-center'
@@ -173,14 +164,10 @@ export const AppSidebar = ({
                       !isExpanded ? 'justify-center px-0' : ''
                     } ${
                       isActive
-                        ? 'bg-clean-white/15 text-clean-white'
-                        : 'text-clean-white/75 hover:bg-clean-white/10 hover:text-clean-white'
+                        ? 'border border-accent-gold bg-clean-white/10 text-clean-white'
+                        : 'border border-transparent text-clean-white/75 hover:bg-clean-white/10 hover:text-clean-white'
                     }`}
                   >
-                    {isActive && isExpanded && (
-                      <span className="absolute left-0 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-accent-gold" />
-                    )}
-
                     <Icon
                       className={`h-5 w-5 shrink-0 transition-colors ${iconColor}`}
                     />
@@ -195,7 +182,7 @@ export const AppSidebar = ({
       </nav>
 
       {isExpanded && (
-        <div className="relative z-10 mt-auto rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+        <div className="relative z-10 mt-auto rounded-[26px] bg-accent-gold p-[2px]">
           <div className="rounded-[24px] bg-deep-green p-3">
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">

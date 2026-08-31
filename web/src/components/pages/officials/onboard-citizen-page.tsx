@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { ShieldCheck } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
@@ -15,7 +16,7 @@ import {
 import {
   AuditLogPreview,
   CaptureContactDetails,
-  OnboardingStatusCard,
+  StatusChecklistCard,
   RetrieveIdentityRecord,
 } from '@/components/organisms'
 import { handleApiError } from '@/lib/exceptionhandler'
@@ -145,14 +146,19 @@ export default function OnboardCitizenPage() {
             setErrors={setErrors}
           />
 
-          <OnboardingStatusCard
-            record={record}
-            idConsent={idConsent}
-            contactDetailsConsent={contactDetailsConsent}
-            phone={phone}
-            email={email}
-            accountCreated={accountCreated}
-            activationSent={activationSent}
+          <StatusChecklistCard
+            icon={ShieldCheck}
+            items={[
+              { done: !!record, label: 'Identity record retrieved' },
+              {
+                done: idConsent && contactDetailsConsent,
+                label: 'Consent captured',
+              },
+              { done: !!phone || !!email, label: 'Contact details captured' },
+              { done: accountCreated, label: 'Pending account created' },
+              { done: activationSent, label: 'Activation link sent' },
+            ]}
+            title="Onboarding Status"
           />
         </div>
 

@@ -44,6 +44,7 @@ export type CredentialView = {
   id: string
   title: string
   issuer: string
+  qrCredentialType: 'identityDocument' | 'driversLicense'
   icon: LucideIcon
   statusLabel: string
   statusIntent: 'active' | 'inactive'

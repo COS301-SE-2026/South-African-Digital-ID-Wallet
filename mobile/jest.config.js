@@ -10,6 +10,7 @@ module.exports = {
     '!src/**/*.test.{ts,tsx}',
     '!src/**/__tests__/**',
     '!src/**/index.ts',
+    '!src/**/types.ts',
   ],
   coverageReporters: ['text', 'lcov'],
 }
