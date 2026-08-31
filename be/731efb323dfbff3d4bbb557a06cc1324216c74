@@ -1,0 +1,25 @@
+web/src/components/organisms/credential-details-modal/credential-details-modal.tsx
+  h_712d174fc3f309 19-22
+  h_712d174fc3f309 18,111-115,127,170,306
+web/src/components/organisms/credential-details-modal/types.ts
+  h_712d174fc3f309 1,3-5,10
+web/src/components/pages/gov-admin/manage-credentials-page.tsx
+  h_712d174fc3f309 6-7,10,61-70,72-76
+web/src/services/credential-service/credential-service.ts
+  h_712d174fc3f309 4-8,17-27
+web/src/services/credential-service/credential-urls.ts
+  h_712d174fc3f309 3-4
+web/src/services/credential-service/types.ts
+  h_712d174fc3f309 38-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "be731efb323dfbff3d4bbb557a06cc1324216c74",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
