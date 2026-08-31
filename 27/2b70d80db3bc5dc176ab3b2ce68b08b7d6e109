@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Application/Features/Officials/DTOs/OfficialHistoryItemDto.cs
+  h_99fca60b892ff4 1-12
+backend/FlashIdBackend/Application/Features/Officials/DTOs/OfficialHistoryResponseDto.cs
+  h_99fca60b892ff4 1-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "272b70d80db3bc5dc176ab3b2ce68b08b7d6e109",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

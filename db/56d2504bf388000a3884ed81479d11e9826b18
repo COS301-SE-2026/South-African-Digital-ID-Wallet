@@ -1,0 +1,14 @@
+backend/FlashIdBackend/Application/Common/Mapping/AuditOutcomeMapper.cs
+  h_99fca60b892ff4 1-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "db56d2504bf388000a3884ed81479d11e9826b18",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
