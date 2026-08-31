@@ -105,6 +105,7 @@ public static class DependencyInjection
         services.AddScoped<CredentialExpiryRepository>();
         services.AddScoped<ICredentialExpiryRepository>(sp => new RetryingCredentialExpiryRepositoryDecorator(sp.GetRequiredService<CredentialExpiryRepository>()));
         services.AddHostedService<CredentialExpiryBackgroundService>();
+        services.AddHttpClient<IFaceLivenessService, AzureFaceLivenessServiceProvider>();
 
         return services;
     }
