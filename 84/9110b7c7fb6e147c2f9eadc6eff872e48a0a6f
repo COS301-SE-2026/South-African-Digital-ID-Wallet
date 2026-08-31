@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Domain/Entities/PhysicalIdentityVerification.cs
+  h_293a8616118f65 1-21
+backend/FlashIdBackend/Domain/Enums/IdentityVerificationStatus.cs
+  h_293a8616118f65 1-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "849110b7c7fb6e147c2f9eadc6eff872e48a0a6f",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

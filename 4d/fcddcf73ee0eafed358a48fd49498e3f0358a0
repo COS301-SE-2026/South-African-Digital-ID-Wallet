@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_293a8616118f65 108
+backend/FlashIdBackend/Infrastructure/Providers/AzureFaceLivenessServiceProvider.cs
+  h_293a8616118f65 1-2,7,9,15,25-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "4dfcddcf73ee0eafed358a48fd49498e3f0358a0",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
