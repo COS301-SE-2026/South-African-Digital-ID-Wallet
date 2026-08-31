@@ -1,6 +1,7 @@
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Common.Mapping;
 using Application.Features.Verification.Dtos;
 using Domain.Entities;
 using Domain.Enums;
@@ -79,7 +80,7 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
         verification.Status = IdentityVerificationStatus.AwaitingDocument;
         verification.UpdatedAt = DateTime.UtcNow;
         await _repository.SaveChangesAsync(cancellationToken);
-        return Map(verification);
+        return PhysicalIdentityVerificationMapper.ToPhysicalVerificationResponseDto(verification); ;
     }
 
     public async Task<CreateLivenessSessionResult> CreateLivenessSessionAsync(Guid verificationId, Guid userId,
@@ -124,7 +125,7 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
 
         if (!result.IsComplete)
         {
-            return Map(verification);
+            return PhysicalIdentityVerificationMapper.ToPhysicalVerificationResponseDto(verification); ;
         }
 
         verification.LivenessPassed = result.LivenessPassed;
@@ -147,7 +148,7 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
 
         }
         await _repository.SaveChangesAsync(cancellationToken);
-        return Map(verification);
+        return PhysicalIdentityVerificationMapper.ToPhysicalVerificationResponseDto(verification); ;
     }
 
     public async Task<PhysicalVerificationResponseDto> GetAsync(Guid verificationId, Guid userId,
@@ -164,7 +165,7 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
             await _repository.SaveChangesAsync(cancellationToken);
         }
 
-        return Map(verification);
+        return PhysicalIdentityVerificationMapper.ToPhysicalVerificationResponseDto(verification);
     }
 
     private async Task<PhysicalIdentityVerification> GetOwnedVerificationAsync(Guid verificationId, Guid userId,
@@ -194,17 +195,5 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
         }
     }
 
-    private static PhysicalVerificationResponseDto Map(PhysicalIdentityVerification verification)
-    {
-        return new PhysicalVerificationResponseDto
-        {
-            VerificationId = verification.Id,
-            Status = verification.Status,
-            LivenessPassed = verification.LivenessPassed,
-            CardFaceMatchedLiveFace = verification.CardFaceMatchedLiveFace,
-            ExpiresAt = verification.ExpiresAt,
-            VerifiedAt = verification.CreatedAt,
-            FailureReason = verification.FailureReason,
-        };
-    }
+
 }

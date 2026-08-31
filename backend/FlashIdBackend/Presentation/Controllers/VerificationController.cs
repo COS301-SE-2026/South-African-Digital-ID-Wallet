@@ -3,7 +3,6 @@ using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Verification.Dtos;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
@@ -49,7 +48,7 @@ public class VerificationController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("physical/{verificationId:guid/consent}")]
+    [HttpPost("physical/{verificationId:guid}/consent")]
     public async Task<IActionResult> GrantPhysicalConsent(Guid verificationId, CancellationToken cancellationToken)
     {
         if (!TryGetUserId(out var userId))
@@ -74,6 +73,30 @@ public class VerificationController : ControllerBase
 
         var result = await _physicalIdentityVerificationService.CreateLivenessSessionAsync(verificationId, userId, stream, referenceImage.ContentType, cancellationToken);
 
+        return Ok(result);
+    }
+
+    [HttpPost("physical/{verificationId:guid}/liveness-result")]
+    public async Task<IActionResult> CompleteLiveness(Guid verificationId, CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var result = await _physicalIdentityVerificationService.CompleteLivenessAsync(verificationId, userId, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpGet("physical/{verificationId:guid}")]
+    public async Task<IActionResult> GetPhysicalVerification(Guid verificationId, CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var result = await _physicalIdentityVerificationService.GetAsync(verificationId, userId, cancellationToken);
         return Ok(result);
     }
 
