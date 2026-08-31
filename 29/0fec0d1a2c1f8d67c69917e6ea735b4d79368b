@@ -1,0 +1,20 @@
+mobile/src/components/atoms/icon-tile/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/atoms/index.ts
+  h_712d174fc3f309 5-6
+mobile/src/components/atoms/icon-tile/icon-tile.tsx
+  h_712d174fc3f309 1-67
+mobile/src/components/atoms/icon-tile/types.ts
+  h_712d174fc3f309 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "290fec0d1a2c1f8d67c69917e6ea735b4d79368b",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
