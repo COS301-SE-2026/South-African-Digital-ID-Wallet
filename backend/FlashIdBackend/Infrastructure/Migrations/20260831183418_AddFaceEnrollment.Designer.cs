@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260831151139_AddFaceEnrollment")]
+    [Migration("20260831183418_AddFaceEnrollment")]
     partial class AddFaceEnrollment
     {
         /// <inheritdoc />
@@ -439,7 +439,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CitizenId")
                         .IsUnique();
 
-                    b.ToTable("FaceEnrollment");
+                    b.ToTable("FaceEnrollments");
                 });
 
             modelBuilder.Entity("Domain.Entities.GovernmentAdministrator", b =>

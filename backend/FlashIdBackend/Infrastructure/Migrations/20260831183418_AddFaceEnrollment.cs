@@ -12,7 +12,7 @@ namespace Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "FaceEnrollment",
+                name: "FaceEnrollments",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -30,9 +30,9 @@ namespace Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FaceEnrollment", x => x.Id);
+                    table.PrimaryKey("PK_FaceEnrollments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FaceEnrollment_Citizens_CitizenId",
+                        name: "FK_FaceEnrollments_Citizens_CitizenId",
                         column: x => x.CitizenId,
                         principalTable: "Citizens",
                         principalColumn: "Id",
@@ -40,8 +40,8 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_FaceEnrollment_CitizenId",
-                table: "FaceEnrollment",
+                name: "IX_FaceEnrollments_CitizenId",
+                table: "FaceEnrollments",
                 column: "CitizenId",
                 unique: true);
         }
@@ -50,7 +50,7 @@ namespace Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "FaceEnrollment");
+                name: "FaceEnrollments");
         }
     }
 }

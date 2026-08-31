@@ -436,7 +436,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CitizenId")
                         .IsUnique();
 
-                    b.ToTable("FaceEnrollment");
+                    b.ToTable("FaceEnrollments");
                 });
 
             modelBuilder.Entity("Domain.Entities.GovernmentAdministrator", b =>

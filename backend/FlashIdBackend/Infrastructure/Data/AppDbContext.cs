@@ -28,7 +28,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<DeviceVerification> DeviceVerifications => Set<DeviceVerification>();
     public DbSet<JobRun> JobRuns => Set<JobRun>();
-    public DbSet<FaceEnrollment> FaceEnrollment => Set<FaceEnrollment>();
+    public DbSet<FaceEnrollment> FaceEnrollments => Set<FaceEnrollment>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
