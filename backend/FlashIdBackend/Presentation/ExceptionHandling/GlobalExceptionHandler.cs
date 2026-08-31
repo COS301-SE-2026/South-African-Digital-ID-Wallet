@@ -1,4 +1,5 @@
 using Application.Features.Onboarding.Exceptions;
+using Application.Features.Verification.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Diagnostics;
 
@@ -32,6 +33,10 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
 
             EmailDeliveryException => (StatusCodes.Status503ServiceUnavailable, "Required value missing",
                     exception.Message),
+
+            VerificationExpiredException => (StatusCodes.Status410Gone, "Verification session expired", exception.Message),
+
+            VerificationNotFoundException => (StatusCodes.Status404NotFound, "Verification session not found", exception.Message),
 
             ArgumentNullException => (StatusCodes.Status400BadRequest, "Invalid request",
                 exception.Message),

@@ -3,6 +3,7 @@ using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Mapping;
 using Application.Features.Verification.Dtos;
+using Application.Features.Verification.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
 
@@ -92,13 +93,13 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
 
         if (verification.ConsentGrantedAt is null)
         {
-            throw new InvalidOperationException("ConsentGrantedAt must be granted before biometric verification.");
+            throw new InvalidOperationException("Consent granted at must be granted before biometric verification.");
         }
 
         if (verification.Status != IdentityVerificationStatus.AwaitingDocument &&
             verification.Status != IdentityVerificationStatus.AwaitingLiveness)
         {
-            throw new InvalidOperationException("Verification is not ready foe liveness.");
+            throw new InvalidOperationException("Verification is not ready for liveness.");
         }
 
         var azure = await _faceLivenessServiceProvider.CreateLivenessWithVerifySessionAsync(referenceImage, contentType, Guid.NewGuid(), cancellationToken);
@@ -175,7 +176,7 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
 
         if (verification is null || verification.UserId != userId)
         {
-            throw new InvalidOperationException("Verification session could not be found.");
+            throw new VerificationNotFoundException();
         }
 
         return verification;
@@ -185,7 +186,7 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
     {
         if (verification.ExpiresAt < DateTime.UtcNow || verification.Status == IdentityVerificationStatus.Expired)
         {
-            throw new InvalidOperationException("Verification session has expired.");
+            throw new VerificationExpiredException();
         }
 
         if (verification.Status == IdentityVerificationStatus.Verified ||
