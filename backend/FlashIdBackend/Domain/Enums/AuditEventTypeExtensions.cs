@@ -1,6 +1,6 @@
 using Domain.Enums;
 
-namespace Doamin.Enums;
+namespace Domain.Enums;
 
 public static class AuditEventTypeExtensions
 {
