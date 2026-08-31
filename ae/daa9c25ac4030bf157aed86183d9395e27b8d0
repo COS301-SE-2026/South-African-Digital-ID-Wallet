@@ -1,0 +1,20 @@
+backend/FlashIdBackend/Application/Common/Services/CredentialExpiryService.cs
+  h_99fca60b892ff4 104
+backend/FlashIdBackend/Application/Common/Services/QrService.cs
+  h_99fca60b892ff4 186
+backend/FlashIdBackend/Application/Common/Services/CitizenVerificationService.cs
+  h_99fca60b892ff4 89
+backend/FlashIdBackend/Application/Common/Services/CredentialService.cs
+  h_99fca60b892ff4 60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "aedaa9c25ac4030bf157aed86183d9395e27b8d0",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

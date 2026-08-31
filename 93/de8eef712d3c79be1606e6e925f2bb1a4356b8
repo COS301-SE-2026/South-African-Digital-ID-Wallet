@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Application/Features/Officials/DTOs/MyActivityResponseDto.cs
+  h_99fca60b892ff4 1-6
+backend/FlashIdBackend/Application/Features/Officials/DTOs/MyActivityItemDto.cs
+  h_99fca60b892ff4 1-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "93de8eef712d3c79be1606e6e925f2bb1a4356b8",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

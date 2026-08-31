@@ -1,0 +1,21 @@
+docs/demo3/SRS-v3.md
+  h_99fca60b892ff4 159,184,190-199,301
+docs/demo3/use-cases-v3.md
+  h_99fca60b892ff4 59,61,63,65-91
+docs/demo3/epics-and-user-stories-v3.md
+  h_99fca60b892ff4 5,269,272-273,285,290-291,294
+  h_99fca60b892ff4 274,288
+docs/images/Issue_Credentials_UC_Diagram.svg
+  h_99fca60b892ff4 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "5d3a121c851aa06d6c2c41b36c0f72fc7d07158e",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

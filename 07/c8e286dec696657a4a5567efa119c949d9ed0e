@@ -1,0 +1,14 @@
+backend/FlashIdBackend/tests/IssueCredentialServiceTests.cs
+  h_99fca60b892ff4 8,10,208-392
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "07c8e286dec696657a4a5567efa119c949d9ed0e",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

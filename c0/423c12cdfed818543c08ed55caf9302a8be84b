@@ -1,0 +1,18 @@
+backend/FlashIdBackend/Application/Common/Services/AzureFaceLivenessService.cs
+  h_293a8616118f65 1-25
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IFaceLivenessService.cs
+  h_293a8616118f65 1-9
+backend/FlashIdBackend/Application/Features/Verification/Dtos/CreateLivenessSessionResult.cs
+  h_293a8616118f65 1-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c0423c12cdfed818543c08ed55caf9302a8be84b",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
