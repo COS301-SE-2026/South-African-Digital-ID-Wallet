@@ -1,0 +1,17 @@
+web/src/components/atoms/status-pill/types.ts
+  h_712d174fc3f309 3-4,7-8
+web/src/components/atoms/status-pill/status-pill.tsx
+  h_712d174fc3f309 1,3-12,16,19,27-29
+  h_712d174fc3f309 2,20-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "91391e1c3559e88750349eea33bb5d27fd4c37b3",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

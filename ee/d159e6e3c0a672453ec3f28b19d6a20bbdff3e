@@ -1,0 +1,21 @@
+web/src/components/organisms/status-checklist-card/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+web/src/components/organisms/status-checklist-card/status-checklist-card.tsx
+  h_712d174fc3f309 1-8,13
+  h_712d174fc3f309 9-12,14-27
+web/src/components/organisms/status-checklist-card/types.ts
+  h_712d174fc3f309 2-3,6-8
+  h_712d174fc3f309 1,4-5,9-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "eed159e6e3c0a672453ec3f28b19d6a20bbdff3e",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

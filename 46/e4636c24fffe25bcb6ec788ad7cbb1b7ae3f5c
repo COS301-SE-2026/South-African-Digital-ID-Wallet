@@ -1,0 +1,21 @@
+web/src/components/organisms/lookup-citizen-credentials/lookup-citizen-credentials.tsx
+  h_712d174fc3f309 1-9,13-20,30
+  h_712d174fc3f309 10-12,21-29,31-133
+web/src/components/organisms/lookup-citizen-credentials/types.ts
+  h_712d174fc3f309 2-3
+  h_712d174fc3f309 1,4-13
+web/src/components/organisms/lookup-citizen-credentials/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "46e4636c24fffe25bcb6ec788ad7cbb1b7ae3f5c",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
