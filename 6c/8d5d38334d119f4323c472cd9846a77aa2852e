@@ -1,0 +1,19 @@
+backend/FlashIdBackend/Presentation/ExceptionHandling/GlobalExceptionHandler.cs
+  h_293a8616118f65 2,37-39
+  h_293a8616118f65 40
+backend/FlashIdBackend/Application/Common/Services/PhysicalIdentityVerificationService.cs
+  h_293a8616118f65 6,96,102,179,189
+backend/FlashIdBackend/Application/Features/Verification/Exceptions/VerificationExpiredException.cs
+  h_293a8616118f65 1-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "6c8d5d38334d119f4323c472cd9846a77aa2852e",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
