@@ -113,7 +113,42 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
     public async Task<PhysicalVerificationResponseDto> CompleteLivenessAsync(Guid verificationId, Guid userId,
         CancellationToken cancellationToken)
     {
-        return new PhysicalVerificationResponseDto();
+        var verification = await GetOwnedVerificationAsync(verificationId, userId, cancellationToken);
+        EnsureNotExpired(verification);
+
+        if (string.IsNullOrWhiteSpace(verification.AzureLivenessSessionId))
+        {
+            throw new InvalidOperationException("Azure liveness session has not been created.");
+        }
+
+        var result = await _faceLivenessServiceProvider.GetLivenessWithVerifyResultAsync(verification.AzureLivenessSessionId, cancellationToken);
+
+        if (!result.IsComplete)
+        {
+            return Map(verification);
+        }
+
+        verification.LivenessPassed = result.LivenessPassed;
+        verification.CardFaceMatchedLiveFace = result.FaceMatched;
+        verification.UpdatedAt = DateTime.UtcNow;
+
+        if (result.LivenessPassed == true && result.FaceMatched == true)
+        {
+            verification.Status = IdentityVerificationStatus.Verified;
+            verification.VerifiedAt = DateTime.UtcNow;
+        }
+        else
+        {
+            verification.Status = IdentityVerificationStatus.Failed;
+            verification.FailureReason =
+                result.LivenessPassed != true
+                    ? "Liveness verification failed."
+                    : "Live face did not match the identitty document.";
+
+
+        }
+        await _repository.SaveChangesAsync(cancellationToken);
+        return Map(verification);
     }
 
     public async Task<PhysicalVerificationResponseDto> GetAsync(Guid verificationId, Guid userId,
