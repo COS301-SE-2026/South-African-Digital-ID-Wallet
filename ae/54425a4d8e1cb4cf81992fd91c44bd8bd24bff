@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Infrastructure/Repositories/PhysicalIdentityVerificationRepository.cs
+  h_293a8616118f65 1-44
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IPhysicalIdentityVerificationRepository.cs
+  h_293a8616118f65 1-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "ae54425a4d8e1cb4cf81992fd91c44bd8bd24bff",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
