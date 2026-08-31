@@ -14,6 +14,9 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Services;
 using Microsoft.Azure.Cosmos;
 using User = Domain.Entities.User;
+using Infrastructure.Repositories.Decorators;
+using Infrastructure.BackgroundJobs;
+using Microsoft.Extensions.Hosting;
 
 namespace Infrastructure;
 
@@ -98,6 +101,11 @@ public static class DependencyInjection
         services.AddScoped<ISmsProvider, AzureCommunicationSmsProvider>();
         services.AddScoped<IVerificationRepository, VerificationRepository>();
         services.AddScoped<ICredentialsActivationRepository, CredentialsActivationRepository>();
+
+        services.AddScoped<CredentialExpiryRepository>();
+        services.AddScoped<ICredentialExpiryRepository>(sp => new RetryingCredentialExpiryRepositoryDecorator(sp.GetRequiredService<CredentialExpiryRepository>()));
+        services.AddHostedService<CredentialExpiryBackgroundService>();
+
         return services;
     }
 }

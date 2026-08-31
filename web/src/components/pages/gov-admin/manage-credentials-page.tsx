@@ -3,8 +3,11 @@ import { useMemo, useState } from 'react'
 import { SearchBar } from '@/components/atoms/search-bar'
 import { SearchResultsTable } from '@/components/organisms/search-results-table'
 import { CredentialDetailsModal } from '@/components/organisms/credential-details-modal'
+import { credentialService } from '@/services/credential-service'
+import { revocationReasons } from '@/components/organisms/revoke-credentials-modal/constants'
 import type { SearchResultRow } from '@/components/organisms/search-results-table/types'
 import type { CredentialDetail } from '@/components/organisms/credential-details-modal/types'
+import type { RevocationReason } from '@/components/organisms/revoke-credentials-modal'
 
 const RESULTS_PER_PAGE = 15
 
@@ -55,10 +58,22 @@ export function ManageCredentialsPage() {
     setSelectedCredentials([])
   }
 
-  const handleRevoke = (credential: CredentialDetail) => {
-    console.log('revoke credential', credential.id)
-  }
+  const handleRevoke = async (
+    credential: CredentialDetail,
+    payload: { reason: RevocationReason; notes: string }
+  ) => {
+    const reasonLabel =
+      revocationReasons.find((r) => r.value === payload.reason)?.label ??
+      payload.reason
+    const combinedReason = payload.notes
+      ? `${reasonLabel}: ${payload.notes}`
+      : reasonLabel
 
+    await credentialService.revoke(credential.id, {
+      newStatus: 'Revoked',
+      reason: combinedReason,
+    })
+  }
   return (
     <div className="flex min-h-full overflow-x-hidden bg-[#f6f2ea]">
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">

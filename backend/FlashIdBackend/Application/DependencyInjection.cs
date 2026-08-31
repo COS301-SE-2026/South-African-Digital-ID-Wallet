@@ -34,6 +34,9 @@ public static class DependencyInjection
         services.AddSingleton<ManageUserAccountMapper>();
         services.AddScoped<IUpdatePasswordService, UpdatePasswordService>();
         services.AddScoped<IDeleteAccountService, DeleteAccountService>();
+        services.AddScoped<ICredentialExpiryService, CredentialExpiryService>();
+        services.AddSingleton<CredentialExpiryMapper>();
+        services.AddScoped<IIssueCredentialService, IssueCredentialService>();
         return services;
     }
 }
