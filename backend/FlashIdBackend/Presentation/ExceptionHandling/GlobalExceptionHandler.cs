@@ -48,6 +48,10 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
                 (StatusCodes.Status404NotFound, "Government registry record not found",
                     exception.Message),
 
+            GovernmentRegistryDataInvalidException =>
+                (StatusCodes.Status502BadGateway, "Government registry record invalid data",
+                    exception.Message),
+
             EmailDeliveryException => (StatusCodes.Status503ServiceUnavailable, "Required value missing",
                     exception.Message),
 

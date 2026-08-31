@@ -16,3 +16,8 @@ public class GovernmentRegistryRecordNotFoundException : Exception
 {
     public GovernmentRegistryRecordNotFoundException(string saId, CredentialType credentialType) : base($"No '{credentialType}' record found at the government registry for SA ID '{saId}'.") { }
 }
+
+public class GovernmentRegistryDataInvalidException : Exception
+{
+    public GovernmentRegistryDataInvalidException(string saId, string fieldName, string value) : base($"The government registry returned an unrecognised value '{value}' for '{fieldName}' (citizen '{saId}').") { }
+}

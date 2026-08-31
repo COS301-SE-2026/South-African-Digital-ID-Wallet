@@ -49,7 +49,7 @@ public class CredentialControllerIntegrationTests
         public CredentialResponseDto? IssueResultToReturn { get; set; }
         public Exception? IssueException { get; set; }
 
-        public Task<CitizenCredentialStatusResponseDto> GetCitizenStatusAsync(string saId, CancellationToken cancellationToken)
+        public Task<CitizenCredentialStatusResponseDto> GetCitizenStatusAsync(string saId, Guid officialId, string ipAddress, CancellationToken cancellationToken)
         {
             if (StatusException is not null) throw StatusException;
 

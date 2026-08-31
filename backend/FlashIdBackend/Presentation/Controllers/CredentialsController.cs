@@ -181,9 +181,18 @@ public class CredentialsController : ControllerBase
     [ProducesResponseType(typeof(CitizenCredentialStatusResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [EnableRateLimiting("citizen-status-lookup")]
     public async Task<IActionResult> GetCitizenStatus(string saId, CancellationToken cancellationToken)
     {
-        var response = await _issueCredentialService.GetCitizenStatusAsync(saId, cancellationToken);
+        var officialIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(officialIdValue, out var officialId))
+        {
+            return Unauthorized(new { message = "The authenticated official could not be identified." });
+        }
+
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var response = await _issueCredentialService.GetCitizenStatusAsync(saId, officialId, ipAddress, cancellationToken);
 
         return Ok(response);
     }

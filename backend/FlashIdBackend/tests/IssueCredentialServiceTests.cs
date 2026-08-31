@@ -129,7 +129,7 @@ public class IssueCredentialServiceTests
         using var context = CreateContext();
         var service = CreateService(context, new FakeGovernmentRegistryGateway());
 
-        await Assert.ThrowsAsync<ArgumentException>(() => service.GetCitizenStatusAsync("12345", TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<ArgumentException>(() => service.GetCitizenStatusAsync("12345", Guid.NewGuid(), TestIpAddress, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -138,7 +138,7 @@ public class IssueCredentialServiceTests
         using var context = CreateContext();
         var service = CreateService(context, new FakeGovernmentRegistryGateway());
 
-        await Assert.ThrowsAsync<CitizenNotFoundException>(() => service.GetCitizenStatusAsync(KnownSaId, TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<CitizenNotFoundException>(() => service.GetCitizenStatusAsync(KnownSaId, Guid.NewGuid(), TestIpAddress, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -148,7 +148,7 @@ public class IssueCredentialServiceTests
         await SeedActivatedCitizenAsync(context);
         var service = CreateService(context, new FakeGovernmentRegistryGateway());
 
-        var response = await service.GetCitizenStatusAsync(KnownSaId, TestContext.Current.CancellationToken);
+        var response = await service.GetCitizenStatusAsync(KnownSaId, Guid.NewGuid(), TestIpAddress, TestContext.Current.CancellationToken);
 
         Assert.Equal("Activated", response.Status);
         Assert.Equal("+27123456789", response.PhoneNumber);
@@ -163,7 +163,7 @@ public class IssueCredentialServiceTests
         await SeedActivatedCitizenAsync(context, withUser: false);
         var service = CreateService(context, new FakeGovernmentRegistryGateway());
 
-        var response = await service.GetCitizenStatusAsync(KnownSaId, TestContext.Current.CancellationToken);
+        var response = await service.GetCitizenStatusAsync(KnownSaId, Guid.NewGuid(), TestIpAddress, TestContext.Current.CancellationToken);
 
         Assert.Null(response.PhoneNumber);
         Assert.Null(response.Email);
@@ -198,7 +198,7 @@ public class IssueCredentialServiceTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var service = CreateService(context, new FakeGovernmentRegistryGateway());
-        var response = await service.GetCitizenStatusAsync(KnownSaId, TestContext.Current.CancellationToken);
+        var response = await service.GetCitizenStatusAsync(KnownSaId, Guid.NewGuid(), TestIpAddress, TestContext.Current.CancellationToken);
         var summary = Assert.Single(response.ExistingCredentials);
 
         Assert.Equal("DriversLicense", summary.Type);

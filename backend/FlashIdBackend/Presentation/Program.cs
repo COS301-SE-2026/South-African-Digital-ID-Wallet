@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Application;
 using Infrastructure;
@@ -15,8 +14,6 @@ using Application.Common.Services;
 using Infrastructure.Repositories;
 using System.Security.Claims;
 using Microsoft.Azure.Cosmos;
-using Microsoft.AspNetCore.Components.Web;
-using System.ComponentModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -166,6 +163,7 @@ builder.Services.AddRateLimiter(options =>
     AddUserPartitionedPolicy(options, "email-change-resend-otp", permitLimit: 3, window: TimeSpan.FromMinutes(1));
     AddUserPartitionedPolicy(options, "email-change-confirm", permitLimit: 5, window: TimeSpan.FromMinutes(1));
     AddUserPartitionedPolicy(options, "issue-credential", permitLimit: 5, window: TimeSpan.FromMinutes(1));
+    AddUserPartitionedPolicy(options, "citizen-status-lookup", permitLimit: 20, window: TimeSpan.FromMinutes(1));
 
     options.RejectionStatusCode = 429;
 });

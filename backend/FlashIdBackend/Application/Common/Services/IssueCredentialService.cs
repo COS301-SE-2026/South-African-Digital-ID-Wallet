@@ -36,6 +36,16 @@ public class IssueCredentialService : IIssueCredentialService
         }
     }
 
+    private static TEnum ParseGovRegEnum<TEnum>(string value, string saId, string fieldName) where TEnum : struct
+    {
+        if (!Enum.TryParse<TEnum>(value, out var parsed))
+        {
+            throw new GovernmentRegistryDataInvalidException(saId, fieldName, value);
+        }
+
+        return parsed;
+    }
+
     private async Task<Credential> BuildDriversLicenseCredential(Citizen citizen, Guid officialId, string ipAddress, CancellationToken cancellationToken)
     {
         if (await _repo.HasDriversLicenseAsync(citizen.Id, cancellationToken))
@@ -62,7 +72,7 @@ public class IssueCredentialService : IIssueCredentialService
             Id = Guid.NewGuid(),
             CredentialId = credential.Id,
             Credential = credential,
-            LicenseCode = Enum.Parse<LicenseCode>(dL.LicenseCode),
+            LicenseCode = ParseGovRegEnum<LicenseCode>(dL.LicenseCode, citizen.SaId, nameof(dL.LicenseCode)),
             LicenseNumber = dL.LicenseNumber,
             Restrictions = dL.Restrictions,
             ExpiryDate = dL.ExpiryDate.ToDateTime(TimeOnly.MinValue),
@@ -102,7 +112,7 @@ public class IssueCredentialService : IIssueCredentialService
             Credential = credential,
             Citizenship = iD.CountryOfBirth,
             CountryOfBirth = iD.CountryOfBirth,
-            Status = Enum.Parse<IdentityDocumentStatus>(iD.CitizenshipStatus),
+            Status = ParseGovRegEnum<IdentityDocumentStatus>(iD.CitizenshipStatus, citizen.SaId, nameof(iD.CitizenshipStatus)),
             Nationality = iD.Nationality,
             PhotoPath = iD.PhotoBlob,
             CreatedAt = DateTime.UtcNow,
@@ -127,11 +137,23 @@ public class IssueCredentialService : IIssueCredentialService
         await _repo.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<CitizenCredentialStatusResponseDto> GetCitizenStatusAsync(string saId, CancellationToken cancellationToken)
+    public async Task<CitizenCredentialStatusResponseDto> GetCitizenStatusAsync(string saId, Guid officialId, string ipAddress, CancellationToken cancellationToken)
     {
         ValidateSaId(saId);
 
         var citizen = await _repo.GetCitizenBySaIdAsync(saId, cancellationToken) ?? throw new CitizenNotFoundException(saId);
+
+        await _repo.AddAuditLogAsync(new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.CitizenStatusViewed,
+            Details = $"Citizen status for '{saId}' viewed by official {officialId}.",
+            ActorId = officialId,
+            IpAddress = ipAddress,
+            CreatedAt = DateTime.UtcNow,
+        }, cancellationToken);
+        await _repo.SaveChangesAsync(cancellationToken);
+
         var response = _citMapper.CitizenToStatusResponseDto(citizen);
 
         if (citizen.Status == CitizenStatus.Activated && citizen.User is not null)
