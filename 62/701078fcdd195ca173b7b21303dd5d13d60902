@@ -1,0 +1,503 @@
+web/src/lib/get-error-status.ts
+  h_712d174fc3f309 1-3
+  h_712d174fc3f309 4-12
+web/src/components/pages/officials/onboard-citizen-page.tsx
+  h_712d174fc3f309 4,19,149-151,158-160
+  h_712d174fc3f309 152-157,161
+web/src/services/issue-credential-service/issue-credential-model.ts
+  h_712d174fc3f309 2-5,7,23-25,27,34
+  h_712d174fc3f309 1,6,8-22,26,28-33,35-38
+web/src/services/issue-credential-service/index.ts
+  h_712d174fc3f309 1-2
+  h_712d174fc3f309 3
+web/src/services/issue-credential-service/test/issue-credential-model.test.ts
+  h_712d174fc3f309 2-5,7-19,21-77
+  h_712d174fc3f309 1,6,20
+web/src/lib/status-intents.ts
+  h_712d174fc3f309 1-4,10-11,21-23
+  h_712d174fc3f309 5-9,12-20,24-26
+backend/FlashIdBackend/Infrastructure/Repositories/CredentialsActivationRepository.cs
+  h_712d174fc3f309 3,44
+  h_712d174fc3f309 18-26,57-61
+backend/FlashIdBackend/Infrastructure/Data/DbSeeder.cs
+  h_712d174fc3f309 789-792,794-796
+  h_712d174fc3f309 89,141-182,221-309
+web/src/services/issue-credential-service/issue-credential-urls.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2-5
+web/src/services/issue-credential-service/issue-credential-dto.ts
+  h_712d174fc3f309 2-3
+  h_712d174fc3f309 1,4-9
+web/src/components/organisms/issue-credential-form/test/issue-credential-form.test.tsx
+  h_712d174fc3f309 1-110
+web/src/components/organisms/lookup-citizen-credentials/test/lookup-citizen-credentials.test.tsx
+  h_712d174fc3f309 1-90
+web/src/components/organisms/index.ts
+  h_712d174fc3f309 23-25
+web/src/schemas/issue-credential-schema.ts
+  h_712d174fc3f309 1-3,10-12,22-25
+  h_712d174fc3f309 4-9,13-21,26
+web/src/types/credential-issuance.types.ts
+  h_712d174fc3f309 7-8,14-17,21-23,33-35,40-42
+  h_712d174fc3f309 1-6,9-13,18-20,24-32,36-39,43-50
+web/src/config/roles/route-permissions.ts
+  h_712d174fc3f309 9
+web/src/config/page-headers/page-headers.ts
+  h_712d174fc3f309 18-19,22-23
+  h_712d174fc3f309 20-21
+web/src/services/issue-credential-service/issue-credential-service.ts
+  h_712d174fc3f309 2-3,5,13-14,19-21,23,29-32
+  h_712d174fc3f309 1,4,6-12,15-18,22,24-28,33
+web/src/components/pages/officials/issue-drivers-license-page.tsx
+  h_712d174fc3f309 1-2,7-8,22-27,34,39,56,69,77,80,99
+  h_712d174fc3f309 3-6,9-21,28-33,35-38,40-55,57-68,70-76,78-79,81-98,100-155
+web/src/services/issue-credential-service/types.ts
+  h_712d174fc3f309 6-7,11-13
+  h_712d174fc3f309 1-5,8-10,14-18
+web/src/components/organisms/status-checklist-card/test/status-checklist-card.test.tsx
+  h_712d174fc3f309 1-21
+web/src/config/navigation/navigation.ts
+  h_712d174fc3f309 95-98
+  h_712d174fc3f309 62-66,94
+government-registry/GovernmentRegistry/Presentation/Program.cs
+  s_c213a9f26b8768::t_d0cf63e99f6742 35
+.github/workflows/web-e2e.yml
+  h_712d174fc3f309 17,53,80-82,112-117
+backend/FlashIdBackend/.config/dotnet-tools.json
+  h_712d174fc3f309 11-17
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/ICredentialExpiryRepository.cs
+  h_712d174fc3f309 1-16
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/ICredentialRepository.cs
+  h_712d174fc3f309 12
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/ICredentialsActivationRepository.cs
+  h_712d174fc3f309 7,14
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/INotificationRepository.cs
+  h_712d174fc3f309 11-12
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/ICredentialExpiryService.cs
+  h_712d174fc3f309 1-10
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/ICredentialService.cs
+  h_712d174fc3f309 8-9
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IIssueCredentialService.cs
+  h_712d174fc3f309 1-10
+backend/FlashIdBackend/Application/Common/Mapping/CitizenMapper.cs
+  h_712d174fc3f309 4,15-19
+backend/FlashIdBackend/Application/Common/Mapping/CredentialExpiryMapper.cs
+  h_712d174fc3f309 1-15
+backend/FlashIdBackend/Application/Common/Mapping/InstitutionMapper.cs
+  h_712d174fc3f309 14-17,25-28
+backend/FlashIdBackend/Application/Common/SastClock.cs
+  h_712d174fc3f309 1-33
+backend/FlashIdBackend/Application/Common/Services/AuthService.cs
+  h_712d174fc3f309 433
+backend/FlashIdBackend/Application/Common/Services/CredentialActivationService.cs
+  h_712d174fc3f309 27
+backend/FlashIdBackend/Application/Common/Services/CredentialExpiryService.cs
+  h_712d174fc3f309 1-119
+backend/FlashIdBackend/Application/Common/Services/CredentialService.cs
+  h_712d174fc3f309 5,7,14-15,18,21-22,37-82
+backend/FlashIdBackend/Application/Common/Services/IssueCredentialService.cs
+  h_712d174fc3f309 1-248
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_712d174fc3f309 37-39
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/CitizenCredentialStatusResponseDto.cs
+  h_712d174fc3f309 1-21
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/CredentialExpiryCheckResponseDto.cs
+  h_712d174fc3f309 1-15
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/IssueCredentialRequestDto.cs
+  h_712d174fc3f309 1-10
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/RevokeCredentialRequestDto.cs
+  h_712d174fc3f309 1-10
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/RevokeCredentialResponseDto.cs
+  h_712d174fc3f309 1-10
+backend/FlashIdBackend/Application/Features/Credentials/Exceptions/CredentialExceptions.cs
+  h_712d174fc3f309 31-36
+backend/FlashIdBackend/Application/Features/Credentials/Exceptions/CredentialExpiryExceptions.cs
+  h_712d174fc3f309 1-7
+backend/FlashIdBackend/Application/Features/Credentials/Exceptions/IssueCredentialExceptions.cs
+  h_712d174fc3f309 1-23
+backend/FlashIdBackend/Domain/Entities/JobRun.cs
+  h_712d174fc3f309 1-13
+backend/FlashIdBackend/Domain/Entities/User.cs
+  h_712d174fc3f309 17-18
+backend/FlashIdBackend/Domain/Enums/AuditEventType.cs
+  h_712d174fc3f309 10,29
+backend/FlashIdBackend/Domain/Enums/JobRunStatus.cs
+  h_712d174fc3f309 1-8
+backend/FlashIdBackend/Infrastructure/BackgroundJobs/CredentialExpiryBackgroundService.cs
+  h_712d174fc3f309 1-45
+backend/FlashIdBackend/Infrastructure/BackgroundJobs/DailyScheduledBackgroundService.cs
+  h_712d174fc3f309 1-47
+backend/FlashIdBackend/Infrastructure/Data/AppDbContext.cs
+  h_712d174fc3f309 30
+backend/FlashIdBackend/Infrastructure/Data/Configurations/AuditLogConfiguration.cs
+  h_712d174fc3f309 48
+backend/FlashIdBackend/Infrastructure/Data/Configurations/JobRunConfiguration.cs
+  h_712d174fc3f309 1-47
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_712d174fc3f309 17-19,104-108
+backend/FlashIdBackend/Infrastructure/Infrastructure.csproj
+  h_712d174fc3f309 29
+backend/FlashIdBackend/Infrastructure/Migrations/20260811194145_AddJobRun.Designer.cs
+  h_712d174fc3f309 1-1320
+backend/FlashIdBackend/Infrastructure/Migrations/20260811194145_AddJobRun.cs
+  h_712d174fc3f309 1-47
+backend/FlashIdBackend/Infrastructure/Migrations/20260816004736_FixAuditLogActorIdNullable.Designer.cs
+  h_712d174fc3f309 1-1319
+backend/FlashIdBackend/Infrastructure/Migrations/20260816004736_FixAuditLogActorIdNullable.cs
+  h_712d174fc3f309 1-37
+backend/FlashIdBackend/Infrastructure/Migrations/20260818204426_AddUserTokenVersion.Designer.cs
+  h_712d174fc3f309 1-1276
+backend/FlashIdBackend/Infrastructure/Migrations/20260818204426_AddUserTokenVersion.cs
+  h_712d174fc3f309 1-29
+backend/FlashIdBackend/Infrastructure/Migrations/20260819123856_AddCitizenIdToCredentialChildEntities.Designer.cs
+  h_712d174fc3f309 1-1331
+backend/FlashIdBackend/Infrastructure/Migrations/20260819123856_AddCitizenIdToCredentialChildEntities.cs
+  h_712d174fc3f309 1-75
+backend/FlashIdBackend/Infrastructure/Migrations/20260831053928_RemoveCitizenIdFromCredentialChildren.Designer.cs
+  h_712d174fc3f309 1-1322
+backend/FlashIdBackend/Infrastructure/Migrations/20260831053928_RemoveCitizenIdFromCredentialChildren.cs
+  h_712d174fc3f309 1-61
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_712d174fc3f309 31,540-586,802-804,1076
+backend/FlashIdBackend/Infrastructure/Providers/JwtTokenProvider.cs
+  h_712d174fc3f309 36
+backend/FlashIdBackend/Infrastructure/Repositories/CredentialExpiryRepository.cs
+  h_712d174fc3f309 1-158
+backend/FlashIdBackend/Infrastructure/Repositories/CredentialRepository.cs
+  h_712d174fc3f309 57-60
+backend/FlashIdBackend/Infrastructure/Repositories/Decorators/RetryingCredentialExpiryRepositoryDecorator.cs
+  h_712d174fc3f309 1-42
+backend/FlashIdBackend/Infrastructure/Repositories/NotificationRepository.cs
+  h_712d174fc3f309 39-43
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_712d174fc3f309 6-7,19-20,25-27,32-33,140-256
+backend/FlashIdBackend/Presentation/ExceptionHandling/GlobalExceptionHandler.cs
+  h_712d174fc3f309 4-5,35-54
+backend/FlashIdBackend/Presentation/Presentation.csproj
+  h_712d174fc3f309 8-9
+backend/FlashIdBackend/Presentation/Program.cs
+  h_712d174fc3f309 24-28,53-71,101-117,165-166,179,181,183-191,194-199,201,203-207,219-220
+backend/FlashIdBackend/scripts/README.md
+  h_712d174fc3f309 1-24
+backend/FlashIdBackend/scripts/export-openapi.py
+  h_712d174fc3f309 1-85
+backend/FlashIdBackend/tests/BackendIntegrationTests.cs
+  h_712d174fc3f309 1,228
+backend/FlashIdBackend/tests/CredentialActivationServiceTests.cs
+  h_712d174fc3f309 1,26,41,44,51
+backend/FlashIdBackend/tests/CredentialControllerIntegrationTests.cs
+  h_712d174fc3f309 1-469
+backend/FlashIdBackend/tests/CredentialExpiryBackgroundServiceTests.cs
+  h_712d174fc3f309 1-104
+backend/FlashIdBackend/tests/CredentialExpiryRepositoryIntegrationTests.cs
+  h_712d174fc3f309 1-346
+backend/FlashIdBackend/tests/CredentialExpiryServiceTests.cs
+  h_712d174fc3f309 1-231
+backend/FlashIdBackend/tests/CredentialServiceIntegrationTests.cs
+  h_712d174fc3f309 1-226
+backend/FlashIdBackend/tests/CredentialServiceTests.cs
+  h_712d174fc3f309 8-9,28-29,88-194
+backend/FlashIdBackend/tests/CredentialsActivationRepositoryIntegrarionTests.cs
+  h_712d174fc3f309 1-193
+backend/FlashIdBackend/tests/DailyScheduledBackgroundServiceTests.cs
+  h_712d174fc3f309 1-55
+backend/FlashIdBackend/tests/IssueCredentialServiceTests.cs
+  h_712d174fc3f309 1-390
+backend/FlashIdBackend/tests/QrServiceTests.cs
+  h_712d174fc3f309 25
+backend/FlashIdBackend/tests/SastClockTests.cs
+  h_712d174fc3f309 1-42
+backend/FlashIdBackend/tests/tests.csproj
+  h_712d174fc3f309 26
+docs/demo3/SAS-v2.md
+  h_712d174fc3f309 216-231,242-265,398-480
+docs/demo3/SRS-v3.md
+  h_712d174fc3f309 159,184,190-199,301
+docs/demo3/architecture-v3.md
+  h_712d174fc3f309 173-183
+docs/demo3/epics-and-user-stories-v3.md
+  h_712d174fc3f309 5-910
+docs/demo3/openapi-government-registry.yaml
+  h_712d174fc3f309 1-48
+docs/demo3/openapi.yaml
+  h_712d174fc3f309 1-1207
+docs/demo3/use-cases-v3.md
+  h_712d174fc3f309 59-97,108,143-173,177
+docs/images/Credentials_Management_v2.svg
+  h_712d174fc3f309 1-4
+docs/images/Issue_Credentials_UC_Diagram.svg
+  h_712d174fc3f309 1-4
+mobile/app.json
+  h_712d174fc3f309 22-23,29-36
+mobile/jest.config.js
+  h_712d174fc3f309 13
+mobile/package.json
+  h_712d174fc3f309 17,19-20,22
+mobile/src/app/_layout.tsx
+  h_712d174fc3f309 3,6,9-12,16-22,26-36
+mobile/src/app/citizen/_layout.tsx
+  h_712d174fc3f309 1-31
+mobile/src/app/citizen/activity.tsx
+  h_712d174fc3f309 1-11
+mobile/src/app/citizen/home.tsx
+  h_712d174fc3f309 5,7-8
+mobile/src/app/citizen/present.tsx
+  h_712d174fc3f309 1-16
+mobile/src/app/citizen/profile.tsx
+  h_712d174fc3f309 1-11
+mobile/src/app/citizen/wallet.tsx
+  h_712d174fc3f309 1-11
+mobile/src/app/official/_layout.tsx
+  h_712d174fc3f309 1-31
+mobile/src/app/official/history.tsx
+  h_712d174fc3f309 1-11
+mobile/src/app/official/home.tsx
+  h_712d174fc3f309 1-11
+mobile/src/app/official/profile.tsx
+  h_712d174fc3f309 1-11
+mobile/src/app/official/requests.tsx
+  h_712d174fc3f309 1-11
+mobile/src/app/official/verify.tsx
+  h_712d174fc3f309 1-16
+mobile/src/app/unsupported-role.tsx
+  h_712d174fc3f309 1-26
+mobile/src/components/atoms/button/test/button.test.tsx
+  h_712d174fc3f309 1-37
+mobile/src/components/atoms/divider/test/divider.test.tsx
+  h_712d174fc3f309 1-14
+mobile/src/components/molecules/index.ts
+  h_712d174fc3f309 2
+mobile/src/components/molecules/nav-tab-item/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/molecules/nav-tab-item/nav-tab-item.tsx
+  h_712d174fc3f309 1-52
+mobile/src/components/molecules/nav-tab-item/types.ts
+  h_712d174fc3f309 1-16
+mobile/src/components/molecules/text-field/test/text-field.test.tsx
+  h_712d174fc3f309 1-17
+mobile/src/components/organisms/bottom-nav-bar/bottom-nav-bar.tsx
+  h_712d174fc3f309 1-43
+mobile/src/components/organisms/bottom-nav-bar/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/bottom-nav-bar/test/bottom-nav-bar.test.tsx
+  h_712d174fc3f309 1-83
+mobile/src/components/organisms/bottom-nav-bar/types.ts
+  h_712d174fc3f309 1-5
+mobile/src/components/organisms/index.ts
+  h_712d174fc3f309 2
+mobile/src/components/organisms/login-form/login-form.tsx
+  h_712d174fc3f309 11,28-33,35-36
+mobile/src/components/organisms/login-form/test/login-form.test.tsx
+  h_712d174fc3f309 84,116-135
+mobile/src/components/pages/login/test/login-page.test.tsx
+  h_712d174fc3f309 1-18
+mobile/src/components/templates/auth-screen/test/auth-screen.test.tsx
+  h_712d174fc3f309 1-15
+mobile/src/components/templates/biometric-gate/biometric-gate.tsx
+  h_712d174fc3f309 1-65
+mobile/src/components/templates/biometric-gate/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/templates/biometric-gate/test/biometric-gate.test.tsx
+  h_712d174fc3f309 1-61
+mobile/src/components/templates/biometric-gate/types.ts
+  h_712d174fc3f309 1-8
+mobile/src/components/templates/index.ts
+  h_712d174fc3f309 2
+mobile/src/components/utility/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/utility/privacy-screen-overlay.tsx
+  h_712d174fc3f309 1-29
+mobile/src/components/utility/session-lock-watcher.tsx
+  h_712d174fc3f309 1-39
+mobile/src/components/utility/test/utility.test.tsx
+  h_712d174fc3f309 1-102
+mobile/src/config/index.ts
+  h_712d174fc3f309 1
+mobile/src/config/navigation/index.ts
+  h_712d174fc3f309 1
+mobile/src/config/navigation/tabs.ts
+  h_712d174fc3f309 1-34
+mobile/src/lib/roles.ts
+  h_712d174fc3f309 1-20
+mobile/src/lib/secure-session.ts
+  h_712d174fc3f309 1-30
+mobile/src/lib/test/roles.test.ts
+  h_712d174fc3f309 1-21
+mobile/src/lib/test/secure-session.test.ts
+  h_712d174fc3f309 1-52
+mobile/src/services/login-service/types.ts
+  h_712d174fc3f309 12-13
+mobile/src/stores/auth-store.ts
+  h_712d174fc3f309 4,17-18,25-28,31,34-47,49,51-53,56-61,64-65
+mobile/src/stores/test/auth-store.test.ts
+  h_712d174fc3f309 5-11,68-114
+mobile/src/test/role-layouts.test.tsx
+  h_712d174fc3f309 1-78
+package.json
+  h_712d174fc3f309 20
+pnpm-lock.yaml
+  h_712d174fc3f309 45-47,51-56,60-62,4305-4309,4361-4371,4391-4400,13062-13066,13143-13151,13169-13179
+web/e2e/.env.e2e.example
+  h_712d174fc3f309 7-8
+web/e2e/auth.setup.ts
+  h_712d174fc3f309 33-37
+web/e2e/test/credential-expiry.spec.ts
+  h_712d174fc3f309 1-34
+web/e2e/test/qr-generation.spec.ts
+  h_712d174fc3f309 11,13-18,22-31
+web/e2e/test/qr-scanning.spec.ts
+  h_712d174fc3f309 19,21-37,39-41,43-46,54-56,60-65,82-84,91-97,114,116
+web/e2e/test/view-credentials.spec.ts
+  h_712d174fc3f309 8-10,12-16,20-21,24-26,28
+web/eslint.config.mjs
+  h_712d174fc3f309 10-19
+web/next.config.ts
+  h_712d174fc3f309 1,5,7-9,18
+web/playwright.config.ts
+  h_712d174fc3f309 49
+web/scripts/copy-standalone-assets.mjs
+  h_712d174fc3f309 1-4
+web/src/app/(portal)/gov-admin/manage-credentials/page.tsx
+  h_712d174fc3f309 1-5
+web/src/components/atoms/avatar/avatar.tsx
+  h_712d174fc3f309 1-23
+web/src/components/atoms/avatar/index.ts
+  h_712d174fc3f309 1-3
+web/src/components/atoms/avatar/test/avatar.test.tsx
+  h_712d174fc3f309 1-9
+web/src/components/atoms/avatar/types.ts
+  h_712d174fc3f309 1-6
+web/src/components/atoms/index.ts
+  h_712d174fc3f309 11-13
+web/src/components/atoms/modal/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/atoms/modal/modal.tsx
+  h_712d174fc3f309 1-56
+web/src/components/atoms/modal/test/modal.test.tsx
+  h_712d174fc3f309 1-75
+web/src/components/atoms/modal/types.ts
+  h_712d174fc3f309 1-9
+web/src/components/atoms/search-bar/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/atoms/search-bar/search-bar.tsx
+  h_712d174fc3f309 1-28
+web/src/components/atoms/search-bar/test/search-bar.test.tsx
+  h_712d174fc3f309 1-56
+web/src/components/atoms/search-bar/types.ts
+  h_712d174fc3f309 1-9
+web/src/components/molecules/account-card/account-card.tsx
+  h_712d174fc3f309 20-24,31-37,44-48,94-97,99-102,104-127
+web/src/components/molecules/activity-overview-card/test/activity-overview-card.test.tsx
+  h_712d174fc3f309 32,35-36,38-42,44-46,52-53,64-71,73-86,91-95,101-109,113,116-135,137-141,143-150,154-155,157-165,167
+web/src/components/molecules/credential-detail-card/credential-detial-card.tsx
+  h_712d174fc3f309 3-8,16-42,44-113,115-126,131-187
+web/src/components/molecules/credential-detail-card/test/credential-detail-card.test.tsx
+  h_712d174fc3f309 1-2,7-71,76,81-88,93-96,98,100-104,108,110,112,114,116,120,122,124-225
+web/src/components/molecules/credentials-list/test/credentials-list.test.tsx
+  h_712d174fc3f309 56-63,79-84,86-88,91-95,97,100-105,109,112-145,147-158
+web/src/components/molecules/delete-account-card/delete-account-card.tsx
+  h_712d174fc3f309 43-57,59,64
+web/src/components/molecules/delete-account-card/test/delete-account-card.test.tsx
+  h_712d174fc3f309 1-172
+web/src/components/molecules/field-toggle-row/field-toggle-row.tsx
+  h_712d174fc3f309 16
+web/src/components/molecules/field-toggle-row/test/field-toggle-row.test.tsx
+  h_712d174fc3f309 17-28
+web/src/components/molecules/index.ts
+  h_712d174fc3f309 28
+web/src/components/molecules/manage-user-trusted-devices/manage-user-trusted-devices.tsx
+  h_712d174fc3f309 63-67,74-83,87-95,97-126,129-141,143-144,147
+web/src/components/molecules/table-pagination/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/table-pagination/table-pagination.tsx
+  h_712d174fc3f309 1-115
+web/src/components/molecules/table-pagination/test/table-pagination.test.tsx
+  h_712d174fc3f309 1-83
+web/src/components/molecules/table-pagination/types.ts
+  h_712d174fc3f309 1-7
+web/src/components/molecules/update-email-card/update-email-card.tsx
+  h_712d174fc3f309 7-9,11-13,15-19,21-28
+web/src/components/molecules/update-password-card/update-password-card.tsx
+  h_712d174fc3f309 9-27,29-32,34-38,40-47
+web/src/components/organisms/app-sidebar/app-sidebar.tsx
+  h_712d174fc3f309 167-168,185
+web/src/components/organisms/app-sidebar/test/app-sidebar.test.tsx
+  h_712d174fc3f309 101-136
+web/src/components/organisms/credential-details-modal/credential-details-modal.tsx
+  h_712d174fc3f309 1-293
+web/src/components/organisms/credential-details-modal/index.ts
+  h_712d174fc3f309 1-7
+web/src/components/organisms/credential-details-modal/types.ts
+  h_712d174fc3f309 1-44
+web/src/components/organisms/credential-selector/credential-selector.tsx
+  h_712d174fc3f309 5,10,13-39,82-144
+web/src/components/organisms/field-selection-form/field-selection-form.tsx
+  h_712d174fc3f309 14-15,27-32,34-37,41-43,47-50,52-55,59-144,146-152,155-160,162-171
+web/src/components/organisms/field-selection-form/test/field-selection-form.test.tsx
+  h_712d174fc3f309 31-36,49-53,69-75,77-79,99-101,104-152
+web/src/components/organisms/field-selection-form/types.ts
+  h_712d174fc3f309 11-12
+web/src/components/organisms/manage-user-account/manage-user-account.tsx
+  h_712d174fc3f309 18
+web/src/components/organisms/qr-display/qr-display.tsx
+  h_712d174fc3f309 23-205,214,217,229,231-235,237,248,263,267-270,282,288,293-297,302-311
+web/src/components/organisms/qr-display/test/qr-display.test.tsx
+  h_712d174fc3f309 33,35,43,45,49-53,57,59,65-70,72-75,78,80,82,99-107,111-117,131-135,143-147
+web/src/components/organisms/qr-display/types.ts
+  h_712d174fc3f309 6-8
+web/src/components/organisms/revoke-credentials-modal/constants.tsx
+  h_712d174fc3f309 1-10
+web/src/components/organisms/revoke-credentials-modal/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/organisms/revoke-credentials-modal/revoke-credentials-modal.tsx
+  h_712d174fc3f309 1-122
+web/src/components/organisms/revoke-credentials-modal/test/revoke-credentials-modal.test.tsx
+  h_712d174fc3f309 1-125
+web/src/components/organisms/revoke-credentials-modal/types.ts
+  h_712d174fc3f309 1-20
+web/src/components/organisms/search-results-table/index.ts
+  h_712d174fc3f309 1-6
+web/src/components/organisms/search-results-table/search-results-table.tsx
+  h_712d174fc3f309 1-177
+web/src/components/organisms/search-results-table/types.ts
+  h_712d174fc3f309 1-21
+web/src/components/pages/citizen/my-credentials-page.tsx
+  h_712d174fc3f309 29-31,33-37,39-41,43-48,50-75,77-82
+web/src/components/pages/gov-admin/manage-credentials-page.tsx
+  h_712d174fc3f309 1-96
+web/src/components/pages/index.ts
+  h_712d174fc3f309 10
+web/src/schemas/index.ts
+  h_712d174fc3f309 2
+web/src/services/credential-service/credential-model.ts
+  h_712d174fc3f309 50-51
+web/src/services/credential-service/test/credential-model.test.ts
+  h_712d174fc3f309 49,74
+web/src/services/credential-service/types.ts
+  h_712d174fc3f309 47
+web/src/services/index.ts
+  h_712d174fc3f309 6
+web/src/types/index.ts
+  h_712d174fc3f309 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "62701078fcdd195ca173b7b21303dd5d13d60902",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_c213a9f26b8768": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "38735699-ca26-434f-bced-e3de56386323",
+        "model": "unknown"
+      },
+      "human_author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
