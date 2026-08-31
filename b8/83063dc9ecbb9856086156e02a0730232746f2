@@ -1,0 +1,21 @@
+web/src/app/(portal)/officials/issue-drivers-license/page.tsx
+  h_712d174fc3f309 2-3
+  h_712d174fc3f309 1,4-5
+web/src/components/organisms/issue-credential-form/types.ts
+  h_712d174fc3f309 2-3
+  h_712d174fc3f309 1,4-14
+web/src/components/organisms/index.ts
+  h_712d174fc3f309 20-21
+  h_712d174fc3f309 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "b883063dc9ecbb9856086156e02a0730232746f2",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
