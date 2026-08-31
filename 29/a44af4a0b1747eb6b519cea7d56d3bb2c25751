@@ -1,0 +1,14 @@
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IAdminDashboardRepository.cs
+  h_99fca60b892ff4 1-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "29a44af4a0b1747eb6b519cea7d56d3bb2c25751",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
