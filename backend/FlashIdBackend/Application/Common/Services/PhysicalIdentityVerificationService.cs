@@ -67,16 +67,47 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
     public async Task<PhysicalVerificationResponseDto> GrantConsentAsync(Guid verificationId, Guid userId,
         CancellationToken cancellationToken)
     {
+        var verification = await GetOwnedVerificationAsync(verificationId, userId, cancellationToken);
 
+        EnsureNotExpired(verification);
 
-        return new PhysicalVerificationResponseDto();
+        if (verification.Status != IdentityVerificationStatus.AwaitingConsent)
+        {
+            throw new InvalidOperationException("Verification is not awaiting consent.");
+        }
 
+        verification.ConsentGrantedAt = DateTime.UtcNow;
+        verification.Status = IdentityVerificationStatus.AwaitingDocument;
+        verification.UpdatedAt = DateTime.UtcNow;
+        await _repository.SaveChangesAsync(cancellationToken);
+        return Map(verification);
     }
 
     public async Task<CreateLivenessSessionResult> CreateLivenessSessionAsync(Guid verificationId, Guid userId,
         Stream referenceImage, string contentType, CancellationToken cancellationToken)
     {
-        return new CreateLivenessSessionResult();
+
+        var verification = await GetOwnedVerificationAsync(verificationId, userId, cancellationToken);
+        EnsureNotExpired(verification);
+
+        if (verification.ConsentGrantedAt is null)
+        {
+            throw new InvalidOperationException("ConsentGrantedAt must be granted before biometric verification.");
+        }
+
+        if (verification.Status != IdentityVerificationStatus.AwaitingDocument &&
+            verification.Status != IdentityVerificationStatus.AwaitingLiveness)
+        {
+            throw new InvalidOperationException("Verification is not ready foe liveness.");
+        }
+
+        var azure = await _faceLivenessServiceProvider.CreateLivenessWithVerifySessionAsync(referenceImage, contentType, Guid.NewGuid(), cancellationToken);
+        verification.AzureLivenessSessionId = azure.SessionId;
+        verification.Status = IdentityVerificationStatus.AwaitingLiveness;
+        verification.UpdatedAt = DateTime.UtcNow;
+        await _repository.SaveChangesAsync(cancellationToken);
+
+        return azure;
     }
 
     public async Task<PhysicalVerificationResponseDto> CompleteLivenessAsync(Guid verificationId, Guid userId,
