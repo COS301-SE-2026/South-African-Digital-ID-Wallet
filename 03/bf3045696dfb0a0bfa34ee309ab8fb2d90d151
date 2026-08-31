@@ -1,0 +1,30 @@
+backend/FlashIdBackend/Presentation/ExceptionHandling/GlobalExceptionHandler.cs
+  h_99fca60b892ff4 51-54
+backend/FlashIdBackend/Presentation/Program.cs
+  h_99fca60b892ff4 166
+backend/FlashIdBackend/Domain/Enums/AuditEventType.cs
+  h_99fca60b892ff4 29
+backend/FlashIdBackend/Application/Common/Services/IssueCredentialService.cs
+  h_99fca60b892ff4 39-48,75,115,140,145-156
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_99fca60b892ff4 184,187-195
+backend/FlashIdBackend/tests/CredentialControllerIntegrationTests.cs
+  h_99fca60b892ff4 52
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IIssueCredentialService.cs
+  h_99fca60b892ff4 8
+backend/FlashIdBackend/Application/Features/Credentials/Exceptions/IssueCredentialExceptions.cs
+  h_99fca60b892ff4 18-22
+backend/FlashIdBackend/tests/IssueCredentialServiceTests.cs
+  h_99fca60b892ff4 132,141,151,166,201
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "03bf3045696dfb0a0bfa34ee309ab8fb2d90d151",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
