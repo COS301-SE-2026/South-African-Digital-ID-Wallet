@@ -1,0 +1,14 @@
+backend/FlashIdBackend/Domain/Enums/AuditEventTypeExtensions.cs
+  h_99fca60b892ff4 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "8f4b17445efe9f773384d7fc924bfc01f749395f",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
