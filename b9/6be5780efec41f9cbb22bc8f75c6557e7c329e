@@ -1,0 +1,18 @@
+backend/FlashIdBackend/Domain/Entities/AuditLog.cs
+  h_99fca60b892ff4 19-21
+backend/FlashIdBackend/Infrastructure/Data/Configurations/AuditLogConfiguration.cs
+  h_99fca60b892ff4 47-53
+backend/FlashIdBackend/Domain/Enums/AuditEventType.cs
+  h_99fca60b892ff4 28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "b96be5780efec41f9cbb22bc8f75c6557e7c329e",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

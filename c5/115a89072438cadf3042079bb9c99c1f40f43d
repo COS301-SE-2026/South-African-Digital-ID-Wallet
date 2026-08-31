@@ -1,0 +1,14 @@
+backend/FlashIdBackend/Application/Common/Mapping/SaIdMasker.cs
+  h_99fca60b892ff4 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c5115a89072438cadf3042079bb9c99c1f40f43d",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

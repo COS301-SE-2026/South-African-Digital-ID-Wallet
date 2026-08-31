@@ -1,0 +1,19 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/IFaceLivenessServiceProvider.cs
+  h_293a8616118f65 9-11
+backend/FlashIdBackend/Infrastructure/Providers/AzureFaceLivenessServiceProvider.cs
+  h_293a8616118f65 4,7,63-141
+  h_293a8616118f65 142-144
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_293a8616118f65 109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c9a1ab5728a4a84428680f472deaa5a322c287ff",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

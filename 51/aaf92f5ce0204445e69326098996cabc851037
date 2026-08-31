@@ -1,0 +1,15 @@
+web/src/components/organisms/lookup-citizen-credentials/lookup-citizen-credentials.tsx
+  h_712d174fc3f309 41-44,55
+  h_712d174fc3f309 45-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "51aaf92f5ce0204445e69326098996cabc851037",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

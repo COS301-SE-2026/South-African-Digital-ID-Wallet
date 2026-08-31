@@ -1,0 +1,18 @@
+backend/FlashIdBackend/Infrastructure/Migrations/20260830132812_AddCitizenIdToAuditLog.Designer.cs
+  h_99fca60b892ff4 1-1334
+backend/FlashIdBackend/Infrastructure/Migrations/20260830132812_AddCitizenIdToAuditLog.cs
+  h_99fca60b892ff4 1-50
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_99fca60b892ff4 34-36,60-61,1083-1087,1089-1090
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "981e1f640cab339af99618b76fee758dd3eac0e9",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

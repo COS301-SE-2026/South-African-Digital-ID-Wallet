@@ -1,0 +1,22 @@
+backend/FlashIdBackend/Infrastructure/Providers/AzureLivenessSessionProvider.cs
+  h_712d174fc3f309 1-77
+  h_712d174fc3f309 78-82
+backend/FlashIdBackend/Infrastructure/Data/AppDbContext.cs
+  h_712d174fc3f309 31
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/ILivenessSessionProvider.cs
+  h_712d174fc3f309 1-18
+  h_712d174fc3f309 19
+backend/FlashIdBackend/Infrastructure/Migrations/20260831151139_AddFaceEnrollment.Designer.cs
+  h_712d174fc3f309 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "8b277a5c3ab0920fbe9565a8311e93b79028c703",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+backend/FlashIdBackend/Infrastructure/Repositories/AdminDashboardRepository.cs
+  h_99fca60b892ff4 1-123
+backend/FlashIdBackend/Application/Features/AdminDashboard/DTOs/AnalyticsResponseDto.cs
+  h_99fca60b892ff4 8
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IAdminDashboardRepository.cs
+  h_99fca60b892ff4 10-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "b347b83f6930e4a04d3817846c4b0a8c3ebf50ba",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

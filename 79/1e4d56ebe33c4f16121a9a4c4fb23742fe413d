@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Infrastructure/Migrations/20260831053928_RemoveCitizenIdFromCredentialChildren.Designer.cs
+  h_99fca60b892ff4 1-1322
+backend/FlashIdBackend/Infrastructure/Migrations/20260831053928_RemoveCitizenIdFromCredentialChildren.cs
+  h_99fca60b892ff4 1-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "791e4d56ebe33c4f16121a9a4c4fb23742fe413d",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

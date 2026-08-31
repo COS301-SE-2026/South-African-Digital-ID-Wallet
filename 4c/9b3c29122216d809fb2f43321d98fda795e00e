@@ -1,0 +1,26 @@
+backend/FlashIdBackend/Application/Features/AdminDashboard/DTOs/AdminActivityItemDto.cs
+  h_99fca60b892ff4 1-9
+backend/FlashIdBackend/Application/Features/AdminDashboard/DTOs/DashboardCountsDto.cs
+  h_99fca60b892ff4 1-8
+backend/FlashIdBackend/Application/Features/AdminDashboard/DTOs/AnalyticsResponseDto.cs
+  h_99fca60b892ff4 1-9
+backend/FlashIdBackend/Application/Features/AdminDashboard/DTOs/SystemStatusDto.cs
+  h_99fca60b892ff4 1-7
+backend/FlashIdBackend/Application/Features/AdminDashboard/DTOs/DashboardSummaryDto.cs
+  h_99fca60b892ff4 1-8
+backend/FlashIdBackend/Application/Features/AdminDashboard/DTOs/DailyPointDto.cs
+  h_99fca60b892ff4 1-7
+backend/FlashIdBackend/Application/Features/AdminDashboard/DTOs/MetricDto.cs
+  h_99fca60b892ff4 1-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "4c9b3c29122216d809fb2f43321d98fda795e00e",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

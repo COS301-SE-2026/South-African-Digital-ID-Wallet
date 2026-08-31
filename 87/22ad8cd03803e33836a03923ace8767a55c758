@@ -1,0 +1,16 @@
+mobile/src/components/molecules/section-header/types.ts
+  h_712d174fc3f309 1-7
+mobile/src/components/molecules/section-header/section-header.tsx
+  h_712d174fc3f309 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "8722ad8cd03803e33836a03923ace8767a55c758",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
