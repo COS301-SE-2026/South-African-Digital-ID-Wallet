@@ -1,0 +1,18 @@
+mobile/src/components/organisms/citizen-dashboard-header/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/citizen-dashboard-header/types.ts
+  h_712d174fc3f309 1-6
+mobile/src/components/organisms/citizen-dashboard-header/citizen-dashboard-header.tsx
+  h_712d174fc3f309 1-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "657617b38607424838c6732b4ff093143fb33e8c",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
