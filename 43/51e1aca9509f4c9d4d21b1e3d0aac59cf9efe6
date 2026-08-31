@@ -1,0 +1,15 @@
+backend/FlashIdBackend/Presentation/Controllers/VerificationController.cs
+  h_293a8616118f65 2,17-18,21,39-83
+  h_293a8616118f65 84-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "4351e1aca9509f4c9d4d21b1e3d0aac59cf9efe6",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

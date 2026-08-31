@@ -1,0 +1,16 @@
+mobile/src/components/atoms/skeleton/types.ts
+  h_712d174fc3f309 1-4
+mobile/src/components/atoms/skeleton/skeleton.tsx
+  h_712d174fc3f309 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "27ba80d4569310c9bc0182b270a1b7b173ea67f8",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
