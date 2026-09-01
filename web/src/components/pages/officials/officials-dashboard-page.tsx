@@ -1,93 +1,68 @@
 'use client'
+import { useEffect, useState } from 'react'
 import { IdCard, QrCode, UserPlus } from 'lucide-react'
 import { QuickActionsCard } from '@/components/molecules/quick-action-card/quick-action-card'
 import { ActivityCard } from '@/components/organisms/activity-card/activity-card'
 import { AuditLogTable } from '@/components/organisms/audit-log-table/audit-log-table'
-import type { AuditLogItem } from '@/components/organisms/audit-log-table/types'
-import type { OfficialActivityItem } from '@/components/organisms/activity-card/types'
+import {
+  getOfficialActivity,
+  getOfficialAuditLogs,
+} from '@/services/official-dashboard-service'
+import type {
+  AuditLogItem,
+  OfficialActivityItem,
+} from '@/services/official-dashboard-service/types'
 
-const MOCK_ACTIVITY: OfficialActivityItem[] = [
-  {
-    id: '1',
-    eventType: 'OnboardCitizen',
-    details: 'Maria Nkosi was successfully onboarded.',
-    createdAt: '2026-09-01T10:24:00Z',
-  },
-  {
-    id: '2',
-    eventType: 'DriverLicenseIssued',
-    details: "Driver's license issued to Maria Nkosi.",
-    createdAt: '2026-09-01T10:20:00Z',
-  },
-  {
-    id: '3',
-    eventType: 'QrCodeVerified',
-    details: "Verified driver's license for Johan Meyer.",
-    createdAt: '2026-09-01T09:55:00Z',
-  },
-  {
-    id: '4',
-    eventType: 'OnboardCitizen',
-    details: 'Thabo Mokoena was successfully onboarded.',
-    createdAt: '2026-09-01T09:30:00Z',
-  },
-  {
-    id: '5',
-    eventType: 'OnboardCitizenFailed',
-    details: 'Citizen onboarding failed for Lerato Nkosi.',
-    createdAt: '2026-09-01T09:10:00Z',
-  },
-]
-
-const MOCK_AUDIT_LOGS: AuditLogItem[] = [
-  {
-    id: '1',
-    createdAt: '2026-09-01T08:30:00',
-    action: 'Citizen Onboarded',
-    citizenName: 'Thabo Mokoena',
-    citizenIdMasked: '900101•••••••',
-    performedBy: 'Sarah Williams',
-    outcome: 'Success',
-  },
-  {
-    id: '2',
-    createdAt: '2026-09-01T09:15:00',
-    action: "Driver's License Issued",
-    citizenName: 'Lerato Nkosi',
-    citizenIdMasked: '950512•••••••',
-    performedBy: 'John Smith',
-    outcome: 'Success',
-  },
-  {
-    id: '3',
-    createdAt: '2026-09-01T09:40:00',
-    action: 'QR Code Verified',
-    citizenName: 'Johan Meyer',
-    citizenIdMasked: '880723•••••••',
-    performedBy: 'Sarah Williams',
-    outcome: 'Success',
-  },
-  {
-    id: '4',
-    createdAt: '2026-09-01T10:05:00',
-    action: 'Citizen Onboarded',
-    citizenName: 'Nomsa Dlamini',
-    citizenIdMasked: '910215•••••••',
-    performedBy: 'Thabo Nkosi',
-    outcome: 'Success',
-  },
-  {
-    id: '5',
-    createdAt: '2026-09-01T10:25:00',
-    action: 'Citizen Onboarding Failed',
-    citizenName: 'Lerato Nkosi',
-    citizenIdMasked: '950512•••••••',
-    performedBy: 'John Smith',
-    outcome: 'Failed',
-  },
-]
-
+const AUDIT_LOG_FETCH_SIZE = 1000
 export default function OfficialsDashboardPage() {
+  const [activity, setActivity] = useState<OfficialActivityItem[]>([])
+  const [activityError, setActivityError] = useState<string | null>(null)
+  useEffect(() => {
+    let ignore = false
+    const load = async () => {
+      setActivityError(null)
+      try {
+        const res = await getOfficialActivity(5)
+        if (!ignore) setActivity(res.items)
+      } catch (err) {
+        console.error('Failed to load official activity', err)
+        if (!ignore) setActivityError('Could not load recent activity.')
+      }
+    }
+    load()
+    return () => {
+      ignore = true
+    }
+  }, [])
+  const [rows, setRows] = useState<AuditLogItem[]>([])
+  const [auditLoading, setAuditLoading] = useState(true)
+  const [auditError, setAuditError] = useState<string | null>(null)
+  useEffect(() => {
+    let ignore = false
+    const load = async () => {
+      setAuditLoading(true)
+      setAuditError(null)
+      try {
+        const res = await getOfficialAuditLogs({
+          page: 1,
+          pageSize: AUDIT_LOG_FETCH_SIZE,
+        })
+        if (!ignore) setRows(res.items)
+      } catch (err) {
+        console.error('Failed to load audit logs', err)
+        if (!ignore) {
+          setAuditError('Could not load audit logs.')
+          setRows([])
+        }
+      } finally {
+        if (!ignore) setAuditLoading(false)
+      }
+    }
+    load()
+    return () => {
+      ignore = true
+    }
+  }, [])
   return (
     <div className="flex min-h-full overflow-x-hidden bg-[#f6f2ea]">
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">
@@ -113,10 +88,24 @@ export default function OfficialsDashboardPage() {
         </div>
         <div className="mt-4 grid min-h-0 flex-1 grid-cols-1 gap-4 lg:mt-6 lg:grid-cols-12 lg:gap-6">
           <section className="min-w-0 lg:col-span-4">
-            <ActivityCard activity={MOCK_ACTIVITY} />
+            {activityError ? (
+              <p className="text-sm text-red-600" role="alert">
+                {activityError}
+              </p>
+            ) : (
+              <ActivityCard activity={activity} />
+            )}
           </section>
           <section className="min-w-0 lg:col-span-8">
-            <AuditLogTable rows={MOCK_AUDIT_LOGS} />
+            {auditError ? (
+              <p className="text-sm text-red-600" role="alert">
+                {auditError}
+              </p>
+            ) : auditLoading ? (
+              <p className="text-sm text-muted-text">Loading audit logs…</p>
+            ) : (
+              <AuditLogTable rows={rows} />
+            )}
           </section>
         </div>
       </main>
