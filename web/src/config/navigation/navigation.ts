@@ -43,7 +43,11 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
   {
     title: 'Government Admin',
     items: [
-      { label: 'Dashboard', href: '/gov-admin', icon: 'dashboard' },
+      {
+        label: 'Dashboard',
+        href: '/gov-admin/gov-admin-dashboard',
+        icon: 'dashboard',
+      },
       {
         label: 'Upload Institution',
         href: '/gov-admin/upload-institution',
