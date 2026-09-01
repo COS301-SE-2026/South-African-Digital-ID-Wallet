@@ -113,7 +113,46 @@ public class CredentialService : ICredentialService
             UpdatedAt = DateTime.UtcNow,
         };
     }
+    public async Task<ReinstateCredentialResponseDto> ReinstateCredentialAsync(Guid credentialId, Guid adminUserId, ReinstateCredentialRequestDto request, string ipAddress)
+    {
+        var credential = await _credentialRepository.GetByIdAsync(credentialId);
+        if (credential == null)
+            throw new CredentialNotFoundException(credentialId);
 
+        if (credential.Status != CredentialStatus.Revoked && credential.Status != CredentialStatus.Investigation)
+            throw new InvalidCredentialStatusTransitionException($"Only credentials that are {CredentialStatus.Revoked} or {CredentialStatus.Investigation} can be reinstated.");
+
+        credential.Status = CredentialStatus.Active;
+        await _credentialRepository.SaveChangesAsync();
+
+        await _institutionRepository.AddAuditLogAsync(new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            ActorId = adminUserId,
+            EventType = AuditEventType.CredentialReinstated,
+            Details = $"Credential {credential.Id} reinstated to Active. Reason: {request.Reason}",
+            IpAddress = ipAddress,
+            CreatedAt = DateTime.UtcNow,
+        });
+        await _institutionRepository.SaveChangesAsync();
+
+        await _notificationRepository.CreateNotificationAsync(new Notification
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = credential.CitizenId,
+            Title = "Credential status updated",
+            Description = "One of your credentials has been reinstated and is now active again.",
+            Tone = "success",
+            CreatedAt = DateTime.UtcNow,
+        });
+
+        return new ReinstateCredentialResponseDto
+        {
+            CredentialId = credential.Id,
+            Status = credential.Status,
+            UpdatedAt = DateTime.UtcNow,
+        };
+    }
     private CredentialResponseDto MapToDto(Credential credential, Citizen citizen)
     {
         var dto = _mapper.CredentialToResponseDto(credential);

@@ -28,7 +28,7 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ActorId")
+                    b.Property<Guid?>("ActorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -537,6 +537,53 @@ namespace Infrastructure.Migrations
                     b.ToTable("Institutions");
                 });
 
+            modelBuilder.Entity("Domain.Entities.JobRun", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("JobName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("ProcessedCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("RunDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobName", "RunDate")
+                        .IsUnique();
+
+                    b.ToTable("JobRuns");
+                });
+
             modelBuilder.Entity("Domain.Entities.Notification", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1026,8 +1073,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.User", "Actor")
                         .WithMany("AuditLogs")
                         .HasForeignKey("ActorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Actor");
                 });

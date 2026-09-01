@@ -4,6 +4,7 @@ import type { TextInputProps } from 'react-native'
 export type BaseTextFieldProps = Omit<TextInputProps, 'secureTextEntry'> & {
   className?: string
   error?: string
+  label?: string
   LeftIcon?: LucideIcon
   secure?: boolean
 }
