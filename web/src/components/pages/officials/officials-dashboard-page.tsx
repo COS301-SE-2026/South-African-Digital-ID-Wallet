@@ -71,13 +71,13 @@ export default function OfficialsDashboardPage() {
             icon={<UserPlus className="h-5 w-5" />}
             title="Onboard Citizen"
             description="Register a new citizen onto FlashID."
-            href="/onboard-citizen"
+            href="/officials/onboard-citizen"
           />
           <QuickActionsCard
             icon={<IdCard className="h-5 w-5" />}
             title="Issue Drivers License"
             description="Issue a driver's license to an active citizen."
-            href="/officials/issue-license"
+            href="/officials/issue-drivers-license"
           />
           <QuickActionsCard
             icon={<QrCode className="h-5 w-5" />}
