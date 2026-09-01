@@ -4,7 +4,7 @@ import type { QuickActionsRowProps } from './types'
 
 export const QuickActionsRow: FC<QuickActionsRowProps> = ({ actions }) => {
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+    <div className="flex flex-col gap-3">
       {actions.map((action) => (
         <QuickActionsCard
           key={action.key}
@@ -13,6 +13,7 @@ export const QuickActionsRow: FC<QuickActionsRowProps> = ({ actions }) => {
           description={action.description}
           href={action.href}
           dataCy={`quick-action-${action.key}`}
+          variant="gradient"
         />
       ))}
     </div>

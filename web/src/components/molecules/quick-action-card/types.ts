@@ -6,4 +6,5 @@ export interface QuickActionsCardProps {
   description: string
   href: string
   dataCy?: string
+  variant?: 'default' | 'gradient'
 }
