@@ -1,2 +1,4 @@
 export * from './login'
 export * from './citizen-home'
+export * from './citizen-wallet'
+export * from './credential-detail'

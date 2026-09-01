@@ -8,13 +8,22 @@ import {
 import type { LucideIcon } from 'lucide-react-native'
 
 import type { IconTileTone } from '@/components/atoms'
-import { formatActivityTimestamp } from '@/lib/format-date'
+import {
+  formatActivityTimestamp,
+  formatIdDate,
+  formatSaId,
+  saIdToDateOfBirth,
+} from '@/lib/format-date'
+import { toneForIndex, type CredentialTone } from '@/theme/credential-tones'
 
 import type {
   ActivityEntry,
   ActivityResponse,
   CredentialResponse,
   IdentityStatusSummary,
+  CredentialField,
+  WalletCredential,
+  ActivityPresentation,
 } from './types'
 
 const IDENTITY_DOCUMENT = 'identitydocument'
@@ -46,6 +55,11 @@ const ATTENTION: IdentityStatusSummary = {
   value: 'Needs attention',
 }
 
+const TONE_BY_TYPE: Record<string, CredentialTone> = {
+  identitydocument: 'green',
+  driverslicense: 'blue',
+}
+
 export const toIdentityStatus = (
   credentials: CredentialResponse[] | undefined
 ): IdentityStatusSummary => {
@@ -68,12 +82,6 @@ export const toIdentityStatus = (
     return ATTENTION
   }
   return PENDING
-}
-
-type ActivityPresentation = {
-  Icon: LucideIcon
-  title: string
-  tone: IconTileTone
 }
 
 const ACTIVITY_PRESENTATION: Record<string, ActivityPresentation> = {
@@ -142,3 +150,43 @@ export const toActivityEntries = (
       tone: presentation.tone,
     }
   })
+
+const hasValue = (field: CredentialField) => field.value !== ''
+
+const toFields = (credential: CredentialResponse): CredentialField[] => {
+  const identity = credential.identityDocument
+  if (identity) {
+    return [
+      { label: 'ID Number', value: formatSaId(identity.idNumber) },
+      { label: 'Date of Birth', value: saIdToDateOfBirth(identity.idNumber) },
+      { label: 'Nationality', value: identity.nationality },
+      { label: 'Citizenship', value: identity.citizenship },
+      { label: 'Country of Birth', value: identity.countryOfBirth },
+    ].filter(hasValue)
+  }
+  const licence = credential.driversLicense
+  if (licence) {
+    return [
+      { label: 'Licence Number', value: licence.licenseNumber },
+      { label: 'Licence Code', value: licence.licenseCode },
+      { label: 'Restrictions', value: licence.restrictions || 'None' },
+      { label: 'Expires', value: formatIdDate(licence.expiryDate) },
+    ].filter(hasValue)
+  }
+  return []
+}
+
+export const toWalletCredentials = (
+  credentials: CredentialResponse[] | undefined
+): WalletCredential[] =>
+  (credentials ?? []).map((credential, index) => ({
+    fields: toFields(credential),
+    id: credential.id,
+    isVerified: normalize(credential.status) === 'active',
+    issuedBy: credential.issuedBy || 'Republic of South Africa',
+    issuedOn: formatIdDate(credential.issueDate),
+    status: credential.status,
+    title: credential.title,
+    tone: TONE_BY_TYPE[normalize(credential.type)] ?? toneForIndex(index),
+    type: credential.type,
+  }))
