@@ -1,0 +1,16 @@
+mobile/src/config/navigation/quick-actions.ts
+  h_712d174fc3f309 1-44
+mobile/src/config/navigation/index.ts
+  h_712d174fc3f309 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "a44545ac7a136e73a8fed152d6ed698fb0550b41",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

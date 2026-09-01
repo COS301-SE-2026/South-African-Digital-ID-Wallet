@@ -1,0 +1,122 @@
+mobile/src/components/molecules/section-header/test/section-header.test.tsx
+  s_4f4d4553691424::t_dbc8cd84c05853 1-4,8-9,16-17,28-29
+  s_4f4d4553691424::t_62761147bef6ee 5-7,10-15,18-27
+mobile/src/components/pages/index.ts
+  h_712d174fc3f309 2
+mobile/src/app/citizen/home.tsx
+  h_712d174fc3f309 1,4
+mobile/jest.config.js
+  s_4f4d4553691424::t_b4dd85b2189462 14
+mobile/src/components/atoms/card/test/card.test.tsx
+  s_4f4d4553691424::t_6b8cc308987083 37
+  s_4f4d4553691424::t_7e05e7970e6697 1-5,10-11,15-16,22-23,28-29,36
+  s_4f4d4553691424::t_626a11806f037a 6-9,12-14,17-21,24-27,30-35
+  s_4f4d4553691424::t_3615786eba1f1b 38-40
+  h_712d174fc3f309 41
+mobile/src/test/citizen-home.integration.test.tsx
+  s_4f4d4553691424::t_1746cea6704e6d 22-24,26-31,34-39,43-45,48,50-51,55,58-67,76-80,82-83,85-87
+  s_4f4d4553691424::t_886dcad2dc2718 92,94-97,101,105,109-110,116,119-122,126,134,143-144,148,151,153,157,159-161,165,168-169
+  s_4f4d4553691424::t_ff1796bf9a50b4 56-57
+  s_4f4d4553691424::t_63b83544750ef8 1-21,25,32-33,40-42,46-47,49,52-54,68-75,81,84,88-91,93,98-100,102-104,106-108,111-115,117-118,123-125,127-133,135-142,145-147,149,154-156,158,162-164,166-167,170-171
+  s_4f4d4553691424::t_bfd46f29d9b7b6 150,152
+mobile/src/components/pages/citizen-home/citizen-home-page.tsx
+  h_712d174fc3f309 1-37
+  h_712d174fc3f309 38
+mobile/src/components/organisms/recent-activity-list/types.ts
+  h_712d174fc3f309 1-4
+mobile/src/components/atoms/icon-tile/test/icon-tile.test.tsx
+  s_4f4d4553691424::t_4416d21b48a5b7 7,20-27,30-33,37,39-41,44-47
+  s_4f4d4553691424::t_35b18f1bd057ef 29,35,43
+  s_4f4d4553691424::t_27f3528d4a16ac 1-6,8-19,28,34,42,48-49
+  h_712d174fc3f309 36,38
+mobile/src/components/organisms/recent-activity-list/test/recent-activity-list.test.tsx
+  s_4f4d4553691424::t_ff1796bf9a50b4 27,32,37,42
+  h_712d174fc3f309 1
+  s_4f4d4553691424::t_34d0c2e03a16ff 2,18
+  s_4f4d4553691424::t_dcce78421eb523 3-11,16,21-23,44-48,50,53-54,56,59-60,62,65-66,68,75-76
+  s_4f4d4553691424::t_670c3492aa386b 12-15,17,19-20,24-26,28-31,33-36,38-41,43,49,51-52,55,57-58,61,63-64,67,69-74
+mobile/src/lib/test/format-date.test.ts
+  s_4f4d4553691424::t_eb5a8724e90a79 3-11,15-16,19-20,23-24,27-28
+  s_4f4d4553691424::t_8a320b7404d5d1 1-2,12-14,17-18,21-22,25-26,29-30
+  s_4f4d4553691424::t_17036746927b1d 31-33
+  h_712d174fc3f309 34-36
+mobile/src/components/molecules/status-summary-card/test/status-summary-card.test.tsx
+  s_4f4d4553691424::t_44d1b494853898 1-5,11-12,23-24,39-40
+  s_4f4d4553691424::t_62761147bef6ee 6-10,13-22,25-38
+mobile/src/services/citizen-dashboard-service/test/citizen-dashboard-service.test.ts
+  s_4f4d4553691424::t_d08c659c69b837 1-11,18-22,27-28,33-34,36-47
+  s_4f4d4553691424::t_5be878cfd113cc 12-17,23-26,29-32,35
+mobile/src/config/navigation/test/quick-actions.test.ts
+  s_4f4d4553691424::t_eb5a8724e90a79 3-11,14-17,20-27
+  s_4f4d4553691424::t_ffe234118ec699 1-2,12-13,18-19,28-29
+mobile/src/components/organisms/recent-activity-list/recent-activity-list.tsx
+  h_712d174fc3f309 1-58
+  h_712d174fc3f309 59-62
+mobile/src/components/organisms/identity-status-panel/types.ts
+  h_712d174fc3f309 1-3
+mobile/src/components/organisms/identity-status-panel/test/identity-status-panel.test.tsx
+  s_4f4d4553691424::t_fbe7cf78417bed 11-13,20,26,28-29,32,34-35,38,40-43
+  s_4f4d4553691424::t_2bc38493737a99 1-10,14-19,21-25,27,30-31,33,36-37,39,44-45
+  s_4f4d4553691424::t_371b981159d740 46-48
+  h_712d174fc3f309 49
+mobile/src/components/organisms/quick-actions-grid/test/quick-actions-grid.test.tsx
+  s_4f4d4553691424::t_20709feb8ed2b0 1-6,11-12,24-25,38-39
+  s_4f4d4553691424::t_670c3492aa386b 7,9-10,13-20,22-23,26-37
+  s_4f4d4553691424::t_0f61c545211a65 21
+  s_4f4d4553691424::t_ff1796bf9a50b4 8
+mobile/src/components/pages/citizen-home/index.ts
+  h_712d174fc3f309 1
+mobile/src/components/organisms/recent-activity-list/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/quick-actions-grid/quick-actions-grid.tsx
+  h_712d174fc3f309 1-28
+mobile/src/components/organisms/quick-actions-grid/types.ts
+  h_712d174fc3f309 1-7
+backend/FlashIdBackend/Application/Common/Services/AuthService.cs
+  h_712d174fc3f309 111-117,133-136,156,164
+  h_712d174fc3f309 137,157,165
+backend/FlashIdBackend/Application/Features/Auth/DTOs/LoginResponseDto.cs
+  h_712d174fc3f309 18-20
+mobile/src/components/organisms/quick-actions-grid/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/molecules/icon-button/test/icon-button.test.tsx
+  s_4f4d4553691424::t_4416d21b48a5b7 6-7,10-17,20-30,33-39,41,44-52
+  s_4f4d4553691424::t_ff1796bf9a50b4 40
+  s_4f4d4553691424::t_0fc7a74ae70320 1-5,8-9,18-19,31-32,42-43,53-54
+mobile/src/test/utils/render-with-providers.tsx
+  s_4f4d4553691424::t_626a11806f037a 6-10,13-14,16-18,21-29,31-34
+  s_4f4d4553691424::t_e2d33a0fae547b 1-5,11-12,15,19-20,30
+mobile/src/components/molecules/quick-action-tile/test/quick-action-tile.test.tsx
+  s_4f4d4553691424::t_c9f18cf992865d 1-5,9-10,22-23,35-36
+  s_4f4d4553691424::t_4416d21b48a5b7 6-8,11-21,24-34
+mobile/src/services/citizen-dashboard-service/test/citizen-dashboard-dto.test.ts
+  s_4f4d4553691424::t_a952cdc25d94a9 27-29,32-34,37-39,42-44,47-50,55-73,76-77,87-88,93-94,99-100
+  s_4f4d4553691424::t_488573bf29e02d 1-5,14-15,22-26,30-31,35-36,40-41,45-46,51-54,74-75,78-86,89-92,95-98,101-102
+  s_4f4d4553691424::t_c57464d682f80c 6-13,16-21
+mobile/src/config/navigation/quick-actions.ts
+  s_4f4d4553691424::t_7582127b6808bf 40
+mobile/src/components/molecules/activity-row/test/activity-row.test.tsx
+  s_4f4d4553691424::t_62761147bef6ee 6-9,12-24,27-34
+  s_4f4d4553691424::t_1078ca81bec746 1-5,10-11,25-26,35-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "d383dc89166ab5defc0f242e43e2d678a40264cd",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_4f4d4553691424": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "b75a1644-b79f-496d-addb-2cb70547eed0",
+        "model": "claude-haiku-4.5"
+      },
+      "human_author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
