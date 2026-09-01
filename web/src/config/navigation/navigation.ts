@@ -20,11 +20,6 @@ export const citizenNavSections: SidebarNavSection[] = [
         href: '/citizen/activate-credentials',
         icon: 'shield',
       },
-      {
-        label: 'Notifications',
-        href: '/under-construction',
-        icon: 'notifications',
-      },
     ],
   },
   {
@@ -64,11 +59,6 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
         href: '/gov-admin/manage-credentials',
         icon: 'institutions',
       },
-      {
-        label: 'Notifications',
-        href: '/under-construction',
-        icon: 'notifications',
-      },
     ],
   },
 
@@ -99,11 +89,6 @@ export const officialsNavSections: SidebarNavSection[] = [
         label: 'Verifications',
         href: '/officials/verifications',
         icon: 'users',
-      },
-      {
-        label: 'Notifications',
-        href: '/under-construction',
-        icon: 'notifications',
       },
     ],
   },
