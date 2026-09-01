@@ -1,0 +1,15 @@
+web/src/components/pages/officials/officials-dashboard-page.tsx
+  h_0aff3b71f739b1 2,6-7,9-88,93,110,114,116,119
+  h_0aff3b71f739b1 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "ffcef323c467031b5ac2ed73139819b3d8370ef7",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

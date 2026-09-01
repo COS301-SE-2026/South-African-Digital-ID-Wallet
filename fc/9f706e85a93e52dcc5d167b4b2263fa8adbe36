@@ -1,0 +1,22 @@
+web/src/components/organisms/audit-log-table/types.ts
+  h_0aff3b71f739b1 1,25-33
+  h_0aff3b71f739b1 34
+web/src/components/organisms/activity-card/types.ts
+  h_0aff3b71f739b1 1
+  h_0aff3b71f739b1 14,20-23
+web/src/components/organisms/activity-card/activity-card.tsx
+  h_0aff3b71f739b1 1-129
+web/src/components/molecules/quick-action-card/quick-action-card.tsx
+  h_0aff3b71f739b1 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "fc9f706e85a93e52dcc5d167b4b2263fa8adbe36",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
