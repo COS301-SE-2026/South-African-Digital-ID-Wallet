@@ -1,0 +1,24 @@
+web/src/services/official-dashboard-service/official-dashboard-urls.ts
+  h_0aff3b71f739b1 1-4
+web/src/components/pages/officials/officials-dashboard-page.tsx
+  h_0aff3b71f739b1 2,7-14,16,18-65,91-97,100-108
+web/src/services/official-dashboard-service/official-dashboard-service.ts
+  h_0aff3b71f739b1 1-32
+  h_0aff3b71f739b1 33-36
+web/src/services/official-dashboard-service/types.ts
+  h_0aff3b71f739b1 1-35
+  h_0aff3b71f739b1 36-39
+web/src/services/official-dashboard-service/index.ts
+  h_0aff3b71f739b1 1-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "fa821062298e70726770ff2646af4d95cd70f1a2",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
