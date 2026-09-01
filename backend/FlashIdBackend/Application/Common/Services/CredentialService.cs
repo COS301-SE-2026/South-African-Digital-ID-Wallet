@@ -65,7 +65,22 @@ public class CredentialService : ICredentialService
             throw new CitizenNotFoundException(citizenId);
 
         var credentials = await _credentialRepository.GetCredentialsByCitizenIdAsync(citizen.Id);
-        return credentials.Select(c => MapToDto(c, citizen));
+        var dtos = credentials.Select(c => MapToDto(c, citizen)).ToList();
+
+        foreach (var dto in dtos)
+        {
+            var (verificationCount, lastVerifiedAt, distinctIpCount) =
+                await _credentialRepository.GetActivitySummaryAsync(dto.Id);
+
+            dto.Activity = new CredentialActivityDto
+            {
+                Verifications = verificationCount,
+                LastVerifiedAt = lastVerifiedAt,
+                DevicesUsed = distinctIpCount,
+            };
+        }
+
+        return dtos;
     }
 
     public async Task<RevokeCredentialResponseDto> RevokeCredentialAsync(Guid credentialId, Guid adminUserId, RevokeCredentialRequestDto request, string ipAddress)
@@ -172,7 +187,14 @@ public class CredentialService : ICredentialService
             dto.Type = "IdentityDocument";
             dto.Title = "National ID Card";
         }
-
+        dto.Citizen = new CredentialCitizenDto
+        {
+            FullName = $"{citizen.Names} {citizen.Surname}",
+            IdNumber = citizen.SaId,
+            DateOfBirth = citizen.DateOfBirth,
+            Email = citizen.User?.Email,
+            Phone = citizen.User?.PhoneNumber,
+        };
         return dto;
     }
 }

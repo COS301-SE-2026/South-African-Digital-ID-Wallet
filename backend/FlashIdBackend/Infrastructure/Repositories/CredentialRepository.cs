@@ -17,6 +17,7 @@ public class CredentialRepository : ICredentialRepository
     public async Task<Citizen?> GetCitizenByUserIdAsync(Guid userId)
     {
         return await _context.Citizens
+            .Include(c => c.User)
             .FirstOrDefaultAsync(c => c.UserId == userId);
     }
 
@@ -56,7 +57,7 @@ public class CredentialRepository : ICredentialRepository
     }
     public async Task<Citizen?> GetCitizenByCitizenIdAsync(Guid citizenId)
     {
-        return await _context.Citizens.FirstOrDefaultAsync(c => c.Id == citizenId);
+        return await _context.Citizens.Include(c => c.User).FirstOrDefaultAsync(c => c.Id == citizenId);
     }
     public async Task<(int VerificationCount, DateTime? LastVerifiedAt, int DistinctIpCount)> GetActivitySummaryAsync(Guid credentialId)
     {
