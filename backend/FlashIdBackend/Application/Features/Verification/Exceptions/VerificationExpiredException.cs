@@ -14,3 +14,10 @@ public class VerificationNotFoundException : Exception
     {
     }
 }
+
+public class InvalidVerificationState : Exception
+{
+    public InvalidVerificationState(string msg) : base(msg)
+    {
+    }
+}

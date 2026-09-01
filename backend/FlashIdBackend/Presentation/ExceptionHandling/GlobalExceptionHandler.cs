@@ -38,6 +38,8 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
 
             VerificationNotFoundException => (StatusCodes.Status404NotFound, "Verification session not found", exception.Message),
 
+            InvalidVerificationState => (StatusCodes.Status400BadRequest, "Invalid verification state", exception.Message),
+
             ArgumentNullException => (StatusCodes.Status400BadRequest, "Invalid request",
                 exception.Message),
 
