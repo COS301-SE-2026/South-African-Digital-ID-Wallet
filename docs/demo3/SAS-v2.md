@@ -485,7 +485,7 @@ Returns the authenticated citizen's activity history
 
 **Authentication:** Required for Citizen
 
-### Dashboard
+### Citizen Dashboard
 
 #### GET /api/dashboard-account-card/me
 Returns summary account data shown on the citizen's dashboard card.
@@ -624,7 +624,63 @@ Unlinks a trusted device from the citizen's account.
 **Path Parameter:** `deviceId` - UUID
 
 **Response 204:** Device unlink
-**Response 404:** Device not found
+**Response 404:** Device not 
+
+### Admin Dashboard
+
+#### GET /api/admin/dashboard-summary
+Returns the admin dashboard landing page summary: system status, headline counts, and a system-wide recent activity feed.
+
+**Authentication:** Required for Government Administrator
+
+**Response 200:**
+```json
+{
+    "systemStatus": {
+        "operational": true,
+        "lastUpdatedAt": "date"
+    },
+    "counts": {
+        "users": 0,
+        "institutions": 0,
+        "credentialsIssued": 0
+    },
+    "activityFeed": [
+        {
+            "id": "string",
+            "eventType": "string",
+            "details": "string",
+            "createdAt": "date"
+        }
+    ]
+}
+```
+`activityFeed` is restricted to an allow-list of institution/system-level event types (`UserRegistered`, `AccountDeleted`, `CredentialIssued`, `CredentialRevoked`, `EmailAddressChanged`, `InstitutionRegistered`, `OfficialVerified`,) so it never surfaces citizen-level data across institution boundaries. Capped at the 10 most recent, not configurable. `systemStatus.operational` is currently a static `true`, not a real health check.
+
+#### GET /api/admin/analytics
+Returns system-wide analytics for the requested data range: verifications, credentials issued, active officials, and active institutions, each with a value, a percentage change against the immediately preceding period of equal length, and a daily bucketed series. Computed live with no pre-aggregation.
+
+**Authentication:** required for Government Admininstrator
+
+**Query Parameter:** range (one of 7d, 30d, 90d. Defaults to 30d if omitted)
+
+**Response 200:**
+```json
+{
+    "verifications": {
+        "value": 0,
+        "changePct": 0,
+        "series": [
+            { "date": "date", "count": 0 }
+        ]
+    },
+    "credentialsIssued": { "value": 0, "changePct": 0, "series": [] },
+    "activeOfficials": { "value": 0, "changePct": 0, "series": [] },
+    "activeInstitutions": { "value": 0, "changePct": 0, "series": [] }
+}
+```
+
+**Response 400:** Invalid `range` value
 
 ### Government Registry Service
 
