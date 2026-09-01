@@ -526,6 +526,62 @@ Verifies an official's badge token.
 **Response 200:** Badge verified
 **Response 400:** Invalid badge token
 
+#### GET /api/officials/activity/me
+Returns the authenticated official's own recent activity, most recent first.
+
+**Authentication:** Required for Officials
+
+**Query Parameters:** limit (clamped to 1-20, default 5)
+
+**Response 200:**
+```json
+{
+    "items": [
+        {
+            "id": "string",
+            "eventType": "string",
+            "details": "string",
+            "createdAt": "date"
+        }
+    ]
+}
+```
+
+#### GET /api/officials/history
+Returns a paginated, filterable audit history for every official at the caller's own institution. The institution is always resolved server side from the caller's Official record, never accepted as a parameter. Each call is itself audit logged.
+
+**Authentication:** Required for Officials
+
+**Query Parameters:** 
+- `search` - matches action, citizen name, performing official's name, or outcome
+- `action` - filters to a specific audit event type
+- `dateFrom` - inclusive lower bound
+- `dateTo` - inclusive upper bound on timestamp
+- `type` - filters by outcome, "Success" or "Failed"
+- `page` - 1 based page number, clamped to >= 1
+- `pageSize` - clamped to 1-100, default 7
+
+**Response 200:**
+```json
+{
+    "items": [
+        {
+            "id": "string",
+            "createdAt": "date",
+            "action": "string",
+            "citizenName": "string",
+            "citizenIdMasked": "string",
+            "performedBy": "string",
+            "outcome": "string"
+        }
+    ],
+    "page": 0,
+    "pageSize": 0,
+    "totalCount": 0
+}
+```
+`citizenName` and `citizenIdMasked` are null for audit entries that predate the citizen linkage, or that are not tied to a specific citizen. The unmasked citizen ID is never returned by this endpoint.
+
 ### Trusted Devices
 
 #### GET /api/trusted-devices/me
