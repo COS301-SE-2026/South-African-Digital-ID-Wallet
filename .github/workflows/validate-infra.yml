@@ -1,0 +1,54 @@
+name: Validate Infrastructure (What-If)
+
+on:
+  # Manual trigger only — run from the Actions tab when you need to validate
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to validate'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+
+permissions:
+  id-token: write   # Required for Azure OIDC login
+  contents: read
+
+jobs:
+  what-if:
+    name: What-If (${{ github.event.inputs.environment || 'dev' }})
+    runs-on: ubuntu-latest
+
+    env:
+      ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Run What-If (dry run)
+        env:
+          SQL_ADMIN_PASSWORD: ${{ secrets.SQL_ADMIN_PASSWORD }}
+        run: |
+          echo "## Infrastructure What-If: ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          az deployment group what-if \
+            --resource-group rg-capstone-techtitans \
+            --template-file infra/main.bicep \
+            --parameters infra/main.${{ env.ENVIRONMENT }}.bicepparam \
+            2>&1 | tee what-if-output.txt
+
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat what-if-output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
