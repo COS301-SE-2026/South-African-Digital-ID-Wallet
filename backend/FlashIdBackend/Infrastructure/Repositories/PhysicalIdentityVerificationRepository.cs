@@ -15,6 +15,21 @@ public class PhysicalIdentityVerificationRepository : IPhysicalIdentityVerificat
         _context = context;
     }
 
+    public async Task<Citizen?> GetCitizenBySaIdAsync(string saId, CancellationToken cancellationToken)
+    {
+        return await _context.Citizens.FirstOrDefaultAsync(c => c.SaId == saId);
+    }
+
+    public async Task<Citizen?> GetCitizenByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        return await _context.Citizens.FirstOrDefaultAsync(c => c.UserId == userId);
+    }
+
+    public async Task<User?> GetUserByEmailAsync(string email)
+    {
+        return await _context.DomainUsers.FirstOrDefaultAsync(u => u.Email == email);
+    }
+
     public async Task<PhysicalIdentityVerification> GetByIdAsync(Guid verificationId,
          CancellationToken cancellationToken)
     {
@@ -39,6 +54,6 @@ public class PhysicalIdentityVerificationRepository : IPhysicalIdentityVerificat
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
-        _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }
