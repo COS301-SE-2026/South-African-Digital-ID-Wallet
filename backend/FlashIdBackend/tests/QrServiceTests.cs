@@ -78,6 +78,7 @@ public class QrServiceTests
     private sealed class FakePhotoStorageProvider : IPhotoStorageProvider
     {
         public Task<string> GenerateReadSasUrlAsync(string blobName, TimeSpan ttl) => Task.FromResult($"https://fake-blob-sas.local/{blobName}");
+        public Task<Stream?> OpenReadAsync(string blobName, CancellationToken cancellationToken) => Task.FromResult<Stream?>(null);
     }
 
     private static Credential ValidCredential(Guid userId, CredentialStatus status = CredentialStatus.Active)
