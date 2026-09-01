@@ -75,7 +75,7 @@ export const CredentialDetailPage = ({ id }: CredentialDetailPageProps) => {
         onPress={() =>
           router.push({
             params: { credentialId: credential.id },
-            pathname: '/citizen/verify',
+            pathname: '/citizen/present',
           })
         }
         testID="share-identity-button"

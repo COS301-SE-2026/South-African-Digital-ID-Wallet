@@ -1,6 +1,6 @@
 import type { LucideIcon } from 'lucide-react-native'
 
-export type ButtonVariant = 'primary' | 'secondary' | 'text'
+export type ButtonVariant = 'primary' | 'secondary' | 'text' | 'danger'
 
 export type BaseButtonProps = {
   className?: string
