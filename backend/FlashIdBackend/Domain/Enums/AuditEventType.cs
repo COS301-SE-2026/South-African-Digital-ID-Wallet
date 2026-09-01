@@ -9,6 +9,7 @@ public enum AuditEventType
     CredentialIssued,
     CredentialIssueFailed,
     CredentialRevoked,
+    CredentialReinstated,
     CredentialVerified,
     CredentialExpired,
     InstitutionRegistered,

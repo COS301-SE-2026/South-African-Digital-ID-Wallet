@@ -229,6 +229,20 @@ Admin marks a credential as revoked or under investigation.
 **Response 403:** Access denied
 **Response 404:** Credential not found
 
+#### POST /api/credentials/{credentialId}/reinstate
+Admin reinstates a revoked or under-investigation credential back to active.
+**Authentication:** Required for GovernmentAdministrator
+**Path Parameter:** `credentialId` - UUID
+**Request Body:**
+```json
+{
+    "reason": "string"
+}
+```
+**Response 200:** Status updated to Active
+**Response 400:** Credential is not currently Revoked or Investigation
+**Response 403:** Access denied
+**Response 404:** Credential not found
 ### Credential Activation
 
 #### POST /api/activate-credentials

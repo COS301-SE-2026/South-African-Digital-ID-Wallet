@@ -193,4 +193,70 @@ public class CredentialServiceTests
                 "127.0.0.1"
             ));
     }
+
+    [Fact]
+    public async Task ReinstateCredentialAsync_ValidRevokedCredential_UpdatesStatusToActive()
+    {
+        using var context = CreateContext();
+        var (_, credential) = SeedCredential(context, CredentialStatus.Revoked);
+        var service = CreateService(context);
+
+        var result = await service.ReinstateCredentialAsync(
+            credential.Id,
+            Guid.NewGuid(),
+            new ReinstateCredentialRequestDto { Reason = "Investigation cleared the citizen" },
+            "127.0.0.1"
+        );
+
+        Assert.Equal(credential.Id, result.CredentialId);
+        Assert.Equal(CredentialStatus.Active, result.Status);
+    }
+
+    [Fact]
+    public async Task ReinstateCredentialAsync_ValidInvestigationCredential_UpdatesStatusToActive()
+    {
+        using var context = CreateContext();
+        var (_, credential) = SeedCredential(context, CredentialStatus.Investigation);
+        var service = CreateService(context);
+
+        var result = await service.ReinstateCredentialAsync(
+            credential.Id,
+            Guid.NewGuid(),
+            new ReinstateCredentialRequestDto { Reason = "Cleared" },
+            "127.0.0.1"
+        );
+
+        Assert.Equal(CredentialStatus.Active, result.Status);
+    }
+
+    [Fact]
+    public async Task ReinstateCredentialAsync_CredentialNotFound_ThrowsCredentialNotFoundException()
+    {
+        using var context = CreateContext();
+        var service = CreateService(context);
+
+        await Assert.ThrowsAsync<CredentialNotFoundException>(() =>
+            service.ReinstateCredentialAsync(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                new ReinstateCredentialRequestDto { Reason = "test" },
+                "127.0.0.1"
+            ));
+    }
+
+    [Fact]
+    public async Task ReinstateCredentialAsync_AlreadyActive_ThrowsInvalidCredentialStatusTransitionException()
+    {
+        using var context = CreateContext();
+        var (_, credential) = SeedCredential(context, CredentialStatus.Active);
+        var service = CreateService(context);
+
+        await Assert.ThrowsAsync<InvalidCredentialStatusTransitionException>(() =>
+            service.ReinstateCredentialAsync(
+                credential.Id,
+                Guid.NewGuid(),
+                new ReinstateCredentialRequestDto { Reason = "test" },
+                "127.0.0.1"
+            ));
+    }
 }
