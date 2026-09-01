@@ -1,0 +1,78 @@
+mobile/src/components/molecules/countdown-ring/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/hooks/use-countdown.ts
+  h_712d174fc3f309 1-23
+mobile/src/components/molecules/index.ts
+  h_712d174fc3f309 10-11
+mobile/src/components/organisms/qr-code-card/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/pages/credential-detail/credential-detail-page.tsx
+  h_712d174fc3f309 78
+mobile/src/services/index.ts
+  h_712d174fc3f309 4
+mobile/src/services/qr-service/types.ts
+  h_712d174fc3f309 1-10
+mobile/src/components/organisms/qr-code-card/qr-code-card.tsx
+  h_712d174fc3f309 1-82
+mobile/src/components/molecules/countdown-ring/types.ts
+  h_712d174fc3f309 1-5
+mobile/src/components/molecules/countdown-ring/countdown-ring.tsx
+  h_712d174fc3f309 1-70
+mobile/src/components/organisms/disclosure-modal/types.ts
+  h_712d174fc3f309 1-9
+mobile/src/components/organisms/disclosure-modal/disclosure-modal.tsx
+  h_712d174fc3f309 1-114
+mobile/src/components/pages/qr-generation/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/app/citizen/present.tsx
+  h_712d174fc3f309 1,4,6-9,13-20,23
+mobile/src/services/qr-service/index.ts
+  h_712d174fc3f309 1-5
+mobile/src/components/pages/qr-generation/types.ts
+  h_712d174fc3f309 1-3
+mobile/src/components/atoms/button/types.ts
+  h_712d174fc3f309 3
+mobile/src/services/qr-service/qr-field-definitions.ts
+  h_712d174fc3f309 1-38
+mobile/src/services/qr-service/qr-service.ts
+  h_712d174fc3f309 1-17
+mobile/src/components/pages/qr-generation/qr-generation-page.tsx
+  h_712d174fc3f309 1-116
+  h_712d174fc3f309 117-119
+mobile/src/hooks/index.ts
+  h_712d174fc3f309 5-6
+mobile/src/components/organisms/index.ts
+  h_712d174fc3f309 12-13
+mobile/src/components/molecules/field-toggle-row/field-toggle-row.tsx
+  h_712d174fc3f309 1-34
+mobile/src/components/organisms/qr-code-card/types.ts
+  h_712d174fc3f309 1-7
+mobile/src/services/qr-service/qr-errors.ts
+  h_712d174fc3f309 1-16
+mobile/src/components/atoms/button/button.tsx
+  h_712d174fc3f309 14,21,28
+mobile/src/services/qr-service/qr-urls.ts
+  h_712d174fc3f309 1-5
+  h_712d174fc3f309 6
+mobile/src/components/organisms/disclosure-modal/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/hooks/use-qr-token.ts
+  h_712d174fc3f309 1-22
+mobile/src/components/pages/index.ts
+  h_712d174fc3f309 6
+mobile/src/components/molecules/field-toggle-row/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/molecules/field-toggle-row/types.ts
+  h_712d174fc3f309 1-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "89c25fa2978b17c96013fc047f82bf279f372456",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
