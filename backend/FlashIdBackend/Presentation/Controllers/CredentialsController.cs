@@ -254,7 +254,6 @@ public class CredentialsController : ControllerBase
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
-
     [HttpPost("{credentialId}/reinstate")]
     [Authorize(Roles = "GovernmentAdministrator")]
     public async Task<IActionResult> ReinstateCredential(Guid credentialId, [FromBody] ReinstateCredentialRequestDto request)
@@ -276,6 +275,40 @@ public class CredentialsController : ControllerBase
         catch (InvalidCredentialStatusTransitionException ex)
         {
             return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    [HttpGet("search")]
+    [Authorize(Roles = "GovernmentAdministrator")]
+    public async Task<IActionResult> SearchCitizens([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 15)
+    {
+        try
+        {
+            var result = await _credentialService.SearchCitizensAsync(query, page, pageSize);
+            return Ok(result);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    [HttpGet("citizen/{citizenId}")]
+    [Authorize(Roles = "GovernmentAdministrator")]
+    public async Task<IActionResult> GetCredentialsForCitizen(Guid citizenId)
+    {
+        try
+        {
+            var result = await _credentialService.GetCredentialsForCitizenAsync(citizenId);
+            return Ok(result);
+        }
+        catch (CitizenNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
         }
         catch (Exception)
         {

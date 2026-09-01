@@ -138,7 +138,7 @@ public class IssueCredentialServiceTests
         using var context = CreateContext();
         var service = CreateService(context, new FakeGovernmentRegistryGateway());
 
-        await Assert.ThrowsAsync<CitizenNotFoundException>(() => service.GetCitizenStatusAsync(KnownSaId, Guid.NewGuid(), TestIpAddress, TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<Application.Features.Citizens.Exceptions.CitizenNotFoundException>(() => service.GetCitizenStatusAsync(KnownSaId, Guid.NewGuid(), TestIpAddress, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -243,7 +243,7 @@ public class IssueCredentialServiceTests
         var service = CreateService(context, new FakeGovernmentRegistryGateway());
         var request = new IssueCredentialRequestDto { SaId = KnownSaId, CredentialType = CredentialType.DriversLicense, ConsentGiven = true };
 
-        await Assert.ThrowsAsync<CitizenNotFoundException>(() => service.IssueCredentialAsync(request, Guid.NewGuid(), TestIpAddress, TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<Application.Features.Citizens.Exceptions.CitizenNotFoundException>(() => service.IssueCredentialAsync(request, Guid.NewGuid(), TestIpAddress, TestContext.Current.CancellationToken));
     }
 
     [Fact]

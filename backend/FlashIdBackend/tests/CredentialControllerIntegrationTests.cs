@@ -297,8 +297,7 @@ public class CredentialControllerIntegrationTests
     [Fact]
     public async Task GetCitizenStatus_CitizenNotFound_ReturnsNotFound()
     {
-        var stub = new StubIssueCredentialService { StatusException = new CitizenNotFoundException("9001015800086") };
-        await using var factory = new TestApiFactory(stub);
+        var stub = new StubIssueCredentialService { StatusException = new Application.Features.Citizens.Exceptions.CitizenNotFoundException("9001015800086") }; await using var factory = new TestApiFactory(stub);
 
         var db = await factory.CreateInitializedContextAsync();
         var official = BuildUser(UserRole.Official);

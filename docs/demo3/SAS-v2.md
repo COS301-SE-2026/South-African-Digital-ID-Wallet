@@ -243,6 +243,20 @@ Admin reinstates a revoked or under-investigation credential back to active.
 **Response 400:** Credential is not currently Revoked or Investigation
 **Response 403:** Access denied
 **Response 404:** Credential not found
+
+#### GET /api/credentials/search
+Admin searches for citizens by name, surname, or ID number. Empty query returns all citizens, paginated.
+**Authentication:** Required for GovernmentAdministrator
+**Query Parameters:** `query` - string (optional), `page` - int (default 1), `pageSize` - int (default 15)
+**Response 200:** Paginated list of matching citizens. Note: `expiresOn` is only populated if the citizen has a driver's license credential; it is null otherwise.
+
+#### GET /api/credentials/citizen/{citizenId}
+Admin retrieves a specific citizen's full credential list.
+**Authentication:** Required for GovernmentAdministrator
+**Path Parameter:** `citizenId` - UUID
+**Response 200:** List of the citizen's credentials
+**Response 404:** Citizen not found
+
 ### Credential Activation
 
 #### POST /api/activate-credentials
