@@ -1,0 +1,20 @@
+mobile/src/components/templates/citizen-dashboard-screen/citizen-dashboard-screen.tsx
+  h_712d174fc3f309 1-29
+mobile/src/components/templates/index.ts
+  h_712d174fc3f309 3
+mobile/src/components/templates/citizen-dashboard-screen/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/templates/citizen-dashboard-screen/types.ts
+  h_712d174fc3f309 1-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "4ca0ff7865eaf3b9ab891d7ef85c7037ccdd461b",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

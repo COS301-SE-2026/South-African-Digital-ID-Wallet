@@ -1,0 +1,18 @@
+mobile/src/components/molecules/status-summary-card/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/molecules/status-summary-card/types.ts
+  h_712d174fc3f309 1-14
+mobile/src/components/molecules/status-summary-card/status-summary-card.tsx
+  h_712d174fc3f309 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "86b1d05e94259e7e5c3bd9ac00449f71ae8372af",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

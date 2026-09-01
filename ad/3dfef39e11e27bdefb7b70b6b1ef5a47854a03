@@ -1,0 +1,16 @@
+mobile/src/components/organisms/identity-status-panel/identity-status-panel.tsx
+  h_712d174fc3f309 1-45
+mobile/src/components/organisms/identity-status-panel/index.ts
+  h_712d174fc3f309 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "ad3dfef39e11e27bdefb7b70b6b1ef5a47854a03",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

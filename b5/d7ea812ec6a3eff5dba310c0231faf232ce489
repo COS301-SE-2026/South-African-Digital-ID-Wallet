@@ -1,0 +1,31 @@
+web/src/components/organisms/audit-log-table/types.ts
+  h_0aff3b71f739b1 1-23
+web/src/components/organisms/activity-card/index.ts
+  h_0aff3b71f739b1 1
+web/src/components/organisms/quick-action-row/quick-action-row.tsx
+  h_0aff3b71f739b1 1-20
+web/src/components/organisms/activity-card/types.ts
+  h_0aff3b71f739b1 1-16
+  h_0aff3b71f739b1 17-20
+web/src/components/organisms/audit-log-table/index.ts
+  h_0aff3b71f739b1 1
+web/src/components/pages/officials/officials-dashboard-page.tsx
+  h_0aff3b71f739b1 1-42
+web/src/components/organisms/quick-action-row/test/quick-action-row.test.tsx
+  h_0aff3b71f739b1 1-33
+web/src/components/organisms/quick-action-row/types.ts
+  h_0aff3b71f739b1 1-13
+web/src/components/organisms/quick-action-row/index.ts
+  h_0aff3b71f739b1 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "b5d7ea812ec6a3eff5dba310c0231faf232ce489",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
