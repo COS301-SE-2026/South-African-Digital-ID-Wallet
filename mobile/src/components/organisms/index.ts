@@ -1,2 +1,6 @@
 export * from './login-form'
 export * from './bottom-nav-bar'
+export * from './citizen-dashboard-header'
+export * from './identity-status-panel'
+export * from './quick-actions-grid'
+export * from './recent-activity-list'
