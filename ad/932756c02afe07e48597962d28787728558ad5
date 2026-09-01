@@ -1,0 +1,25 @@
+government-registry/GovernmentRegistry/Application/Features/Citizens/Dtos/CitizenRecordResponseDto.cs
+  h_293a8616118f65 10
+backend/FlashIdBackend/Infrastructure/Providers/AzureBlobPhotoStorageProvider.cs
+  h_293a8616118f65 37-49
+  h_293a8616118f65 50-51
+backend/FlashIdBackend/Application/Features/Onboarding/Dtos/CitizenRecordDto.cs
+  h_293a8616118f65 12
+backend/FlashIdBackend/tests/QrServiceTests.cs
+  h_293a8616118f65 81
+backend/FlashIdBackend/tests/QrServiceIntegrationTests.cs
+  h_293a8616118f65 33
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/IPhotoStorageProvider.cs
+  h_293a8616118f65 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "ad932756c02afe07e48597962d28787728558ad5",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
