@@ -8,11 +8,14 @@ import type {
 
 import { CredentialCard } from '@/components/molecules'
 
-import { CARD_HEIGHT, CARD_PEEK, FOCUS_GAP, SCROLL_STEP } from './constants'
+import {
+  CARD_HEIGHT,
+  CARD_PEEK,
+  FOCUS_GAP,
+  SCROLL_STEP,
+  focusedIndexFor,
+} from './constants'
 import type { CredentialDeckProps } from './types'
-
-const clamp = (value: number, max: number) =>
-  Math.min(Math.max(value, 0), Math.max(max, 0))
 
 export const CredentialDeck = ({
   credentials,
@@ -35,8 +38,8 @@ export const CredentialDeck = ({
     () =>
       Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
         listener: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-          const next = clamp(
-            Math.round(event.nativeEvent.contentOffset.y / SCROLL_STEP),
+          const next = focusedIndexFor(
+            event.nativeEvent.contentOffset.y,
             lastIndex
           )
           setFocusedIndex((current) => (current === next ? current : next))
@@ -80,6 +83,7 @@ export const CredentialDeck = ({
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
         snapToOffsets={snapToOffsets}
+        testID={`${testID}-scroll`}
       >
         <View style={{ height: contentHeight }}>
           {credentials.map((credential, index) => {
