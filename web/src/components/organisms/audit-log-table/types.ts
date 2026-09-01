@@ -1,3 +1,4 @@
+import type { Dispatch, SetStateAction } from 'react'
 export type AuditLogOutcome = 'Success' | 'Failed'
 export interface AuditLogItem {
   id: string
@@ -20,4 +21,14 @@ export interface AuditLogApiError {
     message: string
     traceId: string
   }
+}
+
+export interface AuditLogTableProps {
+  rows: AuditLogItem[]
+  currentPage: number
+  totalPages: number
+  totalResults: number
+  resultsPerPage: number
+  onPageChange: Dispatch<SetStateAction<number>>
+  isLoading: boolean
 }

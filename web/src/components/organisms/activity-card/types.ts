@@ -1,4 +1,4 @@
-import { LucideIcon } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 export type OfficialActivityEventType =
   | 'OnboardCitizen'
@@ -11,10 +11,14 @@ export interface OfficialActivityItem {
   details: string
   createdAt: string
 }
+export type OfficialActivityTone = 'green' | 'blue' | 'amber' | 'red'
 export interface OfficialActivityLogItem {
   id: string
   details: string
   timestamp: string
   icon: LucideIcon
-  tone: 'green' | 'blue' | 'amber' | 'red'
+  tone: OfficialActivityTone
+}
+export interface ActivityCardProps {
+  activity: OfficialActivityItem[]
 }

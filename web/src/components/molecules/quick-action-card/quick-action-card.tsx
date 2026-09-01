@@ -19,7 +19,7 @@ export const QuickActionsCard: FC<QuickActionsCardProps> = ({
       variant="custom"
       dataCy={dataCy}
       onClick={() => router.push(href)}
-      className="h-auto w-full items-center justify-between gap-3 rounded-2xl border border-black p-3 text-left"
+      className="h-auto w-full items-center justify-between gap-3 rounded-2xl border-2 border-black p-3 text-left"
     >
       <div className="flex items-center gap-3 min-w-0">
         <div className="rounded-2xl bg-primary-green/10 p-3 text-primary-green">
