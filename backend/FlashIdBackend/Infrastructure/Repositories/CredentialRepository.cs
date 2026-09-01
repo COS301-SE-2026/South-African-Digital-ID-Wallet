@@ -2,7 +2,7 @@ using Application.Common.Interfaces.RepositoryInterfaces;
 using Domain.Entities;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-
+using Domain.Enums;
 namespace Infrastructure.Repositories;
 
 public class CredentialRepository : ICredentialRepository
@@ -57,6 +57,26 @@ public class CredentialRepository : ICredentialRepository
     public async Task<Citizen?> GetCitizenByCitizenIdAsync(Guid citizenId)
     {
         return await _context.Citizens.FirstOrDefaultAsync(c => c.Id == citizenId);
+    }
+    public async Task<(int VerificationCount, DateTime? LastVerifiedAt, int DistinctIpCount)> GetActivitySummaryAsync(Guid credentialId)
+    {
+        var verificationLogs = await _context.AuditLogs
+            .AsNoTracking()
+            .Where(a => a.CredentialId == credentialId && a.EventType == AuditEventType.CredentialVerified)
+            .Select(a => new { a.CreatedAt, a.IpAddress })
+            .ToListAsync();
+
+        var verificationCount = verificationLogs.Count;
+        var lastVerifiedAt = verificationLogs.Count > 0
+            ? verificationLogs.Max(a => a.CreatedAt)
+            : (DateTime?)null;
+        var distinctIpCount = verificationLogs
+            .Where(a => !string.IsNullOrEmpty(a.IpAddress))
+            .Select(a => a.IpAddress)
+            .Distinct()
+            .Count();
+
+        return (verificationCount, lastVerifiedAt, distinctIpCount);
     }
     public async Task SaveChangesAsync()
     {
