@@ -1,0 +1,15 @@
+mobile/src/lib/format-date.ts
+  h_712d174fc3f309 1-29
+  h_712d174fc3f309 30-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "a53db8825c43b19863c99595c0b8e234e6542261",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
