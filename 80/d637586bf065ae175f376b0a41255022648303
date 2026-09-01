@@ -1,0 +1,27 @@
+government-registry/GovernmentRegistry/Infrastructure/Data/DbSeeder.cs
+  h_293a8616118f65 21-30,32-41,55-56,65-66
+government-registry/GovernmentRegistry/Infrastructure/Data/Configurations/CitizenRecordConfiguration.cs
+  h_293a8616118f65 33
+  h_293a8616118f65 34
+government-registry/GovernmentRegistry/Infrastructure/Data/MockPhotoData.cs
+  h_293a8616118f65 5-15,18-22
+government-registry/GovernmentRegistry/Domain/Entities/CitizenRecord.cs
+  h_293a8616118f65 18-19
+"government-registry/GovernmentRegistry/Infrastructure/Migrations/20260901103539_PhotoBlob added to citizen record.Designer.cs"
+  h_293a8616118f65 1-191
+"government-registry/GovernmentRegistry/Infrastructure/Migrations/20260901103539_PhotoBlob added to citizen record.cs"
+  h_293a8616118f65 1-29
+government-registry/GovernmentRegistry/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_293a8616118f65 44-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "80d637586bf065ae175f376b0a41255022648303",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
