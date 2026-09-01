@@ -1,0 +1,86 @@
+mobile/src/test/citizen-home.integration.test.tsx
+  h_712d174fc3f309 153
+mobile/src/hooks/use-scan-credential.ts
+  h_712d174fc3f309 1-10
+  h_712d174fc3f309 11-15
+mobile/src/components/organisms/scan-result-card/scan-result-card.tsx
+  h_712d174fc3f309 1-55
+mobile/src/services/index.ts
+  h_712d174fc3f309 3
+mobile/src/components/organisms/bottom-nav-bar/test/bottom-nav-bar.test.tsx
+  h_712d174fc3f309 39
+mobile/src/components/pages/credential-detail/credential-detail-page.tsx
+  h_712d174fc3f309 59,72-82
+mobile/app.json
+  h_712d174fc3f309 35-41
+mobile/src/config/navigation/quick-actions.ts
+  h_712d174fc3f309 17,24
+mobile/src/components/templates/scanner-screen/scanner-screen.tsx
+  h_712d174fc3f309 1-60
+mobile/src/components/pages/index.ts
+  h_712d174fc3f309 5
+mobile/src/services/scan-service/types.ts
+  h_712d174fc3f309 1-8
+mobile/src/services/scan-service/parse-scanned-token.ts
+  h_712d174fc3f309 1-36
+mobile/src/hooks/index.ts
+  h_712d174fc3f309 4
+mobile/src/services/scan-service/scan-urls.ts
+  h_712d174fc3f309 1-5
+mobile/src/app/official/verify.tsx
+  h_712d174fc3f309 3,7
+mobile/src/components/organisms/scanner-help-modal/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/config/navigation/tabs.ts
+  h_712d174fc3f309 17
+mobile/src/components/organisms/scanner-help-modal/scanner-help-modal.tsx
+  h_712d174fc3f309 1-72
+  h_712d174fc3f309 73-76
+mobile/src/services/scan-service/scan-errors.ts
+  h_712d174fc3f309 1-13
+mobile/src/services/scan-service/scan-service.ts
+  h_712d174fc3f309 1-15
+mobile/src/services/scan-service/index.ts
+  h_712d174fc3f309 1-5
+mobile/src/components/organisms/scan-result-card/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/scanner-help-modal/types.ts
+  h_712d174fc3f309 1-5
+mobile/src/components/templates/scanner-screen/types.ts
+  h_712d174fc3f309 1-11
+mobile/src/components/templates/index.ts
+  h_712d174fc3f309 6
+mobile/src/components/pages/qr-scanner/index.ts
+  h_712d174fc3f309 1
+mobile/src/components/organisms/scan-result-card/types.ts
+  h_712d174fc3f309 1-5
+mobile/src/app/citizen/verify.tsx
+  h_712d174fc3f309 1-8
+mobile/src/components/organisms/qr-camera-scanner/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/qr-camera-scanner/types.ts
+  h_712d174fc3f309 1-6
+mobile/src/components/organisms/qr-camera-scanner/qr-camera-scanner.tsx
+  h_712d174fc3f309 1-149
+mobile/src/components/templates/scanner-screen/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/pages/qr-scanner/qr-scanner-page.tsx
+  h_712d174fc3f309 1-163
+mobile/src/components/organisms/index.ts
+  h_712d174fc3f309 9-11
+mobile/package.json
+  h_712d174fc3f309 15
+pnpm-lock.yaml
+  h_712d174fc3f309 39-41,2827-2829,3384-3386,4276-4286,7465-7468,7907-7911,11162-11163,11895-11900,13058-13068,17062-17065,17517-17521
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "bedc072c37ece248068ce556bd3594fe271ba076",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
