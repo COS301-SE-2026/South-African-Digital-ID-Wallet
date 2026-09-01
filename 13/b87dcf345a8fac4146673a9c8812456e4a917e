@@ -1,0 +1,26 @@
+mobile/src/stores/test/credential-unlock-store.test.ts
+  h_712d174fc3f309 1-44
+mobile/src/lib/test/format-date.test.ts
+  h_712d174fc3f309 1,42-75
+  h_712d174fc3f309 2-6,76-80
+mobile/src/components/organisms/credential-deck/credential-deck.tsx
+  h_712d174fc3f309 11
+  h_712d174fc3f309 12-17,41-42,86
+mobile/src/components/organisms/credential-deck/constants.ts
+  h_712d174fc3f309 6-7
+  h_712d174fc3f309 8-11
+mobile/src/services/citizen-dashboard-service/test/citizen-dashboard-dto.test.ts
+  h_712d174fc3f309 3,17-46,141-199
+  h_712d174fc3f309 4-7,47-50,200-203
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "13b87dcf345a8fac4146673a9c8812456e4a917e",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
