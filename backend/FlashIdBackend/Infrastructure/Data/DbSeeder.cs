@@ -786,8 +786,14 @@ public static class DbSeeder
             if (age >= 18)
             {
                 var licenseCredential = NewCredential(citizen.Id, licenseIssuer, now, signature);
+                var isExpired = rnd.Next(2) == 0;
+                licenseCredential.Status = isExpired
+                    ? CredentialStatus.Expired
+                    : CredentialStatus.Active;
                 credentialsToAdd.Add(licenseCredential);
-                var startDate = now.AddYears(-rnd.Next(1, 10));
+                var startDate = isExpired
+                    ? now.AddYears(-rnd.Next(6, 10))
+                    : now.AddYears(-rnd.Next(0, 4));
                 driversLicensesToAdd.Add(new DriversLicense
                 {
                     Id = Guid.NewGuid(),

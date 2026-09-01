@@ -47,6 +47,7 @@ export const LoginForm = ({ onForgotPassword, onRegister }: LoginFormProps) => {
     >
       <View className="gap-4">
         <TextField
+          label="Email:"
           accessibilityLabel="Email"
           autoCapitalize="none"
           autoComplete="email"
@@ -56,6 +57,7 @@ export const LoginForm = ({ onForgotPassword, onRegister }: LoginFormProps) => {
           placeholder=""
         />
         <TextField
+          label="Password:"
           accessibilityLabel="Password"
           autoCapitalize="none"
           autoComplete="password"

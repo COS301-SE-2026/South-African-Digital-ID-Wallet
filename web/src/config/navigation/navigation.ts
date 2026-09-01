@@ -86,6 +86,11 @@ export const officialsNavSections: SidebarNavSection[] = [
         icon: 'onboard',
       },
       {
+        label: "Issue Driver's Licence",
+        href: '/officials/issue-drivers-license',
+        icon: 'credentials',
+      },
+      {
         label: 'Verifications',
         href: '/officials/verifications',
         icon: 'users',

@@ -1,19 +1,28 @@
-import type { StatusPillProps, StatusPillIntent } from './types'
+import { cn } from '@/lib/utils'
 
-const intent_classnames: Record<StatusPillIntent, string> = {
-  active: 'bg-green-100 text-green-700',
+import type { StatusPillIntent, StatusPillProps } from './types'
+
+const BASE_STYLE = 'rounded-full px-4 py-1 text-sm font-semibold'
+
+const STATUS_PILL_INTENT_CLASSNAMES: Record<StatusPillIntent, string> = {
+  active: 'bg-success-green/15 text-success-green',
+  danger: 'bg-danger-red/10 text-danger-red',
   inactive: 'bg-muted text-muted-foreground',
-  suspended: 'bg-amber-100 text-amber-700',
-  revoked: 'bg-red-100 text-red-700',
+  warning: 'bg-accent-gold/20 text-deep-green',
 }
 
 export function StatusPill({
   children,
+  className,
   intent = 'active',
 }: Readonly<StatusPillProps>) {
   return (
     <span
-      className={`px-4 py-1 rounded-full text-sm font-semibold ${intent_classnames[intent]}`}
+      className={cn(
+        BASE_STYLE,
+        STATUS_PILL_INTENT_CLASSNAMES[intent],
+        className
+      )}
     >
       {children}
     </span>

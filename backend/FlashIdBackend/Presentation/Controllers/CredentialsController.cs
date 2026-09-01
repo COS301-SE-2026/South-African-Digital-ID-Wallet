@@ -3,6 +3,8 @@ using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Presentation.Controllers;
 
@@ -15,19 +17,21 @@ public class CredentialsController : ControllerBase
     private readonly IQrService _qrService;
     private readonly ICredentialActivationService _credentialActivationService;
     private readonly ICredentialExpiryService _credentialExpiryService;
+    private readonly IIssueCredentialService _issueCredentialService;
 
     public CredentialsController(
       ICredentialService credentialService,
       IQrService qrService,
       ICredentialActivationService credentialActivationService,
-      ICredentialExpiryService credentialExpiryService)
+      ICredentialExpiryService credentialExpiryService,
+      IIssueCredentialService issueCredentialService)
     {
         _credentialService = credentialService;
         _qrService = qrService;
         _credentialActivationService = credentialActivationService;
         _credentialExpiryService = credentialExpiryService;
+        _issueCredentialService = issueCredentialService;
     }
-
 
     [HttpGet("me")]
     [Authorize(Roles = "Citizen")]
@@ -164,6 +168,65 @@ public class CredentialsController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Looks up a citizen in FlashID by SA ID and returns their onboarding status and existing credentials.
+    /// </summary>
+    /// <param name="saId">The citizen's 13 digit SA ID number</param>
+    /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
+    /// <response code="200">The citizen was found.</response>
+    /// <response code="400">The SA ID is not a valid 13 digit SA ID number.</response>
+    /// <response code="404">No FlashID citizen record exists for this SA ID.</response>
+    [HttpGet("citizens/{saId}/status")]
+    [Authorize(Roles = "Official")]
+    [ProducesResponseType(typeof(CitizenCredentialStatusResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [EnableRateLimiting("citizen-status-lookup")]
+    public async Task<IActionResult> GetCitizenStatus(string saId, CancellationToken cancellationToken)
+    {
+        var officialIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(officialIdValue, out var officialId))
+        {
+            return Unauthorized(new { message = "The authenticated official could not be identified." });
+        }
+
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var response = await _issueCredentialService.GetCitizenStatusAsync(saId, officialId, ipAddress, cancellationToken);
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Fetches a citizen's credential from the government registry and issues it into FlashID.
+    /// </summary>
+    /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
+    /// <response code="201">The credential was issued.</response>
+    /// <response code="400">Validation error, or consent not given.</response>
+    /// <response code="404">Citizen not found in FlashID, or no matching record at the government registry.</response>
+    /// <response code="409">Citizen is not Activated, or already has an active credential of that type.</response>
+    [HttpPost("issue")]
+    [Authorize(Roles = "Official")]
+    [EnableRateLimiting("issue-credential")]
+    [ProducesResponseType(typeof(CredentialResponseDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> IssueCredential([FromBody] IssueCredentialRequestDto request, CancellationToken cancellationToken)
+    {
+        var officialIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(officialIdValue, out var officialId))
+        {
+            return Unauthorized(new { message = "The authenticated official could not be identified." });
+        }
+
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var response = await _issueCredentialService.IssueCredentialAsync(request, officialId, ipAddress, cancellationToken);
+
+        return StatusCode(201, response);
+    }
+
     [HttpPost("{credentialId}/revoke")]
     [Authorize(Roles = "GovernmentAdministrator")]
     public async Task<IActionResult> RevokeCredential(Guid credentialId, [FromBody] RevokeCredentialRequestDto request)
@@ -185,6 +248,67 @@ public class CredentialsController : ControllerBase
         catch (InvalidCredentialStatusTransitionException ex)
         {
             return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+    [HttpPost("{credentialId}/reinstate")]
+    [Authorize(Roles = "GovernmentAdministrator")]
+    public async Task<IActionResult> ReinstateCredential(Guid credentialId, [FromBody] ReinstateCredentialRequestDto request)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
+
+            var adminUserId = Guid.Parse(userIdClaim);
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var result = await _credentialService.ReinstateCredentialAsync(credentialId, adminUserId, request, ipAddress);
+            return Ok(result);
+        }
+        catch (CredentialNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (InvalidCredentialStatusTransitionException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    [HttpGet("search")]
+    [Authorize(Roles = "GovernmentAdministrator")]
+    public async Task<IActionResult> SearchCitizens([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 15)
+    {
+        try
+        {
+            var result = await _credentialService.SearchCitizensAsync(query, page, pageSize);
+            return Ok(result);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    [HttpGet("citizen/{citizenId}")]
+    [Authorize(Roles = "GovernmentAdministrator")]
+    public async Task<IActionResult> GetCredentialsForCitizen(Guid citizenId)
+    {
+        try
+        {
+            var result = await _credentialService.GetCredentialsForCitizenAsync(citizenId);
+            return Ok(result);
+        }
+        catch (CitizenNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
         }
         catch (Exception)
         {

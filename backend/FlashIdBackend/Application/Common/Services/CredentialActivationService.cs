@@ -24,6 +24,7 @@ public class CredentialActivationService : ICredentialActivationService
         _governmentRegistryGateway = governmentRegistryGateway;
         _credentialsActivationRepository = credentialsActivationRepository;
     }
+
     public async Task<ActivateCredentialsResponseDto> ActivateCredentialsAsync(ActivateCredentialsRequestDto request, Guid userId,
         string ipAddress, CancellationToken cancellationToken)
     {
