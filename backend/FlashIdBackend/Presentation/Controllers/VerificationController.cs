@@ -60,8 +60,8 @@ public class VerificationController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("physical/{verificationId:guid}/liveness-session")]
-    public async Task<IActionResult> CreateLivenessSession(Guid verificationId, IFormFile referenceImage,
+    [HttpPost("physical/liveness-session")]
+    public async Task<IActionResult> CreateLivenessSession([FromBody] CreateLivenessSessionRequestDto request,
         CancellationToken cancellationToken)
     {
         if (!TryGetUserId(out var userId))
@@ -69,9 +69,8 @@ public class VerificationController : ControllerBase
             return Unauthorized();
         }
 
-        await using var stream = referenceImage.OpenReadStream();
 
-        var result = await _physicalIdentityVerificationService.CreateLivenessSessionAsync(verificationId, userId, stream, referenceImage.ContentType, cancellationToken);
+        var result = await _physicalIdentityVerificationService.CreateLivenessSessionAsync(request.VerificationId, userId, request.SaId, cancellationToken);
 
         return Ok(result);
     }

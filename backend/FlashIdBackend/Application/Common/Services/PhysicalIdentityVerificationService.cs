@@ -1,3 +1,4 @@
+using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
@@ -14,12 +15,16 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
     private static readonly TimeSpan SessionLifetime = TimeSpan.FromMinutes(15);
     private readonly IPhysicalIdentityVerificationRepository _repository;
     private readonly IFaceLivenessServiceProvider _faceLivenessServiceProvider;
+    private readonly IGovernmentRegistryGateway _governmentRegistryGateway;
+    private readonly IPhotoStorageProvider _photoStorageProvider;
 
     public PhysicalIdentityVerificationService(IPhysicalIdentityVerificationRepository repository,
-        IFaceLivenessServiceProvider faceLivenessServiceProvider)
+        IFaceLivenessServiceProvider faceLivenessServiceProvider, IGovernmentRegistryGateway governmentRegistryGateway, IPhotoStorageProvider photoStorageProvider)
     {
         _repository = repository;
         _faceLivenessServiceProvider = faceLivenessServiceProvider;
+        _governmentRegistryGateway = governmentRegistryGateway;
+        _photoStorageProvider = photoStorageProvider;
     }
 
     public async Task<StartPhysicalVerificationResponseDto> StartAsync(Guid userId,
@@ -85,7 +90,7 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
     }
 
     public async Task<CreateLivenessSessionResult> CreateLivenessSessionAsync(Guid verificationId, Guid userId,
-        Stream referenceImage, string contentType, CancellationToken cancellationToken)
+        string saId, CancellationToken cancellationToken)
     {
 
         var verification = await GetOwnedVerificationAsync(verificationId, userId, cancellationToken);
@@ -93,14 +98,48 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
 
         if (verification.ConsentGrantedAt is null)
         {
-            throw new InvalidOperationException("Consent granted at must be granted before biometric verification.");
+            throw new InvalidVerificationState("Consent granted at must be granted before biometric verification.");
         }
 
-        if (verification.Status != IdentityVerificationStatus.AwaitingDocument &&
-            verification.Status != IdentityVerificationStatus.AwaitingLiveness)
+        if (verification.Status != IdentityVerificationStatus.AwaitingDocument)
         {
-            throw new InvalidOperationException("Verification is not ready for liveness.");
+            throw new InvalidVerificationState("Verification is not ready for liveness.");
         }
+
+        var citizen = await _governmentRegistryGateway.GetCitizenBySaIdAsync(saId);
+
+        if (citizen is null)
+        {
+            verification.RegistryIdentityMatched = false;
+            verification.Status = IdentityVerificationStatus.Failed;
+            verification.FailureReason = "Identity could not be verified against the Government Registry.";
+
+            await _repository.SaveChangesAsync(cancellationToken);
+
+            throw new InvalidVerificationState("Identity could not be verified.");
+        }
+
+        verification.RegistryIdentityMatched = true;
+
+        if (string.IsNullOrWhiteSpace(citizen.PhotoBlobName))
+        {
+            verification.Status = IdentityVerificationStatus.Failed;
+            verification.FailureReason = "Government Registry portrait is unavailable.";
+
+            await _repository.SaveChangesAsync(cancellationToken);
+
+            throw new InvalidVerificationState("Government Registry portrait is unavailable.");
+        }
+
+        await using var referenceImage =
+            await _photoStorageProvider.OpenReadAsync(citizen.PhotoBlobName, cancellationToken);
+
+        if (referenceImage is null)
+        {
+            throw new InvalidOperationException("Government Registry portrait could not be retrieved.");
+        }
+
+        var contentType = GetImageContentType(citizen.PhotoBlobName);
 
         var azure = await _faceLivenessServiceProvider.CreateLivenessWithVerifySessionAsync(referenceImage, contentType, Guid.NewGuid(), cancellationToken);
         verification.AzureLivenessSessionId = azure.SessionId;
@@ -130,21 +169,31 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
         }
 
         verification.LivenessPassed = result.LivenessPassed;
-        verification.CardFaceMatchedLiveFace = result.FaceMatched;
+        verification.RegistryFaceMatched = result.FaceMatched;
         verification.UpdatedAt = DateTime.UtcNow;
 
         if (result.LivenessPassed == true && result.FaceMatched == true)
         {
             verification.Status = IdentityVerificationStatus.Verified;
             verification.VerifiedAt = DateTime.UtcNow;
+            verification.FailureReason = null;
         }
         else
         {
             verification.Status = IdentityVerificationStatus.Failed;
-            verification.FailureReason =
-                result.LivenessPassed != true
-                    ? "Liveness verification failed."
-                    : "Live face did not match the identitty document.";
+
+            if (verification.LivenessPassed != true)
+            {
+                verification.FailureReason = "Liveness verification failed.";
+            }
+            else if (verification.RegistryFaceMatched != true)
+            {
+                verification.FailureReason = "Live face did not match the Government Registry portrait.";
+            }
+            else
+            {
+                verification.FailureReason = "Identity verification failed";
+            }
 
 
         }
@@ -167,6 +216,17 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
         }
 
         return PhysicalIdentityVerificationMapper.ToPhysicalVerificationResponseDto(verification);
+    }
+
+    private static string GetImageContentType(string imageName)
+    {
+        return Path.GetExtension(imageName).ToLowerInvariant()
+            switch
+        {
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".png" => "image/png",
+            _ => "application/octet-stream"
+        };
     }
 
     private async Task<PhysicalIdentityVerification> GetOwnedVerificationAsync(Guid verificationId, Guid userId,

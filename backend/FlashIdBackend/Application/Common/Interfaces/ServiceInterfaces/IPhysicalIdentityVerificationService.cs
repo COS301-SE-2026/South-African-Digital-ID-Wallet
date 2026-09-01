@@ -8,7 +8,8 @@ public interface IPhysicalIdentityVerificationService
 
     Task<PhysicalVerificationResponseDto> GrantConsentAsync(Guid verificationId, Guid userId, CancellationToken cancellationToken);
 
-    Task<CreateLivenessSessionResult> CreateLivenessSessionAsync(Guid verificationId, Guid userId, Stream referenceImage, string contentType, CancellationToken cancellationToken);
+    Task<CreateLivenessSessionResult> CreateLivenessSessionAsync(Guid verificationId, Guid userId,
+        string saId, CancellationToken cancellationToken);
 
     Task<PhysicalVerificationResponseDto> CompleteLivenessAsync(Guid verificationId, Guid userId, CancellationToken cancellationToken);
 
