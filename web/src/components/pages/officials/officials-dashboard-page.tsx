@@ -13,7 +13,9 @@ import type {
   OfficialActivityItem,
 } from '@/services/official-dashboard-service/types'
 
-const AUDIT_LOG_FETCH_SIZE = 1000
+const AUDIT_LOG_PAGE_SIZE = 7
+const SEARCH_DEBOUNCE_MS = 300
+
 export default function OfficialsDashboardPage() {
   const [activity, setActivity] = useState<OfficialActivityItem[]>([])
   const [activityError, setActivityError] = useState<string | null>(null)
@@ -34,9 +36,23 @@ export default function OfficialsDashboardPage() {
       ignore = true
     }
   }, [])
+
   const [rows, setRows] = useState<AuditLogItem[]>([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [page, setPage] = useState(1)
+  const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [auditLoading, setAuditLoading] = useState(true)
   const [auditError, setAuditError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedSearch(search)
+      setPage(1)
+    }, SEARCH_DEBOUNCE_MS)
+    return () => clearTimeout(timeout)
+  }, [search])
+
   useEffect(() => {
     let ignore = false
     const load = async () => {
@@ -44,15 +60,20 @@ export default function OfficialsDashboardPage() {
       setAuditError(null)
       try {
         const res = await getOfficialAuditLogs({
-          page: 1,
-          pageSize: AUDIT_LOG_FETCH_SIZE,
+          page,
+          pageSize: AUDIT_LOG_PAGE_SIZE,
+          search: debouncedSearch.trim() || undefined,
         })
-        if (!ignore) setRows(res.items)
+        if (!ignore) {
+          setRows(res.items)
+          setTotalCount(res.totalCount)
+        }
       } catch (err) {
         console.error('Failed to load audit logs', err)
         if (!ignore) {
           setAuditError('Could not load audit logs.')
           setRows([])
+          setTotalCount(0)
         }
       } finally {
         if (!ignore) setAuditLoading(false)
@@ -62,7 +83,10 @@ export default function OfficialsDashboardPage() {
     return () => {
       ignore = true
     }
-  }, [])
+  }, [page, debouncedSearch])
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / AUDIT_LOG_PAGE_SIZE))
+
   return (
     <div className="flex min-h-full overflow-x-hidden bg-[#f6f2ea]">
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">
@@ -101,10 +125,18 @@ export default function OfficialsDashboardPage() {
               <p className="text-sm text-red-600" role="alert">
                 {auditError}
               </p>
-            ) : auditLoading ? (
-              <p className="text-sm text-muted-text">Loading audit logs…</p>
             ) : (
-              <AuditLogTable rows={rows} />
+              <AuditLogTable
+                rows={rows}
+                search={search}
+                onSearchChange={setSearch}
+                currentPage={page}
+                totalPages={totalPages}
+                totalResults={totalCount}
+                resultsPerPage={AUDIT_LOG_PAGE_SIZE}
+                onPageChange={setPage}
+                isLoading={auditLoading}
+              />
             )}
           </section>
         </div>

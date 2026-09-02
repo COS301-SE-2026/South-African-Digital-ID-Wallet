@@ -3,32 +3,33 @@ export type OfficialActivityEventType =
   | 'OnboardCitizenFailed'
   | 'DriverLicenseIssued'
   | 'QrCodeVerified'
-export interface OfficialActivityItem {
+export type OfficialActivityItem = {
   id: string
   eventType: OfficialActivityEventType
   details: string
   createdAt: string
 }
-export interface OfficialActivityResponse {
+export type OfficialActivityResponse = {
   items: OfficialActivityItem[]
 }
 export type AuditLogOutcome = 'Success' | 'Failed'
-export interface AuditLogItem {
+export type AuditLogItem = {
   id: string
   createdAt: string
   action: string
-  citizenName: string
-  citizenIdMasked: string
+  details: string
+  citizenName: string | null
+  citizenSaId: string | null
   performedBy: string
   outcome: AuditLogOutcome
 }
-export interface AuditLogHistoryResponse {
+export type AuditLogHistoryResponse = {
   items: AuditLogItem[]
   page: number
   pageSize: number
   totalCount: number
 }
-export interface AuditLogFilters {
+export type AuditLogFilters = {
   search?: string
   action?: string
   dateFrom?: string

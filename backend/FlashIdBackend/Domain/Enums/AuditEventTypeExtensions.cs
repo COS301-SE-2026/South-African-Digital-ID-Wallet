@@ -12,6 +12,12 @@ public static class AuditEventTypeExtensions
         AuditEventType.DeviceVerificationFailed,
     };
 
+    public static readonly HashSet<AuditEventType> ViewEvents = new()
+    {
+        AuditEventType.AuditLogViewed,
+        AuditEventType.CitizenStatusViewed,
+    };
+
     public static string ToOutcome(this AuditEventType eventType) =>
         FailedEvents.Contains(eventType) ? "Failed" : "Success";
 }

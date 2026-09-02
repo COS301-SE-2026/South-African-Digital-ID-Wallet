@@ -1,5 +1,4 @@
 using Application.Common.Interfaces.RepositoryInterfaces;
-using Application.Common.Mapping;
 using Application.Features.Officials.DTOs;
 using Domain.Entities;
 using Domain.Enums;
@@ -21,7 +20,7 @@ public class OfficialActivityRepository : IOfficialActivityRepository
     {
         return await _context.AuditLogs
             .AsNoTracking()
-            .Where(a => a.ActorId == userId)
+            .Where(a => a.ActorId == userId && !AuditEventTypeExtensions.ViewEvents.Contains(a.EventType))
             .OrderByDescending(a => a.CreatedAt)
             .Take(limit)
             .Select(a => new MyActivityItemDto
@@ -58,6 +57,8 @@ public class OfficialActivityRepository : IOfficialActivityRepository
             where official.InstitutionId == institutionId
             select new { log, official, citizen };
 
+        query = query.Where(x => !AuditEventTypeExtensions.ViewEvents.Contains(x.log.EventType));
+
         if (action.HasValue)
             query = query.Where(x => x.log.EventType == action.Value);
 
@@ -77,7 +78,10 @@ public class OfficialActivityRepository : IOfficialActivityRepository
         {
             query = query.Where(x =>
                 EF.Functions.Like(x.log.Details, $"%{trimmedSearch}%") ||
-                (x.citizen != null && (EF.Functions.Like(x.citizen.Names, $"%{trimmedSearch}%") || EF.Functions.Like(x.citizen.Surname, $"%{trimmedSearch}%"))) ||
+                (x.citizen != null && (
+                    EF.Functions.Like(x.citizen.Names, $"%{trimmedSearch}%") ||
+                    EF.Functions.Like(x.citizen.Surname, $"%{trimmedSearch}%") ||
+                    EF.Functions.Like(x.citizen.SaId, $"%{trimmedSearch}%"))) ||
                 EF.Functions.Like(x.official.Names, $"%{trimmedSearch}%") ||
                 EF.Functions.Like(x.official.Surname, $"%{trimmedSearch}%") ||
                 (searchMatchesFailed && failedEvents.Contains(x.log.EventType)) ||
@@ -95,6 +99,7 @@ public class OfficialActivityRepository : IOfficialActivityRepository
                 x.log.Id,
                 CreatedAt = DateTime.SpecifyKind(x.log.CreatedAt, DateTimeKind.Utc),
                 x.log.EventType,
+                x.log.Details,
                 CitizenNames = x.citizen != null ? x.citizen.Names : null,
                 CitizenSurname = x.citizen != null ? x.citizen.Surname : null,
                 CitizenSaId = x.citizen != null ? x.citizen.SaId : null,
@@ -108,8 +113,9 @@ public class OfficialActivityRepository : IOfficialActivityRepository
             Id = r.Id,
             CreatedAt = r.CreatedAt,
             Action = r.EventType.ToString(),
+            Details = r.Details,
             CitizenName = r.CitizenNames != null ? $"{r.CitizenNames} {r.CitizenSurname}" : null,
-            CitizenIdMasked = r.CitizenSaId != null ? SaIdMasker.Mask(r.CitizenSaId) : null,
+            CitizenSaId = r.CitizenSaId,
             PerformedBy = $"{r.OfficialNames} {r.OfficialSurname}",
             Outcome = AuditEventTypeExtensions.ToOutcome(r.EventType),
         }).ToList();

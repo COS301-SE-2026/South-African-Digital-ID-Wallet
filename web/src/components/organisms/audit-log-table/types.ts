@@ -1,21 +1,13 @@
 import type { Dispatch, SetStateAction } from 'react'
-export type AuditLogOutcome = 'Success' | 'Failed'
-export interface AuditLogItem {
-  id: string
-  createdAt: string
-  action: string
-  citizenName: string
-  citizenIdMasked: string
-  performedBy: string
-  outcome: AuditLogOutcome
-}
-export interface AuditLogHistoryResponse {
-  items: AuditLogItem[]
-  page: number
-  pageSize: number
-  totalCount: number
-}
-export interface AuditLogApiError {
+import type {
+  AuditLogHistoryResponse,
+  AuditLogItem,
+  AuditLogOutcome,
+} from '@/services/official-dashboard-service/types'
+
+export type { AuditLogHistoryResponse, AuditLogItem, AuditLogOutcome }
+
+export type AuditLogApiError = {
   error: {
     code: string
     message: string
@@ -23,8 +15,10 @@ export interface AuditLogApiError {
   }
 }
 
-export interface AuditLogTableProps {
+export type AuditLogTableProps = {
   rows: AuditLogItem[]
+  search: string
+  onSearchChange: (value: string) => void
   currentPage: number
   totalPages: number
   totalResults: number
