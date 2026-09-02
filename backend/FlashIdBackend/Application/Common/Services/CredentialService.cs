@@ -106,6 +106,7 @@ public class CredentialService : ICredentialService
             Details = $"Credential {credential.Id} marked as {request.NewStatus}. Reason: {request.Reason}",
             IpAddress = ipAddress,
             CreatedAt = DateTime.UtcNow,
+            CitizenId = credential.CitizenId,
         });
         await _institutionRepository.SaveChangesAsync();
 

@@ -18,6 +18,15 @@ public class InstitutionsController : ControllerBase
         _institutionService = institutionService;
     }
 
+    /// <summary>
+    /// Registers a new institution and assigns it an admin.
+    /// </summary>
+    /// <param name="request">The institution's registration details.</param>
+    /// <response code="201">The institution was created.</response>
+    /// <response code="400">The registration request was invalid.</response>
+    /// <response code="404">The specified admin was not found.</response>
+    /// <response code="409">An institution with these details already exists.</response>
+    /// <response code="403">The caller is not a Government Administrator.</response>
     [Authorize(Roles = "GovernmentAdministrator")]
     [HttpPost("register")]
     public async Task<IActionResult> RegisterInstitution(
@@ -46,6 +55,10 @@ public class InstitutionsController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Returns all registered institutions.
+    /// </summary>
+    /// <response code="200">The list of institutions.</response>
     [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAllInstitutions()
@@ -61,6 +74,12 @@ public class InstitutionsController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Returns a single institution by its ID.
+    /// </summary>
+    /// <param name="institutionId">The institution's unique identifier.</param>
+    /// <response code="200">The requested institutions.</response>
+    /// <response code="404">No institution exists with the given ID.</response>
     [Authorize]
     [HttpGet("{institutionId}")]
     public async Task<IActionResult> GetInstitutionById(Guid institutionId)

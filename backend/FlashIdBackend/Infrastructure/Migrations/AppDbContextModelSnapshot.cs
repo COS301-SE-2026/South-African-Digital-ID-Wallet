@@ -31,6 +31,9 @@ namespace Infrastructure.Migrations
                     b.Property<Guid?>("ActorId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("CitizenId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -56,6 +59,8 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ActorId");
+
+                    b.HasIndex("CitizenId");
 
                     b.HasIndex("CreatedAt");
 
@@ -1087,12 +1092,19 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ActorId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Domain.Entities.Citizen", "Citizen")
+                        .WithMany()
+                        .HasForeignKey("CitizenId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Domain.Entities.Credential", "Credential")
                         .WithMany()
                         .HasForeignKey("CredentialId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Actor");
+
+                    b.Navigation("Citizen");
 
                     b.Navigation("Credential");
                 });
