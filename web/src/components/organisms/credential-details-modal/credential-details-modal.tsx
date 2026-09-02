@@ -260,33 +260,47 @@ export function CredentialDetailsModal({
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
                       <span className="text-sm text-muted-text">
-                        Administrator:
-                      </span>
-                      <span className="text-sm font-semibold text-deep-green">
-                        {selected.issuedBy.administrator}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-muted-text">
                         Department:
                       </span>
-
                       <span className="text-sm font-semibold text-deep-green">
                         {selected.issuedBy.department}
                       </span>
                     </div>
+                  </div>
+                </div>
+              </div>
+              <div className="relative rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+                <div className="rounded-[24px] bg-clean-white p-6">
+                  <Text
+                    as="h3"
+                    variant="sub-md"
+                    className="mb-4 font-semibold text-deep-green"
+                  >
+                    Activity
+                  </Text>
+                  <div className="space-y-3">
                     <div className="flex items-center gap-3">
-                      <span className="text-sm text-muted-text">Office:</span>
+                      <span className="text-sm text-muted-text">
+                        Verifications:
+                      </span>
                       <span className="text-sm font-semibold text-deep-green">
-                        {selected.issuedBy.office}
+                        {selected.activity.verifications}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-sm text-muted-text">
-                        Reference:
+                        Last Verified:
                       </span>
                       <span className="text-sm font-semibold text-deep-green">
-                        {selected.issuedBy.reference}
+                        {selected.activity.lastVerifiedAt || 'Never'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm text-muted-text">
+                        Devices Used:
+                      </span>
+                      <span className="text-sm font-semibold text-deep-green">
+                        {selected.activity.devicesUsed}
                       </span>
                     </div>
                   </div>

@@ -109,7 +109,7 @@ export function ManageCredentialsPage() {
         <div className="mt-4 flex min-h-0 flex-1 flex-col gap-4 lg:mt-6 lg:gap-6">
           <SearchBar
             value={searchQuery}
-            placeholder="Search by name, ID number or credential ID..."
+            placeholder="Search by name, surname or ID number..."
             onChange={handleSearchChange}
           />
           <SearchResultsTable
