@@ -1,9 +1,9 @@
 name: Validate Infrastructure (What-If)
 
 on:
-  # Manual trigger only — run from the Actions tab when you need to validate
   push:
     branches: 
+      - main
       - chore/IaC-biceps
   workflow_dispatch:
     inputs:
