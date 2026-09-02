@@ -1,0 +1,15 @@
+web/src/components/organisms/admin-activity-feed/admin-activity-feed.tsx
+  h_0aff3b71f739b1 1-69,71-111
+  h_0aff3b71f739b1 70,112-119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "10ba405e529bdfe23390cf5de685cb0dd93fdfb4",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

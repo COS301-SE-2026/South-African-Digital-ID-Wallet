@@ -1,0 +1,16 @@
+docs/demo3/SAS-v2.md
+  h_99fca60b892ff4 294-317
+docs/demo3/use-cases-v3.md
+  h_99fca60b892ff4 149,155
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "4532116fc124045e5ecd5c09ee64e35bd2b75b87",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
