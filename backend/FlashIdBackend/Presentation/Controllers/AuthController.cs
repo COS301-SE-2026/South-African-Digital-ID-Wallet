@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Application.Features.Auth.Exceptions;
+using System.Security.Cryptography;
 
 namespace Presentation.Controllers;
 
@@ -85,6 +86,7 @@ public class AuthController : ControllerBase
             };
 
             Response.Cookies.Append("access_token", result.Token, cookieOptions);
+            SetCsrfCookie(result.ExpiresAt);
 
             var isNativeClient = IsNativeClient(client);
             if (!isNativeClient)
@@ -142,6 +144,7 @@ public class AuthController : ControllerBase
                 IsEssential = true
             };
             Response.Cookies.Append("access_token", result.Token, accessTokenOptions);
+            SetCsrfCookie(result.ExpiresAt);
 
             if (!string.IsNullOrWhiteSpace(result.DeviceToken))
             {
@@ -202,6 +205,12 @@ public class AuthController : ControllerBase
                 Secure = !_environment.IsDevelopment(),
                 SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
             });
+            Response.Cookies.Delete("csrf_token", new CookieOptions
+            {
+                Path = "/",
+                Secure = !_environment.IsDevelopment(),
+                SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
+            });
 
             return Ok(result);
         }
@@ -210,6 +219,19 @@ public class AuthController : ControllerBase
             _logger.LogError(ex, "Unexpected error during logout");
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
+    }
+    private void SetCsrfCookie(DateTime? expires)
+    {
+        var csrfToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+        Response.Cookies.Append("csrf_token", csrfToken, new CookieOptions
+        {
+            HttpOnly = false,
+            Secure = !_environment.IsDevelopment(),
+            SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
+            Path = "/",
+            Expires = expires.HasValue ? new DateTimeOffset(expires.Value) : DateTimeOffset.UtcNow.AddHours(1),
+            IsEssential = true
+        });
     }
     private string? ReadDeviceToken()
     {
