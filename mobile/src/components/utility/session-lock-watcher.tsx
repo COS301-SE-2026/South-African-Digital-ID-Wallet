@@ -9,7 +9,8 @@ export const SessionLockWatcher = () => {
   const backgroundAtRef = useRef<number | null>(null)
   useEffect(() => {
     const handleChange = (nextState: AppStateStatus) => {
-      const { expiresAt, isAuthenticated, signOut } = useAuthStore.getState()
+      const { expiresAt, isAuthenticated, isBiometricEnabled, lock, signOut } =
+        useAuthStore.getState()
       if (!isAuthenticated) {
         return
       }
@@ -28,8 +29,13 @@ export const SessionLockWatcher = () => {
       const idledOut =
         backgroundedAt !== null &&
         Date.now() - backgroundedAt > MAX_BACKGROUND_MS
-      if (tokenExpired || idledOut) {
+
+      if (tokenExpired || (idledOut && !isBiometricEnabled)) {
         signOut()
+        return
+      }
+      if (idledOut) {
+        lock()
       }
     }
     const subscription = AppState.addEventListener('change', handleChange)

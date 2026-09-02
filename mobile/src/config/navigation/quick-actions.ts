@@ -14,14 +14,14 @@ export type QuickAction = {
 
 export const citizenQuickActions: QuickAction[] = [
   {
-    href: '/citizen/present',
+    href: '/citizen/verify',
     Icon: QrCode,
     label: 'Scan QR',
     name: 'scan-qr',
     tone: 'green',
   },
   {
-    href: '/citizen/present',
+    href: '/citizen/wallet',
     Icon: Share2,
     label: 'Share ID',
     name: 'share-id',

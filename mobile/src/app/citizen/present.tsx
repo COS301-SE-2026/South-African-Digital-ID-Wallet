@@ -1,16 +1,26 @@
+import { useLocalSearchParams } from 'expo-router'
 import { usePreventScreenCapture } from 'expo-screen-capture'
-import { View } from 'react-native'
 
-import { Text } from '@/components/atoms'
+import { QrGenerationPage } from '@/components/pages'
 import { BiometricGate } from '@/components/templates'
+import {
+  isUnlockValid,
+  useCredentialUnlockStore,
+} from '@/stores/credential-unlock-store'
 
 export default function Present() {
   usePreventScreenCapture()
+  const { credentialId } = useLocalSearchParams<{ credentialId: string }>()
+  const unlockedAt = useCredentialUnlockStore((state) => state.unlockedAt)
+  const unlockedId = useCredentialUnlockStore((state) => state.unlockedId)
+
+  if (isUnlockValid(credentialId, unlockedId, unlockedAt)) {
+    return <QrGenerationPage credentialId={credentialId} />
+  }
+
   return (
     <BiometricGate prompt="Confirm your identity to show your digital ID.">
-      <View className="flex-1 items-center justify-center bg-cream-background">
-        <Text variant="h2">Present</Text>
-      </View>
+      <QrGenerationPage credentialId={credentialId} />
     </BiometricGate>
   )
 }
