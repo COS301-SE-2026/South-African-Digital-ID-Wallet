@@ -133,13 +133,6 @@ module storage 'modules/storage.bicep' = {
 var corsOrigins = concat([frontendBaseUrl], corsAdditionalOrigins)
 var corsSettings = [for (origin, i) in corsOrigins: { name: 'Cors__AllowedOrigins__${i}', value: origin }]
 
-// ACR pull credentials. Same pattern as web, reused for both API app services
-var acrPullSettings = [
-  { name: 'DOCKER_REGISTRY_SERVER_URL', value: 'https://${acrLoginServer}' }
-  { name: 'DOCKER_REGISTRY_SERVER_USERNAME', value: 'acrflashid' }
-  { name: 'DOCKER_REGISTRY_SERVER_PASSWORD', value: '${kv}DOCKER-REGISTRY-SERVER-PASSWORD' }
-]
-
 var apiFlashIdSettings = concat(
   [
     // Runtime
@@ -202,7 +195,7 @@ module apiFlashId 'modules/appservice.bicep' = {
     location: location
     alwaysOn: appServiceAlwaysOn
     linuxFxVersion: 'DOTNETCORE|10.0'
-    healthCheckPath: '/heath'
+    healthCheckPath: '/health'
     appSettings: apiFlashIdSettings
   }
 }
@@ -216,7 +209,7 @@ module apiGovRegistry 'modules/appservice.bicep' = {
     location: location
     alwaysOn: appServiceAlwaysOn
     linuxFxVersion: 'DOTNETCORE|10.0'
-    healthCheckPath: '/heath'
+    healthCheckPath: '/health'
     appSettings: apiGovRegistrySettings
   }
 }
@@ -230,7 +223,7 @@ module webFlashId 'modules/appservice.bicep' = {
     location: location
     alwaysOn: appServiceAlwaysOn
     linuxFxVersion: 'DOCKER|${acrLoginServer}/web-flashid:${env}-latest'
-    healthCheckPath: '/api/heath'
+    healthCheckPath: '/api/health'
     appSettings: webFlashIdSettings
   }
 }

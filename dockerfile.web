@@ -4,10 +4,11 @@
 # From the repo root:
 #   docker build -f dockerfile.web \ -t web-flashid:local .
 # 
-# Option A: NEXT_PUBLIC_* values are baked into the bundle at BUILD time.
-# so CI builds a separate image per environment (dev-<sha>, prod-<sha>),
-# each with its own --build-arg NEXT_PUBLIC_API_URL. Images are NOT
-# portable across environments.
+# syntax=docker/dockerfile:1
+#
+# Build context is the REPO ROOT (needed for pnpm-lock.yml + workspace file).
+# From the repo root:
+#   docker build -f dockerfile.web \ -t web-flashid:local .
 
 FROM node:20-alpine AS base
 RUN apk add --no-cache libc6-compat git
@@ -35,17 +36,11 @@ COPY web ./web
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Option A: NEXT_PUBLIC_* vars are baked into the bundle at build time.
-# Each environment gets its own image built with its own values.
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-ARG API_INTERNAL_URL
-ENV API_INTERNAL_URL=$API_INTERNAL_URL
-# Add more NEXT_PUBLIC_* build args here as your app needs them, e.g.:
-# ARG NEXT_PUBLIC_SOMETHING
-# ENV NEXT_PUBLIC_SOMETHING=$NEXT_PUBLIC_SOMETHING
-
 RUN pnpm --filter ./web run build
+
+# API_INTERNAL_URL is read at runtime (App Service Application Setting) by
+# next.config.ts's rewrites(), not baked in here — the same image is built
+# once and deployed to both dev and prod, differing only by that setting.'
 
 # ---------- runner ----------
 FROM base AS runner

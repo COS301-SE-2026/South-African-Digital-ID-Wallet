@@ -1,9 +1,9 @@
 #!/bin/bash
-# ─────────────────────────────────────────────────────────────────────────────
+# ------
 # Seed Key Vault secrets for FlashID
 # Run once per environment after deploying the Bicep templates.
 # Usage: ./seed-secrets.sh dev   or   ./seed-secrets.sh prod
-# ─────────────────────────────────────────────────────────────────────────────
+# ------
 
 set -euo pipefail
 
@@ -17,11 +17,11 @@ echo ""
 prompt_and_set() {
   local SECRET_NAME="$1"
   local DESCRIPTION="$2"
-  echo "─── ${DESCRIPTION} ───"
+  echo "--- ${DESCRIPTION} ---"
   read -rsp "  ${SECRET_NAME}: " VALUE
   echo ""
   az keyvault secret set --vault-name "${VAULT_NAME}" --name "${SECRET_NAME}" --value "${VALUE}" --output none
-  echo "  ✓ Set ${SECRET_NAME}"
+  echo "  Done. Set ${SECRET_NAME}"
   echo ""
 }
 
@@ -47,7 +47,7 @@ prompt_and_set "DOCKER-REGISTRY-SERVER-PASSWORD"   "ACR password (from portal > 
 prompt_and_set "ConnectionStrings--DefaultConnection-Flashid" "SQL connection string for sqldb-flashid-${ENV} (Server=tcp:sql-flashid.database.windows.net,1433;...)"
 prompt_and_set "ConnectionStrings--DefaultConnection-GovRegistry" "SQL connection string for sqldb-gov-registry (shared dev+prod. Same value both times)"
 
-echo "─────────────────────────────────────────────"
-echo "✓ All secrets seeded into ${VAULT_NAME}"
+echo "----------------------------------------"
+echo "Done. All secrets seeded into ${VAULT_NAME}"
 echo ""
 echo "Verify with: az keyvault secret list --vault-name ${VAULT_NAME} --output table"
