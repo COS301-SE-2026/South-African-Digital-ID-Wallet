@@ -1,5 +1,5 @@
 name: Validate Infrastructure (What-If)
-
+# on main
 on:
   push:
     branches: 
@@ -24,6 +24,7 @@ jobs:
   what-if:
     name: What-If (${{ github.event.inputs.environment || 'dev' }})
     runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'dev' }}
 
     env:
       ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
