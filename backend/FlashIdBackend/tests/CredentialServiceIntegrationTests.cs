@@ -445,11 +445,65 @@ public class CredentialServiceIntegrationTests
     }
 
     [Fact]
+    public async Task GetCredentialsForCitizenAsync_IncludesCitizenContactInfoAndRealActivityStats()
+    {
+        using var context = CreateContext();
+        var service = CreateCredentialService(context);
+        var citizen = await SeedCitizenWithOptionalLicenseAsync(context, "Sipho", "Nkosi", "9001015800086");
+        var credential = new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Status = CredentialStatus.Active,
+            Signature = "sig",
+            IssuedBy = "Home Affairs",
+            IssueDate = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+        await context.Credentials.AddAsync(credential, TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var firstVerifiedAt = DateTime.UtcNow.AddHours(-2);
+        var lastVerifiedAt = DateTime.UtcNow.AddMinutes(-5);
+        await context.AuditLogs.AddRangeAsync(
+            new AuditLog
+            {
+                Id = Guid.NewGuid(),
+                CredentialId = credential.Id,
+                EventType = AuditEventType.CredentialVerified,
+                Details = "verified",
+                IpAddress = "196.25.1.10",
+                CreatedAt = firstVerifiedAt,
+            },
+            new AuditLog
+            {
+                Id = Guid.NewGuid(),
+                CredentialId = credential.Id,
+                EventType = AuditEventType.CredentialVerified,
+                Details = "verified",
+                IpAddress = "41.0.0.1",
+                CreatedAt = lastVerifiedAt,
+            });
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var result = (await service.GetCredentialsForCitizenAsync(citizen.Id)).ToList();
+        var dto = Assert.Single(result);
+
+        Assert.NotNull(dto.Citizen);
+        Assert.Equal("Sipho Nkosi", dto.Citizen!.FullName);
+        Assert.Equal("9001015800086", dto.Citizen.IdNumber);
+        Assert.NotNull(dto.Activity);
+        Assert.Equal(2, dto.Activity!.Verifications);
+        Assert.Equal(lastVerifiedAt, dto.Activity.LastVerifiedAt);
+        Assert.Equal(2, dto.Activity.DevicesUsed);
+    }
+
+    [Fact]
     public async Task GetCredentialsForCitizenAsync_UnknownCitizen_ThrowsCitizenNotFoundException()
     {
         using var context = CreateContext();
         var service = CreateCredentialService(context);
-
         await Assert.ThrowsAsync<CitizenNotFoundException>(
             () => service.GetCredentialsForCitizenAsync(Guid.NewGuid()));
     }

@@ -93,6 +93,13 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
         string saId, CancellationToken cancellationToken)
     {
 
+        var cleanSaId = saId?.Trim();
+
+        if (string.IsNullOrWhiteSpace(cleanSaId) || cleanSaId.Length != 13 || !cleanSaId.All(char.IsDigit))
+        {
+            throw new InvalidVerificationState("A valid 13-digit South African ID number is required.");
+        }
+
         var verification = await GetOwnedVerificationAsync(verificationId, userId, cancellationToken);
         EnsureNotExpired(verification);
 
@@ -106,7 +113,7 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
             throw new InvalidVerificationState("Verification is not ready for liveness.");
         }
 
-        var citizen = await _governmentRegistryGateway.GetCitizenBySaIdAsync(saId);
+        var citizen = await _governmentRegistryGateway.GetCitizenBySaIdAsync(cleanSaId);
 
         if (citizen is null)
         {
@@ -120,6 +127,7 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
         }
 
         verification.RegistryIdentityMatched = true;
+        verification.SubmittedSaId = citizen.SaId;
 
         if (string.IsNullOrWhiteSpace(citizen.PhotoBlobName))
         {
@@ -172,33 +180,112 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
         verification.RegistryFaceMatched = result.FaceMatched;
         verification.UpdatedAt = DateTime.UtcNow;
 
-        if (result.LivenessPassed == true && result.FaceMatched == true)
-        {
-            verification.Status = IdentityVerificationStatus.Verified;
-            verification.VerifiedAt = DateTime.UtcNow;
-            verification.FailureReason = null;
-        }
-        else
+        var verificationSucceeded = verification.RegistryFaceMatched == true && verification.LivenessPassed == true && verification.RegistryFaceMatched == true;
+
+        if (!verificationSucceeded)
         {
             verification.Status = IdentityVerificationStatus.Failed;
 
-            if (verification.LivenessPassed != true)
+            if (verification.RegistryIdentityMatched != true)
+            {
+                verification.FailureReason = "Government Registry identity verification failed.";
+            }
+            else if (verification.LivenessPassed != true)
             {
                 verification.FailureReason = "Liveness verification failed.";
             }
-            else if (verification.RegistryFaceMatched != true)
+            else
             {
                 verification.FailureReason = "Live face did not match the Government Registry portrait.";
             }
-            else
-            {
-                verification.FailureReason = "Identity verification failed";
-            }
 
-
+            await _repository.SaveChangesAsync(cancellationToken);
+            return PhysicalIdentityVerificationMapper.ToPhysicalVerificationResponseDto(verification);
         }
+
+        if (string.IsNullOrWhiteSpace(verification.SubmittedSaId))
+        {
+            throw new InvalidVerificationState("No identity is associated with this verification session.");
+        }
+
+        var registryCitizen = await _governmentRegistryGateway.GetCitizenBySaIdAsync(verification.SubmittedSaId);
+
+        if (registryCitizen is null)
+        {
+            throw new InvalidVerificationState("Government Registry identity could not be found.");
+        }
+
+        var flashIdCitizen = await _repository.GetCitizenBySaIdAsync(registryCitizen.SaId, cancellationToken);
+
+        var existingForUser = await _repository.GetCitizenByUserIdAsync(userId, cancellationToken);
+
+        if (flashIdCitizen is not null &&
+            flashIdCitizen.UserId is not null &&
+            flashIdCitizen.UserId != userId)
+        {
+            verification.Status = IdentityVerificationStatus.Failed;
+
+            verification.FailureReason = "This identity is already linked to another account.";
+
+            await _repository.SaveChangesAsync(cancellationToken);
+
+            throw new InvalidVerificationState("This identity is already linked to another account.");
+        }
+
+        if (existingForUser is not null &&
+            (flashIdCitizen is null ||
+             existingForUser.Id != flashIdCitizen.Id))
+        {
+            verification.Status = IdentityVerificationStatus.Failed;
+
+            verification.FailureReason = "This account is already linked to another identity.";
+
+            await _repository.SaveChangesAsync(cancellationToken);
+
+            throw new InvalidVerificationState("This account is already linked to another identity.");
+        }
+
+        if (flashIdCitizen is null)
+        {
+            flashIdCitizen = new Citizen
+            {
+                Id = Guid.NewGuid(),
+
+                SaId = registryCitizen.SaId,
+                Names = registryCitizen.Names,
+                Surname = registryCitizen.Surname,
+                DateOfBirth = registryCitizen.DateOfBirth,
+
+                Gender = Enum.TryParse<Gender>(registryCitizen.Gender, true, out var parsedGender) ? parsedGender : Gender.Unspecified,
+
+                UserId = userId,
+
+                Status = CitizenStatus.Verified,
+
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _repository.AddCitizenAsync(flashIdCitizen, cancellationToken);
+        }
+        else
+        {
+            flashIdCitizen.UserId = userId;
+
+            flashIdCitizen.Status = CitizenStatus.Verified;
+
+            flashIdCitizen.UpdatedAt = DateTime.UtcNow;
+        }
+
+        verification.Status = IdentityVerificationStatus.Verified;
+
+        verification.VerifiedAt = DateTime.UtcNow;
+
+        verification.FailureReason = null;
+
         await _repository.SaveChangesAsync(cancellationToken);
-        return PhysicalIdentityVerificationMapper.ToPhysicalVerificationResponseDto(verification); ;
+
+        return PhysicalIdentityVerificationMapper.ToPhysicalVerificationResponseDto(verification);
     }
 
     public async Task<PhysicalVerificationResponseDto> GetAsync(Guid verificationId, Guid userId,

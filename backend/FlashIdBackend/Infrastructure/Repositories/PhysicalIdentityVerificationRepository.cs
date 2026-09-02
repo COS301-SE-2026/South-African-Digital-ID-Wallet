@@ -30,10 +30,15 @@ public class PhysicalIdentityVerificationRepository : IPhysicalIdentityVerificat
         return await _context.DomainUsers.FirstOrDefaultAsync(u => u.Email == email);
     }
 
-    public async Task<PhysicalIdentityVerification> GetByIdAsync(Guid verificationId,
+    public async Task<PhysicalIdentityVerification?> GetByIdAsync(Guid verificationId,
          CancellationToken cancellationToken)
     {
         return await _context.PhysicalIdentityVerifications.FirstOrDefaultAsync(x => x.Id == verificationId, cancellationToken);
+    }
+
+    public async Task AddCitizenAsync(Citizen citizen, CancellationToken cancellationToken)
+    {
+        await _context.Citizens.AddAsync(citizen, cancellationToken);
     }
 
     public async Task<PhysicalIdentityVerification?> GetActiveForUserAsync(Guid userId,

@@ -38,6 +38,8 @@ public static class DependencyInjection
         services.AddSingleton<CredentialExpiryMapper>();
         services.AddScoped<IPhysicalIdentityVerificationService, PhysicalIdentityVerificationService>();
         services.AddScoped<IIssueCredentialService, IssueCredentialService>();
+        services.AddScoped<IIssueCredentialService, IssueCredentialService>();
+        services.AddScoped<IPhysicalIdentityVerificationService, PhysicalIdentityVerificationService>();
         return services;
     }
 }

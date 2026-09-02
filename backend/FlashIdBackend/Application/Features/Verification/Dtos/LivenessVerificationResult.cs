@@ -2,7 +2,7 @@ namespace Application.Features.Verification.Dtos;
 
 public class LivenessVerificationResult
 {
-    public string Status { get; set; }
+    public string Status { get; set; } = string.Empty;
     public bool? LivenessPassed { get; set; }
     public bool? FaceMatched { get; set; }
     public double? MatchConfidence { get; set; }
