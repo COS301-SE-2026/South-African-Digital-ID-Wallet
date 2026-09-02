@@ -26,6 +26,7 @@ public class CredentialActivationServiceTests
         public Task SaveChangesAsync() => Task.CompletedTask;
         public Task<(List<Citizen> Citizens, int TotalCount)> SearchCitizensAsync(string? query, int page, int pageSize) => Task.FromResult((new List<Citizen>(), 0));
         public Task<Citizen?> GetCitizenByCitizenIdAsync(Guid citizenId) => Task.FromResult(CitizenToReturn);
+        public Task<(int VerificationCount, DateTime? LastVerifiedAt, int DistinctIpCount)> GetActivitySummaryAsync(Guid credentialId) => Task.FromResult((0, (DateTime?)null, 0));
     }
 
     private sealed class FakeGateway : IGovernmentRegistryGateway
