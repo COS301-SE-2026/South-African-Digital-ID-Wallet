@@ -1,0 +1,37 @@
+web/src/components/molecules/admin-stat-card/types.ts
+  h_0aff3b71f739b1 1-12
+web/src/components/atoms/sparkline/types.ts
+  h_0aff3b71f739b1 1-4
+web/src/components/organisms/admin-activity-feed/index.ts
+  h_0aff3b71f739b1 1
+web/src/components/organisms/analytics-overview/index.ts
+  h_0aff3b71f739b1 1
+web/src/components/organisms/analytics-overview/types.ts
+  h_0aff3b71f739b1 1-22
+web/src/components/organisms/admin-activity-feed/types.ts
+  h_0aff3b71f739b1 1-11
+web/src/components/molecules/admin-stat-card/index.ts
+  h_0aff3b71f739b1 1
+web/src/app/(portal)/gov-admin/gov-admin-dashboard/page.tsx
+  h_0aff3b71f739b1 1-5
+web/src/components/atoms/sparkline/index.ts
+  h_0aff3b71f739b1 1
+web/src/config/navigation/navigation.ts
+  h_0aff3b71f739b1 46
+  h_0aff3b71f739b1 47-50
+web/src/components/molecules/admin-greeting-banner/types.ts
+  h_0aff3b71f739b1 1-4
+web/src/components/molecules/admin-greeting-banner/index.ts
+  h_0aff3b71f739b1 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "61ae9cd360e90d6c85f425f0d88e188369de57dd",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

@@ -1,0 +1,62 @@
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IOfficialActivityRepository.cs
+  h_0aff3b71f739b1 1-24
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IOfficialActivityService.cs
+  h_0aff3b71f739b1 1-20
+backend/FlashIdBackend/Application/Common/SaIdMasker.cs
+  h_0aff3b71f739b1 1-17
+backend/FlashIdBackend/Application/Common/Services/CitizenVerificationService.cs
+  h_0aff3b71f739b1 89
+backend/FlashIdBackend/Application/Common/Services/CredentialExpiryService.cs
+  h_0aff3b71f739b1 104
+backend/FlashIdBackend/Application/Common/Services/CredentialService.cs
+  h_0aff3b71f739b1 60
+backend/FlashIdBackend/Application/Common/Services/OfficialActivityService.cs
+  h_0aff3b71f739b1 1-74
+backend/FlashIdBackend/Application/Common/Services/OnboardingService.cs
+  h_0aff3b71f739b1 146,156-157
+backend/FlashIdBackend/Application/Common/Services/QrService.cs
+  h_0aff3b71f739b1 186
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_0aff3b71f739b1 39
+backend/FlashIdBackend/Application/Features/Officials/DTOs/MyActivityItemDto.cs
+  h_0aff3b71f739b1 1-9
+backend/FlashIdBackend/Application/Features/Officials/DTOs/MyActivityResponseDto.cs
+  h_0aff3b71f739b1 1-6
+backend/FlashIdBackend/Application/Features/Officials/DTOs/OfficialHistoryItemDto.cs
+  h_0aff3b71f739b1 1-12
+backend/FlashIdBackend/Application/Features/Officials/DTOs/OfficialHistoryResponseDto.cs
+  h_0aff3b71f739b1 1-9
+backend/FlashIdBackend/Domain/Entities/AuditLog.cs
+  h_0aff3b71f739b1 19-21
+backend/FlashIdBackend/Domain/Enums/AuditEventType.cs
+  h_0aff3b71f739b1 28
+backend/FlashIdBackend/Domain/Enums/AuditEventTypeExtensions.cs
+  h_0aff3b71f739b1 1-17
+backend/FlashIdBackend/Infrastructure/Data/Configurations/AuditLogConfiguration.cs
+  h_0aff3b71f739b1 47-53
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_0aff3b71f739b1 68-69
+backend/FlashIdBackend/Infrastructure/Migrations/20260830132812_AddCitizenIdToAuditLog.Designer.cs
+  h_0aff3b71f739b1 1-1334
+backend/FlashIdBackend/Infrastructure/Migrations/20260830132812_AddCitizenIdToAuditLog.cs
+  h_0aff3b71f739b1 1-50
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_0aff3b71f739b1 34-36,60-61,1083-1087,1089-1090
+backend/FlashIdBackend/Infrastructure/Repositories/OfficialActivityRepository.cs
+  h_0aff3b71f739b1 1-129
+backend/FlashIdBackend/Presentation/Controllers/OfficialsController.cs
+  h_0aff3b71f739b1 2,6,17,19,22,65-132
+docs/demo3/SAS-v2.md
+  h_0aff3b71f739b1 529-584
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "fadfceb3b0566524101b83dccbe293be99d954b2",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

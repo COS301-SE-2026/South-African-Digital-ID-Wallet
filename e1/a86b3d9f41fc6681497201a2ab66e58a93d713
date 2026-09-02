@@ -1,0 +1,54 @@
+infra/AI_AGENT.md
+  h_99fca60b892ff4 1-175
+infra/modules/storage.bicep
+  s_27bd54c8747870::t_d463d5c334559e 1-84
+.github/workflows/validate-infra.yml
+  h_99fca60b892ff4 1-54
+infra/README.md
+  h_99fca60b892ff4 1-113
+infra/main.bicep
+  h_99fca60b892ff4 1-262
+infra/main.dev.bicepparam
+  h_99fca60b892ff4 1-29
+infra/main.json
+  h_99fca60b892ff4 1-1486
+infra/main.prod.bicepparam
+  h_99fca60b892ff4 1-23
+infra/modules/appservice.bicep
+  h_99fca60b892ff4 1-67
+infra/modules/appserviceplan.bicep
+  h_99fca60b892ff4 1-23
+infra/modules/communicationservices.bicep
+  h_99fca60b892ff4 1-19
+infra/modules/cosmos.bicep
+  h_99fca60b892ff4 1-133
+infra/modules/faceapi.bicep
+  h_99fca60b892ff4 1-28
+infra/modules/keyvault.bicep
+  h_99fca60b892ff4 1-36
+infra/modules/roleassignment.bicep
+  h_99fca60b892ff4 1-17
+infra/modules/sql.bicep
+  h_99fca60b892ff4 1-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "e1a86b3d9f41fc6681497201a2ab66e58a93d713",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_27bd54c8747870": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a38fe6499a8b81319",
+        "model": "unknown"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
