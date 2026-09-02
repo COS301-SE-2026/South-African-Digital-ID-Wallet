@@ -1,0 +1,19 @@
+web/src/components/molecules/ready-item/index.ts
+  h_293a8616118f65 1
+web/src/components/molecules/ready-item/ready-item.tsx
+  h_293a8616118f65 1-23
+  h_293a8616118f65 24
+web/src/components/ui/button.tsx
+  h_293a8616118f65 3,16,52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "da0228c8c83a97b2ca25ac68ffb50ad5010127de",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

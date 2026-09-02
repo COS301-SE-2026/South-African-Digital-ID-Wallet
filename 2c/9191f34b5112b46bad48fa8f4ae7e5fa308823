@@ -1,0 +1,17 @@
+web/src/services/verification-service/types.ts
+  h_293a8616118f65 13-52
+web/src/services/verification-service/verification-urls.ts
+  h_293a8616118f65 3-10,12
+  h_293a8616118f65 11,13-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "2c9191f34b5112b46bad48fa8f4ae7e5fa308823",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
