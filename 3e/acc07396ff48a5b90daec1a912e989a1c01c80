@@ -1,0 +1,22 @@
+government-registry/GovernmentRegistry/Presentation/Program.cs
+  h_99fca60b892ff4 20,55-57
+web/src/app/api/health/route.ts
+  h_99fca60b892ff4 1-3
+backend/FlashIdBackend/Presentation/Program.cs
+  h_99fca60b892ff4 123-124,220-222
+infra/main.bicep
+  h_99fca60b892ff4 1-314
+dockerfile.web
+  h_99fca60b892ff4 66-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "3eacc07396ff48a5b90daec1a912e989a1c01c80",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
