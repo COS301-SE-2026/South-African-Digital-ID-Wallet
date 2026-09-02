@@ -229,6 +229,34 @@ Admin marks a credential as revoked or under investigation.
 **Response 403:** Access denied
 **Response 404:** Credential not found
 
+#### POST /api/credentials/{credentialId}/reinstate
+Admin reinstates a revoked or under-investigation credential back to active.
+**Authentication:** Required for GovernmentAdministrator
+**Path Parameter:** `credentialId` - UUID
+**Request Body:**
+```json
+{
+    "reason": "string"
+}
+```
+**Response 200:** Status updated to Active
+**Response 400:** Credential is not currently Revoked or Investigation
+**Response 403:** Access denied
+**Response 404:** Credential not found
+
+#### GET /api/credentials/search
+Admin searches for citizens by name, surname, or ID number. Empty query returns all citizens, paginated.
+**Authentication:** Required for GovernmentAdministrator
+**Query Parameters:** `query` - string (optional), `page` - int (default 1), `pageSize` - int (default 15)
+**Response 200:** Paginated list of matching citizens. Note: `expiresOn` is only populated if the citizen has a driver's license credential; it is null otherwise.
+
+#### GET /api/credentials/citizen/{citizenId}
+Admin retrieves a specific citizen's full credential list.
+**Authentication:** Required for GovernmentAdministrator
+**Path Parameter:** `citizenId` - UUID
+**Response 200:** List of the citizen's credentials
+**Response 404:** Citizen not found
+
 ### Credential Activation
 
 #### POST /api/activate-credentials
@@ -394,6 +422,89 @@ Onboards a citizen after identity verification and generate an activation code.
 
 **Response 400:** Validation error or consent not given
 **Response 409:** Citizen already onboarded
+
+### Issue Credentials
+
+#### GET /api/credentials/citizens/{saId}/status
+Looks up a citizen already known to FlashID (via SA ID) and returns their onboarding status and any credentials already issued, so the admin portal can decide whether to enable "Issue Driver's License" or route to onboarding.
+
+**Authentication:** Required for Officials
+
+**Path Parameter:**
+- `saId` - SA ID number, 13 digits
+
+**Response 200:**
+```json
+{
+    "saId": "string",
+    "names": "string",
+    "surname": "string",
+    "dateOfBirth": "date",
+    "status": "string",
+    "activatedAt": "date",
+    "phoneNumber": "string",
+    "email": "string",
+    "existingCredentials": [
+        { 
+            "type": "string",
+            "status": "string",
+            "issueDate": "date"
+        }
+    ]
+}
+```
+
+Citizen Status Values: Pending | Activated | Deactivated | Suspended | Verified
+Credential Status Values (existingCredentials[].status): Active | Inactive | Investigation | Revoked | Expired
+
+`phoneNumber` and `email` are null unless status is Activated. They belong to the citizen's FlashID user account, which only exists after activation.
+
+**Response 400:** Invalid SA ID format
+**Response 404:** No FlashID citizen record found for this SA ID. Official should route to onboarding
+
+#### POST /api/credentials/issue
+Fetches a citizen's credential from the government registry and issue it into FlashID, after recording POPIA consent for this specific issuance.
+
+**Authentication:** Required for Officials
+
+**Request Body:**
+```json
+{
+    "saId": "string",
+    "credentialType": "string",
+    "consentGiven": true
+}
+```
+
+**Credential Types:**
+| Value | Type |
+|---|---|
+| IdentityDocument | Identity document |
+| DriversLicense | Driver's license |
+
+**Response 201:**
+```json
+{
+    "id": "string",
+    "type": "string",
+    "title": "string",
+    "issuedBy": "string",
+    "status": "string",
+    "issueDate": "date",
+    "driversLicense": {
+            "licenseNumber": "string",
+            "licenseCode": "string",
+            "restrictions": "string",
+            "expiryDate": "date"
+    }
+}
+```
+
+`issuedBy` is the government issuing authority (e.g. "Licensing Department"), taken from the government registry record, not the FlashID official who performed the action. `driversLicense` is present when `credentialType` is "DriversLicense". An equivalent `identityDocument` object is present when `credentialType` is "IdentityDocument".
+
+**Response 400:** Validation error, or consent not given
+**Response 404:** Citizen not found in FlashID, or no matching record at the government registry
+**Response 409:** Citizen is not `Activated` in FlashID, or already has an `Active` credential of that type
 
 ### Activity
 

@@ -1,5 +1,6 @@
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,15 @@ public class CredentialsActivationRepository : ICredentialsActivationRepository
     public CredentialsActivationRepository(AppDbContext context)
     {
         _context = context;
+    }
+
+    public async Task<Citizen?> GetCitizenBySaIdAsync(string saId, CancellationToken cancellationToken)
+    {
+        return await _context.Citizens
+            .Include(c => c.User)
+            .Include(c => c.Credentials).ThenInclude(ct => ct.IdentityDocument)
+            .Include(c => c.Credentials).ThenInclude(ct => ct.DriversLicense)
+            .FirstOrDefaultAsync(c => c.SaId == saId, cancellationToken);
     }
 
     public async Task AddIdentityDocumentAsync(IdentityDocument identityDocument, CancellationToken cancellationToken)
@@ -31,7 +41,7 @@ public class CredentialsActivationRepository : ICredentialsActivationRepository
 
     public async Task<bool> HasDriversLicenseAsync(Guid citizenId, CancellationToken cancellationToken)
     {
-        return await _context.DriversLicenses.AnyAsync(d => d.Credential.CitizenId == citizenId, cancellationToken);
+        return await _context.DriversLicenses.AnyAsync(d => d.Credential.CitizenId == citizenId && d.Credential.Status == CredentialStatus.Active, cancellationToken);
     }
 
     public async Task AddCredentialAsync(Credential credential, CancellationToken cancellationToken)
@@ -42,6 +52,11 @@ public class CredentialsActivationRepository : ICredentialsActivationRepository
     public async Task AddAuditLogAsync(AuditLog auditLog, CancellationToken cancellationToken)
     {
         await _context.AuditLogs.AddAsync(auditLog, cancellationToken);
+    }
+
+    public async Task AddNotificationAsync(Notification notification, CancellationToken cancellationToken)
+    {
+        await _context.Notifications.AddAsync(notification, cancellationToken);
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken)

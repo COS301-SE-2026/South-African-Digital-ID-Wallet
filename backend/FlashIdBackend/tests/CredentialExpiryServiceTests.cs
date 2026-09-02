@@ -112,10 +112,12 @@ public class CredentialExpiryServiceTests
     private static Credential MakeExpiredCredential()
     {
         var credentialId = Guid.NewGuid();
+        var citizenId = Guid.NewGuid();
+
         return new Credential
         {
             Id = credentialId,
-            CitizenId = Guid.NewGuid(),
+            CitizenId = citizenId,
             Status = CredentialStatus.Active,
             Signature = "sig",
             IssuedBy = "Licensing Dept Durban",

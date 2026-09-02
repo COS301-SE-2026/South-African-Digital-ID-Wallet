@@ -7,8 +7,20 @@ import { Text } from '@/components/atoms/text'
 import { StatusPill } from '@/components/atoms/status-pill'
 import { RevokeCredentialModal } from '@/components/organisms/revoke-credentials-modal'
 import { cn } from '@/lib/utils'
-import type { CredentialDetailsModalProps } from './types'
+import type { StatusPillIntent } from '@/components/atoms/status-pill'
+import type { CredentialDetailsModalProps, CredentialStatus } from './types'
 import Image from 'next/image'
+
+const CREDENTIAL_STATUS_PILL_INTENTS: Record<
+  CredentialStatus,
+  StatusPillIntent
+> = {
+  Active: 'active',
+  Expired: 'inactive',
+  Inactive: 'inactive',
+  Investigation: 'warning',
+  Revoked: 'danger',
+}
 
 export function CredentialDetailsModal({
   isOpen,
@@ -96,7 +108,11 @@ export function CredentialDetailsModal({
               <Button
                 variant="custom"
                 onClick={handleReinstate}
-                disabled={selected.status !== 'revoked' || isReinstating}
+                disabled={
+                  (selected.status !== 'Revoked' &&
+                    selected.status !== 'Investigation') ||
+                  isReinstating
+                }
                 isLoading={isReinstating}
                 LeftIcon={RotateCcw}
                 className="!h-auto !w-auto gap-2 border border-primary-green px-4 py-2 text-sm text-primary-green hover:bg-primary-green hover:text-clean-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-primary-green"
@@ -108,7 +124,7 @@ export function CredentialDetailsModal({
               <Button
                 variant="secondary"
                 onClick={() => setIsRevokeModalOpen(true)}
-                disabled={selected.status === 'revoked'}
+                disabled={selected.status === 'Revoked'}
                 className="!h-auto !w-auto !border-national-red px-4 py-2 text-sm !text-national-red hover:!bg-national-red hover:!text-clean-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:!bg-transparent disabled:hover:!text-national-red"
                 dataCy="revoke-credential"
               >
@@ -151,12 +167,14 @@ export function CredentialDetailsModal({
                         Credential ID:
                       </span>
                       <span className="text-sm font-semibold text-deep-green">
-                        {selected.credentialId}
+                        {selected.displayReference}
                       </span>
                     </div>
                     <div className="flex items-center gap-10">
                       <span className="text-sm text-muted-text">Status:</span>
-                      <StatusPill intent={selected.status}>
+                      <StatusPill
+                        intent={CREDENTIAL_STATUS_PILL_INTENTS[selected.status]}
+                      >
                         {selected.status}
                       </StatusPill>
                     </div>
@@ -285,7 +303,7 @@ export function CredentialDetailsModal({
         onConfirm={handleConfirmRevoke}
         citizenName={selected.citizen.fullName}
         credentialLabel={selected.label}
-        credentialId={selected.credentialId}
+        credentialId={selected.displayReference}
         isSubmitting={isRevoking}
       />
     </>

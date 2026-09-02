@@ -35,6 +35,17 @@ export type CredentialResponse = {
   driversLicense?: DriversLicenseDetail | null
 }
 
+export type RevokeCredentialRequest = {
+  newStatus: CredentialStatus
+  reason: string
+}
+
+export type RevokeCredentialResponse = {
+  credentialId: string
+  status: CredentialStatus
+  updatedAt: string
+}
+
 export type CredentialDetailRow = {
   label: string
   value: string

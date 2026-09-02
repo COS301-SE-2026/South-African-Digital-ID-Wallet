@@ -2,6 +2,8 @@ using Application.Features.Onboarding.Exceptions;
 using Application.Features.Verification.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Diagnostics;
+using Application.Features.Citizens.Exceptions;
+using Application.Features.Credentials.Exceptions;
 
 namespace Presentation.ExceptionHandling;
 
@@ -29,6 +31,27 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
 
             DuplicateEmailRegisteredException =>
                 (StatusCodes.Status409Conflict, "Email already registered",
+                    exception.Message),
+
+            Application.Features.Citizens.Exceptions.CitizenNotFoundException or
+            Application.Features.Credentials.Exceptions.CitizenNotFoundException =>
+                (StatusCodes.Status404NotFound, "Citizen not found",
+                    exception.Message),
+
+            CitizenNotOnboardedException =>
+                (StatusCodes.Status409Conflict, "Citizen not activated",
+                    exception.Message),
+
+            CredentialAlreadyIssuedException =>
+                (StatusCodes.Status409Conflict, "Credential already issued",
+                    exception.Message),
+
+            GovernmentRegistryRecordNotFoundException =>
+                (StatusCodes.Status404NotFound, "Government registry record not found",
+                    exception.Message),
+
+            GovernmentRegistryDataInvalidException =>
+                (StatusCodes.Status502BadGateway, "Government registry record invalid data",
                     exception.Message),
 
             EmailDeliveryException => (StatusCodes.Status503ServiceUnavailable, "Required value missing",

@@ -15,4 +15,7 @@ public class LoginResponseDto
 
     [JsonIgnore]
     public string? DeviceToken { get; set; }
+
+    public string? Names { get; set; }
+    public string? Surname { get; set; }
 }
