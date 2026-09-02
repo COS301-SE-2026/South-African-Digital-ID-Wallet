@@ -1,16 +1,21 @@
 import { Mail, ScanFace, ShieldCheck, Lock } from 'lucide-react'
 import { Text } from '@/components/atoms/text'
-import { Modal } from '@/components/atoms/modal/modal'
+import { ProgressStepper } from '@/components/molecules'
 import type { VerifyMethodProps } from './types'
 
 export const VerifyMethod = ({
-  isOpen,
-  onClose,
   onSelectMethod,
+  steps,
+  currentStep,
 }: VerifyMethodProps) => {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="sm:max-w-lg">
+    <div className="w-full rounded-[24px] bg-card">
       <div className="flex flex-col items-center px-8 py-10 text-center">
+        {steps && currentStep !== undefined && (
+          <div className="mb-6 w-full">
+            <ProgressStepper steps={steps} currentStep={currentStep} />
+          </div>
+        )}
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-green/10 text-primary-green">
           <ShieldCheck className="h-7 w-7" />
         </div>
@@ -60,7 +65,7 @@ export const VerifyMethod = ({
             </button>
           </div>
           <div className="flex flex-col items-center rounded-[18px] border border-black/10 p-6">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-national-blue/10 text-national-blue">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-deep-green/10 text-deep-green">
               <ScanFace className="h-5 w-5" />
             </div>
             <Text
@@ -80,7 +85,7 @@ export const VerifyMethod = ({
             <button
               type="button"
               onClick={() => onSelectMethod('id')}
-              className="mt-4 w-full rounded-full bg-national-blue py-2.5 text-sm font-semibold text-clean-white transition-opacity hover:opacity-90"
+              className="mt-4 w-full rounded-full bg-deep-green py-2.5 text-sm font-semibold text-clean-white transition-opacity hover:opacity-90"
             >
               Use ID
             </button>
@@ -93,6 +98,6 @@ export const VerifyMethod = ({
           </Text>
         </div>
       </div>
-    </Modal>
+    </div>
   )
 }

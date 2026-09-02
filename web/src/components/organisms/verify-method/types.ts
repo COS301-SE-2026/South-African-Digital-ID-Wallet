@@ -1,6 +1,6 @@
 export type VerifyMethodOption = 'code' | 'id'
-export interface VerifyMethodProps {
-  isOpen: boolean
-  onClose: () => void
+export type VerifyMethodProps = {
   onSelectMethod: (method: VerifyMethodOption) => void
+  steps?: string[]
+  currentStep?: number
 }
