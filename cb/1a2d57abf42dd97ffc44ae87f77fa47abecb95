@@ -1,0 +1,52 @@
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IAdminDashboardRepository.cs
+  h_0aff3b71f739b1 1-14
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IAdminDashboardService.cs
+  h_0aff3b71f739b1 1-9
+backend/FlashIdBackend/Application/Common/Services/AdminDashboardService.cs
+  h_0aff3b71f739b1 1-91
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_0aff3b71f739b1 41
+backend/FlashIdBackend/Application/Features/AdminDashboard/DTOs/AdminActivityItemDto.cs
+  h_0aff3b71f739b1 1-9
+backend/FlashIdBackend/Application/Features/AdminDashboard/DTOs/AnalyticsResponseDto.cs
+  h_0aff3b71f739b1 1-9
+backend/FlashIdBackend/Application/Features/AdminDashboard/DTOs/DailyPointDto.cs
+  h_0aff3b71f739b1 1-7
+backend/FlashIdBackend/Application/Features/AdminDashboard/DTOs/DashboardCountsDto.cs
+  h_0aff3b71f739b1 1-8
+backend/FlashIdBackend/Application/Features/AdminDashboard/DTOs/DashboardSummaryDto.cs
+  h_0aff3b71f739b1 1-8
+backend/FlashIdBackend/Application/Features/AdminDashboard/DTOs/MetricDto.cs
+  h_0aff3b71f739b1 1-8
+backend/FlashIdBackend/Application/Features/AdminDashboard/DTOs/SystemStatusDto.cs
+  h_0aff3b71f739b1 1-7
+backend/FlashIdBackend/Application/Features/AdminDashboard/Exceptions/InvalidAnalyticsRangeException.cs
+  h_0aff3b71f739b1 1-6
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_0aff3b71f739b1 110-111
+backend/FlashIdBackend/Infrastructure/Repositories/AdminDashboardRepository.cs
+  h_0aff3b71f739b1 1-123
+backend/FlashIdBackend/Presentation/Controllers/AdminDashboardController.cs
+  h_0aff3b71f739b1 1-64
+backend/FlashIdBackend/Presentation/Controllers/CitizensController.cs
+  h_0aff3b71f739b1 20-26,50-55,86-91
+backend/FlashIdBackend/Presentation/Controllers/InstitutionsController.cs
+  h_0aff3b71f739b1 21-29,58-61,77-82
+docs/demo3/SAS-v2.md
+  h_0aff3b71f739b1 516,711-767
+docs/demo3/use-cases-v3.md
+  h_0aff3b71f739b1 182-212
+docs/images/View_Dashboard.svg
+  h_0aff3b71f739b1 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "cb1a2d57abf42dd97ffc44ae87f77fa47abecb95",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
