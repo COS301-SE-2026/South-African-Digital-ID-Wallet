@@ -676,36 +676,33 @@ FlashID distinguishes two environments: **development** and **production**. Both
 All three services deploy automatically on push to their respective branches. There is no manual deployment step for now. Local development is a third, non-deployable environment. Developers will run the stack `pnpm dev` on web, backend and government-registry concurrently. This is with a local SQL Server instance.
 
 ### 5.3 Infrastructure as Code / Containerisation
-FlashID uses Docker containerisation to provide reproducible deployment of the web application and backend services.
 
-Each deployable service contains a Dockerfile that defines its runtime environment, dependency installation, build process, exposed port, and startup command.
+FlashID's Azure infrastructure (App Services, SQL Server and databases, Cosmos DB, Blob Storage, Key Vault, and their configuration) is defined declaratively using Azure Bicep templates (`infra/main.bicep` and per-resource modules under `infra/modules/`), version-controlled alongside the application code. This replaces what was originally manual Portal provisioning with a reproducible definition of the infrastructure: any change to the templates can be previewed with `az deployment group what-if` before being applied with `az deployment group create`, and the templates converge the environment to match what is declared rather than requiring manual reconfiguration.
 
-GitHub Actions builds the relevant service container when changes are pushed to the configured branch. The resulting container image is published to the configured container registry and deployed to the corresponding Azure App Service.
+The web application is containerised: its Dockerfile defines the build and runtime environment, and GitHub Actions builds and publishes an image to Azure Container Registry on every push, which the corresponding Azure App Service is then pointed at. The two backend APIs (FlashID and Government Registry) are deployed using Azure App Service's Code publishing model, where GitHub Actions runs `dotnet publish` and deploys the build directly, rather than containers. This was a deliberate scope decision made under the project timeline, to reuse already-working infrastructure rather than introduce a new container runtime for both services under time pressure.
 
-Containerisation ensures that the same application artefact tested in the CI pipeline is deployed to Azure, reducing differences between developer machines and cloud-hosted environments.
+Application deployment itself (on every push to `dev`/`main`) continues to run automatically via GitHub Actions with no manual step, independent of the Bicep templates. Infrastructure changes described in Bicep are applied deliberately, by a team member, rather than on every push. This is a scope reduction made to fit the project timeline while still meeting the requirement for the infrastructure to be defined as reproducible code rather than manual Portal configuration.
+
 ### 5.4 Secrets Management
+
 Secrets and environment-specific configuration are not committed to the Git repository.
 
-In deployed environments, sensitive configuration values are stored using Azure App Service environment variables and connection string settings. These values include:
+In deployed environments, secrets are stored directly as Azure App Service Application Settings, configured outside of source control. `infra/main.bicep` additionally models an Azure Key Vault based secrets architecture (`kv-flashid-dev` / `kv-flashid-prod`, RBAC-authorised, referenced via managed identity) as the target design for secrets management, with `infra/seed-secrets.sh` provided to seed it. This is defined and validated but not yet the live mechanism serving the deployed applications, and represents a documented next step beyond the current project timeline.
 
-- SQL Server connection strings
-- JWT signing configuration
-- Government Registry API keys
-- Government Registry service URLs
-- Azure Blob Storage credentials
-- Email provider credentials
+Local development uses `.NET User Secrets`, local environment variables, and development configuration files excluded from source control. Public configuration templates (`.env.example` files) are included in the repository to document required variable names without real values.
 
-Local development uses `.NET User Secrets`, local environment variables, and development configuration files that are excluded from source control.
-
-Public configuration templates may be included in the repository to document the required variable names, but these templates do not contain real secret values.
-
-Application code accesses configuration through ASP.NET Core configuration providers and environment variables. Secret va
 ### 5.5 Rollback Strategy
-FlashID uses a previous-version redeployment strategy for rollback.
 
-Each successful CI/CD run produces a deployment artefact or container image associated with a specific Git commit. If a newly deployed version fails, the team identifies the most recent known-good deployment and redeploys that version to the affected Azure App Service.
+FlashID uses a redeploy-previous-version strategy for rollback, with the specific mechanism depending on how each service is deployed.
 
-Where a failure is caused by application code, the responsible commit may also be reverted through a new pull request. Force-pushing or resetting the shared `main` or `dev` branches is not used.
+For the web application (containerised), every build is pushed to Azure Container Registry tagged with its Git commit SHA. A rollback repoints the affected App Service at the previous tag (`az webapp config container set`) and restarts it. Every previously built image remains available in the registry.
+
+For the two backend APIs (Code publishing), a rollback re-publishes the previous known-good commit: checking out that commit, running `dotnet publish`, and redeploying the resulting build to the affected App Service.
+
+Either path takes a few minutes, with a brief restart window (no deployment slots on the current subscription tier). Where a failure is caused by application code rather than a bad deploy, the responsible commit may also be reverted through a new pull request. Force-pushing or resetting the shared `main` or `dev` branches is not used.
+
+Database schema changes are a known exception: both APIs apply Entity Framework Core migrations automatically on startup, and rolling back the application does not roll back an already-applied migration. A schema-breaking deploy would require a manual, targeted migration rollback in addition to the application rollback described above.
+
 ### 5.6 Deployment Diagram
 ![Deploymnet Diagram](../images/Deployment_diagram.drawio.svg)
 ### 5.7 CI/CD Pipeline Diagram
