@@ -1,0 +1,27 @@
+backend/FlashIdBackend/Application/Common/Services/AuthService.cs
+  h_712d174fc3f309 336-341
+  s_869aae32bd3b3f::t_0e29f228d324a5 342-344
+.github/workflows/web-e2e.yml
+  h_712d174fc3f309 54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "f304cbfdc097f8198656075260694e77a3ebbdef",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_869aae32bd3b3f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5d4521bf-8975-4ea6-b1e0-2810363f3aec",
+        "model": "unknown"
+      },
+      "human_author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
