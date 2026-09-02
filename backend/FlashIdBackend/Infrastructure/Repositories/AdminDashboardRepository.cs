@@ -55,7 +55,7 @@ public class AdminDashboardRepository : IAdminDashboardRepository
 
     public async Task<List<DailyPointDto>> GetEventSeriesAsync(AuditEventType eventType, DateTime fromDate, DateTime toDate)
     {
-        return await _context.AuditLogs
+        var points = await _context.AuditLogs
             .AsNoTracking()
             .Where(a => a.EventType == eventType && a.CreatedAt >= fromDate && a.CreatedAt <= toDate)
             .GroupBy(a => a.CreatedAt.Date)
@@ -66,11 +66,12 @@ public class AdminDashboardRepository : IAdminDashboardRepository
             })
             .OrderBy(p => p.Date)
             .ToListAsync();
+        return ZeroFillDays(points, fromDate, toDate);
     }
 
     public async Task<List<DailyPointDto>> GetCredentialsIssuedSeriesAsync(DateTime fromDate, DateTime toDate)
     {
-        return await _context.Credentials
+        var points = await _context.Credentials
             .AsNoTracking()
             .Where(a => a.CreatedAt >= fromDate && a.CreatedAt <= toDate)
             .GroupBy(c => c.CreatedAt.Date)
@@ -81,6 +82,7 @@ public class AdminDashboardRepository : IAdminDashboardRepository
             })
             .OrderBy(p => p.Date)
             .ToListAsync();
+        return ZeroFillDays(points, fromDate, toDate);
     }
 
     public async Task<List<DailyPointDto>> GetActiveOfficialsSeriesAsync(DateTime fromDate, DateTime toDate)
@@ -91,7 +93,7 @@ public class AdminDashboardRepository : IAdminDashboardRepository
             where log.CreatedAt >= fromDate && log.CreatedAt <= toDate
             select new { log.CreatedAt, official.Id };
 
-        return await query
+        var points = await query
             .GroupBy(x => x.CreatedAt.Date)
             .Select(g => new DailyPointDto
             {
@@ -100,6 +102,7 @@ public class AdminDashboardRepository : IAdminDashboardRepository
             })
             .OrderBy(p => p.Date)
             .ToListAsync();
+        return ZeroFillDays(points, fromDate, toDate);
     }
 
     public async Task<List<DailyPointDto>> GetActiveInstitutionsSeriesAsync(DateTime fromDate, DateTime toDate)
@@ -110,7 +113,7 @@ public class AdminDashboardRepository : IAdminDashboardRepository
             where log.CreatedAt >= fromDate && log.CreatedAt <= toDate
             select new { log.CreatedAt, official.InstitutionId };
 
-        return await query
+        var points = await query
             .GroupBy(x => x.CreatedAt.Date)
             .Select(g => new DailyPointDto
             {
@@ -119,5 +122,21 @@ public class AdminDashboardRepository : IAdminDashboardRepository
             })
             .OrderBy(p => p.Date)
             .ToListAsync();
+        return ZeroFillDays(points, fromDate, toDate);
+    }
+
+    private static List<DailyPointDto> ZeroFillDays(List<DailyPointDto> points, DateTime fromDate, DateTime toDate)
+    {
+        var byDate = points.ToDictionary(p => p.Date, p => p.Count);
+        var result = new List<DailyPointDto>();
+        for (var date = DateOnly.FromDateTime(fromDate); date <= DateOnly.FromDateTime(toDate); date = date.AddDays(1))
+        {
+            result.Add(new DailyPointDto
+            {
+                Date = date,
+                Count = byDate.GetValueOrDefault(date, 0),
+            });
+        }
+        return result;
     }
 }

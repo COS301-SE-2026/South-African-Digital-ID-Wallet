@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import {
   Building2,
   IdCard,
@@ -16,6 +17,11 @@ import type {
   AnalyticsOverviewData,
   AnalyticsRange,
 } from '@/components/organisms/analytics-overview/types'
+import { QuickActionsRow } from '@/components/organisms/quick-action-row/quick-action-row'
+import {
+  getGovernmentAdminDashboardSummary,
+  getGovernmentAdminAnalytics,
+} from '@/services/gov-admin-dashboard-service'
 
 const QUICK_ACTIONS = [
   {
@@ -67,24 +73,42 @@ const EMPTY_ANALYTICS: AnalyticsOverviewData = {
 
 export default function GovAdminDashboardPage() {
   const [analyticsRange, setAnalyticsRange] = useState<AnalyticsRange>('30d')
+  const {
+    data: dashboardSummary,
+    isLoading: isSummaryLoading,
+    isError: isSummaryError,
+  } = useQuery({
+    queryKey: ['gov-admin-dashboard-summary'],
+    queryFn: getGovernmentAdminDashboardSummary,
+    staleTime: 15 * 1000,
+  })
+  const {
+    data: analytics,
+    isLoading: isAnalyticsLoading,
+    isError: isAnalyticsError,
+  } = useQuery({
+    queryKey: ['gov-admin-dashboard-analytics', analyticsRange],
+    queryFn: () => getGovernmentAdminAnalytics(analyticsRange),
+    staleTime: 60 * 1000,
+  })
 
   const statItems: AdminStatItem[] = [
     {
       icon: Users,
       label: 'Users',
-      value: 0,
+      value: dashboardSummary?.counts.users ?? 0,
       href: '/gov-admin/users',
     },
     {
       icon: Building2,
       label: 'Institutions',
-      value: 0,
+      value: dashboardSummary?.counts.institutions ?? 0,
       href: '/gov-admin/institutions',
     },
     {
       icon: IdCard,
       label: 'Credentials Issued',
-      value: 0,
+      value: dashboardSummary?.counts.credentialsIssued ?? 0,
       href: '/gov-admin/credentials',
     },
   ]
@@ -94,16 +118,16 @@ export default function GovAdminDashboardPage() {
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">
         <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-6">
           <div className="flex min-w-0 flex-col gap-4 lg:col-span-4">
-            {/* <QuickActionsRow actions={QUICK_ACTIONS} /> */}
+            <QuickActionsRow actions={QUICK_ACTIONS} />
             <AdminStatCard items={statItems} />
           </div>
           <section className="min-w-0 min-h-0 lg:col-span-8">
-            <AdminActivityFeed items={[]} />
+            <AdminActivityFeed items={dashboardSummary?.activityFeed ?? []} />
           </section>
         </div>
         <div className="mt-4 lg:mt-6">
           <AnalyticsOverview
-            data={EMPTY_ANALYTICS}
+            data={analytics ?? EMPTY_ANALYTICS}
             range={analyticsRange}
             onRangeChange={setAnalyticsRange}
           />

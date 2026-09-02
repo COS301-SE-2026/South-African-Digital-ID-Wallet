@@ -4,23 +4,14 @@ import { Text } from '@/components/atoms/text'
 import type { AdminActivityFeedProps } from './types'
 
 const EVENT_CONFIG: Record<string, { icon: LucideIcon; label: string }> = {
-  OfficialRegistered: {
-    icon: User,
-    label: 'New official registered',
-  },
-  InstitutionRegistered: {
-    icon: Building2,
-    label: 'Institution registered',
-  },
-  InstitutionUpdated: {
-    icon: Building2,
-    label: 'Institution updated',
-  },
+  UserRegistered: { icon: User, label: 'New user registered' },
+  InstitutionRegistered: { icon: Building2, label: 'Institution registered' },
+  OfficialVerified: { icon: User, label: 'Official verified' },
+  AccountDeleted: { icon: ShieldAlert, label: 'Account deleted' },
   CredentialIssued: { icon: IdCard, label: 'Credential issued' },
-  FailedLoginAttempt: {
-    icon: ShieldAlert,
-    label: 'Failed login attempt',
-  },
+  CredentialRevoked: { icon: IdCard, label: 'Credential revoked' },
+  EmailAddressChanged: { icon: User, label: 'Email address changed' },
+  FailedLoginAttempt: { icon: ShieldAlert, label: 'Failed login attempt' },
 }
 
 const DEFAULT_CONFIG = {
