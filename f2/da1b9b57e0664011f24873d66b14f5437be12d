@@ -1,0 +1,20 @@
+backend/FlashIdBackend/Application/Features/Verification/Dtos/CreateLivenessSessionRequestDto.cs
+  h_293a8616118f65 1-8
+backend/FlashIdBackend/Application/Features/Verification/Dtos/PhysicalVerificationResponseDto.cs
+  h_293a8616118f65 9,11
+backend/FlashIdBackend/Application/Features/Verification/Exceptions/VerificationExpiredException.cs
+  h_293a8616118f65 16-22
+backend/FlashIdBackend/Presentation/ExceptionHandling/GlobalExceptionHandler.cs
+  h_293a8616118f65 41-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "f2da1b9b57e0664011f24873d66b14f5437be12d",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

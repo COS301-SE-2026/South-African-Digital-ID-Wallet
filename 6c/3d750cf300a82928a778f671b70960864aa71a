@@ -1,0 +1,20 @@
+backend/FlashIdBackend/Presentation/Controllers/VerificationController.cs
+  h_293a8616118f65 63-64
+  h_293a8616118f65 73
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IPhysicalIdentityVerificationService.cs
+  h_293a8616118f65 11-12
+backend/FlashIdBackend/Application/Common/Services/PhysicalIdentityVerificationService.cs
+  h_293a8616118f65 1,18-19,22,26-27,93,101,104,106,110-123,125-130,132-136,138,140-142,184-194,221-227
+  h_293a8616118f65 109,124,131,137,139,143,172,179,195-196,228-231
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "6c3d750cf300a82928a778f671b70960864aa71a",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
