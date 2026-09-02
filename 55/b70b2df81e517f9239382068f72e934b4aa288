@@ -1,0 +1,20 @@
+web/src/components/molecules/quick-action-card/quick-action-card.tsx
+  h_0aff3b71f739b1 3,6,15,18-46
+web/src/components/atoms/sparkline/sparkline.tsx
+  h_0aff3b71f739b1 1-22
+web/src/components/molecules/quick-action-card/types.ts
+  h_0aff3b71f739b1 9
+web/src/components/organisms/quick-action-row/quick-action-row.tsx
+  h_0aff3b71f739b1 7,16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "55b70b2df81e517f9239382068f72e934b4aa288",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+web/src/components/molecules/admin-stat-card/admin-stat-card.tsx
+  h_0aff3b71f739b1 1-15,17-26
+  h_0aff3b71f739b1 16,27-37
+web/src/components/organisms/analytics-overview/analytics-overview.tsx
+  h_0aff3b71f739b1 1-138
+  h_0aff3b71f739b1 139-152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "7e8794f744ec7918e8ec62ba4e1821584bb30bc6",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

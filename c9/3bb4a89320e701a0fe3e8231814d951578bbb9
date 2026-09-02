@@ -1,0 +1,22 @@
+backend/FlashIdBackend/Infrastructure/Data/Configurations/PhysicalIdentityVerificationConfiguration.cs
+  h_293a8616118f65 19
+backend/FlashIdBackend/Domain/Entities/PhysicalIdentityVerification.cs
+  h_293a8616118f65 11
+backend/FlashIdBackend/Infrastructure/Migrations/20260902060945_UpdatePhysicalVerificationSubmittedSaId.Designer.cs
+  h_293a8616118f65 1-1393
+backend/FlashIdBackend/Infrastructure/Migrations/20260902060945_UpdatePhysicalVerificationSubmittedSaId.cs
+  h_293a8616118f65 1-40
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_293a8616118f65 720-722
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c93bb4a89320e701a0fe3e8231814d951578bbb9",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

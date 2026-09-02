@@ -1,0 +1,15 @@
+backend/FlashIdBackend/Application/Common/Services/CredentialUpdateService.cs
+  h_99fca60b892ff4 1-306
+  h_99fca60b892ff4 307-309
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "a7b6de177ab98b41ffa3688fe262d86bdff39b36",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

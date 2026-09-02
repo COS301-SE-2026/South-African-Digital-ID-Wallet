@@ -1,0 +1,14 @@
+backend/FlashIdBackend/Infrastructure/Repositories/Decorators/RetryingCredentialUpdateRepositoryDecorator.cs
+  h_99fca60b892ff4 1-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "009751720956b9bf710fb9ba6d2c01c3d12681c6",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
