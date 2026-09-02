@@ -1,0 +1,40 @@
+web/src/services/gov-admin-dashboard-service/gov-admin-dashboard-service.ts
+  s_ccd024531a2a90::t_367fd7550978cf 1-2,4,16,25-44
+  h_0aff3b71f739b1 3,5-15,17-24,45
+  h_0aff3b71f739b1 46-51
+web/src/services/gov-admin-dashboard-service/types.ts
+  h_0aff3b71f739b1 1-21
+  s_ccd024531a2a90::t_052f6b888cbbe5 22-37
+web/src/services/gov-admin-dashboard-service/index.ts
+  h_0aff3b71f739b1 1-10,12-13
+  s_ccd024531a2a90::t_b1e23fb74fee9b 11
+web/src/components/atoms/sparkline/sparkline.tsx
+  s_ccd024531a2a90::t_deab5e94747d13 1-10,14
+  s_ccd024531a2a90::t_9809bfaf8eda53 16,18-33,42
+  h_0aff3b71f739b1 34
+  s_ccd024531a2a90::t_9bb7d1e3f99b3c 43-45
+  h_0aff3b71f739b1 35-41
+web/src/services/gov-admin-dashboard-service/gov-admin-dashboard-urls.ts
+  h_0aff3b71f739b1 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "4465ad9015389051e8544cc5088ca7978c54de98",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_ccd024531a2a90": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "f5483fce-964f-4e2f-9b8a-7dd6f218aa21",
+        "model": "gpt-5.4-mini"
+      },
+      "human_author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
