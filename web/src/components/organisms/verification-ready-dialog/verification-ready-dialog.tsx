@@ -10,7 +10,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { ReadyItem } from '@/components/molecules/ready-item'
+import { ProgressStepper, ReadyItem } from '@/components/molecules'
+
+const LIVENESS_STEPS = [
+  'Enter SA ID ',
+  'Consent',
+  'Ready to verify',
+  'Camera & Liveness',
+]
 
 interface VerificationReadyDialogProps {
   open: boolean
@@ -28,6 +35,9 @@ const VerificationReadyDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[520px]">
+        <div className="mb-6">
+          <ProgressStepper steps={LIVENESS_STEPS} currentStep={3} />
+        </div>
         <DialogHeader className="text-center sm:text-center">
           <DialogTitle className="text-2xl font-semibold">
             Ready to verify
