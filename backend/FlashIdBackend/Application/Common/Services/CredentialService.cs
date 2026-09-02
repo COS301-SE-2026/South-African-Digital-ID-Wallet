@@ -33,6 +33,55 @@ public class CredentialService : ICredentialService
         var credentials = await _credentialRepository.GetCredentialsByCitizenIdAsync(citizen.Id);
         return credentials.Select(c => MapToDto(c, citizen));
     }
+    public async Task<SearchCitizensResponseDto> SearchCitizensAsync(string? query, int page, int pageSize)
+    {
+        var (citizens, totalCount) = await _credentialRepository.SearchCitizensAsync(query, page, pageSize);
+
+        var results = citizens.Select(citizen => new CitizenSearchResultDto
+        {
+            CitizenId = citizen.Id,
+            FirstName = citizen.Names,
+            Surname = citizen.Surname,
+            IdNumber = citizen.SaId,
+            DateJoined = citizen.ActivatedAt,
+            ExpiresOn = citizen.Credentials
+                .Select(c => c.DriversLicense)
+                .FirstOrDefault(dl => dl != null)?.ExpiryDate,
+        }).ToList();
+
+        return new SearchCitizensResponseDto
+        {
+            Results = results,
+            TotalResults = totalCount,
+            Page = page,
+            PageSize = pageSize,
+        };
+    }
+
+    public async Task<IEnumerable<CredentialResponseDto>> GetCredentialsForCitizenAsync(Guid citizenId)
+    {
+        var citizen = await _credentialRepository.GetCitizenByCitizenIdAsync(citizenId);
+        if (citizen == null)
+            throw new CitizenNotFoundException(citizenId);
+
+        var credentials = await _credentialRepository.GetCredentialsByCitizenIdAsync(citizen.Id);
+        var dtos = credentials.Select(c => MapToDto(c, citizen)).ToList();
+
+        foreach (var dto in dtos)
+        {
+            var (verificationCount, lastVerifiedAt, distinctIpCount) =
+                await _credentialRepository.GetActivitySummaryAsync(dto.Id);
+
+            dto.Activity = new CredentialActivityDto
+            {
+                Verifications = verificationCount,
+                LastVerifiedAt = lastVerifiedAt,
+                DevicesUsed = distinctIpCount,
+            };
+        }
+
+        return dtos;
+    }
 
     public async Task<RevokeCredentialResponseDto> RevokeCredentialAsync(Guid credentialId, Guid adminUserId, RevokeCredentialRequestDto request, string ipAddress)
     {
@@ -79,7 +128,46 @@ public class CredentialService : ICredentialService
             UpdatedAt = DateTime.UtcNow,
         };
     }
+    public async Task<ReinstateCredentialResponseDto> ReinstateCredentialAsync(Guid credentialId, Guid adminUserId, ReinstateCredentialRequestDto request, string ipAddress)
+    {
+        var credential = await _credentialRepository.GetByIdAsync(credentialId);
+        if (credential == null)
+            throw new CredentialNotFoundException(credentialId);
 
+        if (credential.Status != CredentialStatus.Revoked && credential.Status != CredentialStatus.Investigation)
+            throw new InvalidCredentialStatusTransitionException($"Only credentials that are {CredentialStatus.Revoked} or {CredentialStatus.Investigation} can be reinstated.");
+
+        credential.Status = CredentialStatus.Active;
+        await _credentialRepository.SaveChangesAsync();
+
+        await _institutionRepository.AddAuditLogAsync(new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            ActorId = adminUserId,
+            EventType = AuditEventType.CredentialReinstated,
+            Details = $"Credential {credential.Id} reinstated to Active. Reason: {request.Reason}",
+            IpAddress = ipAddress,
+            CreatedAt = DateTime.UtcNow,
+        });
+        await _institutionRepository.SaveChangesAsync();
+
+        await _notificationRepository.CreateNotificationAsync(new Notification
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = credential.CitizenId,
+            Title = "Credential status updated",
+            Description = "One of your credentials has been reinstated and is now active again.",
+            Tone = "success",
+            CreatedAt = DateTime.UtcNow,
+        });
+
+        return new ReinstateCredentialResponseDto
+        {
+            CredentialId = credential.Id,
+            Status = credential.Status,
+            UpdatedAt = DateTime.UtcNow,
+        };
+    }
     private CredentialResponseDto MapToDto(Credential credential, Citizen citizen)
     {
         var dto = _mapper.CredentialToResponseDto(credential);
@@ -99,7 +187,14 @@ public class CredentialService : ICredentialService
             dto.Type = "IdentityDocument";
             dto.Title = "National ID Card";
         }
-
+        dto.Citizen = new CredentialCitizenDto
+        {
+            FullName = $"{citizen.Names} {citizen.Surname}",
+            IdNumber = citizen.SaId,
+            DateOfBirth = citizen.DateOfBirth,
+            Email = citizen.User?.Email,
+            Phone = citizen.User?.PhoneNumber,
+        };
         return dto;
     }
 }

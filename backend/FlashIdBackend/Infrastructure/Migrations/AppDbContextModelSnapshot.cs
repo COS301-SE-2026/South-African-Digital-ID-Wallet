@@ -36,6 +36,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
+                    b.Property<Guid?>("CredentialId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Details")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -56,9 +59,13 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedAt");
 
+                    b.HasIndex("CredentialId");
+
                     b.HasIndex("EventType");
 
                     b.HasIndex("ActorId", "CreatedAt");
+
+                    b.HasIndex("CredentialId", "EventType");
 
                     b.HasIndex("EventType", "CreatedAt");
 
@@ -1146,7 +1153,14 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ActorId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Domain.Entities.Credential", "Credential")
+                        .WithMany()
+                        .HasForeignKey("CredentialId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Actor");
+
+                    b.Navigation("Credential");
                 });
 
             modelBuilder.Entity("Domain.Entities.Biometrics", b =>

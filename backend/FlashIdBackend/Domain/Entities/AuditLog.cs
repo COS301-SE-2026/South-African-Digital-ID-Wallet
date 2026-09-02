@@ -16,4 +16,6 @@ public class AuditLog
 
     public Guid? ActorId { get; set; }
     public User? Actor { get; set; } = null;
+    public Guid? CredentialId { get; set; }
+    public Credential? Credential { get; set; } = null;
 }
