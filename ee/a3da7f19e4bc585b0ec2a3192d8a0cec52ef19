@@ -1,0 +1,405 @@
+backend/FlashIdBackend/Domain/Entities/AuditLog.cs
+  h_712d174fc3f309 19-20
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_712d174fc3f309 113
+  h_712d174fc3f309 110-112
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_712d174fc3f309 1100-1104,1108-1109
+  h_712d174fc3f309 42-44,67-68,73-74,696-700
+backend/FlashIdBackend/Infrastructure/Data/Configurations/AuditLogConfiguration.cs
+  h_712d174fc3f309 53-54
+  h_712d174fc3f309 36-39,47-48
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_712d174fc3f309 41-42
+.github/workflows/web-e2e.yml
+  h_712d174fc3f309 54
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/ICredentialRepository.cs
+  h_712d174fc3f309 15-16
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/ICredentialUpdateRepository.cs
+  h_712d174fc3f309 1-16
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/ICredentialUpdateService.cs
+  h_712d174fc3f309 1-9
+backend/FlashIdBackend/Application/Common/Mapping/CredentialMapper.cs
+  h_712d174fc3f309 12-13
+backend/FlashIdBackend/Application/Common/Mapping/CredentialUpdateMapper.cs
+  h_712d174fc3f309 1-15
+backend/FlashIdBackend/Application/Common/Services/AuthService.cs
+  h_712d174fc3f309 252,268-272,336-337,341-344,433-442
+backend/FlashIdBackend/Application/Common/Services/CredentialService.cs
+  h_712d174fc3f309 68-83,191-198
+backend/FlashIdBackend/Application/Common/Services/CredentialUpdateService.cs
+  h_712d174fc3f309 1-309
+backend/FlashIdBackend/Application/Common/Services/QrService.cs
+  h_712d174fc3f309 185
+backend/FlashIdBackend/Application/Common/Services/TrustedDeviceService.cs
+  h_712d174fc3f309 49-52
+backend/FlashIdBackend/Application/Features/Auth/DTOs/LoginResponseDto.cs
+  h_712d174fc3f309 7,16
+backend/FlashIdBackend/Application/Features/Auth/DTOs/VerifyDeviceRequestDto.cs
+  h_712d174fc3f309 13
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/CredentialResponseDto.cs
+  h_712d174fc3f309 19-32,49-50
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/CredentialUpdateCheckResponseDto.cs
+  h_712d174fc3f309 1-14
+backend/FlashIdBackend/Application/Features/Credentials/Exceptions/CredentialUpdateExceptions.cs
+  h_712d174fc3f309 1-6
+backend/FlashIdBackend/Domain/Entities/TrustedDevice.cs
+  h_712d174fc3f309 26-27
+backend/FlashIdBackend/Domain/Enums/AuditEventType.cs
+  h_712d174fc3f309 32-33
+backend/FlashIdBackend/Infrastructure/BackgroundJobs/CredentialUpdateBackgroundService.cs
+  h_712d174fc3f309 1-45
+backend/FlashIdBackend/Infrastructure/Data/Configurations/TrustedDevicesConfiguration.cs
+  h_712d174fc3f309 15-18
+backend/FlashIdBackend/Infrastructure/Migrations/20260901212441_AddCredentialIdToAuditLog.Designer.cs
+  h_712d174fc3f309 1-1336
+backend/FlashIdBackend/Infrastructure/Migrations/20260901212441_AddCredentialIdToAuditLog.cs
+  h_712d174fc3f309 1-59
+backend/FlashIdBackend/Infrastructure/Migrations/20260902160614_AddDeviceNameToTrustedDevices.Designer.cs
+  h_712d174fc3f309 1-1327
+backend/FlashIdBackend/Infrastructure/Migrations/20260902160614_AddDeviceNameToTrustedDevices.cs
+  h_712d174fc3f309 1-30
+backend/FlashIdBackend/Infrastructure/Providers/EmailSenderProvider.cs
+  h_712d174fc3f309 30
+backend/FlashIdBackend/Infrastructure/Repositories/CredentialRepository.cs
+  h_712d174fc3f309 5,20,60-80
+backend/FlashIdBackend/Infrastructure/Repositories/CredentialUpdateRepository.cs
+  h_712d174fc3f309 1-164
+backend/FlashIdBackend/Infrastructure/Repositories/Decorators/RetryingCredentialUpdateRepositoryDecorator.cs
+  h_712d174fc3f309 1-42
+backend/FlashIdBackend/Presentation/Controllers/AuthController.cs
+  h_712d174fc3f309 18-20,60,89,92,118,124,161-166,214-232
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_712d174fc3f309 4,22,29-30,37,322-349
+backend/FlashIdBackend/Presentation/Controllers/TrustedDeviceController.cs
+  h_712d174fc3f309 33-42
+backend/FlashIdBackend/tests/CredentialActivationServiceTests.cs
+  h_712d174fc3f309 29
+backend/FlashIdBackend/tests/CredentialControllerIntegrationTests.cs
+  h_712d174fc3f309 72,75,79,121-126,165-179,491-570
+backend/FlashIdBackend/tests/CredentialServiceIntegrationTests.cs
+  h_712d174fc3f309 448,452-465,467-506
+backend/FlashIdBackend/tests/CredentialUpdateBackgroundServiceTests.cs
+  h_712d174fc3f309 1-104
+backend/FlashIdBackend/tests/CredentialUpdateRepositoryIntegrationTests.cs
+  h_712d174fc3f309 1-317
+backend/FlashIdBackend/tests/CredentialUpdateServiceTests.cs
+  h_712d174fc3f309 1-562
+backend/FlashIdBackend/tests/QrServiceIntegrationTests.cs
+  h_712d174fc3f309 304
+backend/FlashIdBackend/tests/QrServiceTests.cs
+  h_712d174fc3f309 27
+docs/demo3/SAS-v2.md
+  h_712d174fc3f309 294-317
+docs/demo3/use-cases-v3.md
+  h_712d174fc3f309 149,155
+mobile/app.json
+  h_712d174fc3f309 35-41
+mobile/package.json
+  h_712d174fc3f309 15,17
+mobile/src/app/_layout.tsx
+  h_712d174fc3f309 9-13,39
+mobile/src/app/citizen/present.tsx
+  h_712d174fc3f309 1,4,6-9,13-20,23
+mobile/src/app/citizen/profile.tsx
+  h_712d174fc3f309 1,3-4
+mobile/src/app/citizen/verify.tsx
+  h_712d174fc3f309 1-8
+mobile/src/app/index.tsx
+  h_712d174fc3f309 3-5,7-16
+mobile/src/app/official/profile.tsx
+  h_712d174fc3f309 1,3-4
+mobile/src/app/official/verify.tsx
+  h_712d174fc3f309 3,7
+mobile/src/components/atoms/button/button.tsx
+  h_712d174fc3f309 14,21,28
+mobile/src/components/atoms/button/types.ts
+  h_712d174fc3f309 3
+mobile/src/components/molecules/countdown-ring/countdown-ring.tsx
+  h_712d174fc3f309 1-70
+mobile/src/components/molecules/countdown-ring/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/molecules/countdown-ring/types.ts
+  h_712d174fc3f309 1-5
+mobile/src/components/molecules/field-toggle-row/field-toggle-row.tsx
+  h_712d174fc3f309 1-34
+mobile/src/components/molecules/field-toggle-row/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/molecules/field-toggle-row/types.ts
+  h_712d174fc3f309 1-7
+mobile/src/components/molecules/index.ts
+  h_712d174fc3f309 10-14
+mobile/src/components/molecules/linked-device-row/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/molecules/linked-device-row/linked-device-row.tsx
+  h_712d174fc3f309 1-48
+mobile/src/components/molecules/linked-device-row/types.ts
+  h_712d174fc3f309 1-9
+mobile/src/components/molecules/segmented-tabs/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/molecules/segmented-tabs/segmented-tabs.tsx
+  h_712d174fc3f309 1-44
+mobile/src/components/molecules/segmented-tabs/types.ts
+  h_712d174fc3f309 1-11
+mobile/src/components/molecules/settings-row/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/molecules/settings-row/settings-row.tsx
+  h_712d174fc3f309 1-28
+mobile/src/components/molecules/settings-row/types.ts
+  h_712d174fc3f309 1-8
+mobile/src/components/organisms/bottom-nav-bar/test/bottom-nav-bar.test.tsx
+  h_712d174fc3f309 39
+mobile/src/components/organisms/device-verification-form/device-verification-form.tsx
+  h_712d174fc3f309 1-68
+mobile/src/components/organisms/device-verification-form/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/device-verification-form/types.ts
+  h_712d174fc3f309 1-7
+mobile/src/components/organisms/disclosure-modal/disclosure-modal.tsx
+  h_712d174fc3f309 1-114
+mobile/src/components/organisms/disclosure-modal/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/disclosure-modal/types.ts
+  h_712d174fc3f309 1-9
+mobile/src/components/organisms/email-change-form/email-change-form.tsx
+  h_712d174fc3f309 1-161
+mobile/src/components/organisms/email-change-form/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/email-change-form/types.ts
+  h_712d174fc3f309 1-5
+mobile/src/components/organisms/index.ts
+  h_712d174fc3f309 9-24
+mobile/src/components/organisms/info-sheet/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/info-sheet/info-sheet.tsx
+  h_712d174fc3f309 1-36
+mobile/src/components/organisms/info-sheet/types.ts
+  h_712d174fc3f309 1-10
+mobile/src/components/organisms/linked-devices-sheet/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/linked-devices-sheet/linked-devices-sheet.tsx
+  h_712d174fc3f309 1-58
+mobile/src/components/organisms/linked-devices-sheet/types.ts
+  h_712d174fc3f309 1-4
+mobile/src/components/organisms/login-form/login-form.tsx
+  h_712d174fc3f309 3,5,9-10,13-23,32-33,35-71,77-81,84,90-120
+mobile/src/components/organisms/login-form/test/login-form.test.tsx
+  h_712d174fc3f309 22-50,144,159
+mobile/src/components/organisms/notifications-sheet/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/notifications-sheet/notifications-sheet.tsx
+  h_712d174fc3f309 1-59
+mobile/src/components/organisms/notifications-sheet/types.ts
+  h_712d174fc3f309 1-4
+mobile/src/components/organisms/password-form/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/password-form/password-form.tsx
+  h_712d174fc3f309 1-89
+mobile/src/components/organisms/password-form/types.ts
+  h_712d174fc3f309 1-3
+mobile/src/components/organisms/personal-info-sheet/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/personal-info-sheet/personal-info-sheet.tsx
+  h_712d174fc3f309 1-59
+mobile/src/components/organisms/personal-info-sheet/types.ts
+  h_712d174fc3f309 1-8
+mobile/src/components/organisms/profile-header/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/profile-header/profile-header.tsx
+  h_712d174fc3f309 1-37
+mobile/src/components/organisms/profile-header/types.ts
+  h_712d174fc3f309 1-7
+mobile/src/components/organisms/qr-camera-scanner/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/qr-camera-scanner/qr-camera-scanner.tsx
+  h_712d174fc3f309 1-149
+mobile/src/components/organisms/qr-camera-scanner/types.ts
+  h_712d174fc3f309 1-6
+mobile/src/components/organisms/qr-code-card/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/qr-code-card/qr-code-card.tsx
+  h_712d174fc3f309 1-82
+mobile/src/components/organisms/qr-code-card/types.ts
+  h_712d174fc3f309 1-7
+mobile/src/components/organisms/scan-result-card/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/scan-result-card/scan-result-card.tsx
+  h_712d174fc3f309 1-55
+mobile/src/components/organisms/scan-result-card/types.ts
+  h_712d174fc3f309 1-5
+mobile/src/components/organisms/scanner-help-modal/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/scanner-help-modal/scanner-help-modal.tsx
+  h_712d174fc3f309 1-76
+mobile/src/components/organisms/scanner-help-modal/types.ts
+  h_712d174fc3f309 1-5
+mobile/src/components/organisms/security-sheet/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/security-sheet/security-sheet.tsx
+  h_712d174fc3f309 1-48
+mobile/src/components/organisms/security-sheet/types.ts
+  h_712d174fc3f309 1-4
+mobile/src/components/organisms/settings-section/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/settings-section/settings-section.tsx
+  h_712d174fc3f309 1-35
+mobile/src/components/organisms/settings-section/types.ts
+  h_712d174fc3f309 1-14
+mobile/src/components/organisms/settings-sheet/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/settings-sheet/settings-sheet.tsx
+  h_712d174fc3f309 1-127
+mobile/src/components/organisms/settings-sheet/types.ts
+  h_712d174fc3f309 1-11
+mobile/src/components/pages/credential-detail/credential-detail-page.tsx
+  h_712d174fc3f309 59,72-82
+mobile/src/components/pages/index.ts
+  h_712d174fc3f309 5-7
+mobile/src/components/pages/profile/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/pages/profile/profile-page.tsx
+  h_712d174fc3f309 1-193
+mobile/src/components/pages/profile/types.ts
+  h_712d174fc3f309 1-7
+mobile/src/components/pages/qr-generation/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/pages/qr-generation/qr-generation-page.tsx
+  h_712d174fc3f309 1-119
+mobile/src/components/pages/qr-generation/types.ts
+  h_712d174fc3f309 1-3
+mobile/src/components/pages/qr-scanner/index.ts
+  h_712d174fc3f309 1
+mobile/src/components/pages/qr-scanner/qr-scanner-page.tsx
+  h_712d174fc3f309 1-163
+mobile/src/components/templates/index.ts
+  h_712d174fc3f309 6
+mobile/src/components/templates/scanner-screen/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/templates/scanner-screen/scanner-screen.tsx
+  h_712d174fc3f309 1-60
+mobile/src/components/templates/scanner-screen/types.ts
+  h_712d174fc3f309 1-11
+mobile/src/components/utility/biometric-lock-overlay.tsx
+  h_712d174fc3f309 1-75
+mobile/src/components/utility/index.ts
+  h_712d174fc3f309 3
+mobile/src/components/utility/session-lock-watcher.tsx
+  h_712d174fc3f309 12-13,32-33,35-38
+mobile/src/config/index.ts
+  h_712d174fc3f309 2
+mobile/src/config/navigation/quick-actions.ts
+  h_712d174fc3f309 17,24
+mobile/src/config/navigation/tabs.ts
+  h_712d174fc3f309 17
+mobile/src/config/support/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/config/support/support-content.ts
+  h_712d174fc3f309 1-36
+mobile/src/config/support/types.ts
+  h_712d174fc3f309 1-4
+mobile/src/hooks/index.ts
+  h_712d174fc3f309 4-9
+mobile/src/hooks/use-biometric-preference.ts
+  h_712d174fc3f309 1-52
+mobile/src/hooks/use-countdown.ts
+  h_712d174fc3f309 1-23
+mobile/src/hooks/use-profile.ts
+  h_712d174fc3f309 1-89
+mobile/src/hooks/use-qr-token.ts
+  h_712d174fc3f309 1-22
+mobile/src/hooks/use-scan-credential.ts
+  h_712d174fc3f309 1-15
+mobile/src/hooks/use-sign-out.ts
+  h_712d174fc3f309 1-19
+mobile/src/lib/api.ts
+  h_712d174fc3f309 25-37
+mobile/src/lib/device-identity.ts
+  h_712d174fc3f309 1-13
+mobile/src/lib/device-info.ts
+  h_712d174fc3f309 1-19
+mobile/src/lib/secure-session.ts
+  h_712d174fc3f309 4,32-45
+mobile/src/services/index.ts
+  h_712d174fc3f309 3-5
+mobile/src/services/login-service/index.ts
+  h_712d174fc3f309 1-6
+mobile/src/services/login-service/login-dto.ts
+  h_712d174fc3f309 1,8-17
+mobile/src/services/login-service/login-service.ts
+  h_712d174fc3f309 5,7-11,21-25,28
+mobile/src/services/login-service/login-urls.ts
+  h_712d174fc3f309 4
+mobile/src/services/login-service/schema.ts
+  h_712d174fc3f309 13-22
+mobile/src/services/login-service/types.ts
+  h_712d174fc3f309 1,15,17-21
+mobile/src/services/profile-service/index.ts
+  h_712d174fc3f309 1-5
+mobile/src/services/profile-service/password-schema.ts
+  h_712d174fc3f309 1-41
+mobile/src/services/profile-service/profile-errors.ts
+  h_712d174fc3f309 1-49
+mobile/src/services/profile-service/profile-service.ts
+  h_712d174fc3f309 1-69
+mobile/src/services/profile-service/profile-urls.ts
+  h_712d174fc3f309 1-16
+mobile/src/services/profile-service/types.ts
+  h_712d174fc3f309 1-45
+mobile/src/services/qr-service/index.ts
+  h_712d174fc3f309 1-5
+mobile/src/services/qr-service/qr-errors.ts
+  h_712d174fc3f309 1-16
+mobile/src/services/qr-service/qr-field-definitions.ts
+  h_712d174fc3f309 1-38
+mobile/src/services/qr-service/qr-service.ts
+  h_712d174fc3f309 1-17
+mobile/src/services/qr-service/qr-urls.ts
+  h_712d174fc3f309 1-6
+mobile/src/services/qr-service/types.ts
+  h_712d174fc3f309 1-10
+mobile/src/services/scan-service/index.ts
+  h_712d174fc3f309 1-5
+mobile/src/services/scan-service/parse-scanned-token.ts
+  h_712d174fc3f309 1-36
+mobile/src/services/scan-service/scan-errors.ts
+  h_712d174fc3f309 1-13
+mobile/src/services/scan-service/scan-service.ts
+  h_712d174fc3f309 1-15
+mobile/src/services/scan-service/scan-urls.ts
+  h_712d174fc3f309 1-5
+mobile/src/services/scan-service/types.ts
+  h_712d174fc3f309 1-8
+mobile/src/stores/auth-store.ts
+  h_712d174fc3f309 3-11,24-25,27,29,33,43,51,53-58,60-69,72,75,80-81,87,90-93,95-102
+mobile/src/stores/test/auth-store.test.ts
+  h_712d174fc3f309 1,5-9,13,16-22,29,121,128-143
+mobile/src/test/citizen-home.integration.test.tsx
+  h_712d174fc3f309 153
+pnpm-lock.yaml
+  h_712d174fc3f309 39-41,45-47,2874-2876,3434-3436,4379-4389,4396-4400,7611-7614,7652-7655,8060-8064,11353-11354,12088-12093,13295-13305,13314-13318,17345-17348,17403-17404,17821-17825
+web/src/components/organisms/credential-details-modal/credential-details-modal.tsx
+  h_712d174fc3f309 263,266,269-281,284,287,291-293,295,300,303
+web/src/components/organisms/revoke-credentials-modal/revoke-credentials-modal.tsx
+  h_712d174fc3f309 24-25
+web/src/components/pages/gov-admin/manage-credentials-page.tsx
+  h_712d174fc3f309 2,7-10,17,20,23-25,32-54,62-64,66,70-71,90-103,105,112,116,128,130,133
+web/src/services/credential-service/credential-mapper.ts
+  h_712d174fc3f309 1-73
+web/src/services/credential-service/credential-service.ts
+  h_712d174fc3f309 8-10,29-62
+web/src/services/credential-service/credential-urls.ts
+  h_712d174fc3f309 5-10
+web/src/services/credential-service/types.ts
+  h_712d174fc3f309 26-37,47-48,62-84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "eea3da7f19e4bc585b0ec2a3192d8a0cec52ef19",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
