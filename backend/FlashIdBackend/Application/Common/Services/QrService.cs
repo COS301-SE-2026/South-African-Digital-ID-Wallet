@@ -96,6 +96,7 @@ public class QrService : IQrService
         {
             Payload = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(payloadJson)),
             Signature = signature,
+            Kid = _qrSigningProvider.CurrentKeyId,
         };
 
         var token = Convert.ToBase64String(
@@ -122,6 +123,7 @@ public class QrService : IQrService
     {
         public string Payload { get; set; } = string.Empty;
         public string Signature { get; set; } = string.Empty;
+        public string Kid { get; set; } = string.Empty;
     }
 
     public async Task<List<CredentialSummaryDto>> GetMyCredentialsAsync(Guid userId)
@@ -153,7 +155,7 @@ public class QrService : IQrService
             envelope = JsonSerializer.Deserialize<QrEnvelope>(envelopeJson, CamelCaseOptions) ?? throw new InvalidDisclosureTokenException();
             var payloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(envelope.Payload));
 
-            if (!_qrSigningProvider.Verify(payloadJson, envelope.Signature)) throw new InvalidDisclosureTokenException();
+            if (!_qrSigningProvider.Verify(payloadJson, envelope.Signature, envelope.Kid)) throw new InvalidDisclosureTokenException();
 
             payload = JsonSerializer.Deserialize<QrPayload>(payloadJson, CamelCaseOptions) ?? throw new InvalidDisclosureTokenException();
         }

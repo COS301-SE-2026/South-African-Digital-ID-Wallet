@@ -85,7 +85,9 @@ public class QrServiceIntegrationTests
                 new Dictionary<string, string?>
                 {
                     // NOSONAR: not a real secret
-                    ["Qr:Ed25519PrivateKey"] = "8O/E1cl/UPWEcxPaC6NvN2GSh1ged35YBOP8ACZf0K0=",
+                    ["Qr:SigningKeys:0:Kid"] = "test-key-1",
+                    ["Qr:SigningKeys:0:PrivateKey"] = "8O/E1cl/UPWEcxPaC6NvN2GSh1ged35YBOP8ACZf0K0=",
+                    ["Qr:SigningKeys:0:Status"] = "Active",
                 }
             )
             .Build();

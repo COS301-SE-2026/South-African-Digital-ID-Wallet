@@ -46,6 +46,8 @@ public class OfficialBadgeService : IOfficialBadgeService
         {
             Payload = Convert.ToBase64String(Encoding.UTF8.GetBytes(payloadJson)),
             Signature = signature,
+            Kid = _qrSigningProvider.CurrentKeyId,
+
         };
 
         var token = Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(envelope)));
@@ -68,7 +70,7 @@ public class OfficialBadgeService : IOfficialBadgeService
             envelope = JsonSerializer.Deserialize<BadgeEnvelope>(envelopeJson) ?? throw new InvalidBadgeTokenException();
             var payloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(envelope.Payload));
 
-            if (!_qrSigningProvider.Verify(payloadJson, envelope.Signature)) throw new InvalidBadgeTokenException();
+            if (!_qrSigningProvider.Verify(payloadJson, envelope.Signature, envelope.Kid)) throw new InvalidBadgeTokenException();
 
             payload = JsonSerializer.Deserialize<BadgePayload>(payloadJson) ?? throw new InvalidBadgeTokenException();
         }
@@ -113,5 +115,7 @@ public class OfficialBadgeService : IOfficialBadgeService
     {
         public string Payload { get; set; } = string.Empty;
         public string Signature { get; set; } = string.Empty;
+        public string Kid { get; set; } = string.Empty;
+
     }
 }

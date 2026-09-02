@@ -20,9 +20,9 @@ public class OfficialBadgeServiceTests
     private sealed class FakeQrSigningProvider : IQrSigningProvider
     {
         public bool VerifyResult { get; set; } = true;
-
+        public string CurrentKeyId => "test-key";
         public string Sign(string payload) => "this-signature-is-fake";
-        public bool Verify(string payload, string signature) => VerifyResult;
+        public bool Verify(string payload, string signature, string keyId) => VerifyResult;
     }
 
     private static Official ValidOfficial(InstitutionType institutionType)

@@ -30,8 +30,9 @@ public class QrServiceTests
 
     private sealed class FakeQrSigningProvider : IQrSigningProvider
     {
+        public string CurrentKeyId => "test-key";
         public string Sign(string payload) => "fake-signature";
-        public bool Verify(string payload, string signature) => true;
+        public bool Verify(string payload, string signature, string keyId) => true;
     }
 
     private sealed class FakeQrDisclosureTokenRepository : IQrDisclosureTokenRepository

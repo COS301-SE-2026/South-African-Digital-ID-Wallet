@@ -7,31 +7,42 @@ namespace Infrastructure.Providers;
 
 public class Ed25519SigningProvider : IQrSigningProvider
 {
-    private readonly Key _key;
-    private readonly PublicKey _publicKey;
+    private readonly Dictionary<string, Key> _keysByKid;
     private static readonly SignatureAlgorithm Algorithm = SignatureAlgorithm.Ed25519;
-
+    public string CurrentKeyId { get; }
     public Ed25519SigningProvider(IConfiguration config)
     {
-        var privateKeyBase64 = config["Qr:Ed25519PrivateKey"]
-            ?? throw new InvalidOperationException("QR signing private key not configured.");
+        var keyConfigs = config.GetSection("Qr:SigningKeys").Get<List<QrSigningKeyOptions>>();
 
-        var privateKeyBytes = Convert.FromBase64String(privateKeyBase64);
-        _key = Key.Import(Algorithm, privateKeyBytes, KeyBlobFormat.RawPrivateKey);
-        _publicKey = _key.PublicKey;
+        if (keyConfigs == null || keyConfigs.Count == 0)
+            throw new InvalidOperationException("No QR signing keys configured.");
+
+        _keysByKid = new Dictionary<string, Key>();
+        foreach (var kc in keyConfigs)
+        {
+            var bytes = Convert.FromBase64String(kc.PrivateKey);
+            _keysByKid[kc.Kid] = Key.Import(Algorithm, bytes, KeyBlobFormat.RawPrivateKey);
+        }
+        var activeKeys = keyConfigs.Where(k => k.Status == "Active").ToList();
+        if (activeKeys.Count != 1)
+            throw new InvalidOperationException("Exactly one QR signing key must have Status \"Active\".");
+
+        CurrentKeyId = activeKeys[0].Kid;
     }
 
     public string Sign(string payload)
     {
         var payloadBytes = Encoding.UTF8.GetBytes(payload);
-        var signature = Algorithm.Sign(_key, payloadBytes);
+        var signature = Algorithm.Sign(_keysByKid[CurrentKeyId], payloadBytes);
         return Convert.ToBase64String(signature);
     }
 
-    public bool Verify(string payload, string signature)
+    public bool Verify(string payload, string signature, string keyId)
     {
+        if (!_keysByKid.TryGetValue(keyId, out var key))
+            return false;
         var payloadBytes = Encoding.UTF8.GetBytes(payload);
         var signatureBytes = Convert.FromBase64String(signature);
-        return Algorithm.Verify(_publicKey, payloadBytes, signatureBytes);
+        return Algorithm.Verify(key.PublicKey, payloadBytes, signatureBytes);
     }
 }
