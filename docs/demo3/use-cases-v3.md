@@ -146,13 +146,13 @@ The Credentials Management subsystem allows the system and government administra
 
 **TUCBW:** This use case begins with the system's scheduled credential expiry check running (automatically every day at 00:00 SAST, or manually triggered by a Government Administrator as a testing action) and identifying an Active driver's license credential whose expiry date has passed.
 
-**TUCEW:** This use case ends with the credential's status being updated to Expired, an audit log entry being recorded, and the citizen being notified in-app.
+**TUCEW:** This use case ends with the credential's status being updated to Expired, an audit log entry being recorded, and the citizen being notified of the expiration in-app.
 
 ### Update Citizen Credentials
 
 **TUCBW:** This use case begins with the system's scheduled update citizen credentials check running (automatically every day at 00:00 SAST, or manually triggered by a Government Administrator as a testing action) and updating any credentials in FlashID that have been updated in the Government Registry.
 
-**TUCEW:** This use case ends with the credential being updated and re-signed with a fresh Ed25519 signature, and the citizen being notified of the update.
+**TUCEW:** This use case ends with the citizen's personal details and/or credentials being updated to match the Government Registry, the credential being re-signed with a fresh Ed25519 signature where applicable, an audit log entry being recorded for each change, and the citizen being notified of the update in-app.
 
 ### Reactivate Driver's License
 

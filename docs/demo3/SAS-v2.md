@@ -291,6 +291,30 @@ Manually runs the daily credential-expiry check. Idempotent per SAST calendar da
 **Response 403:** Caller is not a Government Administrator
 **Response 409:** Another expiry check is currently running for today
 
+### Credential Update Check
+
+#### POST /api/credentials/update-check
+Manually runs the daily citizen-credential update check. Idempotent per SAST calendar date (if today's check already completed, returns that result without reprocessing, or if another instance is currently running today's check it returns `409`.). Re-fetches each citizen with at least one Active credential from the Government Registry and applies any changed personal details or credential fields, re-signing `Credential.Signature` and notifying the citizen only where a difference was found.
+
+**Authentication:** Required for Government Administrator
+
+**Request Body:** None
+
+**Response 200:**
+```json
+{
+    "runDate": "date",
+    "status": "string",
+    "processedCount": 0,
+    "startedAt": "date",
+    "completedAt": "date",
+    "errorMessage": "string",
+}
+```
+
+**Response 403:** Caller is not a Government Administrator
+**Response 409:** Another update check is currently running for today
+
 ### Citizen Verify
 
 #### POST /api/citizen-verification/activate-token
