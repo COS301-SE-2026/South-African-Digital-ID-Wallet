@@ -1,0 +1,34 @@
+infra/modules/sql.bicep
+  h_99fca60b892ff4 1-79
+infra/seed-secrets.sh
+  h_99fca60b892ff4 1-53
+infra/modules/storage.bicep
+  s_27bd54c8747870::t_55612ec76f352f 1-84
+infra/modules/faceapi.bicep
+  h_99fca60b892ff4 1-28
+infra/modules/keyvault.bicep
+  h_99fca60b892ff4 1-36
+infra/modules/roleassignment.bicep
+  h_99fca60b892ff4 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "466dcba822ac3765acf59630795fca70bdc98836",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_27bd54c8747870": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a38fe6499a8b81319",
+        "model": "unknown"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
