@@ -13,7 +13,7 @@ public class LoginResponseDto
     public bool RequiresDeviceVerification { get; set; }
     public Guid? DeviceVerificationId { get; set; }
 
-    [JsonIgnore]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? DeviceToken { get; set; }
 
     public string? Names { get; set; }
