@@ -16,7 +16,7 @@ public class PhysicalIdentityVerificationConfiguration
         builder.Property(x => x.Status).HasConversion<string>().HasMaxLength(50).IsRequired();
         builder.Property(x => x.ExpiresAt).IsRequired();
         builder.Property(x => x.ConsentGrantedAt);
-        builder.Property(x => x.SubmittedIdNumberHash).HasMaxLength(64);
+        builder.Property(x => x.SubmittedSaId).HasMaxLength(13);
         builder.Property(x => x.OcrIdNumberHash).HasMaxLength(64);
         builder.Property(x => x.AzureLivenessSessionId).HasMaxLength(200);
         builder.Property(x => x.CardFaceMatchedLiveFace);

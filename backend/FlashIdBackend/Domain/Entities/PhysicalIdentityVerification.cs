@@ -8,7 +8,7 @@ public class PhysicalIdentityVerification : BaseEntity
     public IdentityVerificationStatus Status { get; set; } = IdentityVerificationStatus.AwaitingConsent;
     public DateTime ExpiresAt { get; set; }
     public DateTime? ConsentGrantedAt { get; set; }
-    public string? SubmittedIdNumberHash { get; set; }
+    public string? SubmittedSaId { get; set; }
     public string? OcrIdNumberHash { get; set; }
     public string? AzureLivenessSessionId { get; set; }
     public bool? CardFaceMatchedLiveFace { get; set; }
