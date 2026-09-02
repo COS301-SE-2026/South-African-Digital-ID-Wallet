@@ -333,7 +333,15 @@ public class AuthService : IAuthService
         {
             Console.WriteLine($"Email otp: {otp}.");
         }
-        await SendVerficationOTPAsync(user.Email, otp, cancellationToken);
+
+        try
+        {
+            await SendVerficationOTPAsync(user.Email, otp, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Device verification email failed for {user.Email}: {ex.Message}");
+        }
 
         var verificationAuditLog = new AuditLog()
         {
