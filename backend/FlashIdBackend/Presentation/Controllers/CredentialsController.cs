@@ -1,6 +1,7 @@
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Exceptions;
+using Application.Common.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -18,19 +19,22 @@ public class CredentialsController : ControllerBase
     private readonly ICredentialActivationService _credentialActivationService;
     private readonly ICredentialExpiryService _credentialExpiryService;
     private readonly IIssueCredentialService _issueCredentialService;
+    private readonly ICredentialUpdateService _credentialUpdateService;
 
     public CredentialsController(
       ICredentialService credentialService,
       IQrService qrService,
       ICredentialActivationService credentialActivationService,
       ICredentialExpiryService credentialExpiryService,
-      IIssueCredentialService issueCredentialService)
+      IIssueCredentialService issueCredentialService,
+      ICredentialUpdateService credentialUpdateService)
     {
         _credentialService = credentialService;
         _qrService = qrService;
         _credentialActivationService = credentialActivationService;
         _credentialExpiryService = credentialExpiryService;
         _issueCredentialService = issueCredentialService;
+        _credentialUpdateService = credentialUpdateService;
     }
 
     [HttpGet("me")]
@@ -309,6 +313,34 @@ public class CredentialsController : ControllerBase
         catch (CitizenNotFoundException ex)
         {
             return NotFound(new { error = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    /// <summary>
+    /// Manually runs the daily citizen-credential update check.
+    /// </summary>
+    /// <response code="200">The check ran (or had already run today). See body for status.</response>
+    /// <response code="403">Caller is not a Government Administrator.</response>
+    /// <response code="409">Another update check is currently running for today.</response>
+    [HttpPost("update-check")]
+    [Authorize(Roles = "GovernmentAdministrator")]
+    [ProducesResponseType(typeof(CredentialUpdateCheckResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> TriggerUpdateCheck(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var res = await _credentialUpdateService.RunUpdateCheckAsync(cancellationToken);
+            return res.Failed ? StatusCode(500, res) : Ok(res);
+        }
+        catch (CredentialUpdateJobAlreadyRunningException cuare)
+        {
+            return Conflict(new { error = cuare.Message });
         }
         catch (Exception)
         {

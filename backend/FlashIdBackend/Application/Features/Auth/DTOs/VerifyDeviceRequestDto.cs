@@ -10,4 +10,5 @@ public class VerifyDeviceRequestDto
     public string OperatingSystem { get; set; } = string.Empty;
     public string Browser { get; set; } = string.Empty;
     public bool RememberMe { get; set; }
+    public string? DeviceName { get; set; }
 }

@@ -10,4 +10,14 @@ export const loginSchema = z.object({
     .min(1, { error: 'Enter your password.' }),
 })
 
+export const deviceVerificationSchema = z.object({
+  otp: z
+    .string({ error: 'Enter the 6-digit code.' })
+    .trim()
+    .regex(/^\d{6}$/, { error: 'Enter the 6-digit code from your email.' }),
+})
+
+export type DeviceVerificationFormData = z.infer<
+  typeof deviceVerificationSchema
+>
 export type LoginFormData = z.infer<typeof loginSchema>

@@ -32,6 +32,13 @@
       [
         "expo-local-authentication",
         { "faceIDPermission": "Confirm your identity to show your digital ID." }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "FlashID uses the camera to scan FlashID QR codes.",
+          "recordAudioAndroid": false
+        }
       ]
     ],
     "experiments": {

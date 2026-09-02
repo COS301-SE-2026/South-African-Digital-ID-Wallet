@@ -249,6 +249,7 @@ public class AuthService : IAuthService
                 DeviceType = request.DeviceType,
                 OperatingSystem = request.OperatingSystem,
                 Browser = request.Browser,
+                DeviceName = NormalizeDeviceName(request.DeviceName),
                 LastKnownCity = null,
                 LastKnownCountry = null,
                 LastActive = DateTime.UtcNow,
@@ -264,6 +265,11 @@ public class AuthService : IAuthService
             existingTrustedDevice.IsTrusted = true;
             existingTrustedDevice.LastActive = DateTime.UtcNow;
             existingTrustedDevice.UpdatedAt = DateTime.UtcNow;
+            var incomingName = NormalizeDeviceName(request.DeviceName);
+            if (incomingName.Length > 0)
+            {
+                existingTrustedDevice.DeviceName = incomingName;
+            }
 
             await _trustedDeviceRepository.UpdateTrustedDeviceAsync(existingTrustedDevice, cancellationToken);
         }
@@ -327,9 +333,14 @@ public class AuthService : IAuthService
         {
             Console.WriteLine($"Email otp: {otp}.");
         }
-        else
+
+        try
         {
             await SendVerficationOTPAsync(user.Email, otp, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Device verification email failed for {user.Email}: {ex.Message}");
         }
 
         var verificationAuditLog = new AuditLog()
@@ -417,6 +428,16 @@ public class AuthService : IAuthService
             </p>
         </div>
         """);
+    }
+
+    private static string NormalizeDeviceName(string? deviceName)
+    {
+        if (string.IsNullOrWhiteSpace(deviceName))
+        {
+            return string.Empty;
+        }
+        var trimmed = deviceName.Trim();
+        return trimmed.Length <= 100 ? trimmed : trimmed[..100];
     }
 
     private static string HashOtp(string otp)

@@ -38,6 +38,8 @@ public static class DependencyInjection
         services.AddSingleton<CredentialExpiryMapper>();
         services.AddScoped<IOfficialActivityService, OfficialActivityService>();
         services.AddScoped<IIssueCredentialService, IssueCredentialService>();
+        services.AddScoped<ICredentialUpdateService, CredentialUpdateService>();
+        services.AddSingleton<CredentialUpdateMapper>();
         services.AddScoped<IAdminDashboardService, AdminDashboardService>();
         return services;
     }

@@ -182,6 +182,7 @@ public class QrService : IQrService
             EventType = AuditEventType.CredentialVerified,
             Details = $"Credential {cred.Id} verified via QR disclosure ({disclosedFields.Count} field(s)).",
             IpAddress = ipAddress,
+            CredentialId = cred.Id,
             CreatedAt = DateTime.UtcNow,
             CitizenId = cred.CitizenId,
         });

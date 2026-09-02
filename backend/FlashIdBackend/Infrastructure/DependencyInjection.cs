@@ -107,6 +107,10 @@ public static class DependencyInjection
         services.AddScoped<ICredentialExpiryRepository>(sp => new RetryingCredentialExpiryRepositoryDecorator(sp.GetRequiredService<CredentialExpiryRepository>()));
         services.AddHostedService<CredentialExpiryBackgroundService>();
 
+        services.AddScoped<CredentialUpdateRepository>();
+        services.AddScoped<ICredentialUpdateRepository>(sp => new RetryingCredentialUpdateRepositoryDecorator(sp.GetRequiredService<CredentialUpdateRepository>()));
+        services.AddHostedService<CredentialUpdateBackgroundService>();
+
         services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
 
         return services;

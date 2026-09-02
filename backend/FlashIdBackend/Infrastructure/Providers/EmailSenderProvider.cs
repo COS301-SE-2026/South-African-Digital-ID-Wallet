@@ -27,6 +27,7 @@ public class EmailSenderProvider : IEmailSenderProvider
         email.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = message };
 
         using var smtp = new SmtpClient();
+        smtp.CheckCertificateRevocation = !string.Equals(_config["Email:CheckCertificateRevocation"], "false", StringComparison.OrdinalIgnoreCase);
         await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls, ct);
         await smtp.AuthenticateAsync(fromAddress, appPassword, ct);
         await smtp.SendAsync(email, cancellationToken: ct);
