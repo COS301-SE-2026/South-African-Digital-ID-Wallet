@@ -21,13 +21,17 @@ export const BiometricLockOverlay = () => {
     isPromptingRef.current = true
     try {
       const result = await authenticate('Unlock FlashID')
-      if (result === 'unlocked' || result === 'unavailable') {
+      if (result === 'unlocked') {
         unlock()
+        return
+      }
+      if (result === 'unavailable') {
+        await signOut()
       }
     } finally {
       isPromptingRef.current = false
     }
-  }, [authenticate, unlock])
+  }, [authenticate, signOut, unlock])
 
   useEffect(() => {
     if (isAuthenticated && isLocked) {
@@ -48,7 +52,9 @@ export const BiometricLockOverlay = () => {
         FlashID
       </Text>
       <Text variant="sub-md" className="text-center text-clean-white">
-        {user?.names ? `Welcome back, ${user.names}.` : 'Welcome back.'}
+        {user?.names
+          ? `Welcome back, ${user.names}. Unlock to continue.`
+          : 'Unlock to continue.'}
       </Text>
       <Button
         label="Unlock"

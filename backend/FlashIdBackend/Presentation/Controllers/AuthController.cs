@@ -86,7 +86,7 @@ public class AuthController : ControllerBase
 
             Response.Cookies.Append("access_token", result.Token, cookieOptions);
 
-            var isNativeClient = string.Equals(client, "mobile", StringComparison.Ordinal);
+            var isNativeClient = IsNativeClient(client);
             if (!isNativeClient)
             {
                 result.Token = null;
@@ -158,7 +158,7 @@ public class AuthController : ControllerBase
                 Response.Cookies.Append("flashid_device", result.DeviceToken, deviceCookieOptions);
             }
 
-            var isNativeClient = string.Equals(client, "mobile", StringComparison.Ordinal) && !Request.Headers.ContainsKey("Origin");
+            var isNativeClient = IsNativeClient(client);
             if (!isNativeClient)
             {
                 result.Token = null;
@@ -221,5 +221,13 @@ public class AuthController : ControllerBase
 
         Request.Cookies.TryGetValue(DeviceCookieName, out var cookie);
         return cookie;
+    }
+    private bool IsNativeClient(string? client)
+    {
+        if (!string.Equals(client, "mobile", StringComparison.Ordinal))
+        {
+            return false;
+        }
+        return !Request.Headers.ContainsKey("Origin") && !Request.Headers.ContainsKey("Sec-Fetch-Site");
     }
 }
