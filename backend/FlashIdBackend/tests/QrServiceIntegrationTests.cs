@@ -301,6 +301,7 @@ public class QrServiceIntegrationTests
         var auditlog = await context.AuditLogs.SingleAsync(TestContext.Current.CancellationToken);
         Assert.Equal(AuditEventType.CredentialVerified, auditlog.EventType);
         Assert.Equal(user.Id, auditlog.ActorId);
+        Assert.Equal(cred.Id, auditlog.CredentialId);
     }
 
     [Fact]
