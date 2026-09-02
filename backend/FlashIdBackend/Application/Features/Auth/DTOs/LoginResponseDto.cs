@@ -4,7 +4,7 @@ namespace Application.Features.Auth.DTOs;
 
 public class LoginResponseDto
 {
-    [JsonIgnore]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Token { get; set; } = string.Empty;
     public DateTime? ExpiresAt { get; set; }
     public Guid UserId { get; set; }

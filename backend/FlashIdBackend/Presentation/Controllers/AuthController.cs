@@ -86,7 +86,7 @@ public class AuthController : ControllerBase
             var isNativeClient = string.Equals(client, "mobile", StringComparison.Ordinal);
             if (!isNativeClient)
             {
-                result.Token = string.Empty;
+                result.Token = null;
             }
 
             return Ok(result);
@@ -112,6 +112,7 @@ public class AuthController : ControllerBase
 
     [HttpPost("verify-device")]
     public async Task<IActionResult> VerifyDevice([FromBody] VerifyDeviceRequestDto request,
+        [FromHeader(Name = "X-Client")] string? client,
         CancellationToken cancellationToken)
     {
         try
@@ -154,7 +155,11 @@ public class AuthController : ControllerBase
                 Response.Cookies.Append("flashid_device", result.DeviceToken, deviceCookieOptions);
             }
 
-            result.Token = string.Empty;
+            var isNativeClient = string.Equals(client, "mobile", StringComparison.Ordinal);
+            if (!isNativeClient)
+            {
+                result.Token = null;
+            }
             result.DeviceToken = null;
             return Ok(result);
         }
