@@ -1,0 +1,26 @@
+infra/main.prod.bicepparam
+  h_99fca60b892ff4 1-35
+infra/main.bicep
+  h_99fca60b892ff4 198,212,226
+dockerfile.web
+  h_99fca60b892ff4 7-11,41-44
+infra/main.dev.bicepparam
+  h_99fca60b892ff4 1-35
+infra/README.md
+  h_99fca60b892ff4 1-126
+infra/main.json
+  h_99fca60b892ff4 1-1486
+infra/seed-secrets.sh
+  h_99fca60b892ff4 2,6,20,24,50-51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "4f2d9a3db3b1b68e1892fd30d5cea232634cc8de",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
