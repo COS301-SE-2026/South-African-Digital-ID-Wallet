@@ -1,0 +1,104 @@
+mobile/src/services/login-service/login-urls.ts
+  h_712d174fc3f309 4
+mobile/src/app/_layout.tsx
+  h_712d174fc3f309 9-13,39
+mobile/src/hooks/use-biometric-preference.ts
+  h_712d174fc3f309 1-52
+backend/FlashIdBackend/Application/Features/Auth/DTOs/VerifyDeviceRequestDto.cs
+  h_712d174fc3f309 13
+backend/FlashIdBackend/Application/Common/Services/AuthService.cs
+  h_712d174fc3f309 252,268-271,425-429
+  h_712d174fc3f309 272,336,430-434
+backend/FlashIdBackend/Domain/Entities/TrustedDevice.cs
+  h_712d174fc3f309 26-27
+mobile/src/lib/device-identity.ts
+  h_712d174fc3f309 1-11
+  h_712d174fc3f309 12-13
+mobile/src/services/login-service/schema.ts
+  h_712d174fc3f309 13-19
+  h_712d174fc3f309 20-22
+mobile/src/services/login-service/login-dto.ts
+  h_712d174fc3f309 1,8-17
+mobile/src/services/login-service/login-service.ts
+  h_712d174fc3f309 5,21,25,28
+  h_712d174fc3f309 7-11,22-24
+mobile/src/components/utility/session-lock-watcher.tsx
+  h_712d174fc3f309 12-13,32-33,35-38
+mobile/src/components/organisms/device-verification-form/types.ts
+  h_712d174fc3f309 1-7
+mobile/src/lib/secure-session.ts
+  h_712d174fc3f309 4,32-34,37,40-45
+  h_712d174fc3f309 35-36,38-39
+mobile/src/lib/api.ts
+  h_712d174fc3f309 25-37
+mobile/src/components/organisms/login-form/test/login-form.test.tsx
+  h_712d174fc3f309 30-50
+  h_712d174fc3f309 22-29,144,159
+backend/FlashIdBackend/Application/Common/Services/TrustedDeviceService.cs
+  h_712d174fc3f309 49-51
+  h_712d174fc3f309 52
+mobile/src/app/index.tsx
+  h_712d174fc3f309 3-5,7-16
+mobile/src/components/organisms/security-sheet/security-sheet.tsx
+  h_712d174fc3f309 4,8,19,30-37
+mobile/src/components/organisms/device-verification-form/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+backend/FlashIdBackend/Application/Features/Auth/DTOs/LoginResponseDto.cs
+  h_712d174fc3f309 16
+backend/FlashIdBackend/Infrastructure/Data/Configurations/TrustedDevicesConfiguration.cs
+  h_712d174fc3f309 15-17
+  h_712d174fc3f309 18
+backend/FlashIdBackend/Presentation/Controllers/AuthController.cs
+  h_712d174fc3f309 18-20,60,124,161,165,214-224
+mobile/src/services/login-service/types.ts
+  h_712d174fc3f309 1,15,17-20
+  h_712d174fc3f309 21
+mobile/src/stores/auth-store.ts
+  h_712d174fc3f309 3-11,24-25,27,29,33,43,51,53-58,60-69,72,75,80-81,87,90-93,95-102
+backend/FlashIdBackend/Presentation/Controllers/TrustedDeviceController.cs
+  h_712d174fc3f309 33-42
+mobile/src/components/organisms/login-form/login-form.tsx
+  h_712d174fc3f309 32-33,41-43,47,59
+  h_712d174fc3f309 3,5,9-10,13-23,35-40,44-46,48-58,60-71,77-81,84,90-120
+mobile/src/components/organisms/device-verification-form/device-verification-form.tsx
+  h_712d174fc3f309 1-68
+mobile/src/components/utility/biometric-lock-overlay.tsx
+  h_712d174fc3f309 1-50,52-69
+  h_712d174fc3f309 51
+mobile/src/stores/test/auth-store.test.ts
+  h_712d174fc3f309 29
+  h_712d174fc3f309 1,5-9,13,16-22,121,128-143
+mobile/src/components/organisms/index.ts
+  h_712d174fc3f309 24
+mobile/src/lib/device-info.ts
+  h_712d174fc3f309 1-12,14-18
+  h_712d174fc3f309 13,19
+backend/FlashIdBackend/Infrastructure/Migrations/20260902160614_AddDeviceNameToTrustedDevices.Designer.cs
+  h_712d174fc3f309 1-1327
+backend/FlashIdBackend/Infrastructure/Migrations/20260902160614_AddDeviceNameToTrustedDevices.cs
+  h_712d174fc3f309 1-30
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_712d174fc3f309 684-688
+mobile/package.json
+  h_712d174fc3f309 17
+mobile/src/components/utility/index.ts
+  h_712d174fc3f309 3
+mobile/src/hooks/index.ts
+  h_712d174fc3f309 9
+mobile/src/services/login-service/index.ts
+  h_712d174fc3f309 1-6
+pnpm-lock.yaml
+  h_712d174fc3f309 45-47,4296-4300,7514-7517,13089-13093,17137-17138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "5a0c1c89cdaa4dd4579714a0b87e6cc3919ebfe2",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
