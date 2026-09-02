@@ -1,0 +1,84 @@
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_0aff3b71f739b1 41-42
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/ICredentialRepository.cs
+  h_0aff3b71f739b1 15-16
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IPhysicalIdentityVerificationRepository.cs
+  h_0aff3b71f739b1 10-11
+backend/FlashIdBackend/Application/Common/Mapping/CredentialMapper.cs
+  h_0aff3b71f739b1 12-13
+backend/FlashIdBackend/Application/Common/Services/CredentialService.cs
+  h_0aff3b71f739b1 68-83,190-197
+backend/FlashIdBackend/Application/Common/Services/PhysicalIdentityVerificationService.cs
+  h_0aff3b71f739b1 96-102,116,130,183-185,189,191,193,195,199,202-209,211-215,217-285,287-288
+backend/FlashIdBackend/Application/Common/Services/QrService.cs
+  h_0aff3b71f739b1 185
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/CredentialResponseDto.cs
+  h_0aff3b71f739b1 19-32,49-50
+backend/FlashIdBackend/Application/Features/Verification/Dtos/LivenessVerificationResult.cs
+  h_0aff3b71f739b1 5
+backend/FlashIdBackend/Domain/Entities/AuditLog.cs
+  h_0aff3b71f739b1 19-20
+backend/FlashIdBackend/Infrastructure/Data/Configurations/AuditLogConfiguration.cs
+  h_0aff3b71f739b1 36-39,47-48,53-54
+backend/FlashIdBackend/Infrastructure/Migrations/20260901212441_AddCredentialIdToAuditLog.Designer.cs
+  h_0aff3b71f739b1 1-1336
+backend/FlashIdBackend/Infrastructure/Migrations/20260901212441_AddCredentialIdToAuditLog.cs
+  h_0aff3b71f739b1 1-59
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_0aff3b71f739b1 39-41,62-63,68-69,1156-1160,1162-1163
+backend/FlashIdBackend/Infrastructure/Repositories/CredentialRepository.cs
+  h_0aff3b71f739b1 5,20,60-80
+backend/FlashIdBackend/Infrastructure/Repositories/PhysicalIdentityVerificationRepository.cs
+  h_0aff3b71f739b1 33,39-43
+backend/FlashIdBackend/tests/CredentialActivationServiceTests.cs
+  h_0aff3b71f739b1 29
+backend/FlashIdBackend/tests/CredentialServiceIntegrationTests.cs
+  h_0aff3b71f739b1 448,452-465,467-506
+backend/FlashIdBackend/tests/QrServiceIntegrationTests.cs
+  h_0aff3b71f739b1 305
+backend/FlashIdBackend/tests/QrServiceTests.cs
+  h_0aff3b71f739b1 27
+web/src/app/test/page.tsx
+  h_0aff3b71f739b1 1-18
+web/src/components/molecules/ready-item/index.ts
+  h_0aff3b71f739b1 1
+web/src/components/molecules/ready-item/ready-item.tsx
+  h_0aff3b71f739b1 1-24
+web/src/components/organisms/credential-details-modal/credential-details-modal.tsx
+  h_0aff3b71f739b1 263,266,269-281,284,287,291-293,295,300,303
+web/src/components/organisms/revoke-credentials-modal/revoke-credentials-modal.tsx
+  h_0aff3b71f739b1 24-25
+web/src/components/organisms/verification-ready-dialog/verification-ready-dialog.tsx
+  h_0aff3b71f739b1 1-82
+web/src/components/pages/gov-admin/manage-credentials-page.tsx
+  h_0aff3b71f739b1 2,7-10,17,20,23-25,32-54,62-64,66,70-71,90-103,105,112,116,128,130,133
+web/src/components/ui/button.tsx
+  h_0aff3b71f739b1 3,16,52
+web/src/components/ui/dialog.tsx
+  h_0aff3b71f739b1 1-167
+web/src/services/credential-service/credential-mapper.ts
+  h_0aff3b71f739b1 1-73
+web/src/services/credential-service/credential-service.ts
+  h_0aff3b71f739b1 8-10,29-62
+web/src/services/credential-service/credential-urls.ts
+  h_0aff3b71f739b1 5-10
+web/src/services/credential-service/types.ts
+  h_0aff3b71f739b1 26-37,47-48,62-84
+web/src/services/verification-service/types.ts
+  h_0aff3b71f739b1 13-52
+web/src/services/verification-service/verification-service.ts
+  h_0aff3b71f739b1 4-10,21-65,68-72
+web/src/services/verification-service/verification-urls.ts
+  h_0aff3b71f739b1 3-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "e3657a2d575795981e5e0bb815f1f23f808c9e74",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
