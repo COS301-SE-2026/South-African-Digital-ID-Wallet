@@ -1,0 +1,191 @@
+mobile/src/components/organisms/profile-header/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/hooks/use-profile.ts
+  h_712d174fc3f309 1-89
+mobile/src/components/molecules/linked-device-row/types.ts
+  h_712d174fc3f309 1,9
+  h_712d174fc3f309 2-8
+mobile/src/components/organisms/profile-header/profile-header.tsx
+  h_712d174fc3f309 1-37
+mobile/src/components/organisms/security-sheet/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/components/molecules/settings-row/settings-row.tsx
+  h_712d174fc3f309 1-28
+mobile/src/components/organisms/email-change-form/types.ts
+  h_712d174fc3f309 5
+  h_712d174fc3f309 1-4
+mobile/src/components/organisms/personal-info-sheet/personal-info-sheet.tsx
+  h_712d174fc3f309 1-59
+backend/FlashIdBackend/Application/Features/Auth/DTOs/LoginResponseDto.cs
+  h_712d174fc3f309 7
+mobile/src/components/organisms/settings-sheet/types.ts
+  h_712d174fc3f309 2-3,11
+  h_712d174fc3f309 1,4-10
+mobile/src/components/molecules/linked-device-row/linked-device-row.tsx
+  h_712d174fc3f309 1-48
+mobile/src/components/organisms/settings-section/types.ts
+  h_712d174fc3f309 1-14
+mobile/src/components/organisms/password-form/types.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2-3
+mobile/src/components/organisms/email-change-form/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/services/profile-service/types.ts
+  h_712d174fc3f309 1-45
+mobile/src/components/organisms/settings-section/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/services/profile-service/profile-errors.ts
+  h_712d174fc3f309 42-49
+  h_712d174fc3f309 1-41
+mobile/src/components/organisms/password-form/password-form.tsx
+  h_712d174fc3f309 1-89
+mobile/src/components/organisms/settings-section/settings-section.tsx
+  h_712d174fc3f309 1-35
+mobile/src/components/organisms/linked-devices-sheet/types.ts
+  h_712d174fc3f309 1,4
+  h_712d174fc3f309 2-3
+mobile/src/components/organisms/linked-devices-sheet/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/components/molecules/settings-row/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/components/organisms/personal-info-sheet/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+backend/FlashIdBackend/Infrastructure/Providers/EmailSenderProvider.cs
+  h_712d174fc3f309 30
+mobile/src/components/molecules/settings-row/types.ts
+  h_712d174fc3f309 2-3,8
+  h_712d174fc3f309 1,4-7
+mobile/src/components/organisms/security-sheet/security-sheet.tsx
+  h_712d174fc3f309 1-38
+mobile/src/services/profile-service/password-schema.ts
+  h_712d174fc3f309 1-18,22-24,29-31,36-41
+  h_712d174fc3f309 19-21,25-28,32-35
+mobile/src/components/organisms/notifications-sheet/types.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2-4
+mobile/src/components/organisms/profile-header/types.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2-7
+mobile/src/services/profile-service/profile-service.ts
+  h_712d174fc3f309 1-13,15-16,18,20-21,23,25-26,28,30-31,33,36,39-55,57-69
+  h_712d174fc3f309 14,17,19,22,24,27,29,32,34-35,37-38,56
+backend/FlashIdBackend/Presentation/Controllers/AuthController.cs
+  h_712d174fc3f309 89,115,158-162
+mobile/src/components/pages/profile/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/components/organisms/email-change-form/email-change-form.tsx
+  h_712d174fc3f309 3,7,13,27,30-60,131
+  s_0f1f8d371d1e7f::t_232a710887e309 1-2,4-6,8-12,14-26,28-29,61-130,132-161
+mobile/src/hooks/index.ts
+  h_712d174fc3f309 8
+  h_712d174fc3f309 7
+mobile/src/components/molecules/index.ts
+  h_712d174fc3f309 12-13
+  h_712d174fc3f309 14
+mobile/src/app/official/profile.tsx
+  h_712d174fc3f309 3
+  h_712d174fc3f309 1,4
+mobile/src/components/molecules/segmented-tabs/types.ts
+  h_712d174fc3f309 1,4-6,11
+  h_712d174fc3f309 2-3,7-10
+mobile/src/hooks/use-sign-out.ts
+  h_712d174fc3f309 1-19
+mobile/src/services/profile-service/index.ts
+  h_712d174fc3f309 1-5
+mobile/src/services/profile-service/profile-urls.ts
+  h_712d174fc3f309 1-7,9-16
+  h_712d174fc3f309 8
+mobile/src/components/pages/profile/profile-page.tsx
+  h_712d174fc3f309 28,49,149
+  h_712d174fc3f309 1-27,29-48,50-148,150-193
+mobile/src/components/molecules/segmented-tabs/segmented-tabs.tsx
+  h_712d174fc3f309 1-44
+mobile/src/components/organisms/linked-devices-sheet/linked-devices-sheet.tsx
+  h_712d174fc3f309 1-58
+mobile/src/config/support/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/components/organisms/notifications-sheet/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/components/pages/profile/types.ts
+  h_712d174fc3f309 1-6
+  h_712d174fc3f309 7
+mobile/src/components/molecules/segmented-tabs/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/config/support/types.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2-4
+mobile/src/config/support/support-content.ts
+  h_712d174fc3f309 2-36
+  h_712d174fc3f309 1
+mobile/src/components/organisms/settings-sheet/settings-sheet.tsx
+  h_712d174fc3f309 1-45,62-127
+  h_712d174fc3f309 46-61
+mobile/src/app/citizen/profile.tsx
+  h_712d174fc3f309 3
+  h_712d174fc3f309 1,4
+mobile/src/components/organisms/password-form/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/components/organisms/security-sheet/types.ts
+  h_712d174fc3f309 1,4
+  h_712d174fc3f309 2-3
+mobile/src/components/organisms/info-sheet/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/components/organisms/info-sheet/types.ts
+  h_712d174fc3f309 2-3,10
+  h_712d174fc3f309 1,4-9
+mobile/src/components/organisms/info-sheet/info-sheet.tsx
+  h_712d174fc3f309 1-36
+mobile/src/components/organisms/settings-sheet/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/components/organisms/notifications-sheet/notifications-sheet.tsx
+  h_712d174fc3f309 1-59
+mobile/src/components/molecules/linked-device-row/index.ts
+  h_712d174fc3f309 1
+  h_712d174fc3f309 2
+mobile/src/components/organisms/index.ts
+  h_712d174fc3f309 23
+  s_0f1f8d371d1e7f::t_bc808777914623 14-22
+mobile/src/components/organisms/personal-info-sheet/types.ts
+  h_712d174fc3f309 1-8
+mobile/src/components/pages/index.ts
+  h_712d174fc3f309 7
+mobile/src/config/index.ts
+  h_712d174fc3f309 2
+mobile/src/services/index.ts
+  h_712d174fc3f309 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "1c2a79933beb8530c54be7699a613f7bab0e80df",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_0f1f8d371d1e7f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "298debf4-fb55-4077-a330-3fc49803fe4e",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

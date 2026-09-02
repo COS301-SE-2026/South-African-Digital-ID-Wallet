@@ -1,0 +1,29 @@
+web/src/components/organisms/admin-activity-feed/admin-activity-feed.tsx
+  h_0aff3b71f739b1 7-10,12-14
+web/src/components/pages/gov-admin/gov-admin-dashboard-page.tsx
+  h_0aff3b71f739b1 3,76,82,88
+  h_0aff3b71f739b1 20-24,77-81,83-87,89-93,99,105,111,121,125,130
+backend/FlashIdBackend/Infrastructure/Repositories/AdminDashboardRepository.cs
+  s_ccd024531a2a90::t_b7f429d1c9240d 58,69,74,85,96,105,116,125-140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "7bc117a15d530fb427790f1aca9dcf7ff24a47ef",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_ccd024531a2a90": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "f5483fce-964f-4e2f-9b8a-7dd6f218aa21",
+        "model": "gpt-5.4-mini"
+      },
+      "human_author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
