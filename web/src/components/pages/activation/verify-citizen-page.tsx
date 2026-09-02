@@ -1,10 +1,8 @@
 'use client'
-
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-
 import {
   ActivateCredentialsForm,
   type ActivateCredentialsSelection,
@@ -29,6 +27,7 @@ export default function VerifyCitizen({ token = '' }: VerifyCitizenProps) {
   const [step, setStep] = useState<1 | 2>(1)
   const [saId, setSaId] = useState('')
   const [pin, setPin] = useState('')
+  const [activationCode, setActivationCode] = useState('')
 
   const [selected, setSelected] = useState<ActivateCredentialsSelection>({
     identityDocument: true,
@@ -36,8 +35,14 @@ export default function VerifyCitizen({ token = '' }: VerifyCitizenProps) {
   })
 
   const [successOpen, setSuccessOpen] = useState(false)
+
   const { mutate: verifyCitizen, isPending: isVerifying } = useMutation({
-    mutationFn: () => verificationService.verify({ token, saId, pin }),
+    mutationFn: () =>
+      verificationService.verify({
+        token,
+        saId,
+        pin,
+      }),
     onSuccess: () => {
       setSuccessOpen(true)
     },
@@ -63,8 +68,15 @@ export default function VerifyCitizen({ token = '' }: VerifyCitizenProps) {
   })
   function handleActivateSubmit() {
     const types: CredentialType[] = []
-    if (selected.identityDocument) types.push('identityDocument')
-    if (selected.driversLicense) types.push('driversLicense')
+
+    if (selected.identityDocument) {
+      types.push('identityDocument')
+    }
+
+    if (selected.driversLicense) {
+      types.push('driversLicense')
+    }
+
     activateCredentials(types)
   }
 
@@ -79,8 +91,10 @@ export default function VerifyCitizen({ token = '' }: VerifyCitizenProps) {
                 currentStep={1}
                 saId={saId}
                 pin={pin}
+                activationCode={activationCode}
                 onSaIdChange={setSaId}
                 onPinChange={setPin}
+                onActivationCodeChange={setActivationCode}
                 onSubmit={handleVerification}
                 onRequestNewPin={() => {}}
                 isSubmitting={isVerifying}
@@ -88,7 +102,7 @@ export default function VerifyCitizen({ token = '' }: VerifyCitizenProps) {
             </div>
           </div>
         ) : (
-          <div className=" mx-auto w-full max-w-[1100px] rounded-[32px] bg-white px-12 py-10 shadow-sm border border-neutral-200">
+          <div className="mx-auto w-full max-w-[1100px] rounded-[32px] border border-neutral-200 bg-white px-12 py-10 shadow-sm">
             <div className="space-y-10">
               <ProgressStepper steps={STEPS} currentStep={2} />
               <ActivateCredentialsForm
