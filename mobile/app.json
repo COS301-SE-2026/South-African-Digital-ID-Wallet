@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "FlashID",
+    "slug": "flashid",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,7 +13,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#053B2C",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -31,7 +31,9 @@
       "expo-secure-store",
       [
         "expo-local-authentication",
-        { "faceIDPermission": "Confirm your identity to show your digital ID." }
+        {
+          "faceIDPermission": "Confirm your identity to show your digital ID."
+        }
       ],
       [
         "expo-camera",
