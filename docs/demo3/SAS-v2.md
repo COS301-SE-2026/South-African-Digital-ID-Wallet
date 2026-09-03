@@ -881,15 +881,16 @@ Where a failure is caused by application code, the responsible commit may also b
 
 Every quantified NFR from the SRS is mapped below to the architectural tactic claimed to satisfy it and the test that verifies that claim. Where a target could not be honestlty validated on the current infrastructure (Azure App Service Free/Basic tier 1), that is stated explicitly rather than reported as a pass.
 
-| ID | Quantified requirement | Tactic in SAS | Test / tool | Target | Actual | Status |
-|---|---|---|---|---|---|---|
-| NFR2.2 | Auth ops <2s p95 | JWT, BCrypt | k6 (`nfr2-2-auth.js`) | p95 < 2000ms | p95 = 1.62s | Pass |
-| NFR2.3 | Credential retrieval <2s p95 | - | k6 (`nfr2-3-credentials-and-qr.js`) | p95 < 2000ms | p95 = 508ms | Pass |
-| NFR2.3 | QR generation <2s p95 | Signed disclosure tokens | k6 (`nfr2-3-credentials-and-qr.js`) | p95 < 2000ms | p95 = 94ms | Pass |
-| NFR2.4 | QR verification <3s p95 | p95 < 3000ms | k6 (`nfr2-4-qr-verification.js`) | p95 < 3000ms | pending re-run | Pass |
-| NFR2.5 | 500 concurrent users, no degradation | - | k6 | 500 VUs | Not attainable on Free/Basic tier | Documented limitation |
-| NFR1.6 | Account lockout after failed logins | 5-attempt lockout, 30 min | xUnit integration test | Locked after 5th failed attempt | pending | Not yet run |
-| NFR1.7 | QR token single-use / anti-replay | `TryMarkUsedAsync` on Jti | k6, second resolve attempt | 2nd resolve rejected | pending | Not yet run |
-| NFR1.8 | Rate limiting on abuse-prone endpoints | ASP.NET rate limiting middleware | k6 (`nfr-rate-limit.js`) | 429 past configured limit | 429 confirmed | Pass |
-| (new) | Cold-start latency after idle | - | k6 (`nfr-cold-start.js`) | documented, no hard target | pending genuine idle re-run | Needs isolated re-run |
-| (new) | Expiry-check batch completes in reasonable time at current volume | - | k6 (`nfr-expiry-batch-timing.js`) | documented, no hard target | 366ms at ~150 citizens | Pass |
+| ID | Quantified requirement | Tactic in SAS | Test / tool | Target /  actual |
+|---|---|---|---|---|
+| NFR1.8 | Rate limiting on abuse-prone endpoints | ASP.NET Core rate limiting middleware, per-user partitioned policies | k6 | 429 past configured limit /  429 confirmed on request #4 |
+| NFR2.2 | Auth ops <2s for 95% of requests | JWT bearer auth, BCrypt password hashing, trusted-device check to skip OTP round-trip | k6 | <2000 ms /  1.62 s |
+| NFR2.3 | Credential retrieval <2s for 95% of requests | Indexed lookup via UserId/ CitizenId | k6 | <2000 ms /  508 ms |
+| NFR2.3 | QR generation <2s for 95% of requests | Ed25519-signed disclosure token generation | k6 | <2000 ms /  94 ms |
+| NFR2.4 | QR verification <3s | Single-use Jti claim (`TryMarkUsedAsync`) + Ed25519 signature verification | k6 | <3000 ms /  435.55 ms |
+| NFR2.5 | 500 concurrent authenticated users, no degradation | - | k6 | 500 VUs /  **not attainable on current Basic tier** - requires Standard/ Premium plan with autoscaling |
+| NFR2.6 | Cold-start latency <5s after idle | None - Free/ Basic tier has no "Always On"/ warm-up strategy configured | k6 | <5000 ms /  **not yet validated**, 667 ms measured while still warm |
+| NFR3.6 | Expiry-check batch completes within bounded time at current volume | Idempotent daily sweep, single-flight 409 guard | k6 | documented, no hard target / 366 ms at ~150 citizens |
+| NFR5.2 | CI passes build/lint/tests on main | GitHub Actions quality gates | Actions history | pass required / **pending** - grab a green `backend.yml` run link |
+| NFR5.3 | >=80% unit test coverage on critical logic | - | Codecov | >=80% / 78% - **fail**, 2pts short |
+| NFR5.4 | Deploy within 30 min of merge to main | GitHub Actions -> Azure Web Apps deploy | Actions run duration | <30 min / 5m36s (api-flashid), 5m35s (gov-registry), 2m8s (web) - **pass** |

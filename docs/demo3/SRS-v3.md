@@ -249,6 +249,9 @@ QR code verification requests must return a verification result within 3 seconds
 #### NFR2.5
 The system must support at least 500 concurrent authenticated users without degradation in response times.
 
+#### NFR2.6
+The first request served after a period of application inactivity (cold start) must complete within 5 seconds.
+
 ---
 
 ### 5.3 Reliability & Availability
