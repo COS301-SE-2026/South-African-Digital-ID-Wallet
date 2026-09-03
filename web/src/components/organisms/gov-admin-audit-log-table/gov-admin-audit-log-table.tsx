@@ -64,19 +64,17 @@ export const GovAdminAuditLogTable = ({
             <table className="w-full min-w-[720px] table-fixed border-collapse">
               <thead className="sticky top-0 z-10 bg-card">
                 <tr className="border-b border-black/10">
-                  {['Time', 'Action', 'User', 'Role', 'Entity', 'Details'].map(
+                  {['Time', 'Action', 'User', 'Role', 'Details'].map(
                     (label, i) => (
                       <th
                         key={label}
                         className={`px-4 py-3 text-left ${
                           [
-                            'w-[13%]',
-                            'w-[17%]',
-                            'w-[17%]',
                             'w-[15%]',
-                            'w-[18%]',
-                            'w-[8%]',
-                            'w-[12%]',
+                            'w-[20%]',
+                            'w-[20%]',
+                            'w-[20%]',
+                            'w-[10%]',
                           ][i]
                         }`}
                       >
@@ -136,15 +134,6 @@ export const GovAdminAuditLogTable = ({
                         <span className="truncate !text-xs font-semibold text-text-primary">
                           {row.role ?? 'Unknown'}
                         </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {row.entityType ? (
-                          <div className="truncate !text-xs font-semibold text-text-primary">
-                            {row.entityType}
-                          </div>
-                        ) : (
-                          <span className="!text-xs text-muted-text">-</span>
-                        )}
                       </td>
                       <td className="px-4 py-3">
                         <button
