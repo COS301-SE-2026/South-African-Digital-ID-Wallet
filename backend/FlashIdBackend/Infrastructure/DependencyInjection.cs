@@ -111,7 +111,7 @@ public static class DependencyInjection
         services.AddScoped<ICredentialUpdateRepository>(sp => new RetryingCredentialUpdateRepositoryDecorator(sp.GetRequiredService<CredentialUpdateRepository>()));
         services.AddHostedService<CredentialUpdateBackgroundService>();
 
-        services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
+        services.AddScoped<IGovAdminAuditLogRepository, GovAdminAuditLogRepository>();
 
         return services;
     }
