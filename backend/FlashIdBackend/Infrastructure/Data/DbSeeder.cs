@@ -116,11 +116,35 @@ public static class DbSeeder
             return user;
         }
 
+        async Task EnsureTrustedDeviceAsync(Guid userId, string rawDeviceToken)
+        {
+            var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(rawDeviceToken)));
+            if (await context.TrustedDevices.AnyAsync(d => d.UserId == userId && d.DeviceTokenHash == hash)) return;
+
+            await context.TrustedDevices.AddAsync(new TrustedDevice
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                DeviceTokenHash = hash,
+                DeviceType = DeviceType.Desktop,
+                OperatingSystem = "k6",
+                Browser = "k6",
+                LastKnownCity = "Pretoria",
+                LastKnownCountry = "South Africa",
+                LastActive = now,
+                IsTrusted = true,
+                CreatedAt = now,
+                UpdatedAt = now,
+            });
+            await context.SaveChangesAsync();
+        }
+
         // Fixed pool of 10 NFR-only citizens: nfr-citizen-00@flashid.local .. nfr-citizen-09@flashid.local
         for (int i = 0; i < 10; i++)
         {
             var email = $"nfr-citizen-{i:00}@flashid.local";
             var user = await EnsureUserAsync(email, $"+2782000{i:0000}", UserRole.Citizen);
+            await EnsureTrustedDeviceAsync(user.Id, $"nfr-k6-device-{i:00}");
 
             if (!await context.Citizens.AnyAsync(c => c.UserId == user.Id))
             {
@@ -142,7 +166,8 @@ public static class DbSeeder
         }
 
         // One dedicated GovernmentAdministrator for expiry-check load testing
-        await EnsureUserAsync("nfr-govadmin@flashid.local", "+27820009999", UserRole.GovernmentAdministrator);
+        var govAdminUser = await EnsureUserAsync("nfr-govadmin@flashid.local", "+27820009999", UserRole.GovernmentAdministrator);
+        await EnsureTrustedDeviceAsync(govAdminUser.Id, "nfr-k6-device-govadmin");
     }
 
     internal static async Task SeedE2ETestUsersAsync(AppDbContext context)
