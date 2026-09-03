@@ -2,6 +2,13 @@ import { setAuthToken } from '@/lib/api'
 import type { LoginResponse } from '@/services'
 
 import { useAuthStore } from '../auth-store'
+import { clearSession, loadSession } from '@/lib/secure-session'
+
+jest.mock('@/lib/secure-session', () => ({
+  clearSession: jest.fn(),
+  loadSession: jest.fn(),
+  saveSession: jest.fn().mockResolvedValue(undefined),
+}))
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -56,5 +63,52 @@ describe('useAuthStore', () => {
       expiresAt: null,
     })
     expect(setAuthToken).toHaveBeenLastCalledWith(null)
+  })
+})
+
+describe('useAuthStore.restore', () => {
+  beforeEach(() => {
+    useAuthStore.setState(pristine, true)
+    jest.clearAllMocks()
+  })
+  it('Should settle signed out when there is no stored session', async () => {
+    ;(loadSession as jest.Mock).mockResolvedValue(null)
+    await useAuthStore.getState().restore()
+    expect(useAuthStore.getState()).toMatchObject({
+      isAuthenticated: false,
+      isRestoring: false,
+    })
+    expect(setAuthToken).toHaveBeenCalledWith(null)
+  })
+  it('Should discard an expired session', async () => {
+    ;(loadSession as jest.Mock).mockResolvedValue({
+      expiresAt: '2020-01-01T00:00:00Z',
+      token: 'stale',
+      user: session,
+    })
+    await useAuthStore.getState().restore()
+    expect(clearSession).toHaveBeenCalled()
+    expect(useAuthStore.getState().isAuthenticated).toBe(false)
+  })
+  it('Should awaken a live session', async () => {
+    const user = {
+      names: 'Thabo',
+      role: 'citizen',
+      surname: 'Mokoena',
+      userId: 'u-1',
+    }
+    ;(loadSession as jest.Mock).mockResolvedValue({
+      expiresAt: '2099-01-01T00:00:00Z',
+      token: 'jwt-token',
+      user,
+    })
+    await useAuthStore.getState().restore()
+    expect(useAuthStore.getState()).toMatchObject({
+      isAuthenticated: true,
+      isRestoring: false,
+      token: 'jwt-token',
+      user,
+    })
+    expect(setAuthToken).toHaveBeenCalledWith('jwt-token')
   })
 })

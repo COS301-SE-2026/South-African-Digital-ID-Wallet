@@ -1,0 +1,968 @@
+openapi: 3.0.4
+info:
+  title: FlashID API
+  description: South African Digital ID Wallet backend API.
+  version: v1
+paths:
+  /api/activate-credentials:
+    post:
+      tags:
+      - ActivateCredentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivateCredentialsRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/ActivateCredentialsRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/ActivateCredentialsRequestDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ActivateCredentialsResponseDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivateCredentialsResponseDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ActivateCredentialsResponseDto'
+  /api/activity/me:
+    get:
+      tags:
+      - ActivityOverview
+      responses:
+        '200':
+          description: OK
+  /api/auth/me:
+    get:
+      tags:
+      - Auth
+      responses:
+        '200':
+          description: OK
+  /api/auth/login:
+    post:
+      tags:
+      - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestDto'
+      responses:
+        '200':
+          description: OK
+  /api/auth/verify-device:
+    post:
+      tags:
+      - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyDeviceRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/VerifyDeviceRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/VerifyDeviceRequestDto'
+      responses:
+        '200':
+          description: OK
+  /api/auth/logout:
+    post:
+      tags:
+      - Auth
+      responses:
+        '200':
+          description: OK
+  /api/citizens/register:
+    post:
+      tags:
+      - Citizens
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterCitizenRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RegisterCitizenRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RegisterCitizenRequestDto'
+      responses:
+        '200':
+          description: OK
+  /api/citizens/verify-email:
+    post:
+      tags:
+      - Citizens
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailRequestDto'
+      responses:
+        '200':
+          description: OK
+  /api/citizens/resend-otp:
+    post:
+      tags:
+      - Citizens
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResendOtpRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/ResendOtpRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/ResendOtpRequestDto'
+      responses:
+        '200':
+          description: OK
+  /api/credentials/me:
+    get:
+      tags:
+      - Credentials
+      responses:
+        '200':
+          description: OK
+  /api/credentials/mine:
+    get:
+      tags:
+      - Credentials
+      responses:
+        '200':
+          description: OK
+  /api/credentials/{credentialId}/qr-token:
+    post:
+      tags:
+      - Credentials
+      parameters:
+      - name: credentialId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateQrRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/GenerateQrRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/GenerateQrRequestDto'
+      responses:
+        '200':
+          description: OK
+  /api/credentials/resolve:
+    post:
+      tags:
+      - Credentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveCredentialRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/ResolveCredentialRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/ResolveCredentialRequestDto'
+      responses:
+        '200':
+          description: OK
+  /api/credentials/expiry-check:
+    post:
+      tags:
+      - Credentials
+      summary: "Manually triggers the daily credential-expiry check. Government Administrator only.\r\n\
+        Idempotent. If today's check already completed or is currently running, returns that result instead\
+        \ of reprocessing."
+      responses:
+        '200':
+          description: The check ran, or had already completed for today.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/CredentialExpiryCheckResponseDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialExpiryCheckResponseDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/CredentialExpiryCheckResponseDto'
+        '409':
+          description: Another expiry check is currently running for today.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: The caller is not a Government Administrator.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/dashboard-account-card/me:
+    get:
+      tags:
+      - DashboardAccountCard
+      responses:
+        '200':
+          description: OK
+  /api/account:
+    delete:
+      tags:
+      - DeleteAccount
+      responses:
+        '200':
+          description: OK
+  /api/institutions/register:
+    post:
+      tags:
+      - Institutions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterInstitutionRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RegisterInstitutionRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RegisterInstitutionRequestDto'
+      responses:
+        '200':
+          description: OK
+  /api/institutions:
+    get:
+      tags:
+      - Institutions
+      responses:
+        '200':
+          description: OK
+  /api/institutions/{institutionId}:
+    get:
+      tags:
+      - Institutions
+      parameters:
+      - name: institutionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+  /api/manage-user-account/me:
+    get:
+      tags:
+      - ManageUserAccount
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ManageUserAccountDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManageUserAccountDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ManageUserAccountDto'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/manage-user-account/email/verify-password:
+    post:
+      tags:
+      - ManageUserAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyPasswordRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/VerifyPasswordRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/VerifyPasswordRequestDto'
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '423':
+          description: Locked
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '422':
+          description: Unprocessable Content
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/manage-user-account/email/request-change:
+    post:
+      tags:
+      - ManageUserAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestEmailChangeRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RequestEmailChangeRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RequestEmailChangeRequestDto'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Conflict
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/manage-user-account/email/resend-otp:
+    post:
+      tags:
+      - ManageUserAccount
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/manage-user-account/email/confirm:
+    post:
+      tags:
+      - ManageUserAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmEmailChangeRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmEmailChangeRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/ConfirmEmailChangeRequestDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ManageUserAccountDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManageUserAccountDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ManageUserAccountDto'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Conflict
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/notifications/me:
+    get:
+      tags:
+      - Notification
+      responses:
+        '200':
+          description: OK
+  /api/officials/badge-token:
+    post:
+      tags:
+      - Officials
+      responses:
+        '200':
+          description: OK
+  /api/officials/verify-badge:
+    post:
+      tags:
+      - Officials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyBadgeRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/VerifyBadgeRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/VerifyBadgeRequestDto'
+      responses:
+        '200':
+          description: OK
+  /api/onboarding/verify/{idNumber}:
+    get:
+      tags:
+      - Onboarding
+      parameters:
+      - name: idNumber
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /api/onboarding/citizen:
+    post:
+      tags:
+      - Onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnboardCitizenRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/OnboardCitizenRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/OnboardCitizenRequest'
+      responses:
+        '200':
+          description: OK
+  /api/trusted-devices/me:
+    get:
+      tags:
+      - TrustedDevices
+      responses:
+        '200':
+          description: OK
+  /api/trusted-devices/{deviceId}:
+    delete:
+      tags:
+      - TrustedDevices
+      parameters:
+      - name: deviceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+  /api/UpdatePassword:
+    put:
+      tags:
+      - UpdatePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePasswordDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePasswordDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UpdatePasswordDto'
+      responses:
+        '200':
+          description: OK
+  /api/citizen-verification/activate-token:
+    post:
+      tags:
+      - Verification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/VerificationRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/VerificationRequestDto'
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    ActivateCredentialsRequestDto:
+      type: object
+      properties:
+        credentialTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CredentialType'
+          nullable: true
+      additionalProperties: false
+    ActivateCredentialsResponseDto:
+      type: object
+      properties:
+        status:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CitizenStatus:
+      enum:
+      - Pending
+      - Activated
+      - Deactivated
+      - Suspended
+      - Verified
+      type: string
+    ConfirmEmailChangeRequestDto:
+      type: object
+      properties:
+        otp:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CredentialExpiryCheckResponseDto:
+      type: object
+      properties:
+        runDate:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/JobRunStatus'
+        processedCount:
+          type: integer
+          format: int32
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        errorMessage:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CredentialType:
+      enum:
+      - IdentityDocument
+      - DriversLicense
+      type: string
+    DeviceType:
+      enum:
+      - Desktop
+      - Mobile
+      - Tablet
+      - Laptop
+      - Unknown
+      type: string
+    GenerateQrRequestDto:
+      type: object
+      properties:
+        disclosedFields:
+          type: array
+          items:
+            type: string
+          nullable: true
+      additionalProperties: false
+    InstitutionType:
+      enum:
+      - HomeAffairs
+      - LicensingDepartment
+      - LawEnforcement
+      - Healthcare
+      - FinancialInstitution
+      type: string
+    JobRunStatus:
+      enum:
+      - Running
+      - Completed
+      - Failed
+      type: string
+    LoginRequestDto:
+      type: object
+      properties:
+        email:
+          type: string
+          nullable: true
+        password:
+          type: string
+          nullable: true
+        rememberMe:
+          type: boolean
+      additionalProperties: false
+    ManageUserAccountDto:
+      required:
+      - accountStatus
+      - dateOfBirth
+      - memberSince
+      type: object
+      properties:
+        fullName:
+          type: string
+          nullable: true
+        idEnding:
+          type: string
+          nullable: true
+        emailAddress:
+          type: string
+          nullable: true
+        phoneNumber:
+          type: string
+          nullable: true
+        dateOfBirth:
+          type: string
+          format: date
+        memberSince:
+          type: string
+          format: date-time
+        lastLogin:
+          type: string
+          format: date-time
+          nullable: true
+        accountStatus:
+          $ref: '#/components/schemas/CitizenStatus'
+      additionalProperties: false
+    OnboardCitizenRequest:
+      type: object
+      properties:
+        saId:
+          type: string
+          nullable: true
+        phoneNumber:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        consentGiven:
+          type: boolean
+      additionalProperties: false
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        status:
+          type: integer
+          format: int32
+          nullable: true
+        detail:
+          type: string
+          nullable: true
+        instance:
+          type: string
+          nullable: true
+      additionalProperties: {}
+    RegisterCitizenRequestDto:
+      type: object
+      properties:
+        email:
+          type: string
+          nullable: true
+        password:
+          type: string
+          nullable: true
+      additionalProperties: false
+    RegisterInstitutionRequestDto:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        type:
+          $ref: '#/components/schemas/InstitutionType'
+        verificationNumber:
+          type: string
+          nullable: true
+        adminId:
+          type: string
+          format: uuid
+      additionalProperties: false
+    RequestEmailChangeRequestDto:
+      type: object
+      properties:
+        newEmail:
+          type: string
+          nullable: true
+      additionalProperties: false
+    ResendOtpRequestDto:
+      type: object
+      properties:
+        email:
+          type: string
+          nullable: true
+      additionalProperties: false
+    ResolveCredentialRequestDto:
+      type: object
+      properties:
+        token:
+          type: string
+          nullable: true
+      additionalProperties: false
+    UpdatePasswordDto:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+          nullable: true
+        newPassword:
+          type: string
+          nullable: true
+        confirmPassword:
+          type: string
+          nullable: true
+      additionalProperties: false
+    VerificationRequestDto:
+      type: object
+      properties:
+        token:
+          type: string
+          nullable: true
+        saId:
+          type: string
+          nullable: true
+        pin:
+          type: string
+          nullable: true
+      additionalProperties: false
+    VerifyBadgeRequestDto:
+      type: object
+      properties:
+        token:
+          type: string
+          nullable: true
+      additionalProperties: false
+    VerifyDeviceRequestDto:
+      type: object
+      properties:
+        deviceVerificationId:
+          type: string
+          format: uuid
+        otp:
+          type: string
+          nullable: true
+        deviceType:
+          $ref: '#/components/schemas/DeviceType'
+        operatingSystem:
+          type: string
+          nullable: true
+        browser:
+          type: string
+          nullable: true
+        rememberMe:
+          type: boolean
+      additionalProperties: false
+    VerifyEmailRequestDto:
+      type: object
+      properties:
+        email:
+          type: string
+          nullable: true
+        otp:
+          type: string
+          nullable: true
+      additionalProperties: false
+    VerifyPasswordRequestDto:
+      type: object
+      properties:
+        password:
+          type: string
+          nullable: true
+      additionalProperties: false
+tags:
+- name: ActivateCredentials
+- name: ActivityOverview
+- name: Auth
+- name: Citizens
+- name: Credentials
+- name: DashboardAccountCard
+- name: DeleteAccount
+- name: Institutions
+- name: ManageUserAccount
+- name: Notification
+- name: Officials
+- name: Onboarding
+- name: TrustedDevices
+- name: UpdatePassword
+- name: Verification
