@@ -80,6 +80,7 @@ public static class DbSeeder
         await SeedGovernmentAdministratorUsersAsync(context, usedEmails, usedPhones);
         await SeedOfficialUsersAsync(context, usedEmails, usedPhones);
         await SeedE2ETestUsersAsync(context);
+        await SeedNfrTestUsersAsync(context);
         await RepairInvalidPasswordHashesAsync(context);
         await SeedCredentialsAsync(context);
         await SeedUserPreferencesAsync(context);
@@ -87,6 +88,61 @@ public static class DbSeeder
         await SeedTrustedDevicesAsync(context);
         await SeedNotificationsAsync(context);
         await SeedExpiryE2ECitizenAsync(context);
+    }
+
+    internal static async Task SeedNfrTestUsersAsync(AppDbContext context)
+    {
+        var now = DateTime.UtcNow;
+
+        async Task<User> EnsureUserAsync(string email, string phone, UserRole role)
+        {
+            var existing = await context.DomainUsers.FirstOrDefaultAsync(u => u.Email == email);
+            if (existing != null) return existing;
+
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                Email = email,
+                PhoneNumber = phone,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
+                IsDeleted = false,
+                IsEmailVerified = true,
+                Role = role,
+                CreatedAt = now,
+                UpdatedAt = now
+            };
+            await context.DomainUsers.AddAsync(user);
+            await context.SaveChangesAsync();
+            return user;
+        }
+
+        // Fixed pool of 10 NFR-only citizens: nfr-citizen-00@flashid.local .. nfr-citizen-09@flashid.local
+        for (int i = 0; i < 10; i++)
+        {
+            var email = $"nfr-citizen-{i:00}@flashid.local";
+            var user = await EnsureUserAsync(email, $"+2782000{i:0000}", UserRole.Citizen);
+
+            if (!await context.Citizens.AnyAsync(c => c.UserId == user.Id))
+            {
+                await context.Citizens.AddAsync(new Citizen
+                {
+                    Id = Guid.NewGuid(),
+                    SaId = $"800000000{i:0000}", // reserved NFR SA ID block, distinct from real seed ranges
+                    Names = "NFR",
+                    Surname = $"Citizen{i:00}",
+                    DateOfBirth = now.AddYears(-30),
+                    Gender = Gender.Other,
+                    Status = CitizenStatus.Activated,
+                    UserId = user.Id,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                });
+                await context.SaveChangesAsync();
+            }
+        }
+
+        // One dedicated GovernmentAdministrator for expiry-check load testing
+        await EnsureUserAsync("nfr-govadmin@flashid.local", "+27820009999", UserRole.GovernmentAdministrator);
     }
 
     internal static async Task SeedE2ETestUsersAsync(AppDbContext context)
