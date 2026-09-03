@@ -39,6 +39,7 @@
     - [5.5 Rollback Strategy](#55-rollback-strategy)
     - [5.6 Deployment Diagram](#56-deployment-diagram)
     - [5.7 CI/CD Pipeline Diagram](#57-cicd-pipeline-diagram)
+6. [Non-Functional Requirement (NFR) Testing](#6-non-functional-requirement-nfr-testing)
 
 ## 1. Introduction
 
@@ -875,3 +876,20 @@ Where a failure is caused by application code, the responsible commit may also b
 ### 5.7 CI/CD Pipeline Diagram
 
 ![CI/CD Pipeline Diagram](../images/CICDdiagram.svg)
+
+## 6. Non-Functional Requirement (NFR) Testing
+
+Every quantified NFR from the SRS is mapped below to the architectural tactic claimed to satisfy it and the test that verifies that claim. Where a target could not be honestlty validated on the current infrastructure (Azure App Service Free/Basic tier 1), that is stated explicitly rather than reported as a pass.
+
+| ID | Quantified requirement | Tactic in SAS | Test / tool | Target | Actual | Status |
+|---|---|---|---|---|---|---|
+| NFR2.2 | Auth ops <2s p95 | JWT, BCrypt | k6 (`nfr2-2-auth.js`) | p95 < 2000ms | p95 = 1.62s | Pass |
+| NFR2.3 | Credential retrieval <2s p95 | - | k6 (`nfr2-3-credentials-and-qr.js`) | p95 < 2000ms | p95 = 508ms | Pass |
+| NFR2.3 | QR generation <2s p95 | Signed disclosure tokens | k6 (`nfr2-3-credentials-and-qr.js`) | p95 < 2000ms | p95 = 94ms | Pass |
+| NFR2.4 | QR verification <3s p95 | Single-use disclosure token | k6 (`nfr2-4-qr-verification.js`) | p95 < 3000ms | pending re-run | In progress |
+| NFR2.5 | 500 concurrent users, no degradation | - | k6 | 500 VUs | Not attainable on Free/Basic tier | Documented limitation |
+| NFR1.6 | Account lockout after failed logins | 5-attempt lockout, 30 min | xUnit integration test | Locked after 5th failed attempt | pending | Not yet run |
+| NFR1.7 | QR token single-use / anti-replay | `TryMarkUsedAsync` on Jti | k6, second resolve attempt | 2nd resolve rejected | pending | Not yet run |
+| NFR1.8 | Rate limiting on abuse-prone endpoints | ASP.NET rate limiting middleware | k6 (`nfr-rate-limit.js`) | 429 past configured limit | 429 confirmed | Pass |
+| (new) | Cold-start latency after idle | - | k6 (`nfr-cold-start.js`) | documented, no hard target | pending genuine idle re-run | Needs isolated re-run |
+| (new) | Expiry-check batch completes in reasonable time at current volume | - | k6 (`nfr-expiry-batch-timing.js`) | documented, no hard target | 366ms at ~150 citizens | Pass |
