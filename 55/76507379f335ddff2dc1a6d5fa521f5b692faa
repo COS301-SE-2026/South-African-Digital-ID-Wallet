@@ -1,0 +1,15 @@
+mobile/src/services/login-service/test/login-service.test.ts
+  h_293a8616118f65 24-26
+  h_293a8616118f65 27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "5576507379f335ddff2dc1a6d5fa521f5b692faa",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
