@@ -73,21 +73,21 @@ export const VerifyMethod = ({
               variant="sub-sm"
               className="mt-3 !text-base font-bold text-text-primary"
             >
-              Physical ID
+              Physical Verification
             </Text>
             <Text
               as="p"
               variant="sub-sm"
               className="mt-1 !text-xs text-muted-text"
             >
-              Scan your SA ID and verify face.
+              Verify using your SA ID number and facial veriifcation.
             </Text>
             <button
               type="button"
               onClick={() => onSelectMethod('id')}
               className="mt-4 w-full rounded-full bg-deep-green py-2.5 text-sm font-semibold text-clean-white transition-opacity hover:opacity-90"
             >
-              Use ID
+              Use Fcae Verification
             </button>
           </div>
         </div>

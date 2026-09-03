@@ -1,23 +1,25 @@
 'use client'
+
 import * as React from 'react'
+import { useRouter } from 'next/navigation'
+import { AxiosError } from 'axios'
+
 import { Text } from '@/components/atoms'
 import { Button } from '@/components/ui/button'
-import { QrCameraScanner } from '@/components/organisms/qr-camera-scanner'
-import { ScanResultCard } from '@/components/organisms/scan-result-card'
 import { VerifyMethod } from '@/components/organisms/verify-method'
 import type { VerifyMethodOption } from '@/components/organisms/verify-method'
-import { VerifyIdentityCard } from '@/components/organisms/verify-identity-card/verify-identity-card'
-import scanService, { parseScannedToken } from '@/services/scan-service'
-import type { ResolveCredentialResponse } from '@/services/scan-service'
+import { VerifyIdentityCard } from '@/components/organisms/verify-identity-card'
+import { verificationService } from '@/services/verification-service'
 
-type Status = 'method' | 'scanning' | 'processing' | 'result' | 'error'
+type Status = 'method' | 'code' | 'physical' | 'success' | 'error'
 
 const FLOW_STEPS = ['Choose Method', 'Verify Identity', 'Complete']
+
 const STEP_BY_STATUS: Record<Status, number> = {
   method: 1,
-  scanning: 2,
-  processing: 2,
-  result: 3,
+  code: 2,
+  physical: 2,
+  success: 3,
   error: 2,
 }
 
@@ -25,15 +27,18 @@ type ActivateCitizenPageProps = {
   token?: string
 }
 
+type ProblemDetails = {
+  title?: string
+  detail?: string
+}
+
 export const ActivateCitizenPage = ({
   token = '',
 }: ActivateCitizenPageProps) => {
-  const [status, setStatus] = React.useState<Status>('method')
-  const [isCodeModalOpen, setIsCodeModalOpen] = React.useState(Boolean(token))
+  const router = useRouter()
+
+  const [status, setStatus] = React.useState<Status>(token ? 'code' : 'method')
   const [errorMessage, setErrorMessage] = React.useState('')
-  const [result, setResult] = React.useState<ResolveCredentialResponse | null>(
-    null
-  )
   const [activationCode, setActivationCode] = React.useState(token)
   const [isActivationCodeDetected, setIsActivationCodeDetected] =
     React.useState(Boolean(token))
@@ -42,60 +47,59 @@ export const ActivateCitizenPage = ({
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   const handleSelectMethod = (method: VerifyMethodOption) => {
-    if (method === 'code') {
-      setIsCodeModalOpen(true)
-      return
-    }
-    setStatus('scanning')
-  }
-
-  const handleScan = React.useCallback(async (rawText: string) => {
-    setStatus('processing')
-    const parsed = parseScannedToken(rawText)
-    if (!parsed) {
-      setErrorMessage('This is not a valid FlashID QR Code.')
-      setStatus('error')
-      return
-    }
-    if (parsed.type === 'badge') {
-      setErrorMessage('Scanning official badges is not available yet')
-      setStatus('error')
-      return
-    }
-    try {
-      const response = await scanService.resolveCred(parsed.token)
-      setResult(response)
-      setStatus('result')
-    } catch {
-      setErrorMessage(
-        'This QR Code is invalid, expired, or has already been used.'
-      )
-      setStatus('error')
-    }
-  }, [])
-
-  const handleScanAgain = () => {
-    setResult(null)
     setErrorMessage('')
-    setStatus('method')
+
+    if (method === 'code') {
+      setStatus('code')
+      return
+    }
+
+    setStatus('physical')
   }
 
-  const handleIdentitySubmit = () => {
+  const handleIdentitySubmit = async () => {
     setIsSubmitting(true)
-    console.log('Submitting identity verification', {
-      activationCode,
-      saId,
-      pin,
-    })
-    setTimeout(() => {
+    setErrorMessage('')
+
+    try {
+      const response = await verificationService.verify({
+        token: activationCode,
+        saId,
+        pin,
+      })
+
+      if (!response.isVerified) {
+        setErrorMessage(
+          response.message || 'Your identity could not be verified.'
+        )
+        return
+      }
+
+      setStatus('success')
+    } catch (error) {
+      const axiosError = error as AxiosError<ProblemDetails>
+
+      setErrorMessage(
+        axiosError.response?.data?.detail ??
+          'We could not verify your identity. Please check your details and try again.'
+      )
+    } finally {
       setIsSubmitting(false)
-      setIsCodeModalOpen(false)
-    }, 1500)
+    }
   }
 
   const handleEnterCodeManually = () => {
     setIsActivationCodeDetected(false)
     setActivationCode('')
+  }
+
+  const handleBackToMethods = () => {
+    setErrorMessage('')
+    setStatus('method')
+  }
+
+  const handleActivateCredentials = () => {
+    router.push('/citizen/activate-credentials')
   }
 
   return (
@@ -109,63 +113,87 @@ export const ActivateCitizenPage = ({
           />
         </div>
       )}
-      <VerifyIdentityCard
-        isOpen={isCodeModalOpen}
-        onClose={() => setIsCodeModalOpen(false)}
-        steps={FLOW_STEPS}
-        currentStep={2}
-        activationCode={activationCode}
-        isActivationCodeDetected={isActivationCodeDetected}
-        saId={saId}
-        pin={pin}
-        isSubmitting={isSubmitting}
-        submitLabel="Verify Identity"
-        onActivationCodeChange={setActivationCode}
-        onSaIdChange={setSaId}
-        onPinChange={setPin}
-        onSubmit={handleIdentitySubmit}
-        onEnterCodeManually={
-          isActivationCodeDetected ? handleEnterCodeManually : undefined
-        }
-      />
-      {(status === 'scanning' || status === 'processing') && (
-        <div className="w-full">
-          <QrCameraScanner
-            onScan={handleScan}
-            paused={status === 'processing'}
+
+      {status === 'code' && (
+        <div className="w-full max-w-2xl">
+          <VerifyIdentityCard
+            steps={FLOW_STEPS}
+            currentStep={STEP_BY_STATUS.code}
+            activationCode={activationCode}
+            isActivationCodeDetected={isActivationCodeDetected}
+            saId={saId}
+            pin={pin}
+            isSubmitting={isSubmitting}
+            errorMessage={errorMessage}
+            submitLabel="Verify Identity"
+            onActivationCodeChange={setActivationCode}
+            onSaIdChange={setSaId}
+            onPinChange={setPin}
+            onSubmit={handleIdentitySubmit}
+            onBack={handleBackToMethods}
+            onEnterCodeManually={
+              isActivationCodeDetected ? handleEnterCodeManually : undefined
+            }
           />
         </div>
       )}
-      {status === 'error' && (
-        <div className="w-full max-w-md rounded-3xl border border-gray-200 bg-white p-8 text-center shadow-lg">
-          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
-            <div className="h-3 w-3 rounded-full bg-red-500" />
+
+      {status === 'physical' && (
+        <div className="w-full max-w-2xl rounded-3xl border border-border/70 bg-white p-8 shadow-xl shadow-deep-green/10">
+          <div className="text-center">
+            <Text variant="h3">Verify your identity</Text>
+
+            <Text variant="sub-md" className="mt-2 text-muted-foreground">
+              Verify your South African identity using facial verification.
+            </Text>
           </div>
-          <Text variant="h3">Verification failed</Text>
-          <Text variant="sub-md" className="mt-2 text-muted-foreground">
-            {errorMessage}
-          </Text>
-          <Button
-            type="button"
-            onClick={handleScanAgain}
-            className="mt-6 w-full"
-          >
-            Scan again
-          </Button>
+
+          <div className="mt-8 rounded-2xl bg-muted/40 p-6 text-center">
+            <Text variant="sub-md" className="font-semibold">
+              Physical identity verification
+            </Text>
+
+            <Text variant="sub-sm" className="mt-2 text-muted-foreground">
+              Continue with your South African ID number and facial
+              verification.
+            </Text>
+          </div>
+
+          <div className="mt-6 flex gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleBackToMethods}
+            >
+              Back
+            </Button>
+
+            <Button type="button" className="flex-1">
+              Continue
+            </Button>
+          </div>
         </div>
       )}
-      {status === 'result' && result && (
-        <div className="w-full max-w-md">
-          <ScanResultCard
-            credentialType={result.credentialType}
-            disclosedFields={result.disclosedFields}
-          />
+
+      {status === 'success' && (
+        <div className="w-full max-w-xl rounded-3xl border border-border/70 bg-white p-8 text-center shadow-xl shadow-deep-green/10">
+          <div className="mx-auto mb-5 flex size-16 items-center justify-center rounded-full bg-primary-green/10">
+            <div className="size-4 rounded-full bg-primary-green" />
+          </div>
+
+          <Text variant="h3">Identity verified</Text>
+
+          <Text variant="sub-md" className="mt-3 text-muted-foreground">
+            Your identity has been verified successfully. You can now activate
+            your digital credentials.
+          </Text>
+
           <Button
             type="button"
-            onClick={handleScanAgain}
-            className="mt-5 w-full"
+            className="mt-8 w-full"
+            onClick={handleActivateCredentials}
           >
-            Scan another code
+            Activate My Credentials
           </Button>
         </div>
       )}

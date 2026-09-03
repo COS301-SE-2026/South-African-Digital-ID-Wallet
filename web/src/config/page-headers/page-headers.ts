@@ -60,7 +60,8 @@ export const pageHeaders: Record<string, PageHeader> = {
 
   '/citizen/activate-credentials': {
     title: 'Activate Credentials',
-    description: 'Add your credentials to your wallet.',
+    description:
+      'Select the verified credentials you want to add to your FlashID wallet.',
   },
 
   '/citizen/manage-user-account': {
