@@ -1,7 +1,14 @@
+web/src/components/molecules/index.ts
+  h_0aff3b71f739b1 10-13
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.6.15",
+  "git_ai_version": "1.6.16",
   "base_commit_sha": "816f37aa9520a2e86876b6499b21e69ed85ce0ca",
-  "prompts": {}
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
 }

@@ -1,0 +1,15 @@
+web/src/components/organisms/gov-admin-audit-log-table/gov-admin-audit-log-table.tsx
+  h_0aff3b71f739b1 1-68,71-85,100-104,111-118,123,127-131,133-136,138-143,150-153,159,162-177
+  h_0aff3b71f739b1 69-70,86-99,105-110,119-122,124-126,132,137,144-149,154-158,160-161,178-180
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "3d5565a8d993c925b61cb900274e70d9a7212168",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

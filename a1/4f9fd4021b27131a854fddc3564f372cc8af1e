@@ -1,7 +1,7 @@
 backend/FlashIdBackend/Application/Features/ManageUserAccountCard/DTOs/ManageUserAccountCardDto.cs
   h_0aff3b71f739b1 1-16
 backend/FlashIdBackend/Presentation/appsettings.Development.json
-  h_0aff3b71f739b1 3-4
+  h_0aff3b71f739b1 3-4,3
 backend/FlashIdBackend/Application/Common/Mapping/ManageUserAccountMapper.cs
   h_0aff3b71f739b1 1-29
 ---

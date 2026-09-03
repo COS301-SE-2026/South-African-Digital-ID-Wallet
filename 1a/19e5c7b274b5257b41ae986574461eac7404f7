@@ -1,0 +1,14 @@
+.github/workflows/validate-infra.yml
+  h_99fca60b892ff4 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "1a19e5c7b274b5257b41ae986574461eac7404f7",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
