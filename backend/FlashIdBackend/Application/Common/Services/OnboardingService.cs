@@ -217,7 +217,7 @@ public class OnboardingService : IOnboardingService
 
         var token = Uri.EscapeDataString(rawToken);
 
-        return $"{baseUrl}/citizen/activate-credentials?token={token}";
+        return $"{baseUrl}/citizen/verify-identity?token={token}";
     }
 
     private static string BuildEmailMessage(string activationLink, string name)
