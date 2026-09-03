@@ -1,0 +1,27 @@
+docs/demo3/SAS-v2.md
+  h_99fca60b892ff4 889
+docs/demo3/SRS-v3.md
+  h_99fca60b892ff4 221-232,271-272
+  s_1d2a2958999712::t_8f20a1506a0abf 273
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "cca20a1879627fe8ff8b19cd6b6c8f5879747d71",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_1d2a2958999712": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8d998e94-edae-4a97-8ef8-e7b0f6d8df16",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

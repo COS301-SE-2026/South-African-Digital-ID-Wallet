@@ -1,0 +1,22 @@
+backend/FlashIdBackend/Application/Common/Services/PhysicalIdentityVerificationService.cs
+  h_293a8616118f65 183-184
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_293a8616118f65 108
+backend/FlashIdBackend/Infrastructure/Infrastructure.csproj
+  h_293a8616118f65 11
+backend/FlashIdBackend/Infrastructure/Providers/AzureFaceLivenessServiceProvider.cs
+  h_293a8616118f65 2-3,6-7,13,18,20-21,23-24,26,28-29,31-34,36-37,39-40,42,44-45,49-50,52-62,64-66,68-71,73-75,80-81,84-85,87,89-92,94-98,100,103,107-108,110-115,117-120,122,124-127,131,135-140,142-145,147-153,156-160,162-184,188,190-191,194,197
+backend/FlashIdBackend/tests/DisclosedFieldValueResolverTests.cs
+  h_293a8616118f65 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "913c0fd3b112fef3404f4834a86075b5db751c60",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

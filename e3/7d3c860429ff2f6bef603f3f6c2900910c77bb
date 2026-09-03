@@ -1,0 +1,15 @@
+backend/FlashIdBackend/Infrastructure/Data/DbSeeder.cs
+  h_99fca60b892ff4 83,93-118,123-124,128-130,133-147
+  h_99fca60b892ff4 119-122,125-127,131-132
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "e37d3c860429ff2f6bef603f3f6c2900910c77bb",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

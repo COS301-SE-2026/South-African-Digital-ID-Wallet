@@ -1,0 +1,23 @@
+web/src/components/organisms/gov-admin-audit-log-table/types.ts
+  h_0aff3b71f739b1 1-34
+web/src/components/organisms/gov-admin-audit-log-table/index.ts
+  h_0aff3b71f739b1 1
+web/src/app/(portal)/gov-admin/audit-log/page.tsx
+  h_0aff3b71f739b1 1-5
+web/src/config/navigation/navigation.ts
+  h_0aff3b71f739b1 72
+web/src/components/organisms/gov-admin-audit-log-table/gov-admin-audit-log-details-panel.tsx
+  h_0aff3b71f739b1 1-84
+  h_0aff3b71f739b1 85-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "db69ef13d85d678720b785b713432a6410f2bec9",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

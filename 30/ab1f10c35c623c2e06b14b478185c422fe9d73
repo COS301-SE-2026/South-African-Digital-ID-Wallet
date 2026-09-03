@@ -1,0 +1,16 @@
+backend/FlashIdBackend/k6/read-throughput.js
+  h_99fca60b892ff4 4,6,12-13,19,25-27,29-35,37-38,40-41,43-44
+backend/FlashIdBackend/Infrastructure/Data/DbSeeder.cs
+  h_99fca60b892ff4 119-141,147,169-170
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "30ab1f10c35c623c2e06b14b478185c422fe9d73",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

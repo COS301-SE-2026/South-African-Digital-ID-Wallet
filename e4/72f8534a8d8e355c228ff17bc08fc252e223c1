@@ -1,0 +1,15 @@
+web/src/components/organisms/ready-to-verify/ready-to-verify.tsx
+  h_0aff3b71f739b1 1-93,95-101,103-107,109-128
+  h_0aff3b71f739b1 94,102,108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "e472f8534a8d8e355c228ff17bc08fc252e223c1",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

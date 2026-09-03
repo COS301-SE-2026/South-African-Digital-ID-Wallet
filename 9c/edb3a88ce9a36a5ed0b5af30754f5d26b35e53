@@ -1,10 +1,8 @@
-web/src/components/molecules/index.ts
-  h_0aff3b71f739b1 10-13
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.6.16",
-  "base_commit_sha": "816f37aa9520a2e86876b6499b21e69ed85ce0ca",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "9cedb3a88ce9a36a5ed0b5af30754f5d26b35e53",
   "prompts": {},
   "humans": {
     "h_0aff3b71f739b1": {

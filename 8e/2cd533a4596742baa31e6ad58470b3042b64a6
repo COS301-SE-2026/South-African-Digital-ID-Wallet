@@ -1,0 +1,22 @@
+infra/main.dev.bicepparam
+  h_99fca60b892ff4 8
+infra/main.bicep
+  h_99fca60b892ff4 11
+infra/modules/appservice.bicep
+  h_99fca60b892ff4 28
+infra/modules/sql.bicep
+  h_99fca60b892ff4 60
+infra/main.prod.bicepparam
+  h_99fca60b892ff4 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "8e2cd533a4596742baa31e6ad58470b3042b64a6",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
