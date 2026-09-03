@@ -120,6 +120,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddHealthChecks();
+
 static string UserPartitionKey(HttpContext httpContext) =>
     httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
     ?? httpContext.Connection.RemoteIpAddress?.ToString()
@@ -216,6 +218,9 @@ app.UseCors(FrontendCorsPolicy);
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapControllers();
+
+app.MapHealthChecks("/health");
 app.MapControllers();
 
 await app.RunAsync();
