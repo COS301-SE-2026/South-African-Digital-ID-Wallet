@@ -218,6 +218,18 @@ All administrative accounts need multi-factor authentication (OTP) during authen
 #### NFR1.5
 Sensitive configuration values are to be stored using environment variables or GitHub Secrets
 
+#### NFR1.6
+Accounts must be automatically locked for a defined cool-down period after repeated failed login attempts, to mitigate brute-force credential attacks.
+
+#### NFR1.7
+A credential disclosure QR token must be usable exactly once; any subsequent attempt to redeem the same token must be rejected.
+
+#### NFR1.8
+Sensitive or abuse-prone endpoints (registration, credential issuance, OTP requests) must enforce request rate limits to mitigate automated abuse.
+
+#### NFR1.9
+Upon a citizen's account-deletion request, associated personal data must be deleted or rendered irrecoverable within a defined period, in line with POPIA data-subject erasure obligations.
+
 ---
 
 ### 5.2 Performance
@@ -255,6 +267,9 @@ The system must recover from critical service failures within 5 minutes.
 
 #### NFR3.5
 Credential information and user account data must remain consistent.
+
+#### NFR3.6
+Administrative batch operations (e.g. the daily credential-expiry sweep) must complete within a bounded time proportional to data volume, and must be safely re-runnable without side effects if interrupted.
 
 ---
 

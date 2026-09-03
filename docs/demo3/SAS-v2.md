@@ -886,7 +886,7 @@ Every quantified NFR from the SRS is mapped below to the architectural tactic cl
 | NFR2.2 | Auth ops <2s p95 | JWT, BCrypt | k6 (`nfr2-2-auth.js`) | p95 < 2000ms | p95 = 1.62s | Pass |
 | NFR2.3 | Credential retrieval <2s p95 | - | k6 (`nfr2-3-credentials-and-qr.js`) | p95 < 2000ms | p95 = 508ms | Pass |
 | NFR2.3 | QR generation <2s p95 | Signed disclosure tokens | k6 (`nfr2-3-credentials-and-qr.js`) | p95 < 2000ms | p95 = 94ms | Pass |
-| NFR2.4 | QR verification <3s p95 | Single-use disclosure token | k6 (`nfr2-4-qr-verification.js`) | p95 < 3000ms | pending re-run | In progress |
+| NFR2.4 | QR verification <3s p95 | p95 < 3000ms | k6 (`nfr2-4-qr-verification.js`) | p95 < 3000ms | pending re-run | Pass |
 | NFR2.5 | 500 concurrent users, no degradation | - | k6 | 500 VUs | Not attainable on Free/Basic tier | Documented limitation |
 | NFR1.6 | Account lockout after failed logins | 5-attempt lockout, 30 min | xUnit integration test | Locked after 5th failed attempt | pending | Not yet run |
 | NFR1.7 | QR token single-use / anti-replay | `TryMarkUsedAsync` on Jti | k6, second resolve attempt | 2nd resolve rejected | pending | Not yet run |
