@@ -7,7 +7,7 @@ export interface GovAdminAuditLogRow {
   entityType?: string
   entityId?: string
   ipAddress?: string
-  outcome: 'Success' | 'Failure'
+  outcome: 'Success' | 'Failed'
   description?: string
   device?: string
   location?: string
