@@ -16,7 +16,6 @@ using Microsoft.Azure.Cosmos;
 using User = Domain.Entities.User;
 using Infrastructure.Repositories.Decorators;
 using Infrastructure.BackgroundJobs;
-using Microsoft.Extensions.Hosting;
 
 namespace Infrastructure;
 
@@ -66,6 +65,8 @@ public static class DependencyInjection
         services.AddScoped<IDisclosedFieldsValueResolver, DisclosedFieldValueResolver>();
 
         services.AddScoped<IOfficialRepository, OfficialRepository>();
+        services.AddScoped<IOfficialActivityRepository, OfficialActivityRepository>();
+
         services.AddScoped<IManageUserAccountRepository, ManageUserAccountRepository>();
         services.AddScoped<IUpdatePasswordRepository, UpdatePasswordRepository>();
         services.AddScoped<IDeleteAccountRepository, DeleteAccountRepository>();
@@ -119,6 +120,12 @@ public static class DependencyInjection
         services.AddScoped<CredentialExpiryRepository>();
         services.AddScoped<ICredentialExpiryRepository>(sp => new RetryingCredentialExpiryRepositoryDecorator(sp.GetRequiredService<CredentialExpiryRepository>()));
         services.AddHostedService<CredentialExpiryBackgroundService>();
+
+        services.AddScoped<CredentialUpdateRepository>();
+        services.AddScoped<ICredentialUpdateRepository>(sp => new RetryingCredentialUpdateRepositoryDecorator(sp.GetRequiredService<CredentialUpdateRepository>()));
+        services.AddHostedService<CredentialUpdateBackgroundService>();
+
+        services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
 
         return services;
     }

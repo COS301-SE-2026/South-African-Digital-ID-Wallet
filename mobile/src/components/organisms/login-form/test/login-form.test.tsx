@@ -19,7 +19,35 @@ jest.mock('expo-router', () => ({
 
 jest.mock('@/services/login-service/login-service', () => ({
   __esModule: true,
-  default: { login: jest.fn(), logout: jest.fn() },
+  default: { login: jest.fn(), logout: jest.fn(), verifyDevice: jest.fn() },
+}))
+
+jest.mock('expo-local-authentication', () => ({
+  hasHardwareAsync: jest.fn().mockResolvedValue(false),
+  isEnrolledAsync: jest.fn().mockResolvedValue(false),
+}))
+
+jest.mock('@/lib/secure-session', () => ({
+  clearSession: jest.fn().mockResolvedValue(undefined),
+  getBiometricPreference: jest.fn().mockResolvedValue(false),
+  getBiometricPrompted: jest.fn().mockResolvedValue(false),
+  loadSession: jest.fn().mockResolvedValue(null),
+  saveSession: jest.fn().mockResolvedValue(undefined),
+  setBiometricPreference: jest.fn().mockResolvedValue(undefined),
+  setBiometricPrompted: jest.fn().mockResolvedValue(undefined),
+}))
+
+jest.mock('@/lib/device-identity', () => ({
+  clearDeviceToken: jest.fn().mockResolvedValue(undefined),
+  loadDeviceToken: jest.fn().mockResolvedValue(null),
+  saveDeviceToken: jest.fn().mockResolvedValue(undefined),
+}))
+
+jest.mock('@/lib/api', () => ({
+  __esModule: true,
+  default: { post: jest.fn() },
+  setAuthToken: jest.fn(),
+  setDeviceToken: jest.fn(),
 }))
 
 const loginMock = loginService.login as jest.Mock
@@ -113,7 +141,7 @@ describe('<LoginForm/>', () => {
     expect(onForgotPassword).toHaveBeenCalledTimes(1)
     expect(onRegister).toHaveBeenCalledTimes(1)
   })
-  it('Should refuse to sign in when the device needs verification', async () => {
+  it('Should show the verification form when the device needs verification', async () => {
     loginMock.mockResolvedValue({
       ...session,
       token: '',
@@ -128,7 +156,7 @@ describe('<LoginForm/>', () => {
       ).toBe(false)
     )
     await fireEvent.press(screen.getByTestId('login-submit'))
-    expect(await screen.findByText(/device needs to be verified/i)).toBeTruthy()
+    expect(await screen.findByTestId('device-verification-form')).toBeTruthy()
     expect(useAuthStore.getState().isAuthenticated).toBe(false)
     expect(useAuthStore.getState().token).toBeNull()
     expect(mockReplace).not.toHaveBeenCalled()

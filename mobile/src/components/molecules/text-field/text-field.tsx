@@ -12,6 +12,7 @@ import type { BaseTextFieldProps, TextFieldProps } from './types'
 const BaseTextField = ({
   className,
   error,
+  label,
   LeftIcon,
   secure = false,
   ...rest
@@ -21,6 +22,11 @@ const BaseTextField = ({
 
   return (
     <View className="w-full gap-1.5">
+      {label ? (
+        <Text variant="label" className="text-text-primary">
+          {label}
+        </Text>
+      ) : null}
       <View
         className={cn(
           'flex-row items-center gap-2 rounded-xl border bg-clean-white px-4',

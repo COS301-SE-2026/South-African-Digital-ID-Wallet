@@ -1,1 +1,5 @@
 export * from './login-service'
+export * from './citizen-dashboard-service'
+export * from './scan-service'
+export * from './qr-service'
+export * from './profile-service'

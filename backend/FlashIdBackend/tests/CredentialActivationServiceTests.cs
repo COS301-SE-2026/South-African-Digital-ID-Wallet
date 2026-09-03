@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Services;
@@ -23,6 +24,9 @@ public class CredentialActivationServiceTests
         public Task<List<Credential>> GetByUserIdAsync(Guid u) => Task.FromResult(new List<Credential>());
         public Task<List<Credential>> GetCredentialsByCitizenIdAsync(Guid c) => Task.FromResult(new List<Credential>());
         public Task SaveChangesAsync() => Task.CompletedTask;
+        public Task<(List<Citizen> Citizens, int TotalCount)> SearchCitizensAsync(string? query, int page, int pageSize) => Task.FromResult((new List<Citizen>(), 0));
+        public Task<Citizen?> GetCitizenByCitizenIdAsync(Guid citizenId) => Task.FromResult(CitizenToReturn);
+        public Task<(int VerificationCount, DateTime? LastVerifiedAt, int DistinctIpCount)> GetActivitySummaryAsync(Guid credentialId) => Task.FromResult((0, (DateTime?)null, 0));
     }
 
     private sealed class FakeGateway : IGovernmentRegistryGateway
@@ -37,14 +41,17 @@ public class CredentialActivationServiceTests
     private sealed class FakeActivationRepo : ICredentialsActivationRepository
     {
         public bool HasId, HasDl;
+        public Citizen? CitizenToReturn;
         public List<Credential> Added = new();
         public int Saves;
+        public Task<Citizen?> GetCitizenBySaIdAsync(string saId, CancellationToken n) => Task.FromResult(CitizenToReturn);
         public Task<bool> HasIdentityDocumentAsync(Guid c, CancellationToken t) => Task.FromResult(HasId);
         public Task<bool> HasDriversLicenseAsync(Guid c, CancellationToken t) => Task.FromResult(HasDl);
         public Task AddCredentialAsync(Credential c, CancellationToken t) { Added.Add(c); return Task.CompletedTask; }
         public Task AddIdentityDocumentAsync(IdentityDocument d, CancellationToken t) => Task.CompletedTask;
         public Task AddDriversLicenseAsync(DriversLicense d, CancellationToken t) => Task.CompletedTask;
         public Task AddAuditLogAsync(AuditLog a, CancellationToken t) => Task.CompletedTask;
+        public Task AddNotificationAsync(Notification n, CancellationToken t) => Task.CompletedTask;
         public Task SaveChangesAsync(CancellationToken t) { Saves++; return Task.CompletedTask; }
     }
 

@@ -20,11 +20,6 @@ export const citizenNavSections: SidebarNavSection[] = [
         href: '/citizen/activate-credentials',
         icon: 'shield',
       },
-      {
-        label: 'Notifications',
-        href: '/under-construction',
-        icon: 'notifications',
-      },
     ],
   },
   {
@@ -48,7 +43,11 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
   {
     title: 'Government Admin',
     items: [
-      { label: 'Dashboard', href: '/gov-admin', icon: 'dashboard' },
+      {
+        label: 'Dashboard',
+        href: '/gov-admin/gov-admin-dashboard',
+        icon: 'dashboard',
+      },
       {
         label: 'Upload Institution',
         href: '/gov-admin/upload-institution',
@@ -63,11 +62,6 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
         label: 'Manage Credentials',
         href: '/gov-admin/manage-credentials',
         icon: 'institutions',
-      },
-      {
-        label: 'Notifications',
-        href: '/under-construction',
-        icon: 'notifications',
       },
     ],
   },
@@ -85,21 +79,25 @@ export const officialsNavSections: SidebarNavSection[] = [
   {
     title: 'Officials',
     items: [
-      { label: 'Dashboard', href: '/officials', icon: 'dashboard' },
+      {
+        label: 'Dashboard',
+        href: '/officials/officials-dashboard',
+        icon: 'dashboard',
+      },
       {
         label: 'Onboard Citizen',
         href: '/officials/onboard-citizen',
         icon: 'onboard',
       },
       {
+        label: "Issue Driver's Licence",
+        href: '/officials/issue-drivers-license',
+        icon: 'credentials',
+      },
+      {
         label: 'Verifications',
         href: '/officials/verifications',
         icon: 'users',
-      },
-      {
-        label: 'Notifications',
-        href: '/under-construction',
-        icon: 'notifications',
       },
     ],
   },

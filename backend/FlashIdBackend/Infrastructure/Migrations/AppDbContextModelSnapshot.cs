@@ -31,10 +31,16 @@ namespace Infrastructure.Migrations
                     b.Property<Guid?>("ActorId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("CitizenId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<Guid?>("CredentialId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Details")
                         .IsRequired()
@@ -54,11 +60,17 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ActorId");
 
+                    b.HasIndex("CitizenId");
+
                     b.HasIndex("CreatedAt");
+
+                    b.HasIndex("CredentialId");
 
                     b.HasIndex("EventType");
 
                     b.HasIndex("ActorId", "CreatedAt");
+
+                    b.HasIndex("CredentialId", "EventType");
 
                     b.HasIndex("EventType", "CreatedAt");
 
@@ -681,6 +693,11 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DeviceName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("DeviceTokenHash")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -1075,7 +1092,21 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ActorId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Domain.Entities.Citizen", "Citizen")
+                        .WithMany()
+                        .HasForeignKey("CitizenId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Domain.Entities.Credential", "Credential")
+                        .WithMany()
+                        .HasForeignKey("CredentialId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Actor");
+
+                    b.Navigation("Citizen");
+
+                    b.Navigation("Credential");
                 });
 
             modelBuilder.Entity("Domain.Entities.Biometrics", b =>

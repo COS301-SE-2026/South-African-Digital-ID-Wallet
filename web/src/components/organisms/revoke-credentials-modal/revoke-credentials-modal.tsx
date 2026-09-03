@@ -21,6 +21,8 @@ export const RevokeCredentialModal = ({
   const handleConfirm = async () => {
     if (!reason) return
     await onConfirm({ reason, notes })
+    setReason('')
+    setNotes('')
   }
   const handleClose = () => {
     setReason('')

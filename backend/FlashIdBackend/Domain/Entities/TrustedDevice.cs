@@ -23,4 +23,6 @@ public class TrustedDevice : BaseEntity
     public Guid UserId { get; set; }
 
     public User User { get; set; } = null!;
+
+    public string DeviceName { get; set; } = string.Empty;
 }

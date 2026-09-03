@@ -6,7 +6,11 @@ import { Stack } from 'expo-router'
 import { ActivityIndicator, View } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
-import { PrivacyScreenOverlay, SessionLockWatcher } from '@/components/utility'
+import {
+  BiometricLockOverlay,
+  PrivacyScreenOverlay,
+  SessionLockWatcher,
+} from '@/components/utility'
 import { colors } from '@/theme/colors'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -32,6 +36,7 @@ export default function RootLayout() {
             <Stack screenOptions={{ headerShown: false }} />
             <SessionLockWatcher />
             <PrivacyScreenOverlay />
+            <BiometricLockOverlay />
           </>
         )}
       </SafeAreaProvider>

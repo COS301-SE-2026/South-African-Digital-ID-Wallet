@@ -786,8 +786,14 @@ public static class DbSeeder
             if (age >= 18)
             {
                 var licenseCredential = NewCredential(citizen.Id, licenseIssuer, now, signature);
+                var isExpired = rnd.Next(2) == 0;
+                licenseCredential.Status = isExpired
+                    ? CredentialStatus.Expired
+                    : CredentialStatus.Active;
                 credentialsToAdd.Add(licenseCredential);
-                var startDate = now.AddYears(-rnd.Next(1, 10));
+                var startDate = isExpired
+                    ? now.AddYears(-rnd.Next(6, 10))
+                    : now.AddYears(-rnd.Next(0, 4));
                 driversLicensesToAdd.Add(new DriversLicense
                 {
                     Id = Guid.NewGuid(),
@@ -886,6 +892,15 @@ public static class DbSeeder
         var allUsers = await context.DomainUsers.ToListAsync();
         if (allUsers.Count == 0) return;
 
+        var citizens = await context.Citizens.AsNoTracking().ToListAsync();
+
+        var citizenEvents = new HashSet<AuditEventType>
+        {
+            AuditEventType.CredentialIssued,
+            AuditEventType.CredentialVerified,
+            AuditEventType.CredentialRevoked,
+        };
+
         var eventDetails = new Dictionary<AuditEventType, string[]>
     {
         { AuditEventType.UserRegistered, new[] { "User registered via web portal", "User registered via mobile app" } },
@@ -902,22 +917,23 @@ public static class DbSeeder
 
         foreach (var user in allUsers)
         {
-            // give each user 2-5 audit log entries
             var count = rnd.Next(2, 6);
             for (int i = 0; i < count; i++)
             {
                 var eventType = eventTypes[rnd.Next(eventTypes.Length)];
                 var details = eventDetails[eventType];
+                var citizenId = citizenEvents.Contains(eventType) && citizens.Count > 0
+                    ? citizens[rnd.Next(citizens.Count)].Id
+                    : (Guid?)null;
 
                 auditLogsToAdd.Add(new AuditLog
                 {
                     Id = Guid.NewGuid(),
                     EventType = eventType,
-                    // Details is nvarchar(max) so no length limit
                     Details = details[rnd.Next(details.Length)],
-                    // IpAddress max 45 chars
                     IpAddress = SampleIpAddresses[rnd.Next(SampleIpAddresses.Length)],
                     ActorId = user.Id,
+                    CitizenId = citizenId,
                     CreatedAt = now.AddDays(-rnd.Next(0, 30))
                 });
             }
@@ -926,6 +942,7 @@ public static class DbSeeder
         await context.AuditLogs.AddRangeAsync(auditLogsToAdd);
         await context.SaveChangesAsync();
     }
+
 
     private static async Task SeedTrustedDevicesAsync(AppDbContext context)
     {

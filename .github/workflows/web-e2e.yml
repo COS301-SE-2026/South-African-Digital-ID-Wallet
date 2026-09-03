@@ -53,6 +53,7 @@ jobs:
       IPGEOLOCATION__APIKEY: ${{secrets.IPGEOLOCATION_APIKEY}}
       IPGEOLOCATION__BASEURL: ${{secrets.IPGEOLOCATION_BASEURL}}
       E2E_EXPIRY_CITIZEN_EMAIL: citizen.expiry.e2e@flashid.local
+      AUTH_SKIP_DEVICE_VERIFICATION: 'true'
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
