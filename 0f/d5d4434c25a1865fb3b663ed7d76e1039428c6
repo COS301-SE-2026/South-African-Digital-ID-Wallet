@@ -1,0 +1,34 @@
+backend/FlashIdBackend/Infrastructure/Repositories/OfficialActivityRepository.cs
+  h_712d174fc3f309 23,60-61,81-84,102,116,118,135
+backend/FlashIdBackend/Domain/Enums/AuditEventTypeExtensions.cs
+  h_712d174fc3f309 15-20,23
+backend/FlashIdBackend/Application/Features/Officials/DTOs/OfficialHistoryItemDto.cs
+  h_712d174fc3f309 8,10
+web/src/components/organisms/audit-log-table/types.ts
+  h_712d174fc3f309 2-10,18,20-21
+web/src/services/official-dashboard-service/types.ts
+  h_712d174fc3f309 6,12,16,20-22,26,32
+backend/FlashIdBackend/Infrastructure/Data/DbSeeder.cs
+  h_712d174fc3f309 895-903,925-927,936
+  h_712d174fc3f309 946
+web/src/components/organisms/audit-log-table/audit-log-table.tsx
+  h_712d174fc3f309 4,6-7,9-25,28-29,50-52,56-60,66-70,76-78,83-84,87,96,105,114,123,136,141,145,154-155,160-162,165-177,179,181-182,186,188,208-209
+  h_712d174fc3f309 71-75,178
+web/src/components/pages/officials/officials-dashboard-page.tsx
+  h_712d174fc3f309 16-18,39,41-44,47-55,63-65,67-70,76,86-89,129-139
+pnpm-lock.yaml
+  h_712d174fc3f309 110,247-249,267,2599-2609,2635-2637,2841-2867,2940-2942,3798-3841,3902-3904,4134-4136,4325-4327,4963-4965,5003-5006,6792-6803,6867-6874,6879-6886,6930-6932,7753-7755,11042,11044,11059-11070,11093-11094,11290-11313,11392-11393,12437-12474,12526-12527,12778-12779,13181-13182,13935-13936,13973-13974,16310-16318,16407-16426,16432-16437,16489-16490,17485-17501,17739,17742,17746,17749
+web/package.json
+  h_712d174fc3f309 53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "0fd5d4434c25a1865fb3b663ed7d76e1039428c6",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
