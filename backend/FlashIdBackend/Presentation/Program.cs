@@ -211,6 +211,7 @@ app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);
 app.UseRateLimiter();
+app.UseMiddleware<Presentation.Middleware.CsrfProtectionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
