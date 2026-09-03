@@ -10,7 +10,6 @@ import {
   LivenessCameraDialog,
   PhysicalIdentityForm,
   VerificationFailure,
-  VerificationProcessing,
   VerifyIdentityCard,
 } from '@/components/organisms'
 
@@ -422,8 +421,6 @@ export const VerifyCitizenPage = ({ token = '' }: VerifyCitizenPageProps) => {
             onBack={handleBackToMethods}
           />
         )}
-
-        {view === 'processing' && <VerificationProcessing />}
 
         {view === 'failure' && (
           <VerificationFailure

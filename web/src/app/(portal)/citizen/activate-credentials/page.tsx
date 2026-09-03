@@ -1,10 +1,5 @@
-import { ActivateCitizenPage } from '@/components/pages/activation/verify-citizen-page'
+import { ActivateCredentialsPage } from '@/components/pages/activation/activate-credentials-page'
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ token?: string }>
-}) {
-  const { token } = await searchParams
-  return <ActivateCitizenPage token={token ?? ''} />
+export default function Page() {
+  return <ActivateCredentialsPage />
 }
