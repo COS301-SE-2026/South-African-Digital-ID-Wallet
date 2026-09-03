@@ -16,8 +16,8 @@ import { DeviceType } from '@/types'
 
 const DASHBOARD_ROUTES: Record<string, string> = {
   citizen: '/citizen/citizen-dashboard',
-  official: '/officials',
-  governmentadministrator: '/gov-admin',
+  official: '/officials/officials-dashboard',
+  governmentadministrator: '/gov-admin/gov-admin-dashboard',
   govadmin: '/gov-admin',
 }
 
