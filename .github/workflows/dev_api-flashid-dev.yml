@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - dev
-      - feature/fix-deployment
   workflow_dispatch:
 
 
