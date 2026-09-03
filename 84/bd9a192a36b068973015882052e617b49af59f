@@ -1,0 +1,18 @@
+mobile/src/components/organisms/login-form/login-form.tsx
+  h_712d174fc3f309 29
+mobile/src/components/organisms/login-form/test/login-form.test.tsx
+  h_712d174fc3f309 133,135
+mobile/src/config/navigation/test/quick-actions.test.ts
+  h_712d174fc3f309 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "84bd9a192a36b068973015882052e617b49af59f",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

@@ -1,0 +1,85 @@
+mobile/src/components/molecules/requirement-list/types.ts
+  h_712d174fc3f309 1-9
+mobile/src/components/organisms/register-form/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/molecules/requirement-list/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/index.ts
+  h_712d174fc3f309 32-33
+mobile/src/services/register-service/index.ts
+  h_712d174fc3f309 1-10
+mobile/src/components/pages/register/register-page.tsx
+  h_712d174fc3f309 1-14
+  h_712d174fc3f309 15-17
+mobile/src/components/pages/index.ts
+  h_712d174fc3f309 11
+mobile/src/components/organisms/verify-email-form/types.ts
+  h_712d174fc3f309 1-8
+mobile/src/components/organisms/register-form/types.ts
+  h_712d174fc3f309 1-3
+mobile/src/services/register-service/register-dto.ts
+  h_712d174fc3f309 1-13
+mobile/src/app/(auth)/register.tsx
+  h_712d174fc3f309 1-5
+mobile/src/services/register-service/register-errors.ts
+  h_712d174fc3f309 1-20
+mobile/src/components/pages/login/login-page.tsx
+  h_712d174fc3f309 1-2,6-14
+mobile/src/components/templates/auth-screen/auth-screen.tsx
+  h_712d174fc3f309 1-8,10,14-40,42-66
+  h_712d174fc3f309 67-68
+mobile/src/services/register-service/password-rules.ts
+  h_712d174fc3f309 1-13
+  h_712d174fc3f309 14-22
+mobile/src/components/molecules/index.ts
+  h_712d174fc3f309 17
+mobile/src/services/register-service/schema.ts
+  h_712d174fc3f309 1-36
+mobile/src/services/register-service/register-service.ts
+  h_712d174fc3f309 1-22
+  h_712d174fc3f309 23-30
+mobile/src/services/register-service/types.ts
+  h_712d174fc3f309 1-15
+mobile/src/components/organisms/verify-email-form/verify-email-form.tsx
+  h_712d174fc3f309 1-82
+  h_712d174fc3f309 83-103
+mobile/src/components/organisms/verify-email-form/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/pages/register/index.ts
+  h_712d174fc3f309 1
+mobile/src/config/navigation/quick-actions.ts
+  h_712d174fc3f309 49-50
+mobile/src/components/organisms/register-form/register-form.tsx
+  h_712d174fc3f309 1-149
+  h_712d174fc3f309 150-158
+backend/FlashIdBackend/Presentation/appsettings.json
+  h_712d174fc3f309 42-44
+mobile/src/services/register-service/register-urls.ts
+  h_712d174fc3f309 1-7
+mobile/src/components/molecules/requirement-list/requirement-list.tsx
+  h_712d174fc3f309 1-26
+  h_712d174fc3f309 27-28
+mobile/src/components/atoms/flash-id-logo/flash-id-logo.tsx
+  h_712d174fc3f309 1-33
+mobile/src/components/atoms/flash-id-logo/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/atoms/flash-id-logo/types.ts
+  h_712d174fc3f309 1-4
+mobile/src/components/atoms/index.ts
+  h_712d174fc3f309 9
+mobile/src/components/organisms/login-form/login-form.tsx
+  h_712d174fc3f309 153
+web/src/assets/images/flashid.svg
+  h_712d174fc3f309 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c55d1cd6be9ef9ce1cdd5ec625b464618009f7d7",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
