@@ -225,8 +225,8 @@ public class AuthController : ControllerBase
         var csrfToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
         Response.Cookies.Append("csrf_token", csrfToken, new CookieOptions
         {
-            HttpOnly = false,
-            Secure = !_environment.IsDevelopment(),
+            HttpOnly = false, //NOSONAR: intentional CSRF token must be readable by JS for the double-submit cookie pattern(have to put this for sonar )
+            Secure = !_environment.IsDevelopment(),// NOSONAR: false only in local dev where app runs over plain HTTP; true in production
             SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
             Path = "/",
             Expires = expires.HasValue ? new DateTimeOffset(expires.Value) : DateTimeOffset.UtcNow.AddHours(1),
