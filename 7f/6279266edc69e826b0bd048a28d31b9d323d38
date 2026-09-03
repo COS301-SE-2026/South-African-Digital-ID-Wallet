@@ -1,0 +1,16 @@
+infra/seed-secrets.sh
+  h_99fca60b892ff4 50-53
+infra/main.bicep
+  h_99fca60b892ff4 162-164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "7f6279266edc69e826b0bd048a28d31b9d323d38",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
