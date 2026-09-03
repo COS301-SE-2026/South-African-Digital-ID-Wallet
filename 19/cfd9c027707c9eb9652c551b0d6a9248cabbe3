@@ -1,0 +1,18 @@
+web/src/services/login-service/test/login-service.test.ts
+  h_712d174fc3f309 1-154
+web/src/services/login-service/test/login-dto.test.ts
+  h_712d174fc3f309 1-50
+web/src/services/login-service/test/login-urls.test.ts
+  h_712d174fc3f309 1-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "19cfd9c027707c9eb9652c551b0d6a9248cabbe3",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
