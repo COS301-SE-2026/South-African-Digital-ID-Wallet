@@ -151,6 +151,9 @@ importers:
 
   web:
     dependencies:
+      '@azure/ai-vision-face-ui':
+        specifier: ^1.5.1
+        version: 1.5.1
       '@hookform/error-message':
         specifier: 2.0.1
         version: 2.0.1(react-dom@19.2.4(react@19.2.4))(react-hook-form@7.75.0(react@19.2.4))(react@19.2.4)
@@ -347,6 +350,12 @@ packages:
 
   '@asamuzakjp/css-color@3.2.0':
     resolution: {integrity: sha512-K1A6z8tS3XsmCMM86xoWdn7Fkdn9m6RSVtocUrJYIwZnFVkng/PvkEoWtOWmP+Scc6saYWHWZYbndEEXxl24jw==}
+
+  '@azure-ai-vision-face/ui-assets@1.5.1':
+    resolution: {integrity: sha1-M+r8FK7lU59aHHjnwGsO8gXvWOE=}
+
+  '@azure/ai-vision-face-ui@1.5.1':
+    resolution: {integrity: sha512-w6lBMPuCO8cWUJyxojBCbADuCPAMUmOxApVe21rgWNQNjk+/GB3TZ6AyDVG5u5gFG2NfQFJiBroUpSt4G98C+g==}
 
   '@babel/code-frame@7.29.0':
     resolution: {integrity: sha512-9NhCeYjq9+3uxgdtp20LSiJXJvN0FeCtNGpJxuMFZ1Kv3cWUNb6DOhJwUvcVCzKGR66cw4njwM6hrJLqgOwbcw==}
@@ -7893,6 +7902,12 @@ snapshots:
       '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-tokenizer': 3.0.4
       lru-cache: 10.4.3
+
+  '@azure-ai-vision-face/ui-assets@1.5.1': {}
+
+  '@azure/ai-vision-face-ui@1.5.1':
+    dependencies:
+      '@azure-ai-vision-face/ui-assets': 1.5.1
 
   '@babel/code-frame@7.29.0':
     dependencies:

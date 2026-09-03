@@ -19,6 +19,7 @@
     "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
+    "@azure/ai-vision-face-ui": "^1.5.1",
     "@hookform/error-message": "2.0.1",
     "@hookform/resolvers": "5.2.2",
     "@radix-ui/react-avatar": "1.1.11",
