@@ -1,0 +1,198 @@
+backend/FlashIdBackend/Presentation/Controllers/OfficialsController.cs
+  h_712d174fc3f309 133-180
+  h_712d174fc3f309 181
+mobile/src/components/organisms/official-dashboard-header/types.ts
+  h_712d174fc3f309 1-7
+mobile/src/components/organisms/official-dashboard-header/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/activity-timeline/types.ts
+  h_712d174fc3f309 1-12
+mobile/src/components/pages/audit-log/index.ts
+  h_712d174fc3f309 1
+mobile/src/services/audit-log-service/audit-log-urls.ts
+  h_712d174fc3f309 1-24
+  h_712d174fc3f309 25-26
+mobile/src/services/citizen-dashboard-service/citizen-dashboard-dto.ts
+  h_712d174fc3f309 2-4,7-9,13-15,19-20,25,29,32-35,37,40,42,104-123,125-143,146-163,165,170-171,173,177,182-183,185,188-199,201,206-209,212-259,263,276,280-281,288-327,368-394
+  h_712d174fc3f309 328
+mobile/src/services/citizen-dashboard-service/citizen-dashboard-service.ts
+  h_712d174fc3f309 6,22
+  h_712d174fc3f309 1,7-10,23-31
+backend/FlashIdBackend/Application/Common/Services/QrService.cs
+  h_712d174fc3f309 150-151,161,163-164,166-176
+mobile/src/components/pages/official-home/index.ts
+  h_712d174fc3f309 1
+mobile/src/hooks/use-official-dashboard.ts
+  h_712d174fc3f309 1-40
+mobile/src/components/pages/activity/activity-page.tsx
+  h_712d174fc3f309 1-89
+mobile/src/services/official-service/official-service.ts
+  h_712d174fc3f309 1-32
+  h_712d174fc3f309 33-37
+mobile/src/components/molecules/stat-tile/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/molecules/activity-row/types.ts
+  h_712d174fc3f309 3,9,11
+backend/FlashIdBackend/Application/Common/Services/OfficialActivityService.cs
+  h_712d174fc3f309 74-105
+backend/FlashIdBackend/Application/Features/Officials/DTOs/OfficialHistoryActionsResponseDto.cs
+  h_712d174fc3f309 1-6
+mobile/src/components/organisms/audit-log-filter-sheet/audit-log-filter-sheet.tsx
+  h_712d174fc3f309 1-64
+  h_712d174fc3f309 65-66
+mobile/src/components/organisms/audit-log-filter-sheet/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/audit-log-filter-sheet/types.ts
+  h_712d174fc3f309 1-8
+mobile/src/components/organisms/activity-filter-sheet/types.ts
+  h_712d174fc3f309 1-9
+mobile/src/components/organisms/official-stats-row/official-stats-row.tsx
+  h_712d174fc3f309 1-37
+mobile/src/services/audit-log-service/audit-log-service.ts
+  h_712d174fc3f309 1-24
+mobile/src/services/official-service/official-urls.ts
+  h_712d174fc3f309 1-7
+mobile/src/components/atoms/icon-tile/types.ts
+  h_712d174fc3f309 11
+mobile/src/components/organisms/audit-log-list/audit-log-list.tsx
+  h_712d174fc3f309 1-69
+mobile/src/components/organisms/activity-filter-sheet/activity-filter-sheet.tsx
+  h_712d174fc3f309 1-55
+mobile/src/components/organisms/official-dashboard-header/official-dashboard-header.tsx
+  h_712d174fc3f309 1-39
+mobile/src/components/organisms/official-stats-row/types.ts
+  h_712d174fc3f309 1-7
+mobile/src/config/navigation/quick-actions.ts
+  h_712d174fc3f309 2,54-75
+  h_712d174fc3f309 3-11,76-84
+mobile/src/components/organisms/activity-filter-sheet/index.ts
+  h_712d174fc3f309 1-2
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IOfficialActivityService.cs
+  h_712d174fc3f309 20-22
+mobile/src/services/official-service/types.ts
+  h_712d174fc3f309 1-24
+mobile/src/components/pages/activity/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/app/official/history.tsx
+  h_712d174fc3f309 1,3,5-8
+mobile/src/hooks/use-scan-credential.ts
+  h_712d174fc3f309 1,5-6,8,11-14
+mobile/src/components/templates/citizen-dashboard-screen/citizen-dashboard-screen.tsx
+  h_712d174fc3f309 9,24
+mobile/src/components/molecules/index.ts
+  h_712d174fc3f309 15-16
+mobile/src/components/molecules/segmented-tabs/segmented-tabs.tsx
+  h_712d174fc3f309 6,8-27,34,36,43,51
+  h_712d174fc3f309 7
+mobile/src/app/official/home.tsx
+  h_712d174fc3f309 1,4
+mobile/src/hooks/index.ts
+  h_712d174fc3f309 10-12
+backend/FlashIdBackend/Application/Features/Officials/DTOs/OfficialStatsResponseDto.cs
+  h_712d174fc3f309 1-7
+mobile/src/components/organisms/official-stats-row/index.ts
+  h_712d174fc3f309 1-2
+backend/FlashIdBackend/tests/QrServiceIntegrationTests.cs
+  h_712d174fc3f309 326-327,329-330
+mobile/src/config/navigation/tabs.ts
+  h_712d174fc3f309 5,24
+mobile/src/services/citizen-dashboard-service/types.ts
+  h_712d174fc3f309 7-14,73-77,79,83-84,91,96-116
+backend/FlashIdBackend/Application/Features/Officials/DTOs/OfficialHistoryItemDto.cs
+  h_712d174fc3f309 13
+mobile/src/services/audit-log-service/types.ts
+  h_712d174fc3f309 1-48
+mobile/src/hooks/use-audit-log.ts
+  h_712d174fc3f309 1-71
+  h_712d174fc3f309 72-83
+mobile/src/components/pages/activity/types.ts
+  h_712d174fc3f309 1-5
+mobile/src/components/organisms/official-badge-sheet/types.ts
+  h_712d174fc3f309 1-8
+mobile/src/components/molecules/audit-log-row/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/services/audit-log-service/index.ts
+  h_712d174fc3f309 1-4
+  h_712d174fc3f309 5-8
+mobile/src/components/organisms/audit-log-list/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/templates/citizen-dashboard-screen/types.ts
+  h_712d174fc3f309 1-2,8
+backend/FlashIdBackend/Domain/Enums/AuditEventTypeExtensions.cs
+  h_712d174fc3f309 22-24
+mobile/src/components/molecules/segmented-tabs/types.ts
+  h_712d174fc3f309 6-7,13
+mobile/src/hooks/use-activity-history.ts
+  h_712d174fc3f309 1-59
+  h_712d174fc3f309 60-61
+mobile/src/components/organisms/official-badge-sheet/official-badge-sheet.tsx
+  h_712d174fc3f309 1-78
+mobile/src/services/index.ts
+  h_712d174fc3f309 6
+mobile/src/components/molecules/stat-tile/types.ts
+  h_712d174fc3f309 1-14
+mobile/src/services/official-service/index.ts
+  h_712d174fc3f309 1-4
+mobile/src/components/pages/official-home/official-home-page.tsx
+  h_712d174fc3f309 1-63
+mobile/src/components/molecules/audit-log-row/types.ts
+  h_712d174fc3f309 1-6
+mobile/src/lib/format-date.ts
+  h_712d174fc3f309 22-24,75-119
+mobile/src/app/citizen/activity.tsx
+  h_712d174fc3f309 1,3,5-8
+mobile/src/services/citizen-dashboard-service/citizen-dashboard-urls.ts
+  h_712d174fc3f309 1-2,6
+  h_712d174fc3f309 7
+mobile/src/components/organisms/audit-log-list/types.ts
+  h_712d174fc3f309 1-11
+mobile/src/components/pages/index.ts
+  h_712d174fc3f309 8-10
+mobile/src/components/organisms/index.ts
+  h_712d174fc3f309 25-31
+mobile/src/services/citizen-dashboard-service/index.ts
+  h_712d174fc3f309 3-5,8,11
+  h_712d174fc3f309 12-14
+mobile/src/components/molecules/stat-tile/stat-tile.tsx
+  h_712d174fc3f309 1-29
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IOfficialActivityRepository.cs
+  h_712d174fc3f309 22-28
+mobile/src/components/atoms/icon-tile/icon-tile.tsx
+  h_712d174fc3f309 21,33
+mobile/src/services/audit-log-service/audit-log-dto.ts
+  h_712d174fc3f309 1-56
+  h_712d174fc3f309 57
+mobile/src/components/pages/audit-log/audit-log-page.tsx
+  h_712d174fc3f309 1-114
+mobile/src/hooks/use-citizen-dashboard.ts
+  h_712d174fc3f309 3,6,10-11,30-32,34-42
+mobile/src/components/molecules/activity-row/activity-row.tsx
+  h_712d174fc3f309 1,6,14,16,32,43-48
+mobile/src/components/organisms/activity-timeline/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/official-badge-sheet/index.ts
+  h_712d174fc3f309 1-2
+backend/FlashIdBackend/Infrastructure/Repositories/OfficialActivityRepository.cs
+  h_712d174fc3f309 36-53,68,79,92-102,116-119,134,153,159-174
+mobile/src/components/molecules/audit-log-row/audit-log-row.tsx
+  h_712d174fc3f309 1-55
+  h_712d174fc3f309 56-60
+mobile/src/services/official-service/official-dto.ts
+  h_712d174fc3f309 1-14
+  h_712d174fc3f309 15-18
+mobile/src/components/organisms/activity-timeline/activity-timeline.tsx
+  h_712d174fc3f309 1-75
+mobile/src/app/official/audit-log.tsx
+  h_712d174fc3f309 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "70bc62ec291d27df7c9b3d028d8cd2fde108e65c",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

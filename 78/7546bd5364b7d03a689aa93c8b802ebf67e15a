@@ -1,0 +1,19 @@
+web/src/components/pages/activation/verify-citizen-page.tsx
+  h_293a8616118f65 2,4-6,11-12,14,17,20-22,30-34,38-40,50-51,53,56-57,60-63,65-69,71-76,78-86,88,96-104,116-136,140-173,177-190,193-194,196
+web/src/config/page-headers/page-headers.ts
+  h_293a8616118f65 63
+  h_293a8616118f65 64
+web/src/components/organisms/verify-method/verify-method.tsx
+  h_293a8616118f65 76,83,90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "787546bd5364b7d03a689aa93c8b802ebf67e15a",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
