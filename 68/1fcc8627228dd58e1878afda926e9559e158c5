@@ -1,0 +1,19 @@
+web/src/components/organisms/verify-identity-card/verify-identity-card.tsx
+  h_293a8616118f65 2,4,16,49,51,54,60,69,74,76-77,79,81-82,84,86,88-91,93-95,99-100,102,104,106-124,126-144,146-181,186-187
+  h_293a8616118f65 17-18,22,34,44-48,50,52-53,55-59,61-68,71-72,75,78,83,87,92,96-98,101,103,105,145,182-185,188-190
+backend/FlashIdBackend/Application/Common/Services/OnboardingService.cs
+  h_293a8616118f65 220
+web/src/components/organisms/verify-identity-card/types.ts
+  h_293a8616118f65 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "681fcc8627228dd58e1878afda926e9559e158c5",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
