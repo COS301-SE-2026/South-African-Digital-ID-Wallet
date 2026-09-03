@@ -27,5 +27,8 @@ public enum AuditEventType
     DeviceVerificationRequested,
     DeviceVerificationFailed,
     DeviceVerified,
+    AuditLogViewed,
     CitizenStatusViewed,
+    CitizenCredentialsUpdated,
+    CitizenCredentialsSyncFailed,
 }

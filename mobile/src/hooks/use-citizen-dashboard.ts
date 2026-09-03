@@ -1,10 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { useAuthStore } from '@/stores/auth-store'
 import {
   citizenDashboardService,
+  officialActivityToResponse,
   toActivityEntries,
   toIdentityStatus,
 } from '@/services/citizen-dashboard-service'
+import { normalizeRole } from '@/lib/roles'
+import { officialDashboardKeys } from './use-official-dashboard'
 
 export const RECENT_ACTIVITY_LIMIT = 3
 
@@ -23,9 +27,19 @@ export const useIdentityStatus = () => {
 }
 
 export const useRecentActivity = (limit = RECENT_ACTIVITY_LIMIT) => {
+  const isOfficial = useAuthStore(
+    (state) => normalizeRole(state.user?.role) === 'official'
+  )
   const { data, isError, isPending, refetch } = useQuery({
-    queryFn: citizenDashboardService.getActivity,
-    queryKey: citizenDashboardKeys.activity,
+    queryFn: isOfficial
+      ? () =>
+          citizenDashboardService
+            .getOfficialActivity()
+            .then(officialActivityToResponse)
+      : citizenDashboardService.getActivity,
+    queryKey: isOfficial
+      ? officialDashboardKeys.recentActivity
+      : citizenDashboardKeys.activity,
     staleTime: 30_000,
   })
   return {

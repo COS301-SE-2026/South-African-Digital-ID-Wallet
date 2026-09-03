@@ -1,19 +1,32 @@
-import { setAuthToken } from '@/lib/api'
+import { setAuthToken, setDeviceToken } from '@/lib/api'
 import type { LoginResponse } from '@/services'
 
 import { useAuthStore } from '../auth-store'
-import { clearSession, loadSession } from '@/lib/secure-session'
+import {
+  clearSession,
+  getBiometricPreference,
+  loadSession,
+} from '@/lib/secure-session'
 
 jest.mock('@/lib/secure-session', () => ({
   clearSession: jest.fn(),
+  getBiometricPreference: jest.fn().mockResolvedValue(true),
   loadSession: jest.fn(),
   saveSession: jest.fn().mockResolvedValue(undefined),
+  setBiometricPreference: jest.fn().mockResolvedValue(undefined),
+}))
+
+jest.mock('@/lib/device-identity', () => ({
+  clearDeviceToken: jest.fn().mockResolvedValue(undefined),
+  loadDeviceToken: jest.fn().mockResolvedValue(null),
+  saveDeviceToken: jest.fn().mockResolvedValue(undefined),
 }))
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
   default: { post: jest.fn() },
   setAuthToken: jest.fn(),
+  setDeviceToken: jest.fn(),
 }))
 
 const session: LoginResponse = {
@@ -105,10 +118,27 @@ describe('useAuthStore.restore', () => {
     await useAuthStore.getState().restore()
     expect(useAuthStore.getState()).toMatchObject({
       isAuthenticated: true,
+      isLocked: true,
       isRestoring: false,
       token: 'jwt-token',
       user,
     })
     expect(setAuthToken).toHaveBeenCalledWith('jwt-token')
+  })
+  it('Should discard a live session when biometric unlock is off', async () => {
+    ;(getBiometricPreference as jest.Mock).mockResolvedValue(false)
+    ;(loadSession as jest.Mock).mockResolvedValue({
+      expiresAt: '2099-01-01T00:00:00Z',
+      token: 'jwt-token',
+      user: {
+        names: 'Thabo',
+        role: 'citizen',
+        surname: 'Mokoena',
+        userId: 'u-1',
+      },
+    })
+    await useAuthStore.getState().restore()
+    expect(clearSession).toHaveBeenCalled()
+    expect(useAuthStore.getState().isAuthenticated).toBe(false)
   })
 })

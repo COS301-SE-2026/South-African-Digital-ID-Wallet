@@ -22,4 +22,17 @@ export function setAuthToken(token: string | null) {
   }
 }
 
+let deviceToken: string | null = null
+
+export function setDeviceToken(token: string | null) {
+  deviceToken = token
+}
+
+api.interceptors.request.use((config) => {
+  if (deviceToken) {
+    config.headers.set('X-Device-Token', deviceToken)
+  }
+  return config
+})
+
 export default api

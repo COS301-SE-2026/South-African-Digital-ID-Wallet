@@ -46,6 +46,10 @@ public class TrustedDeviceService : ITrustedDeviceService
 
     private static string BuildDeviceName(TrustedDevice trustedDevice)
     {
+        if (!string.IsNullOrWhiteSpace(trustedDevice.DeviceName))
+        {
+            return trustedDevice.DeviceName;
+        }
         var browser = string.IsNullOrEmpty(trustedDevice.Browser) ? "Unknown browser" : trustedDevice.Browser;
 
         var operatingSystem = string.IsNullOrEmpty(trustedDevice.OperatingSystem) ? trustedDevice.DeviceType.ToString() : trustedDevice.OperatingSystem;

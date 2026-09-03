@@ -69,12 +69,14 @@ public class CredentialControllerIntegrationTests
         private readonly SqliteConnection _connection = new("DataSource=:memory:");
         private readonly IIssueCredentialService? _issueCredentialService;
         private readonly bool _useFailingExpiryService;
+        private readonly bool _useFailingUpdateService;
 
 
-        public TestApiFactory(IIssueCredentialService? issueCredentialService = null, bool useFailingExpiryService = false)
+        public TestApiFactory(IIssueCredentialService? issueCredentialService = null, bool useFailingExpiryService = false, bool useFailingUpdateService = false)
         {
             _issueCredentialService = issueCredentialService;
             _useFailingExpiryService = useFailingExpiryService;
+            _useFailingUpdateService = useFailingUpdateService;
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -116,6 +118,12 @@ public class CredentialControllerIntegrationTests
                     services.RemoveAll(typeof(ICredentialExpiryService));
                     services.AddScoped<ICredentialExpiryService, StubFailingCredentialExpiryService>();
                 }
+
+                if (_useFailingUpdateService)
+                {
+                    services.RemoveAll(typeof(ICredentialUpdateService));
+                    services.AddScoped<ICredentialUpdateService, StubFailingCredentialUpdateService>();
+                }
             });
         }
 
@@ -144,6 +152,21 @@ public class CredentialControllerIntegrationTests
         public Task<bool> HasCompletedTodayAsync(CancellationToken cancellationToken) => Task.FromResult(false);
 
         public Task<CredentialExpiryCheckResponseDto> RunExpiryCheckAsync(CancellationToken cancellationToken) => Task.FromResult(new CredentialExpiryCheckResponseDto
+        {
+            RunDate = DateTime.UtcNow.Date,
+            Status = JobRunStatus.Failed,
+            ProcessedCount = 0,
+            StartedAt = DateTime.UtcNow,
+            CompletedAt = DateTime.UtcNow,
+            ErrorMessage = "Simulated failure",
+        });
+    }
+
+    private sealed class StubFailingCredentialUpdateService : ICredentialUpdateService
+    {
+        public Task<bool> HasCompletedTodayAsync(CancellationToken cancellationToken) => Task.FromResult(false);
+
+        public Task<CredentialUpdateCheckResponseDto> RunUpdateCheckAsync(CancellationToken cancellationToken) => Task.FromResult(new CredentialUpdateCheckResponseDto
         {
             RunDate = DateTime.UtcNow.Date,
             Status = JobRunStatus.Failed,
@@ -460,6 +483,86 @@ public class CredentialControllerIntegrationTests
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
 
         var body = await response.Content.ReadFromJsonAsync<CredentialExpiryCheckResponseDto>(JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.NotNull(body);
+        Assert.Equal(JobRunStatus.Failed, body.Status);
+        Assert.True(body.Failed);
+    }
+
+    [Fact]
+    public async Task UpdateCheck_AsGovernmentAdministrator_ReturnsOk()
+    {
+        await using var factory = new TestApiFactory();
+
+        var db = await factory.CreateInitializedContextAsync();
+        var admin = BuildUser(UserRole.GovernmentAdministrator);
+
+        await db.DomainUsers.AddAsync(admin, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(admin));
+
+        var response = await client.PostAsync("/api/credentials/update-check", null, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var body = await response.Content.ReadFromJsonAsync<CredentialUpdateCheckResponseDto>(JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.NotNull(body);
+        Assert.Equal(JobRunStatus.Completed, body.Status);
+    }
+
+    [Fact]
+    public async Task UpdateCheck_AsCitizen_ReturnsForbidden()
+    {
+        await using var factory = new TestApiFactory();
+
+        var db = await factory.CreateInitializedContextAsync();
+        var citizen = BuildUser(UserRole.Citizen);
+
+        await db.DomainUsers.AddAsync(citizen, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(citizen));
+
+        var response = await client.PostAsync("/api/credentials/update-check", null, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateCheck_Unauthenticated_ReturnsUnauthorized()
+    {
+        await using var factory = new TestApiFactory();
+        await factory.CreateInitializedContextAsync();
+
+        var client = factory.CreateClient();
+        var response = await client.PostAsync("/api/credentials/update-check", null, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateCheck_WhenServiceReportsFailure_ReturnsInternalServerError()
+    {
+        await using var factory = new TestApiFactory(useFailingUpdateService: true);
+
+        var db = await factory.CreateInitializedContextAsync();
+        var admin = BuildUser(UserRole.GovernmentAdministrator);
+
+        await db.DomainUsers.AddAsync(admin, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTokenFor(admin));
+
+        var response = await client.PostAsync("/api/credentials/update-check", null, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+
+        var body = await response.Content.ReadFromJsonAsync<CredentialUpdateCheckResponseDto>(JsonOptions, TestContext.Current.CancellationToken);
 
         Assert.NotNull(body);
         Assert.Equal(JobRunStatus.Failed, body.Status);

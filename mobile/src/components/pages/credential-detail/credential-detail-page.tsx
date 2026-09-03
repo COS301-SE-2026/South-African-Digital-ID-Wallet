@@ -56,23 +56,7 @@ export const CredentialDetailPage = ({ id }: CredentialDetailPageProps) => {
   }
 
   return (
-    <DetailScreen
-      action={
-        <Button
-          label="Share Identity"
-          LeftIcon={QrCode}
-          onPress={() =>
-            router.push({
-              params: { credentialId: credential.id },
-              pathname: '/citizen/present',
-            })
-          }
-          testID="share-identity-button"
-        />
-      }
-      onBack={handleBack}
-      title="My ID"
-    >
+    <DetailScreen onBack={handleBack} title="My ID">
       <CredentialDetailCard
         fields={credential.fields}
         holderName={holderName || 'Cardholder'}
@@ -85,6 +69,17 @@ export const CredentialDetailPage = ({ id }: CredentialDetailPageProps) => {
           ? `Issued on ${credential.issuedOn} · This is your verified digital identity`
           : 'This is your verified digital identity'}
       </Text>
+      <Button
+        label="Share Identity"
+        LeftIcon={QrCode}
+        onPress={() =>
+          router.push({
+            params: { credentialId: credential.id },
+            pathname: '/citizen/present',
+          })
+        }
+        testID="share-identity-button"
+      />
     </DetailScreen>
   )
 }

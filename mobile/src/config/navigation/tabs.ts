@@ -1,9 +1,8 @@
 import {
   History,
   Home,
-  Inbox,
-  QrCode,
   ScanLine,
+  ScrollText,
   ShieldCheck,
   User,
   Wallet,
@@ -15,14 +14,14 @@ import type { AppRole } from '@/lib/roles'
 export const citizenTabs: NavTabConfig[] = [
   { name: 'home', label: 'Home', Icon: Home },
   { name: 'wallet', label: 'Wallet', Icon: Wallet },
-  { name: 'present', label: 'Present', Icon: QrCode, variant: 'center' },
+  { name: 'verify', label: 'Verify', Icon: ScanLine, variant: 'center' },
   { name: 'activity', label: 'Activity', Icon: ShieldCheck },
   { name: 'profile', label: 'Profile', Icon: User },
 ]
 
 export const officialTabs: NavTabConfig[] = [
   { name: 'home', label: 'Home', Icon: Home },
-  { name: 'requests', label: 'Requests', Icon: Inbox },
+  { name: 'audit-log', label: 'Audit Log', Icon: ScrollText },
   { name: 'verify', label: 'Verify', Icon: ScanLine, variant: 'center' },
   { name: 'history', label: 'History', Icon: History },
   { name: 'profile', label: 'Profile', Icon: User },

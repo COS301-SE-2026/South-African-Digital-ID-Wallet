@@ -1,5 +1,14 @@
 import type { Href } from 'expo-router'
-import { FolderClosed, QrCode, Share2, ShieldCheck } from 'lucide-react-native'
+import {
+  FolderClosed,
+  QrCode,
+  Share2,
+  ShieldCheck,
+  History,
+  ScrollText,
+  ScanLine,
+  UserCog,
+} from 'lucide-react-native'
 import type { LucideIcon } from 'lucide-react-native'
 
 import type { IconTileTone } from '@/components/atoms'
@@ -14,14 +23,14 @@ export type QuickAction = {
 
 export const citizenQuickActions: QuickAction[] = [
   {
-    href: '/citizen/present',
+    href: '/citizen/verify',
     Icon: QrCode,
     label: 'Scan QR',
     name: 'scan-qr',
     tone: 'green',
   },
   {
-    href: '/citizen/present',
+    href: '/citizen/wallet',
     Icon: Share2,
     label: 'Share ID',
     name: 'share-id',
@@ -40,5 +49,36 @@ export const citizenQuickActions: QuickAction[] = [
     label: 'Verify Identity',
     name: 'verify-identity',
     tone: 'blue',
+  },
+]
+
+export const officialQuickActions: QuickAction[] = [
+  {
+    href: '/official/verify',
+    Icon: ScanLine,
+    label: 'Scan ID',
+    name: 'scan-id',
+    tone: 'green',
+  },
+  {
+    href: '/official/history',
+    Icon: History,
+    label: 'History',
+    name: 'history',
+    tone: 'blue',
+  },
+  {
+    href: '/official/audit-log',
+    Icon: ScrollText,
+    label: 'Audit Log',
+    name: 'audit-log',
+    tone: 'gold',
+  },
+  {
+    href: '/official/profile',
+    Icon: UserCog,
+    label: 'My Profile',
+    name: 'profile',
+    tone: 'green',
   },
 ]

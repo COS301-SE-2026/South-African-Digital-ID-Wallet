@@ -36,7 +36,7 @@ describe('<BottomNavBar/>', () => {
     citizenTabs.forEach((tab) =>
       expect(screen.getByTestId(`nav-tab-${tab.name}`)).toBeTruthy()
     )
-    expect(screen.getByText('Present')).toBeTruthy()
+    expect(screen.getByText('Verify')).toBeTruthy()
   })
   it('Should mark only the active route as selected', async () => {
     await renderBar(makeProps(1))

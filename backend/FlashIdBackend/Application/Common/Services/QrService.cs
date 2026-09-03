@@ -147,6 +147,8 @@ public class QrService : IQrService
         QrEnvelope envelope;
         QrPayload payload;
 
+        Guid? verifiedCredentialId = null;
+
         try
         {
             var envelopeJson = Encoding.UTF8.GetString(Convert.FromBase64String(token));
@@ -156,9 +158,22 @@ public class QrService : IQrService
             if (!_qrSigningProvider.Verify(payloadJson, envelope.Signature)) throw new InvalidDisclosureTokenException();
 
             payload = JsonSerializer.Deserialize<QrPayload>(payloadJson, CamelCaseOptions) ?? throw new InvalidDisclosureTokenException();
+            verifiedCredentialId = payload.CredentialId;
         }
-        catch (Exception e) when (e is FormatException or JsonException)
+        catch (Exception ex)
+    when (ex is InvalidDisclosureTokenException or FormatException or JsonException)
         {
+            await _institutionRepository.AddAuditLogAsync(new AuditLog
+            {
+                Id = Guid.NewGuid(),
+                ActorId = requestingUserId,
+                EventType = AuditEventType.CitizenVerificationFailed,
+                Details = "QR disclosure verification failed.",
+                IpAddress = ipAddress,
+                CredentialId = verifiedCredentialId,
+                CreatedAt = DateTime.UtcNow,
+            });
+            await _institutionRepository.SaveChangesAsync();
             throw new InvalidDisclosureTokenException();
         }
 
@@ -184,6 +199,7 @@ public class QrService : IQrService
             IpAddress = ipAddress,
             CredentialId = cred.Id,
             CreatedAt = DateTime.UtcNow,
+            CitizenId = cred.CitizenId,
         });
         await _institutionRepository.SaveChangesAsync();
 

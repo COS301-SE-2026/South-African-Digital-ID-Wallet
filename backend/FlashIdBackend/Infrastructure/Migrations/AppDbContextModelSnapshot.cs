@@ -31,6 +31,9 @@ namespace Infrastructure.Migrations
                     b.Property<Guid?>("ActorId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("CitizenId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -56,6 +59,8 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ActorId");
+
+                    b.HasIndex("CitizenId");
 
                     b.HasIndex("CreatedAt");
 
@@ -759,6 +764,11 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DeviceName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("DeviceTokenHash")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -1153,12 +1163,19 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ActorId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Domain.Entities.Citizen", "Citizen")
+                        .WithMany()
+                        .HasForeignKey("CitizenId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Domain.Entities.Credential", "Credential")
                         .WithMany()
                         .HasForeignKey("CredentialId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Actor");
+
+                    b.Navigation("Citizen");
 
                     b.Navigation("Credential");
                 });

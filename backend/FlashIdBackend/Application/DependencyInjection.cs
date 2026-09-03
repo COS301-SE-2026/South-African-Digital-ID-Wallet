@@ -36,9 +36,11 @@ public static class DependencyInjection
         services.AddScoped<IDeleteAccountService, DeleteAccountService>();
         services.AddScoped<ICredentialExpiryService, CredentialExpiryService>();
         services.AddSingleton<CredentialExpiryMapper>();
-        services.AddScoped<IPhysicalIdentityVerificationService, PhysicalIdentityVerificationService>();
+        services.AddScoped<IOfficialActivityService, OfficialActivityService>();
         services.AddScoped<IIssueCredentialService, IssueCredentialService>();
-        services.AddScoped<IIssueCredentialService, IssueCredentialService>();
+        services.AddScoped<ICredentialUpdateService, CredentialUpdateService>();
+        services.AddSingleton<CredentialUpdateMapper>();
+        services.AddScoped<IAdminDashboardService, AdminDashboardService>();
         services.AddScoped<IPhysicalIdentityVerificationService, PhysicalIdentityVerificationService>();
         return services;
     }

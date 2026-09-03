@@ -15,6 +15,9 @@ public class AuthController : ControllerBase
     private readonly ILogger<AuthController> _logger;
     private readonly IHostEnvironment _environment;
 
+    private const string DeviceCookieName = "flashid_device";
+    private const string DeviceHeaderName = "X-Device-Token";
+
     public AuthController(
         IAuthService authService,
         ILogger<AuthController> logger,
@@ -54,7 +57,7 @@ public class AuthController : ControllerBase
         try
         {
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            Request.Cookies.TryGetValue("flashid_device", out var deviceToken);
+            var deviceToken = ReadDeviceToken();
             var result = await _authService.LoginAsync(request, deviceToken, ipAddress, cancellationToken);
 
             if (result.RequiresDeviceVerification)
@@ -83,10 +86,10 @@ public class AuthController : ControllerBase
 
             Response.Cookies.Append("access_token", result.Token, cookieOptions);
 
-            var isNativeClient = string.Equals(client, "mobile", StringComparison.Ordinal);
+            var isNativeClient = IsNativeClient(client);
             if (!isNativeClient)
             {
-                result.Token = string.Empty;
+                result.Token = null;
             }
 
             return Ok(result);
@@ -112,12 +115,13 @@ public class AuthController : ControllerBase
 
     [HttpPost("verify-device")]
     public async Task<IActionResult> VerifyDevice([FromBody] VerifyDeviceRequestDto request,
+        [FromHeader(Name = "X-Client")] string? client,
         CancellationToken cancellationToken)
     {
         try
         {
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            Request.Cookies.TryGetValue("flashid_device", out var deviceToken);
+            var deviceToken = ReadDeviceToken();
 
             var result = await _authService.VerifyDeviceAsync(request, deviceToken, ipAddress, cancellationToken);
 
@@ -154,8 +158,12 @@ public class AuthController : ControllerBase
                 Response.Cookies.Append("flashid_device", result.DeviceToken, deviceCookieOptions);
             }
 
-            result.Token = string.Empty;
-            result.DeviceToken = null;
+            var isNativeClient = IsNativeClient(client);
+            if (!isNativeClient)
+            {
+                result.Token = null;
+                result.DeviceToken = null;
+            }
             return Ok(result);
         }
         catch (UnauthorizedAccessException ex)
@@ -202,5 +210,24 @@ public class AuthController : ControllerBase
             _logger.LogError(ex, "Unexpected error during logout");
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
+    }
+    private string? ReadDeviceToken()
+    {
+        if (Request.Headers.TryGetValue(DeviceHeaderName, out var header)
+            && !string.IsNullOrWhiteSpace(header))
+        {
+            return header.ToString();
+        }
+
+        Request.Cookies.TryGetValue(DeviceCookieName, out var cookie);
+        return cookie;
+    }
+    private bool IsNativeClient(string? client)
+    {
+        if (!string.Equals(client, "mobile", StringComparison.Ordinal))
+        {
+            return false;
+        }
+        return !Request.Headers.ContainsKey("Origin") && !Request.Headers.ContainsKey("Sec-Fetch-Site");
     }
 }
