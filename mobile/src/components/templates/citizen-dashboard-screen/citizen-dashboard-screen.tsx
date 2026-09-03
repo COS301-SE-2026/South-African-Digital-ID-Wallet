@@ -6,6 +6,7 @@ import type { CitizenDashboardScreenProps } from './types'
 export const CitizenDashboardScreen = ({
   children,
   header,
+  refreshControl,
   testID = 'citizen-dashboard-screen',
 }: CitizenDashboardScreenProps) => {
   const insets = useSafeAreaInsets()
@@ -20,6 +21,7 @@ export const CitizenDashboardScreen = ({
       <ScrollView
         className="-mt-14"
         contentContainerClassName="gap-6 px-5 pb-10"
+        refreshControl={refreshControl}
         showsVerticalScrollIndicator={false}
       >
         {children}

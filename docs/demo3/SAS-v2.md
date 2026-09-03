@@ -93,21 +93,181 @@ Return the currently authenticated user's profile
 ```
 
 #### POST /api/auth/login
-Authenticates a user and sets a JWT token in an HttpOnly cookie.
+Authenticates a user. If the device is already trusted, authentication completes immediately and an access token is issued through an HttpOnly cookie. If the device is not trusted, a device verification request is created and OTP verification is required before authentication can complete.
 
 **Authentication:** None
+
+**Cookies:**
+- `flashid_device` - optional HttpOnly cookie containing the existing trusted-device token.
+- `access_token` - set by the server after successful authentication from a trusted device.
 
 **Request Body:**
 ```json
 {
     "email": "string",
-    "password": "string"
+    "password": "string",
+    "rememberMe": false
 }
 ```
 
-**Response 200:** JWT token set in HttpOnly cookie, user profile returned
-**Response 401:** Invalid credentials
-**Reponse 423:** Account locked out
+**Response 200 — Trusted Device:**
+```json
+{
+    "token": "",
+    "expiresAt": "2026-08-16T21:30:00Z",
+    "userId": "00000000-0000-0000-0000-000000000000",
+    "role": "Citizen",
+    "requiresDeviceVerification": false,
+    "deviceVerificationId": null,
+    "deviceToken": null
+}
+```
+
+The JWT access token is returned through the `access_token` HttpOnly cookie and is therefore not exposed in the response body.
+
+**Response 200 — Untrusted Device:**
+```json
+{
+    "token": "",
+    "userId": "00000000-0000-0000-0000-000000000000",
+    "role": "Citizen",
+    "requiresDeviceVerification": true,
+    "deviceVerificationId": "00000000-0000-0000-0000-000000000000"
+}
+```
+
+When `requiresDeviceVerification` is `true`, the client must continue authentication using `POST /api/auth/verify-device`.
+
+**Response 401:** Invalid credentials, deleted account, or locked account  
+**Response 403:** Email address has not been verified  
+**Response 500:** Authentication could not be completed
+
+#### POST /api/auth/verify-device
+Verifies the OTP issued during login for an untrusted device. Successful verification marks the device as trusted and completes authentication.
+
+**Authentication:** None
+
+**Cookies:**
+- `flashid_device` - optional. If an existing device token is supplied, the corresponding trusted-device record is updated. If no device token exists, a new trusted-device token is generated and returned through an HttpOnly cookie.
+- `access_token` - set after successful device verification.
+
+**Request Body:**
+```json
+{
+    "deviceVerificationId": "00000000-0000-0000-0000-000000000000",
+    "otp": "123456",
+    "rememberMe": false,
+    "deviceType": "Desktop",
+    "operatingSystem": "Windows",
+    "browser": "Chrome"
+}
+```
+
+**Request Fields:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `deviceVerificationId` | UUID | Yes | Identifier returned by `POST /api/auth/login` when device verification is required |
+| `otp` | string | Yes | One-time verification code sent to the user's email |
+| `rememberMe` | boolean | Yes | Determines the JWT expiry behaviour |
+| `deviceType` | enum | Yes | Type of device being verified |
+| `operatingSystem` | string | Yes | Client operating system |
+| `browser` | string | Yes | Client browser |
+
+**Device Types:**
+- `Desktop`
+- `Mobile`
+- `Tablet`
+- `Laptop`
+- `Unknown`
+
+**Response 200:**
+```json
+{
+    "token": "",
+    "expiresAt": "2026-08-16T21:30:00Z",
+    "userId": "00000000-0000-0000-0000-000000000000",
+    "role": "Citizen",
+    "requiresDeviceVerification": false,
+    "deviceVerificationId": null,
+    "deviceToken": null
+}
+```
+
+On success:
+- The OTP verification is marked as used.
+- The device is stored or updated as a trusted device.
+- The device's last active time is updated.
+- The approximate city and country associated with the request IP address are stored where available.
+- An `access_token` HttpOnly cookie is set.
+- If the client did not already have a device token, a `flashid_device` HttpOnly cookie is set.
+- Device verification is recorded in the audit log.
+
+Sensitive access and device tokens are not returned to frontend JavaScript in the response body.
+
+**Response 401:** Device verification failed. This includes:
+- Missing device verification ID
+- Missing OTP
+- Verification request not found
+- Verification request already used
+- Verification code expired
+- Maximum verification attempts exceeded
+- Invalid verification code
+- Associated user account no longer exists
+
+**Response 500:** Device verification completed without an access token or an unexpected server error occurred.
+
+#### POST /api/auth/resend-device-verification
+
+Generates and sends a new OTP for an existing device verification request.
+
+**Authentication:** None
+
+**Rate Limit:** `resend-device-verification`
+
+**Request Body:**
+
+```json
+{
+    "deviceVerificationId": "00000000-0000-0000-0000-000000000000"
+}
+```
+
+**Request Fields:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `deviceVerificationId` | string (UUID) | Yes | Identifier returned by `POST /api/auth/login` when device verification is required |
+
+**Response 200:**
+
+```json
+{
+    "message": "Verification code has been resent to your email."
+}
+```
+
+On success:
+
+- A new six-digit OTP is generated.
+- The previous OTP is replaced with the newly generated OTP.
+- The OTP expiry period is refreshed.
+- The new OTP is sent to the User's registered email address.
+- The resend action is recorded in the audit log.
+
+**Response 400:** Invalid request. This includes:
+- Missing `deviceVerificationId`
+- Invalid `deviceVerificationId` format
+
+**Response 401:** Device verification resend failed. This includes:
+- Device verification request not found
+- Device verification has already been completed
+- Device verification request has expired
+- Associated user account does not exist or has been deleted
+
+**Response 429:** Too many resend requests. The configured resend rate limit has been exceeded.
+
+**Response 500:** An unexpected server error occurred while attempting to resend the verification OTP.
 
 #### Post /api/auth/logout
 Clears the JWT cookie and ends the user session.
@@ -818,7 +978,7 @@ Return gov-held driver license record for citizen.
 
 | Environment | Service | URL |
 |---|---|---|
-| Production | WEB | https://web-flashid-prod-cycxaycqetbcdshk.southafricanorth-01.azurewebsites.net |
+| Production | WEB | https://flashid.co.za |
 | Production | Backend API | https://api-flashid-prod-behwhegmcshsb6dg.southafricanorth-01.azurewebsites.net |
 | Production | Government Registry API | https://api-government-registry-prod-ajavcaate3e5fecb.southafricanorth-01.azurewebsites.net |
 | Development | WEB | https://web-flashid-dev-c5f2gbd8hbcqf8h2.southafricanorth-01.azurewebsites.net |
@@ -840,36 +1000,33 @@ FlashID distinguishes two environments: **development** and **production**. Both
 All three services deploy automatically on push to their respective branches. There is no manual deployment step for now. Local development is a third, non-deployable environment. Developers will run the stack `pnpm dev` on web, backend and government-registry concurrently. This is with a local SQL Server instance.
 
 ### 5.3 Infrastructure as Code / Containerisation
-FlashID uses Docker containerisation to provide reproducible deployment of the web application and backend services.
 
-Each deployable service contains a Dockerfile that defines its runtime environment, dependency installation, build process, exposed port, and startup command.
+FlashID's Azure infrastructure (App Services, SQL Server and databases, Cosmos DB, Blob Storage, Key Vault, and their configuration) is defined declaratively using Azure Bicep templates (`infra/main.bicep` and per-resource modules under `infra/modules/`), version-controlled alongside the application code. This replaces what was originally manual Portal provisioning with a reproducible definition of the infrastructure: any change to the templates can be previewed with `az deployment group what-if` before being applied with `az deployment group create`, and the templates converge the environment to match what is declared rather than requiring manual reconfiguration.
 
-GitHub Actions builds the relevant service container when changes are pushed to the configured branch. The resulting container image is published to the configured container registry and deployed to the corresponding Azure App Service.
+The web application is containerised: its Dockerfile defines the build and runtime environment, and GitHub Actions builds and publishes an image to Azure Container Registry on every push, which the corresponding Azure App Service is then pointed at. The two backend APIs (FlashID and Government Registry) are deployed using Azure App Service's Code publishing model, where GitHub Actions runs `dotnet publish` and deploys the build directly, rather than containers. This was a deliberate scope decision made under the project timeline, to reuse already-working infrastructure rather than introduce a new container runtime for both services under time pressure.
 
-Containerisation ensures that the same application artefact tested in the CI pipeline is deployed to Azure, reducing differences between developer machines and cloud-hosted environments.
+Application deployment itself (on every push to `dev`/`main`) continues to run automatically via GitHub Actions with no manual step, independent of the Bicep templates. Infrastructure changes described in Bicep are applied deliberately, by a team member, rather than on every push. This is a scope reduction made to fit the project timeline while still meeting the requirement for the infrastructure to be defined as reproducible code rather than manual Portal configuration.
+
 ### 5.4 Secrets Management
+
 Secrets and environment-specific configuration are not committed to the Git repository.
 
-In deployed environments, sensitive configuration values are stored using Azure App Service environment variables and connection string settings. These values include:
+In deployed environments, secrets are stored directly as Azure App Service Application Settings, configured outside of source control. `infra/main.bicep` additionally models an Azure Key Vault based secrets architecture (`kv-flashid-dev` / `kv-flashid-prod`, RBAC-authorised, referenced via managed identity) as the target design for secrets management, with `infra/seed-secrets.sh` provided to seed it. This is defined and validated but not yet the live mechanism serving the deployed applications, and represents a documented next step beyond the current project timeline.
 
-- SQL Server connection strings
-- JWT signing configuration
-- Government Registry API keys
-- Government Registry service URLs
-- Azure Blob Storage credentials
-- Email provider credentials
+Local development uses `.NET User Secrets`, local environment variables, and development configuration files excluded from source control. Public configuration templates (`.env.example` files) are included in the repository to document required variable names without real values.
 
-Local development uses `.NET User Secrets`, local environment variables, and development configuration files that are excluded from source control.
-
-Public configuration templates may be included in the repository to document the required variable names, but these templates do not contain real secret values.
-
-Application code accesses configuration through ASP.NET Core configuration providers and environment variables. Secret va
 ### 5.5 Rollback Strategy
-FlashID uses a previous-version redeployment strategy for rollback.
 
-Each successful CI/CD run produces a deployment artefact or container image associated with a specific Git commit. If a newly deployed version fails, the team identifies the most recent known-good deployment and redeploys that version to the affected Azure App Service.
+FlashID uses a redeploy-previous-version strategy for rollback, with the specific mechanism depending on how each service is deployed.
 
-Where a failure is caused by application code, the responsible commit may also be reverted through a new pull request. Force-pushing or resetting the shared `main` or `dev` branches is not used.
+For the web application (containerised), every build is pushed to Azure Container Registry tagged with its Git commit SHA. A rollback repoints the affected App Service at the previous tag (`az webapp config container set`) and restarts it. Every previously built image remains available in the registry.
+
+For the two backend APIs (Code publishing), a rollback re-publishes the previous known-good commit: checking out that commit, running `dotnet publish`, and redeploying the resulting build to the affected App Service.
+
+Either path takes a few minutes, with a brief restart window (no deployment slots on the current subscription tier). Where a failure is caused by application code rather than a bad deploy, the responsible commit may also be reverted through a new pull request. Force-pushing or resetting the shared `main` or `dev` branches is not used.
+
+Database schema changes are a known exception: both APIs apply Entity Framework Core migrations automatically on startup, and rolling back the application does not roll back an already-applied migration. A schema-breaking deploy would require a manual, targeted migration rollback in addition to the application rollback described above.
+
 ### 5.6 Deployment Diagram
 ![Deploymnet Diagram](../images/Deployment_diagram.drawio.svg)
 ### 5.7 CI/CD Pipeline Diagram

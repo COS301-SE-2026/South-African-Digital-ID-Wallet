@@ -1,16 +1,19 @@
+import { ChevronRight } from 'lucide-react-native'
 import { Pressable, View } from 'react-native'
 
 import { IconTile, Text } from '@/components/atoms'
 import { cn } from '@/lib/utils'
+import { colors } from '@/theme/colors'
 
 import type { ActivityRowProps } from './types'
-import { timeStamp } from 'console'
 
 export const ActivityRow = ({
   className,
   description,
   Icon,
+  iconShape = 'circle',
   onPress,
+  showChevron = false,
   testID,
   timestamp,
   title,
@@ -26,7 +29,7 @@ export const ActivityRow = ({
       onPress={onPress}
       testID={testID}
     >
-      <IconTile Icon={Icon} shape="circle" size="sm" tone={tone} />
+      <IconTile Icon={Icon} shape={iconShape} size="sm" tone={tone} />
       <View className="flex-1 gap-0.5">
         <Text variant="sub-sm" className="font-semibold text-text-primary">
           {title}
@@ -37,7 +40,12 @@ export const ActivityRow = ({
           </Text>
         ) : null}
       </View>
-      <Text variant="caption">{timestamp}</Text>
+      <View className="flex-row items-center gap-1">
+        <Text variant="caption">{timestamp}</Text>
+        {showChevron ? (
+          <ChevronRight size={16} color={colors.neutralMidGrey} />
+        ) : null}
+      </View>
     </Container>
   )
 }

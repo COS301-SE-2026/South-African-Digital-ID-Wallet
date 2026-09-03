@@ -120,6 +120,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddHealthChecks();
+
 static string UserPartitionKey(HttpContext httpContext) =>
     httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
     ?? httpContext.Connection.RemoteIpAddress?.ToString()
@@ -157,6 +159,9 @@ builder.Services.AddRateLimiter(options =>
         opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         opt.QueueLimit = 0;
     });
+
+    AddUserPartitionedPolicy(options, "resend-device-verification", permitLimit: 3, window: TimeSpan.FromMinutes(1));
+
 
     AddUserPartitionedPolicy(options, "verify-password", permitLimit: 5, window: TimeSpan.FromMinutes(1));
     AddUserPartitionedPolicy(options, "email-change-request", permitLimit: 5, window: TimeSpan.FromMinutes(1));
@@ -213,6 +218,9 @@ app.UseCors(FrontendCorsPolicy);
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapControllers();
+
+app.MapHealthChecks("/health");
 app.MapControllers();
 
 await app.RunAsync();

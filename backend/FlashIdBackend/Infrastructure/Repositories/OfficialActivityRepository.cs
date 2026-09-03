@@ -33,6 +33,24 @@ public class OfficialActivityRepository : IOfficialActivityRepository
             .ToListAsync();
     }
 
+    public async Task<int> CountVerificationsTodayByInstitutionAsync(
+        Guid institutionId,
+        DateTime fromUtc,
+        DateTime toUtc)
+    {
+        return await (
+            from auditLog in _context.AuditLogs.AsNoTracking()
+            join official in _context.Officials.AsNoTracking()
+                on auditLog.ActorId equals official.UserId
+            where official.InstitutionId == institutionId
+                  && auditLog.CreatedAt >= fromUtc
+                  && auditLog.CreatedAt < toUtc
+                  && auditLog.EventType == AuditEventType.CredentialVerified
+            select auditLog.Id
+        ).CountAsync();
+    }
+
+
     public async Task<(List<OfficialHistoryItemDto> Items, int TotalCount)> GetInstitutionHistoryAsync(
         Guid institutionId,
         string? search,
@@ -47,6 +65,7 @@ public class OfficialActivityRepository : IOfficialActivityRepository
         var trimmedSearch = string.IsNullOrWhiteSpace(search) ? null : search.Trim();
         var searchMatchesFailed = trimmedSearch != null && "failed".Contains(trimmedSearch, StringComparison.OrdinalIgnoreCase);
         var searchMatchesSuccess = trimmedSearch != null && "success".Contains(trimmedSearch, StringComparison.OrdinalIgnoreCase);
+        var searchMatchesAccess = trimmedSearch != null && "access".Contains(trimmedSearch, StringComparison.OrdinalIgnoreCase);
         var failedEvents = AuditEventTypeExtensions.FailedEvents;
 
         var query =
@@ -57,7 +76,7 @@ public class OfficialActivityRepository : IOfficialActivityRepository
             where official.InstitutionId == institutionId
             select new { log, official, citizen };
 
-        query = query.Where(x => !AuditEventTypeExtensions.ViewEvents.Contains(x.log.EventType));
+        query = query.Where(x => x.log.EventType != AuditEventType.AuditLogViewed);
 
         if (action.HasValue)
             query = query.Where(x => x.log.EventType == action.Value);
@@ -70,8 +89,17 @@ public class OfficialActivityRepository : IOfficialActivityRepository
 
         if (!string.IsNullOrWhiteSpace(type))
         {
-            var wantFailed = string.Equals(type, "Failed", StringComparison.OrdinalIgnoreCase);
-            query = query.Where(x => failedEvents.Contains(x.log.EventType) == wantFailed);
+            if (string.Equals(type, "Access", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.Where(x => AuditEventTypeExtensions.ViewEvents.Contains(x.log.EventType));
+            }
+            else
+            {
+                var wantFailed = string.Equals(type, "Failed", StringComparison.OrdinalIgnoreCase);
+                query = query.Where(x =>
+                    !AuditEventTypeExtensions.ViewEvents.Contains(x.log.EventType) &&
+                    failedEvents.Contains(x.log.EventType) == wantFailed);
+            }
         }
 
         if (trimmedSearch != null)
@@ -85,7 +113,10 @@ public class OfficialActivityRepository : IOfficialActivityRepository
                 EF.Functions.Like(x.official.Names, $"%{trimmedSearch}%") ||
                 EF.Functions.Like(x.official.Surname, $"%{trimmedSearch}%") ||
                 (searchMatchesFailed && failedEvents.Contains(x.log.EventType)) ||
-                (searchMatchesSuccess && !failedEvents.Contains(x.log.EventType)));
+                (searchMatchesAccess && AuditEventTypeExtensions.ViewEvents.Contains(x.log.EventType)) ||
+                (searchMatchesSuccess &&
+                    !failedEvents.Contains(x.log.EventType) &&
+                    !AuditEventTypeExtensions.ViewEvents.Contains(x.log.EventType)));
         }
 
         var totalCount = await query.CountAsync();
@@ -100,6 +131,7 @@ public class OfficialActivityRepository : IOfficialActivityRepository
                 CreatedAt = DateTime.SpecifyKind(x.log.CreatedAt, DateTimeKind.Utc),
                 x.log.EventType,
                 x.log.Details,
+                x.log.IpAddress,
                 CitizenNames = x.citizen != null ? x.citizen.Names : null,
                 CitizenSurname = x.citizen != null ? x.citizen.Surname : null,
                 CitizenSaId = x.citizen != null ? x.citizen.SaId : null,
@@ -118,9 +150,26 @@ public class OfficialActivityRepository : IOfficialActivityRepository
             CitizenSaId = r.CitizenSaId,
             PerformedBy = $"{r.OfficialNames} {r.OfficialSurname}",
             Outcome = AuditEventTypeExtensions.ToOutcome(r.EventType),
+            IpAddress = r.IpAddress,
         }).ToList();
 
         return (items, totalCount);
+    }
+
+    public async Task<List<string>> GetInstitutionActionsAsync(Guid institutionId)
+    {
+        var eventTypes = await (
+            from log in _context.AuditLogs.AsNoTracking()
+            join official in _context.Officials.AsNoTracking() on log.ActorId equals official.UserId
+            where official.InstitutionId == institutionId
+                  && !AuditEventTypeExtensions.ViewEvents.Contains(log.EventType)
+            select log.EventType
+        ).Distinct().ToListAsync();
+
+        return eventTypes
+            .Select(eventType => eventType.ToString())
+            .OrderBy(name => name)
+            .ToList();
     }
 
     public async Task AddAuditLogAsync(AuditLog auditLog)
