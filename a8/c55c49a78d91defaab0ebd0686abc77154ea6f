@@ -1,0 +1,14 @@
+mobile/app.json
+  h_712d174fc3f309 3-4,16,34-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "a8c55c49a78d91defaab0ebd0686abc77154ea6f",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
