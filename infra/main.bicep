@@ -159,6 +159,9 @@ var apiFlashIdSettings = concat(
     { name: 'Qr__Ed25519PrivateKey', value: '${kv}Qr--Ed25519PrivateKey)' }
     { name: 'SmsPortal__ApiKey', value: '${kv}SmsPortal--ApiKey)' }
     { name: 'SmsPortal__ApiSecret', value: '${kv}SmsPortal--ApiSecret)' }
+    // Face API
+    { name: 'AzureFace__Endpoint', value: faceApi.outputs.faceApiEndpoint }
+    { name: 'AzureFace__ApiKey', value: '${kv}AzureFace--ApiKey)' }
   ],
   corsSettings
 )

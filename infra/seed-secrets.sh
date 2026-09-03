@@ -47,6 +47,10 @@ prompt_and_set "DOCKER-REGISTRY-SERVER-PASSWORD"   "ACR password (from portal > 
 prompt_and_set "ConnectionStrings--DefaultConnection-Flashid" "SQL connection string for sqldb-flashid-${ENV} (Server=tcp:sql-flashid.database.windows.net,1433;...)"
 prompt_and_set "ConnectionStrings--DefaultConnection-GovRegistry" "SQL connection string for sqldb-gov-registry (shared dev+prod. Same value both times)"
 
+# FaceAPI
+prompt_and_set "AzureFace--ApiKey"   "Azure Face API key (from portal > face-digitalwallet-dev > Keys and Endpoint)"
+
+
 echo "----------------------------------------"
 echo "Done. All secrets seeded into ${VAULT_NAME}"
 echo ""
