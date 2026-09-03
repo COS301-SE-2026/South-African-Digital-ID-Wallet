@@ -57,7 +57,7 @@ resource sqlDatabases 'Microsoft.Sql/servers/databases@2023-08-01-preview' = [
     name: db.name
     location: location
     sku: {
-      name: db.?skuName ?? 'GP_S_Gen5_1'
+      name: db.?skuName ?? 'GP_S_Gen5'
       tier: db.?skuTier ?? 'GeneralPurpose'
       family: 'Gen5'
       capacity: db.?capacity ?? 1

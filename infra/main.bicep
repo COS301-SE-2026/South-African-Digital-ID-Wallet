@@ -8,7 +8,7 @@ param location string = 'southafricanorth'
 param baseName string = 'flashid'
 
 @description('App Service Plan SKU (e.g. B1 for dev, S1 or P1v3 for prod)')
-param appServiceSkuName string = 'B1'
+param appServiceSkuName string = 'B1' // will be B2 for demos
 
 @description('Enable always-on for App Services (recommended for prod)')
 param appServiceAlwaysOn bool = false

@@ -25,7 +25,7 @@ param healthCheckPath string = ''
 resource appService 'Microsoft.Web/sites@2024-11-01' = {
   name: '${namePrefix}-${env}'
   location: location
-  kind: 'app,linux'
+  kind: startsWith(linuxFxVersion, 'DOCKER|') ? 'app,linux,container' : 'app,linux'
   identity: {
     type: 'SystemAssigned'
   }

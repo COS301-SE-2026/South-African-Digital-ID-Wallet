@@ -5,7 +5,7 @@ param location = 'southafricanorth'
 param baseName = 'flashid'
 
 // App Service
-param appServiceSkuName = 'B1'
+param appServiceSkuName = 'B1' // will be B2 for demos
 param appServiceAlwaysOn = false
 
 // App URLs
