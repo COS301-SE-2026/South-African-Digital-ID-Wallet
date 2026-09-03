@@ -1,0 +1,24 @@
+web/src/components/organisms/consent-to-verify/consent-to-verify.tsx
+  h_293a8616118f65 1-130
+web/src/components/organisms/consent-to-verify/index.ts
+  h_293a8616118f65 1
+web/src/components/organisms/consent-to-verify/types.ts
+  h_293a8616118f65 1-7
+web/src/components/organisms/ready-to-verify/index.ts
+  h_293a8616118f65 1
+web/src/components/organisms/ready-to-verify/ready-to-verify.tsx
+  h_293a8616118f65 1-128
+web/src/components/organisms/ready-to-verify/types.ts
+  h_293a8616118f65 1-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "71713a1027221d59ab3228d0eaa17799814e7f50",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
