@@ -1,0 +1,16 @@
+docs/demo3/SAS-v2.md
+  h_99fca60b892ff4 884-896
+docs/demo3/SRS-v3.md
+  h_99fca60b892ff4 252-254
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "5f45385962c72cab8173ae31d4ff4e75d32d7be0",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
