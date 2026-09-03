@@ -1,0 +1,17 @@
+backend/FlashIdBackend/Application/Common/Services/PhysicalIdentityVerificationService.cs
+  h_293a8616118f65 82,108,112-113,117,119,136,151,163-168,191,217,222-226,232,377
+  h_293a8616118f65 111,114,116,118,120-126,140,152,169,192,221,227-229,233,376
+backend/FlashIdBackend/Presentation/ExceptionHandling/GlobalExceptionHandler.cs
+  h_293a8616118f65 64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "09cb0243579ef8a8cacd4a9da0be0c0cc87a4145",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
