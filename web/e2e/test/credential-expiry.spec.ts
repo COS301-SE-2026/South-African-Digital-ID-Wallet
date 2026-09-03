@@ -7,7 +7,15 @@ test.describe.serial('Automatic credential expiry', () => {
     })
     const page = await context.newPage()
     const cookies = await context.cookies()
+    console.log(
+      'COOKIES:',
+      cookies.map(
+        (c) =>
+          `${c.name}=${c.value.slice(0, 8)}... (domain=${c.domain}, path=${c.path})`
+      )
+    )
     const csrfToken = cookies.find((c) => c.name === 'csrf_token')?.value
+    console.log('CSRF TOKEN FOUND:', csrfToken ?? 'NONE')
     const response = await page.request.post('/api/credentials/expiry-check', {
       headers: csrfToken ? { 'X-CSRF-Token': csrfToken } : {},
     })
