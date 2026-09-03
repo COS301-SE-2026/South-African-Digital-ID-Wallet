@@ -210,4 +210,34 @@ The View Dashboards subsystem allows each authenticated user type to view a role
 - **Sections 19-22 - Security Safeguards:** Each dashboard is restricted to its own role. Citizens, officials, and government administrators can't view one another's dashboard.
 - **Section 23 - Access to Personal Information:** Citizens can view their own account and activity data.
 
+## 9. View Government admin audit logs
+
+The Audit Logs subsystem allows an authenticated Government Administrator to view, search, and inspect the actions recorded across the platform, supporting oversight and investigation of credential, account, and institutional changes.
+
+![View Dashboards Use Case Diagram](../images/gov-audit-logs.drawio.svg)
+
+### View government admin audit logs
+
+**TUCBW:** This use case begins with an authenticated Government Administrator navigating to the audit logs page.
+
+**TUCEW:** This use case ends with the paginated list of audit log entries displayed, showing the timestamp, action, user, role, entity, and details.
+
+### Search government admin audit logs
+
+**TUCBW:** This use case begins with the Government Administrator entering a search term while viewing the audit logs list.
+
+**TUCEW:** This use case ends with the list filtered to entries matching the search term with the result count and pagination updated accordingly.
+
+### View government admin audit log details
+
+**TUCBW:** This use case begins with the Government Administrator selecting an entry from the audit logs list to view its details.
+
+**TUCEW:** This use case ends with the full detail record displayed.
+
+### POPIA Compliance
+
+- **Section 8 - Accountability:** Every view of an individual audit log's details is itself traceable to the administrator who performed it, keeping oversight of sensitive system history accountable.
+- **Sections 19-22 - Security Safeguards:** Access to audit logs is restricted to the Government Administrator role; other roles cannot view system-wide audit history.
+- **Section 23 - Access to Personal Information:** Audit log entries that reference a citizen or official's actions are only accessible to administrators for legitimate oversight purposes, not for general browsing.
+
 ---
