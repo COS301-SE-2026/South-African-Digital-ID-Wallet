@@ -22,6 +22,7 @@ South African Digital ID Wallet - FlashID, is a secure national-scale digital id
 ## Table of Contents
 
 - [Table of Contents](#table-of-contents)
+- [Live Deployment](#live-deployment)
 - [Demo Videos](#demo-videos)
 - [Contact Us](#contact-us)
 - [Documentation](#documentation)
@@ -31,6 +32,13 @@ South African Digital ID Wallet - FlashID, is a secure national-scale digital id
 - [Badges](#badges)
 
 ---
+
+## Live Deployment
+
+**Production:** [flashid.co.za](https://flashid.co.za)
+**Dev:** [web-flashid-dev](https://web-flashid-dev-c5f2gbd8hbcqf8h2.southafricanorth-01.azurewebsites.net)
+
+Deployment is fully automated via GitHub Actions .See [SAS 5 Deployment](docs/demo3/SAS-v2.md#5-deployment) for architecture, environment parity, secrets management, and rollback strategy.
 
 
 ## Demo Videos
@@ -82,7 +90,14 @@ t3chtitansgo@gmail.com
 <details>
 <summary><strong>Demo 3 Documentation</strong></summary>
 
-
+🔗 [SAS](docs/demo3/SAS-v2.md) <br> 
+🔗 [SRS](docs/demo3/SRS-v3.md) <br> 
+🔗 [User Manual](docs/demo3/user-manual%20(1).pdf) <br> 
+🔗 [Brand style guide](docs/demo3/FlashID.pdf) <br> 
+🔗 [Testing Policy Document](docs/demo3/TESTING_POLICY.md) <br> 
+🔗 [Coding Standards](docs/demo3/coding_standards.md) <br> 
+🔗 [OpenAPI Spec (FlashID)](docs/demo3/openapi.yaml) <br> 
+🔗 [OpenAPI Spec (Government Registry)](docs/demo3/openapi-government-registry.yaml) <br> 
 
 </details>
 
