@@ -323,8 +323,11 @@ public class QrServiceIntegrationTests
     {
         using var context = CreateContext();
         var service = CreateQrService(context);
+        var (user, citizen) = CreateCitizenWithUser();
+        await SeedAsync(context, user, citizen);
 
-        await Assert.ThrowsAsync<InvalidDisclosureTokenException>(() => service.ResolveAsync("not-a-valid-base64!", Guid.NewGuid(), LocalHostIp));
+        await Assert.ThrowsAsync<InvalidDisclosureTokenException>(
+            () => service.ResolveAsync("not-a-valid-base64!", user.Id, LocalHostIp));
     }
 
     [Fact]

@@ -19,6 +19,13 @@ public interface IOfficialActivityRepository
         int pageSize
     );
 
+    Task<int> CountVerificationsTodayByInstitutionAsync(
+        Guid institutionId,
+        DateTime fromUtc,
+        DateTime toUtc
+    );
+
+    Task<List<string>> GetInstitutionActionsAsync(Guid institutionId);
     Task AddAuditLogAsync(AuditLog auditLog);
     Task SaveChangesAsync();
 }

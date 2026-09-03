@@ -1,11 +1,10 @@
-import { View } from 'react-native'
+import { ActivityPage } from '@/components/pages'
 
-import { Text } from '@/components/atoms'
-
-export default function CitizenScreen() {
+export default function CitizenActivityScreen() {
   return (
-    <View className="flex-1 items-center justify-center bg-cream-background">
-      <Text variant="h2">activity</Text>
-    </View>
+    <ActivityPage
+      subtitle="Everything that has happened on your identity."
+      title="Activity"
+    />
   )
 }
