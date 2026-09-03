@@ -1,134 +1,72 @@
 'use client'
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Text } from '@/components/atoms/text'
 import { GovAdminAuditLogTable } from '@/components/organisms/gov-admin-audit-log-table'
 import { GovAdminAuditLogDetailsPanel } from '@/components/organisms/gov-admin-audit-log-table/gov-admin-audit-log-details-panel'
 import type { GovAdminAuditLogRow } from '@/components/organisms/gov-admin-audit-log-table/types'
+import { getGovAdminAuditLogs } from '@/services/gov-admin-audit-log-service/gov-admin-audit-log-service'
 
 const RESULTS_PER_PAGE = 10
-
-const MOCK_AUDIT_LOGS: GovAdminAuditLogRow[] = [
-  {
-    id: '1',
-    createdAt: '2024-06-02T10:42:15',
-    action: 'REVOKE_CREDENTIAL',
-    outcome: 'Success',
-    userName: 'Nomsa P. Dlamini',
-    role: 'Government Administrator',
-    entityType: "Driver's Licence",
-    entityId: 'DL-2024-0089123',
-    description: "Driver's Licence revoked by administrator.",
-    ipAddress: '102.168.1.23',
-    device: 'Windows 11 • Chrome 125.0',
-    location: 'Pretoria, South Africa',
-    previousStatus: 'Active',
-    newStatus: 'Revoked',
-    revocationReason: 'Document compromised',
-  },
-  {
-    id: '2',
-    createdAt: '2024-06-02T10:40:02',
-    action: 'ISSUE_CREDENTIAL',
-    outcome: 'Success',
-    userName: 'Thabo Ndlovu',
-    role: 'Government Administrator',
-    entityType: 'ID Document',
-    entityId: 'ID-2024-0001234',
-    description: 'ID Document issued to citizen.',
-    ipAddress: '102.168.1.23',
-    device: 'Windows 11 • Chrome 125.0',
-    location: 'Pretoria, South Africa',
-  },
-  {
-    id: '3',
-    createdAt: '2024-06-02T10:31:48',
-    action: 'LOGIN_SUCCESS',
-    outcome: 'Success',
-    userName: 'Thandi Mokoena',
-    role: 'Super Administrator',
-    entityType: undefined,
-    entityId: undefined,
-    description: 'Successful login via Web Portal.',
-    ipAddress: '102.168.1.23',
-    device: 'Windows 11 • Chrome 125.0',
-    location: 'Pretoria, South Africa',
-  },
-  {
-    id: '4',
-    createdAt: '2024-06-02T10:28:19',
-    action: 'UPDATE_OFFICIAL',
-    outcome: 'Success',
-    userName: 'Mandla Bhengu',
-    role: 'Government Administrator',
-    entityType: 'Official Profile',
-    entityId: 'OFF-000245',
-    description: 'Official profile details updated.',
-    ipAddress: '102.168.1.23',
-    device: 'Windows 11 • Chrome 125.0',
-    location: 'Pretoria, South Africa',
-  },
-  {
-    id: '5',
-    createdAt: '2024-06-02T10:19:07',
-    action: 'CREATE_INSTITUTION',
-    outcome: 'Success',
-    userName: 'Thandi Mokoena',
-    role: 'Super Administrator',
-    entityType: 'Institution',
-    entityId: 'INS-000078',
-    description: 'New institution created.',
-    ipAddress: '102.168.1.23',
-    device: 'Windows 11 • Chrome 125.0',
-    location: 'Pretoria, South Africa',
-  },
-  {
-    id: '6',
-    createdAt: '2024-06-02T10:12:33',
-    action: 'PASSWORD_RESET',
-    outcome: 'Success',
-    userName: 'Nomsa P. Dlamini',
-    role: 'Government Administrator',
-    entityType: 'Official',
-    entityId: 'OFF-000311',
-    description: 'Password reset for official account.',
-    ipAddress: '102.168.1.23',
-    device: 'Windows 11 • Chrome 125.0',
-    location: 'Pretoria, South Africa',
-  },
-]
+const SEARCH_DEBOUNCE_MS = 300
 
 export default function AuditLogPage() {
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedRow, setSelectedRow] = useState<GovAdminAuditLogRow | null>(
     null
   )
   const [isPanelOpen, setIsPanelOpen] = useState(false)
-  const filteredRows = useMemo(() => {
-    const query = search.trim().toLowerCase()
-    if (!query) return MOCK_AUDIT_LOGS
-    return MOCK_AUDIT_LOGS.filter((row) =>
-      [
-        row.action,
-        row.userName,
-        row.role,
-        row.entityType,
-        row.entityId,
-        row.ipAddress,
-      ]
-        .filter(Boolean)
-        .some((field) => field!.toLowerCase().includes(query))
-    )
+
+  const [rows, setRows] = useState<GovAdminAuditLogRow[]>([])
+  const [totalResults, setTotalResults] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedSearch(search)
+      setCurrentPage(1)
+    }, SEARCH_DEBOUNCE_MS)
+    return () => clearTimeout(timeout)
   }, [search])
-  const totalResults = filteredRows.length
+
+  useEffect(() => {
+    let ignore = false
+    const load = async () => {
+      setIsLoading(true)
+      setError(null)
+      try {
+        const res = await getGovAdminAuditLogs({
+          page: currentPage,
+          pageSize: RESULTS_PER_PAGE,
+          search: debouncedSearch.trim() || undefined,
+        })
+        if (!ignore) {
+          setRows(res.items)
+          setTotalResults(res.totalCount)
+        }
+      } catch (err) {
+        console.error('Failed to load audit logs', err)
+        if (!ignore) {
+          setError('Could not load audit logs.')
+          setRows([])
+          setTotalResults(0)
+        }
+      } finally {
+        if (!ignore) setIsLoading(false)
+      }
+    }
+    load()
+    return () => {
+      ignore = true
+    }
+  }, [currentPage, debouncedSearch])
+
   const totalPages = Math.max(1, Math.ceil(totalResults / RESULTS_PER_PAGE))
-  const paginatedRows = useMemo(() => {
-    const start = (currentPage - 1) * RESULTS_PER_PAGE
-    return filteredRows.slice(start, start + RESULTS_PER_PAGE)
-  }, [filteredRows, currentPage])
+
   const handleSearchChange = (value: string) => {
     setSearch(value)
-    setCurrentPage(1)
   }
   const handleViewDetails = (row: GovAdminAuditLogRow) => {
     setSelectedRow(row)
@@ -137,6 +75,7 @@ export default function AuditLogPage() {
   const handleClosePanel = () => {
     setIsPanelOpen(false)
   }
+
   return (
     <div className="flex h-full w-full flex-col gap-4 p-6">
       <Text
@@ -146,18 +85,24 @@ export default function AuditLogPage() {
       >
         Audit Log
       </Text>
-      <GovAdminAuditLogTable
-        rows={paginatedRows}
-        search={search}
-        onSearchChange={handleSearchChange}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalResults={totalResults}
-        resultsPerPage={RESULTS_PER_PAGE}
-        onPageChange={setCurrentPage}
-        onViewDetails={handleViewDetails}
-        isLoading={false}
-      />
+      {error ? (
+        <p className="text-sm text-red-600" role="alert">
+          {error}
+        </p>
+      ) : (
+        <GovAdminAuditLogTable
+          rows={rows}
+          search={search}
+          onSearchChange={handleSearchChange}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalResults={totalResults}
+          resultsPerPage={RESULTS_PER_PAGE}
+          onPageChange={setCurrentPage}
+          onViewDetails={handleViewDetails}
+          isLoading={isLoading}
+        />
+      )}
       <GovAdminAuditLogDetailsPanel
         row={selectedRow}
         isOpen={isPanelOpen}
