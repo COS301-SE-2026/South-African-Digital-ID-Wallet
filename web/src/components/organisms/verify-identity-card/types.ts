@@ -1,4 +1,6 @@
 export type VerifyIdentityCardProps = {
+  readonly isOpen?: boolean
+  readonly onClose?: () => void
   readonly steps?: string[]
   readonly currentStep?: number
   readonly activationCode: string
