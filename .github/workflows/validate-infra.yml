@@ -1,5 +1,5 @@
 name: Validate Infrastructure (What-If)
-# on main
+
 on:
   push:
     branches: 
