@@ -46,8 +46,8 @@ export const citizenQuickActions: QuickAction[] = [
   {
     href: '/citizen/activity',
     Icon: ShieldCheck,
-    label: 'Verify Identity',
-    name: 'verify-identity',
+    label: 'Activity',
+    name: 'activity',
     tone: 'blue',
   },
 ]

@@ -150,11 +150,7 @@ export const LoginForm = ({ onForgotPassword, onRegister }: LoginFormProps) => {
           className="self-end"
           hitSlop={6}
           onPress={onForgotPassword}
-        >
-          <Text variant="caption" className="font-semibold text-primary-green">
-            Forgot password?
-          </Text>
-        </Pressable>
+        ></Pressable>
         {submitError ? (
           <Text
             accessibilityRole="alert"
