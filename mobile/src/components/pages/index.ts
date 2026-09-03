@@ -1,2 +1,7 @@
 export * from './login'
 export * from './citizen-home'
+export * from './citizen-wallet'
+export * from './credential-detail'
+export * from './qr-scanner'
+export * from './qr-generation'
+export * from './profile'

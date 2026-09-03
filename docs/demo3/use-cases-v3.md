@@ -146,13 +146,13 @@ The Credentials Management subsystem allows the system and government administra
 
 **TUCBW:** This use case begins with the system's scheduled credential expiry check running (automatically every day at 00:00 SAST, or manually triggered by a Government Administrator as a testing action) and identifying an Active driver's license credential whose expiry date has passed.
 
-**TUCEW:** This use case ends with the credential's status being updated to Expired, an audit log entry being recorded, and the citizen being notified in-app.
+**TUCEW:** This use case ends with the credential's status being updated to Expired, an audit log entry being recorded, and the citizen being notified of the expiration in-app.
 
 ### Update Citizen Credentials
 
 **TUCBW:** This use case begins with the system's scheduled update citizen credentials check running (automatically every day at 00:00 SAST, or manually triggered by a Government Administrator as a testing action) and updating any credentials in FlashID that have been updated in the Government Registry.
 
-**TUCEW:** This use case ends with the credential being updated and re-signed with a fresh Ed25519 signature, and the citizen being notified of the update.
+**TUCEW:** This use case ends with the citizen's personal details and/or credentials being updated to match the Government Registry, the credential being re-signed with a fresh Ed25519 signature where applicable, an audit log entry being recorded for each change, and the citizen being notified of the update in-app.
 
 ### Reactivate Driver's License
 
@@ -178,5 +178,36 @@ The Credentials Management subsystem allows the system and government administra
 - **Section 15 — Further Processing Limitation:** Credential data must only be used for valid legal, administrative, or verification purposes.
 - **Section 16 — Information Quality:** Credential records must remain accurate, current, and updated when authoritative source data changes.
 - **Sections 19–22 — Security Safeguards:** Only authorised administrators may update, investigate, or reactivate credentials.
+
+## 8. View Dashboards
+
+The View Dashboards subsystem allows each authenticated user type to view a role-specific landing page summarising information relevant to them: citizens see their account and activity summary, officials see their own recent activity plus their institution's audit history, and government administrators see system-wide status, counts, and analytics.
+
+![View Dashboards Use Case Diagram](../images/View_Dashboard.svg)
+
+### View Citizen Dashboard
+
+**TUCBW:** This use case begins with an authenticated Citizen navigating to their dashboard.
+
+**TUCEW:** This use case ends with the Citizen's account summary, recent activity, and notifications displayed.
+
+### View Official Dashboard
+
+**TUCBW:** This use case begins with an authenticated Official navigating to their dashboard.
+
+**TUCEW:** This use case ends with the Official's own recent activity displayed, and their institution's full audit history available to search and filter, with each such lookup itself recorded as an audit log entry.
+
+### View Government Admin Dashboard
+
+**TUCBW:** This use case begins with an authenticated Government Administrator navigating to their dashboard.
+
+**TUCEW:** This use case ends with system status, headline counts, a system-wide activity feed, and analytics for the selected date range displayed.
+
+### POPIA Compliance
+
+- **Section 8 - Accountability:** An official viewing their institution's audit history is itself an audit-logged event, so access to that data is traceable, not just the data itself.
+- **Section 10 - Minimality:** The official's institution history masks citizen ID numbers rather than displaying them in full. The admin's system-wide feed is restricted to an allow-list of institution/system-level events, excluding citizen-level data from a view that spans institution boundaries.
+- **Sections 19-22 - Security Safeguards:** Each dashboard is restricted to its own role. Citizens, officials, and government administrators can't view one another's dashboard.
+- **Section 23 - Access to Personal Information:** Citizens can view their own account and activity data.
 
 ---

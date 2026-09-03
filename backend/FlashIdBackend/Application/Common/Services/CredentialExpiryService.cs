@@ -101,6 +101,7 @@ public class CredentialExpiryService : ICredentialExpiryService
             Details = $"CredentialId={credential.Id}; Type=DriversLicense; PreviousStatus=Active; ExpiryDate={credential.DriversLicense!.ExpiryDate:yyyy-MM-dd}",
             ActorId = null,
             CreatedAt = DateTime.UtcNow,
+            CitizenId = credential.CitizenId,
         };
     }
 

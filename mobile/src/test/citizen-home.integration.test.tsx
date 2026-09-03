@@ -150,7 +150,7 @@ describe('Citizen home dashboard (integration)', () => {
     await fireEvent.press(screen.getByTestId('quick-actions-my-documents'))
     expect(pushCallback).toHaveBeenCalledWith('/citizen/wallet')
     await fireEvent.press(screen.getByTestId('quick-actions-scan-qr'))
-    expect(pushCallback).toHaveBeenCalledWith('/citizen/present')
+    expect(pushCallback).toHaveBeenCalledWith('/citizen/verify')
   })
 
   it('Should navigate to activity from View all', async () => {

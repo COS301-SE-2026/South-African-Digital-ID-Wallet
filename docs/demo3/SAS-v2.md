@@ -229,6 +229,34 @@ Admin marks a credential as revoked or under investigation.
 **Response 403:** Access denied
 **Response 404:** Credential not found
 
+#### POST /api/credentials/{credentialId}/reinstate
+Admin reinstates a revoked or under-investigation credential back to active.
+**Authentication:** Required for GovernmentAdministrator
+**Path Parameter:** `credentialId` - UUID
+**Request Body:**
+```json
+{
+    "reason": "string"
+}
+```
+**Response 200:** Status updated to Active
+**Response 400:** Credential is not currently Revoked or Investigation
+**Response 403:** Access denied
+**Response 404:** Credential not found
+
+#### GET /api/credentials/search
+Admin searches for citizens by name, surname, or ID number. Empty query returns all citizens, paginated.
+**Authentication:** Required for GovernmentAdministrator
+**Query Parameters:** `query` - string (optional), `page` - int (default 1), `pageSize` - int (default 15)
+**Response 200:** Paginated list of matching citizens. Note: `expiresOn` is only populated if the citizen has a driver's license credential; it is null otherwise.
+
+#### GET /api/credentials/citizen/{citizenId}
+Admin retrieves a specific citizen's full credential list.
+**Authentication:** Required for GovernmentAdministrator
+**Path Parameter:** `citizenId` - UUID
+**Response 200:** List of the citizen's credentials
+**Response 404:** Citizen not found
+
 ### Credential Activation
 
 #### POST /api/activate-credentials
@@ -262,6 +290,30 @@ Manually runs the daily credential-expiry check. Idempotent per SAST calendar da
 
 **Response 403:** Caller is not a Government Administrator
 **Response 409:** Another expiry check is currently running for today
+
+### Credential Update Check
+
+#### POST /api/credentials/update-check
+Manually runs the daily citizen-credential update check. Idempotent per SAST calendar date (if today's check already completed, returns that result without reprocessing, or if another instance is currently running today's check it returns `409`.). Re-fetches each citizen with at least one Active credential from the Government Registry and applies any changed personal details or credential fields, re-signing `Credential.Signature` and notifying the citizen only where a difference was found.
+
+**Authentication:** Required for Government Administrator
+
+**Request Body:** None
+
+**Response 200:**
+```json
+{
+    "runDate": "date",
+    "status": "string",
+    "processedCount": 0,
+    "startedAt": "date",
+    "completedAt": "date",
+    "errorMessage": "string",
+}
+```
+
+**Response 403:** Caller is not a Government Administrator
+**Response 409:** Another update check is currently running for today
 
 ### Citizen Verify
 
@@ -485,7 +537,7 @@ Returns the authenticated citizen's activity history
 
 **Authentication:** Required for Citizen
 
-### Dashboard
+### Citizen Dashboard
 
 #### GET /api/dashboard-account-card/me
 Returns summary account data shown on the citizen's dashboard card.
@@ -609,6 +661,62 @@ Verifies an official's badge token.
 **Response 200:** Badge verified
 **Response 400:** Invalid badge token
 
+#### GET /api/officials/activity/me
+Returns the authenticated official's own recent activity, most recent first.
+
+**Authentication:** Required for Officials
+
+**Query Parameters:** limit (clamped to 1-20, default 5)
+
+**Response 200:**
+```json
+{
+    "items": [
+        {
+            "id": "string",
+            "eventType": "string",
+            "details": "string",
+            "createdAt": "date"
+        }
+    ]
+}
+```
+
+#### GET /api/officials/history
+Returns a paginated, filterable audit history for every official at the caller's own institution. The institution is always resolved server side from the caller's Official record, never accepted as a parameter. Each call is itself audit logged.
+
+**Authentication:** Required for Officials
+
+**Query Parameters:** 
+- `search` - matches action, citizen name, performing official's name, or outcome
+- `action` - filters to a specific audit event type
+- `dateFrom` - inclusive lower bound
+- `dateTo` - inclusive upper bound on timestamp
+- `type` - filters by outcome, "Success" or "Failed"
+- `page` - 1 based page number, clamped to >= 1
+- `pageSize` - clamped to 1-100, default 7
+
+**Response 200:**
+```json
+{
+    "items": [
+        {
+            "id": "string",
+            "createdAt": "date",
+            "action": "string",
+            "citizenName": "string",
+            "citizenIdMasked": "string",
+            "performedBy": "string",
+            "outcome": "string"
+        }
+    ],
+    "page": 0,
+    "pageSize": 0,
+    "totalCount": 0
+}
+```
+`citizenName` and `citizenIdMasked` are null for audit entries that predate the citizen linkage, or that are not tied to a specific citizen. The unmasked citizen ID is never returned by this endpoint.
+
 ### Trusted Devices
 
 #### GET /api/trusted-devices/me
@@ -624,7 +732,63 @@ Unlinks a trusted device from the citizen's account.
 **Path Parameter:** `deviceId` - UUID
 
 **Response 204:** Device unlink
-**Response 404:** Device not found
+**Response 404:** Device not 
+
+### Admin Dashboard
+
+#### GET /api/admin/dashboard-summary
+Returns the admin dashboard landing page summary: system status, headline counts, and a system-wide recent activity feed.
+
+**Authentication:** Required for Government Administrator
+
+**Response 200:**
+```json
+{
+    "systemStatus": {
+        "operational": true,
+        "lastUpdatedAt": "date"
+    },
+    "counts": {
+        "users": 0,
+        "institutions": 0,
+        "credentialsIssued": 0
+    },
+    "activityFeed": [
+        {
+            "id": "string",
+            "eventType": "string",
+            "details": "string",
+            "createdAt": "date"
+        }
+    ]
+}
+```
+`activityFeed` is restricted to an allow-list of institution/system-level event types (`UserRegistered`, `AccountDeleted`, `CredentialIssued`, `CredentialRevoked`, `EmailAddressChanged`, `InstitutionRegistered`, `OfficialVerified`,) so it never surfaces citizen-level data across institution boundaries. Capped at the 10 most recent, not configurable. `systemStatus.operational` is currently a static `true`, not a real health check.
+
+#### GET /api/admin/analytics
+Returns system-wide analytics for the requested data range: verifications, credentials issued, active officials, and active institutions, each with a value, a percentage change against the immediately preceding period of equal length, and a daily bucketed series. Computed live with no pre-aggregation.
+
+**Authentication:** required for Government Admininstrator
+
+**Query Parameter:** range (one of 7d, 30d, 90d. Defaults to 30d if omitted)
+
+**Response 200:**
+```json
+{
+    "verifications": {
+        "value": 0,
+        "changePct": 0,
+        "series": [
+            { "date": "date", "count": 0 }
+        ]
+    },
+    "credentialsIssued": { "value": 0, "changePct": 0, "series": [] },
+    "activeOfficials": { "value": 0, "changePct": 0, "series": [] },
+    "activeInstitutions": { "value": 0, "changePct": 0, "series": [] }
+}
+```
+
+**Response 400:** Invalid `range` value
 
 ### Government Registry Service
 

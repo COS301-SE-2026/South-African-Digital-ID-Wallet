@@ -51,6 +51,7 @@ jobs:
       E2E_GOVADMIN_EMAIL: govadmin.e2e@flashid.local
       E2E_OFFICIAL_EMAIL: official.e2e@flashid.local
       E2E_EXPIRY_CITIZEN_EMAIL: citizen.expiry.e2e@flashid.local
+      AUTH_SKIP_DEVICE_VERIFICATION: 'true'
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5

@@ -141,7 +141,7 @@ public class IssueCredentialService : IIssueCredentialService
     {
         ValidateSaId(saId);
 
-        var citizen = await _repo.GetCitizenBySaIdAsync(saId, cancellationToken) ?? throw new CitizenNotFoundException(saId);
+        var citizen = await _repo.GetCitizenBySaIdAsync(saId, cancellationToken) ?? throw new Application.Features.Citizens.Exceptions.CitizenNotFoundException(saId);
 
         await _repo.AddAuditLogAsync(new AuditLog
         {
@@ -182,7 +182,7 @@ public class IssueCredentialService : IIssueCredentialService
             throw new CitizenConsentRequiredException();
         }
 
-        var citizen = await _repo.GetCitizenBySaIdAsync(request.SaId, cancellationToken) ?? throw new CitizenNotFoundException(request.SaId);
+        var citizen = await _repo.GetCitizenBySaIdAsync(request.SaId, cancellationToken) ?? throw new Application.Features.Citizens.Exceptions.CitizenNotFoundException(request.SaId);
 
         if (citizen.Status != CitizenStatus.Activated) throw new CitizenNotOnboardedException(request.SaId);
 

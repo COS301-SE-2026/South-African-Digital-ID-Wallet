@@ -33,6 +33,10 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
             .WithMany(u => u.AuditLogs)
             .HasForeignKey(a => a.ActorId)
             .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(a => a.Credential)
+            .WithMany()
+            .HasForeignKey(a => a.CredentialId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(a => a.ActorId);
 
@@ -40,9 +44,20 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
 
         builder.HasIndex(a => a.CreatedAt);
 
+        builder.HasIndex(a => a.CredentialId);
+
         builder.HasIndex(a => new { a.ActorId, a.CreatedAt });
 
         builder.HasIndex(a => new { a.EventType, a.CreatedAt });
+
+        builder.HasIndex(a => new { a.CredentialId, a.EventType });
+
+        builder.HasOne(a => a.Citizen)
+            .WithMany()
+            .HasForeignKey(a => a.CitizenId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(a => a.CitizenId);
 
         //for soft deletion
         builder.HasQueryFilter(a => a.Actor == null || !a.Actor.IsDeleted);

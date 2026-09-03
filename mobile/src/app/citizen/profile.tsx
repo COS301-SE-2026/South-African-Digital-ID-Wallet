@@ -1,11 +1,5 @@
-import { View } from 'react-native'
+import { ProfilePage } from '@/components/pages'
 
-import { Text } from '@/components/atoms'
-
-export default function CitizenScreen() {
-  return (
-    <View className="flex-1 items-center justify-center bg-cream-background">
-      <Text variant="h2">profile</Text>
-    </View>
-  )
+export default function Profile() {
+  return <ProfilePage />
 }

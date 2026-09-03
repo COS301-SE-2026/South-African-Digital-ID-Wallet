@@ -32,7 +32,8 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
                 (StatusCodes.Status409Conflict, "Email already registered",
                     exception.Message),
 
-            CitizenNotFoundException =>
+            Application.Features.Citizens.Exceptions.CitizenNotFoundException or
+            Application.Features.Credentials.Exceptions.CitizenNotFoundException =>
                 (StatusCodes.Status404NotFound, "Citizen not found",
                     exception.Message),
 

@@ -86,6 +86,7 @@ public class CitizenVerificationService : ICitizenVerificationService
             ActorId = userId,
             CreatedAt = now,
             IpAddress = ipAddress,
+            CitizenId = citizen.Id,
         };
 
         await _verificationRepository.AddAuditLogAsync(auditLog, cancellationToken);

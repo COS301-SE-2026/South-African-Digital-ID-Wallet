@@ -11,18 +11,21 @@ const CONTAINER_CLASSNAMES: Record<ButtonVariant, string> = {
   primary: 'bg-deep-green',
   secondary: 'border border-border-grey bg-clean-white',
   text: 'bg-transparent',
+  danger: 'border border-danger-red bg-clean-white',
 }
 
 const LABEL_CLASSNAMES: Record<ButtonVariant, string> = {
   primary: 'text-clean-white',
   secondary: 'text-text-primary',
   text: 'text-primary-green',
+  danger: 'text-danger-red',
 }
 
 const ICON_COLORS: Record<ButtonVariant, string> = {
   primary: colors.white,
   secondary: colors.textPrimary,
   text: colors.primaryGreen,
+  danger: colors.danger,
 }
 
 export const BaseButton = ({
