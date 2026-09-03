@@ -13,6 +13,10 @@ export default (phase: string): NextConfig => ({
         source: '/api/:path*',
         destination: `${process.env.API_INTERNAL_URL ?? 'http://localhost:5118'}/api/:path*`,
       },
+      {
+        source: '/citizen/facelivenessdetector-assets/:path*',
+        destination: '/facelivenessdetector-assets/:path*',
+      },
     ]
   },
 })
