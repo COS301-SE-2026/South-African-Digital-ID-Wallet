@@ -6,8 +6,11 @@ test.describe.serial('Automatic credential expiry', () => {
       storageState: 'e2e/.auth/gov-admin.json',
     })
     const page = await context.newPage()
-
-    const response = await page.request.post('/api/credentials/expiry-check')
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((c) => c.name === 'csrf_token')?.value
+    const response = await page.request.post('/api/credentials/expiry-check', {
+      headers: csrfToken ? { 'X-CSRF-Token': csrfToken } : {},
+    })
     expect(response.ok()).toBeTruthy()
 
     const body = await response.json()
