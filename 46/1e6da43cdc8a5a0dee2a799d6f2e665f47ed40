@@ -1,0 +1,29 @@
+backend/FlashIdBackend/k6/nfr2-2-auth.js
+  h_99fca60b892ff4 1-40
+backend/FlashIdBackend/k6/nfr2-4-qr-verification.js
+  s_37572ba18cf0d0::t_965e9b262452b1 1-3,5-23,70
+  h_99fca60b892ff4 4,24-69
+backend/FlashIdBackend/k6/nfr2-3-credentials-and-qr.js
+  h_99fca60b892ff4 1-71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "461e6da43cdc8a5a0dee2a799d6f2e665f47ed40",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_37572ba18cf0d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d879f48a-2ae4-403b-b1a8-951f9c92655d",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
