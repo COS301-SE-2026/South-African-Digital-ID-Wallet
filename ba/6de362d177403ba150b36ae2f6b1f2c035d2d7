@@ -2,6 +2,8 @@ backend/FlashIdBackend/Infrastructure/Repositories/ManageUserAccountRepository.c
   h_0aff3b71f739b1 1-29
 backend/FlashIdBackend/Application/Common/Services/ManageUserAccountService.cs
   h_0aff3b71f739b1 1-34,36-40
+web/src/app/page.tsx
+  h_0aff3b71f739b1 1,4
 ---
 {
   "schema_version": "authorship/3.0.0",
