@@ -79,7 +79,7 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
 
         if (verification.Status != IdentityVerificationStatus.AwaitingConsent)
         {
-            throw new InvalidOperationException("Verification is not awaiting consent.");
+            throw new InvalidVerificationState("Consent cannot be granted because this verification is no longer awaiting consent.");
         }
 
         verification.ConsentGrantedAt = DateTime.UtcNow;
@@ -105,12 +105,25 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
 
         if (verification.ConsentGrantedAt is null)
         {
-            throw new InvalidVerificationState("Consent granted at must be granted before biometric verification.");
+            throw new InvalidVerificationState("Consent must be granted before biometric verification.");
         }
 
-        if (verification.Status != IdentityVerificationStatus.AwaitingDocument)
+        if (
+            verification.Status != IdentityVerificationStatus.AwaitingDocument &&
+            verification.Status != IdentityVerificationStatus.AwaitingLiveness
+        )
         {
-            throw new InvalidVerificationState("Verification is not ready for liveness.");
+            throw new InvalidVerificationState(
+                "A liveness session cannot be created from the current verification state.");
+        }
+
+        if (
+            !string.IsNullOrWhiteSpace(verification.SubmittedSaId) &&
+            verification.SubmittedSaId != cleanSaId
+        )
+        {
+            throw new InvalidVerificationState(
+                "This verification session is already associated with a different South African ID number.");
         }
 
         var citizen = await _governmentRegistryGateway.GetCitizenBySaIdAsync(cleanSaId);
@@ -120,10 +133,11 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
             verification.RegistryIdentityMatched = false;
             verification.Status = IdentityVerificationStatus.Failed;
             verification.FailureReason = "Identity could not be verified against the Government Registry.";
+            verification.UpdatedAt = DateTime.UtcNow;
 
             await _repository.SaveChangesAsync(cancellationToken);
 
-            throw new InvalidVerificationState("Identity could not be verified.");
+            throw new InvalidVerificationState("Identity could not be verified against the Government Registry.");
         }
 
         verification.RegistryIdentityMatched = true;
@@ -133,6 +147,8 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
         {
             verification.Status = IdentityVerificationStatus.Failed;
             verification.FailureReason = "Government Registry portrait is unavailable.";
+
+            verification.UpdatedAt = DateTime.UtcNow;
 
             await _repository.SaveChangesAsync(cancellationToken);
 
@@ -144,7 +160,13 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
 
         if (referenceImage is null)
         {
-            throw new InvalidOperationException("Government Registry portrait could not be retrieved.");
+            verification.Status = IdentityVerificationStatus.Failed;
+            verification.FailureReason =
+                "Government Registry portrait could not be retrieved.";
+            verification.UpdatedAt = DateTime.UtcNow;
+
+            await _repository.SaveChangesAsync(cancellationToken);
+            throw new InvalidVerificationState("Government Registry portrait could not be retrieved.");
         }
 
         var contentType = GetImageContentType(citizen.PhotoBlobName);
@@ -166,7 +188,8 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
 
         if (string.IsNullOrWhiteSpace(verification.AzureLivenessSessionId))
         {
-            throw new InvalidOperationException("Azure liveness session has not been created.");
+            throw new InvalidVerificationState(
+                "Liveness verification has not been started for this session.");
         }
 
         var result = await _faceLivenessServiceProvider.GetLivenessWithVerifyResultAsync(verification.AzureLivenessSessionId, cancellationToken);
@@ -191,13 +214,23 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
             {
                 verification.FailureReason = "Government Registry identity verification failed.";
             }
-            else if (verification.LivenessPassed != true)
+            else if (verification.LivenessPassed == false)
             {
                 verification.FailureReason = "Liveness verification failed.";
             }
+            else if (verification.LivenessPassed is null)
+            {
+                verification.FailureReason = "A liveness verification result could not be obtained.";
+            }
+            else if (verification.RegistryFaceMatched == false)
+            {
+                verification.FailureReason =
+                    "Live face did not match the Government Registry portrait.";
+            }
             else
             {
-                verification.FailureReason = "Live face did not match the Government Registry portrait.";
+                verification.FailureReason =
+                    "A face verification result could not be obtained.";
             }
 
             await _repository.SaveChangesAsync(cancellationToken);
@@ -340,7 +373,8 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
         if (verification.Status == IdentityVerificationStatus.Verified ||
             verification.Status == IdentityVerificationStatus.Failed)
         {
-            throw new InvalidOperationException("Verification session has already completed.");
+            throw new InvalidVerificationState(
+                "This verification session has already completed.");
         }
     }
 
