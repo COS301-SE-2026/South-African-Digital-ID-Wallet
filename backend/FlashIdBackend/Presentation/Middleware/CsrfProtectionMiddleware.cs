@@ -28,7 +28,7 @@ public class CsrfProtectionMiddleware
         if (requiresCheck && !IsValidCsrfToken(context))
         {
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            await context.Response.WriteAsJsonAsync(new { error = "CSRF token missing or invalid." });
+            await context.Response.WriteAsJsonAsync(new { error = "CSRF token missing or invalid." }, context.RequestAborted);
             return;
         }
 
