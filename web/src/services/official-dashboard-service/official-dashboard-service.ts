@@ -13,7 +13,6 @@ export const getOfficialActivity = async (
   const { data } = await api.get<OfficialActivityResponse>(
     OFFICIAL_DASHBOARD_URLS.activity,
     {
-      baseURL: API_BASE_URL,
       params: {
         limit,
       },
@@ -28,7 +27,6 @@ export const getOfficialAuditLogs = async (
   const { data } = await api.get<AuditLogHistoryResponse>(
     OFFICIAL_DASHBOARD_URLS.history,
     {
-      baseURL: API_BASE_URL,
       params: filters,
     }
   )
