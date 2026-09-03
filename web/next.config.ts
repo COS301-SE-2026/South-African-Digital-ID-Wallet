@@ -7,12 +7,4 @@ export default (phase: string): NextConfig => ({
   ...(phase === PHASE_DEVELOPMENT_SERVER
     ? {}
     : { outputFileTracingRoot: path.join(__dirname, '../') }),
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${process.env.API_INTERNAL_URL ?? 'http://localhost:5118'}/api/:path*`,
-      },
-    ]
-  },
 })
