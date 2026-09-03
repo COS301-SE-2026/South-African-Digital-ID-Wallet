@@ -17,4 +17,7 @@ public interface IOfficialActivityService
         int? pageSize,
         string ipAddress
     );
+
+    Task<OfficialHistoryActionsResponseDto> GetInstitutionActionsAsync(Guid userId);
+    Task<OfficialStatsResponseDto> GetMyStatsAsync(Guid userId);
 }
