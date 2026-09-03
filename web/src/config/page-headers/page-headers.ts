@@ -52,10 +52,15 @@ export const pageHeaders: Record<string, PageHeader> = {
     description: 'View and manage your issued digital credentials. ',
   },
 
+  '/citizen/verify-identity': {
+    title: 'Verify Identity',
+    description:
+      'Confirm your identity and link your citizen record to your FlashID account.',
+  },
+
   '/citizen/activate-credentials': {
     title: 'Activate Credentials',
-    description:
-      'Verify your identity and add your credentials to your wallet.',
+    description: 'Add your credentials to your wallet.',
   },
 
   '/citizen/manage-user-account': {

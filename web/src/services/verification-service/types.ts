@@ -12,7 +12,7 @@ export type VerifyCitizenResponse = {
 }
 
 export type IdentityVerificationStatus =
-  | 'AwaitingConsnet'
+  | 'AwaitingConsent'
   | 'AwaitingDocument'
   | 'DocumentProcessing'
   | 'AwaitingIdConfirmation'
