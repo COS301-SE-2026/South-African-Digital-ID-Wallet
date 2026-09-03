@@ -4,6 +4,7 @@ on:
   push:
     branches: 
       - main
+      - dev
       - chore/IaC-biceps
   workflow_dispatch:
     inputs:
@@ -22,12 +23,12 @@ permissions:
 
 jobs:
   what-if:
-    name: What-If (${{ github.event.inputs.environment || 'dev' }})
+    name: What-If (${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'prod' || 'dev') }})
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment || 'dev' }}
+    environment: ${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'prod' || 'dev') }}
 
     env:
-      ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+      ENVIRONMENT: ${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'prod' || 'dev') }}
 
     steps:
       - name: Checkout code
