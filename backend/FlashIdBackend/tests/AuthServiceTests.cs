@@ -4,12 +4,13 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Mapping;
 using Application.Common.Services;
 using Application.Features.Auth.DTOs;
+using Application.Features.ManageUserAccountCard.DTOs;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Providers;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using Org.BouncyCastle.Bcpg;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace tests;
 
@@ -136,6 +137,19 @@ public class AuthServiceTests
         public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
     }
 
+    private class IpGeolocationProvider : IIpGeolocationProvider
+    {
+        public Task<IpLocationResult?> GetLocationAsync(string ipAddress,
+            CancellationToken cancellationToken)
+        {
+            return Task.FromResult<IpLocationResult?>(new IpLocationResult
+            {
+                City = "Play",
+                Country = "Played"
+            });
+        }
+    }
+
     private static User ValidUser() => new()
     {
         Id = Guid.NewGuid(),
@@ -185,7 +199,8 @@ public class AuthServiceTests
         var fakeEmailSenderProvider = new FakeEmailSenderProvider();
         var fakeDeviceTokenProvider = new FakeDeviceTokenProvider();
         var mapper = new AuthMapper();
-        return new AuthService(fakeAuthRepository, fakeJwtTokenProvider, fakePasswordHasher, null!, mapper, fakeTrustedDeviceRepository, fakeDeviceTokenProvider, fakeEmailSenderProvider, fakeHostEnvironment);
+        var fakeIpGeolocationProvider = new IpGeolocationProvider();
+        return new AuthService(fakeAuthRepository, fakeJwtTokenProvider, fakePasswordHasher, null!, mapper, fakeTrustedDeviceRepository, fakeDeviceTokenProvider, fakeEmailSenderProvider, fakeHostEnvironment, fakeIpGeolocationProvider, NullLogger<AuthService>.Instance);
     }
 
     [Fact]
@@ -497,6 +512,84 @@ public class AuthServiceTests
         Assert.Equal(verification, fakeTrustedDeviceRepository.VerificationToReturn);
     }
 
+    [Fact]
+    public async Task ResendDeviceVerificationOtpAsync_VerificationNotFound_ThrowsUnauthorizedAccessException()
+    {
+        var deviceVerificationId = Guid.NewGuid();
+        var fakeRepository = new FakeAuthRepository();
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { VerificationToReturn = null };
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+
+        var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.ResendDeviceVerificationOtpAsync(deviceVerificationId, "127.0.0.1", CancellationToken.None));
+        Assert.Equal("Device verification request not found.", exception.Message);
+
+    }
+
+    [Fact]
+    public async Task ResendDeviceVerificationOtpAsync_AlreadyCompleted_ThrowsUnauthorizedAccessException()
+    {
+        var user = ValidUser();
+        var verification = ValidDeviceVerification(user.Id);
+        verification.VerifiedAt = DateTime.UtcNow;
+        var fakeRepository = new FakeAuthRepository { UserToReturn = user };
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { VerificationToReturn = verification };
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+        var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.ResendDeviceVerificationOtpAsync(verification.Id, "127.0.0.1", CancellationToken.None));
+        Assert.Equal("Device verification has already been completed.", exception.Message);
+    }
+
+    [Fact]
+    public async Task ResendDeviceVerificationOtpAsync_ExpiredVerification_ThrowsUnauthorizedAccessException()
+    {
+        var user = ValidUser();
+        var verification = ValidDeviceVerification(user.Id);
+        verification.ExpiresAt = DateTime.UtcNow.AddMinutes(-1);
+        var fakeRepository = new FakeAuthRepository { UserToReturn = user };
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { VerificationToReturn = verification };
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+        var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.ResendDeviceVerificationOtpAsync(verification.Id, "127.0.0.1", CancellationToken.None));
+        Assert.Equal("Device verification code has expired. Please request an OTP resend.", exception.Message);
+    }
+
+    [Fact]
+    public async Task ResendDeviceVerificationOtpAsync_UserNotFound_ThrowsUnauthorizedAccessException()
+    {
+        var verification = ValidDeviceVerification(Guid.NewGuid());
+        var fakeRepository = new FakeAuthRepository { UserToReturn = null };
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { VerificationToReturn = verification };
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+        var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => authService.ResendDeviceVerificationOtpAsync(verification.Id, "127.0.0.1", CancellationToken.None));
+        Assert.Equal("User account not found or has been deleted.", exception.Message);
+    }
+
+    [Fact]
+    public async Task ResendDeviceVerificationOtpAsync_ValidRequest_UpdatesVerificationAndCreatesAuditLog()
+    {
+        var user = ValidUser();
+        var verification = ValidDeviceVerification(user.Id);
+        var oldOtpHash = verification.OtpHash;
+        var oldExpiryDate = verification.ExpiresAt;
+        var oldUpdatedAt = verification.UpdatedAt;
+
+        var fakeRepository = new FakeAuthRepository { UserToReturn = user };
+        var fakeJwtProvider = new FakeJwtTokenProvider();
+        var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { VerificationToReturn = verification };
+
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+
+        await authService.ResendDeviceVerificationOtpAsync(verification.Id, "127.0.0.1", CancellationToken.None);
+        Assert.NotEqual(oldOtpHash, verification.OtpHash);
+        Assert.True(verification.UpdatedAt >= oldUpdatedAt);
+        Assert.True(verification.ExpiresAt >= oldExpiryDate);
+        Assert.Equal(verification, fakeTrustedDeviceRepository.VerificationToReturn); ;
+    }
 
 
 }

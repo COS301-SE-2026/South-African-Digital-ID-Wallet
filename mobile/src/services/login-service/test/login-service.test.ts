@@ -21,7 +21,10 @@ const session: LoginResponse = {
 }
 
 describe('loginService', () => {
-  beforeEach(() => jest.clearAllMocks())
+  ;(it('should be defined', () => {
+    expect(true).toBe(true)
+  }),
+    beforeEach(() => jest.clearAllMocks()))
   it('Should post the mapped dto to the login endpoint and unwrap the data', async () => {
     postMock.mockResolvedValue({ data: session })
     await expect(

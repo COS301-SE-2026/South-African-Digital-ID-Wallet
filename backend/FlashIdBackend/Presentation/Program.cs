@@ -158,6 +158,9 @@ builder.Services.AddRateLimiter(options =>
         opt.QueueLimit = 0;
     });
 
+    AddUserPartitionedPolicy(options, "resend-device-verification", permitLimit: 3, window: TimeSpan.FromMinutes(1));
+
+
     AddUserPartitionedPolicy(options, "verify-password", permitLimit: 5, window: TimeSpan.FromMinutes(1));
     AddUserPartitionedPolicy(options, "email-change-request", permitLimit: 5, window: TimeSpan.FromMinutes(1));
     AddUserPartitionedPolicy(options, "email-change-resend-otp", permitLimit: 3, window: TimeSpan.FromMinutes(1));
