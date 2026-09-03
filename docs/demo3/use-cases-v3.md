@@ -179,4 +179,35 @@ The Credentials Management subsystem allows the system and government administra
 - **Section 16 — Information Quality:** Credential records must remain accurate, current, and updated when authoritative source data changes.
 - **Sections 19–22 — Security Safeguards:** Only authorised administrators may update, investigate, or reactivate credentials.
 
+## 8. View Dashboards
+
+The View Dashboards subsystem allows each authenticated user type to view a role-specific landing page summarising information relevant to them: citizens see their account and activity summary, officials see their own recent activity plus their institution's audit history, and government administrators see system-wide status, counts, and analytics.
+
+![View Dashboards Use Case Diagram](../images/View_Dashboard.svg)
+
+### View Citizen Dashboard
+
+**TUCBW:** This use case begins with an authenticated Citizen navigating to their dashboard.
+
+**TUCEW:** This use case ends with the Citizen's account summary, recent activity, and notifications displayed.
+
+### View Official Dashboard
+
+**TUCBW:** This use case begins with an authenticated Official navigating to their dashboard.
+
+**TUCEW:** This use case ends with the Official's own recent activity displayed, and their institution's full audit history available to search and filter, with each such lookup itself recorded as an audit log entry.
+
+### View Government Admin Dashboard
+
+**TUCBW:** This use case begins with an authenticated Government Administrator navigating to their dashboard.
+
+**TUCEW:** This use case ends with system status, headline counts, a system-wide activity feed, and analytics for the selected date range displayed.
+
+### POPIA Compliance
+
+- **Section 8 - Accountability:** An official viewing their institution's audit history is itself an audit-logged event, so access to that data is traceable, not just the data itself.
+- **Section 10 - Minimality:** The official's institution history masks citizen ID numbers rather than displaying them in full. The admin's system-wide feed is restricted to an allow-list of institution/system-level events, excluding citizen-level data from a view that spans institution boundaries.
+- **Sections 19-22 - Security Safeguards:** Each dashboard is restricted to its own role. Citizens, officials, and government administrators can't view one another's dashboard.
+- **Section 23 - Access to Personal Information:** Citizens can view their own account and activity data.
+
 ---

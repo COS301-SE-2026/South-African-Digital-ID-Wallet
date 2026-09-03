@@ -184,6 +184,7 @@ public class QrService : IQrService
             IpAddress = ipAddress,
             CredentialId = cred.Id,
             CreatedAt = DateTime.UtcNow,
+            CitizenId = cred.CitizenId,
         });
         await _institutionRepository.SaveChangesAsync();
 
