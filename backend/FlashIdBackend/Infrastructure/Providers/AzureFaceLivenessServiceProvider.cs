@@ -1,145 +1,197 @@
-using System.Net.Http.Headers;
 using System.Text.Json;
+using Azure;
+using Azure.AI.Vision.Face;
 using Application.Common.Interfaces.ProviderInterfaces;
-using Application.Features.ManageUserAccountCard.Exceptions;
-using Application.Features.Verification.Dtos;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using AppLivenessResult = Application.Features.Verification.Dtos.CreateLivenessSessionResult;
+using AppVerificationResult = Application.Features.Verification.Dtos.LivenessVerificationResult;
 
 namespace Infrastructure.Providers;
 
 public class AzureFaceLivenessServiceProvider : IFaceLivenessServiceProvider
 {
+    private readonly FaceSessionClient _sessionClient;
     private readonly HttpClient _httpClient;
     private readonly string _endpoint;
     private readonly string _apiKey;
 
-    public AzureFaceLivenessServiceProvider(HttpClient httpClient, IConfiguration configuration)
+    public AzureFaceLivenessServiceProvider(IConfiguration configuration)
     {
-        _httpClient = httpClient;
-        _endpoint = configuration["AzureFace:Endpoint"] ?? throw new InvalidOperationException("Azure Face endpoint is not configured");
-        _apiKey = configuration["AzureFace:ApiKey"] ?? throw new InvalidOperationException("Azure Face API key is not configured");
+        _endpoint =
+            configuration["AzureFace:Endpoint"] ?? throw new InvalidOperationException("Azure Face endpoint is not configured");
+
+        _apiKey =
+            configuration["AzureFace:ApiKey"] ?? throw new InvalidOperationException("Azure Face API key is not configured");
+
+        _sessionClient = new FaceSessionClient(new Uri(_endpoint), new AzureKeyCredential(_apiKey));
+
+        _httpClient = new HttpClient();
     }
 
-    public async Task<CreateLivenessSessionResult> CreateLivenessWithVerifySessionAsync(Stream referenceImage, string contentType,
-        Guid deviceCorrelationId, CancellationToken cancellationToken)
+    public async Task<AppLivenessResult> CreateLivenessWithVerifySessionAsync(
+        Stream referenceImage, string contentType, Guid deviceCorrelationId, CancellationToken cancellationToken)
     {
-        using var form = new MultipartFormDataContent();
-
-        form.Add(new StringContent("Passive"), "livenessOperationMode");
-        form.Add(new StringContent(deviceCorrelationId.ToString()), "deviceCorrelationId");
-        form.Add(new StringContent("false"), "enableSessionImage");
-
-        using var imageContent = new StreamContent(referenceImage);
-        imageContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
-        form.Add(imageContent, "verifyImage", "reference.jpg");
-
-        using var request = new HttpRequestMessage(HttpMethod.Post, $"{_endpoint.TrimEnd('/')}/face/v1.2/detectLivenessWithVerify-sessions");
-
-        request.Headers.Add("Ocp-Apim-Subscription-Key", _apiKey);
-
-        request.Content = form;
-
-        using var response = await _httpClient.SendAsync(request, cancellationToken);
-
-        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
+        var sessionContent = new CreateLivenessWithVerifySessionContent(LivenessOperationMode.Passive)
         {
-            throw new InvalidOperationException($"Azure Face Session creation failed. Status :{(int)response.StatusCode}. Response:{responseBody}");
-        }
+            DeviceCorrelationId = deviceCorrelationId.ToString(),
+        };
 
-        using var json = JsonDocument.Parse(responseBody);
+        var response = await _sessionClient.CreateLivenessWithVerifySessionAsync(
+            sessionContent, referenceImage, cancellationToken);
 
-        var root = json.RootElement;
-
-        return new CreateLivenessSessionResult
+        return new AppLivenessResult
         {
-            SessionId = root.GetProperty("sessionId").GetString() ?? string.Empty,
-            AuthToken = root.GetProperty("authToken").GetString() ?? string.Empty,
-            Status = root.TryGetProperty("status", out var status) ? status.GetString() : null
+            SessionId = response.Value.SessionId,
+            AuthToken = response.Value.AuthToken,
         };
     }
 
-    public async Task<LivenessVerificationResult> GetLivenessWithVerifyResultAsync(string sessionId,
-        CancellationToken cancellationToken)
+    public async Task<AppVerificationResult> GetLivenessWithVerifyResultAsync(
+        string sessionId, CancellationToken cancellationToken)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get,
-            $"{_endpoint.TrimEnd('/')}/face/v1.2/detectLivenessWithVerify-sessions/{sessionId}");
+        var endpoint =
+            _endpoint.TrimEnd('/');
 
-        request.Headers.Add("Ocp-Apim-Subscription-Key", _apiKey);
+        var url =
+            $"{endpoint}/face/v1.2/" +
+            $"detectLivenessWithVerify-sessions/{sessionId}";
 
-        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        using var request =
+            new HttpRequestMessage(
+                HttpMethod.Get,
+                url);
 
-        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+        request.Headers.Add(
+            "Ocp-Apim-Subscription-Key",
+            _apiKey);
+
+        using var response =
+            await _httpClient.SendAsync(
+                request,
+                cancellationToken);
+
+        var json =
+            await response.Content.ReadAsStringAsync(
+                cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
             throw new InvalidOperationException(
-                $"Azure Face result retrieval failed. Status :{(int)response.StatusCode}. Response:{responseBody}");
+                $"Azure Face result request failed " +
+                $"with status {(int)response.StatusCode}.");
         }
 
-        using var json = JsonDocument.Parse(responseBody);
+        using var document =
+            JsonDocument.Parse(json);
 
-        var root = json.RootElement;
+        var root = document.RootElement;
 
-        var status = root.GetProperty("status").GetString() ?? string.Empty;
+        var status =
+            root.TryGetProperty("status", out var statusElement)
+                ? statusElement.ToString()
+                : "Unknown";
 
-        if (!string.Equals(status, "Succeeded", StringComparison.OrdinalIgnoreCase))
+        if (
+            !root.TryGetProperty("results", out var results) ||
+            !results.TryGetProperty("attempts", out var attempts) ||
+            attempts.ValueKind != JsonValueKind.Array ||
+            attempts.GetArrayLength() == 0)
         {
-            return new LivenessVerificationResult()
+            return new AppVerificationResult
             {
                 Status = status,
-                IsComplete = false
+                IsComplete = false,
             };
         }
 
-        if (!root.TryGetProperty("results", out var results) || !results.TryGetProperty("attempts", out var attempts))
+        var latestAttempt =
+            attempts[attempts.GetArrayLength() - 1];
+
+        var attemptStatus =
+            latestAttempt.TryGetProperty(
+                "attemptStatus",
+                out var attemptStatusElement)
+                ? attemptStatusElement.ToString()
+                : string.Empty;
+
+        if (!string.Equals(
+               attemptStatus,
+               "Succeeded",
+               StringComparison.OrdinalIgnoreCase))
         {
-            return new LivenessVerificationResult()
+            return new AppVerificationResult
             {
-                Status = status,
-                IsComplete = false
+                Status = attemptStatus.Length > 0
+                    ? attemptStatus
+                    : status,
+                IsComplete = false,
             };
         }
 
-        var successfulAttempt = attempts.EnumerateArray().FirstOrDefault(x => string.Equals(x.GetProperty("attemptStatus").GetString(), "Succeeded", StringComparison.OrdinalIgnoreCase));
-
-        if (successfulAttempt.ValueKind == JsonValueKind.Undefined ||
-            !successfulAttempt.TryGetProperty("result", out var result))
-        {
-            return new LivenessVerificationResult()
-            {
-                Status = status,
-                IsComplete = false
-            };
-        }
-
-        var livenessDecision = result.GetProperty("livenessDecision").GetString();
-
+        bool? livenessPassed = null;
         bool? faceMatched = null;
         double? matchConfidence = null;
 
-        if (result.TryGetProperty("verifyResult", out var verifyResult))
+        if (
+            latestAttempt.TryGetProperty(
+                "result",
+                out var resultElement) &&
+            resultElement.ValueKind ==
+                JsonValueKind.Object)
         {
-            if (verifyResult.TryGetProperty("isIdentical", out var isIdentical))
+            if (
+                resultElement.TryGetProperty(
+                    "livenessDecision",
+                    out var decisionElement))
             {
-                faceMatched = isIdentical.GetBoolean();
+                var decision = decisionElement.ToString();
+
+                livenessPassed =
+                    string.Equals(
+                        decision,
+                        "realface",
+                        StringComparison.OrdinalIgnoreCase);
             }
 
-            if (verifyResult.TryGetProperty("matchConfidence", out var confidence))
+            if (
+                resultElement.TryGetProperty(
+                    "verifyResult",
+                    out var verifyResult) &&
+                verifyResult.ValueKind == JsonValueKind.Object)
             {
-                matchConfidence = confidence.GetDouble();
+                if (
+                    verifyResult.TryGetProperty(
+                        "isIdentical",
+                        out var identicalElement))
+                {
+                    faceMatched =
+                        identicalElement.ValueKind switch
+                        {
+                            JsonValueKind.True => true,
+                            JsonValueKind.False => false,
+                            _ => null,
+                        };
+                }
+
+                if (
+                    verifyResult.TryGetProperty(
+                        "matchConfidence",
+                        out var confidenceElement) &&
+                    confidenceElement.TryGetDouble(
+                        out var confidence))
+                {
+                    matchConfidence = confidence;
+                }
             }
         }
 
-        return new LivenessVerificationResult()
+        return new AppVerificationResult
         {
-            Status = status,
-            LivenessPassed = string.Equals(livenessDecision, "realface", StringComparison.OrdinalIgnoreCase),
+            Status = attemptStatus,
+            LivenessPassed = livenessPassed,
             FaceMatched = faceMatched,
             MatchConfidence = matchConfidence,
-            IsComplete = true
+            IsComplete = true,
         };
     }
 }

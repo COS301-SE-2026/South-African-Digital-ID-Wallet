@@ -180,7 +180,8 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
         verification.RegistryFaceMatched = result.FaceMatched;
         verification.UpdatedAt = DateTime.UtcNow;
 
-        var verificationSucceeded = verification.RegistryFaceMatched == true && verification.LivenessPassed == true && verification.RegistryFaceMatched == true;
+        var verificationSucceeded = verification.RegistryIdentityMatched == true && verification.LivenessPassed == true && verification.RegistryFaceMatched == true;
+
 
         if (!verificationSucceeded)
         {
