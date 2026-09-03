@@ -1,0 +1,28 @@
+web/src/app/(portal)/citizen/verify-identity/page.tsx
+  h_293a8616118f65 1-10
+web/src/types/navigation.ts
+  h_293a8616118f65 13
+web/src/config/page-headers/page-headers.ts
+  h_293a8616118f65 55-56,58,63
+  h_293a8616118f65 57,59-60
+web/src/components/organisms/app-sidebar/app-sidebar.tsx
+  h_293a8616118f65 17,41
+web/src/config/navigation/navigation.ts
+  h_293a8616118f65 22-26,30
+  h_293a8616118f65 17-21
+web/src/app/(portal)/citizen/page.tsx
+  h_293a8616118f65 1,4
+web/src/services/verification-service/types.ts
+  h_293a8616118f65 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "19d0a36d171c1f4d2ee546143a6294c8aaeff874",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
