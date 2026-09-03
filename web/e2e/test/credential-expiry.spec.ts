@@ -11,6 +11,11 @@ test.describe.serial('Automatic credential expiry', () => {
     const response = await page.request.post('/api/credentials/expiry-check', {
       headers: csrfToken ? { 'X-CSRF-Token': csrfToken } : {},
     })
+
+    if (!response.ok()) {
+      console.log('STATUS:', response.status())
+      console.log('BODY:', await response.text())
+    }
     expect(response.ok()).toBeTruthy()
 
     const body = await response.json()
