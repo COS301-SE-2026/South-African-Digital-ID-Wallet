@@ -78,7 +78,7 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
   {
     title: 'Security',
     items: [
-      { label: 'Audit Logs', href: '/under-construction', icon: 'history' },
+      { label: 'Audit Logs', href: '/gov-admin/audit-log', icon: 'history' },
       { label: 'Settings', href: '/under-construction', icon: 'settings' },
     ],
   },

@@ -30,11 +30,21 @@ const verifyDevice = async (
   return api.post(url, dto).then((res) => res.data as LoginResponse)
 }
 
+const resendDeviceVerificationOtp = async (
+  deviceVerificationId: string
+): Promise<void> => {
+  console.log(deviceVerificationId)
+  const url = loginUrls.resendVerificationOtp()
+  const response = await api.post(url, { deviceVerificationId })
+  return response.data
+}
+
 const loginService = {
   login,
   getUser,
   logout,
   verifyDevice,
+  resendDeviceVerificationOtp,
 }
 
 export default loginService

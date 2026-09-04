@@ -26,7 +26,7 @@ import type { LoginFormProps } from './types'
 
 const INITIAL_VALUES: LoginFormData = { email: '', password: '' }
 
-export const LoginForm = ({ onForgotPassword, onRegister }: LoginFormProps) => {
+export const LoginForm = ({ onRegister }: LoginFormProps) => {
   const router = useRouter()
   const signIn = useAuthStore((state) => state.signIn)
   const isBiometricEnabled = useAuthStore((state) => state.isBiometricEnabled)
@@ -145,16 +145,6 @@ export const LoginForm = ({ onForgotPassword, onRegister }: LoginFormProps) => {
           placeholder=""
           secure
         />
-        <Pressable
-          accessibilityRole="button"
-          className="self-end"
-          hitSlop={6}
-          onPress={onForgotPassword}
-        >
-          <Text variant="caption" className="font-semibold text-primary-green">
-            Forgot password?
-          </Text>
-        </Pressable>
         {submitError ? (
           <Text
             accessibilityRole="alert"

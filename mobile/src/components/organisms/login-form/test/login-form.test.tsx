@@ -130,15 +130,10 @@ describe('<LoginForm/>', () => {
     expect(useAuthStore.getState().isAuthenticated).toBe(false)
     expect(mockReplace).not.toHaveBeenCalled()
   })
-  it('Should delegate the secondary actions to its props', async () => {
-    const onForgotPassword = jest.fn()
+  it('Should delegate the register action to its props', async () => {
     const onRegister = jest.fn()
-    await render(
-      <LoginForm onForgotPassword={onForgotPassword} onRegister={onRegister} />
-    )
-    await fireEvent.press(screen.getByText('Forgot password?'))
+    await render(<LoginForm onRegister={onRegister} />)
     await fireEvent.press(screen.getByText('Sign up'))
-    expect(onForgotPassword).toHaveBeenCalledTimes(1)
     expect(onRegister).toHaveBeenCalledTimes(1)
   })
   it('Should show the verification form when the device needs verification', async () => {

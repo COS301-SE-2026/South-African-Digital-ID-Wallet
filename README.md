@@ -22,6 +22,7 @@ South African Digital ID Wallet - FlashID, is a secure national-scale digital id
 ## Table of Contents
 
 - [Table of Contents](#table-of-contents)
+- [Live Deployment](#live-deployment)
 - [Demo Videos](#demo-videos)
 - [Contact Us](#contact-us)
 - [Documentation](#documentation)
@@ -31,6 +32,13 @@ South African Digital ID Wallet - FlashID, is a secure national-scale digital id
 - [Badges](#badges)
 
 ---
+
+## Live Deployment
+
+**Production:** [flashid.co.za](https://flashid.co.za)
+**Dev:** [web-flashid-dev](https://web-flashid-dev-c5f2gbd8hbcqf8h2.southafricanorth-01.azurewebsites.net)
+
+Deployment is fully automated via GitHub Actions .See [SAS 5 Deployment](docs/demo3/SAS-v2.md#5-deployment) for architecture, environment parity, secrets management, and rollback strategy.
 
 
 ## Demo Videos
@@ -82,7 +90,14 @@ t3chtitansgo@gmail.com
 <details>
 <summary><strong>Demo 3 Documentation</strong></summary>
 
-
+🔗 [SAS](docs/demo3/SAS-v2.md) <br> 
+🔗 [SRS](docs/demo3/SRS-v3.md) <br> 
+🔗 [User Manual](docs/demo3/user-manual%20(1).pdf) <br> 
+🔗 [Brand style guide](docs/demo3/FlashID.pdf) <br> 
+🔗 [Testing Policy Document](docs/demo3/TESTING_POLICY.md) <br> 
+🔗 [Coding Standards](docs/demo3/coding_standards.md) <br> 
+🔗 [OpenAPI Spec (FlashID)](docs/demo3/openapi.yaml) <br> 
+🔗 [OpenAPI Spec (Government Registry)](docs/demo3/openapi-government-registry.yaml) <br> 
 
 </details>
 
@@ -108,7 +123,7 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Unathi Tshakalisa</strong><br>
-      <img src="docs/images/unathi.JPEG" alt="Unathi Tshakalisa" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+      <img src="docs/images/unathi.JPEG" alt="Unathi Tshakalisa" style="width: 100%; aspect-ratio:3/4; object-fit: cover; display: block; border-radius:12px;">
     </td>
     <td width="20%">
       <code>Team Leader</code><br>
@@ -125,7 +140,7 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Zaynab Samir</strong><br>
-      <img src="docs/images/zaynab.JPEG" alt="Zaynab Samir" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+      <img src="docs/images/zaynab.JPEG" alt="Zaynab Samir" style="width: 100%; aspect-ratio:3/4; object-fit: cover; display: block; border-radius:12px;"
     </td>
     <td width="20%">
       <code>Cybersecurity</code><br>
@@ -142,7 +157,7 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Nathan Chisadza</strong><br>
-      <img src="docs/images/nathan.JPEG" alt="Nathan Chisadza" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+      <img src="docs/images/nathan.JPEG" alt="Nathan Chisadza" style="width: 100%; aspect-ratio:3/4; object-fit: cover; display: block; border-radius:12px;">
     </td>
     <td width="20%">
       <code>Algorithms</code><br>
@@ -159,7 +174,7 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Ryan Liao</strong><br>
-      <img src="docs/images/ryan.JPEG" alt="Ryan Liao" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+      <img src="docs/images/ryan.JPEG" alt="Ryan Liao" style="width: 100%; aspect-ratio:3/4; object-fit: cover; display: block; border-radius:12px;">
     </td>
     <td width="20%">
       <code>Mobile Systems</code><br>
@@ -176,7 +191,7 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Dominiqu Nigatu</strong><br>
-      <img src="docs/images/dom.PNG" alt="Dominiqu Nigatu" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+      <img src="docs/images/dom.PNG" alt="Dominiqu Nigatu" style="width: 100%; aspect-ratio:3/4; object-fit: cover; display: block; border-radius:12px;">
     </td>
     <td width="20%">
       <code>Integration Systems</code><br>
