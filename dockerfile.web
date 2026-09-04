@@ -28,6 +28,7 @@ RUN --mount=type=secret,id=AZUREFACEAPIREGISTRY,env=AZUREFACEAPIREGISTRY \
     --mount=type=secret,id=AZUREFACEAPIUSERNAME,env=AZUREFACEAPIUSERNAME \
     --mount=type=secret,id=AZUREFACEAPIPASSWORD,env=AZUREFACEAPIPASSWORD \
     --mount=type=secret,id=AZUREFACEAPIEMAIL,env=AZUREFACEAPIEMAIL \
+    echo "Azure registry: $(pnpm config get @azure-ai-vision-face:registry)" && \
     pnpm install --frozen-lockfile --filter ./web...
 
 # ---------- builder ----------
