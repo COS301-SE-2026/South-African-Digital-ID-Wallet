@@ -30,7 +30,16 @@ public class TrustedDevicesController : ControllerBase
 
             var userId = Guid.Parse(userIdClaim);
 
-            Request.Cookies.TryGetValue("flashid_device", out var currentDeviceToken);
+            string? currentDeviceToken = null;
+            if (Request.Headers.TryGetValue("X-Device-Token", out var deviceHeader)
+            && !string.IsNullOrWhiteSpace(deviceHeader))
+            {
+                currentDeviceToken = deviceHeader.ToString();
+            }
+            else if (Request.Cookies.TryGetValue("flashid_device", out var deviceCookie))
+            {
+                currentDeviceToken = deviceCookie;
+            }
 
             var result = await _trustedDeviceService.GetMyTrustedDevicesAsync(userId, currentDeviceToken);
 

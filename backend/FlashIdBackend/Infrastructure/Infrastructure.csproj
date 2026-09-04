@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <PackageReference Include="Azure.AI.Vision.Face" Version="1.0.0-beta.2" />
         <PackageReference Include="Azure.Communication.Sms" Version="1.1.0-beta.3" />
         <PackageReference Include="BCrypt.Net-Next" Version="4.2.1" />
         <PackageReference Include="MailKit" Version="4.17.0" />
@@ -24,6 +25,9 @@
         <PackageReference Include="NSec.Cryptography" Version="26.4.0" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
         <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
+        <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.46.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.8" />
     </ItemGroup>
     
     <ItemGroup>

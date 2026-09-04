@@ -1,7 +1,6 @@
 const qrUrls = {
-  generate: (credentialId: string) =>
+  generate: (credentialId: string): string =>
     `/api/credentials/${credentialId}/qr-token`,
-  mine: () => '/api/credentials/mine',
 }
 
 export default qrUrls

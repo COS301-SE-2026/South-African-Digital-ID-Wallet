@@ -29,6 +29,8 @@ jobs:
         run: dotnet build ./backend/FlashIdBackend --no-restore --configuration Release
 
       - name: Run tests with coverage
+        env:
+          COSMOS_TEST_CONNECTION_STRING: ${{ secrets.COSMOS_TEST_CONNECTION_STRING }}
         run: dotnet test ./backend/FlashIdBackend --no-build --configuration Release --coverage --coverage-output-format cobertura --results-directory ./backend/TestResults
 
       - name: Upload coverage to Codecov

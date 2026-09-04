@@ -1,17 +1,18 @@
+import { PHASE_DEVELOPMENT_SERVER } from 'next/dist/shared/lib/constants'
 import type { NextConfig } from 'next'
 import path from 'node:path'
 
-const nextConfig: NextConfig = {
+export default (phase: string): NextConfig => ({
   output: 'standalone',
-  outputFileTracingRoot: path.join(__dirname, '../'),
+  ...(phase === PHASE_DEVELOPMENT_SERVER
+    ? {}
+    : { outputFileTracingRoot: path.join(__dirname, '../') }),
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
-        destination: `${process.env.API_INTERNAL_URL ?? 'http://localhost:5118'}/api/:path*`,
+        source: '/citizen/facelivenessdetector-assets/:path*',
+        destination: '/facelivenessdetector-assets/:path*',
       },
     ]
   },
-}
-
-export default nextConfig
+})

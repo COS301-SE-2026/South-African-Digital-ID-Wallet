@@ -3,7 +3,6 @@ using System.Text;
 using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
-using Domain.Entities;
 using Infrastructure.Gateways.GovernmentRegistry;
 using Infrastructure.Providers;
 using Infrastructure.Repositories;
@@ -13,6 +12,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Azure.Storage.Blobs;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Services;
+using Microsoft.Azure.Cosmos;
+using User = Domain.Entities.User;
+using Infrastructure.Repositories.Decorators;
+using Infrastructure.BackgroundJobs;
 
 namespace Infrastructure;
 
@@ -41,7 +44,17 @@ public static class DependencyInjection
 
         services.AddScoped<ICredentialRepository, CredentialRepository>();
         services.AddSingleton<IQrSigningProvider, Ed25519SigningProvider>();
-        services.AddScoped<IQrDisclosureTokenRepository, QrDisclosureTokenRepository>();
+        services.AddSingleton(n =>
+        {
+            var configuration = n.GetRequiredService<IConfiguration>();
+            var connectionString = configuration["Cosmos:ConnectionString"] ?? throw new InvalidOperationException("Cosmos:ConnectionString is not configured.");
+            return new CosmosClient(connectionString, new CosmosClientOptions
+            {
+                SerializerOptions = new CosmosSerializationOptions
+                { PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase },
+            });
+        });
+        services.AddScoped<IQrDisclosureTokenRepository, CosmosQrDisclosureTokenRepository>();
         services.AddSingleton(n =>
         {
             var configuration = n.GetRequiredService<IConfiguration>();
@@ -52,6 +65,8 @@ public static class DependencyInjection
         services.AddScoped<IDisclosedFieldsValueResolver, DisclosedFieldValueResolver>();
 
         services.AddScoped<IOfficialRepository, OfficialRepository>();
+        services.AddScoped<IOfficialActivityRepository, OfficialActivityRepository>();
+
         services.AddScoped<IManageUserAccountRepository, ManageUserAccountRepository>();
         services.AddScoped<IUpdatePasswordRepository, UpdatePasswordRepository>();
         services.AddScoped<IDeleteAccountRepository, DeleteAccountRepository>();
@@ -87,6 +102,32 @@ public static class DependencyInjection
         services.AddScoped<ISmsProvider, AzureCommunicationSmsProvider>();
         services.AddScoped<IVerificationRepository, VerificationRepository>();
         services.AddScoped<ICredentialsActivationRepository, CredentialsActivationRepository>();
+
+        services.AddHttpClient<IIpGeolocationProvider, IpGeolocationProvider>((serviceProvider, client) =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["IpGeolocation:BaseUrl"];
+
+            if (string.IsNullOrWhiteSpace(baseUrl))
+            {
+                throw new InvalidOperationException("IpGeolocation BaseUrl configuration is missing.");
+            }
+
+            client.BaseAddress = new Uri(baseUrl);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        });
+
+        services.AddScoped<CredentialExpiryRepository>();
+        services.AddScoped<ICredentialExpiryRepository>(sp => new RetryingCredentialExpiryRepositoryDecorator(sp.GetRequiredService<CredentialExpiryRepository>()));
+        services.AddHostedService<CredentialExpiryBackgroundService>();
+
+        services.AddScoped<CredentialUpdateRepository>();
+        services.AddScoped<ICredentialUpdateRepository>(sp => new RetryingCredentialUpdateRepositoryDecorator(sp.GetRequiredService<CredentialUpdateRepository>()));
+        services.AddHostedService<CredentialUpdateBackgroundService>();
+
+        services.AddScoped<IGovAdminAuditLogRepository, GovAdminAuditLogRepository>();
+        services.AddSingleton<IFaceLivenessServiceProvider, AzureFaceLivenessServiceProvider>();
+        services.AddScoped<IPhysicalIdentityVerificationRepository, PhysicalIdentityVerificationRepository>();
         return services;
     }
 }

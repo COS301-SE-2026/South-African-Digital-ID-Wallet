@@ -28,8 +28,15 @@ jobs:
           version: 9.15.9
 
       - name: Install dependencies
+        env:
+            AZUREFACEAPIREGISTRY: ${{ secrets.AZUREFACEAPIREGISTRY }}
+            AZUREFACEAPIUSERNAME: ${{ secrets.AZUREFACEAPIUSERNAME }}
+            AZUREFACEAPIPASSWORD: ${{ secrets.AZUREFACEAPIPASSWORD }}
+            AZUREFACEAPIEMAIL: ${{ secrets.AZUREFACEAPIEMAIL }}
         run: pnpm install --frozen-lockfile
         working-directory: ./web
+        
+        
 
       - name: Build
         run: pnpm run build

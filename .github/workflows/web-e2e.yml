@@ -14,7 +14,7 @@ jobs:
   e2e:
     name: Playwright E2E
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     services:
       sqlserver:
@@ -41,11 +41,19 @@ jobs:
       Jwt__Key: dev-only-super-secret-key-that-is-long-enough-123456789
       JWT_SECRET: dev-only-super-secret-key-that-is-long-enough-123456789
       Qr__Ed25519PrivateKey: ${{ secrets.QR_ED25519_PRIVATE_KEY }}
+      Cosmos__ConnectionString: ${{ secrets.COSMOS_TEST_CONNECTION_STRING }}
+      Cosmos__DatabaseName: FlashIdQrDb
+      Cosmos__ContainerName: QrTokenClaims
+      Cosmos__CredentialIdHmacKey: ${{ secrets.COSMOS_CREDENTIAL_ID_HMAC_KEY }}
       BlobStorage__ConnectionString: UseDevelopmentStorage=true
       E2E_PASSWORD: password123
       E2E_CITIZEN_EMAIL: citizen.e2e@flashid.local
       E2E_GOVADMIN_EMAIL: govadmin.e2e@flashid.local
       E2E_OFFICIAL_EMAIL: official.e2e@flashid.local
+      IPGEOLOCATION__APIKEY: ${{secrets.IPGEOLOCATION_APIKEY}}
+      IPGEOLOCATION__BASEURL: ${{secrets.IPGEOLOCATION_BASEURL}}
+      E2E_EXPIRY_CITIZEN_EMAIL: citizen.expiry.e2e@flashid.local
+      AUTH_SKIP_DEVICE_VERIFICATION: 'true'
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
@@ -68,9 +76,17 @@ jobs:
       - name: Install web dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
         working-directory: ./web
+        env:
+            AZUREFACEAPIREGISTRY: ${{ secrets.AZUREFACEAPIREGISTRY }}
+            AZUREFACEAPIUSERNAME: ${{ secrets.AZUREFACEAPIUSERNAME }}
+            AZUREFACEAPIPASSWORD: ${{ secrets.AZUREFACEAPIPASSWORD }}
+            AZUREFACEAPIEMAIL: ${{ secrets.AZUREFACEAPIEMAIL }}
 
       - name: Restore backend
         run: dotnet restore backend/FlashIdBackend/FlashIdBackend.sln
+
+      - name: Seed E2E data
+        run: dotnet run --project backend/FlashIdBackend/Tools/SeedRunner/SeedRunner.csproj -- "${{ env.ConnectionStrings__DefaultConnection }}"
 
       - name: Start backend (migrations and seeds)
         run: |
@@ -86,9 +102,6 @@ jobs:
               sleep 3
           done
           echo "Backend failed to start. Log:"; cat backend.log; exit 1
-
-      - name: Seed E2E data
-        run: dotnet run --project backend/FlashIdBackend/Tools/SeedRunner/SeedRunner.csproj -- "${{ env.ConnectionStrings__DefaultConnection }}"
         
       - name: Verify E2E accounts exist
         run: |
@@ -104,6 +117,12 @@ jobs:
             echo "$e.e2e@flashid.local -> HTTP $code $(cat /tmp/resp.json)"
             [ "$code" = "200" ] || fail=1
           done
+          code=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
+            -X POST http://localhost:5118/api/auth/login \
+            -H "Content-Type: application/json" \
+            -d '{"email":"citizen.expiry.e2e@flashid.local","password":"password123","rememberMe":false}')
+          echo "citizen.expiry.e2e@flashid.local -> HTTP $code $(cat /tmp/resp.json)"
+          [ "$code" = "200" ] || fail=1
           [ $fail -eq 0 ] || { echo "::error::E2E accounts missing or backend rejecting logins"; exit 1; }
 
       - name: Install Playwright browsers

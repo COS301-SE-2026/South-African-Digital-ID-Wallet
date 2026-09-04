@@ -1,9 +1,5 @@
 import type { SidebarNavSection } from '@/types/navigation'
 
-{
-  /*TODO: Unstub hrefs */
-}
-
 export const citizenNavSections: SidebarNavSection[] = [
   {
     title: 'Citizen Portal',
@@ -18,17 +14,20 @@ export const citizenNavSections: SidebarNavSection[] = [
         href: '/citizen/my-credentials',
         icon: 'credentials',
       },
-      { label: 'Verifications', href: '/citizen/verifications', icon: 'users' },
-      { label: 'Share QR Code', href: '/citizen/qr', icon: 'qr' },
       {
-        label: 'Activate Credentials',
-        href: '/citizen/activate-credentials',
+        label: 'Verifications',
+        href: '/citizen/verifications',
+        icon: 'users',
+      },
+      {
+        label: 'Verify My Identity',
+        href: '/citizen/verify-identity',
         icon: 'shield',
       },
       {
-        label: 'Notifications',
-        href: '/under-construction',
-        icon: 'notifications',
+        label: 'Activate Credentials',
+        href: '/citizen/activate-credentials',
+        icon: 'idCard',
       },
     ],
   },
@@ -49,14 +48,15 @@ export const citizenNavSections: SidebarNavSection[] = [
   },
 ]
 
-{
-  /* TODO: add government and officials nav bar items */
-}
 export const governmentAdminNavSections: SidebarNavSection[] = [
   {
     title: 'Government Admin',
     items: [
-      { label: 'Dashboard', href: '/gov-admin', icon: 'dashboard' },
+      {
+        label: 'Dashboard',
+        href: '/gov-admin/gov-admin-dashboard',
+        icon: 'dashboard',
+      },
       {
         label: 'Upload Institution',
         href: '/gov-admin/upload-institution',
@@ -68,9 +68,9 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
         icon: 'institutions',
       },
       {
-        label: 'Notifications',
-        href: '/under-construction',
-        icon: 'notifications',
+        label: 'Manage Credentials',
+        href: '/gov-admin/manage-credentials',
+        icon: 'institutions',
       },
     ],
   },
@@ -78,7 +78,7 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
   {
     title: 'Security',
     items: [
-      { label: 'Audit Logs', href: '/under-construction', icon: 'history' },
+      { label: 'Audit Logs', href: '/gov-admin/audit-log', icon: 'history' },
       { label: 'Settings', href: '/under-construction', icon: 'settings' },
     ],
   },
@@ -88,21 +88,25 @@ export const officialsNavSections: SidebarNavSection[] = [
   {
     title: 'Officials',
     items: [
-      { label: 'Dashboard', href: '/officials', icon: 'dashboard' },
+      {
+        label: 'Dashboard',
+        href: '/officials/officials-dashboard',
+        icon: 'dashboard',
+      },
       {
         label: 'Onboard Citizen',
         href: '/officials/onboard-citizen',
         icon: 'onboard',
       },
       {
+        label: "Issue Driver's Licence",
+        href: '/officials/issue-drivers-license',
+        icon: 'credentials',
+      },
+      {
         label: 'Verifications',
         href: '/officials/verifications',
         icon: 'users',
-      },
-      {
-        label: 'Notifications',
-        href: '/under-construction',
-        icon: 'notifications',
       },
     ],
   },

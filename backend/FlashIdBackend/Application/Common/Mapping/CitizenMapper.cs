@@ -1,6 +1,7 @@
 using Application.Features.Citizens.DTOs;
 using Domain.Entities;
 using Riok.Mapperly.Abstractions;
+using Application.Features.Credentials.DTOs;
 
 namespace Application.Common.Mapping;
 
@@ -11,4 +12,9 @@ public partial class CitizenMapper
     [MapProperty(nameof(User.Email), nameof(RegisterCitizenResponseDto.Email))]
     [MapProperty(nameof(User.CreatedAt), nameof(RegisterCitizenResponseDto.CreatedAt))]
     public partial RegisterCitizenResponseDto CitizenToRegisterResponseDto(User user);
+
+    [MapperIgnoreTarget(nameof(CitizenCredentialStatusResponseDto.PhoneNumber))]
+    [MapperIgnoreTarget(nameof(CitizenCredentialStatusResponseDto.Email))]
+    [MapperIgnoreTarget(nameof(CitizenCredentialStatusResponseDto.ExistingCredentials))]
+    public partial CitizenCredentialStatusResponseDto CitizenToStatusResponseDto(Citizen citizen);
 }

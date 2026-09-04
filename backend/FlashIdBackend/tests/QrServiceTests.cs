@@ -22,6 +22,10 @@ public class QrServiceTests
         public Task<Citizen?> GetCitizenByIdAsync(Guid citizenId, CancellationToken cancellationToken) => Task.FromResult(CitizenToReturn);
         public Task<Citizen?> GetCitizenByUserIdAsync(Guid userId) => Task.FromResult(CitizenToReturn);
         public Task<List<Credential>> GetCredentialsByCitizenIdAsync(Guid citizenId) => Task.FromResult(CredentialsToReturn);
+        public Task<(List<Citizen> Citizens, int TotalCount)> SearchCitizensAsync(string? query, int page, int pageSize) => Task.FromResult((new List<Citizen>(), 0));
+        public Task<Citizen?> GetCitizenByCitizenIdAsync(Guid citizenId) => Task.FromResult(CitizenToReturn);
+        public Task<(int VerificationCount, DateTime? LastVerifiedAt, int DistinctIpCount)> GetActivitySummaryAsync(Guid credentialId) => Task.FromResult((0, (DateTime?)null, 0));
+        public Task SaveChangesAsync() => Task.CompletedTask;
     }
 
     private sealed class FakeQrSigningProvider : IQrSigningProvider
@@ -56,12 +60,6 @@ public class QrServiceTests
             }
             return Task.CompletedTask;
         }
-
-        public Task<int> PurgeExpiredAsync(DateTime olderThan)
-        {
-            var removed = Tokens.RemoveAll(q => q.ExpiresAt < olderThan);
-            return Task.FromResult(removed);
-        }
     }
 
     private sealed class FakeInstitutionRepository : IInstitutionRepository
@@ -83,6 +81,7 @@ public class QrServiceTests
     private sealed class FakePhotoStorageProvider : IPhotoStorageProvider
     {
         public Task<string> GenerateReadSasUrlAsync(string blobName, TimeSpan ttl) => Task.FromResult($"https://fake-blob-sas.local/{blobName}");
+        public Task<Stream?> OpenReadAsync(string blobName, CancellationToken cancellationToken) => Task.FromResult<Stream?>(null);
     }
 
     private static Credential ValidCredential(Guid userId, CredentialStatus status = CredentialStatus.Active)

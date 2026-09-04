@@ -34,6 +34,14 @@ public static class DependencyInjection
         services.AddSingleton<ManageUserAccountMapper>();
         services.AddScoped<IUpdatePasswordService, UpdatePasswordService>();
         services.AddScoped<IDeleteAccountService, DeleteAccountService>();
+        services.AddScoped<ICredentialExpiryService, CredentialExpiryService>();
+        services.AddSingleton<CredentialExpiryMapper>();
+        services.AddScoped<IOfficialActivityService, OfficialActivityService>();
+        services.AddScoped<IIssueCredentialService, IssueCredentialService>();
+        services.AddScoped<ICredentialUpdateService, CredentialUpdateService>();
+        services.AddSingleton<CredentialUpdateMapper>();
+        services.AddScoped<IGovAdminAuditLogService, GovAdminAuditLogService>();
+        services.AddScoped<IPhysicalIdentityVerificationService, PhysicalIdentityVerificationService>();
         return services;
     }
 }

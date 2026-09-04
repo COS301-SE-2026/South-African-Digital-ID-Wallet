@@ -5,11 +5,14 @@ import toast from 'react-hot-toast'
 import { RefreshCw, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/atoms'
 import { DashboardModal } from '@/components/molecules/dashboard-modal/dashboard-modal'
+import { loginService } from '@/services'
+import axios from 'axios'
 
 type OtpModalProps = {
   open: boolean
   onClose: () => void
   onSuccess: (otp: string) => Promise<void>
+  deviceVerificationId?: string
 }
 
 const OTP_LENGTH = 6
@@ -18,9 +21,10 @@ export function OtpModal({
   open,
   onClose,
   onSuccess,
+  deviceVerificationId,
 }: Readonly<OtpModalProps>) {
   const [otp, setOtp] = React.useState<string[]>(Array(OTP_LENGTH).fill(''))
-
+  const [isResending, setIsResending] = React.useState(false)
   const inputRefs = React.useRef<(HTMLInputElement | null)[]>([])
 
   const otpCode = otp.join('')
@@ -76,10 +80,32 @@ export function OtpModal({
   }
 
   const handleResend = async () => {
+    if (!deviceVerificationId) {
+      toast.error('Device verifictaion ID is missing.')
+      return
+    }
+
+    setIsResending(true)
     try {
+      await loginService.resendDeviceVerificationOtp(deviceVerificationId)
       toast.success('A new verification code has been sent.')
-    } catch {
+    } catch (error) {
+      console.error('Resend device verification error:', error)
+
+      if (axios.isAxiosError(error)) {
+        console.error('Status:', error.response?.status)
+        console.error('Response:', error.response?.data)
+
+        const message =
+          error.response?.data?.error ?? 'Could not resend verification code.'
+
+        toast.error(message)
+        return
+      }
+
       toast.error('Could not resend verification code.')
+    } finally {
+      setIsResending(false)
     }
   }
 
@@ -135,7 +161,7 @@ export function OtpModal({
 
         <div className="flex justify-center">
           <Button
-            className="w-40"
+            className="w-40 bg-primary hover:bg-deep-green"
             onClick={handleVerify}
             disabled={otpCode.length !== OTP_LENGTH}
           >
@@ -146,6 +172,7 @@ export function OtpModal({
         <button
           type="button"
           onClick={handleResend}
+          disabled={isResending}
           className="
             mx-auto
             flex
@@ -155,10 +182,14 @@ export function OtpModal({
             font-medium
             text-primary-green
             hover:text-emerald-700
+            disabled:opacity-50
+            disabled:cursor-not-allowed
           "
         >
-          <RefreshCw className="h-4 w-4" />
-          Resend code
+          <RefreshCw
+            className={`h-4 w-4 ${isResending ? 'animate-spin' : ''}`}
+          />
+          {isResending ? 'Sending...' : 'Resend code'}
         </button>
       </div>
     </DashboardModal>

@@ -8,4 +8,5 @@ public interface IAuthService
     Task<LogoutResponseDto> LogoutAsync(Guid userId, string ipAddress);
     Task<UserProfileDto?> GetCurrentUserAsync(Guid userId);
     Task<LoginResponseDto> VerifyDeviceAsync(VerifyDeviceRequestDto request, string? existingDeviceToken, string? ipAddress, CancellationToken cancellationToken);
+    Task ResendDeviceVerificationOtpAsync(Guid deviceVerificationId, string ipAddress, CancellationToken cancellationToken);
 }

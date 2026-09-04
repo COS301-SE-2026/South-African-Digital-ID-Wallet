@@ -3,10 +3,18 @@ name: Mobile CI
 on:
   push:
     branches: ["main", "dev"]
-    paths: ['mobile/**']
+    paths:
+      - 'mobile/**'
+      - 'pnpm-lock.yaml'
+      - 'package.json'
+      - '.github/workflows/mobile.yml'
   pull_request:
     branches: ["main", "dev"]
-    paths: ['mobile/**']
+    paths:
+      - 'mobile/**'
+      - 'pnpm-lock.yaml'
+      - 'package.json'
+      - '.github/workflows/mobile.yml'
 
 jobs:
   build-and-test:
@@ -17,27 +25,36 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
-        with:
-          expo-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          node-version: '20.20.0'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        working-directory: ./mobile
+        env:
+            AZUREFACEAPIREGISTRY: ${{ secrets.AZUREFACEAPIREGISTRY }}
+            AZUREFACEAPIUSERNAME: ${{ secrets.AZUREFACEAPIUSERNAME }}
+            AZUREFACEAPIPASSWORD: ${{ secrets.AZUREFACEAPIPASSWORD }}
+            AZUREFACEAPIEMAIL: ${{ secrets.AZUREFACEAPIEMAIL }}
+
+      - name: Lint
+        run: pnpm --filter ./mobile run lint:check
+
+      - name: Type check
+        run: pnpm --filter ./mobile run type-check
 
       - name: Run tests with coverage
-        run: pnpm test -- --coverage
-        working-directory: ./mobile
+        run: pnpm --filter ./mobile run test:coverage
+
+      - name: Export bundle
+        run: pnpm --filter ./mobile run build
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

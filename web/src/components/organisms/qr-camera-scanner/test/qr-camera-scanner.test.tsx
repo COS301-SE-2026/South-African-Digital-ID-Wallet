@@ -76,7 +76,7 @@ describe('QrCameraScanner', () => {
     render(<QrCameraScanner onScan={() => {}} />)
 
     await waitFor(() => {
-      expect(screen.getByText(/camera access was denied/i)).toBeInTheDocument()
+      expect(screen.getByText(/camera access denied/i)).toBeInTheDocument()
     })
   })
 
@@ -86,7 +86,7 @@ describe('QrCameraScanner', () => {
     render(<QrCameraScanner onScan={() => {}} />)
 
     await waitFor(() => {
-      expect(screen.getByText(/camera could not be found/i)).toBeInTheDocument()
+      expect(screen.getByText(/no camera found/i)).toBeInTheDocument()
     })
   })
 

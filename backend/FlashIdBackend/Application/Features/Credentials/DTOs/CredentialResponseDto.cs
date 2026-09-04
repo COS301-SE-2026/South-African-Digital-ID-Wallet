@@ -16,7 +16,20 @@ public class DriversLicenseDetailDto
     public string Restrictions { get; set; } = string.Empty;
     public DateTime ExpiryDate { get; set; }
 }
-
+public class CredentialCitizenDto
+{
+    public string FullName { get; set; } = string.Empty;
+    public string IdNumber { get; set; } = string.Empty;
+    public DateTime DateOfBirth { get; set; }
+    public string? Email { get; set; }
+    public string? Phone { get; set; }
+}
+public class CredentialActivityDto
+{
+    public int Verifications { get; set; }
+    public DateTime? LastVerifiedAt { get; set; }
+    public int DevicesUsed { get; set; }
+}
 public class CredentialResponseDto
 {
     public Guid Id { get; set; }
@@ -33,4 +46,6 @@ public class CredentialResponseDto
 
     public IdentityDocumentDetailDto? IdentityDocument { get; set; }
     public DriversLicenseDetailDto? DriversLicense { get; set; }
+    public CredentialCitizenDto? Citizen { get; set; }
+    public CredentialActivityDto? Activity { get; set; }
 }

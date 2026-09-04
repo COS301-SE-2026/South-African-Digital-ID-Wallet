@@ -9,4 +9,9 @@ public interface ICredentialRepository
     Task<Credential?> GetByIdAsync(Guid id);
     Task<List<Credential>> GetByUserIdAsync(Guid userId);
     Task<Citizen?> GetCitizenByIdAsync(Guid userId, CancellationToken cancellationToken);
+    Task SaveChangesAsync();
+    Task<(List<Citizen> Citizens, int TotalCount)> SearchCitizensAsync(string? query, int page, int pageSize);
+    Task<Citizen?> GetCitizenByCitizenIdAsync(Guid citizenId);
+    Task<(int VerificationCount, DateTime? LastVerifiedAt, int DistinctIpCount)> GetActivitySummaryAsync(Guid credentialId);
+
 }

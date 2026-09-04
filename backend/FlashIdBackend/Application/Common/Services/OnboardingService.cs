@@ -143,6 +143,7 @@ public class OnboardingService : IOnboardingService
             ActorId = officialId,
             IpAddress = ipAddress,
             CreatedAt = now,
+            CitizenId = citizen.Id,
         };
 
         var onboardAudit = new AuditLog
@@ -152,7 +153,8 @@ public class OnboardingService : IOnboardingService
             Details = $"Citizen, {citizenRecord.SaId}, has been onboarded into FlashID system with a pending account by Home Affairs Official, {officialId}.",
             ActorId = officialId,
             IpAddress = ipAddress,
-            CreatedAt = now
+            CreatedAt = now,
+            CitizenId = citizen.Id,
         };
 
         await _onboardingRepository.AddAuditLogAsync(consentAudit);
@@ -217,7 +219,7 @@ public class OnboardingService : IOnboardingService
 
         var token = Uri.EscapeDataString(rawToken);
 
-        return $"{baseUrl}/citizen/activate-credentials?token={token}";
+        return $"{baseUrl}/citizen/verify-identity?token={token}";
     }
 
     private static string BuildEmailMessage(string activationLink, string name)

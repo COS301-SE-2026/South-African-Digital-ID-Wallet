@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:webpack": "next dev --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --fix",
@@ -18,6 +19,7 @@
     "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
+    "@azure/ai-vision-face-ui": "^1.5.1",
     "@hookform/error-message": "2.0.1",
     "@hookform/resolvers": "5.2.2",
     "@radix-ui/react-avatar": "1.1.11",
@@ -49,6 +51,7 @@
     "react-dom": "19.2.4",
     "react-hook-form": "7.75.0",
     "react-hot-toast": "2.6.0",
+    "recharts": "3.10.1",
     "shadcn": "4.7.0",
     "tailwind-merge": "3.5.0",
     "tailwindcss-animate": "1.0.7",

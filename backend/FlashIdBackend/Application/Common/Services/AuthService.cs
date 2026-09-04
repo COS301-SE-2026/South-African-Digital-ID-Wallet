@@ -7,9 +7,11 @@ using Application.Common.Mapping;
 using Application.Features.Auth.DTOs;
 using Application.Features.Auth.Exceptions;
 using Application.Features.Citizens.DTOs;
+using Application.Features.ManageUserAccountCard.DTOs;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Common.Services;
 
@@ -25,6 +27,8 @@ public class AuthService : IAuthService
     private readonly IDeviceTokenProvider _deviceTokenProvider;
     private readonly IEmailSenderProvider _emailSenderProvider;
     private readonly IHostEnvironment _environment;
+    private readonly IIpGeolocationProvider _ipGeolocationProvider;
+    private readonly ILogger<AuthService> _logger;
 
     public AuthService(
         IAuthRepository authRepository,
@@ -35,7 +39,9 @@ public class AuthService : IAuthService
         ITrustedDeviceRepository trustedDeviceRepository,
         IDeviceTokenProvider deviceTokenProvider,
         IEmailSenderProvider emailSenderProvider,
-            IHostEnvironment environment)
+            IHostEnvironment environment,
+        IIpGeolocationProvider ipGeolocationProvider,
+        ILogger<AuthService> logger)
     {
         _authRepository = authRepository;
         _jwtTokenProvider = jwtTokenProvider;
@@ -46,6 +52,8 @@ public class AuthService : IAuthService
         _deviceTokenProvider = deviceTokenProvider;
         _emailSenderProvider = emailSenderProvider;
         _environment = environment;
+        _ipGeolocationProvider = ipGeolocationProvider;
+        _logger = logger;
 
     }
 
@@ -108,7 +116,13 @@ public class AuthService : IAuthService
 
         var trustedDevice = await FindTrustedDeviceAsync(user, deviceToken, cancellationToken);
 
-        if (trustedDevice is null)
+        var skipDeviceVerification = _environment.IsDevelopment() && string.Equals(
+            Environment.GetEnvironmentVariable("AUTH_SKIP_DEVICE_VERIFICATION"),
+            "true",
+            StringComparison.OrdinalIgnoreCase
+        );
+
+        if (trustedDevice is null && !skipDeviceVerification)
         {
             var verification = await CreateDeviceVerificationAsync(user, ipAddress, cancellationToken);
 
@@ -124,8 +138,11 @@ public class AuthService : IAuthService
             };
         }
 
-        trustedDevice.LastActive = DateTime.UtcNow;
-        await _trustedDeviceRepository.UpdateTrustedDeviceAsync(trustedDevice, cancellationToken);
+        if (trustedDevice is not null)
+        {
+            trustedDevice.LastActive = DateTime.UtcNow;
+            await _trustedDeviceRepository.UpdateTrustedDeviceAsync(trustedDevice, cancellationToken);
+        }
 
         user.LastLoginAt = DateTime.UtcNow;
         await _authRepository.UpdateUserAsync(user);
@@ -144,12 +161,16 @@ public class AuthService : IAuthService
 
         var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user, request.RememberMe);
 
+        var citizen = await _authRepository.GetCitizenByUserIdAsync(user.Id);
+
         return new LoginResponseDto
         {
             Token = token,
             ExpiresAt = expiresAt,
             UserId = user.Id,
             Role = user.Role.ToString(),
+            Names = citizen?.Names,
+            Surname = citizen?.Surname,
             RequiresDeviceVerification = false,
         };
     }
@@ -225,9 +246,25 @@ public class AuthService : IAuthService
         var hashedToken = _deviceTokenProvider.HashToken(rawDeviceToken);
 
         var existingTrustedDevice = await _trustedDeviceRepository.GetByTokenHashAsync(user.Id, hashedToken, cancellationToken);
-
+        IpLocationResult? location = null;
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(ipAddress))
+            {
+                location = await _ipGeolocationProvider.GetLocationAsync(ipAddress, cancellationToken);
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "IP geolocation lookup failed for device verification. Continuing without location data.");
+        }
         if (existingTrustedDevice is null)
         {
+
             var trustedDevice = new TrustedDevice
             {
                 Id = Guid.NewGuid(),
@@ -236,8 +273,9 @@ public class AuthService : IAuthService
                 DeviceType = request.DeviceType,
                 OperatingSystem = request.OperatingSystem,
                 Browser = request.Browser,
-                LastKnownCity = null,
-                LastKnownCountry = null,
+                DeviceName = NormalizeDeviceName(request.DeviceName),
+                LastKnownCity = location?.City,
+                LastKnownCountry = location?.Country,
                 LastActive = DateTime.UtcNow,
                 IsTrusted = true,
                 CreatedAt = DateTime.UtcNow,
@@ -250,7 +288,18 @@ public class AuthService : IAuthService
         {
             existingTrustedDevice.IsTrusted = true;
             existingTrustedDevice.LastActive = DateTime.UtcNow;
+            if (location is not null)
+            {
+                existingTrustedDevice.LastKnownCity = location.City;
+                existingTrustedDevice.LastKnownCountry = location.Country;
+            }
+
             existingTrustedDevice.UpdatedAt = DateTime.UtcNow;
+            var incomingName = NormalizeDeviceName(request.DeviceName);
+            if (incomingName.Length > 0)
+            {
+                existingTrustedDevice.DeviceName = incomingName;
+            }
 
             await _trustedDeviceRepository.UpdateTrustedDeviceAsync(existingTrustedDevice, cancellationToken);
         }
@@ -314,9 +363,14 @@ public class AuthService : IAuthService
         {
             Console.WriteLine($"Email otp: {otp}.");
         }
-        else
+
+        try
         {
             await SendVerficationOTPAsync(user.Email, otp, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Device verification email failed for {user.Email}: {ex.Message}");
         }
 
         var verificationAuditLog = new AuditLog()
@@ -406,6 +460,74 @@ public class AuthService : IAuthService
         """);
     }
 
+    private static string NormalizeDeviceName(string? deviceName)
+    {
+        if (string.IsNullOrWhiteSpace(deviceName))
+        {
+            return string.Empty;
+        }
+        var trimmed = deviceName.Trim();
+        return trimmed.Length <= 100 ? trimmed : trimmed[..100];
+    }
+
+    public async Task ResendDeviceVerificationOtpAsync(Guid deviceVerificationId, string ipAddress,
+        CancellationToken cancellationToken)
+    {
+        var verification = await _trustedDeviceRepository.GetDeviceVerificationAsync(deviceVerificationId, cancellationToken);
+
+        if (verification is null)
+        {
+            throw new UnauthorizedAccessException("Device verification request not found.");
+        }
+
+        if (verification.VerifiedAt.HasValue)
+        {
+            throw new UnauthorizedAccessException("Device verification has already been completed.");
+        }
+
+        if (verification.ExpiresAt <= DateTime.UtcNow)
+        {
+            throw new UnauthorizedAccessException("Device verification code has expired. Please request an OTP resend.");
+        }
+
+        var user = await _authRepository.GetUserByIdAsync(verification.UserId);
+        if (user is null || user.IsDeleted)
+        {
+            throw new UnauthorizedAccessException("User account not found or has been deleted.");
+        }
+
+        var newOtp = RandomNumberGenerator.GetInt32(100000, 1_000_000).ToString();
+        var otpHash = HashOtp(newOtp);
+
+        verification.OtpHash = otpHash;
+        verification.UpdatedAt = DateTime.UtcNow;
+        verification.ExpiresAt = DateTime.UtcNow.AddMinutes(10);
+
+        await _trustedDeviceRepository.UpdateDeviceVerificationAsync(verification, cancellationToken);
+
+        if (_environment.IsDevelopment())
+        {
+            Console.WriteLine($"Email otp: {newOtp}.");
+        }
+        else
+        {
+            await SendVerficationOTPAsync(user.Email, newOtp, cancellationToken);
+        }
+
+        var auditLog = new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            EventType = AuditEventType.DeviceVerificationResent,
+            Details = $"Device verification code resent for user {user.Email}.",
+            IpAddress = ipAddress,
+            ActorId = user.Id,
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        await _authRepository.AddAuditLogAsync(auditLog);
+        await _authRepository.SaveChangesAsync();
+    }
+
     private static string HashOtp(string otp)
     {
         var otpBytes = Encoding.UTF8.GetBytes(otp);
@@ -430,6 +552,7 @@ public class AuthService : IAuthService
 
         if (user != null)
         {
+            user.TokenVersion++;
             var auditLog = new AuditLog
             {
                 Id = Guid.NewGuid(),

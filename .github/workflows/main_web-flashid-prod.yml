@@ -4,7 +4,6 @@ on:
   push:
     branches: 
       - main
-      - feature/testing-deployment
     paths:
       - "web/**"
       - "pnpm-lock.yaml"
@@ -18,7 +17,7 @@ env:
 
 jobs:
   deploy-main:
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feature/testing-deployment'
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,8 +30,17 @@ jobs:
           password: ${{ secrets.ACR_PASSWORD }}
 
       - name: Build and push prod image
+        env:
+          AZUREFACEAPIREGISTRY: ${{ secrets.AZUREFACEAPIREGISTRY }}
+          AZUREFACEAPIUSERNAME: ${{ secrets.AZUREFACEAPIUSERNAME }}
+          AZUREFACEAPIPASSWORD: ${{ secrets.AZUREFACEAPIPASSWORD }}
+          AZUREFACEAPIEMAIL: ${{ secrets.AZUREFACEAPIEMAIL }}
         run: |
           docker build -f dockerfile.web \
+            --secret id=AZUREFACEAPIREGISTRY,env=AZUREFACEAPIREGISTRY \
+            --secret id=AZUREFACEAPIUSERNAME,env=AZUREFACEAPIUSERNAME \
+            --secret id=AZUREFACEAPIPASSWORD,env=AZUREFACEAPIPASSWORD \
+            --secret id=AZUREFACEAPIEMAIL,env=AZUREFACEAPIEMAIL \
             --build-arg NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL_PROD }} \
             --build-arg API_INTERNAL_URL=${{ vars.NEXT_PUBLIC_API_URL_PROD }} \
             -t ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:prod-${{ github.sha }} \

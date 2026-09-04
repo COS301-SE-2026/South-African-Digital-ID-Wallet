@@ -16,14 +16,34 @@ test('official can scan a citizen QR code and see verified fields', async ({
   const citizenPage = await citizenContext.newPage()
 
   await citizenPage.goto('/citizen/qr')
+
   await expect(
-    citizenPage.getByRole('button', { name: "Driver's License" })
-  ).toBeVisible({ timeout: 15_000 })
-  await citizenPage.getByRole('button', { name: "Driver's License" }).click()
+    citizenPage.getByRole('button', {
+      name: "Driver's License",
+    })
+  ).toBeVisible({
+    timeout: 15_000,
+  })
+
   await citizenPage
-    .getByRole('button', { name: 'Select all for official' })
+    .getByRole('button', {
+      name: "Driver's License",
+    })
     .click()
-  await citizenPage.getByRole('button', { name: 'Review and continue' }).click()
+
+  await expect(citizenPage.getByText('Choose what to share')).toBeVisible({
+    timeout: 15_000,
+  })
+
+  await citizenPage
+    .getByRole('button', {
+      name: /Review and continue/i,
+    })
+    .click()
+
+  await expect(
+    citizenPage.getByText("Confirm what you're sharing")
+  ).toBeVisible()
 
   const [response] = await Promise.all([
     citizenPage.waitForResponse(
@@ -31,11 +51,18 @@ test('official can scan a citizen QR code and see verified fields', async ({
         res.url().includes('/qr-token') && res.request().method() === 'POST'
     ),
     citizenPage
-      .getByRole('button', { name: 'Confirm and generate QR' })
+      .getByRole('button', {
+        name: /Confirm and generate QR/i,
+      })
       .click(),
   ])
 
-  const { token } = (await response.json()) as { token: string }
+  expect(response.ok()).toBeTruthy()
+
+  const { token } = (await response.json()) as {
+    token: string
+  }
+
   expect(token).toBeTruthy()
 
   await citizenContext.close()
@@ -52,14 +79,22 @@ test('official can scan a citizen QR code and see verified fields', async ({
   await officialsContext.grantPermissions(['camera'])
   const officialsPage = await officialsContext.newPage()
 
-  officialsPage.on('console', (msg) => console.log('[browser]', msg.text()))
+  officialsPage.on('console', (msg) => {
+    console.log('[browser]', msg.text())
+  })
 
   await officialsPage.addInitScript((dataUrl: string) => {
     const fakeGetUserMedia = async () => {
       const canvas = document.createElement('canvas')
       canvas.width = 1200
       canvas.height = 1200
-      const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+
+      const ctx = canvas.getContext('2d')
+
+      if (!ctx) {
+        throw new Error('Could not create fake camera canvas context')
+      }
+
       ctx.fillStyle = 'white'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -76,7 +111,9 @@ test('official can scan a citizen QR code and see verified fields', async ({
       const draw = () => {
         ctx.fillStyle = 'white'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
+
         ctx.drawImage(img, offsetX, offsetY)
+
         requestAnimationFrame(draw)
       }
       draw()
@@ -100,7 +137,6 @@ test('official can scan a citizen QR code and see verified fields', async ({
     })
   }, qrDataUrl)
   await officialsPage.goto('/officials/verifications')
-
   await expect(officialsPage.getByText('Verified credentials')).toBeVisible({
     timeout: 20_000,
   })

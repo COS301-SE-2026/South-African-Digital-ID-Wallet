@@ -24,10 +24,11 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<User> DomainUsers => Set<User>();
     public DbSet<UserPreferences> UserPreferences => Set<UserPreferences>();
     public DbSet<CitizenActivation> CitizenActivations => Set<CitizenActivation>();
-    public DbSet<QrDisclosureToken> QrDisclosureTokens => Set<QrDisclosureToken>();
     public DbSet<TrustedDevice> TrustedDevices => Set<TrustedDevice>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<DeviceVerification> DeviceVerifications => Set<DeviceVerification>();
+    public DbSet<JobRun> JobRuns => Set<JobRun>();
+    public DbSet<PhysicalIdentityVerification> PhysicalIdentityVerifications => Set<PhysicalIdentityVerification>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

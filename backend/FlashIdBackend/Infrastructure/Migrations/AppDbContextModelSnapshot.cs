@@ -28,13 +28,19 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ActorId")
+                    b.Property<Guid?>("ActorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CitizenId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<Guid?>("CredentialId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Details")
                         .IsRequired()
@@ -54,11 +60,17 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ActorId");
 
+                    b.HasIndex("CitizenId");
+
                     b.HasIndex("CreatedAt");
+
+                    b.HasIndex("CredentialId");
 
                     b.HasIndex("EventType");
 
                     b.HasIndex("ActorId", "CreatedAt");
+
+                    b.HasIndex("CredentialId", "EventType");
 
                     b.HasIndex("EventType", "CreatedAt");
 
@@ -537,6 +549,53 @@ namespace Infrastructure.Migrations
                     b.ToTable("Institutions");
                 });
 
+            modelBuilder.Entity("Domain.Entities.JobRun", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("JobName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("ProcessedCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("RunDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobName", "RunDate")
+                        .IsUnique();
+
+                    b.ToTable("JobRuns");
+                });
+
             modelBuilder.Entity("Domain.Entities.Notification", b =>
                 {
                     b.Property<Guid>("Id")
@@ -621,42 +680,75 @@ namespace Infrastructure.Migrations
                     b.ToTable("Officials");
                 });
 
-            modelBuilder.Entity("Domain.Entities.QrDisclosureToken", b =>
+            modelBuilder.Entity("Domain.Entities.PhysicalIdentityVerification", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<int>("AttemptCount")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
-                    b.Property<Guid>("CredentialId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("AzureLivenessSessionId")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool?>("CardFaceMatchedLiveFace")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ConsentGrantedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("Jti")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("FailureReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool?>("LivenessPassed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OcrIdNumberHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<bool?>("RegistryFaceMatched")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("RegistryIdentityMatched")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("SubmittedSaId")
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("UsedAt")
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("VerifiedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CredentialId");
+                    b.HasIndex("AzureLivenessSessionId");
 
-                    b.HasIndex("Jti")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
-                    b.ToTable("QrDisclosureTokens");
+                    b.ToTable("PhysicalIdentityVerifications", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.TrustedDevice", b =>
@@ -671,6 +763,11 @@ namespace Infrastructure.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("DeviceName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("DeviceTokenHash")
                         .IsRequired()
@@ -789,6 +886,9 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TokenVersion")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
@@ -1061,10 +1161,23 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.User", "Actor")
                         .WithMany("AuditLogs")
                         .HasForeignKey("ActorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Domain.Entities.Citizen", "Citizen")
+                        .WithMany()
+                        .HasForeignKey("CitizenId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Domain.Entities.Credential", "Credential")
+                        .WithMany()
+                        .HasForeignKey("CredentialId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Actor");
+
+                    b.Navigation("Citizen");
+
+                    b.Navigation("Credential");
                 });
 
             modelBuilder.Entity("Domain.Entities.Biometrics", b =>
@@ -1193,17 +1306,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("Institution");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Domain.Entities.QrDisclosureToken", b =>
-                {
-                    b.HasOne("Domain.Entities.Credential", "Credential")
-                        .WithMany()
-                        .HasForeignKey("CredentialId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Credential");
                 });
 
             modelBuilder.Entity("Domain.Entities.TrustedDevice", b =>

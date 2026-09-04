@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Data.Sqlite;
 using Application.Common.Interfaces.ProviderInterfaces;
+using Application.Common.Interfaces.RepositoryInterfaces;
 
 namespace tests;
 
@@ -29,6 +30,39 @@ public class QrServiceIntegrationTests
     private sealed class FakePhotoStorageProvider : IPhotoStorageProvider
     {
         public Task<string> GenerateReadSasUrlAsync(string blobName, TimeSpan ttl) => Task.FromResult($"https://fake-blob-sas.local/{blobName}");
+        public Task<Stream?> OpenReadAsync(string blobName, CancellationToken cancellationToken) => Task.FromResult<Stream?>(null);
+    }
+
+    private sealed class FakeQrDisclosureTokenRepository : IQrDisclosureTokenRepository
+    {
+        public List<QrDisclosureToken> Tokens { get; } = new();
+
+        public Task AddAsync(QrDisclosureToken token)
+        {
+            Tokens.Add(token);
+            return Task.CompletedTask;
+        }
+
+        public Task<bool> TryMarkUsedAsync(Guid jti)
+        {
+            var token = Tokens.FirstOrDefault(q => q.Jti == jti && q.UsedAt == null);
+
+            if (token == null) return Task.FromResult(false);
+
+            token.UsedAt = DateTime.UtcNow;
+
+            return Task.FromResult(true);
+        }
+
+        public Task InvalidateActiveTokensForCredentialAsync(Guid credentialId)
+        {
+            foreach (var token in Tokens.Where(n => n.CredentialId == credentialId && n.UsedAt == null && n.ExpiresAt > DateTime.UtcNow))
+            {
+                token.UsedAt = DateTime.UtcNow;
+            }
+
+            return Task.CompletedTask;
+        }
     }
 
     private static AppDbContext CreateContext()
@@ -60,14 +94,22 @@ public class QrServiceIntegrationTests
 
     private static QrService CreateQrService(AppDbContext context)
     {
+        var (service, _) = CreateQrServiceWithTokenRepo(context);
+
+        return service;
+    }
+
+    private static (QrService, FakeQrDisclosureTokenRepository TokenRepo) CreateQrServiceWithTokenRepo(AppDbContext context)
+    {
         var credentialRepository = new CredentialRepository(context);
-        var qrDisclosureTokenRepository = new QrDisclosureTokenRepository(context);
+        var qrDisclosureTokenRepository = new FakeQrDisclosureTokenRepository();
         var configuration = CreateQrConfiguration();
         var signingProvider = new Ed25519SigningProvider(configuration);
         var institutionRepository = new InstitutionRepository(context);
         var disclosedFieldValueResolver = new DisclosedFieldValueResolver(new FakePhotoStorageProvider());
+        var service = new QrService(credentialRepository, signingProvider, qrDisclosureTokenRepository, institutionRepository, disclosedFieldValueResolver);
 
-        return new QrService(credentialRepository, signingProvider, qrDisclosureTokenRepository, institutionRepository, disclosedFieldValueResolver);
+        return (service, qrDisclosureTokenRepository);
     }
 
     private static (User User, Citizen Citizen) CreateCitizenWithUser()
@@ -161,18 +203,17 @@ public class QrServiceIntegrationTests
     public async Task GenerateQrAsync_PersistsToken_ThatCanOnlyBeClaimedOnce()
     {
         using var context = CreateContext();
-        var qrDisclosureTokenRepository = new QrDisclosureTokenRepository(context);
-        var service = CreateQrService(context);
+        var (service, tokenRepo) = CreateQrServiceWithTokenRepo(context);
         var (user, _, cred) = await SeedCredentialAsync(context);
 
         var request = FullDisclosureRequest();
         await service.GenerateQrAsync(cred.Id, user.Id, request);
 
-        var persistedToken = await context.QrDisclosureTokens.SingleAsync(TestContext.Current.CancellationToken);
+        var persistedToken = Assert.Single(tokenRepo.Tokens);
         Assert.Null(persistedToken.UsedAt);
 
-        var firstClaim = await qrDisclosureTokenRepository.TryMarkUsedAsync(persistedToken.Jti);
-        var secondClaim = await qrDisclosureTokenRepository.TryMarkUsedAsync(persistedToken.Jti);
+        var firstClaim = await tokenRepo.TryMarkUsedAsync(persistedToken.Jti);
+        var secondClaim = await tokenRepo.TryMarkUsedAsync(persistedToken.Jti);
 
         Assert.True(firstClaim);
         Assert.False(secondClaim);
@@ -224,7 +265,7 @@ public class QrServiceIntegrationTests
     public async Task ResolveAsync_ValidToken_ReturnsDisclosedValuesAndMarksTokenAsUsed()
     {
         using var context = CreateContext();
-        var service = CreateQrService(context);
+        var (service, tokenRepo) = CreateQrServiceWithTokenRepo(context);
         var (user, _, cred) = await SeedCredentialAsync(context);
 
         var driversL = new DriversLicense
@@ -255,14 +296,13 @@ public class QrServiceIntegrationTests
         Assert.Equal("4589161234567", res.DisclosedFields[LicenseNumberField]);
         Assert.Equal("South Africa", res.DisclosedFields[CountryOfIssueField]);
 
-        var persistedToken = await context.QrDisclosureTokens
-            .AsNoTracking()
-            .SingleAsync(TestContext.Current.CancellationToken);
+        var persistedToken = Assert.Single(tokenRepo.Tokens);
         Assert.NotNull(persistedToken.UsedAt);
 
         var auditlog = await context.AuditLogs.SingleAsync(TestContext.Current.CancellationToken);
         Assert.Equal(AuditEventType.CredentialVerified, auditlog.EventType);
         Assert.Equal(user.Id, auditlog.ActorId);
+        Assert.Equal(cred.Id, auditlog.CredentialId);
     }
 
     [Fact]
@@ -284,8 +324,11 @@ public class QrServiceIntegrationTests
     {
         using var context = CreateContext();
         var service = CreateQrService(context);
+        var (user, citizen) = CreateCitizenWithUser();
+        await SeedAsync(context, user, citizen);
 
-        await Assert.ThrowsAsync<InvalidDisclosureTokenException>(() => service.ResolveAsync("not-a-valid-base64!", Guid.NewGuid(), LocalHostIp));
+        await Assert.ThrowsAsync<InvalidDisclosureTokenException>(
+            () => service.ResolveAsync("not-a-valid-base64!", user.Id, LocalHostIp));
     }
 
     [Fact]
