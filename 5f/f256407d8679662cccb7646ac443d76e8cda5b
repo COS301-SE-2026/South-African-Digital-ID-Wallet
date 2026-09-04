@@ -1,0 +1,15 @@
+web/src/components/molecules/credential-card/test/credential-card.test.tsx
+  h_293a8616118f65 7-12,31-32,39,42-44,54,70,73,84,88,99,103
+  h_293a8616118f65 57-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "5ff256407d8679662cccb7646ac443d76e8cda5b",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

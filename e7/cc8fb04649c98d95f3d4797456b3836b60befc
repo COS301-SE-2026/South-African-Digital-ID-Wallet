@@ -1,0 +1,16 @@
+web/.npmrc
+  h_293a8616118f65 1-7
+.github/workflows/web.yml
+  h_293a8616118f65 32-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "e7cc8fb04649c98d95f3d4797456b3836b60befc",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
