@@ -20,9 +20,16 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY web/package.json ./web/package.json
+COPY web/.npmrc ./.npmrc
 
 RUN npm pkg delete scripts.postinstall
-RUN pnpm install --frozen-lockfile --filter ./web...
+
+RUN --mount=type=secret,id=AZUREFACEAPIREGISTRY,env=AZUREFACEAPIREGISTRY \
+    --mount=type=secret,id=AZUREFACEAPIUSERNAME,env=AZUREFACEAPIUSERNAME \
+    --mount=type=secret,id=AZUREFACEAPIPASSWORD,env=AZUREFACEAPIPASSWORD \
+    --mount=type=secret,id=AZUREFACEAPIEMAIL,env=AZUREFACEAPIEMAIL \
+    echo "Azure registry: $(pnpm config get @azure-ai-vision-face:registry)" && \
+    pnpm install --frozen-lockfile --filter ./web...
 
 # ---------- builder ----------
 FROM base AS builder

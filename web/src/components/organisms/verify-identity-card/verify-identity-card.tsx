@@ -1,10 +1,11 @@
 'use client'
-import { LockKeyhole, ShieldCheck, UnlockKeyhole } from 'lucide-react'
+
+import { Check, LockKeyhole, ShieldCheck, UnlockKeyhole } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { VerifyIdentityCardProps } from './types'
 import {
   InputOTP,
   InputOTPGroup,
@@ -12,19 +13,27 @@ import {
 } from '@/components/ui/input-otp'
 import { ProgressStepper } from '@/components/molecules'
 
-const DEFAULT_STEPS = ['Verify Identity', 'Activate Credentials', 'Complete']
+import type { VerifyIdentityCardProps } from './types'
+
+const DEFAULT_STEPS = ['Choose Method', 'Verify Identity', 'Complete']
 
 export function VerifyIdentityCard({
   steps = DEFAULT_STEPS,
-  currentStep = 1,
+  currentStep = 2,
+  activationCode,
+  isActivationCodeDetected = false,
   saId,
   pin,
   isSubmitting = false,
   errorMessage,
+  submitLabel = 'Verify Identity',
+  onActivationCodeChange,
   onSaIdChange,
   onPinChange,
   onSubmit,
+  onBack,
   onRequestNewPin,
+  onEnterCodeManually,
 }: VerifyIdentityCardProps) {
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -32,11 +41,12 @@ export function VerifyIdentityCard({
   }
 
   return (
-    <Card className="w-full rounded-lg border-border/70 bg-card shadow-xl shadow-deep-green/10">
+    <Card className="w-full rounded-3xl border border-border/70 bg-white shadow-xl shadow-deep-green/10">
       <CardHeader className="space-y-6">
         <ProgressStepper steps={steps} currentStep={currentStep} />
+
         <div>
-          <CardTitle className="font-semibold text-2xl text-deep-green">
+          <CardTitle className="text-2xl font-semibold text-deep-green">
             Verify your identity
           </CardTitle>
 
@@ -48,6 +58,44 @@ export function VerifyIdentityCard({
 
       <CardContent>
         <form className="space-y-6" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="activation-code">Activation Code</Label>
+
+              {isActivationCodeDetected && (
+                <span className="rounded-full bg-primary-green/10 px-2 py-0.5 text-xs font-medium text-primary-green">
+                  Detected from link
+                </span>
+              )}
+            </div>
+
+            <div className="relative">
+              <Input
+                id="activation-code"
+                value={activationCode}
+                readOnly={isActivationCodeDetected}
+                placeholder="Enter your activation code"
+                onChange={(event) => onActivationCodeChange(event.target.value)}
+                className="rounded-md pr-9 uppercase"
+              />
+
+              {isActivationCodeDetected && (
+                <Check className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-primary-green" />
+              )}
+            </div>
+
+            {isActivationCodeDetected && onEnterCodeManually && (
+              <Button
+                type="button"
+                variant="link"
+                className="h-auto p-0 text-sm"
+                onClick={onEnterCodeManually}
+              >
+                Enter a different activation code
+              </Button>
+            )}
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="sa-id">South African ID number</Label>
 
@@ -73,60 +121,69 @@ export function VerifyIdentityCard({
                   <InputOTPSlot
                     key={index}
                     index={index}
-                    className="flex-1 h-12 w-12 rounded-md border border-input
-                                                    text-center text-xl shadow-sm
-                                                    first:rounded-md last:rounded-md
-                                                    data-[active=true]:border-primary-green
-                                                    data-[active=true]:ring-2
-                                                    data-[active=true]:ring-primary-green/20
-        "
+                    className="h-12 w-12 rounded-md border border-input text-center text-xl shadow-sm first:rounded-md last:rounded-md data-[active=true]:border-primary-green data-[active=true]:ring-2 data-[active=true]:ring-primary-green/20"
                   />
                 ))}
               </InputOTPGroup>
             </InputOTP>
+          </div>
+
+          <div className="flex items-center justify-between gap-4">
+            {onBack && (
+              <Button
+                type="button"
+                variant="link"
+                className="h-auto p-0"
+                onClick={onBack}
+                disabled={isSubmitting}
+              >
+                Back
+              </Button>
+            )}
 
             {onRequestNewPin && (
               <Button
                 type="button"
                 variant="link"
-                className="h-auto p-0 "
+                className="ml-auto h-auto p-0"
                 onClick={onRequestNewPin}
+                disabled={isSubmitting}
               >
-                Didn&apos;t receive a PIN?
+                Resend OTP
               </Button>
             )}
+          </div>
 
-            <div>
-              {errorMessage && (
-                <p role="alert" className="text-sm text-destructive">
-                  {errorMessage}
-                </p>
-              )}
+          {errorMessage && (
+            <p role="alert" className="text-sm text-destructive">
+              {errorMessage}
+            </p>
+          )}
 
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full rounded-md"
-                disabled={
-                  isSubmitting || saId.length !== 13 || pin.length !== 6
-                }
-              >
-                {isSubmitting ? (
-                  <UnlockKeyhole className="mr-2 h-4 w-4" />
-                ) : (
-                  <LockKeyhole className="mr-2 h-4 w-4" />
-                )}
-                {isSubmitting ? 'Verifying...' : 'Verify & Continue'}
-              </Button>
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full rounded-md"
+            disabled={
+              isSubmitting ||
+              !activationCode.trim() ||
+              saId.length !== 13 ||
+              pin.length !== 6
+            }
+          >
+            {isSubmitting ? (
+              <UnlockKeyhole className="mr-2 size-4" />
+            ) : (
+              <LockKeyhole className="mr-2 size-4" />
+            )}
 
-              <div className="mt-5 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                <ShieldCheck
-                  className="size-5 text-primary"
-                  aria-hidden="true"
-                />
-                <span>Your information is safe with FlashID</span>
-              </div>
-            </div>
+            {isSubmitting ? 'Verifying...' : submitLabel}
+          </Button>
+
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <ShieldCheck className="size-5 text-primary" aria-hidden="true" />
+
+            <span>Your information is safe with FlashID</span>
           </div>
         </form>
       </CardContent>

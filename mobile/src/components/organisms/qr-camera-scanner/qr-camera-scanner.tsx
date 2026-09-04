@@ -5,12 +5,14 @@ import { CameraOff } from 'lucide-react-native'
 import {
   ActivityIndicator,
   Animated,
+  AppState,
   Easing,
+  Linking,
   StyleSheet,
   View,
 } from 'react-native'
 
-import { Text } from '@/components/atoms'
+import { Button, Text } from '@/components/atoms'
 import { colors } from '@/theme/colors'
 
 import type { QrCameraScannerProps } from './types'
@@ -23,16 +25,30 @@ export const QrCameraScanner = ({
   paused = false,
   testID = 'qr-camera-scanner',
 }: QrCameraScannerProps) => {
-  const [permission, requestPermission] = useCameraPermissions()
+  const [permission, requestPermission, getPermission] = useCameraPermissions()
+  const hasAutoRequested = useRef(false)
   const [frameHeight, setFrameHeight] = useState(0)
   const lastScanned = useRef('')
   const [sweep] = useState(() => new Animated.Value(0))
 
   useEffect(() => {
-    if (permission && !permission.granted && permission.canAskAgain) {
+    if (!permission || permission.granted || hasAutoRequested.current) {
+      return
+    }
+    if (permission.status === 'undetermined') {
+      hasAutoRequested.current = true
       void requestPermission()
     }
   }, [permission, requestPermission])
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        void getPermission()
+      }
+    })
+    return () => subscription.remove()
+  }, [getPermission])
 
   useEffect(() => {
     if (!paused) {
@@ -75,7 +91,7 @@ export const QrCameraScanner = ({
     [onScan]
   )
 
-  if (!permission) {
+  if (!permission || permission.status === 'undetermined') {
     return (
       <View className="flex-1 items-center justify-center gap-3">
         <ActivityIndicator color={colors.primaryGreen} size="large" />
@@ -99,8 +115,21 @@ export const QrCameraScanner = ({
           Camera access needed
         </Text>
         <Text variant="sub-sm" className="text-center text-clean-white/70">
-          Allow camera access in your device settings to scan a QR code.
+          {permission.canAskAgain
+            ? 'FlashID needs your camera to scan QR codes.'
+            : 'Camera access is turned off for FlashID. Turn it on in your device settings to scan a QR code.'}
         </Text>
+        <Button
+          label={
+            permission.canAskAgain ? 'Allow camera access' : 'Open settings'
+          }
+          onPress={
+            permission.canAskAgain
+              ? () => void requestPermission()
+              : () => void Linking.openSettings()
+          }
+          testID="qr-camera-permission-button"
+        />
       </View>
     )
   }
