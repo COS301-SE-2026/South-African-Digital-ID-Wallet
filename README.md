@@ -47,7 +47,8 @@ Deployment is fully automated via GitHub Actions .See [SAS 5 Deployment](docs/de
 
 - [Demo 2 Video](https://drive.google.com/file/d/1zvqFxAfxtZlVi4LKnHyqWYL7NjBREaG7/view?usp=sharing)
 
-- [Demo 3 Video](#)
+- [Demo 3 Video](https://drive.google.com/file/d/1fDvILt3r_7-KdpE3DQ4lAmEqNAfbMtk7/view?usp=sharing)
+--[Mobile Video](https://universitypretoria-my.sharepoint.com/:v:/g/personal/u24573699_up_ac_za/IQCfDy_jLr4GQLQG5VqKu8BOAQVXPIE2iC5cbbNoUdkJMK0?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=sBroN4https://universitypretoria-my.sharepoint.com/:v:/g/personal/u24573699_up_ac_za/IQCfDy_jLr4GQLQG5VqKu8BOAQVXPIE2iC5cbbNoUdkJMK0?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=sBroN4)
 
 - [Demo 4 Video](#)
 
@@ -90,14 +91,15 @@ t3chtitansgo@gmail.com
 <details>
 <summary><strong>Demo 3 Documentation</strong></summary>
 
-🔗 [SAS](docs/demo3/SAS-v2.md) <br> 
+🔗 [SAS](docs/demo3/SAS-v3.md) <br> 
 🔗 [SRS](docs/demo3/SRS-v3.md) <br> 
-🔗 [User Manual](docs/demo3/user-manual%20(1).pdf) <br> 
+🔗 [User Manual](docs/demo3/User%20Manual%20v3.pdf) <br> 
 🔗 [Brand style guide](docs/demo3/FlashID.pdf) <br> 
 🔗 [Testing Policy Document](docs/demo3/TESTING_POLICY.md) <br> 
 🔗 [Coding Standards](docs/demo3/coding_standards.md) <br> 
 🔗 [OpenAPI Spec (FlashID)](docs/demo3/openapi.yaml) <br> 
 🔗 [OpenAPI Spec (Government Registry)](docs/demo3/openapi-government-registry.yaml) <br> 
+🔗 [Deployed Instance](https://api-flashid-prod-behwhegmcshsb6dg.southafricanorth-01.azurewebsites.net/) <br>
 
 </details>
 
