@@ -1,0 +1,19 @@
+.github/workflows/web.yml
+  h_293a8616118f65 37-38
+  h_293a8616118f65 36
+.github/workflows/mobile.yml
+  h_293a8616118f65 41-45
+.github/workflows/web-e2e.yml
+  h_293a8616118f65 79-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "11cb936d37f3360bcaa01a268a42b33e317d5928",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

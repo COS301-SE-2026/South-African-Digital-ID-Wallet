@@ -1,0 +1,232 @@
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_293a8616118f65 106-119,128
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_293a8616118f65 43
+.github/workflows/validate-infra.yml
+  h_293a8616118f65 1-58
+.github/workflows/web-e2e.yml
+  h_293a8616118f65 53-54
+.npmrc
+  h_293a8616118f65 1-4
+README.md
+  h_293a8616118f65 25,36-42,93-100,126,143,160,177,194
+backend/.gitignore
+  h_293a8616118f65 64-66
+backend/FlashIdBackend/.env.example
+  h_293a8616118f65 1-33
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/IIpGeolocationProvider.cs
+  h_293a8616118f65 1-8
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IGovAdminAuditLogRepository.cs
+  h_293a8616118f65 1-16
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IAuthService.cs
+  h_293a8616118f65 11
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IGovAdminAuditLogService.cs
+  h_293a8616118f65 1-15
+backend/FlashIdBackend/Application/Common/Services/AuthService.cs
+  h_293a8616118f65 10,14,30-31,42-44,55-56,249-264,267,277-278,291-296,473-530
+backend/FlashIdBackend/Application/Common/Services/GovAdminAuditLogService.cs
+  h_293a8616118f65 1-55
+backend/FlashIdBackend/Application/Features/Auth/DTOs/ResendDeviceVerificationRequestDto.cs
+  h_293a8616118f65 1-6
+backend/FlashIdBackend/Application/Features/GovAdminAuditLog/DTOs/GovAdminAuditLogDtos.cs
+  h_293a8616118f65 1-27
+backend/FlashIdBackend/Application/Features/GovAdminAuditLog/Exceptions/InvalidAuditActionException.cs
+  h_293a8616118f65 1-7
+backend/FlashIdBackend/Application/Features/ManageUserAccountCard/DTOs/IpLocationResult.cs
+  h_293a8616118f65 1-7
+backend/FlashIdBackend/Domain/Enums/AuditEventType.cs
+  h_293a8616118f65 34
+backend/FlashIdBackend/Infrastructure/Providers/IpGeolocationProvider.cs
+  h_293a8616118f65 1-55
+backend/FlashIdBackend/Infrastructure/Repositories/GovAdminAuditLogRepository.cs
+  h_293a8616118f65 1-97
+backend/FlashIdBackend/Presentation/Controllers/AuthController.cs
+  h_293a8616118f65 7-8,22,27-28,33,68-69,71-82,185-194,213-296
+backend/FlashIdBackend/Presentation/Controllers/GovAdminAuditLogController.cs
+  h_293a8616118f65 1-34
+backend/FlashIdBackend/Presentation/ExceptionHandling/GlobalExceptionHandler.cs
+  h_293a8616118f65 7,33-36
+backend/FlashIdBackend/Presentation/Program.cs
+  h_293a8616118f65 123-124,163-165,223-225
+backend/FlashIdBackend/Presentation/appsettings.json
+  h_293a8616118f65 42-44
+backend/FlashIdBackend/tests/AuthServiceTests.cs
+  h_293a8616118f65 7,13,140-152,202-203,515-592
+backend/FlashIdBackend/tests/BackendIntegrationTests.cs
+  h_293a8616118f65 8,18,76-88,124,133
+backend/FlashIdBackend/tests/GovAdminAuditLogServiceTests.cs
+  h_293a8616118f65 1-458
+backend/FlashIdBackend/tests/IpGeolocationProviderTests.cs
+  h_293a8616118f65 1-135
+dockerfile.web
+  h_293a8616118f65 7-11,41-44,61-62
+docs/demo3/SAS-v2.md
+  h_293a8616118f65 96,100-103,108-193,197-270,981,1004,1006-1008,1011,1014,1016,1018,1020,1022-1026,1028
+docs/demo3/use-cases-v3.md
+  h_293a8616118f65 6,9-61,75,92,107,161,176,191,265-294
+docs/images/authentication_use_case.drawio.svg
+  h_293a8616118f65 1-4
+docs/images/gov-audit-logs.drawio.svg
+  h_293a8616118f65 1-4
+government-registry/GovernmentRegistry/.env.example
+  h_293a8616118f65 1-4
+government-registry/GovernmentRegistry/Presentation/Program.cs
+  h_293a8616118f65 20,55-57
+infra/AI_AGENT.md
+  h_293a8616118f65 1-175
+infra/README.md
+  h_293a8616118f65 1-126
+infra/main.bicep
+  h_293a8616118f65 1-310
+infra/main.dev.bicepparam
+  h_293a8616118f65 1-35
+infra/main.json
+  h_293a8616118f65 1-1486
+infra/main.prod.bicepparam
+  h_293a8616118f65 1-35
+infra/modules/appservice.bicep
+  h_293a8616118f65 1-71
+infra/modules/appserviceplan.bicep
+  h_293a8616118f65 1-23
+infra/modules/communicationservices.bicep
+  h_293a8616118f65 1-19
+infra/modules/cosmos.bicep
+  h_293a8616118f65 1-133
+infra/modules/faceapi.bicep
+  h_293a8616118f65 1-28
+infra/modules/keyvault.bicep
+  h_293a8616118f65 1-36
+infra/modules/roleassignment.bicep
+  h_293a8616118f65 1-17
+infra/modules/sql.bicep
+  h_293a8616118f65 1-79
+infra/modules/storage.bicep
+  h_293a8616118f65 1-84
+infra/seed-secrets.sh
+  h_293a8616118f65 1-57
+mobile/app.json
+  h_293a8616118f65 3-4,16,34-36
+mobile/src/app/(auth)/register.tsx
+  h_293a8616118f65 1-5
+mobile/src/components/atoms/flash-id-logo/flash-id-logo.tsx
+  h_293a8616118f65 1-33
+mobile/src/components/atoms/flash-id-logo/index.ts
+  h_293a8616118f65 1-2
+mobile/src/components/atoms/flash-id-logo/types.ts
+  h_293a8616118f65 1-4
+mobile/src/components/atoms/index.ts
+  h_293a8616118f65 9
+mobile/src/components/molecules/index.ts
+  h_293a8616118f65 17
+mobile/src/components/molecules/requirement-list/index.ts
+  h_293a8616118f65 1-2
+mobile/src/components/molecules/requirement-list/requirement-list.tsx
+  h_293a8616118f65 1-28
+mobile/src/components/molecules/requirement-list/types.ts
+  h_293a8616118f65 1-9
+mobile/src/components/organisms/index.ts
+  h_293a8616118f65 32-33
+mobile/src/components/organisms/login-form/login-form.tsx
+  h_293a8616118f65 29
+mobile/src/components/organisms/login-form/test/login-form.test.tsx
+  h_293a8616118f65 133,135
+mobile/src/components/organisms/qr-camera-scanner/qr-camera-scanner.tsx
+  h_293a8616118f65 8,10,15,28-29,35-39,44-52,94,118-120,122-132
+mobile/src/components/organisms/register-form/index.ts
+  h_293a8616118f65 1-2
+mobile/src/components/organisms/register-form/register-form.tsx
+  h_293a8616118f65 1-158
+mobile/src/components/organisms/register-form/types.ts
+  h_293a8616118f65 1-3
+mobile/src/components/organisms/verify-email-form/index.ts
+  h_293a8616118f65 1-2
+mobile/src/components/organisms/verify-email-form/types.ts
+  h_293a8616118f65 1-8
+mobile/src/components/organisms/verify-email-form/verify-email-form.tsx
+  h_293a8616118f65 1-103
+mobile/src/components/pages/index.ts
+  h_293a8616118f65 11
+mobile/src/components/pages/login/login-page.tsx
+  h_293a8616118f65 1-2,6-14
+mobile/src/components/pages/register/index.ts
+  h_293a8616118f65 1
+mobile/src/components/pages/register/register-page.tsx
+  h_293a8616118f65 1-17
+mobile/src/components/templates/auth-screen/auth-screen.tsx
+  h_293a8616118f65 1-8,10,14-40,42-68
+mobile/src/config/navigation/quick-actions.ts
+  h_293a8616118f65 49-50
+mobile/src/config/navigation/test/quick-actions.test.ts
+  h_293a8616118f65 4
+mobile/src/services/login-service/test/login-service.test.ts
+  h_293a8616118f65 24-27
+mobile/src/services/register-service/index.ts
+  h_293a8616118f65 1-10
+mobile/src/services/register-service/password-rules.ts
+  h_293a8616118f65 1-22
+mobile/src/services/register-service/register-dto.ts
+  h_293a8616118f65 1-13
+mobile/src/services/register-service/register-errors.ts
+  h_293a8616118f65 1-20
+mobile/src/services/register-service/register-service.ts
+  h_293a8616118f65 1-30
+mobile/src/services/register-service/register-urls.ts
+  h_293a8616118f65 1-7
+mobile/src/services/register-service/schema.ts
+  h_293a8616118f65 1-36
+mobile/src/services/register-service/types.ts
+  h_293a8616118f65 1-15
+web/.env.example
+  h_293a8616118f65 1-2
+web/src/app/(portal)/gov-admin/audit-log/page.tsx
+  h_293a8616118f65 1-5
+web/src/app/api/health/route.ts
+  h_293a8616118f65 1-3
+web/src/assets/images/flashid.svg
+  h_293a8616118f65 1-4
+web/src/components/organisms/gov-admin-audit-log-table/gov-admin-audit-log-details-panel.tsx
+  h_293a8616118f65 1-101
+web/src/components/organisms/gov-admin-audit-log-table/gov-admin-audit-log-table.tsx
+  h_293a8616118f65 1-169
+web/src/components/organisms/gov-admin-audit-log-table/index.ts
+  h_293a8616118f65 1
+web/src/components/organisms/gov-admin-audit-log-table/types.ts
+  h_293a8616118f65 1-34
+web/src/components/organisms/login-form/login-form.tsx
+  h_293a8616118f65 16,288
+web/src/components/pages/gov-admin/audit-log-page.tsx
+  h_293a8616118f65 1-113
+web/src/components/templates/otp-modal/otp-modal.tsx
+  h_293a8616118f65 8-9,15,24,27,83-88,90,92-105,107-108,164,175,185-186,189-192
+web/src/components/templates/otp-modal/test/otp-modal.test.tsx
+  h_293a8616118f65 1-149
+web/src/config/navigation/navigation.ts
+  h_293a8616118f65 81
+web/src/services/gov-admin-audit-log-service/gov-admin-audit-log-service.ts
+  h_293a8616118f65 1-15
+web/src/services/gov-admin-audit-log-service/gov-admin-audit-log-urls.ts
+  h_293a8616118f65 1-3
+web/src/services/gov-admin-audit-log-service/types.ts
+  h_293a8616118f65 1-17
+web/src/services/login-service/login-service.ts
+  h_293a8616118f65 33-41,47
+web/src/services/login-service/login-urls.ts
+  h_293a8616118f65 5
+web/src/services/login-service/test/login-dto.test.ts
+  h_293a8616118f65 1-50
+web/src/services/login-service/test/login-service.test.ts
+  h_293a8616118f65 1-154
+web/src/services/login-service/test/login-urls.test.ts
+  h_293a8616118f65 1-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "251ec9ebb2bd885a4b29d53f097fc7f2fcd651f0",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
