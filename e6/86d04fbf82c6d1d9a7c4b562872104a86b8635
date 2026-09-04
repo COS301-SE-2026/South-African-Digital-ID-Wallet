@@ -1,0 +1,19 @@
+web/src/components/organisms/liveness-camera-dialog/liveness-camera-dialog.tsx
+  h_293a8616118f65 1-176
+web/src/components/pages/activation/verify-citizen-page.tsx
+  h_293a8616118f65 5-6,8-18,21-26,30-35,37,44,46-55,61-64,66,68,71,73,75-89,92-94,96-113,116,120,123,125,128,134,136,138,142,145-146,148,150-151,153-158,160-161,163-164,166-240,247-355,359-361,363-367,370-372,377-379,382,385,387,390,401,404-410,413-469
+  h_293a8616118f65 45,58,149,152,159,162,165,362
+web/src/app/(portal)/citizen/verify-identity/page.tsx
+  h_293a8616118f65 1,9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "e686d04fbf82c6d1d9a7c4b562872104a86b8635",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

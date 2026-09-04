@@ -1,0 +1,16 @@
+web/src/app/(portal)/officials/page.tsx
+  h_293a8616118f65 1,4
+web/src/app/(portal)/gov-admin/page.tsx
+  h_293a8616118f65 1,3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "7a6d585aea2dd2ca034a9f732c0b2e49999314cf",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

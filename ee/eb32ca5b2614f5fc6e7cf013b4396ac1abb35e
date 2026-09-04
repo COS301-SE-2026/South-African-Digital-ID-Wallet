@@ -1,0 +1,15 @@
+.npmrc
+  h_712d174fc3f309 2-4
+  h_712d174fc3f309 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "eeeb32ca5b2614f5fc6e7cf013b4396ac1abb35e",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

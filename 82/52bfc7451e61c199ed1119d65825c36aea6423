@@ -1,0 +1,18 @@
+web/src/components/organisms/index.ts
+  h_293a8616118f65 26,28-30
+pnpm-lock.yaml
+  h_293a8616118f65 11098,11100
+web/next.config.ts
+  h_293a8616118f65 16-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "8252bfc7451e61c199ed1119d65825c36aea6423",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
