@@ -28,12 +28,16 @@ jobs:
           version: 9.15.9
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
         env:
-          AZUREFACEAPIREGISTRY: ${{ secrets.AZUREFACEAPIREGISTRY }}
-          AZUREFACEAPIUSERNAME: ${{ secrets.AZUREFACEAPIUSERNAME }}
-          AZUREFACEAPIPASSWORD: ${{ secrets.AZUREFACEAPIPASSWORD }}
-          AZUREFACEAPIEMAIL: ${{ secrets.AZUREFACEAPIEMAIL }}
+            AZUREFACEAPIREGISTRY: ${{ secrets.AZUREFACEAPIREGISTRY }}
+            AZUREFACEAPIUSERNAME: ${{ secrets.AZUREFACEAPIUSERNAME }}
+            AZUREFACEAPIPASSWORD: ${{ secrets.AZUREFACEAPIPASSWORD }}
+            AZUREFACEAPIEMAIL: ${{ secrets.AZUREFACEAPIEMAIL }}
+        run: |
+         echo "Azure Face registry:"
+         pnpm config get @azure-ai-vision-face:registry
+         pnpm install --frozen-lockfile
+        
 
       - name: Build
         run: pnpm run build
