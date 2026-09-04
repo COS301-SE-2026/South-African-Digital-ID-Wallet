@@ -1,0 +1,14 @@
+docs/demo3/SAS-v3.md
+  h_0aff3b71f739b1 24,80,90,92-93,425-427,431-463,492,513-522,525,529-789
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "ff837395cefc946349a04bcc07eedd87c63d0668",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
