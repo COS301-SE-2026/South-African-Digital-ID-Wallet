@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Diagnostics;
 using Application.Features.Citizens.Exceptions;
 using Application.Features.Credentials.Exceptions;
+using Application.Features.GovAdminAuditLog.Exceptions;
 
 namespace Presentation.ExceptionHandling;
 
@@ -27,6 +28,10 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
             InvalidSAPhoneNumberException =>
                 (StatusCodes.Status422UnprocessableEntity, "Invalid SA phone number format",
                     exception.Message),
+
+            InvalidAuditActionException =>
+        (StatusCodes.Status400BadRequest, "Invalid audit action",
+            exception.Message),
 
             DuplicateEmailRegisteredException =>
                 (StatusCodes.Status409Conflict, "Email already registered",
