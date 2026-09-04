@@ -1,0 +1,14 @@
+web/src/components/organisms/verify-method/verify-method.tsx
+  h_293a8616118f65 90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "56b3ec8e946b5d7f61581469dfc4d5deea05cc37",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

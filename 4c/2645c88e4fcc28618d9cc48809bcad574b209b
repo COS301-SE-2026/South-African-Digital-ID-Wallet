@@ -1,0 +1,18 @@
+web/src/components/organisms/verification-processing/verification-processing.tsx
+  h_293a8616118f65 1-30
+web/src/components/organisms/verification-failure/verification-failure.tsx
+  h_293a8616118f65 1-34
+web/src/components/organisms/physical-identity-form/physical-identity-form.tsx
+  h_293a8616118f65 1-99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "4c2645c88e4fcc28618d9cc48809bcad574b209b",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
