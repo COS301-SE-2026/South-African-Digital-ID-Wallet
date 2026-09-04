@@ -1,0 +1,15 @@
+web/src/components/organisms/verify-identity-card/test/verify-identity-card.test.tsx
+  h_293a8616118f65 6-14,27,29,37,39,68,74,78,87,94,101,114,144
+  h_293a8616118f65 16,49,58,65,108,116,123,126,133
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "b060b900128903ae588ee3ff3283ceaf0632688e",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
