@@ -38,6 +38,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        env:
+            AZUREFACEAPIREGISTRY: ${{ secrets.AZUREFACEAPIREGISTRY }}
+            AZUREFACEAPIUSERNAME: ${{ secrets.AZUREFACEAPIUSERNAME }}
+            AZUREFACEAPIPASSWORD: ${{ secrets.AZUREFACEAPIPASSWORD }}
+            AZUREFACEAPIEMAIL: ${{ secrets.AZUREFACEAPIEMAIL }}
 
       - name: Lint
         run: pnpm --filter ./mobile run lint:check

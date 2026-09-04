@@ -19,5 +19,7 @@ public static class AuditEventTypeExtensions
     };
 
     public static string ToOutcome(this AuditEventType eventType) =>
-        FailedEvents.Contains(eventType) ? "Failed" : "Success";
+        ViewEvents.Contains(eventType) ? "Access"
+        : FailedEvents.Contains(eventType) ? "Failed"
+        : "Success";
 }

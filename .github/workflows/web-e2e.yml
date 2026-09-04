@@ -50,6 +50,8 @@ jobs:
       E2E_CITIZEN_EMAIL: citizen.e2e@flashid.local
       E2E_GOVADMIN_EMAIL: govadmin.e2e@flashid.local
       E2E_OFFICIAL_EMAIL: official.e2e@flashid.local
+      IPGEOLOCATION__APIKEY: ${{secrets.IPGEOLOCATION_APIKEY}}
+      IPGEOLOCATION__BASEURL: ${{secrets.IPGEOLOCATION_BASEURL}}
       E2E_EXPIRY_CITIZEN_EMAIL: citizen.expiry.e2e@flashid.local
       AUTH_SKIP_DEVICE_VERIFICATION: 'true'
 
@@ -74,6 +76,11 @@ jobs:
       - name: Install web dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
         working-directory: ./web
+        env:
+            AZUREFACEAPIREGISTRY: ${{ secrets.AZUREFACEAPIREGISTRY }}
+            AZUREFACEAPIUSERNAME: ${{ secrets.AZUREFACEAPIUSERNAME }}
+            AZUREFACEAPIPASSWORD: ${{ secrets.AZUREFACEAPIPASSWORD }}
+            AZUREFACEAPIEMAIL: ${{ secrets.AZUREFACEAPIEMAIL }}
 
       - name: Restore backend
         run: dotnet restore backend/FlashIdBackend/FlashIdBackend.sln

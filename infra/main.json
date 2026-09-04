@@ -1,0 +1,1486 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.35.1.17967",
+      "templateHash": "16638014479216553564"
+    }
+  },
+  "parameters": {
+    "env": {
+      "type": "string",
+      "metadata": {
+        "description": "Environment name: dev or prod"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "southafricanorth",
+      "metadata": {
+        "description": "Azure region for all resources"
+      }
+    },
+    "baseName": {
+      "type": "string",
+      "defaultValue": "flashid",
+      "metadata": {
+        "description": "Base name used across resources"
+      }
+    },
+    "appServiceSkuName": {
+      "type": "string",
+      "defaultValue": "B1",
+      "metadata": {
+        "description": "App Service Plan SKU (e.g. B1 for dev, S1 or P1v3 for prod)"
+      }
+    },
+    "appServiceAlwaysOn": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Enable always-on for App Services (recommended for prod)"
+      }
+    },
+    "sqlAdminLogin": {
+      "type": "string",
+      "metadata": {
+        "description": "SQL Server admin login"
+      }
+    },
+    "sqlAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "SQL Server admin password"
+      }
+    },
+    "sqlEntraAdminLogin": {
+      "type": "string",
+      "metadata": {
+        "description": "Entra ID admin email for SQL Server"
+      }
+    },
+    "sqlEntraAdminObjectId": {
+      "type": "string",
+      "metadata": {
+        "description": "Entra ID admin object ID for SQL Server"
+      }
+    },
+    "sqlDatabases": {
+      "type": "array",
+      "metadata": {
+        "description": "SQL databases to create (array of {name, maxSizeBytes, autoPauseDelay?, backupRedundancy?})"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "appServicePlan",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "name": {
+            "value": "[format('asp-{0}', parameters('baseName'))]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "skuName": {
+            "value": "[parameters('appServiceSkuName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "5284381611039672577"
+            }
+          },
+          "parameters": {
+            "name": {
+              "type": "string",
+              "defaultValue": "asp-flashid",
+              "metadata": {
+                "description": "Name for the App Service Plan"
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "southafricanorth",
+              "metadata": {
+                "description": "Azure region"
+              }
+            },
+            "skuName": {
+              "type": "string",
+              "defaultValue": "B1",
+              "metadata": {
+                "description": "SKU name (e.g. B1, B2, S1, P1v3)"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2024-11-01",
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]",
+              "kind": "linux",
+              "sku": {
+                "name": "[parameters('skuName')]"
+              },
+              "properties": {
+                "reserved": true
+              }
+            }
+          ],
+          "outputs": {
+            "appServicePlanId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Web/serverfarms', parameters('name'))]"
+            },
+            "appServicePlanName": {
+              "type": "string",
+              "value": "[parameters('name')]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('communicationService-{0}', parameters('env'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "env": {
+            "value": "[parameters('env')]"
+          },
+          "baseName": {
+            "value": "[parameters('baseName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "11590556392833176693"
+            }
+          },
+          "parameters": {
+            "env": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name: dev or prod"
+              }
+            },
+            "baseName": {
+              "type": "string",
+              "defaultValue": "flashid",
+              "metadata": {
+                "description": "Base name for the Communication Service resource"
+              }
+            },
+            "dataLocation": {
+              "type": "string",
+              "defaultValue": "africa",
+              "metadata": {
+                "description": "Data residency location for Communication Services"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Communication/communicationServices",
+              "apiVersion": "2023-04-01",
+              "name": "[format('acs-{0}-{1}', parameters('baseName'), parameters('env'))]",
+              "location": "global",
+              "properties": {
+                "dataLocation": "[parameters('dataLocation')]"
+              }
+            }
+          ],
+          "outputs": {
+            "communicationServiceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Communication/communicationServices', format('acs-{0}-{1}', parameters('baseName'), parameters('env')))]"
+            },
+            "communicationServiceName": {
+              "type": "string",
+              "value": "[format('acs-{0}-{1}', parameters('baseName'), parameters('env'))]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('apiFlashId-{0}', parameters('env'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "env": {
+            "value": "[parameters('env')]"
+          },
+          "namePrefix": {
+            "value": "[format('api-{0}', parameters('baseName'))]"
+          },
+          "appServicePlanId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'appServicePlan'), '2022-09-01').outputs.appServicePlanId.value]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "alwaysOn": {
+            "value": "[parameters('appServiceAlwaysOn')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "15205596300940823706"
+            }
+          },
+          "parameters": {
+            "env": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name: dev or prod"
+              }
+            },
+            "namePrefix": {
+              "type": "string",
+              "metadata": {
+                "description": "Name prefix for the App Service (e.g. \"api-flashid\", \"web-flashid\")"
+              }
+            },
+            "appServicePlanId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource ID of the App Service Plan to host this app"
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "southafricanorth",
+              "metadata": {
+                "description": "Azure region"
+              }
+            },
+            "linuxFxVersion": {
+              "type": "string",
+              "defaultValue": "DOTNETCORE|10.0",
+              "metadata": {
+                "description": "Linux runtime stack"
+              }
+            },
+            "alwaysOn": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Enable always-on (recommended for prod, costs more on lower SKUs)"
+              }
+            },
+            "appSettings": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "App settings (key-value pairs) — use Key Vault references for secrets"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2024-11-01",
+              "name": "[format('{0}-{1}', parameters('namePrefix'), parameters('env'))]",
+              "location": "[parameters('location')]",
+              "kind": "app,linux",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "enabled": true,
+                "serverFarmId": "[parameters('appServicePlanId')]",
+                "reserved": true,
+                "httpsOnly": true,
+                "clientAffinityEnabled": false,
+                "keyVaultReferenceIdentity": "SystemAssigned",
+                "publicNetworkAccess": "Enabled",
+                "siteConfig": {
+                  "linuxFxVersion": "[parameters('linuxFxVersion')]",
+                  "alwaysOn": "[parameters('alwaysOn')]",
+                  "http20Enabled": true,
+                  "ftpsState": "Disabled",
+                  "minTlsVersion": "1.2",
+                  "appSettings": "[parameters('appSettings')]"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+              "apiVersion": "2024-11-01",
+              "name": "[format('{0}/{1}', format('{0}-{1}', parameters('namePrefix'), parameters('env')), 'ftp')]",
+              "properties": {
+                "allow": false
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', format('{0}-{1}', parameters('namePrefix'), parameters('env')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+              "apiVersion": "2024-11-01",
+              "name": "[format('{0}/{1}', format('{0}-{1}', parameters('namePrefix'), parameters('env')), 'scm')]",
+              "properties": {
+                "allow": true
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', format('{0}-{1}', parameters('namePrefix'), parameters('env')))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "appServiceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Web/sites', format('{0}-{1}', parameters('namePrefix'), parameters('env')))]"
+            },
+            "appServiceName": {
+              "type": "string",
+              "value": "[format('{0}-{1}', parameters('namePrefix'), parameters('env'))]"
+            },
+            "defaultHostName": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Web/sites', format('{0}-{1}', parameters('namePrefix'), parameters('env'))), '2024-11-01').defaultHostName]"
+            },
+            "principalId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Web/sites', format('{0}-{1}', parameters('namePrefix'), parameters('env'))), '2024-11-01', 'full').identity.principalId]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'appServicePlan')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('apiGovRegistry-{0}', parameters('env'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "env": {
+            "value": "[parameters('env')]"
+          },
+          "namePrefix": {
+            "value": "api-government-registry"
+          },
+          "appServicePlanId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'appServicePlan'), '2022-09-01').outputs.appServicePlanId.value]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "alwaysOn": {
+            "value": "[parameters('appServiceAlwaysOn')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "15205596300940823706"
+            }
+          },
+          "parameters": {
+            "env": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name: dev or prod"
+              }
+            },
+            "namePrefix": {
+              "type": "string",
+              "metadata": {
+                "description": "Name prefix for the App Service (e.g. \"api-flashid\", \"web-flashid\")"
+              }
+            },
+            "appServicePlanId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource ID of the App Service Plan to host this app"
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "southafricanorth",
+              "metadata": {
+                "description": "Azure region"
+              }
+            },
+            "linuxFxVersion": {
+              "type": "string",
+              "defaultValue": "DOTNETCORE|10.0",
+              "metadata": {
+                "description": "Linux runtime stack"
+              }
+            },
+            "alwaysOn": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Enable always-on (recommended for prod, costs more on lower SKUs)"
+              }
+            },
+            "appSettings": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "App settings (key-value pairs) — use Key Vault references for secrets"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2024-11-01",
+              "name": "[format('{0}-{1}', parameters('namePrefix'), parameters('env'))]",
+              "location": "[parameters('location')]",
+              "kind": "app,linux",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "enabled": true,
+                "serverFarmId": "[parameters('appServicePlanId')]",
+                "reserved": true,
+                "httpsOnly": true,
+                "clientAffinityEnabled": false,
+                "keyVaultReferenceIdentity": "SystemAssigned",
+                "publicNetworkAccess": "Enabled",
+                "siteConfig": {
+                  "linuxFxVersion": "[parameters('linuxFxVersion')]",
+                  "alwaysOn": "[parameters('alwaysOn')]",
+                  "http20Enabled": true,
+                  "ftpsState": "Disabled",
+                  "minTlsVersion": "1.2",
+                  "appSettings": "[parameters('appSettings')]"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+              "apiVersion": "2024-11-01",
+              "name": "[format('{0}/{1}', format('{0}-{1}', parameters('namePrefix'), parameters('env')), 'ftp')]",
+              "properties": {
+                "allow": false
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', format('{0}-{1}', parameters('namePrefix'), parameters('env')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+              "apiVersion": "2024-11-01",
+              "name": "[format('{0}/{1}', format('{0}-{1}', parameters('namePrefix'), parameters('env')), 'scm')]",
+              "properties": {
+                "allow": true
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', format('{0}-{1}', parameters('namePrefix'), parameters('env')))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "appServiceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Web/sites', format('{0}-{1}', parameters('namePrefix'), parameters('env')))]"
+            },
+            "appServiceName": {
+              "type": "string",
+              "value": "[format('{0}-{1}', parameters('namePrefix'), parameters('env'))]"
+            },
+            "defaultHostName": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Web/sites', format('{0}-{1}', parameters('namePrefix'), parameters('env'))), '2024-11-01').defaultHostName]"
+            },
+            "principalId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Web/sites', format('{0}-{1}', parameters('namePrefix'), parameters('env'))), '2024-11-01', 'full').identity.principalId]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'appServicePlan')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('webFlashId-{0}', parameters('env'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "env": {
+            "value": "[parameters('env')]"
+          },
+          "namePrefix": {
+            "value": "[format('web-{0}', parameters('baseName'))]"
+          },
+          "appServicePlanId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'appServicePlan'), '2022-09-01').outputs.appServicePlanId.value]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "alwaysOn": {
+            "value": "[parameters('appServiceAlwaysOn')]"
+          },
+          "linuxFxVersion": {
+            "value": "[format('DOCKER|acrflashid.azurecr.io/web-flashid:{0}-latest', parameters('env'))]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "15205596300940823706"
+            }
+          },
+          "parameters": {
+            "env": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name: dev or prod"
+              }
+            },
+            "namePrefix": {
+              "type": "string",
+              "metadata": {
+                "description": "Name prefix for the App Service (e.g. \"api-flashid\", \"web-flashid\")"
+              }
+            },
+            "appServicePlanId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource ID of the App Service Plan to host this app"
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "southafricanorth",
+              "metadata": {
+                "description": "Azure region"
+              }
+            },
+            "linuxFxVersion": {
+              "type": "string",
+              "defaultValue": "DOTNETCORE|10.0",
+              "metadata": {
+                "description": "Linux runtime stack"
+              }
+            },
+            "alwaysOn": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Enable always-on (recommended for prod, costs more on lower SKUs)"
+              }
+            },
+            "appSettings": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "App settings (key-value pairs) — use Key Vault references for secrets"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2024-11-01",
+              "name": "[format('{0}-{1}', parameters('namePrefix'), parameters('env'))]",
+              "location": "[parameters('location')]",
+              "kind": "app,linux",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "enabled": true,
+                "serverFarmId": "[parameters('appServicePlanId')]",
+                "reserved": true,
+                "httpsOnly": true,
+                "clientAffinityEnabled": false,
+                "keyVaultReferenceIdentity": "SystemAssigned",
+                "publicNetworkAccess": "Enabled",
+                "siteConfig": {
+                  "linuxFxVersion": "[parameters('linuxFxVersion')]",
+                  "alwaysOn": "[parameters('alwaysOn')]",
+                  "http20Enabled": true,
+                  "ftpsState": "Disabled",
+                  "minTlsVersion": "1.2",
+                  "appSettings": "[parameters('appSettings')]"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+              "apiVersion": "2024-11-01",
+              "name": "[format('{0}/{1}', format('{0}-{1}', parameters('namePrefix'), parameters('env')), 'ftp')]",
+              "properties": {
+                "allow": false
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', format('{0}-{1}', parameters('namePrefix'), parameters('env')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+              "apiVersion": "2024-11-01",
+              "name": "[format('{0}/{1}', format('{0}-{1}', parameters('namePrefix'), parameters('env')), 'scm')]",
+              "properties": {
+                "allow": true
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', format('{0}-{1}', parameters('namePrefix'), parameters('env')))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "appServiceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Web/sites', format('{0}-{1}', parameters('namePrefix'), parameters('env')))]"
+            },
+            "appServiceName": {
+              "type": "string",
+              "value": "[format('{0}-{1}', parameters('namePrefix'), parameters('env'))]"
+            },
+            "defaultHostName": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Web/sites', format('{0}-{1}', parameters('namePrefix'), parameters('env'))), '2024-11-01').defaultHostName]"
+            },
+            "principalId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Web/sites', format('{0}-{1}', parameters('namePrefix'), parameters('env'))), '2024-11-01', 'full').identity.principalId]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'appServicePlan')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('keyVault-{0}', parameters('env'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "env": {
+            "value": "[parameters('env')]"
+          },
+          "baseName": {
+            "value": "[parameters('baseName')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "10891161934925546737"
+            }
+          },
+          "parameters": {
+            "env": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name: dev or prod"
+              }
+            },
+            "baseName": {
+              "type": "string",
+              "defaultValue": "flashid",
+              "metadata": {
+                "description": "Base name for the Key Vault resource"
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "southafricanorth",
+              "metadata": {
+                "description": "Azure region"
+              }
+            },
+            "softDeleteRetentionInDays": {
+              "type": "int",
+              "defaultValue": 90,
+              "metadata": {
+                "description": "Soft-delete retention in days"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.KeyVault/vaults",
+              "apiVersion": "2023-07-01",
+              "name": "[format('kv-{0}-{1}', parameters('baseName'), parameters('env'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "sku": {
+                  "family": "A",
+                  "name": "standard"
+                },
+                "tenantId": "[tenant().tenantId]",
+                "enableRbacAuthorization": true,
+                "enableSoftDelete": true,
+                "softDeleteRetentionInDays": "[parameters('softDeleteRetentionInDays')]",
+                "publicNetworkAccess": "Enabled"
+              }
+            }
+          ],
+          "outputs": {
+            "keyVaultId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.KeyVault/vaults', format('kv-{0}-{1}', parameters('baseName'), parameters('env')))]"
+            },
+            "keyVaultName": {
+              "type": "string",
+              "value": "[format('kv-{0}-{1}', parameters('baseName'), parameters('env'))]"
+            },
+            "keyVaultUri": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.KeyVault/vaults', format('kv-{0}-{1}', parameters('baseName'), parameters('env'))), '2023-07-01').vaultUri]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('cosmos-{0}', parameters('env'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "env": {
+            "value": "[parameters('env')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "enableFreeTier": {
+            "value": "[equals(parameters('env'), 'dev')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "11991100844478105967"
+            }
+          },
+          "parameters": {
+            "env": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name: dev or prod"
+              }
+            },
+            "baseName": {
+              "type": "string",
+              "defaultValue": "flashid-qr-cosmos",
+              "metadata": {
+                "description": "Base name for the Cosmos DB account"
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "southafricanorth",
+              "metadata": {
+                "description": "Azure region"
+              }
+            },
+            "enableFreeTier": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Enable the free tier (only one per subscription)"
+              }
+            },
+            "containerThroughput": {
+              "type": "int",
+              "defaultValue": 400,
+              "metadata": {
+                "description": "Provisioned throughput (RU/s) per container"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts",
+              "apiVersion": "2024-11-15",
+              "name": "[format('{0}-{1}', parameters('baseName'), parameters('env'))]",
+              "location": "[parameters('location')]",
+              "kind": "GlobalDocumentDB",
+              "properties": {
+                "databaseAccountOfferType": "Standard",
+                "enableFreeTier": "[parameters('enableFreeTier')]",
+                "consistencyPolicy": {
+                  "defaultConsistencyLevel": "Session"
+                },
+                "locations": [
+                  {
+                    "locationName": "[parameters('location')]",
+                    "failoverPriority": 0,
+                    "isZoneRedundant": false
+                  }
+                ],
+                "backupPolicy": {
+                  "type": "Periodic",
+                  "periodicModeProperties": {
+                    "backupIntervalInMinutes": 240,
+                    "backupRetentionIntervalInHours": 8,
+                    "backupStorageRedundancy": "Geo"
+                  }
+                },
+                "enableAutomaticFailover": true,
+                "minimalTlsVersion": "Tls12",
+                "publicNetworkAccess": "Enabled"
+              }
+            },
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+              "apiVersion": "2024-11-15",
+              "name": "[format('{0}/{1}', format('{0}-{1}', parameters('baseName'), parameters('env')), 'FlashIDDb')]",
+              "properties": {
+                "resource": {
+                  "id": "FlashIDDb"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', format('{0}-{1}', parameters('baseName'), parameters('env')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+              "apiVersion": "2024-11-15",
+              "name": "[format('{0}/{1}/{2}', format('{0}-{1}', parameters('baseName'), parameters('env')), 'FlashIDDb', 'QrCodes')]",
+              "properties": {
+                "resource": {
+                  "id": "QrCodes",
+                  "partitionKey": {
+                    "paths": [
+                      "/id"
+                    ],
+                    "kind": "Hash",
+                    "version": 2
+                  },
+                  "indexingPolicy": {
+                    "indexingMode": "consistent",
+                    "automatic": true,
+                    "includedPaths": [
+                      {
+                        "path": "/*"
+                      }
+                    ],
+                    "excludedPaths": [
+                      {
+                        "path": "/\"_etag\"/?"
+                      }
+                    ]
+                  }
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', format('{0}-{1}', parameters('baseName'), parameters('env')), 'FlashIDDb')]"
+              ]
+            },
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/throughputSettings",
+              "apiVersion": "2024-11-15",
+              "name": "[format('{0}/{1}/{2}/{3}', format('{0}-{1}', parameters('baseName'), parameters('env')), 'FlashIDDb', 'QrCodes', 'default')]",
+              "properties": {
+                "resource": {
+                  "throughput": "[parameters('containerThroughput')]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', format('{0}-{1}', parameters('baseName'), parameters('env')), 'FlashIDDb', 'QrCodes')]"
+              ]
+            },
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+              "apiVersion": "2024-11-15",
+              "name": "[format('{0}/{1}', format('{0}-{1}', parameters('baseName'), parameters('env')), 'FlashIdQrDb')]",
+              "properties": {
+                "resource": {
+                  "id": "FlashIdQrDb"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', format('{0}-{1}', parameters('baseName'), parameters('env')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+              "apiVersion": "2024-11-15",
+              "name": "[format('{0}/{1}/{2}', format('{0}-{1}', parameters('baseName'), parameters('env')), 'FlashIdQrDb', 'QrTokenClaims')]",
+              "properties": {
+                "resource": {
+                  "id": "QrTokenClaims",
+                  "partitionKey": {
+                    "paths": [
+                      "/id"
+                    ],
+                    "kind": "Hash"
+                  },
+                  "defaultTtl": -1,
+                  "indexingPolicy": {
+                    "indexingMode": "consistent",
+                    "automatic": true,
+                    "includedPaths": [
+                      {
+                        "path": "/*"
+                      }
+                    ],
+                    "excludedPaths": [
+                      {
+                        "path": "/\"_etag\"/?"
+                      }
+                    ]
+                  }
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', format('{0}-{1}', parameters('baseName'), parameters('env')), 'FlashIdQrDb')]"
+              ]
+            },
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/throughputSettings",
+              "apiVersion": "2024-11-15",
+              "name": "[format('{0}/{1}/{2}/{3}', format('{0}-{1}', parameters('baseName'), parameters('env')), 'FlashIdQrDb', 'QrTokenClaims', 'default')]",
+              "properties": {
+                "resource": {
+                  "throughput": "[parameters('containerThroughput')]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', format('{0}-{1}', parameters('baseName'), parameters('env')), 'FlashIdQrDb', 'QrTokenClaims')]"
+              ]
+            }
+          ],
+          "outputs": {
+            "cosmosAccountId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.DocumentDB/databaseAccounts', format('{0}-{1}', parameters('baseName'), parameters('env')))]"
+            },
+            "cosmosAccountName": {
+              "type": "string",
+              "value": "[format('{0}-{1}', parameters('baseName'), parameters('env'))]"
+            },
+            "cosmosEndpoint": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts', format('{0}-{1}', parameters('baseName'), parameters('env'))), '2024-11-15').documentEndpoint]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('faceApi-{0}', parameters('env'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "env": {
+            "value": "[parameters('env')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "5042590994606671870"
+            }
+          },
+          "parameters": {
+            "env": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name: dev or prod"
+              }
+            },
+            "baseName": {
+              "type": "string",
+              "defaultValue": "digitalwallet",
+              "metadata": {
+                "description": "Base name for the Face API resource"
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "southafricanorth",
+              "metadata": {
+                "description": "Azure region"
+              }
+            },
+            "skuName": {
+              "type": "string",
+              "defaultValue": "S0",
+              "metadata": {
+                "description": "SKU name (S0 is the only paid tier for Face API)"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.CognitiveServices/accounts",
+              "apiVersion": "2024-10-01",
+              "name": "[format('face-{0}-{1}', parameters('baseName'), parameters('env'))]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "[parameters('skuName')]"
+              },
+              "kind": "Face",
+              "properties": {
+                "customSubDomainName": "[format('face-{0}-{1}', parameters('baseName'), parameters('env'))]",
+                "publicNetworkAccess": "Enabled"
+              }
+            }
+          ],
+          "outputs": {
+            "faceApiId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.CognitiveServices/accounts', format('face-{0}-{1}', parameters('baseName'), parameters('env')))]"
+            },
+            "faceApiName": {
+              "type": "string",
+              "value": "[format('face-{0}-{1}', parameters('baseName'), parameters('env'))]"
+            },
+            "faceApiEndpoint": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', format('face-{0}-{1}', parameters('baseName'), parameters('env'))), '2024-10-01').endpoint]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "sql",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "serverName": {
+            "value": "[format('sql-{0}', parameters('baseName'))]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "adminLogin": {
+            "value": "[parameters('sqlAdminLogin')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('sqlAdminPassword')]"
+          },
+          "entraAdminLogin": {
+            "value": "[parameters('sqlEntraAdminLogin')]"
+          },
+          "entraAdminObjectId": {
+            "value": "[parameters('sqlEntraAdminObjectId')]"
+          },
+          "databases": {
+            "value": "[parameters('sqlDatabases')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "8437868031503787033"
+            }
+          },
+          "parameters": {
+            "serverName": {
+              "type": "string",
+              "defaultValue": "sql-flashid",
+              "metadata": {
+                "description": "Name for the SQL Server (shared across environments)"
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "southafricanorth",
+              "metadata": {
+                "description": "Azure region"
+              }
+            },
+            "adminLogin": {
+              "type": "string",
+              "metadata": {
+                "description": "SQL admin login username"
+              }
+            },
+            "adminPassword": {
+              "type": "securestring",
+              "metadata": {
+                "description": "SQL admin login password"
+              }
+            },
+            "entraAdminLogin": {
+              "type": "string",
+              "metadata": {
+                "description": "Entra ID admin email"
+              }
+            },
+            "entraAdminObjectId": {
+              "type": "string",
+              "metadata": {
+                "description": "Entra ID admin object ID"
+              }
+            },
+            "databases": {
+              "type": "array",
+              "metadata": {
+                "description": "Array of databases to create on this server"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Sql/servers",
+              "apiVersion": "2023-08-01-preview",
+              "name": "[parameters('serverName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "administratorLogin": "[parameters('adminLogin')]",
+                "administratorLoginPassword": "[parameters('adminPassword')]",
+                "version": "12.0",
+                "minimalTlsVersion": "1.2",
+                "publicNetworkAccess": "Enabled",
+                "administrators": {
+                  "administratorType": "ActiveDirectory",
+                  "principalType": "User",
+                  "login": "[parameters('entraAdminLogin')]",
+                  "sid": "[parameters('entraAdminObjectId')]",
+                  "tenantId": "[tenant().tenantId]",
+                  "azureADOnlyAuthentication": false
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Sql/servers/firewallRules",
+              "apiVersion": "2023-08-01-preview",
+              "name": "[format('{0}/{1}', parameters('serverName'), 'AllowAllWindowsAzureIps')]",
+              "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "0.0.0.0"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+              ]
+            },
+            {
+              "copy": {
+                "name": "sqlDatabases",
+                "count": "[length(parameters('databases'))]"
+              },
+              "type": "Microsoft.Sql/servers/databases",
+              "apiVersion": "2023-08-01-preview",
+              "name": "[format('{0}/{1}', parameters('serverName'), parameters('databases')[copyIndex()].name)]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "[coalesce(tryGet(parameters('databases')[copyIndex()], 'skuName'), 'GP_S_Gen5_1')]",
+                "tier": "[coalesce(tryGet(parameters('databases')[copyIndex()], 'skuTier'), 'GeneralPurpose')]",
+                "family": "Gen5",
+                "capacity": "[coalesce(tryGet(parameters('databases')[copyIndex()], 'capacity'), 1)]"
+              },
+              "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "maxSizeBytes": "[parameters('databases')[copyIndex()].maxSizeBytes]",
+                "autoPauseDelay": "[coalesce(tryGet(parameters('databases')[copyIndex()], 'autoPauseDelay'), 60)]",
+                "minCapacity": "[json('0.5')]",
+                "zoneRedundant": false,
+                "readScale": "Disabled",
+                "requestedBackupStorageRedundancy": "[coalesce(tryGet(parameters('databases')[copyIndex()], 'backupRedundancy'), 'Local')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "sqlServerId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+            },
+            "sqlServerName": {
+              "type": "string",
+              "value": "[parameters('serverName')]"
+            },
+            "sqlServerFqdn": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Sql/servers', parameters('serverName')), '2023-08-01-preview').fullyQualifiedDomainName]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('storage-{0}', parameters('env'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "env": {
+            "value": "[parameters('env')]"
+          },
+          "baseName": {
+            "value": "[parameters('baseName')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "allowBlobPublicAccess": {
+            "value": "[equals(parameters('env'), 'dev')]"
+          },
+          "corsAllowedOrigin": {
+            "value": "[format('https://{0}', reference(resourceId('Microsoft.Resources/deployments', format('webFlashId-{0}', parameters('env'))), '2022-09-01').outputs.defaultHostName.value)]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "995237922365424127"
+            }
+          },
+          "parameters": {
+            "env": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name: dev or prod"
+              }
+            },
+            "baseName": {
+              "type": "string",
+              "defaultValue": "flashid",
+              "metadata": {
+                "description": "Base name (no hyphens — storage accounts only allow alphanumeric)"
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "southafricanorth",
+              "metadata": {
+                "description": "Azure region"
+              }
+            },
+            "skuName": {
+              "type": "string",
+              "defaultValue": "Standard_RAGRS",
+              "metadata": {
+                "description": "Storage SKU"
+              }
+            },
+            "allowBlobPublicAccess": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Allow public blob access (dev may need this, prod should not)"
+              }
+            },
+            "corsAllowedOrigin": {
+              "type": "string",
+              "defaultValue": "",
+              "metadata": {
+                "description": "CORS allowed origin for blob access (e.g. the web app hostname)"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2023-05-01",
+              "name": "[format('st{0}{1}', parameters('baseName'), parameters('env'))]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "[parameters('skuName')]"
+              },
+              "kind": "StorageV2",
+              "properties": {
+                "accessTier": "Hot",
+                "minimumTlsVersion": "TLS1_2",
+                "supportsHttpsTrafficOnly": true,
+                "allowBlobPublicAccess": "[parameters('allowBlobPublicAccess')]",
+                "allowSharedKeyAccess": true,
+                "allowCrossTenantReplication": false,
+                "networkAcls": {
+                  "bypass": "AzureServices",
+                  "defaultAction": "Allow"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}', format('st{0}{1}', parameters('baseName'), parameters('env')), 'default')]",
+              "properties": {
+                "deleteRetentionPolicy": {
+                  "enabled": true,
+                  "days": 7
+                },
+                "containerDeleteRetentionPolicy": {
+                  "enabled": true,
+                  "days": 7
+                },
+                "cors": {
+                  "corsRules": "[if(not(equals(parameters('corsAllowedOrigin'), '')), createArray(createObject('allowedOrigins', createArray(parameters('corsAllowedOrigin')), 'allowedMethods', createArray('GET'), 'maxAgeInSeconds', 3600, 'exposedHeaders', createArray('*'), 'allowedHeaders', createArray('*'))), createArray())]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', format('st{0}{1}', parameters('baseName'), parameters('env')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}/{2}', format('st{0}{1}', parameters('baseName'), parameters('env')), 'default', 'citizen-photos')]",
+              "properties": {
+                "publicAccess": "None"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', format('st{0}{1}', parameters('baseName'), parameters('env')), 'default')]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}/{2}', format('st{0}{1}', parameters('baseName'), parameters('env')), 'default', 'images')]",
+              "properties": {
+                "publicAccess": "[if(parameters('allowBlobPublicAccess'), 'Container', 'None')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', format('st{0}{1}', parameters('baseName'), parameters('env')), 'default')]"
+              ]
+            }
+          ],
+          "outputs": {
+            "storageAccountId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Storage/storageAccounts', format('st{0}{1}', parameters('baseName'), parameters('env')))]"
+            },
+            "storageAccountName": {
+              "type": "string",
+              "value": "[format('st{0}{1}', parameters('baseName'), parameters('env'))]"
+            },
+            "primaryBlobEndpoint": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', format('st{0}{1}', parameters('baseName'), parameters('env'))), '2023-05-01').primaryEndpoints.blob]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('webFlashId-{0}', parameters('env')))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "apiFlashIdHostName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('apiFlashId-{0}', parameters('env'))), '2022-09-01').outputs.defaultHostName.value]"
+    },
+    "apiGovRegistryHostName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('apiGovRegistry-{0}', parameters('env'))), '2022-09-01').outputs.defaultHostName.value]"
+    },
+    "webFlashIdHostName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('webFlashId-{0}', parameters('env'))), '2022-09-01').outputs.defaultHostName.value]"
+    },
+    "communicationServiceName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('communicationService-{0}', parameters('env'))), '2022-09-01').outputs.communicationServiceName.value]"
+    }
+  }
+}

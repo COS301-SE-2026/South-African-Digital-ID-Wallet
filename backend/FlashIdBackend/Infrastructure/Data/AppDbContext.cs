@@ -28,6 +28,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<DeviceVerification> DeviceVerifications => Set<DeviceVerification>();
     public DbSet<JobRun> JobRuns => Set<JobRun>();
+    public DbSet<PhysicalIdentityVerification> PhysicalIdentityVerifications => Set<PhysicalIdentityVerification>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

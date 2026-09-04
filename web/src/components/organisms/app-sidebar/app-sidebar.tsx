@@ -14,6 +14,7 @@ import {
   UserRoundPen,
   Landmark,
   LogOut,
+  IdCard,
 } from 'lucide-react'
 import { useState } from 'react'
 import Image from 'next/image'
@@ -37,6 +38,7 @@ const sidebarIcons: Record<SidebarIconName, React.ElementType> = {
   shield: ShieldCheck,
   onboard: UserRoundPen,
   institutions: Landmark,
+  idCard: IdCard,
 }
 
 export const AppSidebar = ({

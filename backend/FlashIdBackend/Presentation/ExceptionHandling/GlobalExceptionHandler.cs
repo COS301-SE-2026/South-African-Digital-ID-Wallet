@@ -1,8 +1,10 @@
 using Application.Features.Onboarding.Exceptions;
+using Application.Features.Verification.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Diagnostics;
 using Application.Features.Citizens.Exceptions;
 using Application.Features.Credentials.Exceptions;
+using Application.Features.GovAdminAuditLog.Exceptions;
 
 namespace Presentation.ExceptionHandling;
 
@@ -27,6 +29,10 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
             InvalidSAPhoneNumberException =>
                 (StatusCodes.Status422UnprocessableEntity, "Invalid SA phone number format",
                     exception.Message),
+
+            InvalidAuditActionException =>
+        (StatusCodes.Status400BadRequest, "Invalid audit action",
+            exception.Message),
 
             DuplicateEmailRegisteredException =>
                 (StatusCodes.Status409Conflict, "Email already registered",
@@ -55,6 +61,12 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
 
             EmailDeliveryException => (StatusCodes.Status503ServiceUnavailable, "Required value missing",
                     exception.Message),
+
+            VerificationExpiredException => (StatusCodes.Status410Gone, "Verification session expired", exception.Message),
+
+            VerificationNotFoundException => (StatusCodes.Status404NotFound, "Verification session not found", exception.Message),
+
+            InvalidVerificationState => (StatusCodes.Status409Conflict, "Verification cannot continue", exception.Message),
 
             ArgumentNullException => (StatusCodes.Status400BadRequest, "Invalid request",
                 exception.Message),

@@ -18,6 +18,7 @@ const TONE_CONTAINERS: Record<IconTileTone, string> = {
   'soft-green': 'bg-primary-green/10',
   'soft-amber': 'bg-warning-amber/10',
   'soft-red': 'bg-danger-red/10',
+  'soft-blue': 'bg-national-blue/10',
   neutral: 'bg-border-grey',
 }
 
@@ -29,6 +30,7 @@ const TONE_ICONS: Record<IconTileTone, string> = {
   'soft-green': colors.primaryGreen,
   'soft-amber': colors.warning,
   'soft-red': colors.danger,
+  'soft-blue': colors.blue,
   neutral: colors.textMuted,
 }
 

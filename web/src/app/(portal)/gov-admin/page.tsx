@@ -1,5 +1,4 @@
-import { UnderConstructionPage } from '@/components/pages/under-construction-page'
-
+import GovAdminDashboardPage from '@/components/pages/gov-admin/gov-admin-dashboard-page'
 export default function Page() {
-  return <UnderConstructionPage />
+  return <GovAdminDashboardPage />
 }

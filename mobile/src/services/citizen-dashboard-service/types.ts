@@ -4,6 +4,14 @@ import type { IconTileTone } from '@/components/atoms'
 
 import type { CredentialTone } from '@/theme/credential-tones'
 
+export type ActivityCategory = 'login' | 'verification' | 'share' | 'other'
+
+export type ActivityFilterName = ActivityCategory | 'all'
+
+export type ActivityRange = 'all' | '7d' | '30d'
+
+export type IdentityStatus = 'verified' | 'pending' | 'attention'
+
 export type IdentityDocumentDetail = {
   citizenship: string
   countryOfBirth: string
@@ -54,8 +62,6 @@ export type ActivityResponse = {
   type: string
 }
 
-export type IdentityStatus = 'verified' | 'pending' | 'attention'
-
 export type IdentityStatusSummary = {
   description: string
   label: string
@@ -64,17 +70,47 @@ export type IdentityStatusSummary = {
   value: string
 }
 
+export type ActivityFilter = {
+  category: ActivityFilterName
+  range: ActivityRange
+}
+
 export type ActivityEntry = {
+  category: ActivityCategory
   description: string
   id: string
   Icon: LucideIcon
+  occurredAt: string
+  time: string
   timestamp: string
   title: string
   tone: IconTileTone
 }
 
 export type ActivityPresentation = {
+  category: ActivityCategory
   Icon: LucideIcon
   title: string
   tone: IconTileTone
+}
+
+export type ActivityGroup = {
+  entries: ActivityEntry[]
+  label: string
+}
+
+export type OfficialActivityItem = {
+  createdAt: string
+  details: string
+  eventType: string
+  id: string
+}
+
+export type OfficialActivityResponse = {
+  items: OfficialActivityItem[]
+}
+
+export type OfficialStats = {
+  isCapped: boolean
+  todayCount: number
 }
