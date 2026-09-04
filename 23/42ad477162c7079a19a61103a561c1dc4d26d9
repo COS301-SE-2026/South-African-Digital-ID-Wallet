@@ -1,0 +1,14 @@
+web/e2e/test/activate-credentials.spec.ts
+  h_293a8616118f65 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "2342ad477162c7079a19a61103a561c1dc4d26d9",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
