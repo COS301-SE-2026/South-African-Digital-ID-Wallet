@@ -21,7 +21,7 @@
     - [Citizens](#citizens)
     - [Credentials](#credentials)
     - [Credential Activation](#credential-activation)
-    - [Citizen Verify](#citizen-verify)
+    - [Citizen Verification](#citizen-verification)
     - [Institutions](#institutions)
     - [Onboarding](#onboarding)
     - [Activity](#activity)
@@ -77,7 +77,7 @@ The full architectural requirements, including architectural patterns, design pa
 ### Auth
 
 #### GET /api/auth/me
-Return the currently authenticated user's profile
+Returns the currently authenticated user's profile and citizen identity-linking state.
 
 **Authentication:** Required
 
@@ -87,8 +87,10 @@ Return the currently authenticated user's profile
     "id": "string",
     "names": "string",
     "surname": "string",
+    "saId": "string",
     "email": "string",
-    "role": "string"
+    "role": "string",
+    "isIdentityVerified": true
 }
 ```
 
@@ -420,12 +422,45 @@ Admin retrieves a specific citizen's full credential list.
 ### Credential Activation
 
 #### POST /api/activate-credentials
-Activates a citizen's credentials after register.
+Activates one or more government-issued credentials for the authenticated citizen after their identity has been verified.
+
+The citizen must already be linked to a verified FlashID citizen record. FlashID retrieves the selected credential records from the Government Registry and stores them in the citizen's wallet.
 
 **Authentication:** Required for Citizen
 
-**Response 200:** Credentials activated
-**Response 401:** Account could not be identified from token
+**Request Body:**
+json
+{
+    "credentialTypes": [
+        "IdentityDocument",
+        "DriversLicense"
+    ]
+}
+`
+
+**Credential Types:**
+
+| Value            | Description                     |
+| ---------------- | ------------------------------- |
+| IdentityDocument | South African identity document |
+| DriversLicense   | South African driver's licence  |
+
+At least one credential type must be selected.
+
+**Response 200:**
+
+json
+{
+    "status": "string",
+    "message": "string"
+}
+
+
+**Response 400:** Invalid request or unsupported credential type
+**Response 401:** Authenticated account could not be identified
+**Response 404:** Citizen or requested credential could not be found in the Government Registry
+**Response 409:** Citizen is not verified, or the requested credential is already active
+**Response 500:** Unexpected credential persistence failure
 
 ### Credential Expiry Check
 
@@ -454,7 +489,7 @@ Manually runs the daily credential-expiry check. Idempotent per SAST calendar da
 ### Credential Update Check
 
 #### POST /api/credentials/update-check
-Manually runs the daily citizen-credential update check. Idempotent per SAST calendar date (if today's check already completed, returns that result without reprocessing, or if another instance is currently running today's check it returns `409`.). Re-fetches each citizen with at least one Active credential from the Government Registry and applies any changed personal details or credential fields, re-signing `Credential.Signature` and notifying the citizen only where a difference was found.
+Manually runs the daily citizen-credential update check. Idempotent per SAST calendar date (if today's check already completed, returns that result without reprocessing, or if another instance is currently running today's check it returns 409.). Re-fetches each citizen with at least one Active credential from the Government Registry and applies any changed personal details or credential fields, re-signing Credential.Signature and notifying the citizen only where a difference was found.
 
 **Authentication:** Required for Government Administrator
 
@@ -475,12 +510,282 @@ Manually runs the daily citizen-credential update check. Idempotent per SAST cal
 **Response 403:** Caller is not a Government Administrator
 **Response 409:** Another update check is currently running for today
 
-### Citizen Verify
+### Citizen Verification
+
+Citizen verification supports two identity-proofing methods:
+
+1. Activation token verification for citizens previously onboarded by an official.
+2. Physical identity verification using Government Registry identity data and Azure Face liveness-with-verification.
+
+Physical identity verification is performed against the authenticated citizen account. The ID entered by the user is treated as a claim and is validated against the Government Registry before biometric verification.
+
+---
 
 #### POST /api/citizen-verification/activate-token
-Verifies a citizen's activation token as part of the credential-activation flow.
+Verifies an activation token and PIN issued during official assisted citizen onboarding.
 
 **Authentication:** Required for Citizen
+
+**Request Body:**
+```json
+{
+    "token": "string",
+    "saId": "string",
+    "pin": "string"
+}
+```
+
+**Validation Rules:**
+- `saId` must contain exactly 13 numeric digits.
+- `token` must be valid and unexpired.
+- `pin` must match the issued activation PIN.
+
+**Response 200:** Citizen identity verified and account linked
+
+**Response 400:** Invalid request
+**Response 404:** Activation record or citizen not found
+**Response 409:** Activation state is invalid or citizen is already linked to another account
+**Response 410:** Activation token has expired
+
+---
+
+#### POST /api/citizen-verification/physical
+
+Starts a new physical identity verification session for the authenticated citizen.
+
+If the citizen already has an active, non expired physical verification session, the existing session may be returned instead of creating another one.
+
+**Authentication:** Required for Citizen
+
+**Request Body:** None
+
+**Response 200:**
+```json
+{
+    "verificationId": "string",
+    "status": "AwaitingConsent",
+    "expiresAt": "date"
+}
+```
+
+**Physical Verification Status Values:**
+
+| Status                       | Meaning                                                    |
+| ----------------------------- | ---------------------------------------------------------- |
+| AwaitingConsent               | Waiting for citizen biometric consent                      |
+| AwaitingDocument              | Consent granted; identity information may now be submitted |
+| DocumentProcessing            | Reserved for document-processing flow                      |
+| AwaitingIdConfirmation        | Reserved for ID confirmation flow                          |
+| AwaitingLiveness              | Ready for biometric liveness verification                  |
+| LivenessProcessing            | Liveness verification is being processed                   |
+| AwaitingRegistryVerification  | Waiting for authoritative registry verification            |
+| Verified                      | Identity verification succeeded                            |
+| Failed                        | Identity verification failed                               |
+| Expired                       | Verification session expired                               |
+
+
+
+---
+
+#### POST /api/citizen-verification/physical/{verificationId}/consent
+
+Records explicit citizen consent before biometric identity verification is performed.
+
+Consent must be granted before a liveness session can be created.
+
+**Authentication:** Required for Citizen
+
+**Path Parameter:**
+- verificationId - UUID of the physical identity verification session
+
+**Request Body:** None
+
+**Response 200:**
+```json
+{
+    "verificationId": "string",
+    "status": "AwaitingDocument",
+    "registryIdentityMatched": null,
+    "livenessPassed": null,
+    "registryFaceMatched": null,
+    "expiresAt": "date",
+    "verifiedAt": null,
+    "failureReason": null
+}
+```
+
+**Response 404:** Verification session not found or does not belong to authenticated citizen
+**Response 409:** Consent cannot be granted from the current verification state
+**Response 410:** Verification session expired
+
+---
+
+#### POST /api/citizen-verification/physical/liveness-session
+
+Validates the submitted SA ID against the Government Registry and creates an Azure Face liveness with verification session.
+
+FlashID retrieves the authoritative citizen portrait from private backend storage and supplies it directly to Azure Face as the verification image. The reference portrait is never returned to the frontend.
+
+The frontend receives only the short lived Azure session credentials required to run the liveness capture.
+
+**Authentication:** Required for Citizen
+
+**Request Body:**
+```json
+{
+    "verificationId": "string",
+    "saId": "string"
+}
+```
+
+**Validation Rules:**
+- verificationId must identify a verification owned by the authenticated citizen.
+- Consent must already have been granted.
+- saId must contain exactly 13 numeric digits.
+- If an SA ID has already been associated with the verification session, a different SA ID cannot later be submitted.
+- The citizen must exist in the Government Registry.
+- The Government Registry citizen must have an authoritative portrait available.
+
+**Response 200:**
+```json
+{
+    "sessionId": "string",
+    "authToken": "string",
+    "status": "string"
+}
+```
+
+authToken is short-lived and is used only by the Azure Face web component. It must not be persisted or logged by the client.
+
+**Response 400:** Invalid SA ID format
+**Response 404:** Verification session or Government Registry citizen not found
+**Response 409:** Invalid verification state or SA ID conflicts with the current verification session
+**Response 410:** Verification session expired
+**Response 502:** Azure Face or Government Registry integration failure
+
+---
+
+#### POST /api/citizen-verification/physical/{verificationId}/liveness-result
+
+Retrieves the authoritative liveness with verification result from Azure Face and completes the physical identity verification.
+
+The browser does not determine whether verification succeeded. FlashID independently retrieves the result from Azure Face and makes the final decision on the server.
+
+Verification succeeds only when:
+```text
+RegistryIdentityMatched == true
+AND
+LivenessPassed == true
+AND
+RegistryFaceMatched == true
+```
+
+If successful, FlashID creates or links the citizen record to the authenticated user and marks the citizen as verified.
+
+**Authentication:** Required for Citizen
+
+**Path Parameter:**
+- verificationId - UUID of the physical identity verification session
+
+**Request Body:** None
+
+**Response 200:**
+```json
+{
+    "verificationId": "string",
+    "status": "Verified",
+    "registryIdentityMatched": true,
+    "livenessPassed": true,
+    "registryFaceMatched": true,
+    "expiresAt": "date",
+    "verifiedAt": "date",
+    "failureReason": null
+}
+```
+
+If Azure has not yet completed processing, the endpoint may return the current verification state without marking the verification as complete.
+
+If verification fails:
+```json
+{
+    "verificationId": "string",
+    "status": "Failed",
+    "registryIdentityMatched": true,
+    "livenessPassed": false,
+    "registryFaceMatched": false,
+    "expiresAt": "date",
+    "verifiedAt": null,
+    "failureReason": "string"
+}
+```
+
+**Response 404:** Verification session not found or does not belong to authenticated citizen
+**Response 409:** Verification cannot be completed from the current state
+**Response 410:** Verification session expired
+**Response 502:** Azure Face result could not be retrieved
+
+---
+
+#### GET /api/citizen-verification/physical/{verificationId}
+
+Returns the current state of a physical identity verification session.
+
+This endpoint may be used by the frontend to restore or refresh the current verification state.
+
+**Authentication:** Required for Citizen
+
+**Path Parameter:**
+- verificationId - UUID of the physical identity verification session
+
+**Response 200:**
+```json
+{
+    "verificationId": "string",
+    "status": "AwaitingLiveness",
+    "registryIdentityMatched": true,
+    "livenessPassed": null,
+    "registryFaceMatched": null,
+    "expiresAt": "date",
+    "verifiedAt": null,
+    "failureReason": null
+}
+```
+
+**Response 404:** Verification session not found or does not belong to authenticated citizen
+**Response 410:** Verification session expired
+
+---
+
+#### Physical Identity Account Linking Rules
+
+Physical identity verification is an alternative identity proofing mechanism and does not require the citizen to have previously been onboarded by an official.
+
+A FlashID Citizen record is only created or linked after successful Government Registry and biometric verification.
+
+On successful verification:
+
+1. If the SA ID belongs to a Citizen already linked to another user, the request is rejected.
+2. If the authenticated user is already linked to a different Citizen, the request is rejected.
+3. If the Citizen exists but is not linked to a user, it is linked to the authenticated user.
+4. If no FlashID Citizen exists for the verified SA ID, one is created using authoritative Government Registry data and linked to the authenticated user.
+5. If the Citizen is already linked to the same user, the operation is treated idempotently.
+
+The citizen is marked Verified only after identity, liveness and registry face verification have all succeeded.
+
+---
+
+#### Physical Verification Security Rules
+
+- The Government Registry is the authoritative source for citizen identity data.
+- A citizen-entered SA ID is treated only as an identity claim until confirmed by the Government Registry.
+- The Government Registry portrait is retrieved server-to-server and is never exposed to the browser.
+- Azure Face API credentials remain server-side.
+- The frontend receives only a short-lived Azure Face session authentication token.
+- FlashID does not persist raw liveness images or biometric captures.
+- Azure liveness session images are disabled.
+- SA IDs, biometric data, Azure authentication tokens and raw Azure Face responses must not be written to application logs.
+- Explicit citizen consent is required before biometric processing.
+- The final verification decision is made by the FlashID backend, not by the browser.
 
 ### Institutions
 
