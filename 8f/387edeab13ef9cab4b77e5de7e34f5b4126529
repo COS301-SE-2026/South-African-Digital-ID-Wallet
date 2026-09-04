@@ -1,0 +1,15 @@
+dockerfile.web
+  h_293a8616118f65 25-29
+  h_293a8616118f65 30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "8f387edeab13ef9cab4b77e5de7e34f5b4126529",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
