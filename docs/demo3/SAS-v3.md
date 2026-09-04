@@ -1353,6 +1353,6 @@ Every quantified NFR from the SRS is mapped below to the architectural tactic cl
 | NFR2.5 | 500 concurrent authenticated users, no degradation | - | k6 | 500 VUs /  **not attainable on current Basic tier** - requires Standard/ Premium plan with autoscaling |
 | NFR2.6 | Cold-start latency <5s after idle | None - Free/ Basic tier has no "Always On"/ warm-up strategy configured | k6 | <5000 ms /  **not yet validated**, 667 ms measured while still warm |
 | NFR3.6 | Expiry-check batch completes within bounded time at current volume | Idempotent daily sweep, single-flight 409 guard | k6 | documented, no hard target / 366 ms at ~150 citizens |
-| NFR5.2 | CI passes build/lint/tests on main | GitHub Actions quality gates | Actions history | pass required / **pending** - grab a green `backend.yml` run link |
+| NFR5.2 | CI passes build/lint/tests on main | GitHub Actions quality gates | Actions history | https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/33838886255 |
 | NFR5.3 | >=80% unit test coverage on critical logic | - | Codecov | >=80% / 78% - **fail**, 2pts short |
 | NFR5.4 | Deploy within 30 min of merge to main | GitHub Actions -> Azure Web Apps deploy | Actions run duration | <30 min / 5m36s (api-flashid), 5m35s (gov-registry), 2m8s (web) - **pass** |
