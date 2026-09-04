@@ -33,10 +33,9 @@ jobs:
             AZUREFACEAPIUSERNAME: ${{ secrets.AZUREFACEAPIUSERNAME }}
             AZUREFACEAPIPASSWORD: ${{ secrets.AZUREFACEAPIPASSWORD }}
             AZUREFACEAPIEMAIL: ${{ secrets.AZUREFACEAPIEMAIL }}
-        run: |
-         echo "Azure Face registry:"
-         pnpm config get @azure-ai-vision-face:registry
-         pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
+        working-directory: ./web
+        
         
 
       - name: Build
