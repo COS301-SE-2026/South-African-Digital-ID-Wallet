@@ -20,6 +20,7 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY web/package.json ./web/package.json
+COPY web/.npmrc ./.npmrc
 
 RUN npm pkg delete scripts.postinstall
 
