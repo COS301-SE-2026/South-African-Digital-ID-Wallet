@@ -1,0 +1,14 @@
+docs/images/Deployment_diagram.drawio.svg
+  h_712d174fc3f309 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c8926694d515568128991969d1a1dbf217fbc95f",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
