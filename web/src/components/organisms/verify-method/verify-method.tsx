@@ -87,7 +87,7 @@ export const VerifyMethod = ({
               onClick={() => onSelectMethod('id')}
               className="mt-4 w-full rounded-full bg-deep-green py-2.5 text-sm font-semibold text-clean-white transition-opacity hover:opacity-90"
             >
-              Use Fcae Verification
+              Use Face Verification
             </button>
           </div>
         </div>
