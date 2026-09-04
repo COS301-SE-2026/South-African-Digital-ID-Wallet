@@ -25,7 +25,7 @@ export const GovAdminAuditLogTable = ({
           type="search"
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="Search by anything..."
+          placeholder="Search by Action, User, Role..."
           aria-label="Search audit logs"
           className="h-12 w-full rounded-2xl border border-black/15 bg-card px-4 text-sm text-text-primary outline-none placeholder:text-muted-text focus:border-primary-green focus:ring-1 focus:ring-primary-green"
         />
