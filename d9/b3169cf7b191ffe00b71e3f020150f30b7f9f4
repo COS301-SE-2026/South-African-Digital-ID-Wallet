@@ -1,0 +1,16 @@
+.github/workflows/dev_web-flashid-dev.yml
+  h_293a8616118f65 33-37,40-43
+.github/workflows/main_web-flashid-prod.yml
+  h_293a8616118f65 33-37,40-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "d9b3169cf7b191ffe00b71e3f020150f30b7f9f4",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
