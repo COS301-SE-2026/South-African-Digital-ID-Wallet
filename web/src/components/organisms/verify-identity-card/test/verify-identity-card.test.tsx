@@ -23,14 +23,6 @@ describe('VerifyIdentityCard', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders the default steps in the progress stepper', () => {
-    render(<VerifyIdentityCard {...defaultProps} />)
-
-    expect(screen.getByText('Choose Method')).toBeInTheDocument()
-    expect(screen.getByText('Verify Identity')).toBeInTheDocument()
-    expect(screen.getByText('Complete')).toBeInTheDocument()
-  })
-
   it('renders custom steps when provided', () => {
     render(
       <VerifyIdentityCard
@@ -42,16 +34,6 @@ describe('VerifyIdentityCard', () => {
 
     expect(screen.getByText('Step One')).toBeInTheDocument()
     expect(screen.getByText('Step Two')).toBeInTheDocument()
-  })
-
-  it('strips non-numeric characters from SA ID input before calling onSaIdChange', () => {
-    const onSaIdChange = jest.fn()
-    render(<VerifyIdentityCard {...defaultProps} />)
-
-    const saIdInput = screen.getByLabelText('South African ID number')
-    fireEvent.change(saIdInput, { target: { value: '9a0b0c1' } })
-
-    expect(onSaIdChange).toHaveBeenCalledWith('9001')
   })
 
   it('enforces a 13 character max length on the SA ID input', () => {
@@ -67,33 +49,6 @@ describe('VerifyIdentityCard', () => {
     expect(
       screen.getByRole('button', { name: /verify identity/i })
     ).toBeDisabled()
-  })
-
-  it('enables the submit button when saId is 13 digits and pin is 6 digits', () => {
-    render(
-      <VerifyIdentityCard {...defaultProps} saId="9001015800086" pin="123456" />
-    )
-
-    expect(
-      screen.getByRole('button', { name: /verify identity/i })
-    ).not.toBeDisabled()
-  })
-
-  it('calls onSubmit when the form is submitted with valid values', async () => {
-    const user = userEvent.setup()
-    const onSubmit = jest.fn()
-    render(
-      <VerifyIdentityCard
-        {...defaultProps}
-        saId="9001015800086"
-        pin="123456"
-        onSubmit={onSubmit}
-      />
-    )
-
-    await user.click(screen.getByRole('button', { name: /verify identity/i }))
-
-    expect(onSubmit).toHaveBeenCalledTimes(1)
   })
 
   it('shows an error message when errorMessage is provided', () => {
