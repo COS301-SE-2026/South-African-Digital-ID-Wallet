@@ -1,3 +1,4 @@
+using Application.Features.GovAdminAuditLog.Exceptions;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.GovAdminAuditLog.DTOs;
@@ -28,9 +29,17 @@ public class GovAdminAuditLogService : IGovAdminAuditLogService
     {
         var clampedPage = Math.Max(page ?? 1, 1);
         var clampedPageSize = Math.Clamp(pageSize ?? DefaultPageSize, MinPageSize, MaxPageSize);
-        var parsedAction = Enum.TryParse<AuditEventType>(action, ignoreCase: true, out var actionValue)
-            ? actionValue
-            : (AuditEventType?)null;
+        AuditEventType? parsedAction = null;
+        if (!string.IsNullOrWhiteSpace(action))
+        {
+            if (!Enum.TryParse<AuditEventType>(action, ignoreCase: true, out var actionValue)
+                || !Enum.IsDefined(actionValue))
+            {
+                throw new InvalidAuditActionException(action);
+            }
+
+            parsedAction = actionValue;
+        }
 
         var (items, totalCount) = await _repository.GetAuditLogsAsync(
             search, parsedAction, dateFrom, dateTo, clampedPage, clampedPageSize);

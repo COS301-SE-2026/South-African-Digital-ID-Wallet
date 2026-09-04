@@ -1,4 +1,5 @@
-﻿using Application.Common.Services;
+﻿using Application.Features.GovAdminAuditLog.Exceptions;
+using Application.Common.Services;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
@@ -285,6 +286,16 @@ public class GovAdminAuditLogServiceTests
 
         Assert.Single(result.Items);
         Assert.Equal("UserLoggedIn", result.Items[0].Action);
+    }
+
+    [Fact]
+    public async Task GetAuditLogsAsync_InvalidAction_ThrowsInvalidAuditActionException()
+    {
+        using var context = CreateContext();
+        var service = CreateService(context);
+
+        await Assert.ThrowsAsync<InvalidAuditActionException>(() =>
+            service.GetAuditLogsAsync(null, "NotARealAction", null, null, null, null));
     }
 
     [Fact]

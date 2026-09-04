@@ -58,6 +58,7 @@ public class GovAdminAuditLogRepository : IGovAdminAuditLogRepository
 
         var rows = await query
             .OrderByDescending(x => x.log.CreatedAt)
+            .ThenByDescending(x => x.log.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(x => new
