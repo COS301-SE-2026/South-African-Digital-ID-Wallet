@@ -16,6 +16,7 @@ const eslintConfig = defineConfig([
     'test-results/**',
     'coverage/**',
     'blob-report/**',
+    'public/facelivenessdetector-assets/**',
   ]),
 ])
 

@@ -30,6 +30,8 @@ public class CitizenRecordConfiguration : IEntityTypeConfiguration<CitizenRecord
 
         builder.Property(c => c.DateOfBirth).IsRequired();
 
+        builder.Property(c => c.PhotoBlobName).HasMaxLength(500);
+
         builder.HasMany(c => c.Credentials)
             .WithOne(c => c.Citizen)
             .HasForeignKey(c => c.CitizenId)

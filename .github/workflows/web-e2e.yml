@@ -76,6 +76,11 @@ jobs:
       - name: Install web dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
         working-directory: ./web
+        env:
+            AZUREFACEAPIREGISTRY: ${{ secrets.AZUREFACEAPIREGISTRY }}
+            AZUREFACEAPIUSERNAME: ${{ secrets.AZUREFACEAPIUSERNAME }}
+            AZUREFACEAPIPASSWORD: ${{ secrets.AZUREFACEAPIPASSWORD }}
+            AZUREFACEAPIEMAIL: ${{ secrets.AZUREFACEAPIEMAIL }}
 
       - name: Restore backend
         run: dotnet restore backend/FlashIdBackend/FlashIdBackend.sln

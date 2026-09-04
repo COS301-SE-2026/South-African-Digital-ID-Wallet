@@ -10,6 +10,7 @@ export type SidebarIconName =
   | 'shield'
   | 'onboard'
   | 'institutions'
+  | 'idCard'
 
 export type SidebarNavItem = {
   label: string

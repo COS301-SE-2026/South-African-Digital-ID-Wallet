@@ -126,7 +126,8 @@ public static class DependencyInjection
         services.AddHostedService<CredentialUpdateBackgroundService>();
 
         services.AddScoped<IGovAdminAuditLogRepository, GovAdminAuditLogRepository>();
-
+        services.AddSingleton<IFaceLivenessServiceProvider, AzureFaceLivenessServiceProvider>();
+        services.AddScoped<IPhysicalIdentityVerificationRepository, PhysicalIdentityVerificationRepository>();
         return services;
     }
 }

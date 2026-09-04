@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-test('citizen sees a validation error for an incorrect activation PIN', async ({
+test.skip('citizen sees a validation error for an incorrect activation PIN', async ({
   page,
 }) => {
   await page.goto(

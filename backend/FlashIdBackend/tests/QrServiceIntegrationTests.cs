@@ -30,6 +30,7 @@ public class QrServiceIntegrationTests
     private sealed class FakePhotoStorageProvider : IPhotoStorageProvider
     {
         public Task<string> GenerateReadSasUrlAsync(string blobName, TimeSpan ttl) => Task.FromResult($"https://fake-blob-sas.local/{blobName}");
+        public Task<Stream?> OpenReadAsync(string blobName, CancellationToken cancellationToken) => Task.FromResult<Stream?>(null);
     }
 
     private sealed class FakeQrDisclosureTokenRepository : IQrDisclosureTokenRepository
