@@ -113,7 +113,7 @@ Authenticates a user. If the device is already trusted, authentication completes
 }
 ```
 
-**Response 200 — Trusted Device:**
+**Response 200 - Trusted Device:**
 ```json
 {
     "token": "",
@@ -128,7 +128,7 @@ Authenticates a user. If the device is already trusted, authentication completes
 
 The JWT access token is returned through the `access_token` HttpOnly cookie and is therefore not exposed in the response body.
 
-**Response 200 — Untrusted Device:**
+**Response 200 - Untrusted Device:**
 ```json
 {
     "token": "",
@@ -1345,14 +1345,94 @@ Every quantified NFR from the SRS is mapped below to the architectural tactic cl
 
 | ID | Quantified requirement | Tactic in SAS | Test / tool | Target /  actual |
 |---|---|---|---|---|
+| NFR1.1 | All protected resources require a valid JWT | JWT bearer authentication with role-based authorisation policies on controllers | xUnit integration (`CredentialControllerIntegrationTests`) | 401 unauthenticated, 403 wrong role / **pass**, 6 tests including `ExpiryCheck_Unauthenticated_ReturnsUnauthorized` and `IssueCredential_AsCitizen_ReturnsForbidden` |
+| NFR1.4 | OTP required on administrative authentication | Device verification with emailed OTP, attempt-capped and time-expiring, skipped only for an already-trusted device | xUnit (`AuthServiceTests`) | OTP enforced on every untrusted device / **pass**, 12 tests covering missing, invalid, expired, already-verified and max-attempt OTP paths |
+| NFR1.7 | QR disclosure token usable exactly once | Single-use `Jti` claim marked through `TryMarkUsedAsync` in Cosmos DB, plus Ed25519 signature verification | xUnit integration (`QrServiceIntegrationTests`) | Second redemption rejected / **pass**, `ResolveAlreadyUsed_TokenAlreadyUsed_ThrowsInvalidDisclosureTokenException` |
 | NFR1.8 | Rate limiting on abuse-prone endpoints | ASP.NET Core rate limiting middleware, per-user partitioned policies | k6 | 429 past configured limit /  429 confirmed on request #4 |
-| NFR2.2 | Auth ops <2s for 95% of requests | JWT bearer auth, BCrypt password hashing, trusted-device check to skip OTP round-trip | k6 | <2000 ms /  1.62 s |
+| NFR1.9 | POPIA erasure on account-deletion request | Cascading removal of citizen, credential, audit and user records in a defined order | xUnit (`DeleteAccountServiceTests`) | All personal data removed or irrecoverable / **pass**, 5 tests including deletion ordering and audit-log removal |
+| NFR2.1 | Dashboard interactive <2s for 95% of requests | Next.js code-split routing, static asset optimisation | Lighthouse 13.4.1 (desktop, single run per page) | <2000 ms / worst case across all 19 pages: FCP 0.5 s, LCP 1.2 s, TBT 10 ms. Lab measurement, one sample per page, not a 95th-percentile field measurement |
+| NFR2.2 | Auth ops <2s for 95% of requests | JWT bearer auth, BCrypt password hashing, trusted-device check to skip OTP round-trip | k6 | <2000 ms / 1.62 s |
 | NFR2.3 | Credential retrieval <2s for 95% of requests | Indexed lookup via UserId/ CitizenId | k6 | <2000 ms /  508 ms |
 | NFR2.3 | QR generation <2s for 95% of requests | Ed25519-signed disclosure token generation | k6 | <2000 ms /  94 ms |
 | NFR2.4 | QR verification <3s | Single-use Jti claim (`TryMarkUsedAsync`) + Ed25519 signature verification | k6 | <3000 ms /  435.55 ms |
-| NFR2.5 | 500 concurrent authenticated users, no degradation | - | k6 | 500 VUs /  **not attainable on current Basic tier** - requires Standard/ Premium plan with autoscaling |
-| NFR2.6 | Cold-start latency <5s after idle | None - Free/ Basic tier has no "Always On"/ warm-up strategy configured | k6 | <5000 ms /  **not yet validated**, 667 ms measured while still warm |
+| NFR2.5 | 500 concurrent authenticated users, no degradation | - | k6 | 500 VUs /  **not attainable on current Basic tier** - requires Standard/Premium plan with autoscaling |
+| NFR2.6 | Cold-start latency <5s after idle | None - Free/ Basic tier has no "Always On"/ warm-up strategy configured | k6 | <5000 ms / 667 ms |
+| NFR3.5 | Credential and account data remain consistent | EF Core transactional writes, keyset pagination, idempotent background sweeps | xUnit integration (repository test suites) | No hard target / **pass**, consistency is exercised indirectly by `CredentialExpiryRepositoryIntegrationTests` and `CredentialUpdateRepositoryIntegrationTests` |
 | NFR3.6 | Expiry-check batch completes within bounded time at current volume | Idempotent daily sweep, single-flight 409 guard | k6 | documented, no hard target / 366 ms at ~150 citizens |
+| NFR4.3 | WCAG 2.1 AA on public-facing web interfaces | Semantic HTML | Lighthouse 13.4.1 Accessibility audit (desktop) | 90 / 90 to 96 across 19 pages, **pass** |
+| NFR5.1 | Modular Clean Architecture | Domain / Application / Infrastructure / Presentation separation, dependencies inverted through interfaces registered at composition root | xUnit (`DependencyInjectionTests`) | Every Application interface resolves to its Infrastructure implementation at the expected lifetime / **pass** |
 | NFR5.2 | CI passes build/lint/tests on main | GitHub Actions quality gates | Actions history | https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/33838886255 |
-| NFR5.3 | >=80% unit test coverage on critical logic | - | Codecov | >=80% / 78% - **fail**, 2pts short |
+| NFR5.3 | >=80% unit test coverage on critical logic | - | Codecov | >=80% / 63% - **fail**, 17pts short |
 | NFR5.4 | Deploy within 30 min of merge to main | GitHub Actions -> Azure Web Apps deploy | Actions run duration | <30 min / 5m36s (api-flashid), 5m35s (gov-registry), 2m8s (web) - **pass** |
+
+### 6.1 Lighthouse Audit Detail (supports NFR2.1, NFR4.3)
+
+All runs used Lighthouse 13.4.1, emulated desktop, custom throttling, single page session,
+initial page load, one run per page. Raw reports are in `docs/lighthouse-nf-testing/`.
+
+**Production** (`flashid.co.za`)
+
+| Page | Perf | A11y | BP | SEO | FCP | LCP | TBT | CLS | SI |
+|---|---|---|---|---|---|---|---|---|---|
+| Landing (`/`) | 99 | 96 | 100 | 100 | 0.4 s | 0.9 s | 0 ms | 0.004 | 0.4 s |
+| Officials Dashboard (`/officials/officials-dashboard`) | 97 | 96 | 96 | 100 | 0.4 s | 0.9 s | 0 ms | 0.082 | 0.8 s |
+| Onboard Citizen (`/officials/onboard-citizen`) | 99 | 96 | 96 | 100 | 0.4 s | 1.0 s | 10 ms | 0 | 0.7 s |
+| Issue Driver's Licence (`/officials/issue-drivers-license`) | 99 | 96 | 96 | 100 | 0.4 s | 1.0 s | 0 ms | 0 | 0.4 s |
+| Officials Verifications (`/officials/verifications`) | 100 | 93 | 96 | 100 | 0.4 s | 0.8 s | 0 ms | 0.001 | 0.6 s |
+| Citizen Dashboard (`/citizen/citizen-dashboard`) | 99 | 96 | 96 | 100 | 0.4 s | 0.9 s | 0 ms | 0.022 | 0.4 s |
+| View ID Credential (`/citizen/my-credentials`) | 98 | 95 | 96 | 100 | 0.5 s | 1.1 s | 0 ms | 0 | 0.5 s |
+| View Licence Credential (`/citizen/my-credentials`) | 99 | 95 | 96 | 100 | 0.4 s | 1.0 s | 0 ms | 0 | 0.4 s |
+| Citizen Verifications (`/citizen/verifications`) | 96 | 93 | 96 | 100 | 0.5 s | 1.0 s | 0 ms | 0 ms | 0.5 ms |
+| Verify Identity (`/citizen/verify-identity`) | 99 | 96 | 96 | 100 | 0.4 s | 0.9 s | 0 ms | 0 | 0.4 s |
+| Activate Credentials (`/citizen/activate-credentials`) | 99 | 94 | 100 | 100 | 0.4 s | 1.0 s | 0 ms | 0 | 0.4 s |
+| Manage Account (`/citizen/manage-user-account`) | 97 | 96 | 100 | 100 | 0.5 s | 1.2 s | 0 ms | 0 | 0.5 s |
+| Gov Admin Dashboard (`/gov-admin/gov-admin-dashboard`) | 97 | 96 | 96 | 100 | 0.5 s | 1.2 s | 0 ms | 0 | 1.1 s |
+| Upload Institution (`/gov-admin/upload-institution`) | 98 | 90 | 100 | 100 | 0.5 s | 1.1 s | 0 ms | 0 | 0.7 s |
+| View Institutions (`/gov-admin/view-institutions`) | 99 | 96 | 100 | 100 | 0.5 s | 1.0 s | 0 ms | 0 | 0.5 s |
+| Manage Credentials (`/gov-admin/manage-credentials`) | 99 | 96 | 96 | 100 | 0.4 s | 0.9 s | 0 ms | 0 | 0.6 s |
+| Audit Log (`/gov-admin/audit-log`) | 99 | 94 | 96 | 100 | 0.4 s | 0.9 s | 0 ms | 0 | 0.4 s |
+
+#### 6.1.1 Performance findings (NFR2.1)
+
+Across all 19 pages: FCP 0.4 s to 0.5 s, LCP 0.8 s to 1.2 s, TBT 0 ms to 10 ms, CLS 0 to 0.082. Every page is inside the 2 s NFR2.1 budget with roughly a 40% margin on the slowest LCP, and TBT at or near zero means no page blocks the main thread long enough to delay interaction.
+
+The limits of this evidence are stated rather than glossed over:
+
+- Lighthouse reports one simulated lab run per page. NFR2.1 is written as a 95th-percentile claim over real requests, which requires field data (Core Web Vitals / RUM) that the project does not collect. These results are consistent with the target, but do not on their own prove the percentile.
+- The three highest Speed Index values (`/gov-admin/gov-admin-dashboard` at 1.1 s, `/citizen/my-credentials` share flow at 0.8 s, `/officials/officials-dashboard` at 0.8 s) are the data-heavy screens, which is the expected shape.
+- `/officials/officials-dashboard` records the highest CLS in the set (0.082). This is inside Google's 0.1 "good" threshold but is the layout-shift outlier, consistent with its live activity feed.
+
+Recurring optimisation opportunities flagged on nearly every page, none of which currently threaten the NFR2.1 target: HTTP/2 or HTTP/3 not in use (est. 270 ms to 570 ms), render-blocking requests (est. 130 ms to 240 ms), legacy JavaScript transpilation (est. 13 KiB), and unused JavaScript (est. 44 KiB to 203 KiB).
+
+#### 6.1.2 Accessibility findings (NFR4.3)
+
+NFR4.3 is **met**. All scores range from 90 to 96. Reasons why it is now 100:
+
+| Failure | WCAG criterion | Affected pages |
+|---|---|---|
+| Background and foreground colours lack sufficient contrast | 1.4.3 Contrast (Minimum) | All 19 |
+| Form elements do not have associated labels | 1.3.1, 4.1.2 | `/gov-admin/upload-institution` |
+| Document does not have a `<main>` landmark | 1.3.1 (bypass blocks) | `/officials/verifications`, `/citizen/verifications`, `/citizen/activate-credentials`, `/gov-admin/audit-log` |
+
+The unlabelled form controls on `/gov-admin/upload-institution` are the most severe of the three, since a screen reader user cannot determine what each input expects. That page holds the lowest accessibility score in the set at 90.
+
+#### 6.1.3 Other findings
+
+- **Images with incorrect aspect ratio** on 12 of 19 pages, a rendering-quality issue under Best Practices.
+- **Security headers are unverified.** On every page, CSP, HSTS, COOP, X-Frame-Options and Trusted Types appear under Trust and Safety without a pass. Lighthouse confirms these pages are served over HTTPS, which supports but does not prove NFR1.2, since Lighthouse does not report the negotiated TLS version. Adding these headers would strengthen the NFR1.2 position.
+- **SEO scored 100 on all 19 pages.** No SRS NFR depends on this; it is recorded for completeness.
+- **NFR4.5 (responsive interface) is not evidenced by this batch.** All 19 runs used emulated desktop. A mobile-emulation pass would be needed to speak to that requirement.'
+
+#### 6.2 Interaction Counts (NFR4.2)
+
+Counted from the citizen dashboard as the starting point. One interaction is one click,
+tap or form submission. Typing into an already-focused field is not counted.
+
+| Frequent task | Path | Interactions | Within 3 |
+|---|---|---|---|
+| View ID credential | Dashboard > My Credentials > National ID Card | 2 | Yes |
+| Share ID credential via QR | Dashboard > My Credentials > Share | 3 | Yes |
+| View verification history | Dashboard > Verifications | 1 | Yes |
+| Activate a credential | Dashboard > Activate Credentials > select > Activate | 3 | Yes |
+| Update password | Dashboard > Manage Account > Update Password | 4 | Yes |
+

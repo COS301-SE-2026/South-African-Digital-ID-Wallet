@@ -210,7 +210,7 @@ All protected resources require a valid JWT access token before granting access 
 Communication containing sensitive information must be encrypted using HTTPS with TLS 1.2 or later.
 
 #### NFR1.3
-Passwords must never be stored in plaintext and has to be securely hashed using ASP.NET Identity password hashing algorithm before being stored in the database.
+Passwords must never be stored in plaintext and must be securely hashed using BCrypt password hashing algorithm at a work factor of at least 12 before being stored in the database.
 
 #### NFR1.4
 All administrative accounts need multi-factor authentication (OTP) during authentication.
