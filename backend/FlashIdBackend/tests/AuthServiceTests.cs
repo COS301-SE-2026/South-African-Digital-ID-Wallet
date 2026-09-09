@@ -4,6 +4,7 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Mapping;
 using Application.Common.Services;
 using Application.Features.Auth.DTOs;
+using Application.Features.Auth.Exceptions;
 using Application.Features.ManageUserAccountCard.DTOs;
 using Domain.Entities;
 using Domain.Enums;
@@ -591,5 +592,105 @@ public class AuthServiceTests
         Assert.Equal(verification, fakeTrustedDeviceRepository.VerificationToReturn); ;
     }
 
+    [Fact]
+    public async Task LoginAsync_MissingEmail_ThrowsUnauthorizedAccessException()
+    {
+        var service = CreateAuthService(new FakeAuthRepository(), new FakeJwtTokenProvider(), new FakeTrustedDeviceRepository());
 
+        var ex = await Assert.ThrowsAsync<UnauthorizedAccessException>(
+            () => service.LoginAsync(
+                new LoginRequestDto { Email = "  ", Password = "correct-password" },
+                null, "127.0.0.1", TestContext.Current.CancellationToken));
+
+        Assert.Equal("Email is required.", ex.Message);
+    }
+
+    [Fact]
+    public async Task LoginAsync_MissingPassword_ThrowsUnauthorizedAccessException()
+    {
+        var service = CreateAuthService(new FakeAuthRepository(), new FakeJwtTokenProvider(), new FakeTrustedDeviceRepository());
+
+        var ex = await Assert.ThrowsAsync<UnauthorizedAccessException>(
+            () => service.LoginAsync(
+                new LoginRequestDto { Email = "someone@flashid.local", Password = "" },
+                null, "127.0.0.1", TestContext.Current.CancellationToken));
+
+        Assert.Equal("Password is required.", ex.Message);
+    }
+
+    [Fact]
+    public async Task LoginAsync_UnknownEmail_ThrowsWithoutRevealingWhetherTheAccountExists()
+    {
+        var service = CreateAuthService(new FakeAuthRepository { UserToReturn = null }, new FakeJwtTokenProvider(), new FakeTrustedDeviceRepository());
+
+        var ex = await Assert.ThrowsAsync<UnauthorizedAccessException>(
+            () => service.LoginAsync(
+                new LoginRequestDto { Email = "nobody@flashid.local", Password = "correct-password" },
+                null, "127.0.0.1", TestContext.Current.CancellationToken));
+
+        Assert.Equal("Invalid email or password.", ex.Message);
+    }
+
+    [Fact]
+    public async Task LoginAsync_DeletedAccount_ThrowsUnauthorizedAccessException()
+    {
+        var user = ValidUser();
+        user.IsDeleted = true;
+        var service = CreateAuthService(new FakeAuthRepository { UserToReturn = user }, new FakeJwtTokenProvider(), new FakeTrustedDeviceRepository());
+
+        var ex = await Assert.ThrowsAsync<UnauthorizedAccessException>(
+            () => service.LoginAsync(
+                new LoginRequestDto { Email = user.Email, Password = "correct-password" },
+                null, "127.0.0.1", TestContext.Current.CancellationToken));
+
+        Assert.Contains("deleted", ex.Message);
+    }
+
+    [Fact]
+    public async Task LoginAsync_LockedOutAccount_ThrowsBeforeCheckingThePassword()
+    {
+        var user = ValidUser();
+        user.LockoutUntil = DateTime.UtcNow.AddMinutes(20);
+        var service = CreateAuthService(new FakeAuthRepository { UserToReturn = user }, new FakeJwtTokenProvider(), new FakeTrustedDeviceRepository());
+
+        var ex = await Assert.ThrowsAsync<UnauthorizedAccessException>(
+            () => service.LoginAsync(
+                new LoginRequestDto { Email = user.Email, Password = "wrong-password" },
+                null, "127.0.0.1", TestContext.Current.CancellationToken));
+
+        Assert.Contains("locked until", ex.Message);
+        Assert.Equal(0, user.FailedLoginAttempts);
+    }
+
+    [Fact]
+    public async Task LoginAsync_FifthConsecutiveFailure_LocksTheAccountForThirtyMinutes()
+    {
+        var user = ValidUser();
+        user.FailedLoginAttempts = 4;
+        var service = CreateAuthService(new FakeAuthRepository { UserToReturn = user }, new FakeJwtTokenProvider(), new FakeTrustedDeviceRepository());
+        var before = DateTime.UtcNow;
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(
+            () => service.LoginAsync(
+                new LoginRequestDto { Email = user.Email, Password = "wrong-password" },
+                null, "127.0.0.1", TestContext.Current.CancellationToken));
+
+        Assert.Equal(5, user.FailedLoginAttempts);
+        Assert.NotNull(user.LockoutUntil);
+        Assert.InRange(user.LockoutUntil!.Value, before.AddMinutes(30), DateTime.UtcNow.AddMinutes(30));
+    }
+
+    [Fact]
+    public async Task LoginAsync_UnverifiedEmail_ThrowsEmailNotVerifiedException()
+    {
+        var user = ValidUser();
+        user.IsEmailVerified = false;
+        var service = CreateAuthService(new FakeAuthRepository { UserToReturn = user }, new FakeJwtTokenProvider(), new FakeTrustedDeviceRepository());
+
+        await Assert.ThrowsAsync<EmailNotVerifiedException>(
+            () => service.LoginAsync(
+                new LoginRequestDto { Email = user.Email, Password = "correct-password" },
+                null, "127.0.0.1", TestContext.Current.CancellationToken));
+
+    }
 }
