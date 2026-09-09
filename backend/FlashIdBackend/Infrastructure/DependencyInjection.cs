@@ -128,6 +128,8 @@ public static class DependencyInjection
         services.AddScoped<IGovAdminAuditLogRepository, GovAdminAuditLogRepository>();
         services.AddSingleton<IFaceLivenessServiceProvider, AzureFaceLivenessServiceProvider>();
         services.AddScoped<IPhysicalIdentityVerificationRepository, PhysicalIdentityVerificationRepository>();
+
+        services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
         return services;
     }
 }
