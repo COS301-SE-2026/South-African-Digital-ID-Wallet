@@ -1,7 +1,16 @@
 ignore:
   - "**/Migrations/**"
+  - "**/obj/**"
+  
   - "backend/FlashIdBackend/Infrastructure/Data/DbSeeder.cs"
-  - "government-registry/GovernmentRegistry/Infrastructure/DbSeeder.cs"
+  - "government-registry/GovernmentRegistry/Infrastructure/Data/DbSeeder.cs"
+  - "government-registry/GovernmentRegistry/Infrastructure/Data/MockPhotoData.cs"
+  
   - "backend/FlashIdBackend/Presentation/Program.cs"
   - "government-registry/GovernmentRegistry/Presentation/Program.cs"
-  - "**/obj/**"
+
+  - "backend/FlashIdBackend/Infrastructure/Providers/AzureFaceLivenessServiceProvider.cs"
+  - "backend/FlashIdBackend/Infrastructure/Providers/AzureCommunicationSmsProvider.cs"
+  - "backend/FlashIdBackend/Infrastructure/Providers/SmsPortalProvider.cs"
+  - "backend/FlashIdBackend/Infrastructure/Providers/EmailSenderProvider.cs"
+  
