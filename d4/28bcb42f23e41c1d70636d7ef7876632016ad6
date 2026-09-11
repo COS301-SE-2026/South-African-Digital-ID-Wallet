@@ -1,0 +1,14 @@
+backend/FlashIdBackend/tests/AuthServiceDeviceTrustTests.cs
+  h_99fca60b892ff4 1-498
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "d428bcb42f23e41c1d70636d7ef7876632016ad6",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

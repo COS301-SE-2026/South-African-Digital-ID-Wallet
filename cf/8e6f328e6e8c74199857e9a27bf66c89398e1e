@@ -1,0 +1,14 @@
+backend/FlashIdBackend/tests/UserEntityTests.cs
+  h_99fca60b892ff4 1-278
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "cf8e6f328e6e8c74199857e9a27bf66c89398e1e",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
