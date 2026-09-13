@@ -1,0 +1,26 @@
+mobile/src/services/qr-service/test/qr-service.test.ts
+  h_712d174fc3f309 1-17,25-29,33,36-47,49-52,54-56,61-62,67-69,71-76,78-80
+  h_712d174fc3f309 18-24,30-32,34-35,48,53,57-60,63-66,70,77
+mobile/src/services/register-service/test/schema.test.ts
+  h_712d174fc3f309 1-16,20-31,36-41,47-53,61-62
+  h_712d174fc3f309 17-19,32-35,42-46,54-60
+mobile/src/test/utils/render-with-providers.tsx
+  h_712d174fc3f309 36-56
+  h_712d174fc3f309 35
+mobile/package.json
+  h_712d174fc3f309 75
+mobile/src/services/scan-service/test/parse-scanned-token.test.ts
+  h_712d174fc3f309 1-4,11-22,26-32
+  h_712d174fc3f309 5-10,23-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "b89934e8b75bcf8902c700a8cac8be71020820b2",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
