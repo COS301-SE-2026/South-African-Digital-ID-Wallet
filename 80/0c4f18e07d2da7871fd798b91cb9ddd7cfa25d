@@ -1,0 +1,18 @@
+"backend/FlashIdBackend/Infrastructure/Migrations/20260913200523_Certified Credential Copy Table Added.Designer.cs"
+  h_293a8616118f65 1-1483
+"backend/FlashIdBackend/Infrastructure/Migrations/20260913200523_Certified Credential Copy Table Added.cs"
+  h_293a8616118f65 1-63
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_293a8616118f65 119-166,1242-1252
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "800c4f18e07d2da7871fd798b91cb9ddd7cfa25d",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
