@@ -1,0 +1,104 @@
+mobile/src/components/molecules/segmented-tabs/test/segmented-tabs.test.tsx
+  h_712d174fc3f309 1-23
+  h_712d174fc3f309 24-32
+mobile/src/services/profile-service/test/profile-service.test.ts
+  s_493d0777b8c677::t_f8f210b6143de2 1-105
+  s_493d0777b8c677::t_2cf7c9a07cc080 106-108
+  h_712d174fc3f309 109-119
+mobile/src/test/routes.test.tsx
+  h_712d174fc3f309 1-75
+  h_712d174fc3f309 76-93
+mobile/src/services/audit-log-service/test/audit-log-dto.test.ts
+  s_493d0777b8c677::t_7fa0a10ac8854f 1-74
+  s_493d0777b8c677::t_1ad30a6a7abff0 75-77
+  h_712d174fc3f309 78-80
+mobile/src/hooks/test/use-official-dashboard.test.tsx
+  s_493d0777b8c677::t_4c81c451a5b051 1-68
+mobile/src/hooks/test/use-scan-credential.test.tsx
+  s_493d0777b8c677::t_fb4c8161bd37f3 37
+  s_493d0777b8c677::t_4c81c451a5b051 1-3,5,7,9-19,22,25-29,31,33-34,38,40,42-43,48,50,52-53,56-58
+  h_712d174fc3f309 4,6,8,20-21,23-24,30,32,35-36,39,41,44-47,49,51,54-55
+  s_493d0777b8c677::t_f5d0925546d268 59-61
+  h_712d174fc3f309 62-66
+mobile/src/hooks/test/use-profile.test.tsx
+  h_712d174fc3f309 114-141
+  s_493d0777b8c677::t_0255847eb3b1c9 1-113,142-143
+  s_493d0777b8c677::t_6243f4d6175f6a 144-146
+  h_712d174fc3f309 147-153
+mobile/src/hooks/test/use-wallet.test.tsx
+  s_493d0777b8c677::t_0255847eb3b1c9 1-78
+  s_493d0777b8c677::t_06e13c9d5da40d 79-81
+mobile/src/services/register-service/test/register-service.test.ts
+  s_493d0777b8c677::t_7fa0a10ac8854f 1-110
+  s_493d0777b8c677::t_df9adb888ec92b 111-113
+  h_712d174fc3f309 114
+mobile/src/hooks/test/use-audit-log.test.tsx
+  s_493d0777b8c677::t_3f0c9a7cc874f3 1-89,93-97,99,102-105,108-112,114,118-121,124-129
+  h_712d174fc3f309 90-92,98,100-101,106-107,113,115-117,122-123
+  s_493d0777b8c677::t_fd34e54c6072b1 130-132
+  h_712d174fc3f309 133-165
+mobile/src/hooks/test/use-biometric-preference.test.tsx
+  s_493d0777b8c677::t_205dfb3e457c72 1-107
+  s_493d0777b8c677::t_8882ee58fc8e6e 108-110
+  h_712d174fc3f309 111-129
+mobile/src/services/official-service/test/official-service.test.ts
+  s_493d0777b8c677::t_7fa0a10ac8854f 1-104
+  s_493d0777b8c677::t_1edaad50b5cc70 105-106
+mobile/src/hooks/test/use-countdown.test.tsx
+  h_712d174fc3f309 1-40
+  h_712d174fc3f309 41-52
+mobile/src/hooks/test/use-activity-history.test.tsx
+  s_493d0777b8c677::t_205dfb3e457c72 1-82,85-90,93-96,98-99,101-103
+  h_712d174fc3f309 97,100
+  s_493d0777b8c677::t_afb905eaf2c12c 83-84,91-92
+  s_493d0777b8c677::t_accc10ab8d71c2 104-106
+  h_712d174fc3f309 107-118
+mobile/src/components/organisms/qr-camera-scanner/test/qr-camera-scanner.test.tsx
+  h_712d174fc3f309 1-97
+  h_712d174fc3f309 98-103
+mobile/src/services/audit-log-service/test/audit-log-service.test.ts
+  s_493d0777b8c677::t_7fa0a10ac8854f 1-73
+  s_493d0777b8c677::t_f773cbb0d14fd6 74-76
+  h_712d174fc3f309 77-92
+mobile/src/services/scan-service/test/scan-service.test.ts
+  s_493d0777b8c677::t_7fa0a10ac8854f 1-72
+  s_493d0777b8c677::t_efa38cb742b074 73-75
+  h_712d174fc3f309 76-78
+mobile/src/hooks/test/use-sign-out.test.tsx
+  s_493d0777b8c677::t_4c81c451a5b051 1-66
+  s_493d0777b8c677::t_ed3ac0faa36e12 67-69
+  h_712d174fc3f309 70-78
+mobile/src/hooks/test/use-biometric-unlock.test.tsx
+  h_712d174fc3f309 36,38,40,43,45,47,54,56,58,64,66,68,72,74-76
+  s_493d0777b8c677::t_4c81c451a5b051 1-35,37,39,41-42,44,46,48-53,55,57,59-63,65,67,69-71,73,77-79
+  s_493d0777b8c677::t_3bd39a83a790c9 80-82
+  h_712d174fc3f309 83-93
+mobile/src/hooks/test/use-qr-token.test.tsx
+  h_712d174fc3f309 1-50
+  h_712d174fc3f309 51-67
+mobile/src/services/profile-service/test/profile-errors.test.ts
+  s_493d0777b8c677::t_f8f210b6143de2 1-90
+  s_493d0777b8c677::t_867727f7e68122 91-93
+  h_712d174fc3f309 94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "5002a54bcd2d620e1d50d07389a56e1c36dce05b",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_493d0777b8c677": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f64d6abc-45f4-4d15-909a-0f8379c7b4e8",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
