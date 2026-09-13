@@ -1,0 +1,143 @@
+mobile/src/components/organisms/verify-email-form/test/verify-email-form.test.tsx
+  s_493d0777b8c677::t_b57f1265aff2b7 1-66
+  s_493d0777b8c677::t_bb4370b85c7591 67-69
+  h_712d174fc3f309 70-87
+mobile/src/components/molecules/settings-row/test/settings-row.test.tsx
+  s_493d0777b8c677::t_91138dcdf938f9 1-17
+  s_493d0777b8c677::t_962a5812091cb1 18-20
+  h_712d174fc3f309 21-31
+mobile/src/components/utility/test/biometric-lock-overlay.test.tsx
+  s_493d0777b8c677::t_c686a0d2ff4706 1-108
+  s_493d0777b8c677::t_f7f53e0a4cd90c 109-111
+  h_712d174fc3f309 112-121
+mobile/src/components/organisms/activity-filter-sheet/test/activity-filter-sheet.test.tsx
+  s_493d0777b8c677::t_2c8f85e81a3bc1 1-35
+  s_493d0777b8c677::t_519df240eaee4a 36-38
+  h_712d174fc3f309 39-52
+mobile/src/components/molecules/credential-card/test/credential-card.test.tsx
+  s_493d0777b8c677::t_91138dcdf938f9 1-33
+  s_493d0777b8c677::t_8d942f87ab0a00 34-36
+  h_712d174fc3f309 37
+mobile/src/components/organisms/audit-log-filter-sheet/test/audit-log-filter-sheet.test.tsx
+  s_493d0777b8c677::t_2c8f85e81a3bc1 1-61
+  s_493d0777b8c677::t_671fb712453ae5 62-64
+  h_712d174fc3f309 65-81
+mobile/src/components/organisms/activity-timeline/test/activity-timeline.test.tsx
+  s_493d0777b8c677::t_d01fefb51a2a70 4-5,8,13,17
+  s_493d0777b8c677::t_2c8f85e81a3bc1 1-3,6-7,10-12,14-16,18-53
+  s_493d0777b8c677::t_afb905eaf2c12c 9
+  s_493d0777b8c677::t_309de915c5ebb0 54-55
+mobile/src/components/organisms/audit-log-list/test/audit-log-list.test.tsx
+  s_493d0777b8c677::t_4650cb2f4eb3ab 1-72
+  s_493d0777b8c677::t_0c572ee1589bb0 73-75
+  h_712d174fc3f309 76-85
+mobile/src/components/templates/detail-screen/test/detail-screen.test.tsx
+  s_493d0777b8c677::t_4650cb2f4eb3ab 1-44
+  s_493d0777b8c677::t_dfba69230e6f5d 45-47
+  h_712d174fc3f309 48
+mobile/src/components/organisms/scan-result-card/test/scan-result-card.test.tsx
+  s_493d0777b8c677::t_4650cb2f4eb3ab 1-42
+  s_493d0777b8c677::t_62ef8f270d4ce7 43-45
+  h_712d174fc3f309 46-50
+mobile/src/components/molecules/linked-device-row/test/linked-device-row.test.tsx
+  s_493d0777b8c677::t_91138dcdf938f9 1-33
+  s_493d0777b8c677::t_c931327fcf1172 34-35
+mobile/src/theme/test/theme.test.ts
+  h_712d174fc3f309 1-32
+  h_712d174fc3f309 33-39
+mobile/src/components/organisms/disclosure-modal/test/disclosure-modal.test.tsx
+  h_712d174fc3f309 58
+  s_493d0777b8c677::t_4650cb2f4eb3ab 1-57,59-86
+  s_493d0777b8c677::t_77058bf224d2c5 87-89
+  h_712d174fc3f309 90-106
+mobile/src/components/organisms/settings-sheet/test/settings-sheet.test.tsx
+  s_493d0777b8c677::t_2c8f85e81a3bc1 1-44
+  s_493d0777b8c677::t_9d5d56c0eda61e 45-46
+mobile/src/components/organisms/official-dashboard-header/test/official-dashboard-header.test.tsx
+  s_493d0777b8c677::t_1373d20b29510f 1-24
+  s_493d0777b8c677::t_7af39e367a5afb 25-27
+  h_712d174fc3f309 28-33
+mobile/src/components/molecules/audit-log-row/test/audit-log-row.test.tsx
+  s_493d0777b8c677::t_1373d20b29510f 1-48
+  s_493d0777b8c677::t_29f6ab72cfa022 49-51
+  h_712d174fc3f309 52-55
+mobile/src/components/molecules/countdown-ring/test/countdown-ring.test.tsx
+  s_493d0777b8c677::t_91138dcdf938f9 1-28
+  s_493d0777b8c677::t_f8aa89e470ef95 29-30
+mobile/src/lib/test/api.test.ts
+  s_493d0777b8c677::t_42104a8214d5a9 1-2,4-14,39,41,43,45
+  s_493d0777b8c677::t_2d07f3625dd349 3,15-38,40,42,44,46-47
+  s_493d0777b8c677::t_8db98623afbbe2 48-50
+  h_712d174fc3f309 51-54
+mobile/src/components/organisms/password-form/test/password-form.test.tsx
+  s_493d0777b8c677::t_a01855feaf6eaa 21,39-44,46
+  s_493d0777b8c677::t_b57f1265aff2b7 1,3-16,22,26-38,47-55,57-60,63-94
+  s_493d0777b8c677::t_204d93fde6822a 2,17-20,23-25,45,56,61-62
+  s_493d0777b8c677::t_d183305bb61012 95-97
+  h_712d174fc3f309 98-104
+mobile/src/components/molecules/field-toggle-row/test/field-toggle-row.test.tsx
+  s_493d0777b8c677::t_91138dcdf938f9 1-21
+  s_493d0777b8c677::t_6ed209d3ba22ac 22-24
+  h_712d174fc3f309 25-30
+mobile/src/components/molecules/stat-tile/test/stat-tile.test.tsx
+  s_493d0777b8c677::t_91138dcdf938f9 1-28
+  s_493d0777b8c677::t_6c5d5bbf47ca40 29-31
+  h_712d174fc3f309 32-49
+mobile/src/components/organisms/credential-deck/test/credential-deck.test.tsx
+  s_493d0777b8c677::t_2c8f85e81a3bc1 1-2,5-14,17-19,21-22,24-98
+  s_493d0777b8c677::t_d01fefb51a2a70 3-4,15-16,20,23
+  s_493d0777b8c677::t_edc9a266a46fc8 99-101
+  h_712d174fc3f309 102-108
+mobile/src/components/molecules/credential-field-row/test/credential-field-row.test.tsx
+  s_493d0777b8c677::t_91138dcdf938f9 1-12
+mobile/src/components/molecules/requirement-list/test/requirement-list.test.tsx
+  s_493d0777b8c677::t_91138dcdf938f9 1-24
+  s_493d0777b8c677::t_9b5b85beb6a724 25-27
+  h_712d174fc3f309 28-36
+mobile/src/components/organisms/info-sheet/test/info-sheet.test.tsx
+  s_493d0777b8c677::t_1373d20b29510f 1-21
+  s_493d0777b8c677::t_07a4701833189d 22-24
+  h_712d174fc3f309 25-40
+mobile/src/components/organisms/official-stats-row/test/official-stats-row.test.tsx
+  h_712d174fc3f309 1-26
+  h_712d174fc3f309 27-30
+mobile/src/lib/test/format-date.extra.test.ts
+  s_493d0777b8c677::t_42104a8214d5a9 1-73
+  s_493d0777b8c677::t_c7525ef4f0ce4f 74-76
+  h_712d174fc3f309 77-85
+mobile/src/components/organisms/settings-section/test/settings-section.test.tsx
+  s_493d0777b8c677::t_1373d20b29510f 1-29
+  s_493d0777b8c677::t_1bcf5fd92309af 30-32
+  h_712d174fc3f309 33-38
+mobile/src/components/templates/wallet-screen/test/wallet-screen.test.tsx
+  s_493d0777b8c677::t_4650cb2f4eb3ab 1-36
+  s_493d0777b8c677::t_74fd768aec61e4 37-39
+  h_712d174fc3f309 40-42
+mobile/src/components/organisms/register-form/test/register-form.test.tsx
+  s_493d0777b8c677::t_b57f1265aff2b7 1-131
+  s_493d0777b8c677::t_266a584c3327c7 132-134
+  h_712d174fc3f309 135-149
+mobile/src/components/organisms/profile-header/test/profile-header.test.tsx
+  s_493d0777b8c677::t_1373d20b29510f 1-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0e37f629700620200afb51150cdc7b945bd83b76",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_493d0777b8c677": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f64d6abc-45f4-4d15-909a-0f8379c7b4e8",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
