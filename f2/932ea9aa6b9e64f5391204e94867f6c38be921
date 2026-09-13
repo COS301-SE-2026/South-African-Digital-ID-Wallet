@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Infrastructure/Data/AppDbContext.cs
+  h_293a8616118f65 33
+backend/FlashIdBackend/Infrastructure/Data/Configurations/CertifiedCredentialCopyConfiguration.cs
+  h_293a8616118f65 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f2932ea9aa6b9e64f5391204e94867f6c38be921",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
