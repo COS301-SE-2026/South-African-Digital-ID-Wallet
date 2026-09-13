@@ -30,6 +30,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<JobRun> JobRuns => Set<JobRun>();
     public DbSet<PhysicalIdentityVerification> PhysicalIdentityVerifications => Set<PhysicalIdentityVerification>();
 
+    public DbSet<CertifiedCredentialCopy> CertifiedCredentialCopies => Set<CertifiedCredentialCopy>();
     protected override void OnModelCreating(ModelBuilder builder)
     {
         //this lets IdentityDbContext set up its own tables
