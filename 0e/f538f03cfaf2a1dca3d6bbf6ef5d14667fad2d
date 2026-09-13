@@ -1,0 +1,14 @@
+.github/workflows/mobile.yml
+  h_712d174fc3f309 40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0ef538f03cfaf2a1dca3d6bbf6ef5d14667fad2d",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
