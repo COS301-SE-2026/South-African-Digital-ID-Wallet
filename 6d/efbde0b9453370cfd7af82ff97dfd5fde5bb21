@@ -1,0 +1,422 @@
+web/next.config.ts
+  h_293a8616118f65 10-21
+.github/workflows/dev_web-flashid-dev.yml
+  h_293a8616118f65 33-37,40-43
+.github/workflows/main_web-flashid-prod.yml
+  h_293a8616118f65 33-37,40-43
+.github/workflows/mobile.yml
+  h_293a8616118f65 41-45
+.github/workflows/web-e2e.yml
+  h_293a8616118f65 79-83
+.github/workflows/web.yml
+  h_293a8616118f65 31-35,38-39
+.npmrc
+  h_293a8616118f65 1-12
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/IFaceLivenessServiceProvider.cs
+  h_293a8616118f65 1-12
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/IPhotoStorageProvider.cs
+  h_293a8616118f65 6
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IGovAdminAuditLogRepository.cs
+  h_293a8616118f65 1-16
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IPhysicalIdentityVerificationRepository.cs
+  h_293a8616118f65 1-19
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IGovAdminAuditLogService.cs
+  h_293a8616118f65 1-15
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IPhysicalIdentityVerificationService.cs
+  h_293a8616118f65 1-17
+backend/FlashIdBackend/Application/Common/Mapping/PhysicalIdentityVerificationMapper.cs
+  h_293a8616118f65 1-15
+backend/FlashIdBackend/Application/Common/Services/GovAdminAuditLogService.cs
+  h_293a8616118f65 1-55
+backend/FlashIdBackend/Application/Common/Services/OnboardingService.cs
+  h_293a8616118f65 222
+backend/FlashIdBackend/Application/Common/Services/PhysicalIdentityVerificationService.cs
+  h_293a8616118f65 1-382
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_293a8616118f65 43-44
+backend/FlashIdBackend/Application/Features/GovAdminAuditLog/DTOs/GovAdminAuditLogDtos.cs
+  h_293a8616118f65 1-27
+backend/FlashIdBackend/Application/Features/GovAdminAuditLog/Exceptions/InvalidAuditActionException.cs
+  h_293a8616118f65 1-7
+backend/FlashIdBackend/Application/Features/Onboarding/Dtos/CitizenRecordDto.cs
+  h_293a8616118f65 12
+backend/FlashIdBackend/Application/Features/Verification/Dtos/CreateLivenessSessionRequestDto.cs
+  h_293a8616118f65 1-8
+backend/FlashIdBackend/Application/Features/Verification/Dtos/CreateLivenessSessionResult.cs
+  h_293a8616118f65 1-10
+backend/FlashIdBackend/Application/Features/Verification/Dtos/LivenessVerificationResult.cs
+  h_293a8616118f65 1-10
+backend/FlashIdBackend/Application/Features/Verification/Dtos/PhysicalVerificationResponseDto.cs
+  h_293a8616118f65 1-15
+backend/FlashIdBackend/Application/Features/Verification/Dtos/StartPhysicalVerificationResponseDto.cs
+  h_293a8616118f65 1-10
+backend/FlashIdBackend/Application/Features/Verification/Exceptions/VerificationExpiredException.cs
+  h_293a8616118f65 1-23
+backend/FlashIdBackend/Domain/Entities/PhysicalIdentityVerification.cs
+  h_293a8616118f65 1-21
+backend/FlashIdBackend/Domain/Enums/IdentityVerificationStatus.cs
+  h_293a8616118f65 1-15
+backend/FlashIdBackend/Infrastructure/Data/AppDbContext.cs
+  h_293a8616118f65 31
+backend/FlashIdBackend/Infrastructure/Data/Configurations/PhysicalIdentityVerificationConfiguration.cs
+  h_293a8616118f65 1-32
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_293a8616118f65 128-130
+backend/FlashIdBackend/Infrastructure/Infrastructure.csproj
+  h_293a8616118f65 11
+backend/FlashIdBackend/Infrastructure/Migrations/20260829154037_AddPhysicalIdentityVerification.Designer.cs
+  h_293a8616118f65 1-1393
+backend/FlashIdBackend/Infrastructure/Migrations/20260829154037_AddPhysicalIdentityVerification.cs
+  h_293a8616118f65 1-59
+backend/FlashIdBackend/Infrastructure/Migrations/20260902060945_UpdatePhysicalVerificationSubmittedSaId.Designer.cs
+  h_293a8616118f65 1-1393
+backend/FlashIdBackend/Infrastructure/Migrations/20260902060945_UpdatePhysicalVerificationSubmittedSaId.cs
+  h_293a8616118f65 1-40
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_293a8616118f65 683-753
+backend/FlashIdBackend/Infrastructure/Providers/AzureBlobPhotoStorageProvider.cs
+  h_293a8616118f65 37-51
+backend/FlashIdBackend/Infrastructure/Providers/AzureFaceLivenessServiceProvider.cs
+  h_293a8616118f65 1-197
+backend/FlashIdBackend/Infrastructure/Repositories/GovAdminAuditLogRepository.cs
+  h_293a8616118f65 1-97
+backend/FlashIdBackend/Infrastructure/Repositories/PhysicalIdentityVerificationRepository.cs
+  h_293a8616118f65 1-64
+backend/FlashIdBackend/Presentation/Controllers/GovAdminAuditLogController.cs
+  h_293a8616118f65 1-34
+backend/FlashIdBackend/Presentation/Controllers/VerificationController.cs
+  h_293a8616118f65 2,16-17,20,38-107
+backend/FlashIdBackend/Presentation/ExceptionHandling/GlobalExceptionHandler.cs
+  h_293a8616118f65 2,7,33-36,65-70
+backend/FlashIdBackend/tests/DisclosedFieldValueResolverTests.cs
+  h_293a8616118f65 15
+backend/FlashIdBackend/tests/GovAdminAuditLogServiceTests.cs
+  h_293a8616118f65 1-458
+backend/FlashIdBackend/tests/OnboardingServiceTests.cs
+  h_293a8616118f65 142
+backend/FlashIdBackend/tests/QrServiceIntegrationTests.cs
+  h_293a8616118f65 33
+backend/FlashIdBackend/tests/QrServiceTests.cs
+  h_293a8616118f65 84
+dockerfile.web
+  h_293a8616118f65 23,26-32
+docs/demo3/SAS-v3.md
+  h_293a8616118f65 24,80,90,92-93,425-427,431-463,492,513-522,525,529-789
+docs/demo3/use-cases-v3.md
+  h_293a8616118f65 265-294
+docs/images/gov-audit-logs.drawio.svg
+  h_293a8616118f65 1-4
+government-registry/GovernmentRegistry/Application/Features/Citizens/Dtos/CitizenRecordResponseDto.cs
+  h_293a8616118f65 10
+government-registry/GovernmentRegistry/Domain/Entities/CitizenRecord.cs
+  h_293a8616118f65 18-19
+government-registry/GovernmentRegistry/Infrastructure/Data/Configurations/CitizenRecordConfiguration.cs
+  h_293a8616118f65 33-34
+government-registry/GovernmentRegistry/Infrastructure/Data/DbSeeder.cs
+  h_293a8616118f65 21-30,32-41,55-56,65-66
+government-registry/GovernmentRegistry/Infrastructure/Data/MockPhotoData.cs
+  h_293a8616118f65 5-15,18-22
+"government-registry/GovernmentRegistry/Infrastructure/Migrations/20260901103539_PhotoBlob added to citizen record.Designer.cs"
+  h_293a8616118f65 1-191
+"government-registry/GovernmentRegistry/Infrastructure/Migrations/20260901103539_PhotoBlob added to citizen record.cs"
+  h_293a8616118f65 1-29
+government-registry/GovernmentRegistry/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_293a8616118f65 44-47
+mobile/src/components/organisms/qr-camera-scanner/qr-camera-scanner.tsx
+  h_293a8616118f65 8,10,15,28-29,35-39,44-52,94,118-120,122-132
+package-lock.json
+  h_293a8616118f65 1-537
+pnpm-lock.yaml
+  h_293a8616118f65 160-162,363-368,8088-8093,11098,11100
+web/.gitignore
+  h_293a8616118f65 47
+web/.npmrc
+  h_293a8616118f65 1-7
+web/e2e/test/activate-credentials.spec.ts
+  h_293a8616118f65 3
+web/eslint.config.mjs
+  h_293a8616118f65 19
+web/package-lock.json
+  h_293a8616118f65 1-19929
+web/package.json
+  h_293a8616118f65 22
+web/public/facelivenessdetector-assets/i18n/af-ZA/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/am-ET/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/ar-SA/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/as-IN/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/az-Latn-AZ/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/bg-BG/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/bn-IN/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/bs-Latn-BA/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/ca-ES/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/cs-CZ/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/da-DK/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/de-DE/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/el-GR/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/en-GB/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/en-US/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/es-ES/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/es-MX/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/et-EE/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/eu-ES/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/fa-IR/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/fi-FI/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/fil-PH/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/fr-CA/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/fr-FR/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/ga-IE/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/gl-ES/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/gu-IN/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/he-IL/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/hi-IN/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/hr-HR/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/hu-HU/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/id-ID/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/is-IS/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/it-IT/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/ja-JP/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/ka-GE/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/kk-KZ/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/km-KH/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/kn-IN/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/ko-KR/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/lo-LA/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/lt-LT/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/lv-LV/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/mk-MK/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/ml-IN/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/mr-IN/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/ms-MY/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/nb-NO/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/ne-NP/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/nl-NL/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/nn-NO/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/or-IN/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/pa-IN/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/pl-PL/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/pt-BR/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/pt-PT/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/ro-RO/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/ru-RU/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/sk-SK/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/sl-SI/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/sq-AL/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/sr-Cyrl-RS/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/sr-Latn-RS/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/sv-SE/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/ta-IN/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/te-IN/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/th-TH/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/tr-TR/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/ug-CN/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/uk-UA/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/ur-PK/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/vi-VN/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/zh-CN/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/i18n/zh-TW/en.json
+  h_293a8616118f65 1-62
+web/public/facelivenessdetector-assets/images/Brightness.svg
+  h_293a8616118f65 1-3
+web/public/facelivenessdetector-assets/images/FaceId.svg
+  h_293a8616118f65 1-3
+web/public/facelivenessdetector-assets/images/Smile.svg
+  h_293a8616118f65 1-51
+web/public/facelivenessdetector-assets/images/logo.svg
+  h_293a8616118f65 1-6
+web/public/facelivenessdetector-assets/js/AzureAIVisionFace.js
+  h_293a8616118f65 1-5936
+web/public/facelivenessdetector-assets/js/AzureAIVisionFace_SIMD.js
+  h_293a8616118f65 1-5925
+web/src/app/(portal)/citizen/activate-credentials/page.tsx
+  h_293a8616118f65 1,3-4
+web/src/app/(portal)/citizen/page.tsx
+  h_293a8616118f65 1,4
+web/src/app/(portal)/citizen/verify-identity/page.tsx
+  h_293a8616118f65 1-10
+web/src/app/(portal)/gov-admin/audit-log/page.tsx
+  h_293a8616118f65 1-5
+web/src/app/(portal)/gov-admin/page.tsx
+  h_293a8616118f65 1,3
+web/src/app/(portal)/officials/page.tsx
+  h_293a8616118f65 1,4
+web/src/components/molecules/credential-card/test/credential-card.test.tsx
+  h_293a8616118f65 7-12,31-32,39,42-44,54,57-60,70,73,84,88,99,103
+web/src/components/molecules/index.ts
+  h_293a8616118f65 30
+web/src/components/molecules/ready-item/index.ts
+  h_293a8616118f65 1
+web/src/components/molecules/ready-item/ready-item.tsx
+  h_293a8616118f65 1-24
+web/src/components/organisms/activate-credentials-form/activate-credentials-form.tsx
+  h_293a8616118f65 24-35,37-45,47-68,70-83,85
+web/src/components/organisms/app-sidebar/app-sidebar.tsx
+  h_293a8616118f65 17,41
+web/src/components/organisms/consent-to-verify/consent-to-verify.tsx
+  h_293a8616118f65 1-130
+web/src/components/organisms/consent-to-verify/index.ts
+  h_293a8616118f65 1
+web/src/components/organisms/consent-to-verify/types.ts
+  h_293a8616118f65 1-7
+web/src/components/organisms/gov-admin-audit-log-table/gov-admin-audit-log-details-panel.tsx
+  h_293a8616118f65 1-101
+web/src/components/organisms/gov-admin-audit-log-table/gov-admin-audit-log-table.tsx
+  h_293a8616118f65 1-169
+web/src/components/organisms/gov-admin-audit-log-table/index.ts
+  h_293a8616118f65 1
+web/src/components/organisms/gov-admin-audit-log-table/types.ts
+  h_293a8616118f65 1-34
+web/src/components/organisms/index.ts
+  h_293a8616118f65 26,28-29
+web/src/components/organisms/liveness-camera-dialog/liveness-camera-dialog.tsx
+  h_293a8616118f65 1-176
+web/src/components/organisms/physical-identity-form/physical-identity-form.tsx
+  h_293a8616118f65 1-99
+web/src/components/organisms/ready-to-verify/index.ts
+  h_293a8616118f65 1
+web/src/components/organisms/ready-to-verify/ready-to-verify.tsx
+  h_293a8616118f65 1-128
+web/src/components/organisms/ready-to-verify/types.ts
+  h_293a8616118f65 1-8
+web/src/components/organisms/verification-failure/verification-failure.tsx
+  h_293a8616118f65 1-34
+web/src/components/organisms/verification-ready-dialog/verification-ready-dialog.tsx
+  h_293a8616118f65 1-92
+web/src/components/organisms/verification-required/index.ts
+  h_293a8616118f65 1
+web/src/components/organisms/verification-required/types.ts
+  h_293a8616118f65 1-6
+web/src/components/organisms/verification-required/verification-required.tsx
+  h_293a8616118f65 1-47
+web/src/components/organisms/verification-success/index.ts
+  h_293a8616118f65 1-2
+web/src/components/organisms/verification-success/types.ts
+  h_293a8616118f65 1-9
+web/src/components/organisms/verification-success/verification-success.tsx
+  h_293a8616118f65 1-104
+web/src/components/organisms/verify-identity-card/test/verify-identity-card.test.tsx
+  h_293a8616118f65 6-14,16,29,31,40,47,50,56,63,69,71,78,81,88,99
+web/src/components/organisms/verify-identity-card/types.ts
+  h_293a8616118f65 4-5,10-11,15,17
+web/src/components/organisms/verify-identity-card/verify-identity-card.tsx
+  h_293a8616118f65 2-4,16-18,22-24,29-30,34,36,44,47,49,61-98,124,129,131-132,136-138,140,144,146-150,152,154-155,157-186
+web/src/components/organisms/verify-method/index.ts
+  h_293a8616118f65 1-2
+web/src/components/organisms/verify-method/types.ts
+  h_293a8616118f65 1-6
+web/src/components/organisms/verify-method/verify-method.tsx
+  h_293a8616118f65 1-103
+web/src/components/pages/activation/activate-credentials-page.tsx
+  h_293a8616118f65 1-158
+web/src/components/pages/activation/verify-citizen-page.tsx
+  h_293a8616118f65 3,5-7,10-12,15-21,23-25,27,29-43,46-57,59-354,357-372,376-457,462-463
+web/src/components/pages/gov-admin/audit-log-page.tsx
+  h_293a8616118f65 1-113
+web/src/components/ui/button.tsx
+  h_293a8616118f65 3,16,52
+web/src/components/ui/dialog.tsx
+  h_293a8616118f65 1-167
+web/src/config/navigation/navigation.ts
+  h_293a8616118f65 17-26,30,81
+web/src/config/page-headers/page-headers.ts
+  h_293a8616118f65 55-60,64
+web/src/services/gov-admin-audit-log-service/gov-admin-audit-log-service.ts
+  h_293a8616118f65 1-15
+web/src/services/gov-admin-audit-log-service/gov-admin-audit-log-urls.ts
+  h_293a8616118f65 1-3
+web/src/services/gov-admin-audit-log-service/types.ts
+  h_293a8616118f65 1-17
+web/src/services/verification-service/types.ts
+  h_293a8616118f65 13-52
+web/src/services/verification-service/verification-service.ts
+  h_293a8616118f65 4-10,21-65,68-72
+web/src/services/verification-service/verification-urls.ts
+  h_293a8616118f65 3-14
+web/src/types/navigation.ts
+  h_293a8616118f65 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "6defbde0b9453370cfd7af82ff97dfd5fde5bb21",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

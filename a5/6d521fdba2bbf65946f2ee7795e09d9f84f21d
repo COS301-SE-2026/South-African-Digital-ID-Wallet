@@ -1,0 +1,15 @@
+README.md
+  h_293a8616118f65 50-51,102
+  h_293a8616118f65 94,96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "a56d521fdba2bbf65946f2ee7795e09d9f84f21d",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

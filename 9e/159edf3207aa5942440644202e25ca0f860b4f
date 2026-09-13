@@ -1,0 +1,14 @@
+backend/FlashIdBackend/tests/OfficialsControllerIntegrationTests.cs
+  h_99fca60b892ff4 1-700
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9e159edf3207aa5942440644202e25ca0f860b4f",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
