@@ -1,0 +1,18 @@
+backend/FlashIdBackend/Infrastructure/Providers/LocalEs256SigningProvider.cs
+  h_99fca60b892ff4 22,42
+backend/FlashIdBackend/tests/LocalEs256SigningProviderTests.cs
+  h_99fca60b892ff4 1-165
+backend/FlashIdBackend/tests/DependencyInjectionTests.cs
+  h_99fca60b892ff4 55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1f56cf1cbe13229aae57c7bc8fcc17aa54442144",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
