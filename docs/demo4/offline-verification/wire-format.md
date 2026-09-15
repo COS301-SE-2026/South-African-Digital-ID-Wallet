@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft 0.1. Becomes 1.0 and frozen after Spikes A to C |
+| Status | 1.0, frozen on 2026-09-15. A change needs a new version and a decision entry |
 | Owner | Nathan Chisadza |
 | Used by | Backend offline package builder, mobile wallet, mobile verifier |
 | Decisions | [decisions.md](decisions.md) |
@@ -78,7 +78,7 @@ see Q-2.
 | Date of issue | `issue_date` | no | yes |
 | Signature | `signature_image` | no | no (D-011) |
 
-`portrait` is the b64u of a greyscale JPEG, 96 by 96 pixels, quality 40. Final values come from Spike C.
+`portrait` is the b64u of a colour WebP image (lossy, quality 40), 160 by 160 pixels, centre-cropped, with all metadata removed (D-018). Verifiers display it as a `data:image/webp;base64,` URI, after converting base64url to standard base64.
 
 ## 6. Issuer-signed JWT
 
@@ -159,11 +159,12 @@ FID1:K:<tid>:<kb_jwt>
 | `tid` | `b64u(4 random bytes)`, 6 characters, new for every presentation |
 | `idx` | Zero-based frame index, decimal |
 | `tot` | Total number of payload frames, decimal |
-| `chunk` | Consecutive slice of `sd_jwt`, at most 450 characters. Final value from Spike B |
+| `chunk` | Consecutive slice of `sd_jwt`, at most 450 characters (D-019) |
 
 - Payload frames never change during a presentation; only K frames do.
 - One K frame is shown after every third P frame.
-- Display rate is 5 frames per second. Final value from Spike B.
+- Display rate is 8 frames per second (D-019).
+- Scan time is about one display cycle: payload frames plus key binding frames, divided by 8.
 - Reassembly joins chunks in `idx` order to recover `sd_jwt`, then appends the `kb_jwt` from the newest K frame.
 - A new `tid` discards every frame collected so far.
 
@@ -195,14 +196,15 @@ FID1:K:<tid>:<kb_jwt>
 
 ## 12. Size budget
 
-Estimates for a driver's licence presenting 5 of 11 claims, including the portrait. Replace with measured values after Spikes B and C.
+A driver's licence presenting 5 of 11 claims, including the portrait. The portrait figures were measured on 10 test photos with the D-018 recipe. The other parts remain estimates until Phase 1.
 
-| Part | Estimate | Measured |
+| Part | Size | Source |
 |---|---|---|
-| Issuer JWT, 11 digests plus `cnf` | 1,150 bytes | |
-| 4 text disclosures | 270 bytes | |
-| Portrait disclosure | 4,530 bytes | |
-| **Total** | **5,950 bytes, 12 payload frames** | |
+| Issuer JWT, 11 digests plus `cnf` | about 1,150 bytes | Estimate |
+| 4 text disclosures | about 270 bytes | Estimate |
+| Portrait, sent inline | WebP of 772 to 4814 bytes | Measured, Spike C |
+| **Payload frames** | **7 to 14 typical, 23 worst case** | Measured, Spike C |
+| **Scan time at 8 fps** | **1 to 2.5s typical, about 3.9s worst case** | Spike B. Worst case predicted |
 
 ## 13. Test vectors
 
@@ -214,3 +216,4 @@ The cross-stack fixture (checklist 1.11) contains a public key and a presentatio
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-09-14 | Initial draft; Spike A result recorded in section 6 |
+| 1.0 | 2026-09-15 | Frozen. Portrait recipe (D-018), frame size and rate (D-019) from Spikes B and C, with size budget measured |
