@@ -295,5 +295,7 @@ frames and recognisability.
 
 | Id | Question | Owner | Status |
 |---|---|---|---|
-| Q-1 | Shape of the widened signing interface | Nathan and the rolling-keys owner | Deferred: agree before checklist 1.1 |
-| Q-2 | Image library licence: ImageSharp or SkiaSharp | Nathan | Closed by D-017 |
+| Q-1 | The stubbed badge flow has citizens scan officials, contradicting D-001. Drop it, or keep it as a separate step? | Team | Closed: the badge flow is not used |
+| Q-2 | `QrFieldDefinitions.cs` marks fewer fields mandatory than R3.4.2. Which is authoritative? | SRS owner | Closed: `QrFieldDefinitions.cs` is authoritative; R3.4.2 amended to match |
+| Q-3 | Shape of the widened signing interface | Nathan and the rolling-keys owner | Deferred: agree before checklist 1.1 |
+| Q-4 | Image library licence: ImageSharp or SkiaSharp | Nathan | Closed by D-017 |
