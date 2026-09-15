@@ -34,6 +34,7 @@ public static class DependencyInjection
         services.AddScoped<ICitizenRepository, CitizenRepository>();
         services.AddScoped<ICredentialRepository, CredentialRepository>();
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
+        services.AddScoped<ISigningKeyRepository, SigningKeyRepository>();
         services.AddScoped<ITrustedDeviceRepository, TrustedDeviceRepository>();
         services.AddScoped<IActivityOverviewRepository, ActivityOverviewRepository>();
         services.AddScoped<IDashboardAccountCardRepository, DashboardAccountCardRepository>();
