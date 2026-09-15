@@ -130,6 +130,8 @@ public static class DependencyInjection
         services.AddScoped<IPhysicalIdentityVerificationRepository, PhysicalIdentityVerificationRepository>();
 
         services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
+
+        services.AddSingleton<ICredentialSigningProvider, LocalEs256SigningProvider>();
         return services;
     }
 }
