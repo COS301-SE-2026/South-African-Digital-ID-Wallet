@@ -217,6 +217,80 @@ the signature would be for show.
 
 ---
 
+### D-017 ImageSharp 3.1.12 for portrait processing
+
+**Status:** Accepted, 2026-09-14
+
+**Context.** The backend must downscale and re-encode portraits for offline packages (Spike C). The candidates were ImageSharp and SkiaSharp (Q-4). ImageSharp 4.x adds a build-time licence check: without a Six Labors licence key, Release builds fail, and the backend deploys with
+`dotnet publish`, which builds Release.
+
+**Decision.** Use SixLabors.ImageSharp 3.1.12. It is pure .NET, supports every operation the portrait recipe needs, has no build-time licence check and no known vulnerabilities. It is used under the Six Labors Split License clause granting Apache 2.0 to "a For-profit company/individual with less than 1M USD annual gross revenue"; FlashID is a student project with no revenue.
+
+**Alternatives.** ImageSharp 4.1.2, rejected because Release builds need a licence key and community licences are application-based. SkiaSharp 4.152.0 under the MIT licence, kept as the fallback; it needs the native `SkiaSharp.NativeAssets.Linux.NoDependencies` package on Linux App
+Service and different code.
+
+**Consequences.** Q-4 is closed. Do not upgrade to ImageSharp 4.x without a licence key. Watch for security updates on the 3.1 line: 3.1.10 had a known vulnerability, fixed in 3.1.11.
+
+---
+
+### D-018 Portrait: 160 x 160 colour WebP, sent inline
+
+**Status:** Accepted, 2026-09-15
+
+**Context.** R3.4.2 makes the photograph mandatory, so every offline presentation carries a portrait, and it is most of the payload. Spike C (2026-09-14) rendered 10 photos (5 people, each normal and artificially darkened) across four rounds on ImageSharp 3.1.12, measuring bytes, QR
+frames and recognisability.
+
+**Decision.** AutoOrient, centre crop to 160 x 160, bicubic resize, colour, WebP lossy quality 40, metadata stripped. The portrait travels inline as a standard SD-JWT disclosure whose value is the base64url of the WebP.
+
+**Alternatives.**
+
+- 64 and 96 px: facial features blur together. 128 px: acceptable but visibly softer.
+- JPEG: blocky at the same size; WebP looked cleaner.
+- Greyscale: with WebP only 0 to 1 frame smaller, and it loses skin tone, hair and eye colour.
+- Portrait (3:4), tight and natural-proportion crops: no clearer, and tall photos get a small face.
+- Lanczos3 with sharpening: crisper but not clearer, and about 15 percent larger. Adaptive contrast: blotchy and 2 to 3 times larger.
+- Detached portrait (a hash in the disclosure, the image as a separate segment): saves 1 to 5 frames, at most about a second at 8 fps (D-019), but adds a custom structure and another deviation from SD-JWT.
+
+**Evidence.** Recipe C2: 772 to 4,814 bytes; inline 7 to 14 frames for nine photos and 23 for the worst (a 518 px source with a busy background). React Native `Image` displayed a WebP data URI on Samsung Android 16 (Spike B).
+
+**Consequences.** Every portrait scans within about 4 seconds at 8 fps. Data URIs need standard base64, converted from base64url. Official ID photos with plain backgrounds should compress smaller than the test photos. The 23-frame worst case was predicted, not measured (checklist 3.7).
+
+---
+
+### D-019 QR frames carry 450 characters at 8 frames per second
+
+**Status:** Accepted, 2026-09-15
+
+**Context.** Wire-format section 9 splits a presentation into QR frames. The chunk size and frame rate were estimates: 450 characters at 5 fps.
+
+**Decision.** 450 characters per payload frame, displayed at 8 frames per second, with one key binding frame after every third payload frame.
+
+**Alternatives.** 700 characters per frame: fewer frames but denser codes, unreliable in dim light. 5 fps: reliable but slower.
+
+**Evidence.** Spike B, 2026-09-15, release build; display phone Samsung Galaxy S23, scanner Samsung Galaxy S24, both Android 16. Scan time was about one display cycle: payload frames plus key binding frames, divided by fps. The camera decoded about 27 QR codes per second, about 3 reads per frame at 8 fps.
+
+| Preset | Light | fps | Seconds, 3 runs |
+|---|---|---|---|
+| 8 x 450 | normal | 5 | 1.9, 2.0, 2.2 |
+| 12 x 450 | normal | 5 | 3.1, 2.9, 3.0 |
+| 18 x 450 | normal | 5 | 4.8, 4.7, 4.7 |
+| 6 x 700 | normal | 5 | 1.4, 1.3, 1.4 |
+| 8 x 700 | normal | 5 | 2.0, 1.8, 1.8 |
+| 12 x 700 | normal | 5 | 3.0, 2.8, 3.0 |
+| 12 x 450 | dim | 5 | 3.1, 3.2, 3.0 |
+| 18 x 450 | dim | 5 | 4.8, 4.7, 4.7 |
+| 8 x 700 | dim | 5 | 4.4, 2.0, 3.9 |
+| 12 x 700 | dim | 5 | 6.0, 9.3, 3.2 |
+| 8 x 450 | dim | 8 | 1.4, 1.3, 1.3 |
+| 12 x 450 | normal | 8 | 1.9, 1.8, 1.9 |
+| 12 x 450 | dim | 8 | 1.9, 2.0, 2.0 |
+| 18 x 450 | normal | 8 | 3.0, 3.1, 3.1 |
+| 18 x 450 | dim | 8 | 3.1, 3.0, 2.9 |
+
+**Consequences.** Typical presentations scan in 1 to 2.5 seconds; the worst-case inline presentation (23 payload frames, 31 per cycle) is predicted at about 3.9 seconds. Both test phones are flagships, so timing must be confirmed on a budget Android phone (checklist 3.7). Frame rates above 8 fps were not tested.
+
+---
+
 ## Open questions
 
 | Id | Question | Owner | Status |
@@ -224,4 +298,4 @@ the signature would be for show.
 | Q-1 | The stubbed badge flow has citizens scan officials, contradicting D-001. Drop it, or keep it as a separate step? | Team | Open |
 | Q-2 | `QrFieldDefinitions.cs` marks fewer fields mandatory than R3.4.2. Which is authoritative? | SRS owner | Open |
 | Q-3 | Shape of the widened signing interface | Nathan and the rolling-keys owner | Open |
-| Q-4 | Image library licence: ImageSharp or SkiaSharp | Nathan | Open |
+| Q-4 | Image library licence: ImageSharp or SkiaSharp | Nathan | Closed by D-017 |
