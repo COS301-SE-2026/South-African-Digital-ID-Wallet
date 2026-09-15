@@ -18,9 +18,8 @@ public sealed class LocalEs256SigningProvider : ICredentialSigningProvider, IDis
 
         // base64 of a PKCS#8 private key
         var privateKeyBase64 = config["Signing:Credential:PrivateKey"] ?? throw new InvalidOperationException("Credential signing private key is not configured.");
-        var key = ECDsa.Create();
-
         var privateKeyBytes = Convert.FromBase64String(privateKeyBase64);
+        var key = ECDsa.Create();
 
         try
         {
@@ -40,7 +39,7 @@ public sealed class LocalEs256SigningProvider : ICredentialSigningProvider, IDis
         }
         finally
         {
-            // clear private key bytes form memory
+            // clear private key bytes from memory
             CryptographicOperations.ZeroMemory(privateKeyBytes);
         }
 
