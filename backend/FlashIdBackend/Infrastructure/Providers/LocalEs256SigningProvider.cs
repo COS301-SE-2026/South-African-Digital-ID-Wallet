@@ -7,14 +7,15 @@ namespace Infrastructure.Providers;
 
 public sealed class LocalEs256SigningProvider : ICredentialSigningProvider, IDisposable
 {
+    private const string Es256 = "ES256";
     private readonly ECDsa _key;
-
+    private readonly string _keyId;
     // ECDsa instances are not guaranteed thread-safe, so concurrent requests must take turns.
     private readonly Lock _keyLock = new();
 
     public LocalEs256SigningProvider(IConfiguration config)
     {
-        KeyId = config["Signing:Credential:Kid"] ?? throw new InvalidOperationException("Credential signing key id is not configured.");
+        _keyId = config["Signing:Credential:Kid"] ?? throw new InvalidOperationException("Credential signing key id is not configured.");
 
         // base64 of a PKCS#8 private key
         var privateKeyBase64 = config["Signing:Credential:PrivateKey"] ?? throw new InvalidOperationException("Credential signing private key is not configured.");
@@ -46,13 +47,33 @@ public sealed class LocalEs256SigningProvider : ICredentialSigningProvider, IDis
         _key = key;
     }
 
-    public string KeyId { get; }
-
-    public string Algorithm => "ES256";
-
-    public Task<byte[]> SignAsync(byte[] signingInput, CancellationToken cancellationToken)
+    // This provider holds one key, so the active key never changes while the app is running.
+    public Task<CredentialSigningKey> GetActiveKeyAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+
+        ECPoint q;
+
+        lock (_keyLock)
+        {
+            // false exports only the public point, so the private key never leaves this class.
+            q = _key.ExportParameters(false).Q;
+        }
+
+        var publicJwk = new EcPublicJwk("EC", "P-256", _keyId, Base64Url.EncodeToString(q.X!), Base64Url.EncodeToString(q.Y!));
+
+        return Task.FromResult(new CredentialSigningKey(_keyId, Es256, publicJwk));
+    }
+
+    public Task<byte[]> SignAsync(string keyId, byte[] signingInput, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        // The kid is already inside the signed header, so signing with another key would produce a credential nobody can verify.
+        if (keyId != _keyId)
+        {
+            throw new InvalidOperationException($"Credential signing key '{keyId}' is not the active key.");
+        }
 
         lock (_keyLock)
         {
@@ -61,32 +82,6 @@ public sealed class LocalEs256SigningProvider : ICredentialSigningProvider, IDis
 
             return Task.FromResult(signature);
         }
-    }
-
-    public bool Verify(byte[] signingInput, byte[] signature)
-    {
-        // Rejects anything that is not exactly 64 bytes, such as a DER signature, before checking.
-        if (signature.Length != 64)
-        {
-            return false;
-        }
-
-        lock (_keyLock)
-        {
-            return _key.VerifyData(signingInput, signature, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
-        }
-    }
-
-    public EcPublicJwk GetPublicJwk()
-    {
-        ECPoint q;
-        lock (_keyLock)
-        {
-            // false exports only the public point, so the private key never leaves this class.
-            q = _key.ExportParameters(false).Q;
-        }
-
-        return new EcPublicJwk("EC", "P-256", KeyId, Base64Url.EncodeToString(q.X!), Base64Url.EncodeToString(q.Y!));
     }
 
     public void Dispose() => _key.Dispose();

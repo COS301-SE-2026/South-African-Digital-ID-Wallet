@@ -1,6 +1,7 @@
 using System.Buffers.Text;
 using System.Security.Cryptography;
 using System.Text;
+using Application.Common.Interfaces.ProviderInterfaces;
 using Infrastructure.Providers;
 using Microsoft.Extensions.Configuration;
 
@@ -35,14 +36,70 @@ public class LocalEs256SigningProviderTests
         return new LocalEs256SigningProvider(CreateConfiguration(Kid, NewPrivateKey(ECCurve.NamedCurves.nistP256)));
     }
 
+    // Checks a signature using only the published public key, exactly as a phone verifier would.
+    private static bool VerifyWithPublishedKey(EcPublicJwk jwk, byte[] signingInput, byte[] signature)
+    {
+        using var verifier = ECDsa.Create(new ECParameters
+        {
+            Curve = ECCurve.NamedCurves.nistP256,
+            Q = new ECPoint { X = Base64Url.DecodeFromChars(jwk.X), Y = Base64Url.DecodeFromChars(jwk.Y) },
+        });
+
+        return verifier.VerifyData(signingInput, signature, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
+    }
+
     [Fact]
-    public async Task SignAsync_ValidInput_ReturnsSixtyFourByteSignature()
+    public async Task GetActiveKeyAsync_ValidConfiguration_ReturnsConfiguredKidAndEs256()
     {
         using var provider = CreateProvider();
 
-        var signature = await provider.SignAsync(SigningInput, CancellationToken.None);
+        var key = await provider.GetActiveKeyAsync(CancellationToken.None);
+
+        Assert.Equal(Kid, key.KeyId);
+        Assert.Equal("ES256", key.Algorithm);
+        Assert.Equal("EC", key.PublicJwk.Kty);
+        Assert.Equal("P-256", key.PublicJwk.Crv);
+        Assert.Equal(Kid, key.PublicJwk.Kid);
+    }
+
+    [Fact]
+    public async Task GetActiveKeyAsync_PublishedKey_VerifiesSignatureIndependently()
+    {
+        using var provider = CreateProvider();
+        var key = await provider.GetActiveKeyAsync(CancellationToken.None);
+
+        var signature = await provider.SignAsync(key.KeyId, SigningInput, CancellationToken.None);
+
+        Assert.True(VerifyWithPublishedKey(key.PublicJwk, SigningInput, signature));
+    }
+
+    [Fact]
+    public async Task GetActiveKeyAsync_CancelledToken_ThrowsOperationCanceledException()
+    {
+        using var provider = CreateProvider();
+        using var cancellation = new CancellationTokenSource();
+        await cancellation.CancelAsync();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() => provider.GetActiveKeyAsync(cancellation.Token));
+    }
+
+    [Fact]
+    public async Task SignAsync_ActiveKeyId_ReturnsSixtyFourByteSignature()
+    {
+        using var provider = CreateProvider();
+        var key = await provider.GetActiveKeyAsync(CancellationToken.None);
+
+        var signature = await provider.SignAsync(key.KeyId, SigningInput, CancellationToken.None);
 
         Assert.Equal(64, signature.Length);
+    }
+
+    [Fact]
+    public async Task SignAsync_UnknownKeyId_ThrowsInvalidOperationException()
+    {
+        using var provider = CreateProvider();
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => provider.SignAsync("retired-key", SigningInput, CancellationToken.None));
     }
 
     [Fact]
@@ -52,83 +109,40 @@ public class LocalEs256SigningProviderTests
         using var cancellation = new CancellationTokenSource();
         await cancellation.CancelAsync();
 
-        await Assert.ThrowsAsync<OperationCanceledException>(() => provider.SignAsync(SigningInput, cancellation.Token));
+        await Assert.ThrowsAsync<OperationCanceledException>(() => provider.SignAsync(Kid, SigningInput, cancellation.Token));
     }
 
     [Fact]
-    public async Task Verify_SignatureFromSameKey_ReturnsTrue()
+    public async Task Signature_TamperedInput_FailsVerification()
     {
         using var provider = CreateProvider();
-        var signature = await provider.SignAsync(SigningInput, CancellationToken.None);
+        var key = await provider.GetActiveKeyAsync(CancellationToken.None);
+        var signature = await provider.SignAsync(key.KeyId, SigningInput, CancellationToken.None);
 
-        Assert.True(provider.Verify(SigningInput, signature));
+        Assert.False(VerifyWithPublishedKey(key.PublicJwk, Encoding.ASCII.GetBytes("header.tampered"), signature));
     }
 
     [Fact]
-    public async Task Verify_TamperedInput_ReturnsFalse()
+    public async Task Signature_TamperedSignature_FailsVerification()
     {
         using var provider = CreateProvider();
-        var signature = await provider.SignAsync(SigningInput, CancellationToken.None);
-
-        Assert.False(provider.Verify(Encoding.ASCII.GetBytes("header.tampered"), signature));
-    }
-
-    [Fact]
-    public async Task Verify_TamperedSignature_ReturnsFalse()
-    {
-        using var provider = CreateProvider();
-        var signature = await provider.SignAsync(SigningInput, CancellationToken.None);
+        var key = await provider.GetActiveKeyAsync(CancellationToken.None);
+        var signature = await provider.SignAsync(key.KeyId, SigningInput, CancellationToken.None);
         signature[10] ^= 0x01;
 
-        Assert.False(provider.Verify(SigningInput, signature));
+        Assert.False(VerifyWithPublishedKey(key.PublicJwk, SigningInput, signature));
     }
 
     [Fact]
-    public void Verify_SignatureNotSixtyFourBytes_ReturnsFalse()
-    {
-        using var provider = CreateProvider();
-
-        Assert.False(provider.Verify(SigningInput, new byte[72]));
-    }
-
-    [Fact]
-    public async Task Verify_SignatureFromDifferentKey_ReturnsFalse()
+    public async Task Signature_FromDifferentProvider_FailsVerification()
     {
         using var signer = CreateProvider();
-        using var otherProvider = CreateProvider();
-        var signature = await signer.SignAsync(SigningInput, CancellationToken.None);
+        using var other = CreateProvider();
+        var signerKey = await signer.GetActiveKeyAsync(CancellationToken.None);
+        var otherKey = await other.GetActiveKeyAsync(CancellationToken.None);
+        var signature = await signer.SignAsync(signerKey.KeyId, SigningInput, CancellationToken.None);
 
-        Assert.False(otherProvider.Verify(SigningInput, signature));
-    }
-
-    [Fact]
-    public async Task GetPublicJwk_ExportedCoordinates_VerifySignatureIndependently()
-    {
-        using var provider = CreateProvider();
-        var signature = await provider.SignAsync(SigningInput, CancellationToken.None);
-
-        var jwk = provider.GetPublicJwk();
-
-        // Rebuild the public key from the published coordinates only, as a phone verifier would.
-        using var verifier = ECDsa.Create(new ECParameters
-        {
-            Curve = ECCurve.NamedCurves.nistP256,
-            Q = new ECPoint { X = Base64Url.DecodeFromChars(jwk.X), Y = Base64Url.DecodeFromChars(jwk.Y) },
-        });
-
-        Assert.Equal("EC", jwk.Kty);
-        Assert.Equal("P-256", jwk.Crv);
-        Assert.Equal(Kid, jwk.Kid);
-        Assert.True(verifier.VerifyData(SigningInput, signature, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation));
-    }
-
-    [Fact]
-    public void KeyIdAndAlgorithm_ValidConfiguration_ReturnConfiguredKidAndEs256()
-    {
-        using var provider = CreateProvider();
-
-        Assert.Equal(Kid, provider.KeyId);
-        Assert.Equal("ES256", provider.Algorithm);
+        Assert.False(VerifyWithPublishedKey(otherKey.PublicJwk, SigningInput, signature));
     }
 
     [Fact]
