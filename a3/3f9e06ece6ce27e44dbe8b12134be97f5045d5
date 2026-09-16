@@ -1,0 +1,14 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/ICredentialSigningProvider.cs
+  h_99fca60b892ff4 1-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a33f9e06ece6ce27e44dbe8b12134be97f5045d5",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
