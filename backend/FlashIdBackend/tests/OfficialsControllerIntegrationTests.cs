@@ -25,7 +25,7 @@ public class OfficialsControllerIntegrationTests
     private const string JwtKey = "integration-test-secret-key-which-is-long-enough"; // NOSONAR - test-only dummy key, not a real secret
     private const string JwtIssuer = "FlashId";
     private const string JwtAudience = "FlashIdWeb";
-    private const string QrPrivateKey = "8O/E1cl/UPWEcxPaC6NvN2GSh1ged35YBOP8ACZf0K0="; // NOSONAR - test-only dummy key, not a real secret
+    private const string QrPrivateKey = "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg4rL2CwKmOHL8ahecUNbk2354O+EdVY7MaU24rwv05oihRANCAASYflRXGZ/UXWisbqNl+38j4SFM8giEvNiP661TDuupv89JPQledcyFi1m5ujBZfh2p0YSOmGMtciYvqzjr3xXZ"; // NOSONAR - test-only dummy key, not a real secret
 
     private sealed class StubEmailSenderProvider : IEmailSenderProvider
     {
@@ -54,7 +54,7 @@ public class OfficialsControllerIntegrationTests
                     ["Jwt:Key"] = JwtKey,
                     ["Jwt:Issuer"] = JwtIssuer,
                     ["Jwt:Audience"] = JwtAudience,
-                    ["Qr:Ed25519PrivateKey"] = QrPrivateKey,
+                    ["Qr:EcdsaPrivateKey"] = QrPrivateKey,
                 });
             });
 

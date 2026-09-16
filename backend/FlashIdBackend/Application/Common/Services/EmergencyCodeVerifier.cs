@@ -50,13 +50,20 @@ public static class EmergencyCodeVerifier
             signed.AsSpan(Context.Length + 16, 4),
             (uint)code.IssuedAt.ToUnixTimeSeconds());
 
-        using var ecdsa = ECDsa.Create();
-        ecdsa.ImportSubjectPublicKeyInfo(publicKeySpki, out _);
+        try
+        {
+            using var ecdsa = ECDsa.Create();
+            ecdsa.ImportSubjectPublicKeyInfo(publicKeySpki, out _);
 
-        return ecdsa.VerifyData(
-            signed, code.Signature,
-            HashAlgorithmName.SHA256,
-            DSASignatureFormat.Rfc3279DerSequence);
+            return ecdsa.VerifyData(
+                signed, code.Signature,
+                HashAlgorithmName.SHA256,
+                DSASignatureFormat.Rfc3279DerSequence);
+        }
+        catch (CryptographicException)
+        {
+            return false;
+        }
     }
 }
 

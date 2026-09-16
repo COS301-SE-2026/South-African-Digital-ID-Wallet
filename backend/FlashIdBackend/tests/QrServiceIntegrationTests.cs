@@ -86,7 +86,7 @@ public class QrServiceIntegrationTests
                 new Dictionary<string, string?>
                 {
                     // NOSONAR: not a real secret
-                    ["Qr:Ed25519PrivateKey"] = "8O/E1cl/UPWEcxPaC6NvN2GSh1ged35YBOP8ACZf0K0=",
+                    ["Qr:EcdsaPrivateKey"] = "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg4rL2CwKmOHL8ahecUNbk2354O+EdVY7MaU24rwv05oihRANCAASYflRXGZ/UXWisbqNl+38j4SFM8giEvNiP661TDuupv89JPQledcyFi1m5ujBZfh2p0YSOmGMtciYvqzjr3xXZ",
                 }
             )
             .Build();
@@ -104,7 +104,7 @@ public class QrServiceIntegrationTests
         var credentialRepository = new CredentialRepository(context);
         var qrDisclosureTokenRepository = new FakeQrDisclosureTokenRepository();
         var configuration = CreateQrConfiguration();
-        var signingProvider = new Ed25519SigningProvider(configuration);
+        var signingProvider = new EcdsaSigningProvider(configuration);
         var institutionRepository = new InstitutionRepository(context);
         var disclosedFieldValueResolver = new DisclosedFieldValueResolver(new FakePhotoStorageProvider());
         var service = new QrService(credentialRepository, signingProvider, qrDisclosureTokenRepository, institutionRepository, disclosedFieldValueResolver);
