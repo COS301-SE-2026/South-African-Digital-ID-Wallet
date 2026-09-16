@@ -130,6 +130,11 @@ public static class DependencyInjection
         services.AddScoped<IPhysicalIdentityVerificationRepository, PhysicalIdentityVerificationRepository>();
 
         services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
+
+        // services.AddScoped<IEmergencyRepository, EmergencyRepository>();
+        // services.AddScoped<IEmergencyService, EmergencyService>();
+        // services.AddScoped<IEmergencyNotifier, EmergencyNotifier>();
+
         return services;
     }
 }

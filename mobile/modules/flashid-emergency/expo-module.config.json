@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["FlashidEmergencyModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.flashidemergency.FlashidEmergencyModule"]
+  }
+}

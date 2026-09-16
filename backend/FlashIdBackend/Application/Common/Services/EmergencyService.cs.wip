@@ -1,0 +1,61 @@
+public async Task<EmergencyProfileResponseDto> ResolveAsync(
+    ResolveEmergencyRequestDto request, Guid responderUserId, string ipAddress, CancellationToken ct)
+{
+    var now = DateTimeOffset.UtcNow;
+
+    if (!EmergencyCodeVerifier.TryParse(request.Code, out var code))
+        throw await FailAsync(responderUserId, ipAddress, "Malformed emergency code.", ct);
+
+    if (!EmergencyCodeVerifier.IsFresh(code, now))
+        throw await FailAsync(responderUserId, ipAddress, "Emergency code expired.", ct);
+
+    var device = await _repository.GetActiveDeviceByHandleAsync(code.Handle, ct);
+    if (device is null)
+        throw await FailAsync(responderUserId, ipAddress, "Unknown emergency handle.", ct);
+
+    if (!EmergencyCodeVerifier.VerifySignature(code, device.PublicKeySpki))
+        throw await FailAsync(responderUserId, ipAddress, "Emergency code signature invalid.", ct);
+
+    if (!await _repository.TryClaimCodeAsync(code.Handle, code.IssuedAt, ct))
+        throw await FailAsync(responderUserId, ipAddress, "Emergency code already used.", ct);
+
+    var profile = await _repository.GetEnabledProfileWithContactsAsync(device.CitizenId, ct)
+        ?? throw new EmergencyProfileNotFoundException();
+
+    var credential = await _credentialRepository.GetActiveIdentityDocumentAsync(device.CitizenId);
+    var photoUrl = credential?.IdentityDocument is null
+        ? null
+        : await _photoStorage.GetReadSasUriAsync(credential.IdentityDocument.PhotoPath, TimeSpan.FromMinutes(15));
+
+    var access = new EmergencyAccess
+    {
+        Id = Guid.NewGuid(),
+        EmergencyProfileId = profile.Id,
+        ResponderUserId = responderUserId,
+        InstitutionId = await _repository.GetResponderInstitutionIdAsync(responderUserId, ct),
+        Justification = request.Justification,
+        Latitude = request.Latitude,
+        Longitude = request.Longitude,
+        IpAddress = ipAddress,
+        WasOffline = request.WasOffline,
+        AccessedAt = now.UtcDateTime,
+        CreatedAt = now.UtcDateTime,
+    };
+    await _repository.AddAccessAsync(access, ct);
+
+    await _auditRepository.AddAuditLogAsync(new AuditLog
+    {
+        Id = Guid.NewGuid(),
+        ActorId = responderUserId,
+        CitizenId = profile.CitizenId,
+        EventType = AuditEventType.EmergencyProfileAccessed,
+        Details = $"Break-glass emergency access. Justification: {request.Justification}",
+        IpAddress = ipAddress,
+        CreatedAt = now.UtcDateTime,
+    });
+    await _repository.SaveChangesAsync(ct);
+
+    _ = _notifier.NotifyEmergencyAccessAsync(access.Id, CancellationToken.None);
+
+    return _mapper.ToResponse(profile, credential, photoUrl, access);
+}
