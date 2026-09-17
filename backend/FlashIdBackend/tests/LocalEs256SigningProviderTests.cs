@@ -4,6 +4,7 @@ using System.Text;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Infrastructure.Providers;
 using Microsoft.Extensions.Configuration;
+using System.Text.Json;
 
 namespace tests;
 
@@ -145,18 +146,24 @@ public class LocalEs256SigningProviderTests
         Assert.False(VerifyWithPublishedKey(otherKey.PublicJwk, SigningInput, signature));
     }
 
-    [Fact]
-    public void Constructor_MissingKid_ThrowsInvalidOperationException()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Constructor_MissingOrBlankPrivateKey_ThrowsInvalidOperationException(string? privateKey)
     {
-        var config = CreateConfiguration(null, NewPrivateKey(ECCurve.NamedCurves.nistP256));
+        var config = CreateConfiguration(Kid, privateKey);
 
         Assert.Throws<InvalidOperationException>(() => new LocalEs256SigningProvider(config));
     }
 
-    [Fact]
-    public void Constructor_MissingPrivateKey_ThrowsInvalidOperationException()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Constructor_MissingOrBlankKid_ThrowsInvalidOperationException(string? kid)
     {
-        var config = CreateConfiguration(Kid, null);
+        var config = CreateConfiguration(kid, NewPrivateKey(ECCurve.NamedCurves.nistP256));
 
         Assert.Throws<InvalidOperationException>(() => new LocalEs256SigningProvider(config));
     }
@@ -175,5 +182,45 @@ public class LocalEs256SigningProviderTests
         var config = CreateConfiguration(Kid, NewPrivateKey(ECCurve.NamedCurves.nistP384));
 
         Assert.Throws<InvalidOperationException>(() => new LocalEs256SigningProvider(config));
+    }
+
+    [Fact]
+    public void Constructor_BrainpoolP256Key_ThrowsInvalidOperationException()
+    {
+        var config = CreateConfiguration(Kid, NewPrivateKey(ECCurve.NamedCurves.brainpoolP256r1));
+
+        Assert.Throws<InvalidOperationException>(() => new LocalEs256SigningProvider(config));
+    }
+
+    [Fact]
+    public void Constructor_Secp256k1Key_ThrowsInvalidOperationException()
+    {
+        var config = CreateConfiguration(Kid, NewPrivateKey(ECCurve.CreateFromValue("1.3.132.0.10")));
+
+        Assert.Throws<InvalidOperationException>(() => new LocalEs256SigningProvider(config));
+    }
+
+    [Fact]
+    public async Task GetActiveKeyAsync_CalledTwice_ReturnsSameSnapshot()
+    {
+        using var provider = CreateProvider();
+
+        var first = await provider.GetActiveKeyAsync(CancellationToken.None);
+        var second = await provider.GetActiveKeyAsync(CancellationToken.None);
+
+        Assert.Same(first, second);
+    }
+
+    [Fact]
+    public async Task GetActiveKeyAsync_PublicJwkSerialised_UsesLowercaseJwkNames()
+    {
+        using var provider = CreateProvider();
+        var key = await provider.GetActiveKeyAsync(CancellationToken.None);
+
+        var json = JsonSerializer.Serialize(key.PublicJwk);
+
+        using var document = JsonDocument.Parse(json);
+        var names = document.RootElement.EnumerateObject().Select(property => property.Name).ToArray();
+        Assert.Equal(new[] { "kty", "crv", "kid", "x", "y" }, names);
     }
 }
