@@ -1,0 +1,60 @@
+backend/FlashIdBackend/Infrastructure/Repositories/EmergencyRepository.cs
+  h_712d174fc3f309 1-108
+backend/FlashIdBackend/Infrastructure/Providers/EcdsaSigningProvider.cs
+  h_712d174fc3f309 1-48
+backend/FlashIdBackend/Application/Common/Services/EmergencyService.cs
+  h_712d174fc3f309 1-381,383,393-394,396-398,402-404,406-413
+  s_71ab8158583f90::t_bdb0acdac7a5a5 382,384-392,395,399-401,405
+backend/FlashIdBackend/Application/Features/Emergency/DTOs/EmergencyDtos.cs
+  h_712d174fc3f309 1-93
+backend/FlashIdBackend/Application/Features/Emergency/Exceptions/EmergencyExceptions.cs
+  h_712d174fc3f309 1-16
+backend/FlashIdBackend/Application/Common/Services/EmergencyCodeVerifier.cs
+  h_712d174fc3f309 53-56,58-66
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IEmergencyRepository.cs
+  h_712d174fc3f309 1-22
+backend/FlashIdBackend/Presentation/Controllers/EmergencyController.cs
+  h_712d174fc3f309 1-63
+backend/FlashIdBackend/tests/QrServiceIntegrationTests.cs
+  h_712d174fc3f309 89,107
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_712d174fc3f309 46,134-137
+backend/FlashIdBackend/Infrastructure/Providers/AesFieldCryptoProvider.cs
+  h_712d174fc3f309 1-53
+backend/FlashIdBackend/tests/OfficialsControllerIntegrationTests.cs
+  h_712d174fc3f309 28,57
+backend/FlashIdBackend/Presentation/ExceptionHandling/GlobalExceptionHandler.cs
+  h_712d174fc3f309 8,81-94
+  s_71ab8158583f90::t_f946ea3d0d987c 95-96
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IEmergencyNotifier.cs
+  h_712d174fc3f309 1-6
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/IFieldCryptoProvider.cs
+  h_712d174fc3f309 1-7
+backend/FlashIdBackend/tests/DependencyInjectionTests.cs
+  h_712d174fc3f309 48
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IEmergencyService.cs
+  h_712d174fc3f309 1-19
+backend/FlashIdBackend/Application/Common/Services/EmergencyNotifier.cs
+  h_712d174fc3f309 1-72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2e5e970a25bbf26a9d0a6756a8b38a9f2478f71e",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_71ab8158583f90": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c01397e5-ee55-4322-ad10-79c9690c5d6e",
+        "model": "unknown"
+      },
+      "human_author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
