@@ -1,6 +1,7 @@
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
+using Domain.Entities;
 
 namespace Application.Common.Services;
 
@@ -8,11 +9,16 @@ public class EmergencyNotifier : IEmergencyNotifier
 {
     private readonly IEmergencyRepository _repository;
     private readonly IEmailSenderProvider _email;
+    private readonly INotificationRepository _notifications;
 
-    public EmergencyNotifier(IEmergencyRepository repository, IEmailSenderProvider email)
+    public EmergencyNotifier(
+        IEmergencyRepository repository,
+        IEmailSenderProvider email,
+        INotificationRepository notifications)
     {
         _repository = repository;
         _email = email;
+        _notifications = notifications;
     }
 
     public async Task NotifyEmergencyAccessAsync(Guid accessId, CancellationToken ct)
@@ -65,6 +71,18 @@ public class EmergencyNotifier : IEmergencyNotifier
             }
             catch (Exception) { }
         }
+
+        await _notifications.CreateNotificationAsync(new Notification
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Title = "Emergency profile accessed",
+            Description = $"{access.ResponderName} opened your emergency profile "
+                        + $"on {access.AccessedAt:yyyy-MM-dd HH:mm} UTC.",
+            Tone = "warning",
+            CreatedAt = DateTime.UtcNow,
+            IsRead = false,
+        });
 
         access.ContactNotifiedAt = DateTime.UtcNow;
         await _repository.SaveChangesAsync(ct);
