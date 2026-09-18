@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Domain/Entities/Credential.cs
+  h_99fca60b892ff4 28-45
+backend/FlashIdBackend/Infrastructure/Data/Configurations/CredentialConfiguration.cs
+  h_99fca60b892ff4 73-95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ed768d34bcfa8d013bacb0a48c250d3fdf673a96",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
