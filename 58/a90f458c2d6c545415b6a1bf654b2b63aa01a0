@@ -1,0 +1,16 @@
+backend/FlashIdBackend/tests/TestSigningProvider.cs
+  h_99fca60b892ff4 1-40
+backend/FlashIdBackend/tests/SdJwtCredentialRequestBuilder.cs
+  h_99fca60b892ff4 1-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "58a90f458c2d6c545415b6a1bf654b2b63aa01a0",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
