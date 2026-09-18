@@ -132,6 +132,8 @@ public static class DependencyInjection
         services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
 
         services.AddSingleton<ICredentialSigningProvider, LocalEs256SigningProvider>();
+
+        services.AddSingleton<IPortraitProcessor, ImageSharpPortraitProcessor>();
         return services;
     }
 }
