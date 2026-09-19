@@ -18,7 +18,7 @@ internal sealed class SdJwtCredentialRequestBuilder
         [SdJwtClaimNames.FullName] = "Thabo Test Mokoena",
     };
     private IReadOnlyCollection<string> _mandatoryClaimNames = SdJwtClaimNames.MandatoryClaimsFor(CredentialType.DriversLicense);
-    private long _revocationIndex = 1001;
+    private int _revocationIndex = 1001;
     private DateTimeOffset? _documentExpiresAt;
     private EcPublicJwk? _deviceKey;
 
@@ -57,7 +57,7 @@ internal sealed class SdJwtCredentialRequestBuilder
         return this;
     }
 
-    public SdJwtCredentialRequestBuilder WithRevocationIndex(long revocationIndex)
+    public SdJwtCredentialRequestBuilder WithRevocationIndex(int revocationIndex)
     {
         _revocationIndex = revocationIndex;
         return this;
