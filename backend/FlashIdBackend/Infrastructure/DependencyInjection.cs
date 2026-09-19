@@ -135,6 +135,8 @@ public static class DependencyInjection
 
         services.AddSingleton(PortraitProcessingLimits.Default);
         services.AddSingleton<IPortraitProcessor, ImageSharpPortraitProcessor>();
+
+        services.AddScoped<IOfflinePackageRepository, OfflinePackageRepository>();
         return services;
     }
 }
