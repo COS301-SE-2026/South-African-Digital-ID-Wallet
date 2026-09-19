@@ -1,0 +1,23 @@
+backend/FlashIdBackend/Infrastructure/Migrations/20260919194554_AddOfflineCredentialPackage.cs
+  h_99fca60b892ff4 1-102
+backend/FlashIdBackend/Domain/Entities/Credential.cs
+  h_99fca60b892ff4 40,42
+  h_99fca60b892ff4 46
+backend/FlashIdBackend/Infrastructure/Data/Configurations/CredentialConfiguration.cs
+  h_99fca60b892ff4 87,90
+backend/FlashIdBackend/Infrastructure/Migrations/20260919194554_AddOfflineCredentialPackage.Designer.cs
+  h_99fca60b892ff4 15,299-300,314-315
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_99fca60b892ff4 296-297,311-312
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "8bfeaeca8fa07dc99b773ba788ac9f6e71d6472b",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
