@@ -30,10 +30,10 @@ namespace Infrastructure.Migrations
                 type: "nvarchar(max)",
                 nullable: true);
 
-            migrationBuilder.AddColumn<DateTime>(
+            migrationBuilder.AddColumn<DateTimeOffset>(
                 name: "PackageExpiresAt",
                 table: "Credentials",
-                type: "datetime2",
+                type: "datetimeoffset",
                 nullable: true);
 
             migrationBuilder.AddColumn<int>(
@@ -42,10 +42,10 @@ namespace Infrastructure.Migrations
                 type: "int",
                 nullable: true);
 
-            migrationBuilder.AddColumn<DateTime>(
+            migrationBuilder.AddColumn<DateTimeOffset>(
                 name: "SignedAt",
                 table: "Credentials",
-                type: "datetime2",
+                type: "datetimeoffset",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
