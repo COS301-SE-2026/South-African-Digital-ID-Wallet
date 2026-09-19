@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IOfflinePackageRepository.cs
+  h_99fca60b892ff4 15
+backend/FlashIdBackend/Infrastructure/Repositories/OfflinePackageRepository.cs
+  h_99fca60b892ff4 1-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2d7d08826416709db89db60ed6cfcb9a5706c4a4",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
