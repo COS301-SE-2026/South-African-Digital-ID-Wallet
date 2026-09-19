@@ -1,5 +1,4 @@
 using Application.Common.Interfaces.ProviderInterfaces;
-using Microsoft.VisualBasic;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Webp;
@@ -26,7 +25,7 @@ public sealed class ImageSharpPortraitProcessor : IPortraitProcessor
 
         using var buffered = await ReadWithinLimitAsync(source, cancellationToken);
 
-        // Animated sources are rejected rather then silently using their first frame
+        // Animated sources are rejected rather than silently using their first frame
         var decoderOptions = new DecoderOptions { MaxFrames = 1 };
         // Reads only the header, so an oversized image is refused befire it is decoded into memory.
         var info = await Image.IdentifyAsync(decoderOptions, buffered, cancellationToken);

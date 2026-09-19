@@ -53,6 +53,7 @@ public class DependencyInjectionTests
         yield return new object[] { typeof(IVerificationRepository), typeof(VerificationRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(ICredentialsActivationRepository), typeof(CredentialsActivationRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(ICredentialSigningProvider), typeof(LocalEs256SigningProvider), ServiceLifetime.Singleton };
+        yield return new object[] { typeof(IPortraitProcessor), typeof(ImageSharpPortraitProcessor), ServiceLifetime.Singleton };
     }
 
     [Theory]

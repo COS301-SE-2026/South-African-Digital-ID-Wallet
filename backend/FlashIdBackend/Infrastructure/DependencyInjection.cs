@@ -133,6 +133,7 @@ public static class DependencyInjection
 
         services.AddSingleton<ICredentialSigningProvider, LocalEs256SigningProvider>();
 
+        services.AddSingleton(PortraitProcessingLimits.Default);
         services.AddSingleton<IPortraitProcessor, ImageSharpPortraitProcessor>();
         return services;
     }
