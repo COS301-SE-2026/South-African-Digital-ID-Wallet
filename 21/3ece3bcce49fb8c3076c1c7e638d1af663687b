@@ -1,0 +1,20 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/DisclosedFieldSource.cs
+  h_99fca60b892ff4 1-15
+backend/FlashIdBackend/Application/Common/Services/DisclosedFieldValueResolver.cs
+  h_99fca60b892ff4 29,31-66
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IDisclosedFieldValueResolver.cs
+  h_99fca60b892ff4 8-9
+backend/FlashIdBackend/tests/DisclosedFieldValueResolverTests.cs
+  h_99fca60b892ff4 5,19-24,162-222
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "213ece3bcce49fb8c3076c1c7e638d1af663687b",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
