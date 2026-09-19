@@ -14,7 +14,7 @@ public sealed record SdJwtCredentialRequest
     public required IReadOnlyCollection<string> MandatoryClaimNames { get; init; }
 
     // The only credential identifier that appears in a presentation (D-012).
-    public required long RevocationIndex { get; init; }
+    public required int RevocationIndex { get; init; }
 
     // Null when the credential has no expiry of its own; the 30-day cap still applies (D-007).
     public DateTimeOffset? DocumentExpiresAt { get; init; }
