@@ -84,10 +84,10 @@ public class CredentialConfiguration : IEntityTypeConfiguration<Credential>
             .HasMaxLength(64);
 
         builder.Property(c => c.SignedAt)
-            .HasColumnType("datetime2");
+            .HasColumnType("datetimeoffset");
 
         builder.Property(c => c.PackageExpiresAt)
-            .HasColumnType("datetime2");
+            .HasColumnType("datetimeoffset");
 
         // Filtered so the many creds with no index yet do not collide. SQL Server treats NULLs as equal in a unique index and would allow only one.
         builder.HasIndex(c => c.RevocationIndex)

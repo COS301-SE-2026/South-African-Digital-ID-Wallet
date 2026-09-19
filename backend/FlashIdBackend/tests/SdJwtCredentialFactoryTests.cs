@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Services;
-using Application.Features.Credentials.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace tests;
 
@@ -38,6 +38,17 @@ public class SdJwtCredentialFactoryTests
         JsonNode.Parse(Encoding.UTF8.GetString(Base64Url.DecodeFromChars(disclosure)))!.AsArray()
             .Select(node => node!.GetValue<string>())
             .ToArray();
+
+    private static string RawSegment(SdJwtCredential credential, int index) =>
+        Encoding.UTF8.GetString(Base64Url.DecodeFromChars(credential.IssuerJwt.Split('.')[index]));
+
+    private static EcPublicJwk CreateDeviceKey()
+    {
+        using var device = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var parameters = device.ExportParameters(false);
+
+        return new EcPublicJwk("EC", "P-256", "device-1", Base64Url.EncodeToString(parameters.Q.X!), Base64Url.EncodeToString(parameters.Q.Y!));
+    }
 
     [Fact]
     public async Task CreateAsync_ValidRequest_SignatureVerifiesWithTheIssuerKey()
@@ -74,7 +85,7 @@ public class SdJwtCredentialFactoryTests
         var credential = await CreateFactory(signingProvider).CreateAsync(request, CancellationToken.None);
         var payload = Payload(credential);
 
-        Assert.Equal("flashid", payload["iss"]!.GetValue<string>());
+        Assert.Equal("urn:flashid:issuer", payload["iss"]!.GetValue<string>());
         Assert.Equal(SdJwtClaimNames.DriversLicenseVct, payload["vct"]!.GetValue<string>());
         Assert.Equal(Now.ToUnixTimeSeconds(), payload["iat"]!.GetValue<long>());
         Assert.Equal(4242, payload["ri"]!.GetValue<long>());
@@ -204,7 +215,7 @@ public class SdJwtCredentialFactoryTests
         using var signingProvider = new TestSigningProvider();
         var request = new SdJwtCredentialRequestBuilder().WithDocumentExpiry(Now.AddDays(-1)).Build();
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateFactory(signingProvider).CreateAsync(request, CancellationToken.None));
+        await Assert.ThrowsAsync<ArgumentException>(() => CreateFactory(signingProvider).CreateAsync(request, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -266,17 +277,17 @@ public class SdJwtCredentialFactoryTests
     public async Task CreateAsync_DeviceKeyProvided_PayloadCarriesCnfJwk()
     {
         using var signingProvider = new TestSigningProvider();
-        var deviceKey = new EcPublicJwk("EC", "P-256", "device-1", "eA", "eQ");
+        var deviceKey = CreateDeviceKey();
 
         var credential = await CreateFactory(signingProvider)
-            .CreateAsync(new SdJwtCredentialRequestBuilder().WithDeviceKey(deviceKey).Build(), CancellationToken.None);
+            .CreateAsync(new SdJwtCredentialRequestBuilder().WithDeviceKey(deviceKey).Build(), TestContext.Current.CancellationToken);
 
         var jwk = Payload(credential)["cnf"]!["jwk"]!.AsObject();
 
         Assert.Equal("EC", jwk["kty"]!.GetValue<string>());
         Assert.Equal("P-256", jwk["crv"]!.GetValue<string>());
-        Assert.Equal("eA", jwk["x"]!.GetValue<string>());
-        Assert.Equal("eQ", jwk["y"]!.GetValue<string>());
+        Assert.Equal(deviceKey.X, jwk["x"]!.GetValue<string>());
+        Assert.Equal(deviceKey.Y, jwk["y"]!.GetValue<string>());
     }
 
     [Fact]
@@ -313,5 +324,86 @@ public class SdJwtCredentialFactoryTests
         Assert.EndsWith("~", sdJwt, StringComparison.Ordinal);
         Assert.Equal(credential.Disclosures.Count + 1, sdJwt.Split('~').Length - 1);
         Assert.All(credential.Disclosures.Values, disclosure => Assert.Contains(disclosure, sdJwt, StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task CreateAsync_DeviceKeyWithShortCoordinates_ThrowsArgumentException()
+    {
+        using var signingProvider = new TestSigningProvider();
+        var request = new SdJwtCredentialRequestBuilder().WithDeviceKey(new EcPublicJwk("EC", "P-256", "device-1", "eA", "eQ")).Build();
+
+        await Assert.ThrowsAsync<ArgumentException>(() => CreateFactory(signingProvider).CreateAsync(request, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task CreateAsync_DeviceKeyOffTheCurve_ThrowsArgumentException()
+    {
+        using var signingProvider = new TestSigningProvider();
+        var valid = CreateDeviceKey();
+        var tampered = Base64Url.DecodeFromChars(valid.Y);
+        tampered[0] ^= 0x01;
+
+        var request = new SdJwtCredentialRequestBuilder()
+            .WithDeviceKey(valid with { Y = Base64Url.EncodeToString(tampered) })
+            .Build();
+
+        await Assert.ThrowsAsync<ArgumentException>(() => CreateFactory(signingProvider).CreateAsync(request, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task CreateAsync_DeviceKeyOnTheWrongCurve_ThrowsArgumentException()
+    {
+        using var signingProvider = new TestSigningProvider();
+        var valid = CreateDeviceKey();
+
+        var request = new SdJwtCredentialRequestBuilder().WithDeviceKey(valid with { Crv = "P-384" }).Build();
+
+        await Assert.ThrowsAsync<ArgumentException>(() => CreateFactory(signingProvider).CreateAsync(request, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task CreateAsync_ClaimWithBlankValue_ThrowsArgumentException()
+    {
+        using var signingProvider = new TestSigningProvider();
+        var request = new SdJwtCredentialRequestBuilder().WithClaim(SdJwtClaimNames.FullName, "   ").Build();
+
+        var exception = await Assert.ThrowsAsync<ArgumentException>(
+            () => CreateFactory(signingProvider).CreateAsync(request, TestContext.Current.CancellationToken));
+
+        Assert.Contains(SdJwtClaimNames.FullName, exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task CreateAsync_ValidRequest_HeaderBytesAreNotEscaped()
+    {
+        using var signingProvider = new TestSigningProvider();
+        var credential = await CreateFactory(signingProvider).CreateAsync(new SdJwtCredentialRequestBuilder().Build(), TestContext.Current.CancellationToken);
+
+        var header = RawSegment(credential, 0);
+
+        Assert.Contains("\"typ\":\"dc+sd-jwt\"", header, StringComparison.Ordinal);
+        Assert.DoesNotContain("\\u002B", header, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task CreateAsync_ClaimValueWithAccents_IsNotEscapedInTheDisclosure()
+    {
+        using var signingProvider = new TestSigningProvider();
+        var request = new SdJwtCredentialRequestBuilder().WithClaim(SdJwtClaimNames.FullName, "Zoë Müller").Build();
+
+        var credential = await CreateFactory(signingProvider).CreateAsync(request, TestContext.Current.CancellationToken);
+        var disclosure = Encoding.UTF8.GetString(Base64Url.DecodeFromChars(credential.Disclosures[SdJwtClaimNames.FullName]));
+
+        Assert.Contains("Zoë Müller", disclosure, StringComparison.Ordinal);
+        Assert.DoesNotContain("\\u00", disclosure, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task CreateAsync_ValidRequest_IssuerIsAUri()
+    {
+        using var signingProvider = new TestSigningProvider();
+        var credential = await CreateFactory(signingProvider).CreateAsync(new SdJwtCredentialRequestBuilder().Build(), TestContext.Current.CancellationToken);
+
+        Assert.True(Uri.TryCreate(Payload(credential)["iss"]!.GetValue<string>(), UriKind.Absolute, out _));
     }
 }

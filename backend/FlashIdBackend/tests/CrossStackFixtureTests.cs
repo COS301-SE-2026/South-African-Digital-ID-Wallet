@@ -29,6 +29,7 @@ public class CrossStackFixtureTests
 
     public sealed record Fixture(
         string Version,
+        string Note,
         string GeneratedAt,
         long VerifyAtUnix,
         IReadOnlyList<EcPublicJwk> IssuerKeys,
@@ -96,6 +97,7 @@ public class CrossStackFixtureTests
 
         Assert.Equal(3, issuerJwt.Split('.').Length);
         Assert.Equal(DisclosedClaimNames.Length, disclosures.Length);
+        Assert.False(string.IsNullOrWhiteSpace(fixture.Note));
     }
 
     [Fact]
@@ -154,7 +156,8 @@ public class CrossStackFixtureTests
 
         Assert.Equal(fixture.Expected.Vct, payload["vct"]!.GetValue<string>());
         Assert.Equal(fixture.Expected.RevocationIndex, payload["ri"]!.GetValue<long>());
-        Assert.True(payload["exp"]!.GetValue<long>() > fixture.VerifyAtUnix);
+        Assert.Equal("urn:flashid:issuer", payload["iss"]!.GetValue<string>());
+        Assert.Equal(fixture.VerifyAtUnix + (long)TimeSpan.FromDays(30).TotalSeconds, payload["exp"]!.GetValue<long>());
     }
 
     [Fact]
@@ -200,7 +203,8 @@ public class CrossStackFixtureTests
             + "~";
 
         var fixture = new Fixture(
-            "1.0",
+            "1.1",
+            "Verifiers must pin their clock to verifyAtUnix. The exp is 30 days after generation, so checking against the real clock will fail once that window passes, which looks like a verifier bug but is a stale fixture. Regenerate with FLASHID_UPDATE_FIXTURE=1.",
             credential.IssuedAt.ToString("O"),
             credential.IssuedAt.ToUnixTimeSeconds(),
             [signingProvider.ActiveKey.PublicJwk],

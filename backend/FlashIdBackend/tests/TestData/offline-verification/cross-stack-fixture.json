@@ -1,17 +1,18 @@
 {
-  "version": "1.0",
-  "generatedAt": "2026-09-18T13:00:11.4143054\u002B00:00",
-  "verifyAtUnix": 1789736411,
+  "version": "1.1",
+  "note": "Verifiers must pin their clock to verifyAtUnix. The exp is 30 days after generation, so checking against the real clock will fail once that window passes, which looks like a verifier bug but is a stale fixture. Regenerate with FLASHID_UPDATE_FIXTURE=1.",
+  "generatedAt": "2026-09-19T21:52:42.5714658\u002B00:00",
+  "verifyAtUnix": 1789854762,
   "issuerKeys": [
     {
       "kty": "EC",
       "crv": "P-256",
       "kid": "test-key-1",
-      "x": "_3s4S2hBUkihZpH0V9It5X5RxH0WnqzNc9RdsDdQFr0",
-      "y": "tBfOLsHjVwCE8-I3Ni_WDv4h-1jl-SJhWDBPlyaZo8g"
+      "x": "YwIN5o5832AbzS5n7C9iVV2Gl8Z8zh42KbZpo3jME6Q",
+      "y": "KS5yJLcdIJNVoGDj7FhPSnkSGigzxzwd1bn1PIOXarw"
     }
   ],
-  "presentation": "eyJhbGciOiJFUzI1NiIsInR5cCI6ImRjXHUwMDJCc2Qtand0Iiwia2lkIjoidGVzdC1rZXktMSJ9.eyJpc3MiOiJmbGFzaGlkIiwidmN0IjoidXJuOmZsYXNoaWQ6ZHJpdmVycy1saWNlbnNlOjEiLCJpYXQiOjE3ODk3MzY0MTEsImV4cCI6MTc5MjMyODQxMSwicmkiOjQyNDIsIl9zZF9hbGciOiJzaGEtMjU2IiwiX3NkIjpbImFQb05oSWx1ZFc0b0xYNkxNTnFYc2dIeVYzQ2hUcWthQlh5Vk5QMXVPOXMiLCJFLXpjY2FxdGxlb0ZxOUl3a19LUzhwMnpwcWFoLWZnQmZzb29xTnliajRRIiwiZkg2MmxnWVcyR1ZuaU1jMHYwTFVGWXB6c0hCNS1IcUVzM2UzRmUwT2tDUSIsInFxRl9rODBlZGkyVTNfV0lxYUYxLVl0ZUViQ21oRTRyR1kyNzBwNmJRcEkiLCJKREhPUVdZTTZPeGtlRkt3cnBMb21XazVrU2c2TklyT0xDNW11LWhnQmVVIiwiZ0FDQXpFd1E0emFrUVdtajRyV05nUWZFeEpXZkJJd2lBdVJGR0JzN2JiQSIsImZ3eWNUUUFnM0lrRG9IUW9LVElNWFBoeElkSkRoNHc5X1V3QUpod2s3dG8iXX0.YnmASPDV0QQ--oAb4vqBeRprsS3k6uYygCwOzTP52ULtc6ed279FRMajYrRZB-fyOO9F2YVbGsdiDEXOgvOWQg~WyJJWU5iY0VXMXpudWpXZ3I5cFFrRDZ3IiwicG9ydHJhaXQiLCJmYWtlLXBvcnRyYWl0LWJ5dGVzIl0~WyI3c1lobV9QUnBXdXFlTnhvcGNlbUtBIiwiZXhwaXJ5X2RhdGUiLCIyMDMwLTA2LTMwIl0~WyJDNkdlclFTLVhVekhrb0VWZ2NpZDFBIiwiZGF0ZV9vZl9iaXJ0aCIsIjE5OTgtMDMtMTQiXQ~WyI4a1F6RmQyTURLdEV4c0twTlhMeXd3IiwiZnVsbF9uYW1lIiwiVGhhYm8gVGVzdCBNb2tvZW5hIl0~",
+  "presentation": "eyJhbGciOiJFUzI1NiIsInR5cCI6ImRjK3NkLWp3dCIsImtpZCI6InRlc3Qta2V5LTEifQ.eyJpc3MiOiJ1cm46Zmxhc2hpZDppc3N1ZXIiLCJ2Y3QiOiJ1cm46Zmxhc2hpZDpkcml2ZXJzLWxpY2Vuc2U6MSIsImlhdCI6MTc4OTg1NDc2MiwiZXhwIjoxNzkyNDQ2NzYyLCJyaSI6NDI0MiwiX3NkX2FsZyI6InNoYS0yNTYiLCJfc2QiOlsiSmdLNEhUSXFTMjdWTzhVYUd3Si0zYWJWMW8zanM1blB2YnJ1UkJCekRGVSIsIk0wS2VUd3E5b3IxaG8tVDhiUThlcVNoV3RnNTFwX0pTc3pnYlRQTTU5eVkiLCJtdUZzYkJ5QUVFVjkyZkptSm5aMDFZa1ZNdmkwbXp2VkRjZ3RrRExGaHRVIiwiZWxpV0pVZjl5dEh0cjExbmRyTkpxUFNNaFhITUkySk9wbUdTRlI4bXJjayIsImc4ZXhvZ2M0TmhfUHBETVpKNXFfOXp6UWk1Q2tLOGo2QTZZbTJtbk9NcUEiLCI3amNRNC1XVmZScE1WY3Q0SjRGc0h5elhwbVh5amVySHE3eHNpaU9QZTVnIiwiM0NpRlM0MmFQX2l3RWkzU1FDV2RoUUhWdV9kTlh6UXFDNHhWWVNoOFNMNCJdfQ.5_fmzZZgaBL0NFkeAJaWw_UYQZJFIaId9kxd6MBebQEl_kWDDDUZB2LBxA12wEIKvl6pYEwLEmReRr-Zlta6RA~WyJhcnI0Y3dPSGFSXzJkWXFoRk81TU13IiwicG9ydHJhaXQiLCJmYWtlLXBvcnRyYWl0LWJ5dGVzIl0~WyJQQ00wYmdCamhPY20tWmlpUC11OGpnIiwiZXhwaXJ5X2RhdGUiLCIyMDMwLTA2LTMwIl0~WyJBMno3UFA5SG9XQnVWY1lSVFpyeW5BIiwiZGF0ZV9vZl9iaXJ0aCIsIjE5OTgtMDMtMTQiXQ~WyJiQ2tDXzFhbGhCVVNFU0RvTW5ub19BIiwiZnVsbF9uYW1lIiwiVGhhYm8gVGVzdCBNb2tvZW5hIl0~",
   "expected": {
     "vct": "urn:flashid:drivers-license:1",
     "revocationIndex": 4242,

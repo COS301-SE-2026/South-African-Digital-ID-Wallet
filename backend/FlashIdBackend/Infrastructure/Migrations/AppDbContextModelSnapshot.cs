@@ -293,8 +293,8 @@ namespace Infrastructure.Migrations
                     b.Property<string>("IssuerSignedCredential")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("PackageExpiresAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("PackageExpiresAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int?>("RevocationIndex")
                         .HasColumnType("int");
@@ -308,8 +308,8 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
 
-                    b.Property<DateTime?>("SignedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("SignedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("SigningKid")
                         .HasMaxLength(128)

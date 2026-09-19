@@ -37,9 +37,9 @@ public class Credential : BaseEntity
     // Which device key the cnf claim binds to, so a new phone triggers a re-mint.
     public string? HolderKeyThumbprint { get; set; }
 
-    public DateTime? SignedAt { get; set; }
+    public DateTimeOffset? SignedAt { get; set; }
 
-    public DateTime? PackageExpiresAt { get; set; }
+    public DateTimeOffset? PackageExpiresAt { get; set; }
 
     // The only credential identifier inside a presentation. Allocated at 1st mint
     public int? RevocationIndex { get; set; }
