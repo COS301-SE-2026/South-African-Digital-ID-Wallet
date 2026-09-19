@@ -203,7 +203,7 @@ public class CrossStackFixtureTests
             + "~";
 
         var fixture = new Fixture(
-            "1.0",
+            "1.1",
             "Verifiers must pin their clock to verifyAtUnix. The exp is 30 days after generation, so checking against the real clock will fail once that window passes, which looks like a verifier bug but is a stale fixture. Regenerate with FLASHID_UPDATE_FIXTURE=1.",
             credential.IssuedAt.ToString("O"),
             credential.IssuedAt.ToUnixTimeSeconds(),
