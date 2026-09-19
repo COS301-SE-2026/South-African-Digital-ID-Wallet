@@ -291,6 +291,46 @@ frames and recognisability.
 
 ---
 
+### D-020 `iss` is a URI
+
+**Status:** Accepted, 2026-09-19
+
+**Context.** Version 1.0 used the bare string `flashid`. SD-JWT VC requires `iss` to be a URI, and
+standard verifiers use it to resolve issuer metadata.
+
+**Decision.** `iss` is `urn:flashid:issuer`, matching the `urn:flashid:` form already used for `vct`.
+
+**Alternatives.** An HTTPS URL pointing at a published JWKS endpoint, which is the production shape.
+Deferred because the prototype trust anchor is the key set fetched over TLS (D-009), not issuer
+metadata resolution.
+
+**Consequences.** Nothing is deployed, so no credential has to be re-minted. Changing this after
+release would have meant re-minting every package in the field. Raised in review on PR #538.
+
+---
+
+### D-021 JSON on the wire is serialised with relaxed escaping
+
+**Status:** Accepted, 2026-09-19
+
+**Context.** System.Text.Json escapes `+` and every non-ASCII character by default, so the header
+travelled as `dc\u002Bsd-jwt` and a name such as `Zoë` as `Zo\u00EB`.
+
+**Decision.** Serialise the header, payload and disclosures with
+`JavaScriptEncoder.UnsafeRelaxedJsonEscaping`.
+
+**Alternatives.** Keeping the default encoder and documenting the escaping. Rejected: no other
+SD-JWT issuer emits an escaped `typ`, some verifiers compare `typ` against the raw decoded header
+rather than the parsed value, and the whole point of the cross-stack fixture is that another
+implementation can consume our output.
+
+**Consequences.** Escaped characters cost six bytes each, so names with diacritics were quietly
+costing QR frames. The encoder is named "unsafe" because it does not escape characters that matter
+in HTML; this JSON is base64url encoded immediately and never rendered as HTML. Signatures are
+unaffected, since they always cover the exact bytes sent. Raised in review on PR #538.
+
+---
+
 ## Open questions
 
 | Id | Question | Owner | Status |
