@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | 1.0, frozen on 2026-09-15. A change needs a new version and a decision entry |
+| Status | 1.1, updated on 2026-09-19. A change needs a new version and a decision entry |
 | Owner | Nathan Chisadza |
 | Used by | Backend offline package builder, mobile wallet, mobile verifier |
 | Decisions | [decisions.md](decisions.md) |
@@ -23,6 +23,7 @@ Deliberate deviations are listed in section 11.
 ## 3. Encoding rules
 
 - `b64u` means base64url **without padding**.
+- JSON is serialised without escaping non-ASCII characters or `+`. `typ` travels as `dc+sd-jwt`, and aname such as `Zoë` travels as its UTF-8 bytes, not `Zo\u00EB` (D-021).
 - Text is encoded as UTF-8. Every string that is hashed or signed contains only base64url characters, `.` and `~`, so its UTF-8 and ASCII bytes are identical.
 - Receivers parse JSON but **never re-serialise JSON** to check a hash or a signature. Hashes and signatures are always checked over the exact text received.
 - Timestamps are integer Unix seconds, UTC.
@@ -94,7 +95,7 @@ see Q-2.
 
 | Claim | Type | Meaning |
 |---|---|---|
-| `iss` | string | `flashid` |
+| `iss` | string | `urn:flashid:issuer` |
 | `vct` | string | `urn:flashid:identity-document:1` or `urn:flashid:drivers-license:1` |
 | `iat` | integer | When the package was minted |
 | `exp` | integer | The earlier of the document's expiry and `iat` plus 30 days (D-007) |
@@ -217,3 +218,5 @@ The cross-stack fixture (checklist 1.11) contains a public key and a presentatio
 |---|---|---|
 | 0.1 | 2026-09-14 | Initial draft; Spike A result recorded in section 6 |
 | 1.0 | 2026-09-15 | Frozen. Portrait recipe (D-018), frame size and rate (D-019) from Spikes B and C, with size budget measured |
+| 1.1 | 2026-09-19 | `iss` becomes the URI `urn:flashid:issuer` (D-020); JSON escaping relaxed so `typ` and non-ASCII claim values travel unescaped (D-021) |
+
