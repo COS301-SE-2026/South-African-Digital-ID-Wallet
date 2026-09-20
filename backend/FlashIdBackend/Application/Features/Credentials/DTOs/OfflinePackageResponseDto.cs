@@ -3,7 +3,7 @@ namespace Application.Features.Credentials.DTOs;
 // The stored package
 public sealed record OfflinePackageResponseDto(
     string IssuerSignedCredential,
-    Dictionary<string, string> Disclosure,
-    DateTime SignedAt,
-    DateTime ExpiresAt
+    Dictionary<string, string> Disclosures,
+    DateTimeOffset SignedAt,
+    DateTimeOffset ExpiresAt
 );

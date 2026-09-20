@@ -74,10 +74,10 @@ public sealed class OfflinePackageService : IOfflinePackageService
         var activeKey = await _signingProvider.GetActiveKeyAsync(cancellationToken);
         var deviceThumbprint = Thumbprint(deviceKey);
 
-        return NeedsMinting(credential, now.UtcDateTime, activeKey.KeyId, deviceThumbprint) ? await MintAsync(credential, deviceKey, deviceThumbprint, now.UtcDateTime, cancellationToken) : ToResponse(credential);
+        return NeedsMinting(credential, now, activeKey.KeyId, deviceThumbprint) ? await MintAsync(credential, deviceKey, deviceThumbprint, now, cancellationToken) : ToResponse(credential);
     }
 
-    private static bool NeedsMinting(Credential credential, DateTime now, string activeKeyId, string? deviceThumbprint)
+    private static bool NeedsMinting(Credential credential, DateTimeOffset now, string activeKeyId, string? deviceThumbprint)
     {
         // Never minted, or minted but stored incompletely
         if (string.IsNullOrEmpty(credential.IssuerSignedCredential)
@@ -88,24 +88,26 @@ public sealed class OfflinePackageService : IOfflinePackageService
             return true;
         }
 
+        var updatedAt = new DateTimeOffset(DateTime.SpecifyKind(credential.UpdatedAt, DateTimeKind.Utc));
+
         // Every remaining rule comes from D-007
         return credential.PackageExpiresAt <= now
             || now - credential.SignedAt.Value >= RefreshAfter
             || credential.SigningKid != activeKeyId
             || credential.HolderKeyThumbprint != deviceThumbprint
-            || credential.UpdatedAt > credential.SignedAt.Value;
+            || updatedAt > credential.SignedAt.Value;
     }
 
     private async Task<OfflinePackageResponseDto> MintAsync(
         Credential credential,
         EcPublicJwk? deviceKey,
         string? deviceThumbprint,
-        DateTime now,
+        DateTimeOffset now,
         CancellationToken cancellationToken
     )
     {
         var credentialType = credential.IdentityDocument is not null ? CredentialType.IdentityDocument : CredentialType.DriversLicense;
-        var documentExpiry = credential.DriversLicense?.ExpiryDate;
+        var documentExpiry = credential.DriversLicense is { } license ? new DateTimeOffset(DateTime.SpecifyKind(license.ExpiryDate, DateTimeKind.Utc)) : (DateTimeOffset?)null;
 
         if (documentExpiry is not null && documentExpiry <= now)
         {
@@ -128,7 +130,7 @@ public sealed class OfflinePackageService : IOfflinePackageService
                     Claims = claims,
                     MandatoryClaimNames = mandatoryClaims,
                     RevocationIndex = credential.RevocationIndex.Value,
-                    DocumentExpiresAt = documentExpiry is null ? null : new DateTimeOffset(DateTime.SpecifyKind(documentExpiry.Value, DateTimeKind.Utc)),
+                    DocumentExpiresAt = documentExpiry,
                     DeviceKey = deviceKey,
                 },
                 cancellationToken
@@ -138,8 +140,8 @@ public sealed class OfflinePackageService : IOfflinePackageService
             credential.DisclosureSet = JsonSerializer.Serialize(signed.Disclosures);
             credential.SigningKid = signed.KeyId;
             credential.HolderKeyThumbprint = deviceThumbprint;
-            credential.SignedAt = signed.IssuedAt.UtcDateTime;
-            credential.PackageExpiresAt = signed.ExpiresAt.UtcDateTime;
+            credential.SignedAt = signed.IssuedAt;
+            credential.PackageExpiresAt = signed.ExpiresAt;
 
             if (await _repository.TrySaveMintedPackageAsync(cancellationToken))
             {
