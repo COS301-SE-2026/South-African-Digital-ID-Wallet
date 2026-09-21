@@ -25,4 +25,22 @@ public class Credential : BaseEntity
     public string? IdBackImagePath { get; set; }
 
     public string? SelfieImagePath { get; set; }
+
+    // Offline package. All null until the wallet first asks for an offline credential
+    public string? IssuerSignedCredential { get; set; }
+
+    // JSON array of every disclosure, so a presentation can be assembled without re-signing.
+    public string? DisclosureSet { get; set; }
+
+    public string? SigningKid { get; set; }
+
+    // Which device key the cnf claim binds to, so a new phone triggers a re-mint.
+    public string? HolderKeyThumbprint { get; set; }
+
+    public DateTimeOffset? SignedAt { get; set; }
+
+    public DateTimeOffset? PackageExpiresAt { get; set; }
+
+    // The only credential identifier inside a presentation. Allocated at 1st mint
+    public int? RevocationIndex { get; set; }
 }
