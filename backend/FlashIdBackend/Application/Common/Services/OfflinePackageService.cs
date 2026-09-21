@@ -75,7 +75,6 @@ public sealed class OfflinePackageService : IOfflinePackageService
         var activeKey = await _signingProvider.GetActiveKeyAsync(cancellationToken);
         var deviceThumbprint = Thumbprint(deviceKey);
 
-        // return NeedsMinting(credential, now, activeKey.KeyId, deviceThumbprint) ? await MintAsync(credential, deviceKey, deviceThumbprint, now, cancellationToken) : ToResponse(credential);
         if (!NeedsMinting(credential, now, activeKey.KeyId, deviceThumbprint))
         {
             return ToResponse(credential);
@@ -98,7 +97,7 @@ public sealed class OfflinePackageService : IOfflinePackageService
 
             return package;
         }
-        catch (Exception exception) when (exception is OfflinePackageUnavailableException or OfflinePackageDataMissingException)
+        catch (Exception exception) when (exception is OfflinePackageUnavailableException or OfflinePackageDataMissingException or OfflinePackageDocumentExpiredException)
         {
             await WriteAuditAsync(credential, requestUserId, ipAddress, AuditEventType.OfflinePackageMintFailed, exception.Message, discardChanges: true, cancellationToken);
 
@@ -174,7 +173,7 @@ public sealed class OfflinePackageService : IOfflinePackageService
 
         if (documentExpiry is not null && documentExpiry <= now)
         {
-            throw new OfflinePackageUnavailableException("the document has already expired");
+            throw new OfflinePackageDocumentExpiredException();
         }
 
         // Downscaling the portrait is the expensive part, so claims are built once, outside the loop.
@@ -183,6 +182,10 @@ public sealed class OfflinePackageService : IOfflinePackageService
 
         for (var attempt = 1; attempt <= MaxMintAttempts; attempt++)
         {
+            // Only an index allocated in this call may be released. One that came from the database
+            // belongs to packages already in circulation, and changing it would leave those packages
+            // pointing at a revocation index that is no longer theirs.
+            var allocatedHere = credential.RevocationIndex is null;
             credential.RevocationIndex ??= await _repository.NextRevocationIndexAsync(cancellationToken);
 
             // The index is signed into the credential as `ri`, so a new index means signing again.
@@ -209,6 +212,13 @@ public sealed class OfflinePackageService : IOfflinePackageService
             if (await _repository.TrySaveMintedPackageAsync(cancellationToken))
             {
                 return ToResponse(credential);
+            }
+
+            // A credential that already had an index cannot lose a race for it, so this is not the
+            // collision the retry exists for.
+            if (!allocatedHere)
+            {
+                throw new OfflinePackageUnavailableException("the package could not be saved");
             }
 
             // Another mint claimed this index and nothing was written. Release it and try again.
@@ -238,7 +248,7 @@ public sealed class OfflinePackageService : IOfflinePackageService
             }
 
             var source = _fieldResolver.Describe(credential, label);
-            var value = source.Kind == DisclosedFieldKind.Photo ? await PortraitClaimAsync(source.Value, cancellationToken) : source.Value;
+            var value = source.Kind == DisclosedFieldKind.Photo ? await PortraitClaimAsync(claimName, source.Value, cancellationToken) : source.Value;
 
             if (string.IsNullOrEmpty(value))
             {
@@ -258,23 +268,46 @@ public sealed class OfflinePackageService : IOfflinePackageService
         return claims;
     }
 
-    private async Task<string> PortraitClaimAsync(string blobName, CancellationToken cancellationToken)
+    private async Task<string> PortraitClaimAsync(string claimName, string blobName, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(blobName))
         {
             return string.Empty;
         }
 
-        await using var photo = await _photoStorage.OpenReadAsync(blobName, cancellationToken);
+        Stream? photo;
+
+        try
+        {
+            photo = await _photoStorage.OpenReadAsync(blobName, cancellationToken);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            // Storage being unreachable is transient, so the wallet retries rather than being told
+            // its credential is incomplete.
+            throw new OfflinePackageUnavailableException($"the stored photo for '{claimName}' could not be read", exception);
+        }
 
         if (photo is null)
         {
             return string.Empty;
         }
 
-        var portrait = await _portraitProcessor.ToOfflinePortraitAsync(photo, cancellationToken);
+        await using (photo)
+        {
+            try
+            {
+                var portrait = await _portraitProcessor.ToOfflinePortraitAsync(photo, cancellationToken);
 
-        return Base64Url.EncodeToString(portrait);
+                return Base64Url.EncodeToString(portrait);
+            }
+            catch (Exception exception) when (exception is not OperationCanceledException)
+            {
+                // A stored photo that will not decode will never decode, so this is 409 rather than a
+                // retry, and naming the claim makes the audit row worth reading.
+                throw new OfflinePackageDataMissingException(claimName, exception);
+            }
+        }
     }
 
     // RFC 7638 JWK thumbprint: SHA-256 over the required members only, in lexicographic order, no whitespace.

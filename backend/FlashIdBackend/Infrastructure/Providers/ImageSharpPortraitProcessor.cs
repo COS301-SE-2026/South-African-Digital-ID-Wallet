@@ -27,8 +27,15 @@ public sealed class ImageSharpPortraitProcessor : IPortraitProcessor
 
         // Animated sources are rejected rather than silently using their first frame
         var decoderOptions = new DecoderOptions { MaxFrames = 1 };
-        // Reads only the header, so an oversized image is refused befire it is decoded into memory.
-        var info = await Image.IdentifyAsync(decoderOptions, buffered, cancellationToken);
+        // Identify reads headers only, so it uses default options and still reports every frame.
+        var info = await Image.IdentifyAsync(buffered, cancellationToken);
+
+        // An ID photo is a still image. Decoding only the first frame of an animation would hide that
+        // something is wrong with the stored file.
+        if (info.FrameMetadataCollection.Count > 1)
+        {
+            throw new InvalidOperationException("Portrait source must be a single still image.");
+        }
 
         if ((long)info.Width * info.Height > _limits.MaxSourcePixels)
         {
@@ -37,7 +44,8 @@ public sealed class ImageSharpPortraitProcessor : IPortraitProcessor
 
         buffered.Position = 0;
 
-        using var image = await Image.LoadAsync(decoderOptions, buffered, cancellationToken);
+        // Belt and braces after the frame check above: never expand more than one frame into memory.
+        using var image = await Image.LoadAsync(new DecoderOptions { MaxFrames = 1 }, buffered, cancellationToken);
 
         image.Mutate(context => context
             // Phone cameras store rotation as an EXIF tag, so without this a portrait photo lands sideways

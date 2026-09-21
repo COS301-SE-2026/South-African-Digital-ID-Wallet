@@ -12,8 +12,9 @@ public class OfflinePackageRepository : IOfflinePackageRepository
     // SQL server: 2601 is a duplicate key in a unique index, 2627 a unique constraint violation.
     private const int SqlServerDuplicateKey = 2601;
     private const int SqlServerUniqueConstraint = 2627;
-    // SqLite groups every constraint failure under errror code 19, used by integration tests
-    private const int SqliteConstraintViolation = 19;
+    // SQLite reports every constraint failure as error 19, so the extended code is what distinguishes
+    // a duplicate revocation index from an FK or NOT NULL bug that should not be retried.
+    private const int SqliteUniqueConstraint = 2067;
     private readonly AppDbContext _context;
 
     public OfflinePackageRepository(AppDbContext context)
@@ -21,7 +22,7 @@ public class OfflinePackageRepository : IOfflinePackageRepository
         _context = context;
     }
 
-    // Tracked on purposeL the minted pakage is written back onto this entry
+    // Tracked on purpose: the minted pakage is written back onto this entry
     public async Task<Credential?> GetForPackagingAsync(Guid credentialId, CancellationToken cancellationToken) =>
         await _context.Credentials
             .Include(c => c.Citizen)
@@ -31,8 +32,7 @@ public class OfflinePackageRepository : IOfflinePackageRepository
 
     public async Task<int> NextRevocationIndexAsync(CancellationToken cancellationToken)
     {
-        // Cast to int? so an empty table returns null rather than throwing on Max
-        var highest = await _context.Credentials.MaxAsync(c => (int?)c.RevocationIndex, cancellationToken);
+        var highest = await _context.Credentials.MaxAsync(c => c.RevocationIndex, cancellationToken);
 
         return (highest ?? 0) + 1;
     }
@@ -54,7 +54,7 @@ public class OfflinePackageRepository : IOfflinePackageRepository
     private static bool IsUniqueIndexViolation(DbUpdateException due) => due.InnerException switch
     {
         SqlException se => se.Number is SqlServerDuplicateKey or SqlServerUniqueConstraint,
-        SqliteException sle => sle.SqliteErrorCode == SqliteConstraintViolation,
+        SqliteException sle => sle.SqliteExtendedErrorCode == SqliteUniqueConstraint,
         _ => false,
     };
 
