@@ -1,0 +1,141 @@
+mobile/modules/flashid-emergency/android/src/main/res/drawable/ic_flashid_emergency.xml
+  h_712d174fc3f309 1-10
+mobile/src/services/emergency-service/types.ts
+  h_712d174fc3f309 1-51,58-60
+  h_712d174fc3f309 52-57,61
+mobile/src/hooks/use-emergency-device.ts
+  h_712d174fc3f309 1-37
+  h_712d174fc3f309 38
+mobile/jest.config.js
+  h_712d174fc3f309 5-6
+mobile/modules/flashid-emergency/android/src/main/AndroidManifest.xml
+  h_712d174fc3f309 1-31
+mobile/src/services/emergency-service/emergency-urls.ts
+  h_712d174fc3f309 1-8
+  h_712d174fc3f309 9
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/EmergencyQrActivity.kt
+  h_712d174fc3f309 1-2,4-8,10-113
+  h_712d174fc3f309 3,9
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/EmergencyKeys.kt
+  h_712d174fc3f309 1-4,6-8,10-27,29-71,83-84
+  h_712d174fc3f309 5,9,28,72-82
+mobile/modules/flashid-emergency/android/src/main/res/values/themes.xml
+  h_712d174fc3f309 1-9
+mobile/src/services/index.ts
+  h_712d174fc3f309 7
+mobile/modules/flashid-emergency/index.ts
+  h_712d174fc3f309 1-20,24-32
+  h_712d174fc3f309 21-23,33
+mobile/modules/flashid-emergency/android/src/main/res/values/dimens.xml
+  h_712d174fc3f309 1-4
+mobile/src/services/emergency-service/index.ts
+  h_712d174fc3f309 1-2
+  h_712d174fc3f309 3-4
+mobile/modules/flashid-emergency/android/build.gradle
+  h_712d174fc3f309 11-13,22-27
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/EmergencyQrTileService.kt
+  h_712d174fc3f309 1-38
+mobile/modules/flashid-emergency/android/src/main/res/values/strings.xml
+  h_712d174fc3f309 1-12
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/EmergencyStore.kt
+  h_712d174fc3f309 1-42
+mobile/src/services/emergency-service/emergency-service.ts
+  h_712d174fc3f309 1-47
+  h_712d174fc3f309 48
+mobile/modules/flashid-emergency/android/src/main/res/layout/activity_emergency_qr.xml
+  h_712d174fc3f309 1-54
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/FlashidEmergencyModule.kt
+  h_712d174fc3f309 3-7,11-13,15-64
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/EmergencyQrRenderer.kt
+  h_712d174fc3f309 1-9,11-13,15-27,33-50,56-57,59-63
+  h_712d174fc3f309 10,14,28-32,51-55,58
+mobile/src/hooks/index.ts
+  s_71ab8158583f90::t_3a18557488ae39 13
+mobile/src/services/emergency-service/emergency-errors.ts
+  s_71ab8158583f90::t_ad6071ac2dc3db 1-20
+mobile/src/services/scan-service/parse-scanned-token.ts
+  s_71ab8158583f90::t_df9a536e3e53b3 3-5,18-24
+backend/FlashIdBackend/Application/Common/Services/EmergencyService.cs
+  h_712d174fc3f309 64-67,101
+backend/FlashIdBackend/Infrastructure/Repositories/EmergencyRepository.cs
+  h_712d174fc3f309 70-73
+backend/FlashIdBackend/Presentation/Controllers/EmergencyController.cs
+  h_712d174fc3f309 20
+backend/FlashIdBackend/tests/AesFieldCryptoProviderTests.cs
+  h_712d174fc3f309 1-73
+backend/FlashIdBackend/tests/EmergencyCodeVerifierTests.cs
+  h_712d174fc3f309 1-179
+backend/FlashIdBackend/tests/EmergencyNotifierTests.cs
+  h_712d174fc3f309 1-208
+backend/FlashIdBackend/tests/EmergencyServiceTests.cs
+  h_712d174fc3f309 1-435
+mobile/modules/flashid-emergency/__mocks__/index.ts
+  h_712d174fc3f309 1-15
+mobile/src/app/official/emergency.tsx
+  h_712d174fc3f309 1-8
+mobile/src/components/organisms/break-glass-gate/break-glass-gate.tsx
+  h_712d174fc3f309 1-90
+mobile/src/components/organisms/break-glass-gate/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/break-glass-gate/test/break-glass-gate.test.tsx
+  h_712d174fc3f309 1-63
+mobile/src/components/organisms/break-glass-gate/types.ts
+  h_712d174fc3f309 1-7
+mobile/src/components/organisms/emergency-profile-card/emergency-profile-card.tsx
+  h_712d174fc3f309 1-90
+mobile/src/components/organisms/emergency-profile-card/index.ts
+  h_712d174fc3f309 1-2
+mobile/src/components/organisms/emergency-profile-card/test/emergency-profile-card.test.tsx
+  h_712d174fc3f309 1-77
+mobile/src/components/organisms/emergency-profile-card/types.ts
+  h_712d174fc3f309 1-6
+mobile/src/components/organisms/index.ts
+  h_712d174fc3f309 34-35
+mobile/src/components/pages/emergency-scan/emergency-scan-page.tsx
+  h_712d174fc3f309 1-99
+mobile/src/components/pages/emergency-scan/index.ts
+  h_712d174fc3f309 1
+mobile/src/components/pages/emergency-scan/test/emergency-scan-page.test.tsx
+  h_712d174fc3f309 1-166
+mobile/src/components/pages/index.ts
+  h_712d174fc3f309 12
+mobile/src/components/pages/qr-scanner/qr-scanner-page.tsx
+  h_712d174fc3f309 50-56
+mobile/src/config/navigation/quick-actions.ts
+  h_712d174fc3f309 10,57-63
+mobile/src/hooks/test/use-emergency-device.test.tsx
+  h_712d174fc3f309 1-118
+mobile/src/hooks/test/use-emergency-resolve.test.tsx
+  h_712d174fc3f309 1-144
+mobile/src/hooks/use-emergency-resolve.ts
+  h_712d174fc3f309 1-58
+mobile/src/services/emergency-service/test/emergency-errors.test.ts
+  h_712d174fc3f309 1-53
+mobile/src/services/emergency-service/test/emergency-service.test.ts
+  h_712d174fc3f309 1-61
+mobile/src/services/scan-service/test/emergency-token.test.ts
+  h_712d174fc3f309 1-28
+mobile/src/services/scan-service/types.ts
+  h_712d174fc3f309 9-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0ccf203bbbd16f1ec34e3e329b4cd4d950eb308c",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_71ab8158583f90": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c01397e5-ee55-4322-ad10-79c9690c5d6e",
+        "model": "unknown"
+      },
+      "human_author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
