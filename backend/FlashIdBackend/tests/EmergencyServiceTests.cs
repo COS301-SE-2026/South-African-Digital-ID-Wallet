@@ -66,7 +66,7 @@ public class EmergencyServiceTests
         BinaryPrimitives.WriteUInt32BigEndian(ts, (uint)issuedAt.ToUnixTimeSeconds());
 
         return "https://flashid.co.za/e#1."
-             + $"{Base64Url.Encode(_handle)}.{Base64Url.Encode(ts)}.{Base64Url.Encode(signature)}";
+             + $"{EmergencyBase64Url.Encode(_handle)}.{EmergencyBase64Url.Encode(ts)}.{EmergencyBase64Url.Encode(signature)}";
     }
 
     private EmergencyProfile Profile(Guid citizenId) => new()
@@ -314,7 +314,7 @@ public class EmergencyServiceTests
 
         await Assert.ThrowsAsync<InvalidEmergencyCodeException>(() =>
             Service().RegisterDeviceAsync(
-                new RegisterEmergencyDeviceRequestDto { PublicKeySpki = Base64Url.Encode(new byte[] { 1, 2, 3 }) },
+                new RegisterEmergencyDeviceRequestDto { PublicKeySpki = EmergencyBase64Url.Encode(new byte[] { 1, 2, 3 }) },
                 Guid.NewGuid(), CancellationToken.None));
     }
 
@@ -341,14 +341,14 @@ public class EmergencyServiceTests
         var result = await Service().RegisterDeviceAsync(
             new RegisterEmergencyDeviceRequestDto
             {
-                PublicKeySpki = Base64Url.Encode(key.ExportSubjectPublicKeyInfo()),
+                PublicKeySpki = EmergencyBase64Url.Encode(key.ExportSubjectPublicKeyInfo()),
                 Platform = "android",
                 DeviceLabel = "Pixel 8",
                 IsStrongBoxBacked = true,
             },
             Guid.NewGuid(), CancellationToken.None);
 
-        Assert.Equal(16, Base64Url.Decode(result.Handle).Length);
+        Assert.Equal(16, EmergencyBase64Url.Decode(result.Handle).Length);
         Assert.NotNull(existing.RevokedAt);
         _repository.Verify(r => r.AddDeviceAsync(
             It.IsAny<EmergencyDevice>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -428,7 +428,7 @@ public class EmergencyServiceTests
         Assert.NotEmpty(result.Payload);
         Assert.True(result.ExpiresAt > DateTime.UtcNow.AddDays(80));
 
-        var json = Encoding.UTF8.GetString(Base64Url.Decode(result.Payload));
+        var json = Encoding.UTF8.GetString(EmergencyBase64Url.Decode(result.Payload));
         Assert.Contains("emergency-offline", json);
         Assert.Contains("O negative", json);
     }

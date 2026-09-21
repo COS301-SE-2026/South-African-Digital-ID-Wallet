@@ -148,7 +148,7 @@ public class EmergencyService : IEmergencyService
         var citizen = await _credentialRepository.GetCitizenByUserIdAsync(userId)
             ?? throw new EmergencyProfileNotFoundException();
 
-        var publicKey = Base64Url.Decode(request.PublicKeySpki);
+        var publicKey = EmergencyBase64Url.Decode(request.PublicKeySpki);
 
         try
         {
@@ -194,7 +194,7 @@ public class EmergencyService : IEmergencyService
         });
         await _repository.SaveChangesAsync(ct);
 
-        return new RegisterEmergencyDeviceResponseDto { Handle = Base64Url.Encode(handle) };
+        return new RegisterEmergencyDeviceResponseDto { Handle = EmergencyBase64Url.Encode(handle) };
     }
 
     public async Task<EmergencyProfileDto> GetMyProfileAsync(Guid userId, CancellationToken ct)
@@ -299,7 +299,7 @@ public class EmergencyService : IEmergencyService
         {
             v = 1,
             typ = "emergency-offline",
-            hdl = Base64Url.Encode(device.Handle),
+            hdl = EmergencyBase64Url.Encode(device.Handle),
             iat = issuedAt.ToUnixTimeSeconds(),
             exp = expiresAt.ToUnixTimeSeconds(),
             upd = profile.MedicalLastUpdatedAt?.ToString("yyyy-MM-dd"),
@@ -311,7 +311,7 @@ public class EmergencyService : IEmergencyService
 
         return new OfflineCredentialResponseDto
         {
-            Payload = Base64Url.Encode(Encoding.UTF8.GetBytes(json)),
+            Payload = EmergencyBase64Url.Encode(Encoding.UTF8.GetBytes(json)),
             Signature = _qrSigningProvider.Sign(json),
             ExpiresAt = expiresAt.UtcDateTime,
         };

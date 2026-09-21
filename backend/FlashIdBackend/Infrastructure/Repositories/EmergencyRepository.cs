@@ -74,7 +74,7 @@ public class EmergencyRepository : IEmergencyRepository
 
     public async Task<bool> TryClaimCodeAsync(byte[] handle, DateTimeOffset issuedAt, CancellationToken ct)
     {
-        var id = $"emg:{Base64Url.Encode(handle)}:{issuedAt.ToUnixTimeSeconds()}";
+        var id = $"emg:{EmergencyBase64Url.Encode(handle)}:{issuedAt.ToUnixTimeSeconds()}";
 
         try
         {

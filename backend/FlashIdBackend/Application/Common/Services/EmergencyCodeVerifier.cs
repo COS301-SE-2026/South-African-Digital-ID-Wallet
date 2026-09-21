@@ -25,9 +25,9 @@ public static class EmergencyCodeVerifier
 
         try
         {
-            var handle = Base64Url.Decode(parts[1]);
-            var tsBytes = Base64Url.Decode(parts[2]);
-            var signature = Base64Url.Decode(parts[3]);
+            var handle = EmergencyBase64Url.Decode(parts[1]);
+            var tsBytes = EmergencyBase64Url.Decode(parts[2]);
+            var signature = EmergencyBase64Url.Decode(parts[3]);
 
             if (handle.Length != 16 || tsBytes.Length != 4) return false;
 
@@ -67,7 +67,7 @@ public static class EmergencyCodeVerifier
     }
 }
 
-public static class Base64Url
+public static class EmergencyBase64Url
 {
     public static byte[] Decode(string s)
     {

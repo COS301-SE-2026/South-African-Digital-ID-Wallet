@@ -32,7 +32,7 @@ public class EmergencyCodeVerifierTests
         BinaryPrimitives.WriteUInt32BigEndian(ts, (uint)issuedAt.ToUnixTimeSeconds());
 
         return "https://flashid.co.za/e#1."
-             + $"{Base64Url.Encode(handle)}.{Base64Url.Encode(ts)}.{Base64Url.Encode(signature)}";
+             + $"{EmergencyBase64Url.Encode(handle)}.{EmergencyBase64Url.Encode(ts)}.{EmergencyBase64Url.Encode(signature)}";
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public class EmergencyCodeVerifierTests
     {
         var shortHandle = new byte[15];
         var ts = new byte[4];
-        var raw = $"1.{Base64Url.Encode(shortHandle)}.{Base64Url.Encode(ts)}.{Base64Url.Encode(new byte[8])}";
+        var raw = $"1.{EmergencyBase64Url.Encode(shortHandle)}.{EmergencyBase64Url.Encode(ts)}.{EmergencyBase64Url.Encode(new byte[8])}";
 
         Assert.False(EmergencyCodeVerifier.TryParse(raw, out _));
     }
@@ -95,7 +95,7 @@ public class EmergencyCodeVerifierTests
     [Fact]
     public void TryParse_WrongTimestampLength_ReturnsFalse()
     {
-        var raw = $"1.{Base64Url.Encode(Handle())}.{Base64Url.Encode(new byte[8])}.{Base64Url.Encode(new byte[8])}";
+        var raw = $"1.{EmergencyBase64Url.Encode(Handle())}.{EmergencyBase64Url.Encode(new byte[8])}.{EmergencyBase64Url.Encode(new byte[8])}";
 
         Assert.False(EmergencyCodeVerifier.TryParse(raw, out _));
     }
