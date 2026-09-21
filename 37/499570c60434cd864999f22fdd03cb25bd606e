@@ -1,0 +1,22 @@
+backend/FlashIdBackend/Application/Common/Services/EmergencyCodeVerifier.cs
+  h_712d174fc3f309 28-30,70
+backend/FlashIdBackend/Application/Common/Services/EmergencyService.cs
+  h_712d174fc3f309 151,197,302,314
+backend/FlashIdBackend/Infrastructure/Repositories/EmergencyRepository.cs
+  h_712d174fc3f309 77
+backend/FlashIdBackend/tests/EmergencyCodeVerifierTests.cs
+  h_712d174fc3f309 35,90,98
+backend/FlashIdBackend/tests/EmergencyServiceTests.cs
+  h_712d174fc3f309 69,317,344,351,431
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "37499570c60434cd864999f22fdd03cb25bd606e",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
