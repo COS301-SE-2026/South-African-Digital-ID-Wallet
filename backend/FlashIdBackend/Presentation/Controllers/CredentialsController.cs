@@ -416,7 +416,7 @@ public class CredentialsController : ControllerBase
     /// </summary>
     /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
     /// <response code="200">The issuer key set, with the time it was retrieved so the verifier can age it.</response>
-    /// [HttpGet("issuer-keys")]
+    [HttpGet("issuer-keys")]
     [ProducesResponseType(typeof(IssuerKeysResponseDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetIssuerKeys(CancellationToken cancellationToken)
     {
