@@ -1,0 +1,20 @@
+backend/FlashIdBackend/Infrastructure/Migrations/20260918140732_AddOfflineCredentialPackage.Designer.cs
+  h_99fca60b892ff4 1-1451
+backend/FlashIdBackend/Infrastructure/Migrations/20260918140732_AddOfflineCredentialPackage.cs
+  h_99fca60b892ff4 1-102
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_99fca60b892ff4 270-276,293-301,311-317,331-334
+backend/FlashIdBackend/tests/TestData/offline-verification/cross-stack-fixture.json
+  h_99fca60b892ff4 1-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "cdd7fbb24c4185d619a55fd6d53b2409156b9f1d",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

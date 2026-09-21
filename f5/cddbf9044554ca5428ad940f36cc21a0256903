@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Application/Common/Services/SdJwtClaimNames.cs
+  h_99fca60b892ff4 1-95
+backend/FlashIdBackend/tests/SdJwtClaimNamesTests.cs
+  h_99fca60b892ff4 1-149
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f5cddbf9044554ca5428ad940f36cc21a0256903",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

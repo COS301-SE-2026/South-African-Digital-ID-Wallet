@@ -1,0 +1,35 @@
+backend/FlashIdBackend/Domain/Enums/AuditEventType.cs
+  h_99fca60b892ff4 35-36
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IOfflinePackageService.cs
+  h_99fca60b892ff4 14
+backend/FlashIdBackend/tests/OfflinePackageServiceTests.cs
+  h_99fca60b892ff4 34-35,65-79,211,230,245,259,273,288,303,317,333,348,364,380,399,413,429,444,458,473,484,486-536
+  s_794fff04ad9106::t_c8825e98420339 485
+backend/FlashIdBackend/Application/Common/Services/OfflinePackageService.cs
+  h_99fca60b892ff4 58,78-106,109-142,172
+backend/FlashIdBackend/Infrastructure/Repositories/OfflinePackageRepository.cs
+  h_99fca60b892ff4 60-80
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IOfflinePackageRepository.cs
+  h_99fca60b892ff4 15-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "456619446451960a2a846e39a7a511e4b2ef6c89",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_794fff04ad9106": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c11d0b59-23c0-498a-821b-d9aa766e84f7",
+        "model": "claude-opus-5"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

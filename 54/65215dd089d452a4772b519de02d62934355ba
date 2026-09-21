@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/PortraitProcessingLimits.cs
+  h_99fca60b892ff4 1-8
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/IPortraitProcessor.cs
+  h_99fca60b892ff4 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "5465215dd089d452a4772b519de02d62934355ba",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

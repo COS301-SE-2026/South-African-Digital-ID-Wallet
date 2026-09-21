@@ -1,0 +1,14 @@
+web/src/components/molecules/update-password-modal/test/update-password-modal.test.tsx
+  h_0aff3b71f739b1 1-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ffd5dd855a1796310a763baa3f7929b62ee1966d",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

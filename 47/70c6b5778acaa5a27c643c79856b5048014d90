@@ -1,0 +1,16 @@
+docs/demo4/offline-verification/wire-format.md
+  h_99fca60b892ff4 5,26,98,221-222
+docs/demo4/offline-verification/decisions.md
+  h_99fca60b892ff4 294-333
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4770c6b5778acaa5a27c643c79856b5048014d90",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

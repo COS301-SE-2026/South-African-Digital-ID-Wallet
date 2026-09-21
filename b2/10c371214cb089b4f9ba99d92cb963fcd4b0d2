@@ -1,0 +1,14 @@
+backend/FlashIdBackend/tests/CrossStackFixtureTests.cs
+  h_99fca60b892ff4 1-218
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b210c371214cb089b4f9ba99d92cb963fcd4b0d2",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_99fca60b892ff4 46-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "7e400a3298232401d2fe64cf924b7da6cd90c13d",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
