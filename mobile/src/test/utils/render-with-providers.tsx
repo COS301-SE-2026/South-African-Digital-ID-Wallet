@@ -32,3 +32,25 @@ export const renderWithProviders = (
   }
   return render(component, { wrapper: renderWrapper })
 }
+
+export const createQueryWrapper = (
+  queryClient: QueryClient = createTestQueryClient()
+) => {
+  const QueryWrapper = ({ children }: { children: ReactNode }) => {
+    return (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    )
+  }
+  return QueryWrapper
+}
+
+export const renderWithSafeArea = (component: ReactElement) => {
+  const safeAreaWrapper = ({ children }: { children: ReactNode }) => {
+    return (
+      <SafeAreaProvider initialMetrics={DEVICE_METRICS}>
+        {children}
+      </SafeAreaProvider>
+    )
+  }
+  return render(component, { wrapper: safeAreaWrapper })
+}
