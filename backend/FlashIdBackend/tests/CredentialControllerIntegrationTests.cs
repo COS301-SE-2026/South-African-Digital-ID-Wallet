@@ -21,6 +21,7 @@ using Application.Features.Citizens.Exceptions;
 using Application.Features.Credentials.Exceptions;
 using Application.Features.Credentials.Enums;
 using Application.Features.Onboarding.Exceptions;
+using Application.Common.Interfaces.ProviderInterfaces;
 
 namespace tests;
 
@@ -36,6 +37,16 @@ public class CredentialControllerIntegrationTests
         public Task<List<CredentialSummaryDto>> GetMyCredentialsAsync(Guid userId) => Task.FromResult(new List<CredentialSummaryDto>());
         public Task<ResolveCredentialResponseDto> ResolveAsync(string token, Guid requestingUserId, string ipAddress) => throw new NotImplementedException("Not exercised by these tests.");
     }
+
+    // CredentialsController now resolves IOfflinePackageService, which needs photo storage. Stubbed so
+    // these tests do not need a blob connection string.
+    private sealed class StubPhotoStorageProvider : IPhotoStorageProvider
+    {
+        public Task<string> GenerateReadSasUrlAsync(string blobName, TimeSpan ttl) => Task.FromResult($"https://fake-blob-sas.local/{blobName}");
+
+        public Task<Stream?> OpenReadAsync(string blobName, CancellationToken cancellationToken) => Task.FromResult<Stream?>(null);
+    }
+
 
     private sealed class StubCredentialActivationService : ICredentialActivationService
     {
@@ -124,6 +135,9 @@ public class CredentialControllerIntegrationTests
                     services.RemoveAll(typeof(ICredentialUpdateService));
                     services.AddScoped<ICredentialUpdateService, StubFailingCredentialUpdateService>();
                 }
+
+                services.RemoveAll(typeof(IPhotoStorageProvider));
+                services.AddSingleton<IPhotoStorageProvider, StubPhotoStorageProvider>();
             });
         }
 
