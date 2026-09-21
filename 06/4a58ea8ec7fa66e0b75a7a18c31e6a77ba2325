@@ -1,0 +1,17 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/SdJwtCredentialRequest.cs
+  h_99fca60b892ff4 17
+backend/FlashIdBackend/Application/Common/Services/SdJwtCredentialFactory.cs
+  h_99fca60b892ff4 8,17-18,21-22,25-29,43-45,102-103,117-127,129-177
+  h_99fca60b892ff4 78,104,128,184,249
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "064a58ea8ec7fa66e0b75a7a18c31e6a77ba2325",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

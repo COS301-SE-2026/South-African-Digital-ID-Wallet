@@ -1,0 +1,18 @@
+web/src/components/molecules/ready-item/test/ready-item.test.tsx
+  h_0aff3b71f739b1 1-22
+web/src/components/molecules/update-password-card/test/update-password-card.test.tsx
+  h_0aff3b71f739b1 1-30
+web/src/components/molecules/update-email-card/test/update-email-card.test.tsx
+  h_0aff3b71f739b1 1-30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "342d0bd2b425ac4abb38005591074602acbbdb6f",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

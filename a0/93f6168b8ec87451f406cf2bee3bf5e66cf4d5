@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/IPortraitProcessor.cs
+  h_99fca60b892ff4 1-8
+backend/FlashIdBackend/Infrastructure/Infrastructure.csproj
+  h_99fca60b892ff4 26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a093f6168b8ec87451f406cf2bee3bf5e66cf4d5",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

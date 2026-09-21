@@ -1,0 +1,14 @@
+backend/FlashIdBackend/Application/Common/Services/EmergencyNotifier.cs
+  h_712d174fc3f309 4,12,14-17,21,75-86
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "fddf51c9cdea4a9ee5891590abf6ccaedca0cc3f",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

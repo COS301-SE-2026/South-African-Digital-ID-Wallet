@@ -1,0 +1,18 @@
+web/src/components/organisms/capture-contact-details/test/capture-contact-details.test.tsx
+  h_0aff3b71f739b1 1-87
+web/src/components/organisms/verification-failure/index.ts
+  h_0aff3b71f739b1 1
+web/src/components/organisms/verification-failure/test/verification-failure.test.tsx
+  h_0aff3b71f739b1 1-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "840098c7b5b8bd762605de56ba3dd7b7e46a46c9",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/OfflinePackageResponseDto.cs
+  h_99fca60b892ff4 6-8
+backend/FlashIdBackend/Application/Common/Services/OfflinePackageService.cs
+  h_99fca60b892ff4 80,91-92,98,105,110,144
+  s_794fff04ad9106::t_7c9f2b245b5917 77,133,143
+backend/FlashIdBackend/tests/OfflinePackageServiceTests.cs
+  h_99fca60b892ff4 1-469
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "99251501273989843e3f7d3d956a4e49983c2ab7",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_794fff04ad9106": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c11d0b59-23c0-498a-821b-d9aa766e84f7",
+        "model": "claude-opus-5"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

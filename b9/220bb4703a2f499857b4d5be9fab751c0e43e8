@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/OfflinePackageResponseDto.cs
+  h_99fca60b892ff4 1-9
+backend/FlashIdBackend/Application/Features/Credentials/Exceptions/OfflinePackageExceptions.cs
+  h_99fca60b892ff4 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b9220bb4703a2f499857b4d5be9fab751c0e43e8",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

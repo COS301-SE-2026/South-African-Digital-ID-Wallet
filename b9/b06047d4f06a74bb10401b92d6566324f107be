@@ -1,0 +1,21 @@
+backend/FlashIdBackend/tests/LocalEs256SigningProviderTests.cs
+  h_99fca60b892ff4 4,39-50,52,56,58-62,66,69,71-73,77,80-81,83,87,90-92,94,98,102,106,109-110,112,116,118-120,122,126,129-131,133,137,139-143,145
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/ICredentialSigningProvider.cs
+  h_99fca60b892ff4 5-6,8-9
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/CredentialSigningKey.cs
+  h_99fca60b892ff4 1-4
+backend/FlashIdBackend/Infrastructure/Providers/LocalEs256SigningProvider.cs
+  h_99fca60b892ff4 10,12,18,50-51,55-56,59-60,62-65,68,72-73,75
+  h_99fca60b892ff4 70,80-81,83-84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b9b06047d4f06a74bb10401b92d6566324f107be",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

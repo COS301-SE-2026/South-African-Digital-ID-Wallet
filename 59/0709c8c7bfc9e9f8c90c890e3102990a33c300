@@ -1,0 +1,16 @@
+docs/demo4/offline-verification/decisions.md
+  h_99fca60b892ff4 298-299
+docs/demo4/functional-requirements-v3.md
+  h_99fca60b892ff4 1-600
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "590709c8c7bfc9e9f8c90c890e3102990a33c300",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

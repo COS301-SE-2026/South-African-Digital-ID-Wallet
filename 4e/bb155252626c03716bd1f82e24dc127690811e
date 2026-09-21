@@ -1,0 +1,16 @@
+web/src/components/molecules/update-email-modal/test/update-email-modal.test.tsx
+  h_0aff3b71f739b1 1-68
+web/src/components/molecules/update-email-modal/index.ts
+  h_0aff3b71f739b1 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4ebb155252626c03716bd1f82e24dc127690811e",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
