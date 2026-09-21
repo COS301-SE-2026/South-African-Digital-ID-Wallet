@@ -16,6 +16,7 @@ public class CertifiedCredentialCopyConfiguration : IEntityTypeConfiguration<Cer
         builder.Property(c => c.ExpiresAt).IsRequired(false);
         builder.Property(c => c.RevokedAt).IsRequired(false);
         builder.Property(c => c.Status).HasConversion<string>().HasMaxLength(20).IsRequired();
+        builder.Property(c => c.DocumentHash).IsRequired().HasMaxLength(64);
         builder.HasIndex(c => c.VerificationTokenHash).IsUnique();
         builder.HasIndex(c => c.CitizenId);
         builder.HasIndex(c => c.CredentialId);
