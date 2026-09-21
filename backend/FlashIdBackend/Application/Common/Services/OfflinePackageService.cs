@@ -297,4 +297,17 @@ public sealed class OfflinePackageService : IOfflinePackageService
         credential.SignedAt!.Value,
         credential.PackageExpiresAt!.Value
     );
+
+    public async Task<IssuerKeysResponseDto> GetIssuerKeysAsync(CancellationToken cancellationToken)
+    {
+        var activeKey = await _signingProvider.GetActiveKeyAsync(cancellationToken);
+        var jwk = activeKey.PublicJwk;
+
+        // Only the active key for now. Retired keys join this list when the rolling-keys SigningKeys
+        // table lands (checklist 1.23); packages last 30 days, so a retired key stays published for about 45.
+        return new IssuerKeysResponseDto(
+            [new IssuerKeyDto(jwk.Kid, jwk.Kty, jwk.Crv, jwk.X, jwk.Y, "active")],
+            _timeProvider.GetUtcNow());
+    }
+
 }

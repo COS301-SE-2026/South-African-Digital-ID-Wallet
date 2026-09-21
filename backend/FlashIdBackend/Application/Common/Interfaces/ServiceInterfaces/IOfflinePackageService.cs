@@ -14,4 +14,7 @@ public interface IOfflinePackageService
         string ipAddress,
         CancellationToken cancellationToken
     );
+
+    // The public keys a verifier needs to check issuer signatures while offline
+    Task<IssuerKeysResponseDto> GetIssuerKeysAsync(CancellationToken cancellationToken);
 }
