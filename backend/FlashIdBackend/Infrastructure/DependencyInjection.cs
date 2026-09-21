@@ -136,6 +136,7 @@ public static class DependencyInjection
         services.AddScoped<IEmergencyNotifier, EmergencyNotifier>();
         services.AddSingleton<IFieldCryptoProvider, AesFieldCryptoProvider>();
 
+        services.AddSingleton<ICredentialSigningProvider, LocalEs256SigningProvider>();
         return services;
     }
 }
