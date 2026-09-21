@@ -1,0 +1,22 @@
+backend/FlashIdBackend/Domain/Entities/CertifiedCredentialCopy.cs
+  h_293a8616118f65 12,16
+backend/FlashIdBackend/Infrastructure/Data/Configurations/CertifiedCredentialCopyConfiguration.cs
+  h_293a8616118f65 19
+"backend/FlashIdBackend/Infrastructure/Migrations/20260921084400_Updated CertifiedCopies Entity to have Document Hash.Designer.cs"
+  h_293a8616118f65 1-1488
+"backend/FlashIdBackend/Infrastructure/Migrations/20260921084400_Updated CertifiedCopies Entity to have Document Hash.cs"
+  h_293a8616118f65 1-30
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_293a8616118f65 136-140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e2c4438d50e986b2d0e896dad77fc9885e6353f6",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
