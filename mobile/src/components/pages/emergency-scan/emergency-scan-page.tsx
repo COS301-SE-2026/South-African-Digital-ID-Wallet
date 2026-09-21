@@ -44,7 +44,9 @@ export const EmergencyScanPage = () => {
       if (code === null) {
         return
       }
-      void resolve({ code, justification, wasOffline: false })
+      void resolve({ code, justification, wasOffline: false }).catch(
+        () => undefined
+      )
     },
     [code, resolve]
   )

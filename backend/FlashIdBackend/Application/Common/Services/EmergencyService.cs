@@ -345,7 +345,7 @@ public class EmergencyService : IEmergencyService
             IpAddress = ipAddress,
             CreatedAt = DateTime.UtcNow,
         });
-        await _repository.SaveChangesAsync(ct);
+        await _repository.SaveChangesAsync(CancellationToken.None);
 
         return new InvalidEmergencyCodeException(reason);
     }

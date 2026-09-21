@@ -9,6 +9,12 @@ export const resolveEmergencyError = (error: unknown): string => {
     if (status === 401 || status === 403) {
       return 'Your account is not authorised to open emergency profiles.'
     }
+    if (status === 404) {
+      return 'No emergency profile is available. This person has not set one up, or has switched it off.'
+    }
+    if (status === 409) {
+      return 'This phone is not registered for emergency access.'
+    }
     if (status === 429) {
       return 'Too many attempts. Wait a minute before scanning again.'
     }

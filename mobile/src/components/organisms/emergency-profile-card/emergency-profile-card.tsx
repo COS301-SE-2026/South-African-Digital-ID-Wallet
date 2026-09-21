@@ -62,11 +62,8 @@ export const EmergencyProfileCard = ({
           No contacts listed.
         </Text>
       ) : (
-        profile.contacts.map((contact) => (
-          <View
-            key={`${contact.name}-${contact.relationship}`}
-            className="gap-1"
-          >
+        profile.contacts.map((contact, index) => (
+          <View key={`${index}-${contact.name}`} className="gap-1">
             <Text className="text-text-primary">
               {contact.name} · {contact.relationship}
             </Text>

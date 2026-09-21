@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.util.Base64
+import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
@@ -24,20 +25,20 @@ class FlashidEmergencyModule : Module() {
         }
 
         AsyncFunction("setEmergencyHandle") { handleB64Url: String ->
-            EmergencyStore.putHandle(appContext.reactContext!!, handleB64Url)
+            EmergencyStore.putHandle(appContext.reactContext ?: throw Exceptions.ReactContextLost(), handleB64Url)
         }
 
         AsyncFunction("setOfflineBundle") { json: String ->
-            EmergencyStore.putOfflineBundle(appContext.reactContext!!, json)
+            EmergencyStore.putOfflineBundle(appContext.reactContext ?: throw Exceptions.ReactContextLost(), json)
         }
 
         AsyncFunction("isConfigured") {
-            EmergencyStore.handle(appContext.reactContext!!) != null &&
+            EmergencyStore.handle(appContext.reactContext ?: throw Exceptions.ReactContextLost()) != null &&
                 EmergencyKeys.loadPublicKey() != null
         }
 
         AsyncFunction("requestAddTile") { promise: expo.modules.kotlin.Promise ->
-            val context = appContext.reactContext!!
+            val context = appContext.reactContext ?: throw Exceptions.ReactContextLost()
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                 promise.resolve(false)
                 return@AsyncFunction
@@ -57,7 +58,7 @@ class FlashidEmergencyModule : Module() {
         }
 
         AsyncFunction("disableEmergency") {
-            EmergencyStore.clear(appContext.reactContext!!)
+            EmergencyStore.clear(appContext.reactContext ?: throw Exceptions.ReactContextLost())
             EmergencyKeys.delete()
         }
     }

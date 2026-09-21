@@ -132,8 +132,6 @@ public static class DependencyInjection
         services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
 
         services.AddScoped<IEmergencyRepository, EmergencyRepository>();
-        services.AddScoped<IEmergencyService, EmergencyService>();
-        services.AddScoped<IEmergencyNotifier, EmergencyNotifier>();
         services.AddSingleton<IFieldCryptoProvider, AesFieldCryptoProvider>();
 
         services.AddSingleton<ICredentialSigningProvider, LocalEs256SigningProvider>();

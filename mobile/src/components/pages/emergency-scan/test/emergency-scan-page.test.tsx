@@ -44,7 +44,7 @@ const PROFILE = {
 }
 
 const mockHook = (overrides = {}) => {
-  const resolve = jest.fn()
+  const resolve = jest.fn().mockResolvedValue(null)
   const reset = jest.fn()
   useResolve.mockReturnValue({
     error: null,

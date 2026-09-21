@@ -11,7 +11,15 @@ object EmergencyStore {
     private const val KEY_HANDLE = "handle"
     private const val KEY_OFFLINE = "offline_bundle"
 
-    private fun prefs(context: Context): SharedPreferences {
+    @Volatile
+    private var cached: SharedPreferences? = null
+
+    private fun prefs(context: Context): SharedPreferences =
+        cached ?: synchronized(this) {
+            cached ?: build(context).also { cached = it }
+        }
+
+    private fun build(context: Context): SharedPreferences {
         val direct = context.createDeviceProtectedStorageContext()
         val masterKey = MasterKey.Builder(direct)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -39,4 +47,4 @@ object EmergencyStore {
     fun offlineBundle(context: Context): String? = prefs(context).getString(KEY_OFFLINE, null)
 
     fun clear(context: Context) = prefs(context).edit().clear().apply()
-}   
+}

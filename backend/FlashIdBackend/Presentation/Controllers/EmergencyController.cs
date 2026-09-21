@@ -24,7 +24,11 @@ public class EmergencyController : ControllerBase
     public async Task<IActionResult> Resolve(
         [FromBody] ResolveEmergencyRequestDto request, CancellationToken ct)
     {
-        var responderId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var responderId))
+        {
+            return Unauthorized();
+        }
+
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
         return Ok(await _emergencyService.ResolveAsync(request, responderId, ip, ct));
     }

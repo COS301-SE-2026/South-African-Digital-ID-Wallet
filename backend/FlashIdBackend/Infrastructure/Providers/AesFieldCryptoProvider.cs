@@ -41,6 +41,11 @@ public class AesFieldCryptoProvider : IFieldCryptoProvider
     public string Decrypt(string ciphertext)
     {
         var raw = Convert.FromBase64String(ciphertext);
+
+        if (raw.Length < NonceSize + TagSize)
+        {
+            throw new CryptographicException("Emergency field ciphertext is malformed.");
+        }
         var nonce = raw.AsSpan(0, NonceSize);
         var tag = raw.AsSpan(NonceSize, TagSize);
         var cipher = raw.AsSpan(NonceSize + TagSize);
