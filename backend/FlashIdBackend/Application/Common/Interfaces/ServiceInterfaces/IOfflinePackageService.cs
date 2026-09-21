@@ -11,6 +11,7 @@ public interface IOfflinePackageService
         Guid credentialId,
         Guid requestUserId,
         EcPublicJwk? deviceKey,
+        string ipAddress,
         CancellationToken cancellationToken
     );
 }

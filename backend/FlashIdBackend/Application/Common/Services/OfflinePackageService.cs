@@ -55,6 +55,7 @@ public sealed class OfflinePackageService : IOfflinePackageService
         Guid credentialId,
         Guid requestUserId,
         EcPublicJwk? deviceKey,
+        string ipAddress,
         CancellationToken cancellationToken
     )
     {
@@ -74,8 +75,70 @@ public sealed class OfflinePackageService : IOfflinePackageService
         var activeKey = await _signingProvider.GetActiveKeyAsync(cancellationToken);
         var deviceThumbprint = Thumbprint(deviceKey);
 
-        return NeedsMinting(credential, now, activeKey.KeyId, deviceThumbprint) ? await MintAsync(credential, deviceKey, deviceThumbprint, now, cancellationToken) : ToResponse(credential);
+        // return NeedsMinting(credential, now, activeKey.KeyId, deviceThumbprint) ? await MintAsync(credential, deviceKey, deviceThumbprint, now, cancellationToken) : ToResponse(credential);
+        if (!NeedsMinting(credential, now, activeKey.KeyId, deviceThumbprint))
+        {
+            return ToResponse(credential);
+        }
+
+        try
+        {
+            var package = await MintAsync(credential, deviceKey, deviceThumbprint, now, cancellationToken);
+
+            // Claim NAMES only. An audit table holding claim values would be a second copy of the
+            // data this feature exists to protect.
+            await WriteAuditAsync(
+                credential,
+                requestUserId,
+                ipAddress,
+                AuditEventType.OfflinePackageMinted,
+                $"Offline package minted. Key: {credential.SigningKid}. Revocation index: {credential.RevocationIndex}. Type: {SdJwtClaimNames.VctFor(TypeOf(credential))}. Claims: {string.Join(", ", package.Disclosures.Keys)}.",
+                discardChanges: false,
+                cancellationToken);
+
+            return package;
+        }
+        catch (Exception exception) when (exception is OfflinePackageUnavailableException or OfflinePackageDataMissingException)
+        {
+            await WriteAuditAsync(credential, requestUserId, ipAddress, AuditEventType.OfflinePackageMintFailed, exception.Message, discardChanges: true, cancellationToken);
+
+            throw;
+        }
     }
+
+    private static CredentialType TypeOf(Credential credential) =>
+        credential.IdentityDocument is not null ? CredentialType.IdentityDocument : CredentialType.DriversLicense;
+
+    private async Task WriteAuditAsync(
+        Credential credential,
+        Guid actorId,
+        string ipAddress,
+        AuditEventType eventType,
+        string details,
+        bool discardChanges,
+        CancellationToken cancellationToken)
+    {
+        var auditLog = new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            EventType = eventType,
+            Details = details,
+            IpAddress = ipAddress,
+            ActorId = actorId,
+            CredentialId = credential.Id,
+            CitizenId = credential.CitizenId,
+            CreatedAt = _timeProvider.GetUtcNow().UtcDateTime,
+        };
+
+        if (discardChanges)
+        {
+            await _repository.SaveAuditLogDiscardingChangesAsync(auditLog, cancellationToken);
+            return;
+        }
+
+        await _repository.AddAuditLogAsync(auditLog, cancellationToken);
+    }
+
 
     private static bool NeedsMinting(Credential credential, DateTimeOffset now, string activeKeyId, string? deviceThumbprint)
     {
@@ -106,7 +169,7 @@ public sealed class OfflinePackageService : IOfflinePackageService
         CancellationToken cancellationToken
     )
     {
-        var credentialType = credential.IdentityDocument is not null ? CredentialType.IdentityDocument : CredentialType.DriversLicense;
+        var credentialType = TypeOf(credential);
         var documentExpiry = credential.DriversLicense is { } license ? new DateTimeOffset(DateTime.SpecifyKind(license.ExpiryDate, DateTimeKind.Utc)) : (DateTimeOffset?)null;
 
         if (documentExpiry is not null && documentExpiry <= now)

@@ -12,4 +12,9 @@ public interface IOfflinePackageRepository
 
     // Returns false when another mint claimed the same revocation index, so the caller can allocate again.
     Task<bool> TrySaveMintedPackageAsync(CancellationToken cancellationToken);
+
+    Task AddAuditLogAsync(AuditLog auditLog, CancellationToken cancellationToken);
+
+    // For the failure path. A plain save would store a package whose write was never accepted
+    Task SaveAuditLogDiscardingChangesAsync(AuditLog auditLog, CancellationToken cancellationToken);
 }

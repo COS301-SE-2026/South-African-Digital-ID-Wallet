@@ -31,6 +31,8 @@ public class OfflinePackageServiceTests
         public int FailNextSaves { get; set; }
         public int SaveAttempts { get; private set; }
         public List<int> AllocatedIndexes { get; } = [];
+        public List<AuditLog> AuditLogs { get; } = [];
+        public bool DiscardedChanges { get; private set; }
 
         public Task<Credential?> GetForPackagingAsync(Guid credentialId, CancellationToken cancellationToken) =>
             Task.FromResult(Stored?.Id == credentialId ? Stored : null);
@@ -59,6 +61,21 @@ public class OfflinePackageServiceTests
             }
 
             return Task.FromResult(true);
+        }
+
+        public Task AddAuditLogAsync(AuditLog auditLog, CancellationToken cancellationToken)
+        {
+            AuditLogs.Add(auditLog);
+
+            return Task.CompletedTask;
+        }
+
+        public Task SaveAuditLogDiscardingChangesAsync(AuditLog auditLog, CancellationToken cancellationToken)
+        {
+            DiscardedChanges = true;
+            AuditLogs.Add(auditLog);
+
+            return Task.CompletedTask;
         }
     }
 
@@ -191,7 +208,7 @@ public class OfflinePackageServiceTests
         using var signingProvider = new TestSigningProvider();
 
         var package = await CreateService(repository, signingProvider)
-            .GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken);
+            .GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken);
 
         Assert.Equal(1, repository.SaveAttempts);
         Assert.Equal(1, credential.RevocationIndex);
@@ -210,7 +227,7 @@ public class OfflinePackageServiceTests
         using var signingProvider = new TestSigningProvider();
 
         var package = await CreateService(repository, signingProvider)
-            .GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken);
+            .GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken);
 
         Assert.Equal(0, repository.SaveAttempts);
         Assert.Equal("stored.issuer.jwt", package.IssuerSignedCredential);
@@ -225,7 +242,7 @@ public class OfflinePackageServiceTests
         var repository = new FakeOfflinePackageRepository { Stored = credential };
         using var signingProvider = new TestSigningProvider();
 
-        await CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken);
+        await CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken);
 
         Assert.Equal(1, repository.SaveAttempts);
         Assert.NotEqual("stored.issuer.jwt", credential.IssuerSignedCredential);
@@ -239,7 +256,7 @@ public class OfflinePackageServiceTests
         var repository = new FakeOfflinePackageRepository { Stored = credential };
         using var signingProvider = new TestSigningProvider();
 
-        await CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken);
+        await CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken);
 
         Assert.Equal(1, repository.SaveAttempts);
     }
@@ -253,7 +270,7 @@ public class OfflinePackageServiceTests
         var repository = new FakeOfflinePackageRepository { Stored = credential };
         using var signingProvider = new TestSigningProvider();
 
-        await CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken);
+        await CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken);
 
         Assert.Equal(1, repository.SaveAttempts);
         Assert.Equal("test-key-1", credential.SigningKid);
@@ -268,7 +285,7 @@ public class OfflinePackageServiceTests
         var repository = new FakeOfflinePackageRepository { Stored = credential };
         using var signingProvider = new TestSigningProvider();
 
-        await CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken);
+        await CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken);
 
         Assert.Equal(1, repository.SaveAttempts);
         Assert.Null(credential.HolderKeyThumbprint);
@@ -283,7 +300,7 @@ public class OfflinePackageServiceTests
         var repository = new FakeOfflinePackageRepository { Stored = credential };
         using var signingProvider = new TestSigningProvider();
 
-        await CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken);
+        await CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken);
 
         Assert.Equal(1, repository.SaveAttempts);
     }
@@ -297,7 +314,7 @@ public class OfflinePackageServiceTests
         using var signingProvider = new TestSigningProvider();
 
         var package = await CreateService(repository, signingProvider)
-            .GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken);
+            .GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken);
 
         Assert.DoesNotContain(SdJwtClaimNames.SignatureImage, package.Disclosures.Keys);
         Assert.Contains(SdJwtClaimNames.Portrait, package.Disclosures.Keys);
@@ -313,7 +330,7 @@ public class OfflinePackageServiceTests
         using var signingProvider = new TestSigningProvider();
 
         var package = await CreateService(repository, signingProvider, portraitProcessor: processor)
-            .GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken);
+            .GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken);
 
         Assert.Equal(processor.Portrait, Base64Url.DecodeFromChars(ClaimValue(package, SdJwtClaimNames.Portrait)));
     }
@@ -328,7 +345,7 @@ public class OfflinePackageServiceTests
         using var signingProvider = new TestSigningProvider();
 
         var package = await CreateService(repository, signingProvider)
-            .GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken);
+            .GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken);
 
         Assert.DoesNotContain(SdJwtClaimNames.CountryOfIssue, package.Disclosures.Keys);
         Assert.Contains(SdJwtClaimNames.LicenseNumber, package.Disclosures.Keys);
@@ -344,7 +361,7 @@ public class OfflinePackageServiceTests
         var storage = new FakePhotoStorageProvider { BlobExists = false };
 
         await Assert.ThrowsAsync<OfflinePackageDataMissingException>(
-            () => CreateService(repository, signingProvider, storage).GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken));
+            () => CreateService(repository, signingProvider, storage).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken));
 
         Assert.Equal(0, repository.SaveAttempts);
         Assert.Null(credential.IssuerSignedCredential);
@@ -360,7 +377,7 @@ public class OfflinePackageServiceTests
         using var signingProvider = new TestSigningProvider();
 
         var package = await CreateService(repository, signingProvider)
-            .GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken);
+            .GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken);
 
         Assert.Equal(3, repository.SaveAttempts);
         Assert.Equal([1, 2, 3], repository.AllocatedIndexes);
@@ -379,7 +396,7 @@ public class OfflinePackageServiceTests
         using var signingProvider = new TestSigningProvider();
 
         await Assert.ThrowsAsync<OfflinePackageUnavailableException>(
-            () => CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken));
+            () => CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken));
 
         Assert.Equal(4, repository.SaveAttempts);
     }
@@ -393,7 +410,7 @@ public class OfflinePackageServiceTests
         using var signingProvider = new TestSigningProvider();
 
         var package = await CreateService(repository, signingProvider)
-            .GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken);
+            .GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken);
 
         Assert.Equal(SdJwtClaimNames.IdentityDocumentVct, Payload(package.IssuerSignedCredential)["vct"]!.GetValue<string>());
         Assert.Contains(SdJwtClaimNames.CitizenshipStatus, package.Disclosures.Keys);
@@ -409,7 +426,7 @@ public class OfflinePackageServiceTests
         var deviceKey = signingProvider.ActiveKey.PublicJwk;
 
         var package = await CreateService(repository, signingProvider)
-            .GetOrMintAsync(credential.Id, OwnerUserId, deviceKey, TestContext.Current.CancellationToken);
+            .GetOrMintAsync(credential.Id, OwnerUserId, deviceKey, "196.25.1.10", TestContext.Current.CancellationToken);
 
         Assert.False(string.IsNullOrEmpty(credential.HolderKeyThumbprint));
         Assert.Equal(deviceKey.X, Payload(package.IssuerSignedCredential)["cnf"]!["jwk"]!["x"]!.GetValue<string>());
@@ -424,7 +441,7 @@ public class OfflinePackageServiceTests
         using var signingProvider = new TestSigningProvider();
 
         await Assert.ThrowsAsync<OfflinePackageUnavailableException>(
-            () => CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken));
+            () => CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken));
 
         Assert.Equal(0, repository.SaveAttempts);
     }
@@ -438,7 +455,7 @@ public class OfflinePackageServiceTests
         using var signingProvider = new TestSigningProvider();
 
         await Assert.ThrowsAsync<CredentialAccessDeniedException>(
-            () => CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, Guid.NewGuid(), null, TestContext.Current.CancellationToken));
+            () => CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, Guid.NewGuid(), null, "196.25.1.10", TestContext.Current.CancellationToken));
 
         Assert.Equal(0, repository.SaveAttempts);
     }
@@ -453,7 +470,7 @@ public class OfflinePackageServiceTests
         using var signingProvider = new TestSigningProvider();
 
         await Assert.ThrowsAsync<CredentialNotActiveException>(
-            () => CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, TestContext.Current.CancellationToken));
+            () => CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -464,6 +481,58 @@ public class OfflinePackageServiceTests
         using var signingProvider = new TestSigningProvider();
 
         await Assert.ThrowsAsync<CredentialNotFoundException>(
-            () => CreateService(repository, signingProvider).GetOrMintAsync(Guid.NewGuid(), OwnerUserId, null, TestContext.Current.CancellationToken));
+            () => CreateService(repository, signingProvider).GetOrMintAsync(Guid.NewGuid(), OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task GetOrMintAsync_Minted_WritesAnAuditEntryWithoutClaimValues()
+    {
+        var credential = DriversLicenseCredential();
+        var repository = new FakeOfflinePackageRepository { Stored = credential };
+        using var signingProvider = new TestSigningProvider();
+
+        await CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken);
+
+        var entry = Assert.Single(repository.AuditLogs);
+
+        Assert.Equal(AuditEventType.OfflinePackageMinted, entry.EventType);
+        Assert.Equal(OwnerUserId, entry.ActorId);
+        Assert.Equal(credential.Id, entry.CredentialId);
+        Assert.Equal("196.25.1.10", entry.IpAddress);
+        Assert.Contains(SdJwtClaimNames.Portrait, entry.Details, StringComparison.Ordinal);
+        Assert.DoesNotContain("Mokoena", entry.Details, StringComparison.Ordinal);
+        Assert.DoesNotContain("FAKE-1234", entry.Details, StringComparison.Ordinal);
+        Assert.DoesNotContain("0000000000000", entry.Details, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task GetOrMintAsync_MintFails_WritesAFailureEntryAndDiscardsTheChanges()
+    {
+        var credential = DriversLicenseCredential();
+        var repository = new FakeOfflinePackageRepository { Stored = credential };
+        using var signingProvider = new TestSigningProvider();
+        var storage = new FakePhotoStorageProvider { BlobExists = false };
+
+        await Assert.ThrowsAsync<OfflinePackageDataMissingException>(
+            () => CreateService(repository, signingProvider, storage).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken));
+
+        var entry = Assert.Single(repository.AuditLogs);
+
+        Assert.Equal(AuditEventType.OfflinePackageMintFailed, entry.EventType);
+        Assert.True(repository.DiscardedChanges);
+        Assert.Equal(0, repository.SaveAttempts);
+    }
+
+    [Fact]
+    public async Task GetOrMintAsync_FreshPackageReused_WritesNoAuditEntry()
+    {
+        var credential = DriversLicenseCredential();
+        GivenStoredPackage(credential, Now.AddDays(-1));
+        var repository = new FakeOfflinePackageRepository { Stored = credential };
+        using var signingProvider = new TestSigningProvider();
+
+        await CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken);
+
+        Assert.Empty(repository.AuditLogs);
     }
 }

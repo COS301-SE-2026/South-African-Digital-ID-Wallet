@@ -57,4 +57,25 @@ public class OfflinePackageRepository : IOfflinePackageRepository
         SqliteException sle => sle.SqliteErrorCode == SqliteConstraintViolation,
         _ => false,
     };
+
+    public async Task AddAuditLogAsync(AuditLog auditLog, CancellationToken cancellationToken)
+    {
+        _context.AuditLogs.Add(auditLog);
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task SaveAuditLogDiscardingChangesAsync(AuditLog auditLog, CancellationToken cancellationToken)
+    {
+        // Marking the tracked credentials Unchanged leaves the in-memory values alone but stops EF
+        // writing them, so a failed mint can be recorded without storing the package it failed on.
+        foreach (var entry in _context.ChangeTracker.Entries<Credential>().Where(entry => entry.State == EntityState.Modified))
+        {
+            entry.State = EntityState.Unchanged;
+        }
+
+        _context.AuditLogs.Add(auditLog);
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
 }
