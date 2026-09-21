@@ -1,0 +1,42 @@
+backend/FlashIdBackend/Application/Common/Services/EmergencyService.cs
+  h_712d174fc3f309 348
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_712d174fc3f309 23-24
+backend/FlashIdBackend/Infrastructure/Providers/AesFieldCryptoProvider.cs
+  h_712d174fc3f309 44-48
+backend/FlashIdBackend/Infrastructure/Providers/EcdsaSigningProvider.cs
+  h_712d174fc3f309 11,20-25,30-35,37-38,45-52
+backend/FlashIdBackend/Presentation/Controllers/EmergencyController.cs
+  h_712d174fc3f309 27-31
+backend/FlashIdBackend/Presentation/Program.cs
+  h_712d174fc3f309 172
+backend/FlashIdBackend/tests/DependencyInjectionTests.cs
+  h_712d174fc3f309 56-59
+mobile/modules/flashid-emergency/android/build.gradle
+  h_712d174fc3f309 18-19
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/EmergencyStore.kt
+  h_712d174fc3f309 14-22,50
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/FlashidEmergencyModule.kt
+  h_712d174fc3f309 8,28,32,36,41,61
+mobile/modules/flashid-emergency/expo-module.config.json
+  h_712d174fc3f309 2
+mobile/src/components/organisms/emergency-profile-card/emergency-profile-card.tsx
+  h_712d174fc3f309 65-66
+mobile/src/components/pages/emergency-scan/emergency-scan-page.tsx
+  h_712d174fc3f309 47-49
+mobile/src/components/pages/emergency-scan/test/emergency-scan-page.test.tsx
+  h_712d174fc3f309 47
+mobile/src/services/emergency-service/emergency-errors.ts
+  h_712d174fc3f309 12-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "12cc79b1f41e118bac981320bfd2da1c1d0df637",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
