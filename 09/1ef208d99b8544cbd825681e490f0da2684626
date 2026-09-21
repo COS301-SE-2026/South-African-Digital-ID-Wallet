@@ -1,0 +1,14 @@
+docs/demo4/openapi.yaml
+  h_99fca60b892ff4 1-2264
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "091ef208d99b8544cbd825681e490f0da2684626",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

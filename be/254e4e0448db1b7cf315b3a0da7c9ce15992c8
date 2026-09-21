@@ -1,0 +1,24 @@
+backend/FlashIdBackend/tests/LocalEs256SigningProviderTests.cs
+  s_71ab8158583f90::t_2a5c8d01daf319 24-38,205,213
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "be254e4e0448db1b7cf315b3a0da7c9ce15992c8",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_71ab8158583f90": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c01397e5-ee55-4322-ad10-79c9690c5d6e",
+        "model": "unknown"
+      },
+      "human_author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

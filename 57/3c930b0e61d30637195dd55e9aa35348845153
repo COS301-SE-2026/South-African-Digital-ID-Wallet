@@ -1,0 +1,31 @@
+backend/FlashIdBackend/Infrastructure/Providers/LocalEs256SigningProvider.cs
+  h_99fca60b892ff4 5,12-13,19-21,23-24,58-59,79,86-87,89,98,101,111-116
+  s_7cda04e0480946::t_fc08845d7a15f6 18,22,110
+backend/FlashIdBackend/tests/LocalEs256SigningProviderTests.cs
+  h_99fca60b892ff4 153,155,157,164,166,168,172,174,176,180,182,184,188,190,192,196,198,200,203
+backend/FlashIdBackend/tests/OfflinePackageControllerIntegrationTests.cs
+  h_99fca60b892ff4 1-388
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_99fca60b892ff4 419
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "573c930b0e61d30637195dd55e9aa35348845153",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_7cda04e0480946": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "00df07d6-3b68-4737-bf94-8c59cafc0704",
+        "model": "unknown"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
