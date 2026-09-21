@@ -1,2 +1,32 @@
-<manifest>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
+
+  <application>
+    <service
+        android:name=".EmergencyQrTileService"
+        android:label="@string/flashid_emergency_tile"
+        android:icon="@drawable/ic_flashid_emergency"
+        android:exported="true"
+        android:directBootAware="true"
+        android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+      <intent-filter>
+        <action android:name="android.service.quicksettings.action.QS_TILE" />
+      </intent-filter>
+      <meta-data android:name="android.service.quicksettings.ACTIVE_TILE" android:value="false" />
+      <meta-data android:name="android.service.quicksettings.TOGGLEABLE_TILE" android:value="false" />
+    </service>
+
+    <activity
+        android:name=".EmergencyQrActivity"
+        android:exported="false"
+        android:directBootAware="true"
+        android:excludeFromRecents="true"
+        android:launchMode="singleInstance"
+        android:taskAffinity=""
+        android:screenOrientation="portrait"
+        android:theme="@style/Theme.FlashIdEmergency"
+        android:showWhenLocked="true"
+        android:turnScreenOn="true"
+        tools:targetApi="o_mr1" />
+  </application>
 </manifest>

@@ -17,7 +17,7 @@ public class EmergencyController : ControllerBase
     public EmergencyController(IEmergencyService emergencyService) => _emergencyService = emergencyService;
 
     [HttpPost("resolve")]
-    [Authorize(Roles = "EmergencyResponder")]
+    [Authorize(Roles = "Official")]
     [EnableRateLimiting("emergency-resolve")]
     [ProducesResponseType(typeof(EmergencyProfileResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

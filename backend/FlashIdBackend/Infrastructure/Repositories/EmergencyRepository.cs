@@ -67,7 +67,10 @@ public class EmergencyRepository : IEmergencyRepository
         _context.Officials
             .Include(o => o.Institution)
             .FirstOrDefaultAsync(
-                o => o.UserId == responderUserId && o.User.Role == UserRole.EmergencyResponder, ct);
+                o => o.UserId == responderUserId
+                    && o.User.Role == UserRole.Official
+                    && (o.Institution.Type == InstitutionType.Healthcare
+                        || o.Institution.Type == InstitutionType.LawEnforcement), ct);
 
     public async Task<bool> TryClaimCodeAsync(byte[] handle, DateTimeOffset issuedAt, CancellationToken ct)
     {

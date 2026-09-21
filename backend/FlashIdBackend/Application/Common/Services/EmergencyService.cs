@@ -61,6 +61,10 @@ public class EmergencyService : IEmergencyService
     {
         var now = DateTimeOffset.UtcNow;
 
+        var responder = await _repository.GetResponderAsync(responderUserId, ct)
+            ?? throw await FailAsync(responderUserId, ipAddress,
+                "Official is not attached to a healthcare or law-enforcement institution.", ct);
+
         if (!EmergencyCodeVerifier.TryParse(request.Code, out var code))
             throw await FailAsync(responderUserId, ipAddress, "Malformed emergency code.", ct);
 
@@ -89,16 +93,12 @@ public class EmergencyService : IEmergencyService
             ? null
             : await _photoStorage.GenerateReadSasUrlAsync(photoPath, TimeSpan.FromMinutes(15));
 
-        var responder = await _repository.GetResponderAsync(responderUserId, ct);
-
         var access = new EmergencyAccess
         {
             Id = Guid.NewGuid(),
             EmergencyProfileId = profile.Id,
             ResponderUserId = responderUserId,
-            ResponderName = responder is null
-                ? "Unknown responder"
-                : $"{responder.Names} {responder.Surname}",
+            ResponderName = $"{responder.Names} {responder.Surname}",
             ResponderInstitutionName = responder?.Institution?.Name,
             InstitutionId = responder?.InstitutionId,
             Justification = request.Justification,

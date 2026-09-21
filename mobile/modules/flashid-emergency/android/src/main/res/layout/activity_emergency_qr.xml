@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#0B0F14"
+    android:padding="24dp">
+
+  <TextView
+      android:id="@+id/message"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:paddingBottom="16dp"
+      android:gravity="center"
+      android:textColor="#E6EDF3"
+      android:textSize="16sp" />
+
+  <ImageView
+      android:id="@+id/qr"
+      android:layout_width="@dimen/emergency_qr_size"
+      android:layout_height="@dimen/emergency_qr_size"
+      android:background="#FFFFFF"
+      android:padding="8dp"
+      android:contentDescription="@string/emergency_qr_description" />
+
+  <TextView
+      android:id="@+id/caption"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:paddingTop="20dp"
+      android:gravity="center"
+      android:textColor="#E6EDF3"
+      android:textSize="15sp" />
+
+  <TextView
+      android:id="@+id/countdown"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:paddingTop="8dp"
+      android:gravity="center"
+      android:textColor="#8B98A5"
+      android:textSize="13sp" />
+
+  <Button
+      android:id="@+id/offlineToggle"
+      style="?android:attr/borderlessButtonStyle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="24dp"
+      android:textAllCaps="false"
+      android:textColor="#5AA9E6"
+      android:textSize="15sp" />
+</LinearLayout>
