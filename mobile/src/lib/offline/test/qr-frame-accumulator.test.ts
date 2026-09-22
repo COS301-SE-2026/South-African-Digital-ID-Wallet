@@ -104,4 +104,31 @@ describe('PayloadFrameAccumulator', () => {
       'Invalid offline payload frame indexes.'
     )
   })
+
+  it('rejects a changed total for the same presentation id', () => {
+    const accumulator = new PayloadFrameAccumulator()
+
+    accumulator.add('FID1:P:abcdef:0/2:first')
+
+    expect(() => accumulator.add('FID1:P:abcdef:0/3:first')).toThrow(
+      'Payload frame total changed for the same presentation.'
+    )
+  })
+
+  it('rejects characters that cannot occur in an SD-JWT chunk', () => {
+    const accumulator = new PayloadFrameAccumulator()
+
+    expect(() => accumulator.add('FID1:P:abcdef:0/1:invalid:chunk')).toThrow(
+      'Invalid offline payload frame.'
+    )
+  })
+
+  it('rejects a chunk larger than the wire-format frame size', () => {
+    const accumulator = new PayloadFrameAccumulator()
+    const oversizedChunk = 'a'.repeat(451)
+
+    expect(() =>
+      accumulator.add(`FID1:P:abcdef:0/1:${oversizedChunk}`)
+    ).toThrow('Invalid offline payload frame indexes.')
+  })
 })

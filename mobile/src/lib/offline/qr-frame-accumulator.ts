@@ -1,6 +1,10 @@
-const FRAME_PATTERN = /^FID1:P:([A-Za-z0-9_-]{6}):(\d+)\/(\d+):(.+)$/
+import { PAYLOAD_FRAME_SIZE } from './qr-frames'
+
+const FRAME_PATTERN =
+  /^FID1:P:([A-Za-z0-9_-]{6}):(\d+)\/(\d+):([A-Za-z0-9._~-]+)$/
 
 export const MAX_PAYLOAD_FRAMES = 64
+export const MAX_PAYLOAD_LENGTH = MAX_PAYLOAD_FRAMES * PAYLOAD_FRAME_SIZE
 
 export type AccumulatedPayload = {
   complete: boolean
@@ -11,10 +15,14 @@ export type AccumulatedPayload = {
   total: number
 }
 
-type StoredFrame = {
+type ParsedFrame = {
   chunk: string
   index: number
+  tid: string
+  total: number
 }
+
+type StoredFrame = ParsedFrame
 
 const emptyState = (): AccumulatedPayload => ({
   complete: false,
@@ -33,8 +41,16 @@ export class PayloadFrameAccumulator {
   add(encodedFrame: string): AccumulatedPayload {
     const parsed = this.parse(encodedFrame)
 
-    if (this.state.tid !== parsed.tid) {
+    if (this.state.tid !== null && this.state.tid !== parsed.tid) {
       this.frames.clear()
+      this.state = emptyState()
+    }
+
+    if (this.state.tid === parsed.tid && this.state.total !== parsed.total) {
+      throw new Error('Payload frame total changed for the same presentation.')
+    }
+
+    if (this.state.tid !== parsed.tid) {
       this.state = {
         complete: false,
         received: 0,
@@ -49,10 +65,7 @@ export class PayloadFrameAccumulator {
     }
 
     if (!this.frames.has(parsed.index)) {
-      this.frames.set(parsed.index, {
-        chunk: parsed.chunk,
-        index: parsed.index,
-      })
+      this.frames.set(parsed.index, parsed)
     }
 
     const missingIndexes = Array.from(
@@ -61,22 +74,23 @@ export class PayloadFrameAccumulator {
     ).filter((index) => !this.frames.has(index))
 
     const complete = missingIndexes.length === 0
+    const presentation = complete
+      ? Array.from(this.frames.values())
+          .sort((left, right) => left.index - right.index)
+          .map((frame) => frame.chunk)
+          .join('')
+      : null
 
     this.state = {
       complete,
       received: this.frames.size,
       missingIndexes,
-      presentation: complete
-        ? Array.from(this.frames.values())
-            .sort((left, right) => left.index - right.index)
-            .map((frame) => frame.chunk)
-            .join('')
-        : null,
+      presentation,
       tid: parsed.tid,
       total: parsed.total,
     }
 
-    return this.state
+    return this.getSnapshot()
   }
 
   reset(): void {
@@ -91,12 +105,7 @@ export class PayloadFrameAccumulator {
     }
   }
 
-  private parse(encodedFrame: string): {
-    chunk: string
-    index: number
-    tid: string
-    total: number
-  } {
+  private parse(encodedFrame: string): ParsedFrame {
     const match = FRAME_PATTERN.exec(encodedFrame)
 
     if (!match) {
@@ -113,7 +122,8 @@ export class PayloadFrameAccumulator {
       total < 1 ||
       total > MAX_PAYLOAD_FRAMES ||
       index < 0 ||
-      index >= total
+      index >= total ||
+      chunk.length > PAYLOAD_FRAME_SIZE
     ) {
       throw new Error('Invalid offline payload frame indexes.')
     }
