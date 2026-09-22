@@ -1,0 +1,32 @@
+backend/FlashIdBackend/tests/CredentialSigningKeyHealthCheckTests.cs
+  h_99fca60b892ff4 1-41
+backend/FlashIdBackend/tests/OfflinePackageControllerIntegrationTests.cs
+  h_99fca60b892ff4 44-51,245,272-273,289,295,310-311,328,348,360,372,396-424
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_99fca60b892ff4 17-18,136,203,233,249,276,357,365,367,375,385,394,396,398,400,402,404,406,408,410,412,414,416
+  h_99fca60b892ff4 405,407,433
+docs/demo4/SAS-v4.md
+  h_99fca60b892ff4 765,796
+backend/FlashIdBackend/tests/OfflinePackageServiceTests.cs
+  h_99fca60b892ff4 88-89,91-93,100-103,531-575
+backend/FlashIdBackend/tests/ImageSharpPortraitProcessorTests.cs
+  h_99fca60b892ff4 212-227
+backend/FlashIdBackend/Presentation/Program.cs
+  h_99fca60b892ff4 17-18,125-126,226-228
+  h_99fca60b892ff4 229
+backend/FlashIdBackend/Application/Common/Services/DisclosedFieldValueResolver.cs
+  h_99fca60b892ff4 29,31,35-46,48-53
+backend/FlashIdBackend/Presentation/HealthChecks/CredentialSigningKeyHealthCheck.cs
+  h_99fca60b892ff4 1-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2b61ea559266d5acc8101b737de6726d16687ea5",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
