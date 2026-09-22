@@ -43,7 +43,35 @@ public class CertifiedCopyCryptographyProvider : ICertifiedCopyCryptographyProvi
 
     public bool VerifyDocumentHash(byte[] documentBytes, string expectedHash)
     {
-        return false;
+        ArgumentNullException.ThrowIfNull(documentBytes);
+        ArgumentException.ThrowIfNullOrWhiteSpace(expectedHash);
+
+        if (documentBytes.Length == 0)
+        {
+            return false;
+        }
+
+        var actualHashBytes = SHA256.HashData(documentBytes);
+
+        byte[] expectedHashBytes;
+
+        try
+        {
+            expectedHashBytes = Convert.FromHexString(expectedHash);
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
+
+        if (actualHashBytes.Length != expectedHashBytes.Length)
+        {
+            return false;
+        }
+
+        return CryptographicOperations.FixedTimeEquals(
+            actualHashBytes,
+            expectedHashBytes);
     }
 
     private static string ComputeSha256Hash(byte[] data)
