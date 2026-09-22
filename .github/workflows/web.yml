@@ -27,16 +27,38 @@ jobs:
         with:
           version: 9.15.9
 
+      - name: Get Azure Face client assets token
+        shell: bash
+        env: 
+          AZURE_FACE_API_KEY: ${{ secrets.AZUREFACEAPIKEY }}
+        run: |
+          set -euo pipefail
+
+          response=$(curl --fail-with-body --silent --show-error \
+            -H "Ocp-Apim-Subscription-Key: $AZURE_FACE_API_KEY" \
+            "https://face-digitalwallet-dev.cognitiveservices.azure.com/face/v1.3-preview.1/settings/getClientAssetsAccessToken")
+
+          token=$(echo "$response" | jq -r '.base64AccessToken')
+          expiry=$(echo "$response" | jq -r '.expiry')
+
+          if [ -z "$token" ] || [ "$token" = "null" ]; then
+            echo "::error::Azure Face did not return a client assets access token."
+            exit 1
+          fi
+
+          echo "::add-mask::$token"
+          echo "AZUREFACEAPIPASSWORD=$token" >> "$GITHUB_ENV"
+
+          echo "Azure Face client assets token acquired."
+          echo "Token expires: $expiry"
+
       - name: Install dependencies
         env:
             AZUREFACEAPIREGISTRY: ${{ secrets.AZUREFACEAPIREGISTRY }}
             AZUREFACEAPIUSERNAME: ${{ secrets.AZUREFACEAPIUSERNAME }}
-            AZUREFACEAPIPASSWORD: ${{ secrets.AZUREFACEAPIPASSWORD }}
             AZUREFACEAPIEMAIL: ${{ secrets.AZUREFACEAPIEMAIL }}
         run: pnpm install --frozen-lockfile
         working-directory: ./web
-        
-        
 
       - name: Build
         run: pnpm run build
