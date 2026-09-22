@@ -1,0 +1,21 @@
+mobile/src/services/offline-service/test/offline-service.test.ts
+  h_99fca60b892ff4 1-180
+mobile/src/services/offline-service/offline-service.ts
+  h_99fca60b892ff4 1-109
+mobile/src/services/offline-service/types.ts
+  h_99fca60b892ff4 1-20
+mobile/src/services/offline-service/offline-urls.ts
+  h_99fca60b892ff4 1-6
+  h_99fca60b892ff4 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "3f317e7f332856dbd8e1fb24f70e06572f499700",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
