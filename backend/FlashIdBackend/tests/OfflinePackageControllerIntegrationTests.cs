@@ -41,6 +41,14 @@ public class OfflinePackageControllerIntegrationTests
         return Convert.ToBase64String(key.ExportPkcs8PrivateKey());
     }
 
+    private static async Task<OfflinePackageResponseDto> RequestPackageAsync(HttpClient client, Guid credentialId)
+    {
+        var response = await client.PostAsync($"/api/credentials/{credentialId}/offline-package", null, TestContext.Current.CancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        return (await response.Content.ReadFromJsonAsync<OfflinePackageResponseDto>(JsonOptions, TestContext.Current.CancellationToken))!;
+    }
+
     // The real portrait processor runs against this, so the whole downscale path is exercised.
     private sealed class StubPhotoStorageProvider : IPhotoStorageProvider
     {
@@ -234,7 +242,7 @@ public class OfflinePackageControllerIntegrationTests
         var db = await factory.CreateInitializedContextAsync();
         var (user, credential) = await SeedCitizenWithLicenceAsync(db);
 
-        var response = await ClientFor(factory, user).GetAsync($"/api/credentials/{credential.Id}/offline-package", TestContext.Current.CancellationToken);
+        var response = await ClientFor(factory, user).PostAsync($"/api/credentials/{credential.Id}/offline-package", null, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -261,8 +269,8 @@ public class OfflinePackageControllerIntegrationTests
         var (user, credential) = await SeedCitizenWithLicenceAsync(db);
         var client = ClientFor(factory, user);
 
-        var first = await client.GetFromJsonAsync<OfflinePackageResponseDto>($"/api/credentials/{credential.Id}/offline-package", JsonOptions, TestContext.Current.CancellationToken);
-        var second = await client.GetFromJsonAsync<OfflinePackageResponseDto>($"/api/credentials/{credential.Id}/offline-package", JsonOptions, TestContext.Current.CancellationToken);
+        var first = await RequestPackageAsync(client, credential.Id);
+        var second = await RequestPackageAsync(client, credential.Id);
 
         Assert.NotNull(first);
         Assert.NotNull(second);
@@ -278,13 +286,13 @@ public class OfflinePackageControllerIntegrationTests
         var (user, credential) = await SeedCitizenWithLicenceAsync(db);
         var client = ClientFor(factory, user);
 
-        var first = await client.GetFromJsonAsync<OfflinePackageResponseDto>($"/api/credentials/{credential.Id}/offline-package", JsonOptions, TestContext.Current.CancellationToken);
+        var first = await RequestPackageAsync(client, credential.Id);
 
         var tracked = await db.Credentials.FirstAsync(c => c.Id == credential.Id, TestContext.Current.CancellationToken);
         tracked.HolderKeyThumbprint = "a-different-phone";
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var second = await client.GetFromJsonAsync<OfflinePackageResponseDto>($"/api/credentials/{credential.Id}/offline-package", JsonOptions, TestContext.Current.CancellationToken);
+        var second = await RequestPackageAsync(client, credential.Id);
 
         Assert.NotNull(first);
         Assert.NotNull(second);
@@ -299,8 +307,8 @@ public class OfflinePackageControllerIntegrationTests
         var (firstUser, firstCredential) = await SeedCitizenWithLicenceAsync(db);
         var (secondUser, secondCredential) = await SeedCitizenWithLicenceAsync(db);
 
-        await ClientFor(factory, firstUser).GetAsync($"/api/credentials/{firstCredential.Id}/offline-package", TestContext.Current.CancellationToken);
-        await ClientFor(factory, secondUser).GetAsync($"/api/credentials/{secondCredential.Id}/offline-package", TestContext.Current.CancellationToken);
+        await ClientFor(factory, firstUser).PostAsync($"/api/credentials/{firstCredential.Id}/offline-package", null, TestContext.Current.CancellationToken);
+        await ClientFor(factory, secondUser).PostAsync($"/api/credentials/{secondCredential.Id}/offline-package", null, TestContext.Current.CancellationToken);
 
         var first = await ReloadAsync(db, firstCredential.Id);
         var second = await ReloadAsync(db, secondCredential.Id);
@@ -317,7 +325,7 @@ public class OfflinePackageControllerIntegrationTests
         var (_, credential) = await SeedCitizenWithLicenceAsync(db);
         var (intruder, _) = await SeedCitizenWithLicenceAsync(db);
 
-        var response = await ClientFor(factory, intruder).GetAsync($"/api/credentials/{credential.Id}/offline-package", TestContext.Current.CancellationToken);
+        var response = await ClientFor(factory, intruder).PostAsync($"/api/credentials/{credential.Id}/offline-package", null, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
@@ -337,7 +345,7 @@ public class OfflinePackageControllerIntegrationTests
         tracked.Status = CredentialStatus.Revoked;
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var response = await ClientFor(factory, user).GetAsync($"/api/credentials/{credential.Id}/offline-package", TestContext.Current.CancellationToken);
+        var response = await ClientFor(factory, user).PostAsync($"/api/credentials/{credential.Id}/offline-package", null, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -349,7 +357,7 @@ public class OfflinePackageControllerIntegrationTests
         var db = await factory.CreateInitializedContextAsync();
         var (user, _) = await SeedCitizenWithLicenceAsync(db);
 
-        var response = await ClientFor(factory, user).GetAsync($"/api/credentials/{Guid.NewGuid()}/offline-package", TestContext.Current.CancellationToken);
+        var response = await ClientFor(factory, user).PostAsync($"/api/credentials/{Guid.NewGuid()}/offline-package", null, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -361,7 +369,7 @@ public class OfflinePackageControllerIntegrationTests
         var db = await factory.CreateInitializedContextAsync();
         var (_, credential) = await SeedCitizenWithLicenceAsync(db);
 
-        var response = await factory.CreateClient().GetAsync($"/api/credentials/{credential.Id}/offline-package", TestContext.Current.CancellationToken);
+        var response = await factory.CreateClient().PostAsync($"/api/credentials/{credential.Id}/offline-package", null, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
@@ -384,5 +392,34 @@ public class OfflinePackageControllerIntegrationTests
         Assert.Equal("P-256", key.Crv);
         Assert.Equal("active", key.Status);
         Assert.InRange(body.RetrievedAt, DateTimeOffset.UtcNow.AddMinutes(-1), DateTimeOffset.UtcNow.AddMinutes(1));
+    }
+
+    [Fact]
+    public async Task GetIssuerKeys_AsOfficial_ReturnsTheActiveKey()
+    {
+
+        await using var factory = new TestApiFactory();
+        var db = await factory.CreateInitializedContextAsync();
+        var official = BuildUser(UserRole.Official);
+
+        await db.DomainUsers.AddAsync(official, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var body = await ClientFor(factory, official).GetFromJsonAsync<IssuerKeysResponseDto>("/api/credentials/issuer-keys", JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.Equal(SigningKid, Assert.Single(body!.Keys).Kid);
+    }
+
+    [Fact]
+    public async Task RequestOfflinePackage_MalformedCredentialId_ReturnsNotFound()
+    {
+
+        await using var factory = new TestApiFactory();
+        var db = await factory.CreateInitializedContextAsync();
+        var (user, _) = await SeedCitizenWithLicenceAsync(db);
+
+        var response = await ClientFor(factory, user).PostAsync("/api/credentials/not-a-guid/offline-package", null, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

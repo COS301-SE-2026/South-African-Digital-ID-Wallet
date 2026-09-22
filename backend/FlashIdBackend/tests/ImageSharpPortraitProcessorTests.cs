@@ -209,4 +209,20 @@ public class ImageSharpPortraitProcessorTests
         await Assert.ThrowsAnyAsync<OperationCanceledException>(
             () => CreateProcessor().ToOfflinePortraitAsync(source, cancellation.Token));
     }
+
+    [Fact]
+    public async Task ToOfflinePortraitAsync_AnimatedSource_ThrowsInvalidOperationException()
+    {
+        using var animated = new Image<Rgba32>(200, 200);
+        animated.Frames.AddFrame(animated.Frames.RootFrame);
+
+        using var source = new MemoryStream();
+        animated.SaveAsGif(source);
+        source.Position = 0;
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => CreateProcessor().ToOfflinePortraitAsync(source, TestContext.Current.CancellationToken));
+
+        Assert.Contains("still image", exception.Message, StringComparison.Ordinal);
+    }
 }

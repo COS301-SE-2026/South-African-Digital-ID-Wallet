@@ -85,15 +85,22 @@ public class OfflinePackageServiceTests
 
         public Task<string> GenerateReadSasUrlAsync(string blobName, TimeSpan ttl) => Task.FromResult($"https://fake-blob-sas.local/{blobName}");
 
+        public Exception? ThrowOnOpen { get; set; }
+
         public Task<Stream?> OpenReadAsync(string blobName, CancellationToken cancellationToken) =>
-            Task.FromResult<Stream?>(BlobExists ? new MemoryStream([1, 2, 3, 4]) : null);
+            ThrowOnOpen is not null
+                ? Task.FromException<Stream?>(ThrowOnOpen)
+                : Task.FromResult<Stream?>(BlobExists ? new MemoryStream([1, 2, 3, 4]) : null);
     }
 
     private sealed class FakePortraitProcessor : IPortraitProcessor
     {
         public byte[] Portrait { get; set; } = [0x52, 0x49, 0x46, 0x46, 0x57, 0x45, 0x42, 0x50];
 
-        public Task<byte[]> ToOfflinePortraitAsync(Stream source, CancellationToken cancellationToken) => Task.FromResult(Portrait);
+        public Exception? ThrowOnProcess { get; set; }
+
+        public Task<byte[]> ToOfflinePortraitAsync(Stream source, CancellationToken cancellationToken) =>
+            ThrowOnProcess is not null ? Task.FromException<byte[]>(ThrowOnProcess) : Task.FromResult(Portrait);
     }
 
     private static OfflinePackageService CreateService(
@@ -433,20 +440,6 @@ public class OfflinePackageServiceTests
     }
 
     [Fact]
-    public async Task GetOrMintAsync_ExpiredDriversLicense_ThrowsOfflinePackageUnavailable()
-    {
-        var credential = DriversLicenseCredential();
-        credential.DriversLicense!.ExpiryDate = Now.AddDays(-1).UtcDateTime;
-        var repository = new FakeOfflinePackageRepository { Stored = credential };
-        using var signingProvider = new TestSigningProvider();
-
-        await Assert.ThrowsAsync<OfflinePackageUnavailableException>(
-            () => CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken));
-
-        Assert.Equal(0, repository.SaveAttempts);
-    }
-
-    [Fact]
     public async Task GetOrMintAsync_RequestedByAnotherCitizen_ThrowsCredentialAccessDenied()
     {
 
@@ -534,5 +527,50 @@ public class OfflinePackageServiceTests
         await CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken);
 
         Assert.Empty(repository.AuditLogs);
+    }
+
+    [Fact]
+    public async Task GetOrMintAsync_ExpiredDriversLicense_ThrowsOfflinePackageDocumentExpired()
+    {
+        var credential = DriversLicenseCredential();
+        credential.DriversLicense!.ExpiryDate = Now.AddDays(-1).UtcDateTime;
+        var repository = new FakeOfflinePackageRepository { Stored = credential };
+        using var signingProvider = new TestSigningProvider();
+
+        await Assert.ThrowsAsync<OfflinePackageDocumentExpiredException>(
+            () => CreateService(repository, signingProvider).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken));
+
+        Assert.Equal(0, repository.SaveAttempts);
+        Assert.Single(repository.AuditLogs);
+    }
+
+    [Fact]
+    public async Task GetOrMintAsync_PortraitCannotBeProcessed_ThrowsDataMissingAndAudits()
+    {
+        var credential = DriversLicenseCredential();
+        var repository = new FakeOfflinePackageRepository { Stored = credential };
+        using var signingProvider = new TestSigningProvider();
+        var processor = new FakePortraitProcessor { ThrowOnProcess = new InvalidOperationException("corrupt image") };
+
+        var exception = await Assert.ThrowsAsync<OfflinePackageDataMissingException>(
+            () => CreateService(repository, signingProvider, portraitProcessor: processor).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken));
+
+        Assert.Contains(SdJwtClaimNames.Portrait, exception.Message, StringComparison.Ordinal);
+        Assert.Equal(AuditEventType.OfflinePackageMintFailed, Assert.Single(repository.AuditLogs).EventType);
+        Assert.Equal(0, repository.SaveAttempts);
+    }
+
+    [Fact]
+    public async Task GetOrMintAsync_PhotoStorageUnreachable_ThrowsUnavailableSoTheWalletRetries()
+    {
+        var credential = DriversLicenseCredential();
+        var repository = new FakeOfflinePackageRepository { Stored = credential };
+        using var signingProvider = new TestSigningProvider();
+        var storage = new FakePhotoStorageProvider { ThrowOnOpen = new HttpRequestException("blob storage unreachable") };
+
+        await Assert.ThrowsAsync<OfflinePackageUnavailableException>(
+            () => CreateService(repository, signingProvider, storage).GetOrMintAsync(credential.Id, OwnerUserId, null, "196.25.1.10", TestContext.Current.CancellationToken));
+
+        Assert.Equal(0, repository.SaveAttempts);
     }
 }

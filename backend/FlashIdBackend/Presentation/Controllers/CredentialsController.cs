@@ -14,6 +14,8 @@ namespace Presentation.Controllers;
 [Authorize]
 public class CredentialsController : ControllerBase
 {
+    // The audit trail records where a request came from. This is the fallback when the socket has no address.
+    private const string UnknownIpAddress = "unknown";
     private readonly ICredentialService _credentialService;
     private readonly IQrService _qrService;
     private readonly ICredentialActivationService _credentialActivationService;
@@ -131,7 +133,7 @@ public class CredentialsController : ControllerBase
             if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
 
             var userId = Guid.Parse(userIdClaim);
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownIpAddress;
             var res = await _qrService.ResolveAsync(req.Token, userId, ipAddress);
             return Ok(res);
         }
@@ -198,7 +200,7 @@ public class CredentialsController : ControllerBase
             return Unauthorized(new { message = "The authenticated official could not be identified." });
         }
 
-        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownIpAddress;
         var response = await _issueCredentialService.GetCitizenStatusAsync(saId, officialId, ipAddress, cancellationToken);
 
         return Ok(response);
@@ -228,7 +230,7 @@ public class CredentialsController : ControllerBase
             return Unauthorized(new { message = "The authenticated official could not be identified." });
         }
 
-        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownIpAddress;
         var response = await _issueCredentialService.IssueCredentialAsync(request, officialId, ipAddress, cancellationToken);
 
         return StatusCode(201, response);
@@ -244,7 +246,7 @@ public class CredentialsController : ControllerBase
             if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
 
             var adminUserId = Guid.Parse(userIdClaim);
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownIpAddress;
             var result = await _credentialService.RevokeCredentialAsync(credentialId, adminUserId, request, ipAddress);
             return Ok(result);
         }
@@ -271,7 +273,7 @@ public class CredentialsController : ControllerBase
             if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
 
             var adminUserId = Guid.Parse(userIdClaim);
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownIpAddress;
             var result = await _credentialService.ReinstateCredentialAsync(credentialId, adminUserId, request, ipAddress);
             return Ok(result);
         }
@@ -352,7 +354,7 @@ public class CredentialsController : ControllerBase
     }
 
     /// <summary>
-    /// Returns the citizen's offline credential package, minting it if none is stored or the stored one is stale.
+    /// Prepares the citizen's offline credential package, minting it if none is stored or the stored one is stale.
     /// </summary>
     /// <param name="credentialId">The credential to prepare for offline presentation.</param>
     /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
@@ -360,9 +362,9 @@ public class CredentialsController : ControllerBase
     /// <response code="400">The credential is not active.</response>
     /// <response code="403">The credential belongs to another citizen.</response>
     /// <response code="404">No credential with that id.</response>
-    /// <response code="409">The credential is missing data an offline presentation requires, such as a photograph.</response>
+    /// <response code="409">The credential cannot produce a presentation: missing a photograph, or the document has expired.</response>
     /// <response code="503">The package could not be prepared right now. The wallet should retry later.</response>
-    [HttpGet("{credentialId}/offline-package")]
+    [HttpPost("{credentialId:guid}/offline-package")]
     [Authorize(Roles = "Citizen")]
     [ProducesResponseType(typeof(OfflinePackageResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -370,7 +372,7 @@ public class CredentialsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-    public async Task<IActionResult> GetOfflinePackage(Guid credentialId, CancellationToken cancellationToken)
+    public async Task<IActionResult> RequestOfflinePackage(Guid credentialId, CancellationToken cancellationToken)
     {
         var userIdClaim = User.FindFirst("userId")?.Value;
 
@@ -380,7 +382,7 @@ public class CredentialsController : ControllerBase
         }
 
         var userId = Guid.Parse(userIdClaim);
-        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownIpAddress;
 
         try
         {
@@ -389,25 +391,29 @@ public class CredentialsController : ControllerBase
 
             return Ok(package);
         }
-        catch (CredentialNotFoundException ex)
+        catch (CredentialNotFoundException cnfe)
         {
-            return NotFound(new { error = ex.Message });
+            return NotFound(new { error = cnfe.Message });
         }
-        catch (CredentialAccessDeniedException ex)
+        catch (CredentialAccessDeniedException cade)
         {
-            return StatusCode(403, new { error = ex.Message });
+            return StatusCode(403, new { error = cade.Message });
         }
-        catch (CredentialNotActiveException ex)
+        catch (CredentialNotActiveException cnae)
         {
-            return BadRequest(new { error = ex.Message });
+            return BadRequest(new { error = cnae.Message });
         }
-        catch (OfflinePackageDataMissingException ex)
+        catch (OfflinePackageDataMissingException opdme)
         {
-            return Conflict(new { error = ex.Message });
+            return Conflict(new { error = opdme.Message });
         }
-        catch (OfflinePackageUnavailableException ex)
+        catch (OfflinePackageUnavailableException opue)
         {
-            return StatusCode(503, new { error = ex.Message });
+            return StatusCode(503, new { error = opue.Message });
+        }
+        catch (OfflinePackageDocumentExpiredException opdee)
+        {
+            return StatusCode(503, new { error = opdee.Message });
         }
     }
 

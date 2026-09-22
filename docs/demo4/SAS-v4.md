@@ -762,7 +762,7 @@ Byte-level definitions of the values returned here are in [wire-format.md](wire-
 
 ### Offline Verification
 
-#### GET /api/credentials/{credentialId}/offline-package
+#### POST /api/credentials/{credentialId}/offline-package
 
 Returns the citizen's offline credential package, minting it if none is stored or the stored one is stale. Re-minting happens when the package has expired, is older than 7 days, was signed by a key that is no longer active, is bound to a different device key, or the credential has been updated since it was signed (D-007).
 
@@ -793,8 +793,7 @@ Returns the citizen's offline credential package, minting it if none is stored o
 
 **Response 404:** no credential with that id.
 
-**Response 409:** the credential is missing data every offline presentation needs, such as a
-photograph.
+**Response 409:** the credential can't produce a presentation: it is missing data every offline presentation needs, such as a photograph, or the document behind it has expired.
 
 ```json
 { "error": "The credential is missing 'portrait', which every offline presentation must include." }

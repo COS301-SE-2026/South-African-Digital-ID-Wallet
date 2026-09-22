@@ -26,31 +26,31 @@ public class DisclosedFieldValueResolver : IDisclosedFieldsValueResolver
         return res;
     }
 
-    public DisclosedFieldSource Describe(Credential cred, string field)
+    public DisclosedFieldSource Describe(Credential credential, string field)
     {
-        ArgumentNullException.ThrowIfNull(cred);
+        ArgumentNullException.ThrowIfNull(credential);
 
         return field switch
         {
-            "Identity number" => DisclosedFieldSource.Text(cred.Citizen.SaId),
-            "SA ID number" => DisclosedFieldSource.Text(cred.Citizen.SaId),
-            "Full surname" => DisclosedFieldSource.Text(cred.Citizen.Surname),
-            "Full forenames" => DisclosedFieldSource.Text(cred.Citizen.Names),
-            "Full name" => DisclosedFieldSource.Text($"{cred.Citizen.Names} {cred.Citizen.Surname}"),
-            "Date of birth" => DisclosedFieldSource.Text(cred.Citizen.DateOfBirth.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
-            "Gender" => DisclosedFieldSource.Text(cred.Citizen.Gender.ToString()),
-            "Citizenship status" => DisclosedFieldSource.Text(cred.IdentityDocument?.Citizenship),
-            "Country of birth" => DisclosedFieldSource.Text(cred.IdentityDocument?.CountryOfBirth),
-            "Photograph" => DisclosedFieldSource.Photo(cred.IdentityDocument?.PhotoPath),
-            "Photo" => DisclosedFieldSource.Photo(cred.DriversLicense?.PhotoPath),
-            "Signature" => DisclosedFieldSource.Photo(cred.Signature),
+            "Identity number" => DisclosedFieldSource.Text(credential.Citizen.SaId),
+            "SA ID number" => DisclosedFieldSource.Text(credential.Citizen.SaId),
+            "Full surname" => DisclosedFieldSource.Text(credential.Citizen.Surname),
+            "Full forenames" => DisclosedFieldSource.Text(credential.Citizen.Names),
+            "Full name" => DisclosedFieldSource.Text($"{credential.Citizen.Names} {credential.Citizen.Surname}"),
+            "Date of birth" => DisclosedFieldSource.Text(credential.Citizen.DateOfBirth.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
+            "Gender" => DisclosedFieldSource.Text(credential.Citizen.Gender.ToString()),
+            "Citizenship status" => DisclosedFieldSource.Text(credential.IdentityDocument?.Citizenship),
+            "Country of birth" => DisclosedFieldSource.Text(credential.IdentityDocument?.CountryOfBirth),
+            "Photograph" => DisclosedFieldSource.Photo(credential.IdentityDocument?.PhotoPath),
+            "Photo" => DisclosedFieldSource.Photo(credential.DriversLicense?.PhotoPath),
+            "Signature" => DisclosedFieldSource.Photo(credential.Signature),
             "Card issue date and number" => DisclosedFieldSource.Text(string.Empty),
-            "License number" => DisclosedFieldSource.Text(cred.DriversLicense?.LicenseNumber),
-            "License code" => DisclosedFieldSource.Text(cred.DriversLicense?.LicenseCode.ToString()),
-            "Expiry date" => DisclosedFieldSource.Text(cred.DriversLicense?.ExpiryDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
-            "Country of issue" => DisclosedFieldSource.Text(cred.DriversLicense?.CountryOfIssue),
-            "Vehicle restrictions" => DisclosedFieldSource.Text(cred.DriversLicense?.Restrictions),
-            "Date of issue" => DisclosedFieldSource.Text(cred.IssueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
+            "License number" => DisclosedFieldSource.Text(credential.DriversLicense?.LicenseNumber),
+            "License code" => DisclosedFieldSource.Text(credential.DriversLicense?.LicenseCode.ToString()),
+            "Expiry date" => DisclosedFieldSource.Text(credential.DriversLicense?.ExpiryDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
+            "Country of issue" => DisclosedFieldSource.Text(credential.DriversLicense?.CountryOfIssue),
+            "Vehicle restrictions" => DisclosedFieldSource.Text(credential.DriversLicense?.Restrictions),
+            "Date of issue" => DisclosedFieldSource.Text(credential.IssueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
             _ => throw new InvalidOperationException($"No resolver defined for this disclosed field: '{field}'."),
         };
     }
