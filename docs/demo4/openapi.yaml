@@ -613,10 +613,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
   '/api/credentials/{credentialId}/offline-package':
-    get:
+    post:
       tags:
         - Credentials
-      summary: 'Returns the citizen''s offline credential package, minting it if none is stored or the stored one is stale.'
+      summary: 'Prepares the citizen''s offline credential package, minting it if none is stored or the stored one is stale.'
       parameters:
         - name: credentialId
           in: path
@@ -675,7 +675,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
         '409':
-          description: 'The credential is missing data an offline presentation requires, such as a photograph.'
+          description: 'The credential cannot produce a presentation: missing a photograph, or the document has expired.'
           content:
             text/plain:
               schema:
