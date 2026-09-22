@@ -43,6 +43,8 @@ public static class DependencyInjection
         services.AddScoped<IGovAdminAuditLogService, GovAdminAuditLogService>();
         services.AddScoped<IPhysicalIdentityVerificationService, PhysicalIdentityVerificationService>();
         services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+        services.AddSingleton(TimeProvider.System);
+        services.AddScoped<ISdJwtCredentialFactory, SdJwtCredentialFactory>();
         return services;
     }
 }
