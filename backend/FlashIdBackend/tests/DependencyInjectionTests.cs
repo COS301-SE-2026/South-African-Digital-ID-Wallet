@@ -10,6 +10,12 @@ using Infrastructure.Repositories;
 using Infrastructure.Providers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using Presentation.Controllers;
+using Microsoft.AspNetCore.Mvc;
+using Infrastructure.Data;
+using Application;
+using Microsoft.ApplicationInsights.Extensibility;
 
 namespace tests;
 
@@ -46,6 +52,7 @@ public class DependencyInjectionTests
         yield return new object[] { typeof(IOfficialRepository), typeof(OfficialRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(IVerificationRepository), typeof(VerificationRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(ICredentialsActivationRepository), typeof(CredentialsActivationRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(ICredentialSigningProvider), typeof(LocalEs256SigningProvider), ServiceLifetime.Singleton };
     }
 
     [Theory]
@@ -82,5 +89,35 @@ public class DependencyInjectionTests
         services.AddInfrastructure();
 
         Assert.Contains(services, sd => sd.ServiceType == typeof(IGovernmentRegistryGateway));
+    }
+
+    [Fact]
+    public void AddApplicationAndInfrastructure_RegistersEveryControllerConstructorDependency()
+    {
+        var services = new ServiceCollection();
+        services.AddApplication();
+        services.AddInfrastructure();
+
+        var applicationAssembly = typeof(IAdminDashboardService).Assembly;
+        var registered = services.Select(sd => sd.ServiceType).ToHashSet();
+
+        var controllerTypes = typeof(AdminDashboardController).Assembly
+            .GetTypes()
+            .Where(t => t.IsClass && !t.IsAbstract && typeof(ControllerBase).IsAssignableFrom(t))
+            .ToList();
+
+        Assert.NotEmpty(controllerTypes);
+
+        var missing = controllerTypes
+            .SelectMany(cont => cont
+                .GetConstructors()
+                .SelectMany(ctor => ctor.GetParameters())
+                .Where(p => p.ParameterType.Assembly == applicationAssembly)
+                .Where(p => !registered.Contains(p.ParameterType))
+                .Select(p => $"{cont.Name} -> {p.ParameterType.Name}"))
+            .Distinct()
+            .ToList();
+
+        Assert.Empty(missing);
     }
 }

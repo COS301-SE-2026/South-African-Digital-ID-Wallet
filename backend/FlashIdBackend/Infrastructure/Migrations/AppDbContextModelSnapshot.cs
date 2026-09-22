@@ -320,6 +320,13 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
+                    b.Property<string>("DisclosureSet")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HolderKeyThumbprint")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
                     b.Property<string>("IdBackImagePath")
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
@@ -336,6 +343,15 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("IssuerSignedCredential")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("PackageExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("RevocationIndex")
+                        .HasColumnType("int");
+
                     b.Property<string>("SelfieImagePath")
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
@@ -344,6 +360,13 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
+
+                    b.Property<DateTimeOffset?>("SignedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("SigningKid")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -357,6 +380,10 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CitizenId");
+
+                    b.HasIndex("RevocationIndex")
+                        .IsUnique()
+                        .HasFilter("[RevocationIndex] IS NOT NULL");
 
                     b.ToTable("Credentials");
                 });
