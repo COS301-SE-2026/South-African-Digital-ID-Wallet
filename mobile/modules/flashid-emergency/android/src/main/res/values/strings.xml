@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="flashid_emergency_tile">FlashID Emergency</string>
+  <string name="emergency_qr_description">Emergency QR code</string>
+  <string name="emergency_not_configured">Set up the emergency profile in the FlashID app first.</string>
+  <string name="emergency_caption_online">Paramedics: scan with the FlashID responder app</string>
+  <string name="emergency_caption_offline">Offline code. Hold steady while the frames cycle</string>
+  <string name="emergency_no_signal">No signal? Show the offline code</string>
+  <string name="emergency_back_online">Back to the live code</string>
+  <string name="emergency_no_offline_bundle">No offline copy stored. Open FlashID once while online.</string>
+  <string name="emergency_expires_in">Expires in %1$d s</string>
+</resources>

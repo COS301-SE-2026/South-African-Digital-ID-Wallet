@@ -1,0 +1,27 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'expo.modules.flashidemergency'
+version = '0.1.0'
+
+android {
+  namespace "expo.modules.flashidemergency"
+  buildFeatures {
+    viewBinding true
+  }
+  defaultConfig {
+    versionCode 1
+    versionName "0.1.0"
+  }
+  lint {
+    abortOnError true
+  }
+}
+
+dependencies {
+  implementation "com.google.zxing:core:3.5.3"
+  implementation "androidx.security:security-crypto:1.1.0-alpha06"
+  implementation "androidx.appcompat:appcompat:1.7.0"
+}

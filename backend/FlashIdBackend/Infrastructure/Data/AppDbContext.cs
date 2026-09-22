@@ -29,6 +29,10 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<DeviceVerification> DeviceVerifications => Set<DeviceVerification>();
     public DbSet<JobRun> JobRuns => Set<JobRun>();
     public DbSet<PhysicalIdentityVerification> PhysicalIdentityVerifications => Set<PhysicalIdentityVerification>();
+    public DbSet<EmergencyProfile> EmergencyProfiles => Set<EmergencyProfile>();
+    public DbSet<EmergencyContact> EmergencyContacts => Set<EmergencyContact>();
+    public DbSet<EmergencyDevice> EmergencyDevices => Set<EmergencyDevice>();
+    public DbSet<EmergencyAccess> EmergencyAccesses => Set<EmergencyAccess>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

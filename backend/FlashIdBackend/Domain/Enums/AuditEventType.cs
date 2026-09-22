@@ -32,4 +32,10 @@ public enum AuditEventType
     CitizenCredentialsUpdated,
     CitizenCredentialsSyncFailed,
     DeviceVerificationResent,
+    EmergencyConsentRecorded,
+    EmergencyProfileUpdated,
+    EmergencyDeviceRegistered,
+    EmergencyDeviceRevoked,
+    EmergencyProfileAccessed,
+    EmergencyProfileAccessFailed,
 }

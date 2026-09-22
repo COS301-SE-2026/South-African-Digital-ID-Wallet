@@ -43,7 +43,7 @@ public static class DependencyInjection
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
 
         services.AddScoped<ICredentialRepository, CredentialRepository>();
-        services.AddSingleton<IQrSigningProvider, Ed25519SigningProvider>();
+        services.AddSingleton<IQrSigningProvider, EcdsaSigningProvider>();
         services.AddSingleton(n =>
         {
             var configuration = n.GetRequiredService<IConfiguration>();
@@ -130,6 +130,9 @@ public static class DependencyInjection
         services.AddScoped<IPhysicalIdentityVerificationRepository, PhysicalIdentityVerificationRepository>();
 
         services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
+
+        services.AddScoped<IEmergencyRepository, EmergencyRepository>();
+        services.AddSingleton<IFieldCryptoProvider, AesFieldCryptoProvider>();
 
         services.AddSingleton<ICredentialSigningProvider, LocalEs256SigningProvider>();
         return services;

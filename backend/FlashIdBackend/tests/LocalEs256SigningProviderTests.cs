@@ -21,6 +21,21 @@ public class LocalEs256SigningProviderTests
         return Convert.ToBase64String(key.ExportPkcs8PrivateKey());
     }
 
+    // macOS CoreCrypto only implements the NIST curves, so secp256k1 and brainpool
+    // cannot be generated there at all. Skip rather than fail on those platforms.
+    private static string NewPrivateKeyOrSkip(ECCurve curve)
+    {
+        try
+        {
+            return NewPrivateKey(curve);
+        }
+        catch (PlatformNotSupportedException)
+        {
+            Assert.Skip("Curve not supported by this platform's crypto backend.");
+            throw;
+        }
+    }
+
     private static IConfiguration CreateConfiguration(string? kid, string? privateKey)
     {
         return new ConfigurationBuilder()
@@ -187,7 +202,7 @@ public class LocalEs256SigningProviderTests
     [Fact]
     public void Constructor_BrainpoolP256Key_ThrowsInvalidOperationException()
     {
-        var config = CreateConfiguration(Kid, NewPrivateKey(ECCurve.NamedCurves.brainpoolP256r1));
+        var config = CreateConfiguration(Kid, NewPrivateKeyOrSkip(ECCurve.NamedCurves.brainpoolP256r1));
 
         Assert.Throws<InvalidOperationException>(() => new LocalEs256SigningProvider(config));
     }
@@ -195,7 +210,7 @@ public class LocalEs256SigningProviderTests
     [Fact]
     public void Constructor_Secp256k1Key_ThrowsInvalidOperationException()
     {
-        var config = CreateConfiguration(Kid, NewPrivateKey(ECCurve.CreateFromValue("1.3.132.0.10")));
+        var config = CreateConfiguration(Kid, NewPrivateKeyOrSkip(ECCurve.CreateFromValue("1.3.132.0.10")));
 
         Assert.Throws<InvalidOperationException>(() => new LocalEs256SigningProvider(config));
     }

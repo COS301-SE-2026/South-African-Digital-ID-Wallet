@@ -45,7 +45,7 @@ public class DependencyInjectionTests
         yield return new object[] { typeof(IDashboardAccountCardRepository), typeof(DashboardAccountCardRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(INotificationRepository), typeof(NotificationRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(IEmailSenderProvider), typeof(EmailSenderProvider), ServiceLifetime.Transient };
-        yield return new object[] { typeof(IQrSigningProvider), typeof(Ed25519SigningProvider), ServiceLifetime.Singleton };
+        yield return new object[] { typeof(IQrSigningProvider), typeof(EcdsaSigningProvider), ServiceLifetime.Singleton };
         yield return new object[] { typeof(IQrDisclosureTokenRepository), typeof(CosmosQrDisclosureTokenRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(IPhotoStorageProvider), typeof(AzureBlobPhotoStorageProvider), ServiceLifetime.Singleton };
         yield return new object[] { typeof(IDisclosedFieldsValueResolver), typeof(DisclosedFieldValueResolver), ServiceLifetime.Scoped };
@@ -53,6 +53,8 @@ public class DependencyInjectionTests
         yield return new object[] { typeof(IVerificationRepository), typeof(VerificationRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(ICredentialsActivationRepository), typeof(CredentialsActivationRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(ICredentialSigningProvider), typeof(LocalEs256SigningProvider), ServiceLifetime.Singleton };
+        yield return new object[] { typeof(IEmergencyRepository), typeof(EmergencyRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IFieldCryptoProvider), typeof(AesFieldCryptoProvider), ServiceLifetime.Singleton };
     }
 
     [Theory]

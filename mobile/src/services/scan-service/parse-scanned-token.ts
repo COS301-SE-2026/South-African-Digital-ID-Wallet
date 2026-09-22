@@ -1,5 +1,8 @@
 import type { ParsedScannedToken } from './types'
 
+const EMERGENCY_PREFIX = 'https://flashid.co.za/e#'
+const EMERGENCY_OFFLINE_PREFIX = 'FIDE1/'
+
 const base64ToUtf8 = (base64: string): string => {
   const binary = atob(base64)
   let escaped = ''
@@ -12,6 +15,13 @@ const base64ToUtf8 = (base64: string): string => {
 export const parseScannedToken = (
   rawText: string
 ): ParsedScannedToken | null => {
+  if (rawText.startsWith(EMERGENCY_PREFIX)) {
+    return { token: rawText, type: 'emergency' }
+  }
+  if (rawText.startsWith(EMERGENCY_OFFLINE_PREFIX)) {
+    return { frame: rawText, type: 'emergency-offline' }
+  }
+
   try {
     const envelope = JSON.parse(base64ToUtf8(rawText)) as {
       payload?: unknown
