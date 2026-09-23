@@ -29,16 +29,3 @@ export type SecurityAlert = {
 export type FraudAlertFlowProps = {
   alert: SecurityAlert
 }
-
-export type FraudAlertModalProps = {
-  alert: SecurityAlert
-  layer: SecurityAlertLayer
-  actionMessage?: string
-  onClose: () => void
-  onViewDetails: () => void
-  onOpenGuidance: () => void
-  onChangePassword: () => void
-  onReviewActivity: () => void
-  onReviewTrustedDevices: () => void
-  onUnavailableAction: (message: string) => void
-}
