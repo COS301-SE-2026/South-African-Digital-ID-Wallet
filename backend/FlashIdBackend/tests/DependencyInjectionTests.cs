@@ -45,8 +45,7 @@ public class DependencyInjectionTests
         yield return new object[] { typeof(IDashboardAccountCardRepository), typeof(DashboardAccountCardRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(INotificationRepository), typeof(NotificationRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(IEmailSenderProvider), typeof(EmailSenderProvider), ServiceLifetime.Transient };
-        yield return new object[] { typeof(IQrSigningProvider), typeof(AzureKeyVaultQrSigningProvider), ServiceLifetime.Singleton };
-        yield return new object[] { typeof(IQrSignatureVerifier), typeof(QrSignatureVerifier), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IQrSigningProvider), typeof(AzureKeyVaultQrSigningProvider), ServiceLifetime.Scoped }; yield return new object[] { typeof(IQrSignatureVerifier), typeof(QrSignatureVerifier), ServiceLifetime.Scoped };
         yield return new object[] { typeof(IQrSigningKeyVaultInspector), typeof(AzureQrSigningKeyVaultInspector), ServiceLifetime.Singleton };
         yield return new object[] { typeof(IKeyRotationRepository), typeof(KeyRotationRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(IQrDisclosureTokenRepository), typeof(CosmosQrDisclosureTokenRepository), ServiceLifetime.Scoped };

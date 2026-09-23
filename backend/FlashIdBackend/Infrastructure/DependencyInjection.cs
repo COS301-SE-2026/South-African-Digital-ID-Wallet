@@ -44,7 +44,7 @@ public static class DependencyInjection
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddSingleton<IDeviceTokenProvider, DeviceTokenProvider>();
         services.AddSingleton<TokenCredential, DefaultAzureCredential>();
-        services.AddSingleton<IQrSigningProvider, AzureKeyVaultQrSigningProvider>();
+        services.AddScoped<IQrSigningProvider, AzureKeyVaultQrSigningProvider>();
         services.AddSingleton<IQrSigningKeyVaultInspector, AzureQrSigningKeyVaultInspector>();
         services.AddScoped<IQrSignatureVerifier, QrSignatureVerifier>();
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
