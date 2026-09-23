@@ -7,10 +7,10 @@ using Infrastructure.Data;
 using Infrastructure.Providers;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Data.Sqlite;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
 
 namespace tests;
 
@@ -31,6 +31,23 @@ public class QrServiceIntegrationTests
     {
         public Task<string> GenerateReadSasUrlAsync(string blobName, TimeSpan ttl) => Task.FromResult($"https://fake-blob-sas.local/{blobName}");
         public Task<Stream?> OpenReadAsync(string blobName, CancellationToken cancellationToken) => Task.FromResult<Stream?>(null);
+    }
+
+    private sealed class FakeQrSigningProvider : IQrSigningProvider
+    {
+        private static readonly EcPublicJwk FakeJwk = new("EC", "P-256", "fake-kid", "fake-x", "fake-y");
+        private static readonly QrSigningKey FakeKey = new("fake-kid", "ES256", FakeJwk);
+
+        public Task<QrSigningKey> GetActiveKeyAsync(CancellationToken cancellationToken) => Task.FromResult(FakeKey);
+
+        public Task<byte[]> SignAsync(string keyId, byte[] signingInput, CancellationToken cancellationToken) =>
+            Task.FromResult(System.Text.Encoding.UTF8.GetBytes("fake-signature"));
+    }
+
+    private sealed class FakeQrSignatureVerifier : IQrSignatureVerifier
+    {
+        public Task<bool> VerifyAsync(string kid, byte[] signingInput, byte[] signature, CancellationToken cancellationToken) =>
+            Task.FromResult(true);
     }
 
     private sealed class FakeQrDisclosureTokenRepository : IQrDisclosureTokenRepository
@@ -78,20 +95,6 @@ public class QrServiceIntegrationTests
         context.Database.EnsureCreated();
         return context;
     }
-
-    private static IConfiguration CreateQrConfiguration()
-    {
-        return new ConfigurationBuilder()
-            .AddInMemoryCollection(
-                new Dictionary<string, string?>
-                {
-                    // NOSONAR: not a real secret
-                    ["Qr:Ed25519PrivateKey"] = "8O/E1cl/UPWEcxPaC6NvN2GSh1ged35YBOP8ACZf0K0=",
-                }
-            )
-            .Build();
-    }
-
     private static QrService CreateQrService(AppDbContext context)
     {
         var (service, _) = CreateQrServiceWithTokenRepo(context);
@@ -103,12 +106,11 @@ public class QrServiceIntegrationTests
     {
         var credentialRepository = new CredentialRepository(context);
         var qrDisclosureTokenRepository = new FakeQrDisclosureTokenRepository();
-        var configuration = CreateQrConfiguration();
-        var signingProvider = new Ed25519SigningProvider(configuration);
+        var signingProvider = new FakeQrSigningProvider();
+        var signatureVerifier = new FakeQrSignatureVerifier();
         var institutionRepository = new InstitutionRepository(context);
         var disclosedFieldValueResolver = new DisclosedFieldValueResolver(new FakePhotoStorageProvider());
-        var service = new QrService(credentialRepository, signingProvider, qrDisclosureTokenRepository, institutionRepository, disclosedFieldValueResolver);
-
+        var service = new QrService(credentialRepository, signingProvider, signatureVerifier, qrDisclosureTokenRepository, institutionRepository, disclosedFieldValueResolver);
         return (service, qrDisclosureTokenRepository);
     }
 

@@ -1,5 +1,6 @@
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Services;
 using Application.Features.Officials.Exceptions;
 using Domain.Entities;
@@ -19,10 +20,21 @@ public class OfficialBadgeServiceTests
 
     private sealed class FakeQrSigningProvider : IQrSigningProvider
     {
-        public bool VerifyResult { get; set; } = true;
+        private static readonly EcPublicJwk FakeJwk = new("EC", "P-256", "fake-kid", "fake-x", "fake-y");
+        private static readonly QrSigningKey FakeKey = new("fake-kid", "ES256", FakeJwk);
 
-        public string Sign(string payload) => "this-signature-is-fake";
-        public bool Verify(string payload, string signature) => VerifyResult;
+        public Task<QrSigningKey> GetActiveKeyAsync(CancellationToken cancellationToken) => Task.FromResult(FakeKey);
+
+        public Task<byte[]> SignAsync(string keyId, byte[] signingInput, CancellationToken cancellationToken) =>
+            Task.FromResult(System.Text.Encoding.UTF8.GetBytes("this-signature-is-fake"));
+    }
+
+    private sealed class FakeQrSignatureVerifier : IQrSignatureVerifier
+    {
+        public bool ShouldVerify { get; set; } = true;
+
+        public Task<bool> VerifyAsync(string kid, byte[] signingInput, byte[] signature, CancellationToken cancellationToken) =>
+            Task.FromResult(ShouldVerify);
     }
 
     private static Official ValidOfficial(InstitutionType institutionType)
@@ -55,7 +67,8 @@ public class OfficialBadgeServiceTests
         var official = ValidOfficial(InstitutionType.LawEnforcement);
         var fakeRepository = new FakeOfficialRepository { OfficialToReturn = official };
         var fakeSigningProvider = new FakeQrSigningProvider();
-        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider);
+        var fakeSignatureVerifier = new FakeQrSignatureVerifier();
+        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider, fakeSignatureVerifier);
 
         var res = await service.GenerateBadgeTokenAsync(official.UserId);
 
@@ -68,7 +81,8 @@ public class OfficialBadgeServiceTests
     {
         var fakeRepository = new FakeOfficialRepository { OfficialToReturn = null };
         var fakeSigningProvider = new FakeQrSigningProvider();
-        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider);
+        var fakeSignatureVerifier = new FakeQrSignatureVerifier();
+        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider, fakeSignatureVerifier);
 
         await Assert.ThrowsAsync<OfficialNotFoundException>(() => service.GenerateBadgeTokenAsync(Guid.NewGuid()));
     }
@@ -79,7 +93,8 @@ public class OfficialBadgeServiceTests
         var official = ValidOfficial(InstitutionType.LawEnforcement);
         var fakeRepository = new FakeOfficialRepository { OfficialToReturn = official };
         var fakeSigningProvider = new FakeQrSigningProvider();
-        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider);
+        var fakeSignatureVerifier = new FakeQrSignatureVerifier();
+        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider, fakeSignatureVerifier);
 
         var badge = await service.GenerateBadgeTokenAsync(official.UserId);
         var res = await service.VerifyBadgeAsync(badge.Token);
@@ -97,7 +112,8 @@ public class OfficialBadgeServiceTests
         var official = ValidOfficial(InstitutionType.HomeAffairs);
         var fakeRepository = new FakeOfficialRepository { OfficialToReturn = official };
         var fakeSigningProvider = new FakeQrSigningProvider();
-        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider);
+        var fakeSignatureVerifier = new FakeQrSignatureVerifier();
+        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider, fakeSignatureVerifier);
 
         var badge = await service.GenerateBadgeTokenAsync(official.UserId);
         var res = await service.VerifyBadgeAsync(badge.Token);
@@ -111,10 +127,11 @@ public class OfficialBadgeServiceTests
         var official = ValidOfficial(InstitutionType.LawEnforcement);
         var fakeRepository = new FakeOfficialRepository { OfficialToReturn = official };
         var fakeSigningProvider = new FakeQrSigningProvider();
-        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider);
+        var fakeSignatureVerifier = new FakeQrSignatureVerifier();
+        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider, fakeSignatureVerifier);
 
         var badge = await service.GenerateBadgeTokenAsync(official.UserId);
-        fakeSigningProvider.VerifyResult = false;
+        fakeSignatureVerifier.ShouldVerify = false;
 
         await Assert.ThrowsAsync<InvalidBadgeTokenException>(() => service.VerifyBadgeAsync(badge.Token));
     }
@@ -124,7 +141,8 @@ public class OfficialBadgeServiceTests
     {
         var fakeRepository = new FakeOfficialRepository();
         var fakeSigningProvider = new FakeQrSigningProvider();
-        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider);
+        var fakeSignatureVerifier = new FakeQrSignatureVerifier();
+        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider, fakeSignatureVerifier);
 
         await Assert.ThrowsAsync<InvalidBadgeTokenException>(() => service.VerifyBadgeAsync("not-valid-base64!!!"));
     }
@@ -135,7 +153,8 @@ public class OfficialBadgeServiceTests
         var official = ValidOfficial(InstitutionType.LawEnforcement);
         var fakeRepository = new FakeOfficialRepository { OfficialToReturn = official };
         var fakeSigningProvider = new FakeQrSigningProvider();
-        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider);
+        var fakeSignatureVerifier = new FakeQrSignatureVerifier();
+        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider, fakeSignatureVerifier);
 
         var badge = await service.GenerateBadgeTokenAsync(official.UserId);
         fakeRepository.OfficialToReturn = null;
