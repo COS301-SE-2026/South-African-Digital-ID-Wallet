@@ -67,7 +67,7 @@ const TRUST_WARNING_SECONDS = 24 * 60 * 60
 const TRUST_EXPIRY_SECONDS = 7 * 24 * 60 * 60
 
 // Mirrors SdJwtClaimNames on the backend. The cross-stack fixture test is what stops these drifting.
-const MANDATORY_CLAIMS: Readonly<Record<string, readonly string[]>> = {
+export const MANDATORY_CLAIMS: Readonly<Record<string, readonly string[]>> = {
   'urn:flashid:identity-document:1': ['date_of_birth', 'portrait'],
   'urn:flashid:drivers-license:1': ['portrait', 'expiry_date', 'date_of_birth'],
 }
