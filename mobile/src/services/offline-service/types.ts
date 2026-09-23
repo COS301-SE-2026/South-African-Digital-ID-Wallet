@@ -1,18 +1,12 @@
-export type OfflinePackageResponse = {
-  issuerSignedCredential: string
-  disclosures: Record<string, string>
-  signedAt: string
-  expiresAt: string
-}
+import type { z } from 'zod'
+import type { IssuerKey } from '@/lib/offline/verify'
+import type { offlinePackageResponseSchema } from './schema'
 
-export type IssuerKeyResponse = {
-  kid: string
-  kty: string
-  crv: string
-  x: string
-  y: string
-  status: 'active' | 'retired' | 'revoked'
-}
+export type OfflinePackageResponse = z.infer<
+  typeof offlinePackageResponseSchema
+>
+
+export type IssuerKeyResponse = IssuerKey
 
 export type IssuerKeysResponse = {
   keys: IssuerKeyResponse[]

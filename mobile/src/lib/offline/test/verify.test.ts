@@ -5,7 +5,12 @@ import { p256 } from '@noble/curves/nist.js'
 import { sha256 } from '@noble/hashes/sha2.js'
 import { base64urlnopad } from '@scure/base'
 
-import { verifyPresentation, type PublicJwk, type TrustData } from '../verify'
+import {
+  REVOCATION_NOT_CHECKED_WARNING,
+  verifyPresentation,
+  type PublicJwk,
+  type TrustData,
+} from '../verify'
 
 const FIXTURE_PATH = join(
   __dirname,
@@ -50,6 +55,8 @@ type MintOptions = {
   expiresInSeconds?: number
   revocationIndex?: number
   deviceKey?: PublicJwk
+  issuedAt?: number
+  extraDisclosures?: unknown[]
 }
 
 const NOW = 1_790_000_000
@@ -62,16 +69,21 @@ const mint = (options: MintOptions = {}) => {
     date_of_birth: '1998-03-14',
   }
 
-  const disclosures = Object.entries(claims).map(([name, value], index) =>
-    base64urlnopad.encode(
-      utf8(JSON.stringify([`salt${index}0000000000`, name, value]))
-    )
-  )
+  const disclosures = [
+    ...Object.entries(claims).map(([name, value], index) =>
+      base64urlnopad.encode(
+        utf8(JSON.stringify([`salt${index}0000000000`, name, value]))
+      )
+    ),
+    ...(options.extraDisclosures ?? []).map((value) =>
+      base64urlnopad.encode(utf8(JSON.stringify(value)))
+    ),
+  ]
 
   const payload: Record<string, unknown> = {
     iss: options.issuer ?? 'urn:flashid:issuer',
     vct: options.vct ?? LICENCE_VCT,
-    iat: NOW - 60,
+    iat: options.issuedAt ?? NOW - 60,
     exp: NOW + (options.expiresInSeconds ?? 3600),
     ri: options.revocationIndex ?? 7,
     _sd_alg: 'sha-256',
@@ -93,17 +105,18 @@ const mint = (options: MintOptions = {}) => {
     keys: [{ kid: KID, status: 'active', ...jwkFor(privateKey) }],
     retrievedAt: NOW - 3600,
     revokedIndexes: [],
+    revocationRetrievedAt: NOW - 3600,
   }
 
   return { sdJwt, issuerJwt, disclosures, trust, privateKey }
 }
 
-const keyBindingFor = (sdJwt: string, privateKey: Uint8Array, issuedAt = NOW) =>
-  signJws(
-    { alg: 'ES256', typ: 'kb+jwt' },
-    { iat: issuedAt, sd_hash: digestOf(sdJwt) },
-    privateKey
-  )
+const keyBindingFor = (
+  sdJwt: string,
+  privateKey: Uint8Array,
+  issuedAt = NOW,
+  header: Record<string, string> = { alg: 'ES256', typ: 'kb+jwt' }
+) => signJws(header, { iat: issuedAt, sd_hash: digestOf(sdJwt) }, privateKey)
 
 describe('verifyPresentation', () => {
   it('verifies the committed cross-stack fixture', () => {
@@ -118,6 +131,7 @@ describe('verifyPresentation', () => {
         })),
         retrievedAt: fixture.verifyAtUnix,
         revokedIndexes: [],
+        revocationRetrievedAt: fixture.verifyAtUnix,
       },
       { now: fixture.verifyAtUnix }
     )
@@ -132,7 +146,7 @@ describe('verifyPresentation', () => {
 
   it('accepts a high-S signature (D-014)', () => {
     const { sdJwt, trust } = mint()
-    const [header, payload, signature] = sdJwt.split('~')[0].split('.')
+    const [, , signature] = sdJwt.split('~')[0].split('.')
 
     // Same signature with s replaced by n - s: still valid, but rejected unless lowS is disabled.
     const raw = base64urlnopad.decode(signature)
@@ -302,6 +316,87 @@ describe('verifyPresentation', () => {
     ).toMatchObject({ code: 'STALE_TRUST_DATA' })
   })
 
+  it('accepts a credential signed by a retired key', () => {
+    const { sdJwt, trust } = mint()
+    const retired = { ...trust.keys[0], status: 'retired' as const }
+
+    expect(
+      verifyPresentation(sdJwt, { ...trust, keys: [retired] }, { now: NOW }).ok
+    ).toBe(true)
+  })
+
+  it('returns EXPIRED when exp is exactly now', () => {
+    const { sdJwt, trust } = mint({ expiresInSeconds: 0 })
+
+    expect(verifyPresentation(sdJwt, trust, { now: NOW })).toMatchObject({
+      code: 'EXPIRED',
+    })
+  })
+
+  it('returns MALFORMED when the trailing tilde is missing', () => {
+    const { sdJwt, trust } = mint()
+
+    expect(
+      verifyPresentation(sdJwt.slice(0, -1), trust, { now: NOW })
+    ).toMatchObject({ code: 'MALFORMED' })
+  })
+
+  it('returns MALFORMED for a credential issued in the future', () => {
+    const { sdJwt, trust } = mint({ issuedAt: NOW + 3600 })
+
+    expect(verifyPresentation(sdJwt, trust, { now: NOW })).toMatchObject({
+      code: 'MALFORMED',
+    })
+  })
+
+  it.each([
+    ['a non-string value', ['salt', 'full_name', 42]],
+    ['a non-string name', ['salt', 7, 'Thabo']],
+    ['a two-element array', ['salt', 'full_name']],
+    ['an object instead of an array', { name: 'full_name' }],
+  ])('returns MALFORMED for a disclosure with %s', (_label, disclosure) => {
+    const { sdJwt, trust } = mint({ extraDisclosures: [disclosure] })
+
+    expect(verifyPresentation(sdJwt, trust, { now: NOW })).toMatchObject({
+      code: 'MALFORMED',
+    })
+  })
+
+  it('returns UNKNOWN_KEY when the trusted key is malformed', () => {
+    const { sdJwt, trust } = mint()
+    const broken = { ...trust.keys[0], x: 'AAAA' }
+
+    expect(
+      verifyPresentation(sdJwt, { ...trust, keys: [broken] }, { now: NOW })
+    ).toMatchObject({ code: 'UNKNOWN_KEY' })
+  })
+
+  it('warns that revocation was not checked when there is no revocation list', () => {
+    const { sdJwt, trust } = mint()
+
+    const result = verifyPresentation(
+      sdJwt,
+      { ...trust, revocationRetrievedAt: null },
+      { now: NOW }
+    )
+
+    expect(result.ok).toBe(true)
+    expect(result.warnings).toContain(REVOCATION_NOT_CHECKED_WARNING)
+  })
+
+  it('treats an old revocation list as stale even when the keys are fresh', () => {
+    const { sdJwt, trust } = mint()
+    const stale = {
+      ...trust,
+      retrievedAt: NOW,
+      revocationRetrievedAt: NOW - 8 * 24 * 3600,
+    }
+
+    expect(verifyPresentation(sdJwt, stale, { now: NOW })).toMatchObject({
+      code: 'STALE_TRUST_DATA',
+    })
+  })
+
   describe('key binding', () => {
     const mintBound = () => {
       const devicePrivateKey = p256.utils.randomSecretKey()
@@ -370,6 +465,47 @@ describe('verifyPresentation', () => {
           requireKeyBinding: true,
         })
       ).toMatchObject({ code: 'STALE_PRESENTATION' })
+    })
+
+    it('requires key binding for a bound credential even when the flag is off', () => {
+      const { sdJwt, trust } = mintBound()
+
+      expect(verifyPresentation(sdJwt, trust, { now: NOW })).toMatchObject({
+        code: 'MISSING_KEY_BINDING',
+      })
+    })
+
+    it('returns MALFORMED for a key binding JWT on a credential without cnf', () => {
+      const { sdJwt, trust } = mint()
+      const presentation =
+        sdJwt + keyBindingFor(sdJwt, p256.utils.randomSecretKey())
+
+      expect(
+        verifyPresentation(presentation, trust, { now: NOW })
+      ).toMatchObject({ code: 'MALFORMED' })
+    })
+
+    it.each([
+      ['the wrong typ', { alg: 'ES256', typ: 'jwt' }],
+      ['the wrong alg', { alg: 'ES384', typ: 'kb+jwt' }],
+    ])('returns MALFORMED for a key binding JWT with %s', (_label, header) => {
+      const { sdJwt, trust, devicePrivateKey } = mintBound()
+      const presentation =
+        sdJwt + keyBindingFor(sdJwt, devicePrivateKey, NOW, header)
+
+      expect(
+        verifyPresentation(presentation, trust, { now: NOW })
+      ).toMatchObject({ code: 'MALFORMED' })
+    })
+
+    it('accepts a key binding JWT from a holder whose clock runs 80 seconds slow', () => {
+      const { sdJwt, trust, devicePrivateKey } = mintBound()
+      const presentation =
+        sdJwt + keyBindingFor(sdJwt, devicePrivateKey, NOW - 80)
+
+      expect(verifyPresentation(presentation, trust, { now: NOW }).ok).toBe(
+        true
+      )
     })
   })
 })
