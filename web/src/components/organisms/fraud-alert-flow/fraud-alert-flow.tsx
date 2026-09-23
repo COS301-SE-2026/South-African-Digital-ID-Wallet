@@ -5,6 +5,8 @@ import {
   ShieldAlert,
 } from 'lucide-react'
 
+import { Text } from '@/components/atoms/text'
+
 import type { FraudAlertFlowProps } from './types'
 
 export function FraudAlertFlow({ alert }: FraudAlertFlowProps) {
@@ -21,18 +23,30 @@ export function FraudAlertFlow({ alert }: FraudAlertFlowProps) {
 
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-base font-extrabold text-danger-red">
+              <Text
+                as="h2"
+                variant="h4"
+                className="text-danger-red"
+              >
                 Suspicious activity detected
-              </h2>
+              </Text>
 
-              <span className="rounded-full bg-danger-red/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-danger-red">
+              <Text
+                as="span"
+                variant="caption"
+                className="rounded-full bg-danger-red/10 px-2.5 py-1 font-bold uppercase tracking-wide text-danger-red"
+              >
                 High risk
-              </span>
+              </Text>
             </div>
 
-            <p className="mt-2 text-sm leading-6 text-muted-text">
+            <Text
+              as="p"
+              variant="sub-sm"
+              className="mt-2"
+            >
               {alert.summary}
-            </p>
+            </Text>
           </div>
 
           <AlertTriangle className="hidden h-5 w-5 shrink-0 text-danger-red sm:block" />
