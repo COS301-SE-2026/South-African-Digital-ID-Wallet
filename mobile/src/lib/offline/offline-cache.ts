@@ -14,11 +14,14 @@ export type OfflinePackage = {
 }
 
 export type OfflineCache = {
-  package: OfflinePackage | null
+  // One package per credential. A citizen holds an ID and a license, and presenting the wrong one would show a verifier a different credential from the one the citizen chose
+  packages: Readonly<Record<string, OfflinePackage>>
   trust: TrustData | null
   savedAt: number
 }
 
+// Bumped whenever the cached shape changes, so an older file is refetched rather than misread
+const CACHE_VERSION = 1
 const CACHE_KEY_NAME = 'flashid.offline.cache-key'
 const CACHE_FILE_NAME = 'flashid-offline-cache.bin'
 const KEY_BYTES = 32
@@ -49,7 +52,9 @@ export const writeOfflineCache = async (
 ): Promise<void> => {
   const key = (await loadKey()) ?? (await createKey())
   const nonce = Crypto.getRandomBytes(NONCE_BYTES)
-  const plaintext = new TextEncoder().encode(JSON.stringify(contents))
+  const plaintext = new TextEncoder().encode(
+    JSON.stringify({ version: CACHE_VERSION, ...contents })
+  )
 
   // A fresh nonce per write: reusing one with the same key would leak the difference between two
   // cache versions, which is the classic GCM failure.
@@ -76,15 +81,23 @@ export const readOfflineCache = async (): Promise<OfflineCache | null> => {
   }
 
   try {
-    const raw = file.bytes()
-    const nonce = (await raw).slice(0, NONCE_BYTES)
-    const ciphertext = (await raw).slice(NONCE_BYTES)
+    const raw = await file.bytes()
+    const nonce = raw.slice(0, NONCE_BYTES)
+    const ciphertext = raw.slice(NONCE_BYTES)
 
-    // GCM authenticates as it decrypts, so any edit to the file throws here rather than returning
-    // altered credentials.
+    // GCM authenticates as it decrypts, so any edit to the file throws here rather than returning altered credentials.
     const plaintext = gcm(key, nonce).decrypt(ciphertext)
+    const { version, ...contents } = JSON.parse(
+      new TextDecoder().decode(plaintext)
+    ) as OfflineCache & { version?: number }
 
-    return JSON.parse(new TextDecoder().decode(plaintext)) as OfflineCache
+    // A cache from an older build, such as the single-package shape, is dropped and refetched.
+    if (version !== CACHE_VERSION) {
+      file.delete()
+      return null
+    }
+
+    return contents
   } catch {
     // Tampered or corrupt: drop it and fall back to online, rather than trusting half a file.
     file.delete()

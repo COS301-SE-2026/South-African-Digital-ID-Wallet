@@ -51,13 +51,15 @@ const issuerKeysResponse = {
 }
 
 const existingCache: OfflineCache = {
-  package: {
-    issuerSignedCredential: 'old.issuer.jwt',
-    disclosures: {
-      full_name: 'old-disclosure',
+  packages: {
+    'credential-1': {
+      issuerSignedCredential: 'old.issuer.jwt',
+      disclosures: {
+        full_name: 'old-disclosure',
+      },
+      signedAt: '2026-09-20T16:22:00.000Z',
+      expiresAt: '2026-10-20T16:22:00.000Z',
     },
-    signedAt: '2026-09-20T16:22:00.000Z',
-    expiresAt: '2026-10-20T16:22:00.000Z',
   },
   trust: {
     keys: [
@@ -77,10 +79,17 @@ const existingCache: OfflineCache = {
 }
 
 describe('offlineService', () => {
+  const FIXED_NOW_MS = 1_790_010_000_000
+
   beforeEach(() => {
     jest.clearAllMocks()
     readOfflineCacheMock.mockResolvedValue(null)
     writeOfflineCacheMock.mockResolvedValue(undefined)
+    jest.spyOn(Date, 'now').mockReturnValue(FIXED_NOW_MS)
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
   })
 
   it('Should post the credential id to the offline package endpoint', async () => {
@@ -113,10 +122,10 @@ describe('offlineService', () => {
 
     expect(writeOfflineCacheMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        package: packageResponse,
+        packages: { 'credential-1': packageResponse },
         trust: {
           keys: issuerKeysResponse.keys,
-          retrievedAt: 1_790_007_651,
+          retrievedAt: 1_790_010_000,
           revokedIndexes: [],
         },
       })
@@ -132,7 +141,7 @@ describe('offlineService', () => {
 
     expect(writeOfflineCacheMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        package: existingCache.package,
+        packages: existingCache.packages,
         trust: expect.objectContaining({
           keys: issuerKeysResponse.keys,
         }),
@@ -149,7 +158,7 @@ describe('offlineService', () => {
 
     expect(writeOfflineCacheMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        package: packageResponse,
+        packages: { 'credential-1': packageResponse },
         trust: existingCache.trust,
       })
     )
@@ -176,5 +185,22 @@ describe('offlineService', () => {
     ).rejects.toThrow('package request failed')
 
     expect(writeOfflineCacheMock).not.toHaveBeenCalled()
+  })
+
+  it('Should keep the other credential when refreshing one', async () => {
+    readOfflineCacheMock.mockResolvedValue(existingCache)
+    postMock.mockResolvedValue({ data: packageResponse })
+    getMock.mockResolvedValue({ data: issuerKeysResponse })
+
+    await offlineService.refreshOfflineCache('credential-2')
+
+    expect(writeOfflineCacheMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        packages: {
+          'credential-1': existingCache.packages['credential-1'],
+          'credential-2': packageResponse,
+        },
+      })
+    )
   })
 })
