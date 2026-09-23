@@ -1,0 +1,17 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/ICertifiedCopyCryptographyProvider.cs
+  h_293a8616118f65 1-2,11
+backend/FlashIdBackend/Infrastructure/Providers/CertifiedCopyCryptographyProvider.cs
+  h_293a8616118f65 1,5,27,29-30,119-126
+  h_293a8616118f65 80-113,127-128
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9a56914508892639206f6bd91847d9fd611e2f64",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
