@@ -133,6 +133,11 @@ public static class DependencyInjection
         services.AddScoped<IFraudDetectionRepository, FraudDetectionRepository>();
 
         services.AddSingleton<ICredentialSigningProvider, LocalEs256SigningProvider>();
+
+        services.AddSingleton(PortraitProcessingLimits.Default);
+        services.AddSingleton<IPortraitProcessor, ImageSharpPortraitProcessor>();
+
+        services.AddScoped<IOfflinePackageRepository, OfflinePackageRepository>();
         return services;
     }
 }

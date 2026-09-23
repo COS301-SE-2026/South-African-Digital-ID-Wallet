@@ -39,4 +39,6 @@ public enum AuditEventType
     FraudAlertSecured,
     FraudAlertDismissed,
     SecuritySettingsUpdated,
+    OfflinePackageMinted,
+    OfflinePackageMintFailed,
 }

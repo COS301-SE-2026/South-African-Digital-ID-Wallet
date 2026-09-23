@@ -48,6 +48,7 @@ public static class DependencyInjection
         services.AddSingleton(sp => Application.Features.FraudDetection.FraudDetectionOptions.FromConfiguration(
             sp.GetService<Microsoft.Extensions.Configuration.IConfiguration>()));
         services.AddScoped<IFraudDetectionService, FraudDetectionService>();
+        services.AddScoped<IOfflinePackageService, OfflinePackageService>();
         return services;
     }
 }
