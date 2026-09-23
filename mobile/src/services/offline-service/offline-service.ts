@@ -21,18 +21,6 @@ const requestIssuerKeys = () =>
     .get(offlineUrls.issuerKeys())
     .then((res: AxiosResponse<IssuerKeysResponse>) => res.data)
 
-const toUnixSeconds = (value: string): number => {
-  const milliseconds = Date.parse(value)
-
-  if (Number.isNaN(milliseconds)) {
-    throw new Error(
-      'The issuer key response contained an invalid retrieval time.'
-    )
-  }
-
-  return Math.floor(milliseconds / 1000)
-}
-
 const toOfflinePackage = (
   response: OfflinePackageResponse
 ): OfflinePackage => ({
@@ -42,12 +30,14 @@ const toOfflinePackage = (
   expiresAt: response.expiresAt,
 })
 
+const nowInSeconds = () => Math.floor(Date.now() / 1000)
+
 const toTrustData = (
   response: IssuerKeysResponse,
   existing: OfflineCache['trust']
 ): NonNullable<OfflineCache['trust']> => ({
   keys: response.keys,
-  retrievedAt: toUnixSeconds(response.retrievedAt),
+  retrievedAt: nowInSeconds(),
   revokedIndexes: existing?.revokedIndexes ?? [],
 })
 
@@ -56,43 +46,36 @@ const refreshOfflineCache = async (
 ): Promise<OfflineCache> => {
   const existing = await readOfflineCache()
 
-  let offlinePackage = existing?.package ?? null
-  let trust = existing?.trust ?? null
-  let packageRefreshed = false
-  let trustRefreshed = false
-  let packageError: unknown
-  let trustError: unknown
+  const [packageResult, trustResult] = await Promise.allSettled([
+    requestOfflinePackage(credentialId),
+    requestIssuerKeys(),
+  ])
 
-  try {
-    offlinePackage = toOfflinePackage(await requestOfflinePackage(credentialId))
-    packageRefreshed = true
-  } catch (error) {
-    packageError = error
-  }
-
-  try {
-    trust = toTrustData(await requestIssuerKeys(), existing?.trust ?? null)
-    trustRefreshed = true
-  } catch (error) {
-    trustError = error
-  }
-
-  if (!packageRefreshed && !trustRefreshed) {
+  if (
+    packageResult.status === 'rejected' &&
+    trustResult.status === 'rejected'
+  ) {
     if (existing) {
       return existing
     }
 
-    throw (
-      packageError ??
-      trustError ??
-      new Error('Unable to refresh offline verification data.')
-    )
+    throw packageResult.reason
   }
 
   const refreshed: OfflineCache = {
-    package: offlinePackage,
-    trust,
-    savedAt: Math.floor(Date.now() / 1000),
+    // Only this credential's entry changes, so the citizen's other credential stays presentable.
+    packages:
+      packageResult.status === 'fulfilled'
+        ? {
+            ...existing?.packages,
+            [credentialId]: toOfflinePackage(packageResult.value),
+          }
+        : (existing?.packages ?? {}),
+    trust:
+      trustResult.status === 'fulfilled'
+        ? toTrustData(trustResult.value, existing?.trust ?? null)
+        : (existing?.trust ?? null),
+    savedAt: nowInSeconds(),
   }
 
   await writeOfflineCache(refreshed)

@@ -27,7 +27,7 @@ jest.mock('expo-crypto', () => ({
 }))
 
 jest.mock('expo-file-system', () => ({
-  Paths: { document: '/ documents' },
+  Paths: { document: '/documents' },
   File: class {
     get exists() {
       return mockDiskFile !== null
@@ -46,13 +46,15 @@ jest.mock('expo-file-system', () => ({
 }))
 
 const contents: OfflineCache = {
-  package: {
-    issuerSignedCredential: 'eyJhbGciOiJFUzI1NiJ9.eyJ9.sig',
-    disclosures: {
-      full_name: 'WyJzYWx0IiwiZnVsbF9uYW1lIiwiVGhhYm8gTW9rb2VuYSJd',
+  packages: {
+    'credential-1': {
+      issuerSignedCredential: 'eyJhbGciOiJFUzI1NiJ9.eyJ9.sig',
+      disclosures: {
+        full_name: 'WyJzYWx0IiwiZnVsbF9uYW1lIiwiVGhhYm8gTW9rb2VuYSJd',
+      },
+      signedAt: '2026-09-21T16:22:00+00:00',
+      expiresAt: '2026-10-21T16:22:00+00:00',
     },
-    signedAt: '2026-09-21T16:22:00+00:00',
-    expiresAt: '2026-10-21T16:22:00+00:00',
   },
   trust: { keys: [], retrievedAt: 1_790_000_000, revokedIndexes: [] },
   savedAt: 1_790_000_000,
@@ -106,5 +108,26 @@ describe('offline cache', () => {
 
     expect(mockDiskFile).toBeNull()
     expect(mockSecureStore.size).toBe(0)
+  })
+
+  it('discards a cache written in an older shape', async () => {
+    await writeOfflineCache({
+      package: contents.packages['credential-1'],
+    } as unknown as OfflineCache)
+
+    // Simulate the pre-versioning build by rewriting the file without a version field.
+    const { gcm } = jest.requireActual('@noble/ciphers/aes.js')
+    const key = Buffer.from(mockSecureStore.values().next().value!, 'base64')
+    const nonce = mockDiskFile!.slice(0, 12)
+    const legacy = new TextEncoder().encode(
+      JSON.stringify({ package: {}, trust: null, savedAt: 1 })
+    )
+    mockDiskFile = new Uint8Array([
+      ...nonce,
+      ...gcm(key, nonce).encrypt(legacy),
+    ])
+
+    expect(await readOfflineCache()).toBeNull()
+    expect(mockDiskFile).toBeNull()
   })
 })
