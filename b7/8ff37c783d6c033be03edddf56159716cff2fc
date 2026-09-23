@@ -1,0 +1,32 @@
+backend/FlashIdBackend/Application/Common/Services/OfflinePackageService.cs
+  h_99fca60b892ff4 100,176,185-188,217-223,271,278-289,296-300,302-307
+  s_794fff04ad9106::t_ea4d84a900044a 251,308-310
+backend/FlashIdBackend/Application/Features/Credentials/Exceptions/OfflinePackageExceptions.cs
+  h_99fca60b892ff4 3,6-7,10,13-21
+backend/FlashIdBackend/Infrastructure/Repositories/OfflinePackageRepository.cs
+  h_99fca60b892ff4 15-17,25,57
+  s_794fff04ad9106::t_e624e0ec951fda 35
+backend/FlashIdBackend/Infrastructure/Providers/ImageSharpPortraitProcessor.cs
+  h_99fca60b892ff4 30-38,47-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b78ff37c783d6c033be03edddf56159716cff2fc",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_794fff04ad9106": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c11d0b59-23c0-498a-821b-d9aa766e84f7",
+        "model": "claude-opus-5"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

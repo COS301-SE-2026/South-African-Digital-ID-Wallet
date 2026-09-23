@@ -1,0 +1,20 @@
+mobile/src/lib/offline/verify.ts
+  h_99fca60b892ff4 70
+mobile/src/lib/offline/test/offline-presentation.test.ts
+  h_99fca60b892ff4 1-79
+  h_99fca60b892ff4 80-107
+mobile/src/lib/offline/offline-presentation.ts
+  h_99fca60b892ff4 1-2,4,28-61,64,66-69,71-73,75-76,78-80,82-83,85-97
+  h_99fca60b892ff4 98-104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "649f446f251248e2276ae3da3cae140788d2d1f7",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

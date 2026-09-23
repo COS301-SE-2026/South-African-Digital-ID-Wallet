@@ -1,0 +1,18 @@
+mobile/src/lib/offline/test/offline-cache.test.ts
+  h_99fca60b892ff4 1-100
+  h_99fca60b892ff4 101-110
+mobile/src/lib/offline/offline-cache.ts
+  h_99fca60b892ff4 1-101
+  h_99fca60b892ff4 102-103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "fc4036da211198d4315443d6615129a7e55655a2",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,214 @@
+.github/workflows/mobile.yml
+  h_293a8616118f65 40,54
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/CredentialSigningKey.cs
+  h_293a8616118f65 1-4
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/EcPublicJwk.cs
+  h_293a8616118f65 1-11
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/ICredentialSigningProvider.cs
+  h_293a8616118f65 1-10
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/ISdJwtCredentialFactory.cs
+  h_293a8616118f65 1-8
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/SdJwtCredentialRequest.cs
+  h_293a8616118f65 1-40
+backend/FlashIdBackend/Application/Common/Services/SdJwtClaimNames.cs
+  h_293a8616118f65 1-95
+backend/FlashIdBackend/Application/Common/Services/SdJwtCredentialFactory.cs
+  h_293a8616118f65 1-250
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_293a8616118f65 45-47
+backend/FlashIdBackend/Domain/Entities/Credential.cs
+  h_293a8616118f65 28-46
+backend/FlashIdBackend/Infrastructure/Data/Configurations/CredentialConfiguration.cs
+  h_293a8616118f65 73-95
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_293a8616118f65 131-134
+backend/FlashIdBackend/Infrastructure/Migrations/20260919194554_AddOfflineCredentialPackage.Designer.cs
+  h_293a8616118f65 1-1451
+backend/FlashIdBackend/Infrastructure/Migrations/20260919194554_AddOfflineCredentialPackage.cs
+  h_293a8616118f65 1-102
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_293a8616118f65 270-276,293-301,311-317,331-334
+backend/FlashIdBackend/Infrastructure/Providers/LocalEs256SigningProvider.cs
+  h_293a8616118f65 1-102
+backend/FlashIdBackend/tests/AdminDashboardControllerIntegrationTests.cs
+  h_293a8616118f65 1-508
+backend/FlashIdBackend/tests/AdminDashboardServiceTests.cs
+  h_293a8616118f65 1-310
+backend/FlashIdBackend/tests/AuthControllerIntegrationTests.cs
+  h_293a8616118f65 1-634
+backend/FlashIdBackend/tests/AuthServiceDeviceTrustTests.cs
+  h_293a8616118f65 1-498
+backend/FlashIdBackend/tests/AuthServiceTests.cs
+  h_293a8616118f65 7,595-639,641-696
+backend/FlashIdBackend/tests/CrossStackFixtureTests.cs
+  h_293a8616118f65 1-222
+backend/FlashIdBackend/tests/DependencyInjectionTests.cs
+  h_293a8616118f65 13-18,55,93-122
+backend/FlashIdBackend/tests/GlobalExceptionHandlerTests.cs
+  h_293a8616118f65 1-196
+backend/FlashIdBackend/tests/LocalEs256SigningProviderTests.cs
+  h_293a8616118f65 1-226
+backend/FlashIdBackend/tests/ManageUserAccountServiceTests.cs
+  h_293a8616118f65 1-630
+backend/FlashIdBackend/tests/OfficialActivityServiceTests.cs
+  h_293a8616118f65 1-434
+backend/FlashIdBackend/tests/OfficialsControllerIntegrationTests.cs
+  h_293a8616118f65 1-700
+backend/FlashIdBackend/tests/PasswordHashingProviderTests.cs
+  h_293a8616118f65 1-49
+backend/FlashIdBackend/tests/PhysicalIdentityVerificationServiceTests.cs
+  h_293a8616118f65 1-825
+backend/FlashIdBackend/tests/SaIdMaskerTests.cs
+  h_293a8616118f65 1-46
+backend/FlashIdBackend/tests/SdJwtClaimNamesTests.cs
+  h_293a8616118f65 1-149
+backend/FlashIdBackend/tests/SdJwtCredentialFactoryTests.cs
+  h_293a8616118f65 1-409
+backend/FlashIdBackend/tests/SdJwtCredentialRequestBuilder.cs
+  h_293a8616118f65 1-87
+backend/FlashIdBackend/tests/TestData/offline-verification/cross-stack-fixture.json
+  h_293a8616118f65 1-27
+backend/FlashIdBackend/tests/TestSigningProvider.cs
+  h_293a8616118f65 1-40
+backend/FlashIdBackend/tests/TrustedDevicesControllerIntegrationTests.cs
+  h_293a8616118f65 1-428
+backend/FlashIdBackend/tests/UpdatePasswordControllerIntegrationsTests.cs
+  h_293a8616118f65 1-228
+backend/FlashIdBackend/tests/UpdatePasswordServiceTests.cs
+  h_293a8616118f65 1-146
+backend/FlashIdBackend/tests/UserEntityTests.cs
+  h_293a8616118f65 1-278
+codecov.yml
+  h_293a8616118f65 3-4,6-8,11-16
+docs/demo4/functional-requirements-v4.md
+  h_293a8616118f65 1-600
+docs/demo4/offline-verification/decisions.md
+  h_293a8616118f65 1-341
+docs/demo4/offline-verification/wire-format.md
+  h_293a8616118f65 1-222
+mobile/package.json
+  h_293a8616118f65 75
+mobile/src/components/molecules/audit-log-row/test/audit-log-row.test.tsx
+  h_293a8616118f65 1-55
+mobile/src/components/molecules/countdown-ring/test/countdown-ring.test.tsx
+  h_293a8616118f65 1-30
+mobile/src/components/molecules/credential-card/test/credential-card.test.tsx
+  h_293a8616118f65 1-37
+mobile/src/components/molecules/credential-field-row/test/credential-field-row.test.tsx
+  h_293a8616118f65 1-12
+mobile/src/components/molecules/field-toggle-row/test/field-toggle-row.test.tsx
+  h_293a8616118f65 1-30
+mobile/src/components/molecules/linked-device-row/test/linked-device-row.test.tsx
+  h_293a8616118f65 1-35
+mobile/src/components/molecules/requirement-list/test/requirement-list.test.tsx
+  h_293a8616118f65 1-36
+mobile/src/components/molecules/segmented-tabs/test/segmented-tabs.test.tsx
+  h_293a8616118f65 1-32
+mobile/src/components/molecules/settings-row/test/settings-row.test.tsx
+  h_293a8616118f65 1-31
+mobile/src/components/molecules/stat-tile/test/stat-tile.test.tsx
+  h_293a8616118f65 1-49
+mobile/src/components/organisms/activity-filter-sheet/test/activity-filter-sheet.test.tsx
+  h_293a8616118f65 1-52
+mobile/src/components/organisms/activity-timeline/test/activity-timeline.test.tsx
+  h_293a8616118f65 1-55
+mobile/src/components/organisms/audit-log-filter-sheet/test/audit-log-filter-sheet.test.tsx
+  h_293a8616118f65 1-81
+mobile/src/components/organisms/audit-log-list/test/audit-log-list.test.tsx
+  h_293a8616118f65 1-85
+mobile/src/components/organisms/credential-deck/test/credential-deck.test.tsx
+  h_293a8616118f65 1-108
+mobile/src/components/organisms/disclosure-modal/test/disclosure-modal.test.tsx
+  h_293a8616118f65 1-106
+mobile/src/components/organisms/info-sheet/test/info-sheet.test.tsx
+  h_293a8616118f65 1-40
+mobile/src/components/organisms/official-dashboard-header/test/official-dashboard-header.test.tsx
+  h_293a8616118f65 1-33
+mobile/src/components/organisms/official-stats-row/test/official-stats-row.test.tsx
+  h_293a8616118f65 1-30
+mobile/src/components/organisms/password-form/test/password-form.test.tsx
+  h_293a8616118f65 1-104
+mobile/src/components/organisms/profile-header/test/profile-header.test.tsx
+  h_293a8616118f65 1-20
+mobile/src/components/organisms/qr-camera-scanner/test/qr-camera-scanner.test.tsx
+  h_293a8616118f65 1-103
+mobile/src/components/organisms/register-form/test/register-form.test.tsx
+  h_293a8616118f65 1-149
+mobile/src/components/organisms/scan-result-card/test/scan-result-card.test.tsx
+  h_293a8616118f65 1-50
+mobile/src/components/organisms/settings-section/test/settings-section.test.tsx
+  h_293a8616118f65 1-38
+mobile/src/components/organisms/settings-sheet/test/settings-sheet.test.tsx
+  h_293a8616118f65 1-46
+mobile/src/components/organisms/verify-email-form/test/verify-email-form.test.tsx
+  h_293a8616118f65 1-87
+mobile/src/components/templates/detail-screen/test/detail-screen.test.tsx
+  h_293a8616118f65 1-48
+mobile/src/components/templates/wallet-screen/test/wallet-screen.test.tsx
+  h_293a8616118f65 1-42
+mobile/src/components/utility/test/biometric-lock-overlay.test.tsx
+  h_293a8616118f65 1-121
+mobile/src/hooks/test/use-activity-history.test.tsx
+  h_293a8616118f65 1-118
+mobile/src/hooks/test/use-audit-log.test.tsx
+  h_293a8616118f65 1-165
+mobile/src/hooks/test/use-biometric-preference.test.tsx
+  h_293a8616118f65 1-129
+mobile/src/hooks/test/use-biometric-unlock.test.tsx
+  h_293a8616118f65 1-93
+mobile/src/hooks/test/use-countdown.test.tsx
+  h_293a8616118f65 1-52
+mobile/src/hooks/test/use-official-dashboard.test.tsx
+  h_293a8616118f65 1-68
+mobile/src/hooks/test/use-profile.test.tsx
+  h_293a8616118f65 1-153
+mobile/src/hooks/test/use-qr-token.test.tsx
+  h_293a8616118f65 1-67
+mobile/src/hooks/test/use-scan-credential.test.tsx
+  h_293a8616118f65 1-66
+mobile/src/hooks/test/use-sign-out.test.tsx
+  h_293a8616118f65 1-78
+mobile/src/hooks/test/use-wallet.test.tsx
+  h_293a8616118f65 1-81
+mobile/src/lib/test/api.test.ts
+  h_293a8616118f65 1-54
+mobile/src/lib/test/format-date.extra.test.ts
+  h_293a8616118f65 1-85
+mobile/src/services/audit-log-service/test/audit-log-dto.test.ts
+  h_293a8616118f65 1-80
+mobile/src/services/audit-log-service/test/audit-log-service.test.ts
+  h_293a8616118f65 1-92
+mobile/src/services/official-service/test/official-service.test.ts
+  h_293a8616118f65 1-106
+mobile/src/services/profile-service/test/profile-errors.test.ts
+  h_293a8616118f65 1-94
+mobile/src/services/profile-service/test/profile-service.test.ts
+  h_293a8616118f65 1-119
+mobile/src/services/qr-service/test/qr-service.test.ts
+  h_293a8616118f65 1-80
+mobile/src/services/register-service/test/register-service.test.ts
+  h_293a8616118f65 1-114
+mobile/src/services/register-service/test/schema.test.ts
+  h_293a8616118f65 1-62
+mobile/src/services/scan-service/test/parse-scanned-token.test.ts
+  h_293a8616118f65 1-32
+mobile/src/services/scan-service/test/scan-service.test.ts
+  h_293a8616118f65 1-78
+mobile/src/test/routes.test.tsx
+  h_293a8616118f65 1-93
+mobile/src/test/utils/render-with-providers.tsx
+  h_293a8616118f65 35-56
+mobile/src/theme/test/theme.test.ts
+  h_293a8616118f65 1-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "73d6bcefae3b886d801093f783ec30ef1758213d",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
