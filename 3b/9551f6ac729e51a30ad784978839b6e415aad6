@@ -1,0 +1,18 @@
+mobile/src/components/organisms/qr-code-card/test/qr-code-card.test.tsx
+  h_99fca60b892ff4 1-124
+mobile/src/components/organisms/qr-code-card/qr-code-card.tsx
+  h_99fca60b892ff4 1,14-15,23,25-26,29-49,65,67-68,81-94
+mobile/src/components/organisms/qr-code-card/types.ts
+  h_99fca60b892ff4 6-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "3b9551f6ac729e51a30ad784978839b6e415aad6",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
