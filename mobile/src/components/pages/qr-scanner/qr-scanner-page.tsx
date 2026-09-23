@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react'
 import { useFocusEffect, useRouter } from 'expo-router'
 import { HelpCircle, ShieldAlert, Zap, ZapOff } from 'lucide-react-native'
 import { ActivityIndicator, View } from 'react-native'
-
 import { Button, Card, IconTile, Text } from '@/components/atoms'
 import { IconButton } from '@/components/molecules'
 import {
@@ -11,7 +10,16 @@ import {
   ScannerHelpModal,
 } from '@/components/organisms'
 import { DetailScreen, ScannerScreen } from '@/components/templates'
-import { useScanCredential } from '@/hooks'
+import {
+  useNetworkStatus,
+  useOfflineScan,
+  useScanCredential,
+  useVerifierTrust,
+} from '@/hooks'
+import {
+  describeVerificationFailure,
+  toOfflineScanDisplay,
+} from '@/lib/offline/offline-scan-display'
 import { parseScannedToken, resolveScanError } from '@/services/scan-service'
 import { colors } from '@/theme/colors'
 
@@ -22,9 +30,15 @@ export const QrScannerPage = () => {
   const [isHelpVisible, setIsHelpVisible] = useState(false)
   const [isTorchOn, setIsTorchOn] = useState(false)
   const { isResolving, reset, resolve, result } = useScanCredential()
+  const { isOffline } = useNetworkStatus()
+  const { trust } = useVerifierTrust()
+  const {
+    addFrame,
+    progress: offlineProgress,
+    reset: resetOfflineScan,
+    result: offlineResult,
+  } = useOfflineScan(trust)
 
-  // The scanner lives in a tab, so the camera would keep running and the
-  // disclosed fields would stay on screen after the user moves away.
   useFocusEffect(
     useCallback(() => {
       setIsFocused(true)
@@ -32,12 +46,20 @@ export const QrScannerPage = () => {
         setIsFocused(false)
         setErrorMessage('')
         reset()
+        resetOfflineScan()
       }
-    }, [reset])
+    }, [reset, resetOfflineScan])
   )
 
   const handleScan = useCallback(
     (rawText: string) => {
+      // Offline frames are collected until the whole presentation has arrived, then verified on
+      // this phone with no network call.
+      if (rawText.startsWith('FID1:')) {
+        addFrame(rawText)
+        return
+      }
+
       const parsed = parseScannedToken(rawText)
       if (!parsed) {
         setErrorMessage('This is not a valid FlashID QR code.')
@@ -47,17 +69,71 @@ export const QrScannerPage = () => {
         setErrorMessage('Scanning official badges is not available yet.')
         return
       }
+      // 3.5a: an online code needs the server, so without signal say what to do instead.
+      if (isOffline) {
+        setErrorMessage(
+          'No connection. Ask the citizen to show their offline code.'
+        )
+        return
+      }
       resolve(parsed.token, {
         onError: (error) => setErrorMessage(resolveScanError(error)),
       })
     },
-    [resolve]
+    [addFrame, isOffline, resolve]
   )
 
   const handleScanAgain = useCallback(() => {
     setErrorMessage('')
     reset()
   }, [reset])
+
+  // Derived rather than stored, so it can never drift from the verification result it describes.
+  const displayedError =
+    errorMessage ||
+    (offlineResult && !offlineResult.ok
+      ? describeVerificationFailure(offlineResult.code)
+      : '')
+
+  if (offlineResult?.ok) {
+    const display = toOfflineScanDisplay(
+      offlineResult.vct,
+      offlineResult.claims
+    )
+
+    return (
+      <DetailScreen
+        action={
+          <Button
+            label="Scan another code"
+            onPress={handleScanAgain}
+            testID="scan-again-button"
+          />
+        }
+        onBack={handleScanAgain}
+        testID="offline-scan-result-screen"
+        title="Verification result"
+      >
+        <ScanResultCard
+          credentialType={display.credentialType}
+          disclosedFields={display.disclosedFields}
+        />
+        <Text variant="caption" className="text-center">
+          Verified offline on this phone. Only the fields the holder chose to
+          share are shown.
+        </Text>
+        {offlineResult.warnings.map((warning) => (
+          <Text
+            key={warning}
+            variant="caption"
+            className="text-center text-warning-orange"
+          >
+            {warning}
+          </Text>
+        ))}
+      </DetailScreen>
+    )
+  }
 
   if (result) {
     return (
@@ -84,7 +160,7 @@ export const QrScannerPage = () => {
     )
   }
 
-  if (errorMessage) {
+  if (displayedError) {
     return (
       <DetailScreen
         action={
@@ -102,7 +178,7 @@ export const QrScannerPage = () => {
           <IconTile Icon={ShieldAlert} size="lg" tone="soft-red" />
           <Text variant="h3">Verification failed</Text>
           <Text variant="sub-sm" className="text-center">
-            {errorMessage}
+            {displayedError}
           </Text>
         </Card>
       </DetailScreen>
@@ -150,6 +226,17 @@ export const QrScannerPage = () => {
             <ActivityIndicator color={colors.primaryGreen} size="large" />
             <Text variant="sub-sm" className="text-clean-white">
               Verifying credential...
+            </Text>
+          </View>
+        ) : null}
+        {offlineProgress ? (
+          <View
+            className="absolute bottom-10 left-0 right-0 items-center"
+            testID="offline-scan-progress"
+          >
+            <Text variant="sub-sm" className="text-clean-white">
+              Receiving offline code: {offlineProgress.received} of{' '}
+              {offlineProgress.total}
             </Text>
           </View>
         ) : null}
