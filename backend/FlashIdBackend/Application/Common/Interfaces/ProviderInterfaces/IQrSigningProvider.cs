@@ -2,6 +2,6 @@ namespace Application.Common.Interfaces.ProviderInterfaces;
 
 public interface IQrSigningProvider
 {
-    string Sign(string payload);
-    bool Verify(string payload, string signature);
+    Task<QrSigningKey> GetActiveKeyAsync(CancellationToken cancellationToken);
+    Task<byte[]> SignAsync(string keyId, byte[] signingInput, CancellationToken cancellationToken);
 }

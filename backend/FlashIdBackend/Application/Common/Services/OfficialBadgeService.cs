@@ -15,11 +15,13 @@ public class OfficialBadgeService : IOfficialBadgeService
 
     private readonly IOfficialRepository _officialRepository;
     private readonly IQrSigningProvider _qrSigningProvider;
+    private readonly IQrSignatureVerifier _qrSignatureVerifier;
 
-    public OfficialBadgeService(IOfficialRepository officialRepository, IQrSigningProvider qrSigningProvider)
+    public OfficialBadgeService(IOfficialRepository officialRepository, IQrSigningProvider qrSigningProvider, IQrSignatureVerifier qrSignatureVerifier)
     {
         _officialRepository = officialRepository;
         _qrSigningProvider = qrSigningProvider;
+        _qrSignatureVerifier = qrSignatureVerifier;
     }
 
     public async Task<GenerateBadgeTokenResponseDto> GenerateBadgeTokenAsync(Guid userId)
@@ -40,12 +42,17 @@ public class OfficialBadgeService : IOfficialBadgeService
         };
 
         var payloadJson = JsonSerializer.Serialize(payload);
-        var signature = _qrSigningProvider.Sign(payloadJson);
+        var payloadBytes = Encoding.UTF8.GetBytes(payloadJson);
+
+        var activeKey = await _qrSigningProvider.GetActiveKeyAsync(CancellationToken.None);
+        var signatureBytes = await _qrSigningProvider.SignAsync(activeKey.KeyId, payloadBytes, CancellationToken.None);
 
         var envelope = new BadgeEnvelope
         {
-            Payload = Convert.ToBase64String(Encoding.UTF8.GetBytes(payloadJson)),
-            Signature = signature,
+            Payload = Convert.ToBase64String(payloadBytes),
+            Signature = Convert.ToBase64String(signatureBytes),
+            Kid = activeKey.KeyId,
+            Alg = activeKey.Algorithm,
         };
 
         var token = Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(envelope)));
@@ -66,10 +73,11 @@ public class OfficialBadgeService : IOfficialBadgeService
         {
             var envelopeJson = Encoding.UTF8.GetString(Convert.FromBase64String(token));
             envelope = JsonSerializer.Deserialize<BadgeEnvelope>(envelopeJson) ?? throw new InvalidBadgeTokenException();
-            var payloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(envelope.Payload));
+            var payloadBytes = Convert.FromBase64String(envelope.Payload);
+            var payloadJson = Encoding.UTF8.GetString(payloadBytes);
+            var signatureBytes = Convert.FromBase64String(envelope.Signature);
 
-            if (!_qrSigningProvider.Verify(payloadJson, envelope.Signature)) throw new InvalidBadgeTokenException();
-
+            if (!await _qrSignatureVerifier.VerifyAsync(envelope.Kid, payloadBytes, signatureBytes, CancellationToken.None)) throw new InvalidBadgeTokenException();
             payload = JsonSerializer.Deserialize<BadgePayload>(payloadJson) ?? throw new InvalidBadgeTokenException();
         }
         catch (Exception n) when (n is FormatException or JsonException)
@@ -113,5 +121,7 @@ public class OfficialBadgeService : IOfficialBadgeService
     {
         public string Payload { get; set; } = string.Empty;
         public string Signature { get; set; } = string.Empty;
+        public string Kid { get; set; } = string.Empty;
+        public string Alg { get; set; } = string.Empty;
     }
 }
