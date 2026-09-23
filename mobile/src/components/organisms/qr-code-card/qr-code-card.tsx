@@ -56,7 +56,8 @@ export const QrCodeCard = ({
         <QRCode
           backgroundColor={colors.white}
           color={colors.black}
-          logo={require('../../../../assets/icon.png')}
+          // logo covers modules, and dense offline frames need every one of them to scan at 8fps
+          logo={isOffline ? undefined : require('../../../../assets/icon.png')}
           logoBackgroundColor={colors.white}
           logoBorderRadius={12}
           logoSize={46}
@@ -93,13 +94,15 @@ export const QrCodeCard = ({
         </Text>
       )}
 
-      <View className="items-center gap-2">
-        <Text variant="caption">This code expires in</Text>
-        <CountdownRing
-          secondsRemaining={secondsRemaining}
-          totalSeconds={QR_LIFETIME_SECONDS}
-        />
-      </View>
+      {isOffline ? null : (
+        <View className="items-center gap-2">
+          <Text variant="caption">This code expires in</Text>
+          <CountdownRing
+            secondsRemaining={secondsRemaining}
+            totalSeconds={QR_LIFETIME_SECONDS}
+          />
+        </View>
+      )}
 
       <View className="w-full gap-3">
         <Button

@@ -121,4 +121,12 @@ describe('<QrCodeCard/>', () => {
 
     expect(qrCodeMock).toHaveBeenCalledTimes(1)
   })
+
+  it('hides the countdown in offline mode', async () => {
+    await render(
+      <QrCodeCard {...baseProps} offlineFrames={['DID1:P:abcdef:0/1:only ']} />
+    )
+
+    expect(screen.queryByText('This code expires in')).toBeNull()
+  })
 })

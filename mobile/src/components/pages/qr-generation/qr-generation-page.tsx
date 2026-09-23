@@ -1,20 +1,19 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useRouter } from 'expo-router'
 import { ShieldAlert } from 'lucide-react-native'
 import { ActivityIndicator, View } from 'react-native'
-
 import { Button, Card, IconTile, Text } from '@/components/atoms'
 import { DisclosureModal, QrCodeCard } from '@/components/organisms'
 import { DetailScreen } from '@/components/templates'
 import {
-  readOfflineCache,
-  type OfflineCache,
-} from '@/lib/offline/offline-cache'
-import { createOfflinePresentation } from '@/lib/offline/offline-presentation'
+  createOfflinePresentation,
+  isPackageUsable,
+} from '@/lib/offline/offline-presentation'
 import { splitPayloadFrames } from '@/lib/offline/qr-frames'
 import {
   useCountdown,
   useNetworkStatus,
+  useOfflinePackage,
   useQrToken,
   useWalletCredential,
 } from '@/hooks'
@@ -31,10 +30,10 @@ export const QrGenerationPage = ({ credentialId }: QrGenerationPageProps) => {
   const router = useRouter()
   const { credential, isPending } = useWalletCredential(credentialId)
   const { isOffline } = useNetworkStatus()
+  const { offlinePackage, isPreparing } = useOfflinePackage(credentialId)
 
   const [disclosedFields, setDisclosedFields] = useState<string[]>([])
   const [isDisclosureOpen, setIsDisclosureOpen] = useState(true)
-  const [offlineCache, setOfflineCache] = useState<OfflineCache | null>(null)
   const [offlineFrames, setOfflineFrames] = useState<readonly string[]>([])
   const [isOfflineMode, setIsOfflineMode] = useState(false)
   const [offlineError, setOfflineError] = useState<string | null>(null)
@@ -42,20 +41,6 @@ export const QrGenerationPage = ({ credentialId }: QrGenerationPageProps) => {
   const { error, generate, isGenerating, token } = useQrToken()
   const secondsRemaining = useCountdown(token?.expiresAt)
   const credentialType = toQrCredentialType(credential?.type)
-
-  useEffect(() => {
-    let cancelled = false
-
-    readOfflineCache().then((cache) => {
-      if (!cancelled) {
-        setOfflineCache(cache)
-      }
-    })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
   const handleConfirm = useCallback(
     (selectedOptionalFields: string[]) => {
@@ -87,29 +72,27 @@ export const QrGenerationPage = ({ credentialId }: QrGenerationPageProps) => {
   const handleShowOfflineCode = useCallback(() => {
     setOfflineError(null)
 
-    const cachedPackage = offlineCache?.package
-
-    if (!cachedPackage) {
-      setOfflineError('Connect once to prepare offline verification.')
-      return
-    }
-
-    const expiresAt = Date.parse(cachedPackage.expiresAt)
-
-    if (Number.isNaN(expiresAt) || expiresAt <= Date.now()) {
-      setOfflineError('Connect once to prepare offline verification.')
+    if (
+      !offlinePackage ||
+      !isPackageUsable(offlinePackage, Math.floor(Date.now() / 1000))
+    ) {
+      setOfflineError(
+        isPreparing
+          ? 'Preparing your offline code. Try again in a moment.'
+          : 'Connect once to prepare offline verification.'
+      )
       return
     }
 
     try {
       const presentation = createOfflinePresentation(
-        cachedPackage,
+        offlinePackage,
         disclosedFields
       )
 
-      const frames = splitPayloadFrames(presentation)
-
-      setOfflineFrames(frames.map((frame) => frame.encoded))
+      setOfflineFrames(
+        splitPayloadFrames(presentation).map((frame) => frame.encoded)
+      )
       setIsOfflineMode(true)
     } catch (offlinePresentationError) {
       setOfflineError(
@@ -118,7 +101,7 @@ export const QrGenerationPage = ({ credentialId }: QrGenerationPageProps) => {
           : 'Offline code is not ready.'
       )
     }
-  }, [disclosedFields, offlineCache])
+  }, [disclosedFields, isPreparing, offlinePackage])
 
   const handleShowOnlineCode = useCallback(() => {
     setOfflineFrames([])
