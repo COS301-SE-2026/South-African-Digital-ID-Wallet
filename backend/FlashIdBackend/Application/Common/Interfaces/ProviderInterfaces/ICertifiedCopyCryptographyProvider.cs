@@ -1,3 +1,5 @@
+using Application.Features.CertifiedCredentialCopies.Models;
+
 namespace Application.Common.Interfaces.ProviderInterfaces;
 
 public interface ICertifiedCopyCryptographyProvider
@@ -6,7 +8,7 @@ public interface ICertifiedCopyCryptographyProvider
 
     string HashVerificationToken(string token);
 
-    string HashCredentialSnapshot(string canonicalSnapshot);
+    string HashCredentialSnapshot(CertifiedCredentialSnapshot snapshot);
 
     string HashDocument(byte[] documentBytes);
 

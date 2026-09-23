@@ -1,6 +1,8 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using Application.Common.Interfaces.ProviderInterfaces;
+using Application.Features.CertifiedCredentialCopies.Models;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace Infrastructure.Providers;
@@ -22,9 +24,10 @@ public class CertifiedCopyCryptographyProvider : ICertifiedCopyCryptographyProvi
         return ComputeSha256Hash(tokenBytes);
     }
 
-    public string HashCredentialSnapshot(string canonicalSnapshot)
+    public string HashCredentialSnapshot(CertifiedCredentialSnapshot snapshot)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(canonicalSnapshot);
+        ArgumentNullException.ThrowIfNull(snapshot);
+        var canonicalSnapshot = CreateCanonicalSnapshot(snapshot);
         var snapshotBytes = Encoding.UTF8.GetBytes(canonicalSnapshot);
         return ComputeSha256Hash(snapshotBytes);
     }
@@ -74,9 +77,53 @@ public class CertifiedCopyCryptographyProvider : ICertifiedCopyCryptographyProvi
             expectedHashBytes);
     }
 
+    private static string CreateCanonicalSnapshot(CertifiedCredentialSnapshot snapshot)
+    {
+        return string.Join("|",
+            $"credentialId={snapshot.CredentialId:D}",
+            $"credentialType={Normalize(snapshot.CredentialType)}",
+            $"issuedBy={Normalize(snapshot.IssuedBy)}",
+            $"issueDate={FormatDate(snapshot.IssueDate)}",
+            $"fullName={Normalize(snapshot.FullName)}",
+            $"idNumber={Normalize(snapshot.IdNumber)}",
+            $"dateOfBirth={FormatNullableDate(snapshot.DateOfBirth)}",
+            $"citizenship={Normalize(snapshot.Citizenship)}",
+            $"countryOfBirth={Normalize(snapshot.CountryOfBirth)}",
+            $"nationality={Normalize(snapshot.Nationality)}",
+            $"licenseNumber={Normalize(snapshot.LicenseNumber)}",
+            $"licenseCode={Normalize(snapshot.LicenseCode)}",
+            $"restrictions={Normalize(snapshot.Restrictions)}",
+            $"expiryDate={FormatNullableDate(snapshot.ExpiryDate)}",
+            $"countryOfIssue={Normalize(snapshot.CountryOfIssue)}"
+        );
+    }
+
+    private static string Normalize(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        return value.Trim()
+            .Replace("\\", "\\\\")
+            .Replace("|", "\\|")
+            .Replace("=", "\\=");
+    }
+
     private static string ComputeSha256Hash(byte[] data)
     {
         var hashBytes = SHA256.HashData(data);
         return Convert.ToHexString(hashBytes);
+    }
+
+    private static string FormatDate(DateTime value)
+    {
+        return value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+    }
+
+    private static string FormatNullableDate(DateTime? value)
+    {
+        return value?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? string.Empty;
     }
 }
