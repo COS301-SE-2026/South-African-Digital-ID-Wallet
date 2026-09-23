@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Application.Features.Auth.Exceptions;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.DataProtection;
+using Application.Features.FraudDetection.DTOs;
+using Presentation.Security;
 
 namespace Presentation.Controllers;
 
@@ -57,7 +59,7 @@ public class AuthController : ControllerBase
 
     // Login is anonymous — no [Authorize] needed because the user does not have a token yet.
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequestDto request, [FromHeader(Name = "X-Client")] string? client, CancellationToken cancellationToken)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request, [FromHeader(Name = "X-Client")] string? client, [FromServices] IFraudDetectionService fraudDetectionService, CancellationToken cancellationToken)
     {
         try
         {
@@ -89,6 +91,9 @@ public class AuthController : ControllerBase
                 _logger.LogError("Login completed without an access token for {Email}", request.Email);
                 return StatusCode(StatusCodes.Status500InternalServerError, new { error = "The login could not be completed." });
             }
+
+            result.SecurityAlert = await RecordSecurityEventAsync(fraudDetectionService, result.UserId,
+                Domain.Enums.SecurityEventType.Login, deviceToken, cancellationToken);
 
             // The token is set in an HttpOnly cookie so JavaScript cannot read it.
             // Secure = true in production forces HTTPS; in development HTTP is allowed.
@@ -134,6 +139,7 @@ public class AuthController : ControllerBase
     [HttpPost("verify-device")]
     public async Task<IActionResult> VerifyDevice([FromBody] VerifyDeviceRequestDto request,
         [FromHeader(Name = "X-Client")] string? client,
+        [FromServices] IFraudDetectionService fraudDetectionService,
         CancellationToken cancellationToken)
     {
         try
@@ -149,6 +155,9 @@ public class AuthController : ControllerBase
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new { error = "The login could not be completed." });
             }
+
+            result.SecurityAlert = await RecordSecurityEventAsync(fraudDetectionService, result.UserId,
+                Domain.Enums.SecurityEventType.DeviceVerified, result.DeviceToken ?? deviceToken, cancellationToken);
 
             var accessTokenOptions = new CookieOptions
             {
@@ -323,6 +332,14 @@ public class AuthController : ControllerBase
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
+    private async Task<SecurityAlertNoticeDto?> RecordSecurityEventAsync(IFraudDetectionService fraudDetectionService,
+        Guid userId, Domain.Enums.SecurityEventType eventType, string? deviceToken, CancellationToken cancellationToken)
+    {
+        var context = SecurityEventContextFactory.Create(HttpContext, userId, eventType, deviceToken);
+        var assessment = await fraudDetectionService.RecordSecurityEventAsync(context, cancellationToken);
+        return assessment.Notice;
+    }
+
     private string? ReadDeviceToken()
     {
         if (Request.Headers.TryGetValue(DeviceHeaderName, out var header)

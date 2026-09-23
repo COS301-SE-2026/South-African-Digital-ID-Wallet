@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Application.Common.Interfaces.ProviderInterfaces;
@@ -49,7 +50,24 @@ public class IpGeolocationProvider : IIpGeolocationProvider
         {
             City = cityElement.GetString(),
             Country = countryElement.GetString(),
+            Latitude = ReadCoordinate(location, "latitude"),
+            Longitude = ReadCoordinate(location, "longitude"),
         };
 
+    }
+
+    private static double? ReadCoordinate(JsonElement location, string propertyName)
+    {
+        if (!location.TryGetProperty(propertyName, out var element))
+        {
+            return null;
+        }
+
+        return element.ValueKind switch
+        {
+            JsonValueKind.Number when element.TryGetDouble(out var number) => number,
+            JsonValueKind.String when double.TryParse(element.GetString(), NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) => parsed,
+            _ => null,
+        };
     }
 }

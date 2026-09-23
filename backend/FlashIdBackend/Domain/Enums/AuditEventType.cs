@@ -32,4 +32,11 @@ public enum AuditEventType
     CitizenCredentialsUpdated,
     CitizenCredentialsSyncFailed,
     DeviceVerificationResent,
+    ImpossibleTravelDetected,
+    SuspiciousActivityDetected,
+    QrGenerationRestricted,
+    QrGenerationBlocked,
+    FraudAlertSecured,
+    FraudAlertDismissed,
+    SecuritySettingsUpdated,
 }

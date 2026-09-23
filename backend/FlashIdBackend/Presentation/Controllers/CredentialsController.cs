@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.RateLimiting;
+using Application.Features.FraudDetection.Exceptions;
+using Presentation.Security;
 
 namespace Presentation.Controllers;
 
@@ -83,7 +85,8 @@ public class CredentialsController : ControllerBase
     [HttpPost("{credentialId}/qr-token")]
     public async Task<IActionResult> GenerateQr(
         Guid credentialId,
-        [FromBody] GenerateQrRequestDto request)
+        [FromBody] GenerateQrRequestDto request,
+        [FromServices] IFraudDetectionService fraudDetectionService)
     {
         try
         {
@@ -94,6 +97,11 @@ public class CredentialsController : ControllerBase
             }
 
             var userId = Guid.Parse(userIdClaim);
+
+            await fraudDetectionService.AssessQrGenerationAsync(
+                SecurityEventContextFactory.Create(HttpContext, userId, Domain.Enums.SecurityEventType.QrGenerated),
+                HttpContext.RequestAborted);
+
             var result = await _qrService.GenerateQrAsync(credentialId, userId, request);
             return Ok(result);
         }
@@ -112,6 +120,10 @@ public class CredentialsController : ControllerBase
         catch (InvalidDisclosedFieldsException ex)
         {
             return BadRequest(new { error = ex.Message });
+        }
+        catch (QrGenerationRestrictedException ex)
+        {
+            return StatusCode(403, new { error = ex.Message, code = ex.Code, restrictedUntil = ex.RestrictedUntil, alertId = ex.AlertId });
         }
         catch (Exception)
         {
