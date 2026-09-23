@@ -14,6 +14,7 @@ using Application.Common.Services;
 using Infrastructure.Repositories;
 using System.Security.Claims;
 using Microsoft.Azure.Cosmos;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,8 @@ if (!builder.Environment.IsEnvironment("Testing"))
 builder.Services.AddInfrastructure();
 
 builder.Services.AddApplication();
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -218,7 +221,6 @@ app.UseCors(FrontendCorsPolicy);
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
 
 app.MapHealthChecks("/health");
 app.MapControllers();

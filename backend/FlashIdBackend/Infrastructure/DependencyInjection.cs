@@ -135,6 +135,7 @@ public static class DependencyInjection
 
         services.AddScoped<ICertifiedCredentialCopyRepository, CertifiedCredentialCopyRepository>();
         services.AddSingleton<ICertifiedCopyCryptographyProvider, CertifiedCopyCryptographyProvider>();
+        services.AddSingleton<ICertifiedCopyPdfProvider, CertifiedCopyPdfProvider>();
         return services;
     }
 }
