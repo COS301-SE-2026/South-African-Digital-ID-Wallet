@@ -32,4 +32,6 @@ public enum AuditEventType
     CitizenCredentialsUpdated,
     CitizenCredentialsSyncFailed,
     DeviceVerificationResent,
+    OfflinePackageMinted,
+    OfflinePackageMintFailed,
 }

@@ -42,6 +42,10 @@ public static class DependencyInjection
         services.AddSingleton<CredentialUpdateMapper>();
         services.AddScoped<IGovAdminAuditLogService, GovAdminAuditLogService>();
         services.AddScoped<IPhysicalIdentityVerificationService, PhysicalIdentityVerificationService>();
+        services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+        services.AddSingleton(TimeProvider.System);
+        services.AddScoped<ISdJwtCredentialFactory, SdJwtCredentialFactory>();
+        services.AddScoped<IOfflinePackageService, OfflinePackageService>();
         return services;
     }
 }

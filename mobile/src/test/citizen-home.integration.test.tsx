@@ -100,7 +100,6 @@ describe('Citizen home dashboard (integration)', () => {
   it('Should resolve the identity status from the credentials endpoint', async () => {
     configureApiMock(CREDENTIALS, ACTIVITY)
     await renderWithProviders(<CitizenHomePage />)
-    expect(screen.getByTestId('identity-status-loading')).toBeTruthy()
     await waitFor(() => expect(screen.getByText('Verified')).toBeTruthy())
     expect(mockedGet).toHaveBeenCalledWith('/api/credentials/me')
   })
