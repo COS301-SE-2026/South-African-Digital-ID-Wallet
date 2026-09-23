@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { RefreshCw } from 'lucide-react-native'
 import { View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
@@ -10,6 +11,8 @@ import { colors } from '@/theme/colors'
 import type { QrCodeCardProps } from './types'
 
 const QR_SIZE = 236
+const OFFLINE_FRAME_RATE = 8
+const OFFLINE_FRAME_INTERVAL_MS = 1000 / OFFLINE_FRAME_RATE
 
 export const QrCodeCard = ({
   onCancel,
@@ -17,8 +20,32 @@ export const QrCodeCard = ({
   secondsRemaining,
   testID = 'qr-code-card',
   token,
+  offlineFrames = [],
 }: QrCodeCardProps) => {
+  const [frameIndex, setFrameIndex] = useState(0)
+  const isOffline = offlineFrames.length > 0
   const isExpired = secondsRemaining <= 0
+
+  useEffect(() => {
+    if (!isOffline || offlineFrames.length <= 1) {
+      return
+    }
+
+    const interval = setInterval(() => {
+      setFrameIndex((currentIndex) => (currentIndex + 1) % offlineFrames.length)
+    }, OFFLINE_FRAME_INTERVAL_MS)
+
+    return () => clearInterval(interval)
+  }, [isOffline, offlineFrames.length])
+
+  const currentFrameIndex =
+    isOffline && offlineFrames.length > 0
+      ? frameIndex % offlineFrames.length
+      : 0
+
+  const qrValue = isOffline
+    ? (offlineFrames[currentFrameIndex] ?? '')
+    : (token ?? '')
 
   return (
     <View
@@ -35,9 +62,10 @@ export const QrCodeCard = ({
           logoSize={46}
           quietZone={12}
           size={QR_SIZE}
-          value={token}
+          value={qrValue}
         />
-        {isExpired ? (
+
+        {!isOffline && isExpired ? (
           <View
             className="absolute inset-0 items-center justify-center bg-clean-white/90"
             testID="qr-expired-overlay"
@@ -50,9 +78,20 @@ export const QrCodeCard = ({
         ) : null}
       </View>
 
-      <Text variant="sub-md" className="text-center text-text-primary">
-        Present this QR code to verify your identity
-      </Text>
+      {isOffline ? (
+        <View className="items-center gap-1" testID="offline-frame-status">
+          <Text variant="sub-md" className="text-center text-text-primary">
+            Showing offline verification code
+          </Text>
+          <Text variant="caption" testID="offline-frame-progress">
+            Frame {currentFrameIndex + 1} of {offlineFrames.length}
+          </Text>
+        </View>
+      ) : (
+        <Text variant="sub-md" className="text-center text-text-primary">
+          Present this QR code to verify your identity
+        </Text>
+      )}
 
       <View className="items-center gap-2">
         <Text variant="caption">This code expires in</Text>
