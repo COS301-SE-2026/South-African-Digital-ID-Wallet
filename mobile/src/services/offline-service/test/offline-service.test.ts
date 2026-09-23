@@ -4,8 +4,14 @@ import {
   writeOfflineCache,
   type OfflineCache,
 } from '@/lib/offline/offline-cache'
-
 import offlineService from '../offline-service'
+import { base64urlnopad } from '@scure/base'
+
+const encodeJson = (value: unknown) =>
+  base64urlnopad.encode(new TextEncoder().encode(JSON.stringify(value)))
+
+const credentialExpiringAt = (exp: number) =>
+  `${encodeJson({ alg: 'ES256' })}.${encodeJson({ vct: 'urn:flashid:drivers-license:1', exp })}.signature`
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -28,7 +34,7 @@ const readOfflineCacheMock = readOfflineCache as jest.Mock
 const writeOfflineCacheMock = writeOfflineCache as jest.Mock
 
 const packageResponse = {
-  issuerSignedCredential: 'issuer.jwt.signature',
+  issuerSignedCredential: credentialExpiringAt(1_800_000_000),
   disclosures: {
     full_name: 'disclosure-value',
   },
@@ -53,7 +59,7 @@ const issuerKeysResponse = {
 const existingCache: OfflineCache = {
   packages: {
     'credential-1': {
-      issuerSignedCredential: 'old.issuer.jwt',
+      issuerSignedCredential: credentialExpiringAt(1_800_000_000),
       disclosures: {
         full_name: 'old-disclosure',
       },
@@ -74,6 +80,7 @@ const existingCache: OfflineCache = {
     ],
     retrievedAt: 1_790_000_000,
     revokedIndexes: [4, 8],
+    revocationRetrievedAt: null,
   },
   savedAt: 1_790_000_000,
 }
@@ -127,6 +134,7 @@ describe('offlineService', () => {
           keys: issuerKeysResponse.keys,
           retrievedAt: 1_790_010_000,
           revokedIndexes: [],
+          revocationRetrievedAt: null,
         },
       })
     )
@@ -202,5 +210,101 @@ describe('offlineService', () => {
         },
       })
     )
+  })
+
+  const axiosError = (status: number) =>
+    Object.assign(new Error(`Request failed with status ${status}`), {
+      isAxiosError: true,
+      response: { status },
+    })
+
+  it('Should drop the package when the credential is no longer active', async () => {
+    readOfflineCacheMock.mockResolvedValue(existingCache)
+    postMock.mockRejectedValue(axiosError(400))
+    getMock.mockResolvedValue({ data: issuerKeysResponse })
+
+    await offlineService.refreshOfflineCache('credential-1')
+
+    expect(writeOfflineCacheMock).toHaveBeenCalledWith(
+      expect.objectContaining({ packages: {} })
+    )
+  })
+
+  it('Should keep the package when the backend is only temporarily unavailable', async () => {
+    readOfflineCacheMock.mockResolvedValue(existingCache)
+    postMock.mockRejectedValue(axiosError(503))
+    getMock.mockResolvedValue({ data: issuerKeysResponse })
+
+    await offlineService.refreshOfflineCache('credential-1')
+
+    expect(writeOfflineCacheMock).toHaveBeenCalledWith(
+      expect.objectContaining({ packages: existingCache.packages })
+    )
+  })
+
+  it('Should prune packages that have already expired', async () => {
+    const expired = {
+      ...existingCache.packages['credential-1'],
+      issuerSignedCredential: credentialExpiringAt(1_790_000_000),
+    }
+    readOfflineCacheMock.mockResolvedValue({
+      ...existingCache,
+      packages: { 'credential-9': expired },
+    })
+    postMock.mockResolvedValue({ data: packageResponse })
+    getMock.mockResolvedValue({ data: issuerKeysResponse })
+
+    await offlineService.refreshOfflineCache('credential-1')
+
+    expect(writeOfflineCacheMock).toHaveBeenCalledWith(
+      expect.objectContaining({ packages: { 'credential-1': packageResponse } })
+    )
+  })
+
+  it('Should keep both credentials when two refreshes run at once', async () => {
+    let stored: OfflineCache | null = null
+    readOfflineCacheMock.mockImplementation(async () => stored)
+    writeOfflineCacheMock.mockImplementation(async (contents: OfflineCache) => {
+      stored = contents
+    })
+    postMock.mockResolvedValue({ data: packageResponse })
+    getMock.mockResolvedValue({ data: issuerKeysResponse })
+
+    await Promise.all([
+      offlineService.refreshOfflineCache('credential-1'),
+      offlineService.refreshOfflineCache('credential-2'),
+    ])
+
+    expect(Object.keys(stored!.packages).sort()).toEqual([
+      'credential-1',
+      'credential-2',
+    ])
+  })
+
+  it('Should drop an issuer key that is not EC P-256', async () => {
+    getMock.mockResolvedValue({
+      data: {
+        ...issuerKeysResponse,
+        keys: [
+          ...issuerKeysResponse.keys,
+          { ...issuerKeysResponse.keys[0], kid: 'rsa-key', kty: 'RSA' },
+        ],
+      },
+    })
+
+    const response = await offlineService.requestIssuerKeys()
+
+    expect(response.keys.map((key) => key.kid)).toEqual([
+      'flashid-cred-2026-09',
+    ])
+  })
+
+  it('Should keep both causes when both refresh requests fail', async () => {
+    postMock.mockRejectedValue(new Error('package request failed'))
+    getMock.mockRejectedValue(new Error('issuer keys request failed'))
+
+    await expect(
+      offlineService.refreshOfflineCache('credential-1')
+    ).rejects.toThrow('issuer keys request failed')
   })
 })
