@@ -1,0 +1,37 @@
+mobile/package.json
+  h_99fca60b892ff4 11-13,24,40
+mobile/jest.config.js
+  h_99fca60b892ff4 1,6-8,16
+  h_99fca60b892ff4 2-5,9
+mobile/src/lib/offline/offline-cache.ts
+  h_99fca60b892ff4 1-103
+mobile/src/lib/offline/test/crypto-imports.test.ts
+  h_99fca60b892ff4 1-14
+mobile/src/lib/offline/test/offline-cache.test.ts
+  h_99fca60b892ff4 1-110
+mobile/src/lib/offline/test/verify.test.ts
+  h_99fca60b892ff4 1-375
+mobile/src/lib/offline/verify.ts
+  h_99fca60b892ff4 1-368
+mobile/src/services/offline-service/offline-service.ts
+  h_99fca60b892ff4 1-109
+mobile/src/services/offline-service/offline-urls.ts
+  h_99fca60b892ff4 1-7
+mobile/src/services/offline-service/test/offline-service.test.ts
+  h_99fca60b892ff4 1-180
+mobile/src/services/offline-service/types.ts
+  h_99fca60b892ff4 1-20
+pnpm-lock.yaml
+  h_99fca60b892ff4 24-32,66-68,77,98,110,114-116,1721-1724,1729-1732,1737-1740,4457-4458,6817-6818,6821-6822,8975,9252,9267,9277,9940-9941,9946-9949,9952-9953,11153,11155,13397,13459,13464,13488,13500,13564,15680,15684,16288,16297,16306,16312,16336
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "365cd81236023f84676c3a44295c4dae35926af4",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

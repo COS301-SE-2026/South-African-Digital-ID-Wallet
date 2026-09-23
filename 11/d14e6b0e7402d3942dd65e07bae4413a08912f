@@ -1,0 +1,20 @@
+mobile/src/hooks/use-network-status.ts
+  h_99fca60b892ff4 1-13
+mobile/src/lib/offline/offline-presentation.ts
+  h_99fca60b892ff4 1-52
+mobile/src/hooks/index.ts
+  h_99fca60b892ff4 13
+mobile/src/components/pages/qr-generation/qr-generation-page.tsx
+  h_99fca60b892ff4 1,9-20,33-34,37-41,46-59,65,70,73,83,87-131,146-167,175,188,195,202-226,229-237
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "11d14e6b0e7402d3942dd65e07bae4413a08912f",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

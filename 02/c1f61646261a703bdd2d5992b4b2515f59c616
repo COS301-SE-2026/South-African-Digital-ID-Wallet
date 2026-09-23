@@ -1,0 +1,20 @@
+mobile/src/lib/offline/verify.ts
+  h_99fca60b892ff4 1-321
+  h_99fca60b892ff4 322-368
+mobile/src/lib/offline/test/verify.test.ts
+  h_99fca60b892ff4 1-269
+  h_99fca60b892ff4 270-375
+mobile/src/lib/offline/test/crypto-imports.test.ts
+  h_99fca60b892ff4 1-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "02c1f61646261a703bdd2d5992b4b2515f59c616",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
