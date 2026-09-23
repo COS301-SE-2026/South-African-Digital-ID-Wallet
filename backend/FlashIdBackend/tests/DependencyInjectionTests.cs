@@ -11,6 +11,7 @@ using Infrastructure.Providers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Presentation.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Infrastructure.Data;
@@ -45,7 +46,6 @@ public class DependencyInjectionTests
         yield return new object[] { typeof(IDashboardAccountCardRepository), typeof(DashboardAccountCardRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(INotificationRepository), typeof(NotificationRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(IEmailSenderProvider), typeof(EmailSenderProvider), ServiceLifetime.Transient };
-        yield return new object[] { typeof(IQrSigningProvider), typeof(AzureKeyVaultQrSigningProvider), ServiceLifetime.Scoped }; yield return new object[] { typeof(IQrSignatureVerifier), typeof(QrSignatureVerifier), ServiceLifetime.Scoped };
         yield return new object[] { typeof(IQrSigningKeyVaultInspector), typeof(AzureQrSigningKeyVaultInspector), ServiceLifetime.Singleton };
         yield return new object[] { typeof(IKeyRotationRepository), typeof(KeyRotationRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(IQrDisclosureTokenRepository), typeof(CosmosQrDisclosureTokenRepository), ServiceLifetime.Scoped };
@@ -93,6 +93,43 @@ public class DependencyInjectionTests
         services.AddInfrastructure();
 
         Assert.Contains(services, sd => sd.ServiceType == typeof(IGovernmentRegistryGateway));
+    }
+
+    [Fact]
+    public void AddInfrastructure_QrSigningProvider_UsesStub_WhenVaultUriNotConfigured()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
+        services.AddDbContext<AppDbContext>(o => o.UseSqlite("DataSource=:memory:"));
+        services.AddInfrastructure();
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var qrSigningProvider = scope.ServiceProvider.GetRequiredService<IQrSigningProvider>();
+
+        Assert.IsType<StubQrSigningProvider>(qrSigningProvider);
+    }
+
+    [Fact]
+    public void AddInfrastructure_QrSigningProvider_UsesAzureKeyVault_WhenVaultUriConfigured()
+    {
+        var services = new ServiceCollection();
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["AzureKeyVault:VaultUri"] = "https://example.vault.azure.net/",
+                ["QrSigning:KeyName"] = "some-key",
+            })
+            .Build();
+        services.AddSingleton<IConfiguration>(config);
+        services.AddDbContext<AppDbContext>(o => o.UseSqlite("DataSource=:memory:"));
+        services.AddInfrastructure();
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var qrSigningProvider = scope.ServiceProvider.GetRequiredService<IQrSigningProvider>();
+
+        Assert.IsType<AzureKeyVaultQrSigningProvider>(qrSigningProvider);
     }
 
     [Fact]

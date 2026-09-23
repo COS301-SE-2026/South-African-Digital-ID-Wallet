@@ -44,7 +44,15 @@ public static class DependencyInjection
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddSingleton<IDeviceTokenProvider, DeviceTokenProvider>();
         services.AddSingleton<TokenCredential, DefaultAzureCredential>();
-        services.AddScoped<IQrSigningProvider, AzureKeyVaultQrSigningProvider>();
+        services.AddScoped<IQrSigningProvider>(sp =>
+        {
+            var config = sp.GetRequiredService<IConfiguration>();
+            var vaultUri = config["AzureKeyVault:VaultUri"];
+
+            return string.IsNullOrWhiteSpace(vaultUri)
+                ? ActivatorUtilities.CreateInstance<StubQrSigningProvider>(sp)
+                : ActivatorUtilities.CreateInstance<AzureKeyVaultQrSigningProvider>(sp);
+        });
         services.AddSingleton<IQrSigningKeyVaultInspector, AzureQrSigningKeyVaultInspector>();
         services.AddScoped<IQrSignatureVerifier, QrSignatureVerifier>();
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
