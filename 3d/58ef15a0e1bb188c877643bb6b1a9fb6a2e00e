@@ -1,0 +1,21 @@
+mobile/src/hooks/use-verifier-trust.ts
+  h_99fca60b892ff4 1-17
+  h_99fca60b892ff4 18
+mobile/src/hooks/index.ts
+  h_99fca60b892ff4 15-16
+mobile/src/hooks/use-offline-scan.ts
+  h_99fca60b892ff4 1-54
+mobile/src/lib/offline/offline-scan-display.ts
+  h_99fca60b892ff4 1-94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "3d58ef15a0e1bb188c877643bb6b1a9fb6a2e00e",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
