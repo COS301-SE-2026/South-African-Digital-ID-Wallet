@@ -4,6 +4,7 @@ import {
   writeOfflineCache,
   type OfflineCache,
 } from '../offline-cache'
+import * as SecureStorage from 'expo-secure-store'
 
 const mockSecureStore = new Map<string, string>()
 let mockDiskFile: Uint8Array | null = null
@@ -56,12 +57,18 @@ const contents: OfflineCache = {
       expiresAt: '2026-10-21T16:22:00+00:00',
     },
   },
-  trust: { keys: [], retrievedAt: 1_790_000_000, revokedIndexes: [] },
+  trust: {
+    keys: [],
+    retrievedAt: 1_790_000_000,
+    revokedIndexes: [],
+    revocationRetrievedAt: null,
+  },
   savedAt: 1_790_000_000,
 }
 
 describe('offline cache', () => {
   beforeEach(() => {
+    jest.clearAllMocks()
     mockSecureStore.clear()
     mockDiskFile = null
   })
@@ -129,5 +136,15 @@ describe('offline cache', () => {
 
     expect(await readOfflineCache()).toBeNull()
     expect(mockDiskFile).toBeNull()
+  })
+
+  it('creates one key when two writes race on first use', async () => {
+    await Promise.all([
+      writeOfflineCache(contents),
+      writeOfflineCache(contents),
+    ])
+
+    expect(SecureStorage.setItemAsync).toHaveBeenCalledTimes(1)
+    expect(await readOfflineCache()).toEqual(contents)
   })
 })

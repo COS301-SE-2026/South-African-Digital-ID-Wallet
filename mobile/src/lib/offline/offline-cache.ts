@@ -14,20 +14,32 @@ export type OfflinePackage = {
 }
 
 export type OfflineCache = {
-  // One package per credential. A citizen holds an ID and a license, and presenting the wrong one would show a verifier a different credential from the one the citizen chose
+  // One package per credential. A citizen holds an ID and a licence, and presenting the wrong one
+  // would show a verifier a different credential from the one the citizen chose.
   packages: Readonly<Record<string, OfflinePackage>>
   trust: TrustData | null
   savedAt: number
 }
 
-// Bumped whenever the cached shape changes, so an older file is refetched rather than misread
-const CACHE_VERSION = 1
 const CACHE_KEY_NAME = 'flashid.offline.cache-key'
 const CACHE_FILE_NAME = 'flashid-offline-cache.bin'
 const KEY_BYTES = 32
 const NONCE_BYTES = 12
 
+// Bumped whenever the cached shape changes, so an older file is refetched rather than misread.
+const CACHE_VERSION = 1
+
 const cacheFile = () => new File(Paths.document, CACHE_FILE_NAME)
+
+// Best effort: failing to remove an unusable file must not turn "no cache" into a crash, and the
+// next write overwrites it anyway.
+const discard = (file: File) => {
+  try {
+    file.delete()
+  } catch {
+    // Nothing more to do; the caller still reports that there is no usable cache.
+  }
+}
 
 const loadKey = async (): Promise<Uint8Array | null> => {
   const stored = await SecureStore.getItemAsync(CACHE_KEY_NAME)
@@ -38,19 +50,35 @@ const loadKey = async (): Promise<Uint8Array | null> => {
 const createKey = async (): Promise<Uint8Array> => {
   const key = Crypto.getRandomBytes(KEY_BYTES)
 
+  // iOS: kept out of backups and off any other device. Android: the expo-secure-store config plugin
+  // in app.json (configureAndroidBackup defaults to true) writes backup rules that exclude
+  // SecureStore. The cache file itself is backed up, but without this key it cannot be decrypted,
+  // and readOfflineCache deletes it.
   await SecureStore.setItemAsync(CACHE_KEY_NAME, base64.encode(key), {
-    // Keeps the key off device backups and out of a restore onto another phone, so a copied cache
-    // file is undecryptable even if the backup is compromised.
     keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
   })
 
   return key
 }
 
+let pendingKey: Promise<Uint8Array> | null = null
+
+// Two writes racing on first use would each create a key, and the file written with the losing key
+// could never be decrypted. Concurrent callers share one lookup, and it is released once settled,
+// so no key is held in memory after use.
+const getOrCreateKey = (): Promise<Uint8Array> => {
+  pendingKey ??= (async () =>
+    (await loadKey()) ?? (await createKey()))().finally(() => {
+    pendingKey = null
+  })
+
+  return pendingKey
+}
+
 export const writeOfflineCache = async (
   contents: OfflineCache
 ): Promise<void> => {
-  const key = (await loadKey()) ?? (await createKey())
+  const key = await getOrCreateKey()
   const nonce = Crypto.getRandomBytes(NONCE_BYTES)
   const plaintext = new TextEncoder().encode(
     JSON.stringify({ version: CACHE_VERSION, ...contents })
@@ -60,6 +88,8 @@ export const writeOfflineCache = async (
   // cache versions, which is the classic GCM failure.
   const ciphertext = gcm(key, nonce).encrypt(plaintext)
 
+  // Not atomic, deliberately: a write cut short by a crash fails GCM authentication on the next read
+  // and is discarded, so the worst case is one refetch.
   const file = cacheFile()
   file.create({ overwrite: true })
   file.write(new Uint8Array([...nonce, ...ciphertext]))
@@ -76,7 +106,7 @@ export const readOfflineCache = async (): Promise<OfflineCache | null> => {
 
   // The file is useless without its key, so a missing key means a reinstall or a restored backup.
   if (!key) {
-    file.delete()
+    discard(file)
     return null
   }
 
@@ -85,7 +115,8 @@ export const readOfflineCache = async (): Promise<OfflineCache | null> => {
     const nonce = raw.slice(0, NONCE_BYTES)
     const ciphertext = raw.slice(NONCE_BYTES)
 
-    // GCM authenticates as it decrypts, so any edit to the file throws here rather than returning altered credentials.
+    // GCM authenticates as it decrypts, so any edit to the file throws here rather than returning
+    // altered credentials. That also means only this module can have written what follows.
     const plaintext = gcm(key, nonce).decrypt(ciphertext)
     const { version, ...contents } = JSON.parse(
       new TextDecoder().decode(plaintext)
@@ -93,14 +124,14 @@ export const readOfflineCache = async (): Promise<OfflineCache | null> => {
 
     // A cache from an older build, such as the single-package shape, is dropped and refetched.
     if (version !== CACHE_VERSION) {
-      file.delete()
+      discard(file)
       return null
     }
 
     return contents
   } catch {
     // Tampered or corrupt: drop it and fall back to online, rather than trusting half a file.
-    file.delete()
+    discard(file)
     return null
   }
 }
@@ -109,7 +140,7 @@ export const clearOfflineCache = async (): Promise<void> => {
   const file = cacheFile()
 
   if (file.exists) {
-    file.delete()
+    discard(file)
   }
 
   await SecureStore.deleteItemAsync(CACHE_KEY_NAME)
