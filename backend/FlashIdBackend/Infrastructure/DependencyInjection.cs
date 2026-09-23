@@ -37,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<ICredentialRepository, CredentialRepository>();
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
         services.AddScoped<ISigningKeyRepository, SigningKeyRepository>();
+        services.AddScoped<IKeyRotationRepository, KeyRotationRepository>();
         services.AddScoped<ITrustedDeviceRepository, TrustedDeviceRepository>();
         services.AddScoped<IActivityOverviewRepository, ActivityOverviewRepository>();
         services.AddScoped<IDashboardAccountCardRepository, DashboardAccountCardRepository>();
@@ -44,6 +45,7 @@ public static class DependencyInjection
         services.AddSingleton<IDeviceTokenProvider, DeviceTokenProvider>();
         services.AddSingleton<TokenCredential, DefaultAzureCredential>();
         services.AddSingleton<IQrSigningProvider, AzureKeyVaultQrSigningProvider>();
+        services.AddSingleton<IQrSigningKeyVaultInspector, AzureQrSigningKeyVaultInspector>();
         services.AddScoped<IQrSignatureVerifier, QrSignatureVerifier>();
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
 
@@ -124,7 +126,7 @@ public static class DependencyInjection
         services.AddScoped<CredentialExpiryRepository>();
         services.AddScoped<ICredentialExpiryRepository>(sp => new RetryingCredentialExpiryRepositoryDecorator(sp.GetRequiredService<CredentialExpiryRepository>()));
         services.AddHostedService<CredentialExpiryBackgroundService>();
-
+        services.AddHostedService<KeyRotationBackgroundService>();
         services.AddScoped<CredentialUpdateRepository>();
         services.AddScoped<ICredentialUpdateRepository>(sp => new RetryingCredentialUpdateRepositoryDecorator(sp.GetRequiredService<CredentialUpdateRepository>()));
         services.AddHostedService<CredentialUpdateBackgroundService>();
