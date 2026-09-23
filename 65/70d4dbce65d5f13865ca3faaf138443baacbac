@@ -1,0 +1,46 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IFraudDetectionService.cs
+  h_712d174fc3f309 9-10
+backend/FlashIdBackend/Application/Common/Security/FraudRiskScorer.cs
+  h_712d174fc3f309 52-53
+backend/FlashIdBackend/Application/Common/Services/FraudDetectionService.cs
+  h_712d174fc3f309 94,112,121-133,138-148,184-188,328-336,415-416
+backend/FlashIdBackend/Application/Features/FraudDetection/DTOs/FraudDetectionDtos.cs
+  h_712d174fc3f309 141
+backend/FlashIdBackend/Application/Features/FraudDetection/FraudDetectionOptions.cs
+  h_712d174fc3f309 22,51-54
+backend/FlashIdBackend/Infrastructure/Data/Configurations/UserSecurityProfileConfiguration.cs
+  h_712d174fc3f309 14,17
+backend/FlashIdBackend/Infrastructure/Migrations/20260923200544_RemoveSecurityProfileBoolDefaults.Designer.cs
+  h_712d174fc3f309 1-1666
+backend/FlashIdBackend/Infrastructure/Migrations/20260923200544_RemoveSecurityProfileBoolDefaults.cs
+  h_712d174fc3f309 1-54
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_712d174fc3f309 1127,1130
+backend/FlashIdBackend/Presentation/Controllers/AuthController.cs
+  h_712d174fc3f309 100,152,319-329
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_712d174fc3f309 106-107,110-112
+backend/FlashIdBackend/Presentation/Controllers/SecurityController.cs
+  h_712d174fc3f309 17-18,32,41,50,60,75,81,90,112-115,125,150,160,179
+backend/FlashIdBackend/Presentation/Program.cs
+  h_712d174fc3f309 19,78-87,229
+backend/FlashIdBackend/Presentation/Security/AuthCookies.cs
+  h_712d174fc3f309 1-19
+backend/FlashIdBackend/Presentation/Security/SecurityEventContextFactory.cs
+  h_712d174fc3f309 2,18-25,34-35
+backend/FlashIdBackend/tests/FraudDetectionControllerIntegrationTests.cs
+  h_712d174fc3f309 7,9,42-44,48-69,80-82,93-98,126-131,404,426,442,507-661
+backend/FlashIdBackend/tests/FraudDetectionServiceTests.cs
+  h_712d174fc3f309 368,372-382,390,397,405,409,413,417,427-428,441-442,445-500,597,624,640,652,668
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "6570d4dbce65d5f13865ca3faaf138443baacbac",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
