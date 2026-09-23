@@ -85,6 +85,9 @@ public class FraudDetectionControllerIntegrationTests
                 services.AddScoped<IEmailSenderProvider, StubEmailSenderProvider>();
                 services.RemoveAll(typeof(IQrService));
                 services.AddScoped<IQrService, StubQrService>();
+                // CredentialsController -> OfflinePackageService -> photo storage needs a real Blob connection string.
+                services.RemoveAll(typeof(IPhotoStorageProvider));
+                services.AddSingleton(Mock.Of<IPhotoStorageProvider>());
                 services.RemoveAll(typeof(IHostedService));
             });
         }
