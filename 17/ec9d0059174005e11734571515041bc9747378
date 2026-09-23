@@ -1,0 +1,21 @@
+mobile/src/services/offline-service/test/offline-service.test.ts
+  h_99fca60b892ff4 310-339
+  h_99fca60b892ff4 340-343
+mobile/src/lib/offline/test/offline-scan-display.test.ts
+  h_99fca60b892ff4 1-74
+  h_99fca60b892ff4 75-76
+mobile/src/hooks/test/use-offline-scan.test.tsx
+  h_99fca60b892ff4 1-103
+  h_99fca60b892ff4 104-115
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "17ec9d0059174005e11734571515041bc9747378",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
