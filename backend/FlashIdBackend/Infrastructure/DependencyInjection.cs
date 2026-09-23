@@ -132,8 +132,8 @@ public static class DependencyInjection
         services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
 
         services.AddSingleton<ICredentialSigningProvider, LocalEs256SigningProvider>();
-        services.AddScoped<ICertifiedCredentialCopyRepository, CertifiedCredentialCopyRepository>();
 
+        services.AddScoped<ICertifiedCredentialCopyRepository, CertifiedCredentialCopyRepository>();
         services.AddSingleton<ICertifiedCopyCryptographyProvider, CertifiedCopyCryptographyProvider>();
         return services;
     }
