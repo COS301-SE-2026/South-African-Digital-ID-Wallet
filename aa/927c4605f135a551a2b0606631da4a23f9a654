@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_293a8616118f65 48-49
+backend/FlashIdBackend/Application/Features/CertifiedCredentialCopies/DTOs/GeneratedCertifiedCopyResult.cs
+  h_293a8616118f65 1-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "aa927c4605f135a551a2b0606631da4a23f9a654",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
