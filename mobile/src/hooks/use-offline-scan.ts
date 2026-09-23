@@ -1,0 +1,54 @@
+import { useCallback, useState } from 'react'
+
+import { PayloadFrameAccumulator } from '@/lib/offline/qr-frame-accumulator'
+import {
+  verifyPresentation,
+  type TrustData,
+  type VerificationResult,
+} from '@/lib/offline/verify'
+
+export type OfflineScanProgress = { received: number; total: number }
+
+export const useOfflineScan = (trust: TrustData | null) => {
+  // useState rather than useRef, so one accumulator lives for the life of the screen.
+  const [accumulator] = useState(() => new PayloadFrameAccumulator())
+  const [progress, setProgress] = useState<OfflineScanProgress | null>(null)
+  const [result, setResult] = useState<VerificationResult | null>(null)
+
+  const addFrame = useCallback(
+    (rawText: string) => {
+      let snapshot
+
+      try {
+        snapshot = accumulator.add(rawText)
+      } catch {
+        // A misread frame is skipped: the display cycles, so the same frame comes round again.
+        return
+      }
+
+      if (!snapshot.complete || !snapshot.presentation) {
+        setProgress({ received: snapshot.received, total: snapshot.total })
+        return
+      }
+
+      accumulator.reset()
+      setProgress(null)
+      setResult(
+        trust
+          ? verifyPresentation(snapshot.presentation, trust, {
+              now: Math.floor(Date.now() / 1000),
+            })
+          : { ok: false, code: 'STALE_TRUST_DATA', warnings: [] }
+      )
+    },
+    [accumulator, trust]
+  )
+
+  const reset = useCallback(() => {
+    accumulator.reset()
+    setProgress(null)
+    setResult(null)
+  }, [accumulator])
+
+  return { addFrame, progress, reset, result }
+}
