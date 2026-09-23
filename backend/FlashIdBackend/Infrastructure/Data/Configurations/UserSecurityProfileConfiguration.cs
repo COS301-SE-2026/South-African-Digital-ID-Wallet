@@ -11,12 +11,10 @@ public class UserSecurityProfileConfiguration : IEntityTypeConfiguration<UserSec
         builder.HasKey(p => p.UserId);
 
         builder.Property(p => p.ImpossibleTravelDetectionEnabled)
-            .IsRequired()
-            .HasDefaultValue(true);
+            .IsRequired();
 
         builder.Property(p => p.EnhancedVerificationEnabled)
-            .IsRequired()
-            .HasDefaultValue(false);
+            .IsRequired();
 
         builder.HasOne(p => p.User)
             .WithOne()

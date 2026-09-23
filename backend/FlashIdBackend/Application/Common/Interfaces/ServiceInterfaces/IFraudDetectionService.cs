@@ -6,7 +6,8 @@ namespace Application.Common.Interfaces.ServiceInterfaces;
 public interface IFraudDetectionService
 {
     Task<FraudAssessmentResultDto> RecordSecurityEventAsync(SecurityEventContext context, CancellationToken cancellationToken);
-    Task<FraudAssessmentResultDto> AssessQrGenerationAsync(SecurityEventContext context, CancellationToken cancellationToken);
+    Task EnsureQrGenerationAllowedAsync(SecurityEventContext context, CancellationToken cancellationToken);
+    Task<FraudAssessmentResultDto> RecordQrGenerationAsync(SecurityEventContext context, CancellationToken cancellationToken);
     Task<SecurityOverviewDto> GetSecurityOverviewAsync(Guid userId, CancellationToken cancellationToken);
     Task<List<SecurityActivityItemDto>> GetActivityAsync(Guid userId, int limit, CancellationToken cancellationToken);
     Task<List<FraudAlertSummaryDto>> GetAlertsAsync(Guid userId, FraudAlertStatus? status, CancellationToken cancellationToken);

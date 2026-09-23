@@ -365,11 +365,21 @@ public class FraudDetectionServiceTests
     }
 
     [Fact]
-    public async Task Qr_LowRisk_IsAllowedAndRecorded()
+    public async Task Qr_EnsureAllowed_DoesNotRecordAnEvent()
     {
         using var h = new Harness();
 
-        var result = await h.Service.AssessQrGenerationAsync(h.Context(JohannesburgIp), CancellationToken.None);
+        await h.Service.EnsureQrGenerationAllowedAsync(h.Context(JohannesburgIp), CancellationToken.None);
+
+        Assert.Empty(h.Db.SecurityEvents);
+    }
+
+    [Fact]
+    public async Task Qr_LowRisk_IsRecordedAfterGeneration()
+    {
+        using var h = new Harness();
+
+        var result = await h.Service.RecordQrGenerationAsync(h.Context(JohannesburgIp), CancellationToken.None);
 
         Assert.Equal(FraudRiskLevel.Low, result.RiskLevel);
         Assert.Contains(FraudSignals.SensitiveAction, result.Signals);
@@ -377,14 +387,14 @@ public class FraudDetectionServiceTests
     }
 
     [Fact]
-    public async Task Qr_ImpossibleTravel_IsBlockedWithAlertId()
+    public async Task Qr_ImpossibleTravel_IsWithheldWithAlertId()
     {
         using var h = new Harness();
         await h.Service.RecordSecurityEventAsync(h.Context(JohannesburgIp, deviceToken: "home-device"), CancellationToken.None);
         h.Time.Advance(TimeSpan.FromMinutes(5));
 
         var ex = await Assert.ThrowsAsync<QrGenerationRestrictedException>(() =>
-            h.Service.AssessQrGenerationAsync(h.Context(CapeTownIp), CancellationToken.None));
+            h.Service.RecordQrGenerationAsync(h.Context(CapeTownIp), CancellationToken.None));
 
         Assert.Equal(QrGenerationRestrictedException.RiskRestriction, ex.Code);
         Assert.NotNull(ex.AlertId);
@@ -392,17 +402,19 @@ public class FraudDetectionServiceTests
     }
 
     [Fact]
-    public async Task Qr_WhileRestricted_IsBlockedAndAudited()
+    public async Task Qr_WhileRestricted_IsBlockedAndAuditedWithoutRecordingAnEvent()
     {
         using var h = new Harness();
         var high = await h.JohannesburgThenLondonAsync();
+        var eventsBefore = h.Db.SecurityEvents.Count();
         h.Time.Advance(TimeSpan.FromMinutes(1));
 
         var ex = await Assert.ThrowsAsync<QrGenerationRestrictedException>(() =>
-            h.Service.AssessQrGenerationAsync(h.Context(JohannesburgIp, deviceToken: "home-device"), CancellationToken.None));
+            h.Service.EnsureQrGenerationAllowedAsync(h.Context(JohannesburgIp, deviceToken: "home-device"), CancellationToken.None));
 
         Assert.Equal(high.AlertId, ex.AlertId);
         Assert.Contains(h.Db.AuditLogs, a => a.EventType == AuditEventType.QrGenerationBlocked);
+        Assert.Equal(eventsBefore, h.Db.SecurityEvents.Count());
     }
 
     [Fact]
@@ -412,7 +424,8 @@ public class FraudDetectionServiceTests
         await h.JohannesburgThenLondonAsync();
         h.Time.Advance(TimeSpan.FromMinutes(31));
 
-        var result = await h.Service.AssessQrGenerationAsync(h.Context(LondonIp, deviceToken: "attacker-device"), CancellationToken.None);
+        await h.Service.EnsureQrGenerationAllowedAsync(h.Context(LondonIp, deviceToken: "attacker-device"), CancellationToken.None);
+        var result = await h.Service.RecordQrGenerationAsync(h.Context(LondonIp, deviceToken: "attacker-device"), CancellationToken.None);
 
         Assert.True(result.Assessed);
     }
@@ -425,11 +438,66 @@ public class FraudDetectionServiceTests
         await h.Service.UpdateSettingsAsync(h.User.Id, new UpdateSecuritySettingsRequestDto { EnhancedVerificationEnabled = true }, "1.1.1.1", CancellationToken.None);
 
         var ex = await Assert.ThrowsAsync<QrGenerationRestrictedException>(() =>
-            h.Service.AssessQrGenerationAsync(h.Context(JohannesburgIp, deviceToken: "unknown-device"), CancellationToken.None));
-        var ok = await h.Service.AssessQrGenerationAsync(h.Context(JohannesburgIp, deviceToken: "home-device"), CancellationToken.None);
+            h.Service.EnsureQrGenerationAllowedAsync(h.Context(JohannesburgIp, deviceToken: "unknown-device"), CancellationToken.None));
+        await h.Service.EnsureQrGenerationAllowedAsync(h.Context(JohannesburgIp, deviceToken: "home-device"), CancellationToken.None);
 
         Assert.Equal(QrGenerationRestrictedException.TrustedDeviceRequired, ex.Code);
-        Assert.True(ok.IsTrustedDevice);
+        Assert.Empty(h.Db.SecurityEvents);
+    }
+
+    // ---------- SA network routing ----------
+
+    [Fact]
+    public async Task Record_SameDeviceJumpingBetweenSaCities_IsTreatedAsRoutingNotTravel()
+    {
+        using var h = new Harness();
+        h.TrustDevice("home-device");
+
+        await h.Service.RecordSecurityEventAsync(h.Context(JohannesburgIp, deviceToken: "home-device"), CancellationToken.None);
+        h.Time.Advance(TimeSpan.FromMinutes(2));
+        var result = await h.Service.RecordSecurityEventAsync(h.Context(CapeTownIp, deviceToken: "home-device"), CancellationToken.None);
+
+        Assert.DoesNotContain(FraudSignals.ImpossibleTravel, result.Signals);
+        Assert.Equal(FraudRiskLevel.Low, result.RiskLevel);
+        Assert.Empty(h.Db.FraudAlerts);
+    }
+
+    [Fact]
+    public async Task Record_DifferentDeviceJumpingBetweenSaCities_IsStillImpossibleTravel()
+    {
+        using var h = new Harness();
+
+        await h.Service.RecordSecurityEventAsync(h.Context(JohannesburgIp, deviceToken: "home-device"), CancellationToken.None);
+        h.Time.Advance(TimeSpan.FromMinutes(2));
+        var result = await h.Service.RecordSecurityEventAsync(h.Context(CapeTownIp, deviceToken: "other-device"), CancellationToken.None);
+
+        Assert.Contains(FraudSignals.ImpossibleTravel, result.Signals);
+    }
+
+    [Fact]
+    public async Task Record_SameDeviceJumpingToAnotherCountry_IsStillImpossibleTravel()
+    {
+        using var h = new Harness();
+        h.TrustDevice("home-device");
+
+        await h.Service.RecordSecurityEventAsync(h.Context(JohannesburgIp, deviceToken: "home-device"), CancellationToken.None);
+        h.Time.Advance(TimeSpan.FromMinutes(2));
+        var result = await h.Service.RecordSecurityEventAsync(h.Context(LondonIp, deviceToken: "home-device"), CancellationToken.None);
+
+        Assert.Contains(FraudSignals.ImpossibleTravel, result.Signals);
+    }
+
+    [Fact]
+    public async Task Record_RoutingToleranceCanBeSwitchedOff()
+    {
+        using var h = new Harness(new FraudDetectionOptions { IgnoreDomesticJumpsOnSameDevice = false });
+        h.TrustDevice("home-device");
+
+        await h.Service.RecordSecurityEventAsync(h.Context(JohannesburgIp, deviceToken: "home-device"), CancellationToken.None);
+        h.Time.Advance(TimeSpan.FromMinutes(2));
+        var result = await h.Service.RecordSecurityEventAsync(h.Context(CapeTownIp, deviceToken: "home-device"), CancellationToken.None);
+
+        Assert.Contains(FraudSignals.ImpossibleTravel, result.Signals);
     }
 
     [Fact]
@@ -526,7 +594,7 @@ public class FraudDetectionServiceTests
         var alert = await h.JohannesburgThenLondonAsync();
 
         var result = await h.Service.SecureAccountAsync(h.User.Id, alert.AlertId!.Value,
-            new SecureAccountRequestDto { Action = SecureAccountAction.LogOutOtherDevices }, "home-device", "1.1.1.1", CancellationToken.None);
+            new SecureAccountRequestDto { Action = SecureAccountAction.LogOutOtherDevices, Password = Password }, "home-device", "1.1.1.1", CancellationToken.None);
 
         Assert.Equal("Your account is secured", result.Title);
         Assert.Equal(1, result.DevicesRemoved);
@@ -553,7 +621,7 @@ public class FraudDetectionServiceTests
         var alert = await h.JohannesburgThenLondonAsync();
 
         var result = await h.Service.SecureAccountAsync(h.User.Id, alert.AlertId!.Value,
-            new SecureAccountRequestDto { Action = SecureAccountAction.ResetPassword }, null, "1.1.1.1", CancellationToken.None);
+            new SecureAccountRequestDto { Action = SecureAccountAction.ResetPassword, Password = Password }, null, "1.1.1.1", CancellationToken.None);
 
         Assert.True(result.RequiresPasswordChange);
         Assert.Equal(SecureAccountAction.ResetPassword, h.Db.FraudAlerts.Single().ResolutionAction);
@@ -569,7 +637,7 @@ public class FraudDetectionServiceTests
         var alert = await h.JohannesburgThenLondonAsync();
 
         var result = await h.Service.SecureAccountAsync(h.User.Id, alert.AlertId!.Value,
-            new SecureAccountRequestDto { Action = SecureAccountAction.AddExtraVerification }, "home-device", "1.1.1.1", CancellationToken.None);
+            new SecureAccountRequestDto { Action = SecureAccountAction.AddExtraVerification, Password = Password }, "home-device", "1.1.1.1", CancellationToken.None);
 
         Assert.Equal(2, result.DevicesRemoved);
         Assert.Single(h.Db.TrustedDevices);
@@ -581,7 +649,7 @@ public class FraudDetectionServiceTests
     {
         using var h = new Harness();
         var alert = await h.JohannesburgThenLondonAsync();
-        var request = new SecureAccountRequestDto { Action = SecureAccountAction.LogOutOtherDevices };
+        var request = new SecureAccountRequestDto { Action = SecureAccountAction.LogOutOtherDevices, Password = Password };
         await h.Service.SecureAccountAsync(h.User.Id, alert.AlertId!.Value, request, null, "1.1.1.1", CancellationToken.None);
 
         await Assert.ThrowsAsync<FraudAlertAlreadyResolvedException>(() =>
@@ -597,7 +665,7 @@ public class FraudDetectionServiceTests
         await Assert.ThrowsAsync<FraudAlertNotFoundException>(() =>
             h.Service.SecureAccountAsync(h.User.Id, Guid.NewGuid(), new SecureAccountRequestDto(), null, "1.1.1.1", CancellationToken.None));
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
-            h.Service.SecureAccountAsync(h.User.Id, alert.AlertId!.Value, new SecureAccountRequestDto { Action = (SecureAccountAction)99 }, null, "1.1.1.1", CancellationToken.None));
+            h.Service.SecureAccountAsync(h.User.Id, alert.AlertId!.Value, new SecureAccountRequestDto { Action = (SecureAccountAction)99, Password = Password }, null, "1.1.1.1", CancellationToken.None));
     }
 
     [Fact]

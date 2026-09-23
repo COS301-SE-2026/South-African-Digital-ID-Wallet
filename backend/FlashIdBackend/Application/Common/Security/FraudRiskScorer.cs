@@ -49,6 +49,8 @@ public static class FraudRiskScorer
             signals.Add(new FraudSignal(FraudSignals.NewDevice, options.NewDeviceWeight));
         }
 
+        // Intentional: NewDevice and UntrustedDevice are separate signals. A brand-new device that has not
+        // been verified gets both (+35); one that just passed the email OTP is trusted and only gets +20.
         if (!input.IsTrustedDevice)
         {
             signals.Add(new FraudSignal(FraudSignals.UntrustedDevice, options.UntrustedDeviceWeight));

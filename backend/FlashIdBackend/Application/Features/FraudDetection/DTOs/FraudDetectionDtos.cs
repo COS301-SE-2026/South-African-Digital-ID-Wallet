@@ -138,6 +138,7 @@ public class SecurityOverviewDto
 public class SecureAccountRequestDto
 {
     public SecureAccountAction Action { get; set; }
+    public string Password { get; set; } = string.Empty;
 }
 
 public class SecureAccountResultDto

@@ -4,7 +4,9 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Features.Auth.DTOs;
 using Application.Features.Credentials.DTOs;
+using Application.Features.Credentials.Exceptions;
 using Application.Features.FraudDetection.DTOs;
 using Application.Features.ManageUserAccountCard.DTOs;
 using Domain.Entities;
@@ -37,10 +39,34 @@ public class FraudDetectionControllerIntegrationTests
         Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() },
     };
 
+    private const string JohannesburgIp = "41.0.0.1";
+    private const string LondonIp = "81.2.69.160";
+
     private sealed class StubIpGeolocationProvider : IIpGeolocationProvider
     {
         public Task<IpLocationResult?> GetLocationAsync(string ipAddress, CancellationToken cancellationToken) =>
-            Task.FromResult<IpLocationResult?>(null);
+            Task.FromResult(ipAddress switch
+            {
+                JohannesburgIp => new IpLocationResult { City = "Johannesburg", Country = "South Africa", Latitude = -26.2041, Longitude = 28.0473 },
+                LondonIp => new IpLocationResult { City = "London", Country = "United Kingdom", Latitude = 51.5074, Longitude = -0.1278 },
+                _ => null,
+            });
+    }
+
+    private sealed class ThrowingFraudDetectionService : IFraudDetectionService
+    {
+        private static Exception Boom() => new InvalidOperationException("fraud engine down");
+        public Task<FraudAssessmentResultDto> RecordSecurityEventAsync(SecurityEventContext context, CancellationToken cancellationToken) => throw Boom();
+        public Task EnsureQrGenerationAllowedAsync(SecurityEventContext context, CancellationToken cancellationToken) => throw Boom();
+        public Task<FraudAssessmentResultDto> RecordQrGenerationAsync(SecurityEventContext context, CancellationToken cancellationToken) => throw Boom();
+        public Task<SecurityOverviewDto> GetSecurityOverviewAsync(Guid userId, CancellationToken cancellationToken) => throw Boom();
+        public Task<List<SecurityActivityItemDto>> GetActivityAsync(Guid userId, int limit, CancellationToken cancellationToken) => throw Boom();
+        public Task<List<FraudAlertSummaryDto>> GetAlertsAsync(Guid userId, FraudAlertStatus? status, CancellationToken cancellationToken) => throw Boom();
+        public Task<FraudAlertDetailsDto> GetAlertDetailsAsync(Guid userId, Guid alertId, CancellationToken cancellationToken) => throw Boom();
+        public Task<SecureAccountResultDto> SecureAccountAsync(Guid userId, Guid alertId, SecureAccountRequestDto request, string? currentDeviceToken, string ipAddress, CancellationToken cancellationToken) => throw Boom();
+        public Task DismissAlertAsync(Guid userId, Guid alertId, DismissFraudAlertRequestDto request, string ipAddress, CancellationToken cancellationToken) => throw Boom();
+        public Task<SecuritySettingsDto> GetSettingsAsync(Guid userId, CancellationToken cancellationToken) => throw Boom();
+        public Task<SecuritySettingsDto> UpdateSettingsAsync(Guid userId, UpdateSecuritySettingsRequestDto request, string ipAddress, CancellationToken cancellationToken) => throw Boom();
     }
 
     private sealed class StubEmailSenderProvider : IEmailSenderProvider
@@ -51,7 +77,9 @@ public class FraudDetectionControllerIntegrationTests
     private sealed class StubQrService : IQrService
     {
         public Task<GenerateQrResponseDto> GenerateQrAsync(Guid credentialId, Guid requestingUserId, GenerateQrRequestDto request) =>
-            Task.FromResult(new GenerateQrResponseDto { Token = "stub-qr-token", ExpiresAt = DateTime.UtcNow.AddSeconds(60) });
+            credentialId == Guid.Empty
+                ? throw new CredentialNotFoundException(credentialId)
+                : Task.FromResult(new GenerateQrResponseDto { Token = "stub-qr-token", ExpiresAt = DateTime.UtcNow.AddSeconds(60) });
 
         public Task<List<CredentialSummaryDto>> GetMyCredentialsAsync(Guid userId) => Task.FromResult(new List<CredentialSummaryDto>());
 
@@ -62,6 +90,12 @@ public class FraudDetectionControllerIntegrationTests
     private sealed class TestApiFactory : WebApplicationFactory<Program>
     {
         private readonly SqliteConnection _connection = new("DataSource=:memory:");
+        private readonly bool _throwingFraudService;
+
+        public TestApiFactory(bool throwingFraudService = false)
+        {
+            _throwingFraudService = throwingFraudService;
+        }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -89,6 +123,12 @@ public class FraudDetectionControllerIntegrationTests
                 services.RemoveAll(typeof(IPhotoStorageProvider));
                 services.AddSingleton(Mock.Of<IPhotoStorageProvider>());
                 services.RemoveAll(typeof(IHostedService));
+
+                if (_throwingFraudService)
+                {
+                    services.RemoveAll(typeof(IFraudDetectionService));
+                    services.AddScoped<IFraudDetectionService, ThrowingFraudDetectionService>();
+                }
             });
         }
 
@@ -361,7 +401,7 @@ public class FraudDetectionControllerIntegrationTests
         var alertId = await CreateImpossibleTravelAlertAsync(client);
 
         var response = await client.PostAsJsonAsync($"/api/security/alerts/{alertId}/secure",
-            new SecureAccountRequestDto { Action = SecureAccountAction.LogOutOtherDevices }, JsonOptions, Ct);
+            new SecureAccountRequestDto { Action = SecureAccountAction.LogOutOtherDevices, Password = Password }, JsonOptions, Ct);
         var body = await response.Content.ReadFromJsonAsync<JsonElement>(Ct);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -383,7 +423,7 @@ public class FraudDetectionControllerIntegrationTests
         client.DefaultRequestHeaders.Add("X-Client", "mobile");
 
         var response = await client.PostAsJsonAsync($"/api/security/alerts/{alertId}/secure",
-            new SecureAccountRequestDto { Action = SecureAccountAction.ResetPassword }, JsonOptions, Ct);
+            new SecureAccountRequestDto { Action = SecureAccountAction.ResetPassword, Password = Password }, JsonOptions, Ct);
         var body = await response.Content.ReadFromJsonAsync<JsonElement>(Ct);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -399,7 +439,7 @@ public class FraudDetectionControllerIntegrationTests
         var client = ClientFor(factory, user);
         client.DefaultRequestHeaders.Add("X-Client", "mobile");
         var alertId = await CreateImpossibleTravelAlertAsync(client);
-        var request = new SecureAccountRequestDto { Action = SecureAccountAction.LogOutOtherDevices };
+        var request = new SecureAccountRequestDto { Action = SecureAccountAction.LogOutOtherDevices, Password = Password };
 
         var first = await client.PostAsJsonAsync($"/api/security/alerts/{alertId}/secure", request, JsonOptions, Ct);
         var fresh = (await first.Content.ReadFromJsonAsync<JsonElement>(Ct)).GetProperty("token").GetString();
@@ -463,5 +503,160 @@ public class FraudDetectionControllerIntegrationTests
 
         Assert.Equal(HttpStatusCode.OK, allowed.StatusCode);
         Assert.False(body.GetProperty("impossibleTravelDetectionEnabled").GetBoolean());
+    }
+
+    private static async Task<HttpResponseMessage> PostQrAsync(HttpClient client, Guid credentialId, params (string Name, string Value)[] headers)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/api/credentials/{credentialId}/qr-token")
+        {
+            Content = JsonContent.Create(new GenerateQrRequestDto { DisclosedFields = ["names"] }, options: JsonOptions),
+        };
+        foreach (var (name, value) in headers)
+        {
+            request.Headers.Add(name, value);
+        }
+        return await client.SendAsync(request, Ct);
+    }
+
+    [Fact]
+    public async Task Secure_WrongPassword_Returns401AndKeepsAlertOpen()
+    {
+        using var factory = new TestApiFactory();
+        var user = await SeedUserAsync(factory);
+        var client = ClientFor(factory, user);
+        var alertId = await CreateImpossibleTravelAlertAsync(client);
+
+        var response = await client.PostAsJsonAsync($"/api/security/alerts/{alertId}/secure",
+            new SecureAccountRequestDto { Action = SecureAccountAction.LogOutOtherDevices, Password = "wrong" }, JsonOptions, Ct);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(Ct);
+        var overview = await client.GetFromJsonAsync<JsonElement>("/api/security/overview", Ct);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal("STEP_UP_FAILED", body.GetProperty("code").GetString());
+        Assert.True(overview.GetProperty("hasActiveAlert").GetBoolean());
+    }
+
+    [Fact]
+    public async Task Settings_DisablingDetection_IsPersistedAsFalseInTheDatabase()
+    {
+        using var factory = new TestApiFactory();
+        var user = await SeedUserAsync(factory);
+        var client = ClientFor(factory, user);
+
+        var response = await client.PutAsJsonAsync("/api/security/settings",
+            new UpdateSecuritySettingsRequestDto { ImpossibleTravelDetectionEnabled = false, Password = Password }, JsonOptions, Ct);
+        response.EnsureSuccessStatusCode();
+
+        var db = await factory.CreateInitializedContextAsync();
+        var stored = await db.UserSecurityProfiles.AsNoTracking().SingleAsync(p => p.UserId == user.Id, Ct);
+        var reread = await client.GetFromJsonAsync<JsonElement>("/api/security/settings", Ct);
+
+        Assert.False(stored.ImpossibleTravelDetectionEnabled);
+        Assert.False(reread.GetProperty("impossibleTravelDetectionEnabled").GetBoolean());
+    }
+
+    [Fact]
+    public async Task QrToken_FailedGeneration_DoesNotRecordASecurityEvent()
+    {
+        using var factory = new TestApiFactory();
+        var user = await SeedUserAsync(factory);
+
+        var response = await PostQrAsync(ClientFor(factory, user), Guid.Empty);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        var db = await factory.CreateInitializedContextAsync();
+        Assert.False(await db.SecurityEvents.AnyAsync(e => e.UserId == user.Id, Ct));
+    }
+
+    [Fact]
+    public async Task QrToken_SuccessfulGeneration_RecordsASecurityEvent()
+    {
+        using var factory = new TestApiFactory();
+        var user = await SeedUserAsync(factory);
+
+        var response = await PostQrAsync(ClientFor(factory, user), Guid.NewGuid());
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var db = await factory.CreateInitializedContextAsync();
+        var evt = await db.SecurityEvents.SingleAsync(e => e.UserId == user.Id, Ct);
+        Assert.Equal(SecurityEventType.QrGenerated, evt.EventType);
+    }
+
+    [Theory]
+    [InlineData("NaN", "28.0473")]
+    [InlineData("999", "28.0473")]
+    [InlineData("-26.2041", "not-a-number")]
+    [InlineData("Infinity", "-Infinity")]
+    public async Task QrToken_InvalidGeoHeaders_AreIgnored(string latitude, string longitude)
+    {
+        using var factory = new TestApiFactory();
+        var user = await SeedUserAsync(factory);
+
+        var response = await PostQrAsync(ClientFor(factory, user), Guid.NewGuid(),
+            ("X-Geo-Latitude", latitude), ("X-Geo-Longitude", longitude));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var db = await factory.CreateInitializedContextAsync();
+        var evt = await db.SecurityEvents.SingleAsync(e => e.UserId == user.Id, Ct);
+        Assert.Null(evt.Latitude);
+        Assert.Null(evt.Longitude);
+    }
+
+    [Fact]
+    public async Task QrToken_UsesForwardedClientIpBehindAProxy()
+    {
+        using var factory = new TestApiFactory();
+        var user = await SeedUserAsync(factory);
+        var client = ClientFor(factory, user);
+
+        var fromJohannesburg = await PostQrAsync(client, Guid.NewGuid(), ("X-Forwarded-For", JohannesburgIp));
+        var fromLondon = await PostQrAsync(client, Guid.NewGuid(), ("X-Forwarded-For", LondonIp));
+        var body = await fromLondon.Content.ReadFromJsonAsync<JsonElement>(Ct);
+
+        Assert.Equal(HttpStatusCode.OK, fromJohannesburg.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, fromLondon.StatusCode);
+        Assert.Equal("QR_GENERATION_RESTRICTED", body.GetProperty("code").GetString());
+
+        var db = await factory.CreateInitializedContextAsync();
+        Assert.Contains(await db.SecurityEvents.Where(e => e.UserId == user.Id).Select(e => e.IpAddress).ToListAsync(Ct), ip => ip == LondonIp);
+    }
+
+    [Fact]
+    public async Task Login_WhenFraudDetectionThrows_StillSucceeds()
+    {
+        using var factory = new TestApiFactory(throwingFraudService: true);
+        var user = await SeedUserAsync(factory);
+        const string deviceToken = "trusted-browser"; // NOSONAR - test-only dummy token
+
+        var db = await factory.CreateInitializedContextAsync();
+        db.TrustedDevices.Add(new TrustedDevice
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            DeviceTokenHash = new DeviceTokenProvider().HashToken(deviceToken),
+            DeviceType = DeviceType.Laptop,
+            OperatingSystem = "Windows 11",
+            Browser = "Chrome",
+            DeviceName = "Thabo's Laptop",
+            LastActive = DateTime.UtcNow,
+            IsTrusted = true,
+            CreatedAt = DateTime.UtcNow.AddDays(-10),
+            UpdatedAt = DateTime.UtcNow,
+        });
+        await db.SaveChangesAsync(Ct);
+
+        var client = factory.CreateClient(new WebApplicationFactoryClientOptions { HandleCookies = false });
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/login")
+        {
+            Content = JsonContent.Create(new LoginRequestDto { Email = user.Email, Password = Password }, options: JsonOptions),
+        };
+        request.Headers.Add("X-Device-Token", deviceToken);
+
+        var response = await client.SendAsync(request, Ct);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(Ct);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.False(body.GetProperty("requiresDeviceVerification").GetBoolean());
+        Assert.False(body.TryGetProperty("securityAlert", out _));
     }
 }

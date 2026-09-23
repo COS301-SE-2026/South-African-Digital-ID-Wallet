@@ -16,6 +16,7 @@ using System.Security.Claims;
 using Microsoft.Azure.Cosmos;
 using Presentation.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,6 +75,16 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<IDeleteAccountService, DeleteAccountService>();
 builder.Services.AddScoped<IDeleteAccountRepository, DeleteAccountRepository>();
 builder.Services.AddProblemDetails();
+
+// Azure App Service terminates TLS and forwards requests, so the real client IP is in X-Forwarded-For.
+// ForwardLimit = 1 only trusts the last hop (added by the Azure front end), so clients cannot spoof it.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.ForwardLimit = 1;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -215,6 +226,7 @@ if (!app.Environment.IsEnvironment("Testing"))
     }
 }
 
+app.UseForwardedHeaders();
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);

@@ -14,6 +14,8 @@ namespace Presentation.Controllers;
 [Authorize(Roles = "Citizen")]
 public class SecurityController : ControllerBase
 {
+    private const string InvalidToken = "Invalid token.";
+
     private readonly IFraudDetectionService _fraudDetectionService;
     private readonly IHostEnvironment _environment;
 
@@ -27,7 +29,7 @@ public class SecurityController : ControllerBase
     [ProducesResponseType(typeof(SecurityOverviewDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetOverview(CancellationToken cancellationToken)
     {
-        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = "Invalid token." });
+        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = InvalidToken });
 
         return Ok(await _fraudDetectionService.GetSecurityOverviewAsync(userId, cancellationToken));
     }
@@ -36,7 +38,7 @@ public class SecurityController : ControllerBase
     [ProducesResponseType(typeof(List<SecurityActivityItemDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetActivity([FromQuery] int limit = 20, CancellationToken cancellationToken = default)
     {
-        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = "Invalid token." });
+        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = InvalidToken });
 
         return Ok(await _fraudDetectionService.GetActivityAsync(userId, limit, cancellationToken));
     }
@@ -45,7 +47,7 @@ public class SecurityController : ControllerBase
     [ProducesResponseType(typeof(List<FraudAlertSummaryDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAlerts([FromQuery] FraudAlertStatus? status, CancellationToken cancellationToken)
     {
-        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = "Invalid token." });
+        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = InvalidToken });
 
         return Ok(await _fraudDetectionService.GetAlertsAsync(userId, status, cancellationToken));
     }
@@ -55,7 +57,7 @@ public class SecurityController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAlert(Guid alertId, CancellationToken cancellationToken)
     {
-        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = "Invalid token." });
+        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = InvalidToken });
 
         try
         {
@@ -70,12 +72,13 @@ public class SecurityController : ControllerBase
     [HttpPost("alerts/{alertId:guid}/secure")]
     [ProducesResponseType(typeof(SecureAccountResultDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> SecureAccount(Guid alertId, [FromBody] SecureAccountRequestDto request,
         [FromHeader(Name = "X-Client")] string? client, CancellationToken cancellationToken)
     {
-        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = "Invalid token." });
+        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = InvalidToken });
 
         try
         {
@@ -84,15 +87,7 @@ public class SecurityController : ControllerBase
 
             if (!string.IsNullOrWhiteSpace(result.Token))
             {
-                Response.Cookies.Append("access_token", result.Token, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = !_environment.IsDevelopment(),
-                    SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
-                    Path = "/",
-                    Expires = result.ExpiresAt,
-                    IsEssential = true,
-                });
+                AuthCookies.AppendAccessToken(Response, _environment, result.Token, result.ExpiresAt);
             }
 
             if (!IsNativeClient(client))
@@ -114,6 +109,10 @@ public class SecurityController : ControllerBase
         {
             return BadRequest(new { error = "Unsupported security action." });
         }
+        catch (StepUpVerificationFailedException ex)
+        {
+            return Unauthorized(new { error = ex.Message, code = StepUpVerificationFailedException.ErrorCode });
+        }
     }
 
     [HttpPost("alerts/{alertId:guid}/dismiss")]
@@ -123,7 +122,7 @@ public class SecurityController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> DismissAlert(Guid alertId, [FromBody] DismissFraudAlertRequestDto request, CancellationToken cancellationToken)
     {
-        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = "Invalid token." });
+        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = InvalidToken });
 
         try
         {
@@ -148,7 +147,7 @@ public class SecurityController : ControllerBase
     [ProducesResponseType(typeof(SecuritySettingsDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSettings(CancellationToken cancellationToken)
     {
-        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = "Invalid token." });
+        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = InvalidToken });
 
         return Ok(await _fraudDetectionService.GetSettingsAsync(userId, cancellationToken));
     }
@@ -158,7 +157,7 @@ public class SecurityController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> UpdateSettings([FromBody] UpdateSecuritySettingsRequestDto request, CancellationToken cancellationToken)
     {
-        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = "Invalid token." });
+        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = InvalidToken });
 
         try
         {
@@ -177,7 +176,7 @@ public class SecurityController : ControllerBase
     public async Task<IActionResult> Simulate([FromBody] SimulateSecurityEventRequestDto request, CancellationToken cancellationToken)
     {
         if (!_environment.IsDevelopment() && !_environment.IsEnvironment("Testing")) return NotFound();
-        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = "Invalid token." });
+        if (!TryGetUserId(out var userId)) return Unauthorized(new { error = InvalidToken });
 
         if (!GeoDistance.IsValidCoordinate(request.Latitude, request.Longitude))
         {

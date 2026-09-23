@@ -1,4 +1,5 @@
 using System.Globalization;
+using Application.Common.Security;
 using Application.Features.FraudDetection.DTOs;
 using Domain.Enums;
 
@@ -14,6 +15,14 @@ public static class SecurityEventContextFactory
     public static SecurityEventContext Create(HttpContext httpContext, Guid userId, SecurityEventType eventType, string? deviceToken = null)
     {
         var request = httpContext.Request;
+        var latitude = ReadCoordinate(request, LatitudeHeaderName);
+        var longitude = ReadCoordinate(request, LongitudeHeaderName);
+
+        if (!GeoDistance.IsValidCoordinate(latitude, longitude))
+        {
+            latitude = null;
+            longitude = null;
+        }
 
         return new SecurityEventContext
         {
@@ -22,8 +31,8 @@ public static class SecurityEventContextFactory
             IpAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
             DeviceToken = string.IsNullOrWhiteSpace(deviceToken) ? ReadDeviceToken(request) : deviceToken,
             UserAgent = request.Headers.UserAgent.ToString(),
-            ClientLatitude = ReadCoordinate(request, LatitudeHeaderName),
-            ClientLongitude = ReadCoordinate(request, LongitudeHeaderName),
+            ClientLatitude = latitude,
+            ClientLongitude = longitude,
         };
     }
 

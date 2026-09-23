@@ -91,10 +91,9 @@ public class FraudDetectionService : IFraudDetectionService
         }
     }
 
-    public async Task<FraudAssessmentResultDto> AssessQrGenerationAsync(SecurityEventContext context, CancellationToken cancellationToken)
+    public async Task EnsureQrGenerationAllowedAsync(SecurityEventContext context, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
-        context.EventType = SecurityEventType.QrGenerated;
 
         var profile = await _repository.GetProfileAsync(context.UserId, cancellationToken);
 
@@ -110,14 +109,7 @@ public class FraudDetectionService : IFraudDetectionService
             throw new QrGenerationRestrictedException(QrGenerationRestrictedException.RiskRestriction, AsUtc(restrictedUntil), openAlert?.Id);
         }
 
-        var result = await RecordSecurityEventAsync(context, cancellationToken);
-
-        if (result.RequiresStepUp)
-        {
-            throw new QrGenerationRestrictedException(QrGenerationRestrictedException.RiskRestriction, result.QrRestrictedUntil, result.AlertId);
-        }
-
-        if (profile?.EnhancedVerificationEnabled == true && !result.IsTrustedDevice)
+        if (profile?.EnhancedVerificationEnabled == true && !await IsTrustedDeviceAsync(context, cancellationToken))
         {
             await AddAuditAsync(context.UserId, null, AuditEventType.QrGenerationBlocked,
                 "QR code generation blocked: extra verification requires a trusted device.",
@@ -126,8 +118,32 @@ public class FraudDetectionService : IFraudDetectionService
 
             throw new QrGenerationRestrictedException(QrGenerationRestrictedException.TrustedDeviceRequired, null, null);
         }
+    }
+
+    public async Task<FraudAssessmentResultDto> RecordQrGenerationAsync(SecurityEventContext context, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        context.EventType = SecurityEventType.QrGenerated;
+
+        var result = await RecordSecurityEventAsync(context, cancellationToken);
+
+        if (result.RequiresStepUp)
+        {
+            throw new QrGenerationRestrictedException(QrGenerationRestrictedException.RiskRestriction, result.QrRestrictedUntil, result.AlertId);
+        }
 
         return result;
+    }
+
+    private async Task<bool> IsTrustedDeviceAsync(SecurityEventContext context, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(context.DeviceToken))
+        {
+            return false;
+        }
+
+        var hash = _deviceTokenProvider.HashToken(context.DeviceToken);
+        return await _repository.GetTrustedDeviceAsync(context.UserId, hash, cancellationToken) is not null;
     }
 
     private async Task<FraudAssessmentResultDto> AssessAsync(SecurityEventContext context, CancellationToken cancellationToken)
@@ -165,6 +181,11 @@ public class FraudDetectionService : IFraudDetectionService
                     previous.Latitude!.Value, previous.Longitude!.Value, previous.OccurredAt,
                     location.Latitude!.Value, location.Longitude!.Value, now,
                     _options);
+
+                if (travel.IsImpossible && IsLikelyNetworkRouting(previous, deviceTokenHash, location.Country))
+                {
+                    travel = travel with { IsImpossible = false };
+                }
             }
         }
 
@@ -304,6 +325,15 @@ public class FraudDetectionService : IFraudDetectionService
         return result;
     }
 
+    // SA carriers often exit through Johannesburg or Cape Town, so the same device jumping between
+    // cities inside one country (Wi-Fi <-> mobile data) is treated as a routing change, not travel.
+    private bool IsLikelyNetworkRouting(SecurityEvent previous, string? deviceTokenHash, string? currentCountry) =>
+        _options.IgnoreDomesticJumpsOnSameDevice &&
+        deviceTokenHash is not null &&
+        string.Equals(previous.DeviceTokenHash, deviceTokenHash, StringComparison.Ordinal) &&
+        !string.IsNullOrWhiteSpace(previous.Country) &&
+        string.Equals(previous.Country.Trim(), currentCountry?.Trim(), StringComparison.OrdinalIgnoreCase);
+
     public async Task<SecurityOverviewDto> GetSecurityOverviewAsync(Guid userId, CancellationToken cancellationToken)
     {
         var profile = await _repository.GetProfileAsync(userId, cancellationToken);
@@ -382,6 +412,8 @@ public class FraudDetectionService : IFraudDetectionService
         }
 
         var alert = await GetOpenAlertAsync(userId, alertId, cancellationToken);
+        await VerifyStepUpPasswordAsync(userId, request.Password, ipAddress, cancellationToken);
+
         var user = await _repository.GetUserByIdAsync(userId, cancellationToken)
                    ?? throw new FraudAlertNotFoundException(alertId);
         var profile = await _repository.GetOrCreateProfileAsync(userId, cancellationToken);

@@ -97,17 +97,7 @@ public class AuthController : ControllerBase
 
             // The token is set in an HttpOnly cookie so JavaScript cannot read it.
             // Secure = true in production forces HTTPS; in development HTTP is allowed.
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = !_environment.IsDevelopment(),
-                SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
-                Path = "/",
-                Expires = result.ExpiresAt,
-                IsEssential = true
-            };
-
-            Response.Cookies.Append("access_token", result.Token, cookieOptions);
+            AuthCookies.AppendAccessToken(Response, _environment, result.Token, result.ExpiresAt);
 
             var isNativeClient = IsNativeClient(client);
             if (!isNativeClient)
@@ -159,16 +149,7 @@ public class AuthController : ControllerBase
             result.SecurityAlert = await RecordSecurityEventAsync(fraudDetectionService, result.UserId,
                 Domain.Enums.SecurityEventType.DeviceVerified, result.DeviceToken ?? deviceToken, cancellationToken);
 
-            var accessTokenOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = !_environment.IsDevelopment(),
-                SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
-                Path = "/",
-                Expires = result.ExpiresAt,
-                IsEssential = true
-            };
-            Response.Cookies.Append("access_token", result.Token, accessTokenOptions);
+            AuthCookies.AppendAccessToken(Response, _environment, result.Token, result.ExpiresAt);
 
             if (!string.IsNullOrWhiteSpace(result.DeviceToken))
             {
@@ -335,9 +316,17 @@ public class AuthController : ControllerBase
     private async Task<SecurityAlertNoticeDto?> RecordSecurityEventAsync(IFraudDetectionService fraudDetectionService,
         Guid userId, Domain.Enums.SecurityEventType eventType, string? deviceToken, CancellationToken cancellationToken)
     {
-        var context = SecurityEventContextFactory.Create(HttpContext, userId, eventType, deviceToken);
-        var assessment = await fraudDetectionService.RecordSecurityEventAsync(context, cancellationToken);
-        return assessment.Notice;
+        try
+        {
+            var context = SecurityEventContextFactory.Create(HttpContext, userId, eventType, deviceToken);
+            var assessment = await fraudDetectionService.RecordSecurityEventAsync(context, cancellationToken);
+            return assessment.Notice;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogError(ex, "Fraud check failed for user {UserId}. Continuing the sign-in without it.", userId);
+            return null;
+        }
     }
 
     private string? ReadDeviceToken()

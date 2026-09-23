@@ -19,6 +19,7 @@ public class FraudDetectionOptions
     public int MediumRiskThreshold { get; set; } = 40;
     public int HighRiskThreshold { get; set; } = 70;
     public TimeSpan QrRestrictionDuration { get; set; } = TimeSpan.FromMinutes(30);
+    public bool IgnoreDomesticJumpsOnSameDevice { get; set; } = true;
 
     public int ImpossibleTravelWeight { get; set; } = 50;
     public int LocationChangeWeight { get; set; } = 10;
@@ -47,6 +48,10 @@ public class FraudDetectionOptions
         options.MediumRiskThreshold = ReadInt(section, "MediumRiskThreshold", options.MediumRiskThreshold);
         options.HighRiskThreshold = ReadInt(section, "HighRiskThreshold", options.HighRiskThreshold);
         options.QrRestrictionDuration = TimeSpan.FromMinutes(ReadDouble(section, "QrRestrictionMinutes", options.QrRestrictionDuration.TotalMinutes));
+        if (bool.TryParse(section["IgnoreDomesticJumpsOnSameDevice"], out var ignoreDomesticJumps))
+        {
+            options.IgnoreDomesticJumpsOnSameDevice = ignoreDomesticJumps;
+        }
 
         options.ImpossibleTravelWeight = ReadInt(section, "Weights:ImpossibleTravel", options.ImpossibleTravelWeight);
         options.LocationChangeWeight = ReadInt(section, "Weights:LocationChange", options.LocationChangeWeight);

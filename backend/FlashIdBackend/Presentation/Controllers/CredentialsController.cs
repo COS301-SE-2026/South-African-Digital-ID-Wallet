@@ -103,11 +103,13 @@ public class CredentialsController : ControllerBase
 
             var userId = Guid.Parse(userIdClaim);
 
-            await fraudDetectionService.AssessQrGenerationAsync(
-                SecurityEventContextFactory.Create(HttpContext, userId, Domain.Enums.SecurityEventType.QrGenerated),
-                HttpContext.RequestAborted);
+            var securityContext = SecurityEventContextFactory.Create(HttpContext, userId, Domain.Enums.SecurityEventType.QrGenerated);
+            await fraudDetectionService.EnsureQrGenerationAllowedAsync(securityContext, HttpContext.RequestAborted);
 
             var result = await _qrService.GenerateQrAsync(credentialId, userId, request);
+
+            // Only successful generations are recorded. A high-risk result withholds this QR and blocks new ones.
+            await fraudDetectionService.RecordQrGenerationAsync(securityContext, HttpContext.RequestAborted);
             return Ok(result);
         }
         catch (CredentialNotFoundException ex)
