@@ -1,0 +1,14 @@
+web/src/components/organisms/fraud-alert-guidance/fraud-alert-guidance.tsx
+  h_0aff3b71f739b1 1-120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2f7712a9b43de2dc9e17e912b7f1d9728e3f8502",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
