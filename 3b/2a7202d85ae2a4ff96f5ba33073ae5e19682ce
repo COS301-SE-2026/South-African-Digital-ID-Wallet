@@ -1,0 +1,15 @@
+web/src/components/organisms/fraud-alert-flow/fraud-alert-flow.tsx
+  h_0aff3b71f739b1 8-9,26-29,32,34-38,40,43-47,49
+  h_0aff3b71f739b1 30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "3b2a7202d85ae2a4ff96f5ba33073ae5e19682ce",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
