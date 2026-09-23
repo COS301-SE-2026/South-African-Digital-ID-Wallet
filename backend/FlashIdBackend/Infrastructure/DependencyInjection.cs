@@ -9,6 +9,8 @@ using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Azure.Core;
+using Azure.Identity;
 using Azure.Storage.Blobs;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Services;
@@ -40,7 +42,9 @@ public static class DependencyInjection
         services.AddScoped<IDashboardAccountCardRepository, DashboardAccountCardRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddSingleton<IDeviceTokenProvider, DeviceTokenProvider>();
-
+        services.AddSingleton<TokenCredential, DefaultAzureCredential>();
+        services.AddSingleton<IQrSigningProvider, AzureKeyVaultQrSigningProvider>();
+        services.AddScoped<IQrSignatureVerifier, QrSignatureVerifier>();
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
 
         services.AddScoped<ICredentialRepository, CredentialRepository>();
