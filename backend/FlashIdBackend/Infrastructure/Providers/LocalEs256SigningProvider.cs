@@ -2,18 +2,26 @@ using System.Buffers.Text;
 using System.Security.Cryptography;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Providers;
 
 public sealed class LocalEs256SigningProvider : ICredentialSigningProvider, IDisposable
 {
     private const string Es256 = "ES256";
-    private readonly ECDsa _key;
-    private readonly CredentialSigningKey _activeKey;
+    private sealed record LoadedKey(ECDsa Key, CredentialSigningKey Active);
+    private readonly Lazy<LoadedKey> _loaded;
     // ECDsa instances are not guaranteed thread-safe, so concurrent signing requests must take turns.
     private readonly Lock _keyLock = new();
 
     public LocalEs256SigningProvider(IConfiguration config)
+    {
+        // Loaded on first use, not at construction. This is a singleton, so throwing in the constructor takes down every endpoint on a controller.
+        // that merely resolves something depending on it, including endpoints that have nothing to do with offline credentials. 
+        _loaded = new Lazy<LoadedKey>(() => Load(config));
+    }
+
+    private static LoadedKey Load(IConfiguration config)
     {
         var keyId = config["Signing:Credential:Kid"];
 
@@ -47,7 +55,8 @@ public sealed class LocalEs256SigningProvider : ICredentialSigningProvider, IDis
 
             // The key never changes for this singleton, so the public half is exported once here.
             var publicJwk = new EcPublicJwk("EC", "P-256", keyId, Base64Url.EncodeToString(parameters.Q.X!), Base64Url.EncodeToString(parameters.Q.Y!));
-            _activeKey = new CredentialSigningKey(keyId, Es256, publicJwk);
+
+            return new LoadedKey(key, new CredentialSigningKey(keyId, Es256, publicJwk));
         }
         catch
         {
@@ -60,8 +69,6 @@ public sealed class LocalEs256SigningProvider : ICredentialSigningProvider, IDis
             // clear private key bytes from memory
             CryptographicOperations.ZeroMemory(privateKeyBytes);
         }
-
-        _key = key;
     }
 
     // This provider holds one key, so the active key never changes while the app is running.
@@ -69,15 +76,17 @@ public sealed class LocalEs256SigningProvider : ICredentialSigningProvider, IDis
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        return Task.FromResult(_activeKey);
+        return Task.FromResult(_loaded.Value.Active);
     }
 
     public Task<byte[]> SignAsync(string keyId, byte[] signingInput, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
+        var loaded = _loaded.Value;
+
         // The kid is already inside the signed header, so signing with another key would produce a credential nobody can verify.
-        if (keyId != _activeKey.KeyId)
+        if (keyId != loaded.Active.KeyId)
         {
             throw new InvalidOperationException($"Credential signing key '{keyId}' is not the active key.");
         }
@@ -86,10 +95,10 @@ public sealed class LocalEs256SigningProvider : ICredentialSigningProvider, IDis
         lock (_keyLock)
         {
             // Hashes with SHA-256 and returns raw r||s 64 bytes instead of DER
-            signature = _key.SignData(signingInput, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
+            signature = loaded.Key.SignData(signingInput, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
 
             // An issued offline credential cannot be recalled, so a signature that fails its own check is never returned.
-            if (!_key.VerifyData(signingInput, signature, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation))
+            if (!loaded.Key.VerifyData(signingInput, signature, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation))
             {
                 throw new CryptographicException("Credential signature failed verification after signing.");
             }
@@ -98,5 +107,11 @@ public sealed class LocalEs256SigningProvider : ICredentialSigningProvider, IDis
         return Task.FromResult(signature);
     }
 
-    public void Dispose() => _key.Dispose();
+    public void Dispose()
+    {
+        if (_loaded.IsValueCreated)
+        {
+            _loaded.Value.Key.Dispose();
+        }
+    }
 }
