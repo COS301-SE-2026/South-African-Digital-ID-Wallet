@@ -14,6 +14,8 @@ using Application.Common.Services;
 using Infrastructure.Repositories;
 using System.Security.Claims;
 using Microsoft.Azure.Cosmos;
+using Presentation.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -120,7 +122,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks()
+    .AddCheck<CredentialSigningKeyHealthCheck>("credential-signing-key", tags: ["readiness"]);
 
 static string UserPartitionKey(HttpContext httpContext) =>
     httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
@@ -220,7 +223,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.MapHealthChecks("/health");
+app.MapHealthChecks("/health", new HealthCheckOptions { Predicate = check => !check.Tags.Contains("readiness") });
+
+app.MapHealthChecks("/health/ready");
+
 app.MapControllers();
 
 await app.RunAsync();
