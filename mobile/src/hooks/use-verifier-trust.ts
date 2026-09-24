@@ -10,8 +10,10 @@ export const useVerifierTrust = () => {
     queryKey: ['verifier-trust', isOffline],
     queryFn: () =>
       isOffline ? readOfflineCache() : offlineService.refreshTrustData(),
-    staleTime: Infinity,
+    staleTime: isOffline ? 0 : Infinity,
     retry: false,
+    // Offline this query reads the phone's cache, so it must run even when TanStack pauses the rest.
+    networkMode: 'always',
   })
 
   return { trust: data?.trust ?? null }
