@@ -1,0 +1,18 @@
+mobile/src/hooks/test/use-prefetch-offline-packages.test.tsx
+  h_99fca60b892ff4 1-87
+mobile/src/components/pages/qr-scanner/test/qr-scanner-page.test.tsx
+  h_99fca60b892ff4 1-128
+mobile/src/components/pages/qr-generation/test/qr-generation-page.test.tsx
+  h_99fca60b892ff4 1-233
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "8e94dc0dbdfe54cc66692d9e2f590a4e41a74966",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

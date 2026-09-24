@@ -1,0 +1,19 @@
+mobile/src/app/citizen/_layout.tsx
+  h_99fca60b892ff4 22,24
+mobile/src/components/pages/credential-detail/credential-detail-page.tsx
+  h_99fca60b892ff4 2,29-32,43,80
+  h_99fca60b892ff4 1,35-42
+mobile/src/test/routes.test.tsx
+  h_99fca60b892ff4 79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "7f9caca0b6bab81219541ff3bb49655254ddcea6",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
