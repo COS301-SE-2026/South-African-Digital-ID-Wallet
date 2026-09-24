@@ -1,5 +1,6 @@
-import { useCallback, useState } from 'react'
-import { useFocusEffect, useRouter } from 'expo-router'
+import { useCallback, useEffect, useState } from 'react'
+import { useFocusEffect, useNavigation, useRouter } from 'expo-router'
+import { BottomTabNavigationProp } from 'expo-router/tabs'
 import { HelpCircle, ShieldAlert, Zap, ZapOff } from 'lucide-react-native'
 import { ActivityIndicator, View } from 'react-native'
 import { Button, Card, IconTile, Text } from '@/components/atoms'
@@ -86,7 +87,18 @@ export const QrScannerPage = () => {
   const handleScanAgain = useCallback(() => {
     setErrorMessage('')
     reset()
-  }, [reset])
+    // The offline result lives in its own hook, so it is cleared too or its screen stays up
+    resetOfflineScan()
+  }, [reset, resetOfflineScan])
+
+  const navigation =
+    useNavigation<BottomTabNavigationProp<Record<string, object | undefined>>>()
+
+  // The tab bar ignores a press on the open tab, so pressing Verify here starts a new scan instead.
+  useEffect(
+    () => navigation.addListener('tabPress', handleScanAgain),
+    [handleScanAgain, navigation]
+  )
 
   // Derived rather than stored, so it can never drift from the verification result it describes.
   const displayedError =
