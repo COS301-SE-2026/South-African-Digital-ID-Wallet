@@ -11,6 +11,7 @@ export const DetailScreen = ({
   action,
   children,
   onBack,
+  scrollRef,
   testID = 'detail-screen',
   title,
 }: DetailScreenProps) => {
@@ -41,6 +42,7 @@ export const DetailScreen = ({
       </View>
 
       <ScrollView
+        ref={scrollRef}
         contentContainerClassName="gap-5 px-5 pb-8"
         showsVerticalScrollIndicator={false}
       >
