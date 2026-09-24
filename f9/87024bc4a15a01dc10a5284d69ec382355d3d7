@@ -1,0 +1,27 @@
+mobile/src/hooks/use-prefetch-offline-packages.ts
+  h_99fca60b892ff4 1-32
+mobile/src/components/pages/citizen-home/citizen-home-page.tsx
+  h_99fca60b892ff4 1,3,13-17,19,27-40,51-55
+  h_99fca60b892ff4 56-57
+mobile/src/components/pages/official-home/official-home-page.tsx
+  h_99fca60b892ff4 12,25-26
+mobile/src/hooks/index.ts
+  h_99fca60b892ff4 17
+mobile/src/hooks/use-offline-package.ts
+  h_99fca60b892ff4 6-7,24
+  h_99fca60b892ff4 8-9,15,23,26-27
+mobile/src/test/citizen-home.integration.test.tsx
+  h_99fca60b892ff4 7,20-21,173-179
+  h_99fca60b892ff4 22,180
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f987024bc4a15a01dc10a5284d69ec382355d3d7",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
