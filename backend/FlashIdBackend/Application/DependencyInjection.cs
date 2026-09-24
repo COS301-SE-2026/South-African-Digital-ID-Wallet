@@ -46,6 +46,7 @@ public static class DependencyInjection
         services.AddSingleton(TimeProvider.System);
         services.AddScoped<ISdJwtCredentialFactory, SdJwtCredentialFactory>();
         services.AddSingleton<CertifiedCredentialSnapshotMapper>();
+        services.AddScoped<ICertifiedCredentialCopyService, CertifiedCredentialCopyService>();
 
         return services;
     }

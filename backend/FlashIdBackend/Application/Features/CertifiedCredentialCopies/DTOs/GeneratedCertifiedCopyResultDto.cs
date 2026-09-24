@@ -1,6 +1,6 @@
 namespace Application.Features.CertifiedCredentialCopies.DTOs;
 
-public class GeneratedCertifiedCopyResult
+public class GeneratedCertifiedCopyResultDto
 {
     public Guid CertifiedCopyId { get; set; }
     public byte[] PdfBytes { get; set; } = [];
