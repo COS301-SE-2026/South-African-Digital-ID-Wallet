@@ -15,6 +15,7 @@ on:
       - 'pnpm-lock.yaml'
       - 'package.json'
       - '.github/workflows/mobile.yml'
+  workflow_dispatch:
 
 jobs:
   build-and-test:
@@ -60,5 +61,6 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           directory: ./mobile/coverage
+          flags: mobile
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
