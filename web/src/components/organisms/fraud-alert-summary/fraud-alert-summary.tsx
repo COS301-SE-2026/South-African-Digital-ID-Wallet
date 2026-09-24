@@ -1,8 +1,5 @@
-import {
-  ArrowRight,
-  MapPin,
-  ShieldAlert,
-} from 'lucide-react'
+import {ArrowRight,MapPin,ShieldAlert,} from 'lucide-react'
+import { Text } from '@/components/atoms/text'
 import { Button } from '@/components/ui/button'
 import type { FraudAlertSummaryProps } from './types'
 
@@ -17,10 +14,16 @@ export function FraudAlertSummary({
           <ShieldAlert className="h-5 w-5" />
         </div>
         <div>
-          <p className="font-bold text-danger-red">{alert.title}</p>
-          <p className="mt-1 text-sm leading-6 text-text-primary">
+          <Text
+            as="p"
+            variant="sub-sm"
+            className="font-bold text-danger-red"
+          >
+            {alert.title}
+          </Text>
+          <Text as="p" variant="sub-sm" className="mt-1 text-text-primary">
             {alert.summary}
-          </p>
+          </Text>
         </div>
       </div>
       <button
@@ -30,15 +33,23 @@ export function FraudAlertSummary({
       >
         <MapPin className="h-6 w-6 shrink-0 text-danger-red" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-danger-red">
+          <Text
+            as="p"
+            variant="sub-sm"
+            className="font-bold text-danger-red"
+          >
             New login detected
-          </p>
-          <p className="mt-1 text-sm font-semibold text-text-primary">
+          </Text>
+          <Text as="p" variant="sub-sm" className="mt-1 font-semibold text-text-primary">
             {alert.newLogin.location}
-          </p>
-          <p className="mt-1 text-xs text-muted-text">
+          </Text>
+          <Text
+            as="p"
+            variant="caption"
+            className="mt-1"
+          >
             {alert.newLogin.timestamp}
-          </p>
+          </Text>
         </div>
         <ArrowRight className="h-5 w-5 shrink-0 text-deep-green" />
       </button>
