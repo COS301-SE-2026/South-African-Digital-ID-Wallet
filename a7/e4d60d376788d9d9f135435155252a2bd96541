@@ -1,0 +1,17 @@
+mobile/src/services/offline-service/offline-service.ts
+  h_99fca60b892ff4 4,25-26,28-32,34-36
+  h_99fca60b892ff4 33
+mobile/src/services/offline-service/test/offline-service.test.ts
+  h_99fca60b892ff4 9,32-35,40-41,102,110,118-119,123-132
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a7e4d60d376788d9d9f135435155252a2bd96541",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+mobile/src/stores/auth-store.ts
+  h_99fca60b892ff4 12,72,109
+mobile/src/stores/test/auth-store.test.ts
+  h_99fca60b892ff4 10,33-36,85-95,160-178
+mobile/src/hooks/test/use-offline-scan.test.tsx
+  h_99fca60b892ff4 115-148
+mobile/src/hooks/use-offline-scan.ts
+  h_99fca60b892ff4 12-15,23-26,36,51
+mobile/src/hooks/test/use-verifier-trust.test.tsx
+  h_99fca60b892ff4 70
+mobile/src/components/pages/qr-scanner/qr-scanner-page.tsx
+  h_99fca60b892ff4 35,41,43-44,75-76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "dfbb507672df60f7d6c87b96854f7f44dc5b5837",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+mobile/src/hooks/use-verifier-trust.ts
+  h_99fca60b892ff4 13,15-16
+mobile/src/app/_layout.tsx
+  h_99fca60b892ff4 4-5,23-24
+  h_99fca60b892ff4 6-9,25-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "5502d94fec422476372ca212de5881aa2dbf5ed6",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

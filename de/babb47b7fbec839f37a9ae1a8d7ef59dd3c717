@@ -1,0 +1,22 @@
+codecov.yml
+  h_99fca60b892ff4 17-28
+.github/workflows/backend.yml
+  h_99fca60b892ff4 10,41
+.github/workflows/web.yml
+  h_99fca60b892ff4 76
+.github/workflows/gov_registry.yml
+  h_99fca60b892ff4 10,39
+.github/workflows/mobile.yml
+  h_99fca60b892ff4 18,64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "debabb47b7fbec839f37a9ae1a8d7ef59dd3c717",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

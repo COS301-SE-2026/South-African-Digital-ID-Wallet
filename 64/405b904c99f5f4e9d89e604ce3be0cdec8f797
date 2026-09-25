@@ -1,0 +1,19 @@
+web/src/components/organisms/fraud-alert-flow/index.ts
+  h_0aff3b71f739b1 2
+  h_0aff3b71f739b1 1
+web/src/components/organisms/fraud-alert-guidance/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/organisms/fraud-alert-guidance/types.ts
+  h_0aff3b71f739b1 1-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "64405b904c99f5f4e9d89e604ce3be0cdec8f797",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

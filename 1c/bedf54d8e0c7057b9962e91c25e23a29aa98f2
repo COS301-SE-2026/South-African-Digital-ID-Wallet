@@ -1,0 +1,16 @@
+web/src/components/organisms/fraud-alert-modal/types.ts
+  h_0aff3b71f739b1 1-17
+web/src/components/organisms/fraud-alert-modal/index.ts
+  h_0aff3b71f739b1 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1cbedf54d8e0c7057b9962e91c25e23a29aa98f2",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
