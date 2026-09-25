@@ -2,7 +2,7 @@ import { base64urlnopad } from '@scure/base'
 
 import type { OfflinePackage } from './offline-cache'
 
-export type IssuerClaims = { vct: string; exp: number }
+export type IssuerClaims = { vct: string; exp: number; isDeviceBound: boolean }
 
 // Read from the signed credential rather than the server's timestamp strings: exp is plain unix
 // seconds, and .NET's seven-digit fractional seconds are not guaranteed to parse on Hermes.
@@ -17,7 +17,12 @@ export const readIssuerClaims = (
     )
 
     return typeof payload.vct === 'string' && typeof payload.exp === 'number'
-      ? { vct: payload.vct, exp: payload.exp }
+      ? {
+          vct: payload.vct,
+          exp: payload.exp,
+          isDeviceBound:
+            typeof payload.cnf === 'object' && payload.cnf !== null,
+        }
       : null
   } catch {
     return null
@@ -32,3 +37,6 @@ export const isPackageUsable = (
 
   return claims !== null && claims.exp > nowInSeconds
 }
+
+export const isDeviceBound = (offlinePakcge: OfflinePackage): boolean =>
+  readIssuerClaims(offlinePakcge)?.isDeviceBound === true
