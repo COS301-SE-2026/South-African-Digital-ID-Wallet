@@ -130,7 +130,7 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
 
         var token = Uri.EscapeDataString(verificationToken);
 
-        return $"{baseUrl}/api/certified-copies/verify/{token}";
+        return $"{baseUrl}/verify-certified-copy/{token}";
     }
 
     private async Task<byte[]?> GetPhotoBytesAsync(string? photoPath)
