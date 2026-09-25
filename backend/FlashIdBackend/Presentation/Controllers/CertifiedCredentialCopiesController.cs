@@ -76,4 +76,24 @@ public class CertifiedCredentialCopiesController : ControllerBase
         }
     }
 
+    [AllowAnonymous]
+    [HttpGet("verify/{verificationToken}")]
+    public async Task<IActionResult> VerifyCertifiedCopy(string verificationToken)
+    {
+        try
+        {
+            var result = await _certifiedCopyService.VerifyAsync(verificationToken);
+
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
+        }
+    }
+
+
 }
