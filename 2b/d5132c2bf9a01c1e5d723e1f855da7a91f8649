@@ -1,0 +1,22 @@
+backend/FlashIdBackend/Domain/Enums/AuditEventType.cs
+  h_99fca60b892ff4 44-45
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/OfflineVerificationBatchDto.cs
+  h_99fca60b892ff4 1-3
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/OfflineVerificationSyncResultDto.cs
+  h_99fca60b892ff4 1-3
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/OfflineVerificationEntryDto.cs
+  h_99fca60b892ff4 1-3
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/RevocationListResponseDto.cs
+  h_99fca60b892ff4 1-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2bd5132c2bf9a01c1e5d723e1f855da7a91f8649",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
