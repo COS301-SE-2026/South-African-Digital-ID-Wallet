@@ -56,7 +56,9 @@ describe('<QrCodeCard/>', () => {
       }),
       undefined
     )
-    expect(screen.getByText('Frame 1 of 2')).toBeTruthy()
+    expect(
+      screen.getByText('Frame 1 of 2', { includeHiddenElements: true })
+    ).toBeTruthy()
   })
 
   it('changes the offline frame eight times per second', async () => {
@@ -74,7 +76,9 @@ describe('<QrCodeCard/>', () => {
       }),
       undefined
     )
-    expect(screen.getByText('Frame 2 of 2')).toBeTruthy()
+    expect(
+      screen.getByText('Frame 2 of 2', { includeHiddenElements: true })
+    ).toBeTruthy()
   })
 
   it('cycles back to the first frame after the final frame', async () => {
@@ -92,7 +96,9 @@ describe('<QrCodeCard/>', () => {
       }),
       undefined
     )
-    expect(screen.getByText('Frame 1 of 2')).toBeTruthy()
+    expect(
+      screen.getByText('Frame 1 of 2', { includeHiddenElements: true })
+    ).toBeTruthy()
   })
 
   it('does not show the online expiry overlay for offline frames', async () => {
@@ -124,9 +130,40 @@ describe('<QrCodeCard/>', () => {
 
   it('hides the countdown in offline mode', async () => {
     await render(
-      <QrCodeCard {...baseProps} offlineFrames={['DID1:P:abcdef:0/1:only ']} />
+      <QrCodeCard {...baseProps} offlineFrames={['FID1:P:abcdef:0/1:only']} />
     )
 
     expect(screen.queryByText('This code expires in')).toBeNull()
+  })
+
+  it('Should draw offline frames larger and with low error correction', async () => {
+    await render(<QrCodeCard {...baseProps} offlineFrames={['frame-one']} />)
+
+    expect(qrCodeMock).toHaveBeenCalledWith(
+      expect.objectContaining({ ecl: 'L', logo: undefined, size: 280 }),
+      undefined
+    )
+  })
+
+  it('Should keep medium error correction for the online code and its logo', async () => {
+    await render(<QrCodeCard {...baseProps} token="online-token" />)
+
+    expect(qrCodeMock).toHaveBeenCalledWith(
+      expect.objectContaining({ ecl: 'M', size: 236 }),
+      undefined
+    )
+  })
+
+  it('Should hide the changing frame counter from screen readers', async () => {
+    await render(
+      <QrCodeCard {...baseProps} offlineFrames={['frame-one', 'frame-two']} />
+    )
+
+    const counter = screen.getByTestId('offline-frame-progress', {
+      includeHiddenElements: true,
+    })
+
+    expect(counter.props.importantForAccessibility).toBe('no')
+    expect(counter.props.accessibilityElementsHidden).toBe(true)
   })
 })

@@ -22,8 +22,6 @@ type ParsedFrame = {
   total: number
 }
 
-type StoredFrame = ParsedFrame
-
 const emptyState = (): AccumulatedPayload => ({
   complete: false,
   received: 0,
@@ -34,7 +32,7 @@ const emptyState = (): AccumulatedPayload => ({
 })
 
 export class PayloadFrameAccumulator {
-  private frames = new Map<number, StoredFrame>()
+  private frames = new Map<number, ParsedFrame>()
 
   private state: AccumulatedPayload = emptyState()
 
@@ -48,20 +46,6 @@ export class PayloadFrameAccumulator {
 
     if (this.state.tid === parsed.tid && this.state.total !== parsed.total) {
       throw new Error('Payload frame total changed for the same presentation.')
-    }
-
-    if (this.state.tid !== parsed.tid) {
-      this.state = {
-        complete: false,
-        received: 0,
-        missingIndexes: Array.from(
-          { length: parsed.total },
-          (_, index) => index
-        ),
-        presentation: null,
-        tid: parsed.tid,
-        total: parsed.total,
-      }
     }
 
     if (!this.frames.has(parsed.index)) {

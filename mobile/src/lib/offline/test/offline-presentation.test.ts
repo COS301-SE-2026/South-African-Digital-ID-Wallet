@@ -88,6 +88,12 @@ describe('createOfflinePresentation', () => {
       'Unsupported offline claim'
     )
   })
+
+  it('Should refuse a label that belongs to the other credential type', () => {
+    expect(() => createOfflinePresentation(licence, ['Photograph'])).toThrow(
+      'Unsupported offline claim'
+    )
+  })
 })
 
 describe('isPackageUsable', () => {

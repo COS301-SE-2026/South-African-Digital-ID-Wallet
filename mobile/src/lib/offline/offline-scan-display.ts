@@ -1,6 +1,7 @@
 import { base64, base64urlnopad } from '@scure/base'
 
 import type { VerificationFailureCode } from './verify'
+import { CLAIM_LABELS } from './claim-labels'
 
 // Labels match QrFieldDefinitions, so an offline result reads exactly like an online one.
 const FIELD_LABELS: Readonly<Record<string, Readonly<Record<string, string>>>> =
@@ -44,7 +45,7 @@ export const toOfflineScanDisplay = (
   vct: string,
   claims: Readonly<Record<string, string>>
 ): OfflineScanDisplay => {
-  const labels = FIELD_LABELS[vct] ?? {}
+  const labels = CLAIM_LABELS[vct] ?? {}
 
   const disclosedFields = Object.fromEntries(
     Object.entries(claims).map(([claimName, value]) => [

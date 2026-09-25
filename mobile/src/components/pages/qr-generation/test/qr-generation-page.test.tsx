@@ -85,6 +85,7 @@ const qrTokenMock = useQrToken as jest.Mock
 const presentationMock = createOfflinePresentation as jest.Mock
 const generateMock = jest.fn()
 const dismissToMock = jest.fn()
+const resetTokenMock = jest.fn()
 
 const CREDENTIAL_ID = 'c-1'
 const LICENCE_MANDATORY = ['Photo', 'Expiry date', 'Date of birth']
@@ -121,6 +122,7 @@ describe('QrGenerationPage', () => {
       error: null,
       generate: generateMock,
       isGenerating: false,
+      reset: resetTokenMock,
       token: null,
     })
     presentationMock.mockReturnValue('presentation')
@@ -229,5 +231,44 @@ describe('QrGenerationPage', () => {
     await fireEvent.press(screen.getByTestId('detail-back-button'))
 
     expect(dismissToMock).toHaveBeenCalledWith('/citizen/wallet')
+  })
+
+  it('Should stop showing the previous offline code when rebuilding it fails', async () => {
+    networkMock.mockReturnValue({ isOffline: true, isOnline: false })
+    await renderPage()
+    await fireEvent.press(screen.getByTestId('mock-share-licence-number'))
+    expect(screen.getByTestId('offline-qr-card')).toBeTruthy()
+    presentationMock.mockImplementationOnce(() => {
+      throw new Error('Offline claim is not cached: portrait')
+    })
+
+    await fireEvent.press(screen.getByTestId('qr-edit-disclosure-button'))
+    await fireEvent.press(screen.getByTestId('mock-share-mandatory-only'))
+
+    expect(screen.queryByTestId('offline-qr-card')).toBeNull()
+    expect(
+      screen.getByText(
+        'Your offline code could not be prepared. Connect to the internet and open Share again.'
+      )
+    ).toBeTruthy()
+    expect(screen.queryByText(/portrait/)).toBeNull()
+  })
+
+  it('Should clear the online code for the old selection when the fields change', async () => {
+    await renderPage()
+
+    await fireEvent.press(screen.getByTestId('mock-share-licence-number'))
+
+    expect(resetTokenMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('Should hide Show offline code while the offline code is showing', async () => {
+    await renderPage()
+    await fireEvent.press(screen.getByTestId('mock-share-licence-number'))
+
+    await fireEvent.press(screen.getByTestId('show-offline-button'))
+
+    expect(screen.getByTestId('offline-qr-card')).toBeTruthy()
+    expect(screen.queryByTestId('show-offline-button')).toBeNull()
   })
 })

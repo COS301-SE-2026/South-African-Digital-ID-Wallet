@@ -9,7 +9,10 @@ import {
 
 export type OfflineScanProgress = { received: number; total: number }
 
-export const useOfflineScan = (trust: TrustData | null) => {
+export const useOfflineScan = (
+  trust: TrustData | null,
+  isTrustLoading = false
+) => {
   // useState rather than useRef, so one accumulator lives for the life of the screen.
   const [accumulator] = useState(() => new PayloadFrameAccumulator())
   const [progress, setProgress] = useState<OfflineScanProgress | null>(null)
@@ -17,6 +20,10 @@ export const useOfflineScan = (trust: TrustData | null) => {
 
   const addFrame = useCallback(
     (rawText: string) => {
+      if (result) {
+        return
+      }
+
       let snapshot
 
       try {
@@ -26,7 +33,7 @@ export const useOfflineScan = (trust: TrustData | null) => {
         return
       }
 
-      if (!snapshot.complete || !snapshot.presentation) {
+      if (!snapshot.complete || !snapshot.presentation || isTrustLoading) {
         setProgress({ received: snapshot.received, total: snapshot.total })
         return
       }
@@ -41,7 +48,7 @@ export const useOfflineScan = (trust: TrustData | null) => {
           : { ok: false, code: 'STALE_TRUST_DATA', warnings: [] }
       )
     },
-    [accumulator, trust]
+    [accumulator, isTrustLoading, result, trust]
   )
 
   const reset = useCallback(() => {
