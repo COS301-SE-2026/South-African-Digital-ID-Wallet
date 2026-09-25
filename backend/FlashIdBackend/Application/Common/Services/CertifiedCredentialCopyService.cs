@@ -39,8 +39,7 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
         _photoStorageProvider = photoStorageProvider;
     }
 
-    public async Task<GeneratedCertifiedCopyResultDto> GenerateAsync(
-        Guid credentialId, Guid requestingUserId)
+    public async Task<GeneratedCertifiedCopyResultDto> GenerateAsync(Guid credentialId, Guid requestingUserId)
     {
         var credential = await _credentialRepository.GetByIdAsync(credentialId);
 
@@ -104,8 +103,7 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
         };
     }
 
-    private CertifiedCredentialSnapshot CreateSnapshot(
-        Credential credential)
+    private CertifiedCredentialSnapshot CreateSnapshot(Credential credential)
     {
         if (credential.IdentityDocument is not null)
             return _snapshotMapper.MapIdentityDocument(credential);
@@ -155,22 +153,102 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
         return memoryStream.ToArray();
     }
 
-    private static string CreateFileName(
-        CertifiedCredentialSnapshot snapshot,
-        Guid certificationId)
+    private static string CreateFileName(CertifiedCredentialSnapshot snapshot, Guid certificationId)
     {
-        var credentialType =
-            snapshot.CredentialType == "DriversLicense" ? "Drivers-License" : "Identity-Document";
+        var credentialType = snapshot.CredentialType == "DriversLicense" ? "Drivers-License" : "Identity-Document";
 
         return $"FlashID-Certified-{credentialType}-{certificationId:N}.pdf";
     }
 
-    public Task<VerifyCertifiedCopyResponseDto> VerifyAsync(string verificationToken)
+    public async Task<VerifyCertifiedCopyResponseDto> VerifyAsync(string verificationToken)
     {
-        throw new NotImplementedException();
+        ArgumentException.ThrowIfNullOrWhiteSpace(verificationToken);
+
+        var tokenHash = _cryptographyProvider.HashVerificationToken(verificationToken);
+
+        var certifiedCopy =
+            await _certifiedCopyRepository.GetByVerificationTokenHashAsync(tokenHash);
+
+        if (certifiedCopy is null)
+        {
+            return new VerifyCertifiedCopyResponseDto
+            {
+                IsValid = false,
+                Status = "Invalid"
+            };
+        }
+
+        if (certifiedCopy.Status == CertifiedCopyStatus.Revoked)
+        {
+            return new VerifyCertifiedCopyResponseDto
+            {
+                IsValid = false,
+                Status = "Revoked",
+                CertificationId = certifiedCopy.Id,
+                GeneratedAt = certifiedCopy.GeneratedAt,
+                ExpiresAt = certifiedCopy.ExpiresAt
+            };
+        }
+
+        if (certifiedCopy.ExpiresAt.HasValue && certifiedCopy.ExpiresAt.Value <= DateTime.UtcNow)
+        {
+            return new VerifyCertifiedCopyResponseDto
+            {
+                IsValid = false,
+                Status = "Expired",
+                CertificationId = certifiedCopy.Id,
+                GeneratedAt = certifiedCopy.GeneratedAt,
+                ExpiresAt = certifiedCopy.ExpiresAt
+            };
+        }
+
+        var credential = certifiedCopy.Credential;
+
+        if (credential.Status != CredentialStatus.Active)
+        {
+            return new VerifyCertifiedCopyResponseDto
+            {
+                IsValid = false,
+                Status = "CredentialInactive",
+                CertificationId = certifiedCopy.Id,
+                GeneratedAt = certifiedCopy.GeneratedAt,
+                ExpiresAt = certifiedCopy.ExpiresAt
+            };
+        }
+
+        var snapshot = CreateSnapshot(credential);
+
+        return new VerifyCertifiedCopyResponseDto
+        {
+            IsValid = true,
+            Status = "Valid",
+
+            CertificationId = certifiedCopy.Id,
+            GeneratedAt = certifiedCopy.GeneratedAt,
+            ExpiresAt = certifiedCopy.ExpiresAt,
+
+            CredentialType = snapshot.CredentialType,
+            IssuedBy = snapshot.IssuedBy,
+            IssueDate = snapshot.IssueDate,
+
+            FullName = snapshot.FullName,
+            IdNumber = snapshot.IdNumber,
+            DateOfBirth = snapshot.DateOfBirth,
+
+            Citizenship = snapshot.Citizenship,
+            CountryOfBirth = snapshot.CountryOfBirth,
+            Nationality = snapshot.Nationality,
+
+            LicenseNumber = snapshot.LicenseNumber,
+            LicenseCode = snapshot.LicenseCode,
+            Restrictions = snapshot.Restrictions,
+            ExpiryDate = snapshot.ExpiryDate,
+            CountryOfIssue = snapshot.CountryOfIssue
+        };
     }
 
-    public Task<VerifyCertifiedCopyDocumentResponseDto> VerifyDocumentAsync(string verificationToken, byte[] documentBytes)
+    public Task<VerifyCertifiedCopyDocumentResponseDto> VerifyDocumentAsync(string verificationToken,
+        byte[] documentBytes)
     {
         throw new NotImplementedException();
     }
