@@ -1,5 +1,5 @@
-import { Check, FileText, QrCode } from 'lucide-react'
-import { Text } from '@/components/atoms'
+import { Check, Download, FileText, QrCode, Share2 } from 'lucide-react'
+import { Button, Text } from '@/components/atoms'
 import type { CertifiedCopyGeneratedProps } from './types'
 
 const formatDateTime = (date: string) =>
@@ -11,7 +11,6 @@ const formatDateTime = (date: string) =>
     minute: '2-digit',
     hour12: false,
   })
-
 const getReference = (
   credential: CertifiedCopyGeneratedProps['credential']
 ) =>
@@ -23,6 +22,7 @@ export function CertifiedCopyGenerated({
   generatedAt,
 }: Readonly<CertifiedCopyGeneratedProps>) {
   const reference = getReference(credential)
+
   return (
     <div className="mx-auto w-full max-w-5xl">
       <div className="mb-6 flex items-start gap-3">
@@ -38,71 +38,135 @@ export function CertifiedCopyGenerated({
           </Text>
         </div>
       </div>
-      <div className="rounded-2xl border border-border-grey bg-[#ecebe6] p-4 shadow-inner sm:p-6">
-        <div className="mx-auto max-w-[430px] rounded-lg border border-deep-green/40 bg-clean-white p-4 shadow-lg sm:p-5">
-          <div className="flex items-center justify-between border-b border-border-grey pb-3">
-            <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-md bg-deep-green text-clean-white">
-                <FileText className="h-4 w-4" />
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_290px]">
+        <div className="rounded-2xl border border-border-grey bg-[#ecebe6] p-4 shadow-inner sm:p-6">
+          <div className="mx-auto max-w-[430px] rounded-lg border border-deep-green/40 bg-clean-white p-4 shadow-lg sm:p-5">
+            <div className="flex items-center justify-between border-b border-border-grey pb-3">
+              <div className="flex items-center gap-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-deep-green text-clean-white">
+                  <FileText className="h-4 w-4" />
+                </div>
+                <div>
+                  <Text variant="caption" className="font-bold text-deep-green">
+                    FlashID
+                  </Text>
+                  <Text variant="caption" className="block text-[9px]">
+                    Secure. Verify. Trust.
+                  </Text>
+                </div>
               </div>
-              <div>
+              <Text variant="caption" className="font-bold text-deep-green">
+                CERTIFIED COPY
+              </Text>
+            </div>
+            <div className="mt-5 flex items-start justify-between gap-5">
+              <div className="min-w-0">
                 <Text variant="caption" className="font-bold text-deep-green">
-                  FlashID
+                  {credential.title}
                 </Text>
-                <Text variant="caption" className="block text-[9px]">
-                  Secure. Verify. Trust.
-                </Text>
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <Text variant="caption">Reference</Text>
+                    <Text
+                      variant="sub-sm"
+                      className="font-semibold text-deep-green"
+                    >
+                      {reference}
+                    </Text>
+                  </div>
+                  <div>
+                    <Text variant="caption">Issued by</Text>
+                    <Text
+                      variant="sub-sm"
+                      className="font-semibold text-deep-green"
+                    >
+                      {credential.issuedBy}
+                    </Text>
+                  </div>
+                  <div>
+                    <Text variant="caption">Generated</Text>
+                    <Text
+                      variant="sub-sm"
+                      className="font-semibold text-deep-green"
+                    >
+                      {formatDateTime(generatedAt)}
+                    </Text>
+                  </div>
+                </div>
+              </div>
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center border-4 border-deep-green p-1 text-deep-green">
+                <QrCode className="h-full w-full" />
               </div>
             </div>
-            <Text variant="caption" className="font-bold text-deep-green">
-              CERTIFIED COPY
-            </Text>
+            <div className="mt-6 flex items-center justify-between border-t border-border-grey pt-3">
+              <Text variant="caption" className="text-[9px]">
+                Scan to verify at flashid.co/verify
+              </Text>
+              <span className="h-5 w-5 rounded-full border-2 border-deep-green" />
+            </div>
           </div>
-          <div className="mt-5 flex items-start justify-between gap-5">
-            <div className="min-w-0">
-              <Text variant="caption" className="font-bold text-deep-green">
+        </div>
+        <div className="rounded-2xl border border-border-grey bg-clean-white p-5">
+          <div className="flex items-start gap-3 rounded-xl bg-success-green/10 p-3">
+            <Check className="mt-0.5 h-4 w-4 shrink-0 text-success-green" />
+            <div>
+              <Text
+                variant="sub-sm"
+                className="font-semibold text-deep-green"
+              >
+                Certified Copy Generated
+              </Text>
+              <Text variant="caption" className="mt-0.5">
+                Your certified copy has been created successfully.
+              </Text>
+            </div>
+          </div>
+          <div className="mt-5 space-y-3">
+            <div className="flex justify-between gap-3 border-b border-border-grey pb-2">
+              <Text variant="caption">Credential Type</Text>
+              <Text
+                variant="caption"
+                className="text-right font-semibold text-deep-green"
+              >
                 {credential.title}
               </Text>
-              <div className="mt-4 space-y-3">
-                <div>
-                  <Text variant="caption">Reference</Text>
-                  <Text
-                    variant="sub-sm"
-                    className="font-semibold text-deep-green"
-                  >
-                    {reference}
-                  </Text>
-                </div>
-                <div>
-                  <Text variant="caption">Issued by</Text>
-                  <Text
-                    variant="sub-sm"
-                    className="font-semibold text-deep-green"
-                  >
-                    {credential.issuedBy}
-                  </Text>
-                </div>
-                <div>
-                  <Text variant="caption">Generated</Text>
-                  <Text
-                    variant="sub-sm"
-                    className="font-semibold text-deep-green"
-                  >
-                    {formatDateTime(generatedAt)}
-                  </Text>
-                </div>
-              </div>
             </div>
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center border-4 border-deep-green p-1 text-deep-green">
-              <QrCode className="h-full w-full" />
+            <div className="flex justify-between gap-3 border-b border-border-grey pb-2">
+              <Text variant="caption">Generated</Text>
+              <Text
+                variant="caption"
+                className="text-right font-semibold text-deep-green"
+              >
+                {formatDateTime(generatedAt)}
+              </Text>
+            </div>
+            <div className="flex justify-between gap-3">
+              <Text variant="caption">Certification ID</Text>
+              <Text
+                variant="caption"
+                className="max-w-[145px] truncate text-right font-semibold text-deep-green"
+              >
+                {credential.id}
+              </Text>
             </div>
           </div>
-          <div className="mt-6 flex items-center justify-between border-t border-border-grey pt-3">
-            <Text variant="caption" className="text-[9px]">
-              Scan to verify at flashid.co/verify
-            </Text>
-
-            <span className="h-5 w-5 rounded-full border-2 border-deep-green" />
+          <div className="mt-5 space-y-2">
+            <Button
+              type="button"
+              variant="primary"
+              className="w-full lg:w-full"
+              LeftIcon={Download}
+            >
+              Download PDF
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              className="w-full lg:w-full"
+              LeftIcon={Share2}
+            >
+              Share
+            </Button>
           </div>
         </div>
       </div>
