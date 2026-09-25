@@ -42,6 +42,8 @@ public class SigningKeyConfiguration : IEntityTypeConfiguration<SigningKey>
             .ValueGeneratedOnAdd();
 
         builder.HasIndex(k => k.Kid).IsUnique();
-        builder.HasIndex(k => new { k.Purpose, k.Status });
+        builder.HasIndex(k => k.Purpose)
+            .IsUnique()
+            .HasFilter("[Status] = 'Active'");
     }
 }
