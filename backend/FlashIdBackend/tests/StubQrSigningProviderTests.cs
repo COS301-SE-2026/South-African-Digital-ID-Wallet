@@ -85,4 +85,17 @@ public class StubQrSigningProviderTests
 
         Assert.True(valid);
     }
+
+    [Fact]
+    public async Task SignAsync_KeyIdDoesNotMatchActiveKey_Throws()
+    {
+        using var context = CreateInMemoryContext();
+        var repo = new SigningKeyRepository(context);
+        var provider = new StubQrSigningProvider(repo);
+
+        await provider.GetActiveKeyAsync(CancellationToken.None);
+        var data = Encoding.UTF8.GetBytes("some QR payload");
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => provider.SignAsync("wrong-kid", data, CancellationToken.None));
+    }
 }

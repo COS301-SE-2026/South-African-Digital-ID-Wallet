@@ -75,14 +75,22 @@ public class StubQrSigningProvider : IQrSigningProvider
         return new QrSigningKey(kid, "ES256", new EcPublicJwk("EC", "P-256", kid, currentX, currentY));
     }
 
-    public Task<byte[]> SignAsync(string keyId, byte[] signingInput, CancellationToken cancellationToken)
+    public async Task<byte[]> SignAsync(string keyId, byte[] signingInput, CancellationToken cancellationToken)
     {
+        var activeKey = await _signingKeyRepository.GetActiveKeyAsync(SigningKeyPurpose.Qr)
+            ?? throw new InvalidOperationException("No active QR signing key configured.");
+
+        if (keyId != activeKey.Kid)
+        {
+            throw new InvalidOperationException($"QR signing key '{keyId}' is not the active key.");
+        }
+
         byte[] signature;
         lock (SignLock)
         {
             signature = PrivateKey.SignData(signingInput, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
         }
 
-        return Task.FromResult(signature);
+        return signature;
     }
 }

@@ -92,8 +92,7 @@ public class QrService : IQrService
         };
 
         var payloadJson = JsonSerializer.Serialize(payload, CamelCaseOptions);
-        var payloadBytes = System.Text.Encoding.UTF8.GetBytes(payloadJson);
-
+        var payloadBytes = Encoding.UTF8.GetBytes(payloadJson);
         var activeKey = await _qrSigningProvider.GetActiveKeyAsync(CancellationToken.None);
         var signatureBytes = await _qrSigningProvider.SignAsync(activeKey.KeyId, payloadBytes, CancellationToken.None);
 
@@ -106,7 +105,7 @@ public class QrService : IQrService
         };
 
         var token = Convert.ToBase64String(
-            System.Text.Encoding.UTF8.GetBytes(JsonSerializer.Serialize(envelope, CamelCaseOptions)));
+            Encoding.UTF8.GetBytes(JsonSerializer.Serialize(envelope, CamelCaseOptions)));
 
         return new GenerateQrResponseDto
         {

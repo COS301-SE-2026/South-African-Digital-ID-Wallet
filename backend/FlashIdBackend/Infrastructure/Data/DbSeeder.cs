@@ -87,7 +87,6 @@ public static class DbSeeder
         await SeedTrustedDevicesAsync(context);
         await SeedNotificationsAsync(context);
         await SeedExpiryE2ECitizenAsync(context);
-        await SeedSigningKeysAsync(context);
     }
 
     internal static async Task SeedE2ETestUsersAsync(AppDbContext context)
@@ -304,31 +303,6 @@ public static class DbSeeder
 
         license.ExpiryDate = now.AddDays(-30);
         license.Credential.Status = CredentialStatus.Active;
-
-        await context.SaveChangesAsync();
-    }
-    private static async Task SeedSigningKeysAsync(AppDbContext context)
-    {
-        if (await context.SigningKeys.AnyAsync(k => k.Purpose == SigningKeyPurpose.Qr && k.Status == SigningKeyStatus.Active))
-        {
-            return;
-        }
-
-        var now = DateTime.UtcNow;
-
-        await context.SigningKeys.AddAsync(new SigningKey
-        {
-            Id = Guid.NewGuid(),
-            Kid = "qr-key-2026-09",
-            Purpose = SigningKeyPurpose.Qr,
-            Algorithm = "ES256",
-            PublicKeyJwk = "{\"crv\":\"P-256\",\"x\":\"UHflbsLIkUS0aJ6vdrMHmp_EBlygzQNW_KiB_A3C7l8\",\"y\":\"F27F2YGInGXf9GNP4HANNjzCsjn_FqJz6A3gDNKjAgA\"}",
-            KeyVaultKeyName = "flashid-qr-signing-v2",
-            KeyVaultKeyVersion = "806c91efb50f4ab490d9e623a19083c6",
-            Status = SigningKeyStatus.Active,
-            CreatedAt = now,
-            UpdatedAt = now
-        });
 
         await context.SaveChangesAsync();
     }
