@@ -1,4 +1,14 @@
-import { Check, Download, FileText, QrCode, Share2 } from 'lucide-react'
+import {
+  ArrowLeft,
+  Check,
+  Download,
+  ExternalLink,
+  FileText,
+  Link,
+  Mail,
+  QrCode,
+  Share2,
+} from 'lucide-react'
 import { Button, Text } from '@/components/atoms'
 import type { CertifiedCopyGeneratedProps } from './types'
 
@@ -20,6 +30,7 @@ const getReference = (
 export function CertifiedCopyGenerated({
   credential,
   generatedAt,
+  onBack,
 }: Readonly<CertifiedCopyGeneratedProps>) {
   const reference = getReference(credential)
 
@@ -56,7 +67,7 @@ export function CertifiedCopyGenerated({
                 </div>
               </div>
               <Text variant="caption" className="font-bold text-deep-green">
-                CERTIFIED COPY
+                Certified copy
               </Text>
             </div>
             <div className="mt-5 flex items-start justify-between gap-5">
@@ -110,10 +121,7 @@ export function CertifiedCopyGenerated({
           <div className="flex items-start gap-3 rounded-xl bg-success-green/10 p-3">
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-success-green" />
             <div>
-              <Text
-                variant="sub-sm"
-                className="font-semibold text-deep-green"
-              >
+              <Text variant="sub-sm" className="font-semibold text-deep-green">
                 Certified Copy Generated
               </Text>
               <Text variant="caption" className="mt-0.5">
@@ -124,10 +132,7 @@ export function CertifiedCopyGenerated({
           <div className="mt-5 space-y-3">
             <div className="flex justify-between gap-3 border-b border-border-grey pb-2">
               <Text variant="caption">Credential Type</Text>
-              <Text
-                variant="caption"
-                className="text-right font-semibold text-deep-green"
-              >
+              <Text variant="caption" className="text-right font-semibold text-deep-green">
                 {credential.title}
               </Text>
             </div>
@@ -168,6 +173,46 @@ export function CertifiedCopyGenerated({
               Share
             </Button>
           </div>
+          <div className="mt-5 border-t border-border-grey pt-4">
+            <Text variant="caption" className="mb-3 block text-center">
+              Other Options
+            </Text>
+            <div className="space-y-2">
+              <Button
+                type="button"
+                variant="secondary"
+                LeftIcon={Mail}
+                className="w-full justify-start border-0 bg-transparent px-2 py-1.5 text-left text-sm font-normal text-deep-green hover:bg-primary-green/5"
+              >
+                Send to Email
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                LeftIcon={Link}
+                className="w-full justify-start border-0 bg-transparent px-2 py-1.5 text-left text-sm font-normal text-deep-green hover:bg-primary-green/5"
+              >
+                Copy Verification Link
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                LeftIcon={ExternalLink}
+                className="w-full justify-start border-0 bg-transparent px-2 py-1.5 text-left text-sm font-normal text-deep-green hover:bg-primary-green/5"
+              >
+                View in New Tab
+              </Button>
+            </div>
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onBack}
+            LeftIcon={ArrowLeft}
+            className="mt-5 w-full justify-center border border-border-grey text-sm font-semibold text-deep-green hover:border-deep-green hover:bg-primary-green/5"
+          >
+            Back to My Credentials
+          </Button>
         </div>
       </div>
     </div>
