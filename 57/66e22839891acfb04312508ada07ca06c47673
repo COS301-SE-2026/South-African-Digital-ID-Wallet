@@ -1,0 +1,16 @@
+mobile/src/hooks/test/use-offline-package.test.ts
+  h_99fca60b892ff4 1-82
+mobile/src/hooks/use-offline-package.ts
+  h_99fca60b892ff4 2,5,8,13-23,31,35-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "5766e22839891acfb04312508ada07ca06c47673",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
