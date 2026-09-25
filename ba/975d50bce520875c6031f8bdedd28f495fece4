@@ -1,0 +1,15 @@
+web/src/components/molecules/certified-copy-generated/certified-copy-generated.tsx
+  h_0aff3b71f739b1 1-2,25,41-42,47-56,61-63,65,69-72,77-78,83,86-87,92,97-98,101-105,108-112,117-120,124-126,129,134,137-138,143-150,153-169
+  h_0aff3b71f739b1 43-46,58-60,67-68,73-76,79-82,84-85,88-91,93-96,106,113-116,121-123,127-128,130,135-136,139-142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ba975d50bce520875c6031f8bdedd28f495fece4",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
