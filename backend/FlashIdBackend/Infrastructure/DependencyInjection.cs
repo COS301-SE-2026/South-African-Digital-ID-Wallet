@@ -9,6 +9,7 @@ using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Azure.Core;
 using Azure.Identity;
 using Azure.Storage.Blobs;
@@ -24,7 +25,7 @@ namespace Infrastructure;
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(
-        this IServiceCollection services)
+        this IServiceCollection services, IConfiguration rootConfiguration)
     {
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         services.AddScoped<IPasswordHashingProvider, PasswordHashingProvider>();
@@ -49,11 +50,24 @@ public static class DependencyInjection
             var config = sp.GetRequiredService<IConfiguration>();
             var vaultUri = config["AzureKeyVault:VaultUri"];
 
-            return string.IsNullOrWhiteSpace(vaultUri)
-                ? ActivatorUtilities.CreateInstance<StubQrSigningProvider>(sp)
-                : ActivatorUtilities.CreateInstance<AzureKeyVaultQrSigningProvider>(sp);
+            if (string.IsNullOrWhiteSpace(vaultUri))
+            {
+                var env = sp.GetRequiredService<IHostEnvironment>();
+                if (env.IsDevelopment() || env.IsEnvironment("Testing"))
+                {
+                    return ActivatorUtilities.CreateInstance<StubQrSigningProvider>(sp);
+                }
+
+                throw new InvalidOperationException("AzureKeyVault:VaultUri is not configured.");
+            }
+
+            return ActivatorUtilities.CreateInstance<AzureKeyVaultQrSigningProvider>(sp);
         });
-        services.AddSingleton<IQrSigningKeyVaultInspector, AzureQrSigningKeyVaultInspector>();
+        var vaultUriConfigured = !string.IsNullOrWhiteSpace(rootConfiguration["AzureKeyVault:VaultUri"]);
+        if (vaultUriConfigured)
+        {
+            services.AddSingleton<IQrSigningKeyVaultInspector, AzureQrSigningKeyVaultInspector>();
+        }
         services.AddScoped<IQrSignatureVerifier, QrSignatureVerifier>();
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
 
@@ -134,7 +148,10 @@ public static class DependencyInjection
         services.AddScoped<CredentialExpiryRepository>();
         services.AddScoped<ICredentialExpiryRepository>(sp => new RetryingCredentialExpiryRepositoryDecorator(sp.GetRequiredService<CredentialExpiryRepository>()));
         services.AddHostedService<CredentialExpiryBackgroundService>();
-        services.AddHostedService<KeyRotationBackgroundService>();
+        if (vaultUriConfigured)
+        {
+            services.AddHostedService<KeyRotationBackgroundService>();
+        }
         services.AddScoped<CredentialUpdateRepository>();
         services.AddScoped<ICredentialUpdateRepository>(sp => new RetryingCredentialUpdateRepositoryDecorator(sp.GetRequiredService<CredentialUpdateRepository>()));
         services.AddHostedService<CredentialUpdateBackgroundService>();
