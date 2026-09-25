@@ -33,7 +33,7 @@ public class OfficialBadgeServiceTests
     {
         public bool ShouldVerify { get; set; } = true;
 
-        public Task<bool> VerifyAsync(string kid, byte[] signingInput, byte[] signature, CancellationToken cancellationToken) =>
+        public Task<bool> VerifyAsync(string kid, string alg, byte[] signingInput, byte[] signature, CancellationToken cancellationToken) =>
             Task.FromResult(ShouldVerify);
     }
 

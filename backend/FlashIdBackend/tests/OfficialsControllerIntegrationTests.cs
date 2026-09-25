@@ -44,7 +44,7 @@ public class OfficialsControllerIntegrationTests
 
     private sealed class StubQrSignatureVerifier : IQrSignatureVerifier
     {
-        public Task<bool> VerifyAsync(string kid, byte[] signingInput, byte[] signature, CancellationToken cancellationToken) =>
+        public Task<bool> VerifyAsync(string kid, string alg, byte[] signingInput, byte[] signature, CancellationToken cancellationToken) =>
             Task.FromResult(true);
     }
 

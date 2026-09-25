@@ -27,7 +27,7 @@ public class QrSignatureVerifierTests
         public Task SaveChangesAsync() => Task.CompletedTask;
     }
 
-    private static (SigningKey Key, ECDsa PrivateKey) CreateActiveKey(string kid = "test-kid", SigningKeyStatus status = SigningKeyStatus.Active)
+    private static (SigningKey Key, ECDsa PrivateKey) CreateActiveKey(string kid = "test-kid", SigningKeyStatus status = SigningKeyStatus.Active, SigningKeyPurpose purpose = SigningKeyPurpose.Qr)
     {
         var ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
         var parameters = ecdsa.ExportParameters(false);
@@ -38,7 +38,7 @@ public class QrSignatureVerifierTests
         {
             Id = Guid.NewGuid(),
             Kid = kid,
-            Purpose = SigningKeyPurpose.Qr,
+            Purpose = purpose,
             Algorithm = "ES256",
             PublicKeyJwk = JsonSerializer.Serialize(new { crv = "P-256", x, y }),
             KeyVaultKeyName = "test-key",
@@ -60,7 +60,7 @@ public class QrSignatureVerifierTests
         var data = "hello world"u8.ToArray();
         var signature = privateKey.SignData(data, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
 
-        var result = await verifier.VerifyAsync(key.Kid, data, signature, CancellationToken.None);
+        var result = await verifier.VerifyAsync(key.Kid, key.Algorithm, data, signature, CancellationToken.None);
 
         Assert.True(result);
     }
@@ -77,8 +77,7 @@ public class QrSignatureVerifierTests
         var signature = privateKey.SignData(data, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
         var tamperedData = "hello worlD"u8.ToArray();
 
-        var result = await verifier.VerifyAsync(key.Kid, tamperedData, signature, CancellationToken.None);
-
+        var result = await verifier.VerifyAsync(key.Kid, key.Algorithm, tamperedData, signature, CancellationToken.None);
         Assert.False(result);
     }
 
@@ -88,7 +87,7 @@ public class QrSignatureVerifierTests
         var repo = new FakeSigningKeyRepository();
         var verifier = new QrSignatureVerifier(repo);
 
-        var result = await verifier.VerifyAsync("unknown-kid", "data"u8.ToArray(), new byte[64], CancellationToken.None);
+        var result = await verifier.VerifyAsync("unknown-kid", "ES256", "data"u8.ToArray(), new byte[64], CancellationToken.None);
 
         Assert.False(result);
     }
@@ -104,7 +103,7 @@ public class QrSignatureVerifierTests
         var data = "hello world"u8.ToArray();
         var signature = privateKey.SignData(data, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
 
-        var result = await verifier.VerifyAsync(key.Kid, data, signature, CancellationToken.None);
+        var result = await verifier.VerifyAsync(key.Kid, key.Algorithm, data, signature, CancellationToken.None);
 
         Assert.False(result);
     }
@@ -120,7 +119,7 @@ public class QrSignatureVerifierTests
         var data = "hello world"u8.ToArray();
         var signature = privateKey.SignData(data, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
 
-        var result = await verifier.VerifyAsync(key.Kid, data, signature, CancellationToken.None);
+        var result = await verifier.VerifyAsync(key.Kid, key.Algorithm, data, signature, CancellationToken.None);
 
         Assert.True(result);
     }
@@ -134,8 +133,7 @@ public class QrSignatureVerifierTests
         repo.KeyToReturn = key;
         var verifier = new QrSignatureVerifier(repo);
 
-        var result = await verifier.VerifyAsync(key.Kid, "data"u8.ToArray(), new byte[64], CancellationToken.None);
-
+        var result = await verifier.VerifyAsync(key.Kid, key.Algorithm, "data"u8.ToArray(), new byte[64], CancellationToken.None);
         Assert.False(result);
     }
 
@@ -148,7 +146,39 @@ public class QrSignatureVerifierTests
         repo.KeyToReturn = key;
         var verifier = new QrSignatureVerifier(repo);
 
-        var result = await verifier.VerifyAsync(key.Kid, "data"u8.ToArray(), new byte[64], CancellationToken.None);
+        var result = await verifier.VerifyAsync(key.Kid, key.Algorithm, "data"u8.ToArray(), new byte[64], CancellationToken.None);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task VerifyAsync_KeyPurposeMismatch_ReturnsFalse()
+    {
+        var repo = new FakeSigningKeyRepository();
+        var (key, privateKey) = CreateActiveKey(purpose: SigningKeyPurpose.Pdf);
+        repo.KeyToReturn = key;
+        var verifier = new QrSignatureVerifier(repo);
+
+        var data = "hello world"u8.ToArray();
+        var signature = privateKey.SignData(data, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
+
+        var result = await verifier.VerifyAsync(key.Kid, key.Algorithm, data, signature, CancellationToken.None);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task VerifyAsync_AlgorithmMismatch_ReturnsFalse()
+    {
+        var repo = new FakeSigningKeyRepository();
+        var (key, privateKey) = CreateActiveKey();
+        repo.KeyToReturn = key;
+        var verifier = new QrSignatureVerifier(repo);
+
+        var data = "hello world"u8.ToArray();
+        var signature = privateKey.SignData(data, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
+
+        var result = await verifier.VerifyAsync(key.Kid, "RS256", data, signature, CancellationToken.None);
 
         Assert.False(result);
     }

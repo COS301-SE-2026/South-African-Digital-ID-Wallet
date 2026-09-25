@@ -77,8 +77,7 @@ public class OfficialBadgeService : IOfficialBadgeService
             var payloadJson = Encoding.UTF8.GetString(payloadBytes);
             var signatureBytes = Convert.FromBase64String(envelope.Signature);
 
-            if (!await _qrSignatureVerifier.VerifyAsync(envelope.Kid, payloadBytes, signatureBytes, CancellationToken.None)) throw new InvalidBadgeTokenException();
-            payload = JsonSerializer.Deserialize<BadgePayload>(payloadJson) ?? throw new InvalidBadgeTokenException();
+            if (!await _qrSignatureVerifier.VerifyAsync(envelope.Kid, envelope.Alg, payloadBytes, signatureBytes, CancellationToken.None)) throw new InvalidBadgeTokenException(); payload = JsonSerializer.Deserialize<BadgePayload>(payloadJson) ?? throw new InvalidBadgeTokenException();
         }
         catch (Exception n) when (n is FormatException or JsonException)
         {

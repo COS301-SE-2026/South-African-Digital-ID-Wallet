@@ -46,7 +46,7 @@ public class QrServiceIntegrationTests
 
     private sealed class FakeQrSignatureVerifier : IQrSignatureVerifier
     {
-        public Task<bool> VerifyAsync(string kid, byte[] signingInput, byte[] signature, CancellationToken cancellationToken) =>
+        public Task<bool> VerifyAsync(string kid, string alg, byte[] signingInput, byte[] signature, CancellationToken cancellationToken) =>
             Task.FromResult(true);
     }
 

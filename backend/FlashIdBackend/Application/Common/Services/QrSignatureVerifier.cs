@@ -16,11 +16,14 @@ public class QrSignatureVerifier : IQrSignatureVerifier
         _signingKeyRepository = signingKeyRepository;
     }
 
-    public async Task<bool> VerifyAsync(string kid, byte[] signingInput, byte[] signature, CancellationToken cancellationToken)
+    public async Task<bool> VerifyAsync(string kid, string alg, byte[] signingInput, byte[] signature, CancellationToken cancellationToken)
     {
         var signingKey = await _signingKeyRepository.GetByKidAsync(kid);
 
-        if (signingKey == null || signingKey.Status == SigningKeyStatus.Revoked)
+        if (signingKey == null
+            || signingKey.Purpose != SigningKeyPurpose.Qr
+            || signingKey.Status == SigningKeyStatus.Revoked
+            || signingKey.Algorithm != alg)
         {
             return false;
         }

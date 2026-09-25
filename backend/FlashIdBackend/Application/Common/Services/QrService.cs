@@ -166,7 +166,7 @@ public class QrService : IQrService
             var payloadJson = Encoding.UTF8.GetString(payloadBytes);
             var signatureBytes = Convert.FromBase64String(envelope.Signature);
 
-            if (!await _qrSignatureVerifier.VerifyAsync(envelope.Kid, payloadBytes, signatureBytes, CancellationToken.None)) throw new InvalidDisclosureTokenException();
+            if (!await _qrSignatureVerifier.VerifyAsync(envelope.Kid, envelope.Alg, payloadBytes, signatureBytes, CancellationToken.None)) throw new InvalidDisclosureTokenException();
             payload = JsonSerializer.Deserialize<QrPayload>(payloadJson, CamelCaseOptions) ?? throw new InvalidDisclosureTokenException();
             verifiedCredentialId = payload.CredentialId;
         }
