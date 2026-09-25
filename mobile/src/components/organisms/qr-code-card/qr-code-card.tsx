@@ -11,6 +11,7 @@ import { colors } from '@/theme/colors'
 import type { QrCodeCardProps } from './types'
 
 const QR_SIZE = 236
+const OFFLINE_QR_SIZE = 280
 const OFFLINE_FRAME_RATE = 8
 const OFFLINE_FRAME_INTERVAL_MS = 1000 / OFFLINE_FRAME_RATE
 
@@ -56,13 +57,13 @@ export const QrCodeCard = ({
         <QRCode
           backgroundColor={colors.white}
           color={colors.black}
-          // logo covers modules, and dense offline frames need every one of them to scan at 8fps
+          ecl={isOffline ? 'L' : 'M'}
           logo={isOffline ? undefined : require('../../../../assets/icon.png')}
           logoBackgroundColor={colors.white}
           logoBorderRadius={12}
           logoSize={46}
           quietZone={12}
-          size={QR_SIZE}
+          size={isOffline ? OFFLINE_QR_SIZE : QR_SIZE}
           value={qrValue}
         />
 
@@ -84,7 +85,12 @@ export const QrCodeCard = ({
           <Text variant="sub-md" className="text-center text-text-primary">
             Showing offline verification code
           </Text>
-          <Text variant="caption" testID="offline-frame-progress">
+          <Text
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+            testID="offline-frame-progress"
+            variant="caption"
+          >
             Frame {currentFrameIndex + 1} of {offlineFrames.length}
           </Text>
         </View>
