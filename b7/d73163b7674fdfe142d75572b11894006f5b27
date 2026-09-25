@@ -1,0 +1,15 @@
+backend/FlashIdBackend/Application/Common/Services/CertifiedCredentialCopyService.cs
+  h_293a8616118f65 163,165-231,233-235,237-239,241-245,247
+  h_293a8616118f65 42,106,156,158,232,236,240,246,250-251
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b7d73163b7674fdfe142d75572b11894006f5b27",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
