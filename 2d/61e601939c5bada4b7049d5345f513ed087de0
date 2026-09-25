@@ -1,0 +1,18 @@
+web/src/components/molecules/certified-credential-card/certified-credential-card.tsx
+  h_0aff3b71f739b1 2-3,25,49,56,79-95
+web/src/components/molecules/certified-credential-card/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/molecules/certified-credential-card/types.ts
+  h_0aff3b71f739b1 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2d61e601939c5bada4b7049d5345f513ed087de0",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
