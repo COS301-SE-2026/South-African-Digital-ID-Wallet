@@ -61,3 +61,26 @@ export const splitPayloadFrames = (
     }
   })
 }
+
+export const KEY_BINDING_FRAME_PREFIX = 'FID1:K'
+
+// Wire-format section 9: one K frame after every third P frame, so a camera that starts mid-cycle
+// meets a fresh signature within half a second at 8 fps.
+const PAYLOAD_FRAMES_PER_KEY_BINDING_FRAME = 3
+
+export const encodeKeyBindingFrame = (
+  tid: string,
+  keyBindingJwt: string
+): string => `${KEY_BINDING_FRAME_PREFIX}:${tid}:${keyBindingJwt}`
+
+export const interleaveKeyBindingFrame = (
+  payloadFrames: readonly string[],
+  keyBindingFrame: string
+): readonly string[] =>
+  payloadFrames.flatMap((frame, index) =>
+    // The last payload frame always gets one too, so a code shorter than three frames still carries it.
+    (index + 1) % PAYLOAD_FRAMES_PER_KEY_BINDING_FRAME === 0 ||
+    index === payloadFrames.length - 1
+      ? [frame, keyBindingFrame]
+      : [frame]
+  )

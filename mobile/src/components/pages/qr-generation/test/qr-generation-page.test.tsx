@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router'
 import { Pressable, Text, View } from 'react-native'
 import {
   useCountdown,
+  useKeyBindingFrame,
   useNetworkStatus,
   useOfflinePackage,
   useQrToken,
@@ -59,6 +60,7 @@ const MockQrCodeCard = ({
 jest.mock('expo-router', () => ({ useRouter: jest.fn() }))
 jest.mock('@/hooks', () => ({
   useCountdown: jest.fn(),
+  useKeyBindingFrame: jest.fn(),
   useNetworkStatus: jest.fn(),
   useOfflinePackage: jest.fn(),
   useQrToken: jest.fn(),
@@ -69,9 +71,10 @@ jest.mock('@/lib/offline/offline-presentation', () => ({
   isPackageUsable: jest.fn(),
 }))
 jest.mock('@/lib/offline/qr-frames', () => ({
+  ...jest.requireActual('@/lib/offline/qr-frames'),
   splitPayloadFrames: jest.fn(() => [
-    { encoded: 'FID1:P:abcdef:0/2:first' },
-    { encoded: 'FID1:P:abcdef:1/2:second' },
+    { encoded: 'FID1:P:abcdef:0/2:first', tid: 'abcedf' },
+    { encoded: 'FID1:P:abcdef:1/2:second', tid: 'abcdef' },
   ]),
 }))
 jest.mock('@/components/organisms', () => ({
@@ -83,6 +86,7 @@ const networkMock = useNetworkStatus as jest.Mock
 const offlinePackageMock = useOfflinePackage as jest.Mock
 const qrTokenMock = useQrToken as jest.Mock
 const presentationMock = createOfflinePresentation as jest.Mock
+const keyBindingFrameMock = useKeyBindingFrame as jest.Mock
 const generateMock = jest.fn()
 const dismissToMock = jest.fn()
 const resetTokenMock = jest.fn()
@@ -126,6 +130,7 @@ describe('QrGenerationPage', () => {
       token: null,
     })
     presentationMock.mockReturnValue('presentation')
+    keyBindingFrameMock.mockReturnValue(null)
   })
 
   it('Should request an online code with the mandatory and chosen fields when online', async () => {
@@ -270,5 +275,24 @@ describe('QrGenerationPage', () => {
 
     expect(screen.getByTestId('offline-qr-card')).toBeTruthy()
     expect(screen.queryByTestId('show-offline-button')).toBeNull()
+  })
+
+  it('Should add the signed key binding frame to the offline code', async () => {
+    keyBindingFrameMock.mockReturnValue('FID1:K:abcdef:kb')
+    networkMock.mockReturnValue({ isOffline: true, isOnline: false })
+    await renderPage()
+
+    await fireEvent.press(screen.getByTestId('mock-share-licence-number'))
+
+    expect(screen.getByText('3 frames')).toBeTruthy()
+  })
+
+  it('Should not ask for key binding when the credential is not bound to this phone', async () => {
+    networkMock.mockReturnValue({ isOffline: true, isOnline: false })
+    await renderPage()
+
+    await fireEvent.press(screen.getByTestId('mock-share-licence-number'))
+
+    expect(keyBindingFrameMock).toHaveBeenLastCalledWith(null)
   })
 })

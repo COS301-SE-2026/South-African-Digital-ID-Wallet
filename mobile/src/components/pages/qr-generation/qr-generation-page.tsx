@@ -1,21 +1,27 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'expo-router'
 import { ActivityIndicator, type ScrollView, View } from 'react-native'
 import { Button, Card, Text } from '@/components/atoms'
 import { DisclosureModal, QrCodeCard } from '@/components/organisms'
 import { DetailScreen } from '@/components/templates'
 import type { OfflinePackage } from '@/lib/offline/offline-cache'
+import { isDeviceBound } from '@/lib/offline/offline-package'
 import {
   createOfflinePresentation,
   isPackageUsable,
 } from '@/lib/offline/offline-presentation'
-import { splitPayloadFrames } from '@/lib/offline/qr-frames'
+import {
+  interleaveKeyBindingFrame,
+  splitPayloadFrames,
+} from '@/lib/offline/qr-frames'
 import {
   useCountdown,
+  useKeyBindingFrame,
   useNetworkStatus,
   useOfflinePackage,
   useQrToken,
   useWalletCredential,
+  type KeyBindingSource,
 } from '@/hooks'
 import { MANDATORY_FIELDS, toQrCredentialType } from '@/services/qr-service'
 import { colors } from '@/theme/colors'
@@ -28,7 +34,9 @@ const CONNECT_ONCE_MESSAGE = 'Connect once to prepare offline verification.'
 const OFFLINE_CODE_FAILED_MESSAGE =
   'Your offline code could not be prepared. Connect to the internet and open Share again.'
 
-type OfflineCodeOutcome = { frames: readonly string[] } | { error: string }
+type OfflineCodeOutcome =
+  | { frames: readonly string[]; keyBindingSource: KeyBindingSource | null }
+  | { error: string }
 
 // Pure, so every way an offline code can fail is decided in one place and the page only applies the outcome.
 const buildOfflineCode = (
@@ -45,9 +53,14 @@ const buildOfflineCode = (
 
   try {
     const presentation = createOfflinePresentation(offlinePackage, fields)
+    const payloadFrames = splitPayloadFrames(presentation)
 
     return {
-      frames: splitPayloadFrames(presentation).map((frame) => frame.encoded),
+      frames: payloadFrames.map((frame) => frame.encoded),
+      // Only a credential bound to this phone gets K frames; an unbound one would be refused with them.
+      keyBindingSource: isDeviceBound(offlinePackage)
+        ? { sdJwt: presentation, tid: payloadFrames[0].tid }
+        : null,
     }
   } catch {
     // The builder's messages name internal claims such as "portrait", which mean nothing to a citizen.
@@ -64,6 +77,8 @@ export const QrGenerationPage = ({ credentialId }: QrGenerationPageProps) => {
   const [disclosedFields, setDisclosedFields] = useState<string[]>([])
   const [isDisclosureOpen, setIsDisclosureOpen] = useState(true)
   const [offlineFrames, setOfflineFrames] = useState<readonly string[]>([])
+  const [keyBindingSource, setKeyBindingSource] =
+    useState<KeyBindingSource | null>(null)
   const [isOfflineMode, setIsOfflineMode] = useState(false)
   const [offlineError, setOfflineError] = useState<string | null>(null)
 
@@ -77,6 +92,15 @@ export const QrGenerationPage = ({ credentialId }: QrGenerationPageProps) => {
   const secondsRemaining = useCountdown(token?.expiresAt)
   const credentialType = toQrCredentialType(credential?.type)
 
+  const keyBindingFrame = useKeyBindingFrame(keyBindingSource)
+  const displayedFrames = useMemo(
+    () =>
+      keyBindingFrame
+        ? interleaveKeyBindingFrame(offlineFrames, keyBindingFrame)
+        : offlineFrames,
+    [keyBindingFrame, offlineFrames]
+  )
+
   const scrollRef = useRef<ScrollView>(null)
 
   // The mode buttons sit below the code, so switching would otherwise leave the new code
@@ -85,8 +109,8 @@ export const QrGenerationPage = ({ credentialId }: QrGenerationPageProps) => {
     scrollRef.current?.scrollTo({ animated: true, y: 0 })
   }, [])
 
-  // Scrolls once the new code has rendered, so both switches and an offline field change
-  // end with the whole code in view.
+  // Scrolls once the new code has rendered. Keyed on the payload frames, not the displayed ones, so
+  // the K frame re-signing every 5 seconds never scrolls the page.
   useEffect(() => {
     scrollToTop()
   }, [isOfflineMode, offlineFrames, scrollToTop])
@@ -99,6 +123,7 @@ export const QrGenerationPage = ({ credentialId }: QrGenerationPageProps) => {
         // A failed rebuild must not leave the previous code cycling, or the citizen would
         // present fields they no longer chose.
         setOfflineFrames([])
+        setKeyBindingSource(null)
         setIsOfflineMode(false)
         setOfflineError(outcome.error)
         return
@@ -106,6 +131,7 @@ export const QrGenerationPage = ({ credentialId }: QrGenerationPageProps) => {
 
       setOfflineError(null)
       setOfflineFrames(outcome.frames)
+      setKeyBindingSource(outcome.keyBindingSource)
       setIsOfflineMode(true)
     },
     [isPreparing, offlinePackage]
@@ -162,6 +188,7 @@ export const QrGenerationPage = ({ credentialId }: QrGenerationPageProps) => {
 
   const handleShowOnlineCode = useCallback(() => {
     setOfflineFrames([])
+    setKeyBindingSource(null)
     setIsOfflineMode(false)
     setOfflineError(null)
 
@@ -208,7 +235,7 @@ export const QrGenerationPage = ({ credentialId }: QrGenerationPageProps) => {
 
       {isOfflineMode ? (
         <QrCodeCard
-          offlineFrames={offlineFrames}
+          offlineFrames={displayedFrames}
           onCancel={handleBack}
           onRefresh={handleShowOfflineCode}
           secondsRemaining={Number.MAX_SAFE_INTEGER}
