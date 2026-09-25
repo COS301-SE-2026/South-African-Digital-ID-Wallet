@@ -1,0 +1,15 @@
+web/src/components/molecules/gen-copy-progress/gen-copy-progress.tsx
+  h_0aff3b71f739b1 1,29-35,40,49,56-57,59-67,69,76-78,80,83,87,92,100-105
+  h_0aff3b71f739b1 28,36-39,41-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f2ea7f97b9e1f79010497ae62608f193acf2c722",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
