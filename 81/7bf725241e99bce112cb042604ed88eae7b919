@@ -1,0 +1,19 @@
+mobile/src/components/pages/qr-generation/types.ts
+  h_99fca60b892ff4 4-13
+mobile/src/components/pages/qr-generation/qr-generation-page.tsx
+  h_99fca60b892ff4 4,7,20,23,26-57,70-76,82-83,88-89,96,98-103,107-109,127-128,146,168-169,175,209,217-221,225,227,231,238-241
+mobile/src/components/pages/qr-generation/online-qr-state.tsx
+  h_99fca60b892ff4 1-66
+  h_99fca60b892ff4 67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "817bf725241e99bce112cb042604ed88eae7b919",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
