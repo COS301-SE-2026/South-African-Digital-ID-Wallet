@@ -1,0 +1,16 @@
+mobile/package.json
+  h_99fca60b892ff4 13
+pnpm-lock.yaml
+  h_99fca60b892ff4 501-504,521-524,8170,8185,8210,8213,8271-8272,8300-8301,8313,8322,8325,8357,8409,8449,8469,8484,8578,8710-8711,8739,10980,11132,11134,12036,15499,15510
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f93b112526535d0e77b25fd1ebaed902eaa1c13f",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
