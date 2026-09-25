@@ -32,14 +32,16 @@ export const QrScannerPage = () => {
   const [isTorchOn, setIsTorchOn] = useState(false)
   const { isResolving, reset, resolve, result } = useScanCredential()
   const { isOffline } = useNetworkStatus()
-  const { trust } = useVerifierTrust()
+  const { isLoading: isTrustLoading, trust } = useVerifierTrust()
   const {
     addFrame,
     progress: offlineProgress,
     reset: resetOfflineScan,
     result: offlineResult,
-  } = useOfflineScan(trust)
+  } = useOfflineScan(trust, isTrustLoading)
 
+  // Leaving the tab does not unmount this screen, so the result and any half-collected offline code are cleared on the way out,
+  // and coming back alwats starts a fresh scan.
   useFocusEffect(
     useCallback(() => {
       setIsFocused(true)
@@ -70,7 +72,8 @@ export const QrScannerPage = () => {
         setErrorMessage('Scanning official badges is not available yet.')
         return
       }
-      // 3.5a: an online code needs the server, so without signal say what to do instead.
+
+      // Online codes are resolved by the server, so without signal the verifier is told what to asj for instead.
       if (isOffline) {
         setErrorMessage(
           'No connection. Ask the citizen to show their offline code.'

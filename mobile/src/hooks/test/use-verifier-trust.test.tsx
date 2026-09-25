@@ -67,7 +67,7 @@ describe('useVerifierTrust', () => {
 
     await act(async () => resolveTrust(CACHE))
 
-    expect(result.current.isLoading).toBe(false)
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
     expect(result.current.trust).toEqual(TRUST)
   })
 

@@ -112,4 +112,38 @@ describe('useOfflineScan', () => {
     expect(result.current.progress).toBeNull()
     expect(result.current.result).toBeNull()
   })
+
+  it('Should wait for the verification data to load before verifying', async () => {
+    const { result, rerender } = await renderHook(
+      ({ isLoading }: { isLoading: boolean }) =>
+        useOfflineScan(trust, isLoading),
+      { initialProps: { isLoading: true } }
+    )
+    const frames = framesFor(PRESENTATION, 'abcdef')
+
+    for (const frame of frames) {
+      await act(async () => result.current.addFrame(frame))
+    }
+
+    expect(verifyMock).not.toHaveBeenCalled()
+    expect(result.current.progress).toEqual({ received: 3, total: 3 })
+
+    await rerender({ isLoading: false })
+    await act(async () => result.current.addFrame(frames[0]))
+
+    expect(verifyMock).toHaveBeenCalledTimes(1)
+    expect(result.current.result).toEqual(verified)
+  })
+
+  it('Should ignore frames once a result is showing', async () => {
+    const { result } = await renderHook(() => useOfflineScan(trust))
+    const frames = framesFor(PRESENTATION, 'abcdef')
+
+    for (const frame of [...frames, ...frames]) {
+      await act(async () => result.current.addFrame(frame))
+    }
+
+    expect(verifyMock).toHaveBeenCalledTimes(1)
+    expect(result.current.progress).toBeNull()
+  })
 })
