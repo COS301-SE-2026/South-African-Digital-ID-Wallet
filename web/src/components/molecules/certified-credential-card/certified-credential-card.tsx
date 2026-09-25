@@ -1,5 +1,5 @@
 'use client'
-import { Car, Download, FileText, MoreHorizontal } from 'lucide-react'
+import { Car, Download, FileText } from 'lucide-react'
 import { Button, StatusPill, Text } from '@/components/atoms'
 import type { CredentialResponse } from '@/services/credential-service'
 import type { CertifiedCredentialCardProps } from './types'
@@ -22,6 +22,7 @@ const getExpiryDate = (credential: CredentialResponse) =>
 
 export function CertifiedCredentialCard({
   credential,
+  onViewCredential,
   onGenerateCertifiedCopy,
 }: Readonly<CertifiedCredentialCardProps>) {
   const Icon = credential.type === 'DriversLicense' ? Car : FileText
@@ -79,18 +80,20 @@ export function CertifiedCredentialCard({
         <div className="mt-5 flex gap-2">
           <Button
             type="button"
-            onClick={() => onGenerateCertifiedCopy(credential)}
-            className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-deep-green px-3 text-sm font-semibold text-clean-white hover:bg-primary-green focus-visible:ring-primary-green"
+            variant="secondary"
+            className="w-auto min-w-0 flex-1"
+            onClick={() => onViewCredential(credential)}
           >
-            <Download className="h-4 w-4" aria-hidden="true" />
-            Generate Certified Copy
+            View Credential
           </Button>
           <Button
             type="button"
-            aria-label={`More options for ${credential.title}`}
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border-grey bg-transparent p-0 text-deep-green hover:border-deep-green hover:bg-primary-green/5"
+            variant="primary"
+            LeftIcon={Download}
+            className="w-auto min-w-0 flex-1"
+            onClick={() => onGenerateCertifiedCopy(credential)}
           >
-            <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
+            Generate Certified Copy
           </Button>
         </div>
       </div>

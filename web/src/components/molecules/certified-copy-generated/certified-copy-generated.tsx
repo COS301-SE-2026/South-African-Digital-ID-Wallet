@@ -3,217 +3,74 @@ import {
   Check,
   Download,
   ExternalLink,
-  FileText,
-  Link,
   Mail,
-  QrCode,
-  Share2,
 } from 'lucide-react'
 import { Button, Text } from '@/components/atoms'
 import type { CertifiedCopyGeneratedProps } from './types'
 
-const formatDateTime = (date: string) =>
-  new Date(date).toLocaleString('en-ZA', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  })
-const getReference = (
-  credential: CertifiedCopyGeneratedProps['credential']
-) =>
-  credential.identityDocument?.idNumber ??
-  credential.driversLicense?.licenseNumber ??
-  credential.id
 export function CertifiedCopyGenerated({
-  credential,
-  generatedAt,
   onBack,
 }: Readonly<CertifiedCopyGeneratedProps>) {
-  const reference = getReference(credential)
-
   return (
-    <div className="mx-auto w-full max-w-5xl">
-      <div className="mb-6 flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-success-green text-clean-white">
-          <Check className="h-5 w-5" strokeWidth={3} />
-        </div>
-        <div>
-          <Text as="h2" variant="h4" className="text-text-primary">
-            Your Certified Copy is Ready!
-          </Text>
-          <Text variant="caption" className="mt-1">
-            Here is your digitally generated and verifiable document.
-          </Text>
-        </div>
-      </div>
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_290px]">
-        <div className="rounded-2xl border border-border-grey bg-[#ecebe6] p-4 shadow-inner sm:p-6">
-          <div className="mx-auto max-w-[430px] rounded-lg border border-deep-green/40 bg-clean-white p-4 shadow-lg sm:p-5">
-            <div className="flex items-center justify-between border-b border-border-grey pb-3">
-              <div className="flex items-center gap-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-deep-green text-clean-white">
-                  <FileText className="h-4 w-4" />
-                </div>
-                <div>
-                  <Text variant="caption" className="font-bold text-deep-green">
-                    FlashID
-                  </Text>
-                  <Text variant="caption" className="block text-[9px]">
-                    Secure. Verify. Trust.
-                  </Text>
-                </div>
-              </div>
-              <Text variant="caption" className="font-bold text-deep-green">
-                Certified copy
-              </Text>
-            </div>
-            <div className="mt-5 flex items-start justify-between gap-5">
-              <div className="min-w-0">
-                <Text variant="caption" className="font-bold text-deep-green">
-                  {credential.title}
-                </Text>
-                <div className="mt-4 space-y-3">
-                  <div>
-                    <Text variant="caption">Reference</Text>
-                    <Text
-                      variant="sub-sm"
-                      className="font-semibold text-deep-green"
-                    >
-                      {reference}
-                    </Text>
-                  </div>
-                  <div>
-                    <Text variant="caption">Issued by</Text>
-                    <Text
-                      variant="sub-sm"
-                      className="font-semibold text-deep-green"
-                    >
-                      {credential.issuedBy}
-                    </Text>
-                  </div>
-                  <div>
-                    <Text variant="caption">Generated</Text>
-                    <Text
-                      variant="sub-sm"
-                      className="font-semibold text-deep-green"
-                    >
-                      {formatDateTime(generatedAt)}
-                    </Text>
-                  </div>
-                </div>
-              </div>
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center border-4 border-deep-green p-1 text-deep-green">
-                <QrCode className="h-full w-full" />
-              </div>
-            </div>
-            <div className="mt-6 flex items-center justify-between border-t border-border-grey pt-3">
-              <Text variant="caption" className="text-[9px]">
-                Scan to verify at flashid.co/verify
-              </Text>
-              <span className="h-5 w-5 rounded-full border-2 border-deep-green" />
-            </div>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 px-4 py-6 sm:px-6"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Certified copy generated"
+    >
+      <div className="max-h-[calc(100dvh-3rem)] w-full max-w-md overflow-y-auto rounded-2xl border border-border-grey bg-clean-white p-4 shadow-xl sm:p-5">
+        <div className="mb-5 flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-success-green text-clean-white">
+            <Check className="h-5 w-5" strokeWidth={3} />
+          </div>
+          <div>
+            <Text as="h2" variant="h4" className="text-text-primary">
+              Your Certified Copy is Ready!
+            </Text>
+            <Text variant="caption" className="mt-1">
+              Here is your digitally generated and verifiable document.
+            </Text>
           </div>
         </div>
-        <div className="rounded-2xl border border-border-grey bg-clean-white p-5">
-          <div className="flex items-start gap-3 rounded-xl bg-success-green/10 p-3">
-            <Check className="mt-0.5 h-4 w-4 shrink-0 text-success-green" />
-            <div>
-              <Text variant="sub-sm" className="font-semibold text-deep-green">
-                Certified Copy Generated
-              </Text>
-              <Text variant="caption" className="mt-0.5">
-                Your certified copy has been created successfully.
-              </Text>
-            </div>
-          </div>
-          <div className="mt-5 space-y-3">
-            <div className="flex justify-between gap-3 border-b border-border-grey pb-2">
-              <Text variant="caption">Credential Type</Text>
-              <Text variant="caption" className="text-right font-semibold text-deep-green">
-                {credential.title}
-              </Text>
-            </div>
-            <div className="flex justify-between gap-3 border-b border-border-grey pb-2">
-              <Text variant="caption">Generated</Text>
-              <Text
-                variant="caption"
-                className="text-right font-semibold text-deep-green"
-              >
-                {formatDateTime(generatedAt)}
-              </Text>
-            </div>
-            <div className="flex justify-between gap-3">
-              <Text variant="caption">Certification ID</Text>
-              <Text
-                variant="caption"
-                className="max-w-[145px] truncate text-right font-semibold text-deep-green"
-              >
-                {credential.id}
-              </Text>
-            </div>
-          </div>
-          <div className="mt-5 space-y-2">
+        <div className="mt-5">
+          <Button
+            type="button"
+            variant="primary"
+            className="!w-full"
+            LeftIcon={Download}
+          >
+            Download PDF
+          </Button>
+        </div>
+        <div className="mt-5 border-t border-border-grey pt-4">
+          <div className="space-y-2">
             <Button
               type="button"
-              variant="primary"
-              className="w-full lg:w-full"
-              LeftIcon={Download}
+              variant="secondary"
+              LeftIcon={Mail}
+              className="!w-full justify-start border-0 bg-transparent px-2 py-1.5 text-left text-sm font-normal text-deep-green hover:bg-deep-green"
             >
-              Download PDF
+              Send to Email
             </Button>
             <Button
               type="button"
               variant="secondary"
-              className="w-full lg:w-full"
-              LeftIcon={Share2}
+              LeftIcon={ExternalLink}
+              className="!w-full justify-start border-0 bg-transparent px-2 py-1.5 text-left text-sm font-normal text-deep-green hover:bg-deep-green"
             >
-              Share
+              View in New Tab
             </Button>
           </div>
-          <div className="mt-5 border-t border-border-grey pt-4">
-            <Text variant="caption" className="mb-3 block text-center">
-              Other Options
-            </Text>
-            <div className="space-y-2">
-              <Button
-                type="button"
-                variant="secondary"
-                LeftIcon={Mail}
-                className="w-full justify-start border-0 bg-transparent px-2 py-1.5 text-left text-sm font-normal text-deep-green hover:bg-primary-green/5"
-              >
-                Send to Email
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                LeftIcon={Link}
-                className="w-full justify-start border-0 bg-transparent px-2 py-1.5 text-left text-sm font-normal text-deep-green hover:bg-primary-green/5"
-              >
-                Copy Verification Link
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                LeftIcon={ExternalLink}
-                className="w-full justify-start border-0 bg-transparent px-2 py-1.5 text-left text-sm font-normal text-deep-green hover:bg-primary-green/5"
-              >
-                View in New Tab
-              </Button>
-            </div>
-          </div>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={onBack}
-            LeftIcon={ArrowLeft}
-            className="mt-5 w-full justify-center border border-border-grey text-sm font-semibold text-deep-green hover:border-deep-green hover:bg-primary-green/5"
-          >
-            Back to My Credentials
-          </Button>
         </div>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onBack}
+          LeftIcon={ArrowLeft}
+          className="mt-5 !w-full justify-center border border-border-grey text-sm font-semibold text-deep-green hover:border-deep-green hover:bg-primary-green/5"
+        >
+          Back to My Credentials
+        </Button>
       </div>
     </div>
   )
