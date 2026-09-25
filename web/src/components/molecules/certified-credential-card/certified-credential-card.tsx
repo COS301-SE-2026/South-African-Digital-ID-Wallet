@@ -1,6 +1,6 @@
 'use client'
-import { Car, FileText } from 'lucide-react'
-import { StatusPill, Text } from '@/components/atoms'
+import { Car, Download, FileText, MoreHorizontal } from 'lucide-react'
+import { Button, StatusPill, Text } from '@/components/atoms'
 import type { CredentialResponse } from '@/services/credential-service'
 import type { CertifiedCredentialCardProps } from './types'
 
@@ -22,9 +22,9 @@ const getExpiryDate = (credential: CredentialResponse) =>
 
 export function CertifiedCredentialCard({
   credential,
+  onGenerateCertifiedCopy,
 }: Readonly<CertifiedCredentialCardProps>) {
   const Icon = credential.type === 'DriversLicense' ? Car : FileText
-
   return (
     <div className="rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-deep-green/10">
       <div className="flex h-full flex-col rounded-[24px] bg-card p-4 sm:p-5">
@@ -46,20 +46,14 @@ export function CertifiedCredentialCard({
               </Text>
             </div>
           </div>
-          <StatusPill
-            intent={credential.status === 'Active' ? 'active' : 'inactive'}
-            className="shrink-0 px-3 py-1 text-xs"
-          >
+          <StatusPill intent={credential.status === 'Active' ? 'active' : 'inactive'} className="shrink-0 px-3 py-1 text-xs">
             {credential.status}
           </StatusPill>
         </div>
         <div className="mt-5 grid grid-cols-3 gap-3 border-t border-border-grey pt-4">
           <div className="min-w-0">
             <Text variant="caption">{getReferenceLabel(credential)}</Text>
-            <Text
-              variant="sub-sm"
-              className="mt-1 truncate font-semibold text-deep-green"
-            >
+            <Text variant="sub-sm" className="mt-1 truncate font-semibold text-deep-green">
               {getReference(credential)}
             </Text>
           </div>
@@ -81,6 +75,23 @@ export function CertifiedCredentialCard({
               {getExpiryDate(credential)}
             </Text>
           </div>
+        </div>
+        <div className="mt-5 flex gap-2">
+          <Button
+            type="button"
+            onClick={() => onGenerateCertifiedCopy(credential)}
+            className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-deep-green px-3 text-sm font-semibold text-clean-white hover:bg-primary-green focus-visible:ring-primary-green"
+          >
+            <Download className="h-4 w-4" aria-hidden="true" />
+            Generate Certified Copy
+          </Button>
+          <Button
+            type="button"
+            aria-label={`More options for ${credential.title}`}
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border-grey bg-transparent p-0 text-deep-green hover:border-deep-green hover:bg-primary-green/5"
+          >
+            <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
+          </Button>
         </div>
       </div>
     </div>
