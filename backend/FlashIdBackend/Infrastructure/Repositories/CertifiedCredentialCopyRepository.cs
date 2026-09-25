@@ -22,7 +22,14 @@ public class CertifiedCredentialCopyRepository : ICertifiedCredentialCopyReposit
 
     public async Task<CertifiedCredentialCopy?> GetByVerificationTokenHashAsync(string tokenHash)
     {
-        return await _context.CertifiedCredentialCopies.AsNoTracking().FirstOrDefaultAsync(c => c.VerificationTokenHash == tokenHash);
+        return await _context.CertifiedCredentialCopies.AsNoTracking()
+            .Include(c => c.Credential)
+            .ThenInclude(c => c.Citizen)
+            .Include(c => c.Credential)
+            .ThenInclude(c => c.IdentityDocument)
+            .Include(c => c.Credential)
+            .ThenInclude(c => c.DriversLicense)
+            .FirstOrDefaultAsync(c => c.VerificationTokenHash == tokenHash);
     }
 
     public async Task AddAsync(CertifiedCredentialCopy certifiedCopy)
