@@ -18,4 +18,7 @@ public class LoginResponseDto
 
     public string? Names { get; set; }
     public string? Surname { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public Application.Features.FraudDetection.DTOs.SecurityAlertNoticeDto? SecurityAlert { get; set; }
 }

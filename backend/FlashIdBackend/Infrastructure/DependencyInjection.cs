@@ -144,6 +144,7 @@ public static class DependencyInjection
         services.AddScoped<IPhysicalIdentityVerificationRepository, PhysicalIdentityVerificationRepository>();
 
         services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
+        services.AddScoped<IFraudDetectionRepository, FraudDetectionRepository>();
 
         services.AddSingleton<ICredentialSigningProvider, LocalEs256SigningProvider>();
 
