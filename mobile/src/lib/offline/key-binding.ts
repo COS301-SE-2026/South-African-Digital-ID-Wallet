@@ -24,3 +24,18 @@ export const createKeyBindingJwt = (
 
   return `${signingInput}.${base64urlnopad.encode(sign(utf8(signingInput)))}`
 }
+
+// Read without verifying, only to decide whether the scanner waits for a K frame. verifyPresentation
+// still enforces key binding itself, and stripping cnf would break the issuer signature anyway.
+export const requiresKeyBinding = (sdJwt: string): boolean => {
+  try {
+    const payloadSegment = sdJwt.split('~')[0].split('.')[1] ?? ''
+    const payload = JSON.parse(
+      new TextDecoder().decode(base64urlnopad.decode(payloadSegment))
+    )
+
+    return typeof payload.cnf === 'object' && payload.cnf !== null
+  } catch {
+    return false
+  }
+}
