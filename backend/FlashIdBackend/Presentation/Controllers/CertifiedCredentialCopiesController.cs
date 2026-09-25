@@ -14,12 +14,14 @@ public class CertifiedCredentialCopiesController : ControllerBase
 {
     private readonly ICertifiedCredentialCopyService _certifiedCopyService;
 
+    private const long MaxPdfFileSize = 10 * 1024 * 1024;
+
     public CertifiedCredentialCopiesController(ICertifiedCredentialCopyService certifiedCopyService)
     {
         _certifiedCopyService = certifiedCopyService;
     }
 
-    [Authorize(Roles = "citizen")]
+    [Authorize(Roles = "Citizen")]
     [HttpPost("credentials/{credentialId:guid}")]
     public async Task<IActionResult> GenerateCertifiedCopy(Guid credentialId)
     {
@@ -95,5 +97,54 @@ public class CertifiedCredentialCopiesController : ControllerBase
         }
     }
 
+    [AllowAnonymous]
+    [HttpPost("verify-document/{verificationToken}")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> VerifyCertifiedCopyDocument(string verificationToken, IFormFile document)
+    {
+        try
+        {
+            if (document is null || document.Length == 0)
+            {
+                return BadRequest(new
+                {
+                    message = "A PDF document is required."
+                });
+            }
+
+            if (document.Length > MaxPdfFileSize)
+            {
+                return BadRequest(new
+                {
+                    message = "The PDF document exceeds the maximum allowed size of 10 MB."
+                });
+            }
+
+            if (!string.Equals(document.ContentType, "application/pdf", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest(new
+                {
+                    message = "Only PDF documents are supported."
+                });
+            }
+
+            await using var memoryStream = new MemoryStream();
+
+            await document.CopyToAsync(memoryStream);
+
+            var documentBytes = memoryStream.ToArray();
+
+            var result = await _certifiedCopyService.VerifyDocumentAsync(verificationToken, documentBytes);
+
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
+        }
+    }
 
 }
