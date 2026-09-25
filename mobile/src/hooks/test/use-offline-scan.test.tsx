@@ -146,4 +146,23 @@ describe('useOfflineScan', () => {
     expect(verifyMock).toHaveBeenCalledTimes(1)
     expect(result.current.progress).toBeNull()
   })
+
+  it('Should wait for the key binding frame when the credential is bound to a phone', async () => {
+    const encodeJson = (value: unknown) =>
+      Buffer.from(JSON.stringify(value)).toString('base64url')
+    const bound = `${encodeJson({ alg: 'ES256' })}.${encodeJson({ cnf: { jwk: {} } })}.sig~${'d'.repeat(900)}~`
+    const { result } = await renderHook(() => useOfflineScan(trust))
+
+    for (const frame of framesFor(bound, 'abcdef')) {
+      await act(async () => result.current.addFrame(frame))
+    }
+
+    expect(verifyMock).not.toHaveBeenCalled()
+
+    await act(async () => result.current.addFrame('FID1:K:abcdef:kb.jwt.sig'))
+
+    expect(verifyMock).toHaveBeenCalledWith(`${bound}kb.jwt.sig`, trust, {
+      now: expect.any(Number),
+    })
+  })
 })

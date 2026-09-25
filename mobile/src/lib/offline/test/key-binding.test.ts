@@ -2,7 +2,7 @@ import { p256 } from '@noble/curves/nist.js'
 import { sha256 } from '@noble/hashes/sha2.js'
 import { base64urlnopad } from '@scure/base'
 
-import { createKeyBindingJwt } from '../key-binding'
+import { createKeyBindingJwt, requiresKeyBinding } from '../key-binding'
 
 const utf8 = (value: string) => new TextEncoder().encode(value)
 const decodeSegment = (segment: string) =>
@@ -54,5 +54,22 @@ describe('createKeyBindingJwt', () => {
     expect(payloadOf(`${SD_JWT}extra~`).sd_hash).not.toBe(
       payloadOf(SD_JWT).sd_hash
     )
+  })
+})
+
+describe('requiresKeyBinding', () => {
+  const sdJwtWith = (payload: unknown) =>
+    `${base64urlnopad.encode(utf8('{}'))}.${base64urlnopad.encode(utf8(JSON.stringify(payload)))}.sig~d~`
+
+  it('Should be true for a credential bound to a device key', () => {
+    expect(requiresKeyBinding(sdJwtWith({ cnf: { jwk: {} } }))).toBe(true)
+  })
+
+  it('Should be false for a credential without cnf', () => {
+    expect(requiresKeyBinding(sdJwtWith({ vct: 'x' }))).toBe(false)
+  })
+
+  it('Should be false for something it cannot read', () => {
+    expect(requiresKeyBinding('not-a-credential')).toBe(false)
   })
 })

@@ -1,6 +1,10 @@
 import { useCallback, useState } from 'react'
 
-import { PayloadFrameAccumulator } from '@/lib/offline/qr-frame-accumulator'
+import { requiresKeyBinding } from '@/lib/offline/key-binding'
+import {
+  PayloadFrameAccumulator,
+  type AccumulatedPayload,
+} from '@/lib/offline/qr-frame-accumulator'
 import {
   verifyPresentation,
   type TrustData,
@@ -8,6 +12,13 @@ import {
 } from '@/lib/offline/verify'
 
 export type OfflineScanProgress = { received: number; total: number }
+
+// Every payload frame is in, and a bound credential also has its K frame.
+const isReadyToVerify = (snapshot: AccumulatedPayload): boolean =>
+  snapshot.complete &&
+  snapshot.presentation !== null &&
+  (snapshot.keyBindingJwt !== null ||
+    !requiresKeyBinding(snapshot.presentation))
 
 export const useOfflineScan = (
   trust: TrustData | null,
@@ -20,11 +31,13 @@ export const useOfflineScan = (
 
   const addFrame = useCallback(
     (rawText: string) => {
+      // The camera keeps reading the same code until the result screen replaces it, so later
+      // frames are ignored rather than collected and verified a second time.
       if (result) {
         return
       }
 
-      let snapshot
+      let snapshot: AccumulatedPayload
 
       try {
         snapshot = accumulator.add(rawText)
@@ -33,7 +46,9 @@ export const useOfflineScan = (
         return
       }
 
-      if (!snapshot.complete || !snapshot.presentation || isTrustLoading) {
+      // Still collecting, waiting for a bound credential's K frame, or waiting for the verifier's
+      // keys. The code keeps cycling, so a later frame completes it once everything is in.
+      if (!isReadyToVerify(snapshot) || isTrustLoading) {
         setProgress({ received: snapshot.received, total: snapshot.total })
         return
       }
@@ -42,9 +57,11 @@ export const useOfflineScan = (
       setProgress(null)
       setResult(
         trust
-          ? verifyPresentation(snapshot.presentation, trust, {
-              now: Math.floor(Date.now() / 1000),
-            })
+          ? verifyPresentation(
+              `${snapshot.presentation}${snapshot.keyBindingJwt ?? ''}`,
+              trust,
+              { now: Math.floor(Date.now() / 1000) }
+            )
           : { ok: false, code: 'STALE_TRUST_DATA', warnings: [] }
       )
     },
