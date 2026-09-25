@@ -1,6 +1,7 @@
 import { isAxiosError, type AxiosResponse } from 'axios'
 
 import api from '@/lib/api'
+import { getDevicePublicJwk } from '@/lib/offline/device-key'
 import {
   readOfflineCache,
   writeOfflineCache,
@@ -21,14 +22,18 @@ import type { IssuerKeysResponse, OfflinePackageResponse } from './types'
 // so keeping the old one would let a revoked or deleted credential be presented offline.
 const PERMANENT_PACKAGE_FAILURES = new Set([400, 403, 404])
 
-const requestOfflinePackage = (
+// The public key goes with every request: the backend binds the credential to it as cnf, and re-mints when it changes, for example after a reinstall.
+const requestOfflinePackage = async (
   credentialId: string
-): Promise<OfflinePackageResponse> =>
-  api
-    .post(offlineUrls.package(credentialId))
-    .then((res: AxiosResponse<unknown>) =>
-      offlinePackageResponseSchema.parse(res.data)
-    )
+): Promise<OfflinePackageResponse> => {
+  const deviceKey = await getDevicePublicJwk()
+  const res: AxiosResponse<unknown> = await api.post(
+    offlineUrls.package(credentialId),
+    { deviceKey }
+  )
+
+  return offlinePackageResponseSchema.parse(res.data)
+}
 
 const requestIssuerKeys = (): Promise<IssuerKeysResponse> =>
   api.get(offlineUrls.issuerKeys()).then((res: AxiosResponse<unknown>) => {

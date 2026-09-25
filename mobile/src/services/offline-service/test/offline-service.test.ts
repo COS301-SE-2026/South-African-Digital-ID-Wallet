@@ -6,6 +6,7 @@ import {
 } from '@/lib/offline/offline-cache'
 import offlineService from '../offline-service'
 import { base64urlnopad } from '@scure/base'
+import { getDevicePublicJwk } from '@/lib/offline/device-key'
 
 const encodeJson = (value: unknown) =>
   base64urlnopad.encode(new TextEncoder().encode(JSON.stringify(value)))
@@ -28,10 +29,16 @@ jest.mock('@/lib/offline/offline-cache', () => ({
   writeOfflineCache: jest.fn(),
 }))
 
+jest.mock('@/lib/offline/device-key', () => ({
+  getDevicePublicJwk: jest.fn(),
+}))
+
 const getMock = api.get as jest.Mock
 const postMock = api.post as jest.Mock
 const readOfflineCacheMock = readOfflineCache as jest.Mock
 const writeOfflineCacheMock = writeOfflineCache as jest.Mock
+const deviceKeyMock = getDevicePublicJwk as jest.Mock
+const DEVICE_KEY = { key: 'EC', crv: 'P-256', x: 'device-x', y: 'device-y' }
 
 const packageResponse = {
   issuerSignedCredential: credentialExpiringAt(1_800_000_000),
@@ -92,6 +99,7 @@ describe('offlineService', () => {
     jest.clearAllMocks()
     readOfflineCacheMock.mockResolvedValue(null)
     writeOfflineCacheMock.mockResolvedValue(undefined)
+    deviceKeyMock.mockResolvedValue(DEVICE_KEY)
     jest.spyOn(Date, 'now').mockReturnValue(FIXED_NOW_MS)
   })
 
@@ -99,7 +107,7 @@ describe('offlineService', () => {
     jest.restoreAllMocks()
   })
 
-  it('Should post the credential id to the offline package endpoint', async () => {
+  it('Should post the device public key to the offline package endpoint', async () => {
     postMock.mockResolvedValue({ data: packageResponse })
 
     await expect(
@@ -107,8 +115,19 @@ describe('offlineService', () => {
     ).resolves.toEqual(packageResponse)
 
     expect(postMock).toHaveBeenCalledWith(
-      '/api/credentials/credential-1/offline-package'
+      '/api/credentials/credential-1/offline-package',
+      { deviceKey: DEVICE_KEY }
     )
+  })
+
+  it("Should not request a package when the device key can't be loaded", async () => {
+    deviceKeyMock.mockRejectedValue(new Error('secure storage unavailable'))
+
+    await expect(
+      offlineService.requestOfflinePackage('credential-1')
+    ).rejects.toThrow('secure storage unavailable')
+
+    expect(postMock).not.toHaveBeenCalled
   })
 
   it('Should get issuer keys from the issuer keys endpoint', async () => {
