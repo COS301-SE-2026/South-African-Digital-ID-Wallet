@@ -1,6 +1,7 @@
 import { p256 } from '@noble/curves/nist.js'
 import { sha256 } from '@noble/hashes/sha2.js'
 import { base64urlnopad } from '@scure/base'
+import { CLAIM_LABELS } from './claim-labels'
 
 export type VerificationFailureCode =
   | 'MALFORMED'
@@ -78,31 +79,14 @@ export const MANDATORY_CLAIMS: Readonly<Record<string, readonly string[]>> = {
   'urn:flashid:drivers-license:1': ['portrait', 'expiry_date', 'date_of_birth'],
 }
 
-const ALLOWED_CLAIMS: Readonly<Record<string, readonly string[]>> = {
-  'urn:flashid:identity-document:1': [
-    'date_of_birth',
-    'portrait',
-    'identity_number',
-    'surname',
-    'forenames',
-    'citizenship_status',
-    'gender',
-    'country_of_birth',
-    'card_issue_date_and_number',
-  ],
-  'urn:flashid:drivers-license:1': [
-    'portrait',
-    'expiry_date',
-    'date_of_birth',
-    'full_name',
-    'identity_number',
-    'license_number',
-    'license_code',
-    'country_of_issue',
-    'vehicle_restrictions',
-    'issue_date',
-  ],
-}
+// Derived from the shared label table, so any claim the phone can show is exactly a claim it accepts.
+const ALLOWED_CLAIMS: Readonly<Record<string, readonly string[]>> =
+  Object.fromEntries(
+    Object.entries(CLAIM_LABELS).map(([vct, labels]) => [
+      vct,
+      Object.keys(labels),
+    ])
+  )
 
 type JsonObject = Record<string, unknown>
 type Failure = { failure: VerificationFailureCode }

@@ -1,62 +1,39 @@
+import { claimNameFor, LABELS_NOT_OFFLINE } from './claim-labels'
 import type { OfflinePackage } from './offline-cache'
 import { readIssuerClaims } from './offline-package'
 import { MANDATORY_CLAIMS } from './verify'
 
 export { isPackageUsable } from './offline-package'
 
-const CLAIM_NAMES: Record<string, string> = {
-  'Date of birth': 'date_of_birth',
-  Photograph: 'portrait',
-  Photo: 'portrait',
-  'Identity number': 'identity_number',
-  'Full surname': 'surname',
-  'Full forenames': 'forenames',
-  'Citizenship status': 'citizenship_status',
-  Gender: 'gender',
-  'Country of birth': 'country_of_birth',
-  'Card issue date and number': 'card_issue_date_and_number',
-  Signature: 'signature_image',
-  'Expiry date': 'expiry_date',
-  'Full name': 'full_name',
-  'SA ID number': 'identity_number',
-  'License number': 'license_number',
-  'License code': 'license_code',
-  'Country of issue': 'country_of_issue',
-  'Vehicle restrictions': 'vehicle_restrictions',
-  'Date of issue': 'issue_date',
-}
+const claimNameOf = (vct: string, label: string): string => {
+  const claimName = claimNameFor(vct, label)
 
-// D-011: the handwritten signature image never travels offline.
-const EXCLUDED_CLAIMS = new Set(['signature_image'])
+  if (!claimName) {
+    throw new Error(`Unsupported offline claim: ${label}`)
+  }
+
+  return claimName
+}
 
 export const createOfflinePresentation = (
   offlinePackage: OfflinePackage,
   selectedFields: readonly string[]
 ): string => {
-  const issuerClaims = readIssuerClaims(offlinePackage)
-  const mandatory = issuerClaims
-    ? MANDATORY_CLAIMS[issuerClaims.vct]
-    : undefined
+  const vct = readIssuerClaims(offlinePackage)?.vct
+  const mandatory = vct ? MANDATORY_CLAIMS[vct] : undefined
 
-  if (!mandatory) {
+  if (!vct || !mandatory) {
     throw new Error('This credential cannot be presented offline.')
   }
 
-  const selectedClaims = selectedFields.map((field) => {
-    const claimName = CLAIM_NAMES[field]
-
-    if (!claimName) {
-      throw new Error(`Unsupported offline claim: ${field}`)
-    }
-
-    return claimName
-  })
+  const selectedClaims = selectedFields
+    // D-011: the handwritten signature image never travels offline.
+    .filter((field) => !LABELS_NOT_OFFLINE.has(field))
+    .map((field) => claimNameOf(vct, field))
 
   // Mandatory claims are always presented, because a verifier rejects a presentation without them,
   // so the code works even before the citizen has chosen optional fields.
-  const claimNames = [...new Set([...mandatory, ...selectedClaims])].filter(
-    (claimName) => !EXCLUDED_CLAIMS.has(claimName)
-  )
+  const claimNames = [...new Set([...mandatory, ...selectedClaims])]
 
   const disclosures = claimNames.flatMap((claimName) => {
     const disclosure = offlinePackage.disclosures[claimName]
