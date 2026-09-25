@@ -1,0 +1,20 @@
+backend/FlashIdBackend/Application/Common/Services/CertifiedCredentialCopyService.cs
+  h_293a8616118f65 1-177
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_293a8616118f65 49
+backend/FlashIdBackend/Application/Features/CertifiedCredentialCopies/DTOs/GeneratedCertifiedCopyResultDto.cs
+  h_293a8616118f65 1-9
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/ICertifiedCredentialCopyService.cs
+  h_293a8616118f65 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "140383f13a9d0767cc07d06e0d568abb3b9f7b17",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

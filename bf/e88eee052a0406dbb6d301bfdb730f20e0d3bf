@@ -1,0 +1,20 @@
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/DevicePublicKeyDto.cs
+  h_99fca60b892ff4 1-10
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/OfflinePackageRequestDto.cs
+  h_99fca60b892ff4 1-4
+backend/FlashIdBackend/tests/OfflinePackageControllerIntegrationTests.cs
+  h_99fca60b892ff4 24,53-74,448-546
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_99fca60b892ff4 6,360,363,376,390,418-421
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "bfe88eee052a0406dbb6d301bfdb730f20e0d3bf",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
