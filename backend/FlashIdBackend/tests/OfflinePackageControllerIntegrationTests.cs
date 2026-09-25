@@ -21,6 +21,7 @@ using Microsoft.Extensions.Hosting;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Application.Common.Interfaces.ServiceInterfaces;
+using System.Buffers.Text;
 
 namespace tests;
 
@@ -47,6 +48,28 @@ public class OfflinePackageControllerIntegrationTests
         response.EnsureSuccessStatusCode();
 
         return (await response.Content.ReadFromJsonAsync<OfflinePackageResponseDto>(JsonOptions, TestContext.Current.CancellationToken))!;
+    }
+
+    private static async Task<OfflinePackageResponseDto> RequestPackageWithBodyAsync(HttpClient client, Guid credentialId, OfflinePackageRequestDto body)
+    {
+        var response = await client.PostAsJsonAsync($"/api/credentials/{credentialId}/offline-package", body, JsonOptions, TestContext.Current.CancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        return (await response.Content.ReadFromJsonAsync<OfflinePackageResponseDto>(JsonOptions, TestContext.Current.CancellationToken))!;
+    }
+
+    private static OfflinePackageRequestDto DeviceKeyBody(ECDsa deviceKey)
+    {
+        var point = deviceKey.ExportParameters(false).Q;
+
+        return new OfflinePackageRequestDto(new DevicePublicKeyDto("EC", "P-256", Base64Url.EncodeToString(point.X), Base64Url.EncodeToString(point.Y)));
+    }
+
+    private static JsonElement PayloadOf(string issuerJwt)
+    {
+        using var document = JsonDocument.Parse(Base64Url.DecodeFromChars(issuerJwt.Split('.')[1]));
+
+        return document.RootElement.Clone();
     }
 
     // The real portrait processor runs against this, so the whole downscale path is exercised.
@@ -421,5 +444,104 @@ public class OfflinePackageControllerIntegrationTests
         var response = await ClientFor(factory, user).PostAsync("/api/credentials/not-a-guid/offline-package", null, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task RequestOfflinePackage_WithDeviceKey_BindsTheCredentialToThatKey()
+    {
+        await using var factory = new TestApiFactory();
+        var db = await factory.CreateInitializedContextAsync();
+        var (user, credential) = await SeedCitizenWithLicenceAsync(db);
+        using var deviceKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var body = DeviceKeyBody(deviceKey);
+
+        var package = await RequestPackageWithBodyAsync(ClientFor(factory, user), credential.Id, body);
+
+        var jwk = PayloadOf(package.IssuerSignedCredential).GetProperty("cnf").GetProperty("jwk");
+
+        Assert.Equal("EC", jwk.GetProperty("kty").GetString());
+        Assert.Equal("P-256", jwk.GetProperty("crv").GetString());
+        Assert.Equal(body.DeviceKey!.X, jwk.GetProperty("x").GetString());
+        Assert.Equal(body.DeviceKey.Y, jwk.GetProperty("y").GetString());
+        Assert.NotNull((await ReloadAsync(db, credential.Id)).HolderKeyThumbprint);
+    }
+
+    [Fact]
+    public async Task RequestOfflinePackage_WithoutABody_MintsAnUnboundPackage()
+    {
+        await using var factory = new TestApiFactory();
+        var db = await factory.CreateInitializedContextAsync();
+        var (user, credential) = await SeedCitizenWithLicenceAsync(db);
+
+        var package = await RequestPackageAsync(ClientFor(factory, user), credential.Id);
+
+        Assert.False(PayloadOf(package.IssuerSignedCredential).TryGetProperty("cnf", out _));
+        Assert.Null((await ReloadAsync(db, credential.Id)).HolderKeyThumbprint);
+    }
+
+    [Fact]
+    public async Task RequestOfflinePackage_SameDeviceKeyTwice_ReusesThePackage()
+    {
+        await using var factory = new TestApiFactory();
+        var db = await factory.CreateInitializedContextAsync();
+        var (user, credential) = await SeedCitizenWithLicenceAsync(db);
+        using var deviceKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var client = ClientFor(factory, user);
+
+        var first = await RequestPackageWithBodyAsync(client, credential.Id, DeviceKeyBody(deviceKey));
+        var second = await RequestPackageWithBodyAsync(client, credential.Id, DeviceKeyBody(deviceKey));
+
+        Assert.Equal(first.IssuerSignedCredential, second.IssuerSignedCredential);
+    }
+
+    [Fact]
+    public async Task RequestOfflinePackage_NewDeviceKey_MintsAgainForTheNewPhone()
+    {
+        await using var factory = new TestApiFactory();
+        var db = await factory.CreateInitializedContextAsync();
+        var (user, credential) = await SeedCitizenWithLicenceAsync(db);
+        using var oldPhone = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        using var newPhone = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var client = ClientFor(factory, user);
+
+        var first = await RequestPackageWithBodyAsync(client, credential.Id, DeviceKeyBody(oldPhone));
+        var second = await RequestPackageWithBodyAsync(client, credential.Id, DeviceKeyBody(newPhone));
+
+        Assert.NotEqual(first.IssuerSignedCredential, second.IssuerSignedCredential);
+        Assert.Equal(
+            DeviceKeyBody(newPhone).DeviceKey!.X,
+            PayloadOf(second.IssuerSignedCredential).GetProperty("cnf").GetProperty("jwk").GetProperty("x").GetString());
+    }
+
+    [Theory]
+    [InlineData("RSA", "P-256", 32)]
+    [InlineData("EC", "P-384", 32)]
+    [InlineData("EC", "P-256", 31)]
+    public async Task RequestOfflinePackage_InvalidDeviceKey_ReturnsBadRequestAndStoresNothing(string kty, string crv, int coordinateBytes)
+    {
+        await using var factory = new TestApiFactory();
+        var db = await factory.CreateInitializedContextAsync();
+        var (user, credential) = await SeedCitizenWithLicenceAsync(db);
+        var coordinate = Base64Url.EncodeToString(new byte[coordinateBytes]);
+        var body = new OfflinePackageRequestDto(new DevicePublicKeyDto(kty, crv, coordinate, coordinate));
+
+        var response = await ClientFor(factory, user).PostAsJsonAsync($"/api/credentials/{credential.Id}/offline-package", body, JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Null((await ReloadAsync(db, credential.Id)).IssuerSignedCredential);
+    }
+
+    [Fact]
+    public async Task RequestOfflinePackage_DeviceKeyNotOnTheCurve_ReturnsBadRequest()
+    {
+        await using var factory = new TestApiFactory();
+        var db = await factory.CreateInitializedContextAsync();
+        var (user, credential) = await SeedCitizenWithLicenceAsync(db);
+        var coordinate = Base64Url.EncodeToString(new byte[32]);
+        var body = new OfflinePackageRequestDto(new DevicePublicKeyDto("EC", "P-256", coordinate, coordinate));
+
+        var response = await ClientFor(factory, user).PostAsJsonAsync($"/api/credentials/{credential.Id}/offline-package", body, JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 }
