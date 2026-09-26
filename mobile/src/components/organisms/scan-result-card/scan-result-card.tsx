@@ -46,7 +46,7 @@ export const ScanResultCard = ({
             key={label}
             label={label}
             testID={`scan-field-${label}`}
-            value={value}
+            value={value || '-'}
           />
         )
       )}

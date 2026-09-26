@@ -1,7 +1,12 @@
 import '../../global.css'
 
 import { useEffect } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import NetInfo from '@react-native-community/netinfo'
+import {
+  onlineManager,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
 import { Stack } from 'expo-router'
 import { ActivityIndicator, View } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
@@ -15,6 +20,15 @@ import { colors } from '@/theme/colors'
 import { useAuthStore } from '@/stores/auth-store'
 
 const queryClient = new QueryClient()
+// TanStack assumes the phone is always online, so offline refetches fail and replace data with errors.
+// Given the real state (same rule as useNetworkStatus), it pauses them and keeps the last data.
+onlineManager.setEventListener((setOnline) =>
+  NetInfo.addEventListener((state) => {
+    setOnline(
+      state.isConnected !== false && state.isInternetReachable !== false
+    )
+  })
+)
 
 export default function RootLayout() {
   const isRestoring = useAuthStore((state) => state.isRestoring)

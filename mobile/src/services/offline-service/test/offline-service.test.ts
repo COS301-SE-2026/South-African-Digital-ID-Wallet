@@ -307,4 +307,38 @@ describe('offlineService', () => {
       offlineService.refreshOfflineCache('credential-1')
     ).rejects.toThrow('issuer keys request failed')
   })
+
+  it('Should refresh only the issuer keys for a verifier', async () => {
+    readOfflineCacheMock.mockResolvedValue(existingCache)
+    getMock.mockResolvedValue({ data: issuerKeysResponse })
+
+    await offlineService.refreshTrustData()
+
+    expect(postMock).not.toHaveBeenCalled()
+    expect(writeOfflineCacheMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        packages: existingCache.packages,
+        trust: expect.objectContaining({ keys: issuerKeysResponse.keys }),
+      })
+    )
+  })
+
+  it('Should keep the existing cache when the verifier cannot fetch keys', async () => {
+    readOfflineCacheMock.mockResolvedValue(existingCache)
+    getMock.mockRejectedValue(new Error('issuer keys request failed'))
+
+    await expect(offlineService.refreshTrustData()).resolves.toEqual(
+      existingCache
+    )
+
+    expect(writeOfflineCacheMock).not.toHaveBeenCalled()
+  })
+
+  it('Should throw when the verifier cannot fetch keys and nothing is cached', async () => {
+    getMock.mockRejectedValue(new Error('issuer keys request failed'))
+
+    await expect(offlineService.refreshTrustData()).rejects.toThrow(
+      'issuer keys request failed'
+    )
+  })
 })

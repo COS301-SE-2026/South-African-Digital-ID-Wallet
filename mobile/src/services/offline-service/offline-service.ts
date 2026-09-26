@@ -149,10 +149,46 @@ const refreshOfflineCache = (credentialId: string): Promise<OfflineCache> =>
     return refreshed
   })
 
+// For the verifier's phone: issuer keys only, since a verifier may hold no credential of its own.
+// Serialised like refreshOfflineCache, because it reads and rewrites the same cache.
+const refreshTrustData = (): Promise<OfflineCache> =>
+  serialised(async () => {
+    const existing = await readOfflineCache()
+
+    let keys: IssuerKeysResponse
+    try {
+      keys = await requestIssuerKeys()
+    } catch (error) {
+      // Out of signal or the request failed: keep verifying with what the phone already has.
+      if (existing) {
+        return existing
+      }
+
+      throw error
+    }
+
+    const now = nowInSeconds()
+    const refreshed: OfflineCache = {
+      // Expired packages are pruned here too, so none outlives its usefulness on the phone.
+      packages: Object.fromEntries(
+        Object.entries(existing?.packages ?? {}).filter(([, offlinePackage]) =>
+          isPackageUsable(offlinePackage, now)
+        )
+      ),
+      trust: toTrustData(keys, existing?.trust ?? null),
+      savedAt: now,
+    }
+
+    await writeOfflineCache(refreshed)
+
+    return refreshed
+  })
+
 const offlineService = {
   requestOfflinePackage,
   requestIssuerKeys,
   refreshOfflineCache,
+  refreshTrustData,
 }
 
 export default offlineService

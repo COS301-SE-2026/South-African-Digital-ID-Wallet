@@ -30,6 +30,8 @@ export const QrCameraScanner = ({
   const [frameHeight, setFrameHeight] = useState(0)
   const lastScanned = useRef('')
   const [sweep] = useState(() => new Animated.Value(0))
+  // The camera takes a moment to start on Android, so a label covers the black preview until then.
+  const [isCameraReady, setIsCameraReady] = useState(false)
 
   useEffect(() => {
     if (!permission || permission.granted || hasAutoRequested.current) {
@@ -141,8 +143,20 @@ export const QrCameraScanner = ({
         enableTorch={isTorchOn}
         facing="back"
         onBarcodeScanned={paused ? undefined : handleBarcodeScanned}
+        onCameraReady={() => setIsCameraReady(true)}
         style={StyleSheet.absoluteFill}
       />
+      {isCameraReady ? null : (
+        <View
+          className="absolute inset-0 items-center justify-center gap-3"
+          testID="qr-camera-starting"
+        >
+          <ActivityIndicator color={colors.primaryGreen} size="large" />
+          <Text variant="sub-sm" className="text-clean-white/70">
+            Starting the camera...
+          </Text>
+        </View>
+      )}
       <View className="flex-1 items-center justify-center px-8">
         <View
           className="aspect-square w-full max-w-[320px]"

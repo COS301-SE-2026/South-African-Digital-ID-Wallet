@@ -19,8 +19,9 @@ export default function CitizenLayout() {
   }
 
   return (
+    // Leaving a tab resets its stack, so no unlocked credential or share screen waits behind it
     <Tabs
-      screenOptions={{ headerShown: false }}
+      screenOptions={{ headerShown: false, popToTopOnBlur: true }}
       tabBar={(props) => <BottomNavBar {...props} tabs={citizenTabs} />}
     >
       {citizenTabs.map((tab) => (
