@@ -22,7 +22,8 @@ const isReadyToVerify = (snapshot: AccumulatedPayload): boolean =>
 
 export const useOfflineScan = (
   trust: TrustData | null,
-  isTrustLoading = false
+  isTrustLoading = false,
+  onResult?: (result: VerificationResult) => void
 ) => {
   // useState's lazy initialiser builds the accumulator on the first render only, never again.
   const [accumulator] = useState(() => new PayloadFrameAccumulator())
@@ -55,17 +56,19 @@ export const useOfflineScan = (
 
       accumulator.reset()
       setProgress(null)
-      setResult(
-        trust
-          ? verifyPresentation(
-              `${snapshot.presentation}${snapshot.keyBindingJwt ?? ''}`,
-              trust,
-              { now: Math.floor(Date.now() / 1000) }
-            )
-          : { ok: false, code: 'STALE_TRUST_DATA', warnings: [] }
-      )
+
+      const verification: VerificationResult = trust
+        ? verifyPresentation(
+            `${snapshot.presentation}${snapshot.keyBindingJwt ?? ''}`,
+            trust,
+            { now: Math.floor(Date.now() / 1000) }
+          )
+        : { ok: false, code: 'STALE_TRUST_DATA', warnings: [] }
+
+      setResult(verification)
+      onResult?.(verification)
     },
-    [accumulator, isTrustLoading, result, trust]
+    [accumulator, isTrustLoading, onResult, result, trust]
   )
 
   const reset = useCallback(() => {

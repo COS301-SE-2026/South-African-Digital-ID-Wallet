@@ -16,7 +16,7 @@ import {
   useOfflineScan,
   useScanCredential,
   useVerifierTrust,
-} from '@/hooks'
+ useRecordOfflineVerification } from '@/hooks'
 import {
   describeVerificationFailure,
   toOfflineScanDisplay,
@@ -33,12 +33,13 @@ export const QrScannerPage = () => {
   const { isResolving, reset, resolve, result } = useScanCredential()
   const { isOffline } = useNetworkStatus()
   const { isLoading: isTrustLoading, trust } = useVerifierTrust()
+  const recordOfflineVerification = useRecordOfflineVerification()
   const {
     addFrame,
     progress: offlineProgress,
     reset: resetOfflineScan,
     result: offlineResult,
-  } = useOfflineScan(trust, isTrustLoading)
+  } = useOfflineScan(trust, isTrustLoading, recordOfflineVerification)
 
   // Leaving the tab does not unmount this screen, so the result and any half-collected offline code are cleared on the way out,
   // and coming back alwats starts a fresh scan.

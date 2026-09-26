@@ -21,6 +21,7 @@ jest.mock('expo-router', () => ({
 jest.mock('@/hooks', () => ({
   useNetworkStatus: jest.fn(),
   useOfflineScan: jest.fn(),
+  useRecordOffineVerification: jest.fn(),
   useScanCredential: jest.fn(),
   useVerifierTrust: jest.fn(),
 }))
