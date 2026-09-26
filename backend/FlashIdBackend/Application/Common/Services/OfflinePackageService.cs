@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
@@ -27,25 +28,17 @@ public sealed class OfflinePackageService : IOfflinePackageService
     private const int MinRetryDelayMs = 10;
     private const int MaxRetryDelayMs = 40;
 
-    private const string Issuer = "urn:flashid:issuer";
     private const string RevocationListType = "revocation-list+jwt";
     // A day before a verifier is told its list is stale, matching the 24-hour trust data warning (D-009).
     private static readonly TimeSpan RevocationListLifetime = TimeSpan.FromHours(24);
-    private static readonly JsonSerializerOptions WireJsonOptions = new()
-    {
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-    };
 
     private const int MaxOfflineVerificationsPerBatch = 100;
     private const string VerifiedResult = "VERIFIED";
-    private static readonly long MaxUnixSeconds = DateTimeOffset.MaxValue.ToUnixTimeSeconds();
-    // Mirrors VerificationFailureCode in the wallet's verify.ts, plus VERIFIED.
-    private static readonly HashSet<string> KnownVerificationResults = new(StringComparer.Ordinal)
-    {
-        VerifiedResult, "MALFORMED", "UNSUPPORTED_ALG", "UNKNOWN_KEY", "REVOKED_KEY", "BAD_ISSUER_SIGNATURE",
-        "EXPIRED", "CREDENTIAL_REVOKED", "DISCLOSURE_NOT_IN_SD", "DUPLICATE_DISCLOSURE", "MISSING_MANDATORY_CLAIM",
-        "MISSING_KEY_BINDING", "BAD_KEY_BINDING_SIGNATURE", "SD_HASH_MISMATCH", "STALE_PRESENTATION", "STALE_TRUST_DATA",
-    };
+    // A phone clock can be wrong, but not by a day, so a scan time further ahead than that is refused as impossible.
+    private static readonly TimeSpan MaxScanClockAhead = TimeSpan.FromDays(1);
+    // Result codes are stored as sent rather than checked against a copy of the wallet's list, so a code added to
+    // verify.ts later is still recorded. The pattern only stops arbitrary text from reaching the audit log.
+    private static readonly Regex ResultCodePattern = new("^[A-Z_]{1,40}$", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
 
     private readonly IOfflinePackageRepository _repository;
     private readonly IDisclosedFieldsValueResolver _fieldResolver;
@@ -380,7 +373,7 @@ public sealed class OfflinePackageService : IOfflinePackageService
         };
         var payload = new JsonObject
         {
-            ["iss"] = Issuer,
+            ["iss"] = SdJwtCredentialFactory.Issuer,
             ["iat"] = now.ToUnixTimeSeconds(),
             ["next_update"] = now.Add(RevocationListLifetime).ToUnixTimeSeconds(),
             ["revoked"] = new JsonArray(revokedIndexes.Select(index => (JsonNode?)JsonValue.Create(index)).ToArray()),
@@ -400,11 +393,18 @@ public sealed class OfflinePackageService : IOfflinePackageService
         CancellationToken cancellationToken
     )
     {
-        ValidateOfflineVerifications(entries);
+        if (entries.Count > MaxOfflineVerificationsPerBatch)
+        {
+            throw new ArgumentException($"At most {MaxOfflineVerificationsPerBatch} offline verifications can be sent at once.", nameof(entries));
+        }
 
-        var existing = await _repository.GetExistingAuditLogIdsAsync(entries.Select(entry => entry.Id).ToList(), cancellationToken);
+        var receivedAt = _timeProvider.GetUtcNow();
+        var valid = entries.Where(entry => IsValidOfflineVerification(entry, receivedAt)).ToList();
+        var rejected = entries.Where(entry => !IsValidOfflineVerification(entry, receivedAt)).Select(entry => entry.Id).ToList();
+
+        var existing = await _repository.GetExistingAuditLogIdsAsync(valid.Select(entry => entry.Id).ToList(), cancellationToken);
         // A retried upload repeats entries already stored. The phone's id is the audit row's id, so those are skipped.
-        var fresh = entries.Where(entry => !existing.Contains(entry.Id)).DistinctBy(entry => entry.Id).ToList();
+        var fresh = valid.Where(entry => !existing.Contains(entry.Id)).DistinctBy(entry => entry.Id).ToList();
 
         var verifiedIndexes = fresh
             .Where(entry => entry.Result == VerifiedResult && entry.RevocationIndex is not null)
@@ -412,43 +412,24 @@ public sealed class OfflinePackageService : IOfflinePackageService
             .Distinct()
             .ToList();
         var credentials = await _repository.GetCredentialsByRevocationIndexAsync(verifiedIndexes, cancellationToken);
-        var receivedAt = _timeProvider.GetUtcNow();
 
         var auditLogs = fresh.Select(entry => ToOfflineAuditLog(entry, verifierUserId, ipAddress, receivedAt, credentials)).ToList();
 
-        if (auditLogs.Count > 0)
+        if (auditLogs.Count > 0 && !await _repository.TryAddAuditLogsAsync(auditLogs, cancellationToken))
         {
-            await _repository.AddAuditLogsAsync(auditLogs, cancellationToken);
+            throw new OfflineVerificationConflictException();
         }
 
-        return new OfflineVerificationSyncResultDto(auditLogs.Count, entries.Count - auditLogs.Count);
+        return new OfflineVerificationSyncResultDto(auditLogs.Count, valid.Count - auditLogs.Count, rejected);
     }
 
-    private static void ValidateOfflineVerifications(IReadOnlyList<OfflineVerificationEntryDto> entries)
-    {
-        if (entries.Count > MaxOfflineVerificationsPerBatch)
-        {
-            throw new ArgumentException($"At most {MaxOfflineVerificationsPerBatch} offline verifications can be sent at once.", nameof(entries));
-        }
-
-        foreach (var entry in entries)
-        {
-            if (entry.Id == Guid.Empty)
-            {
-                throw new ArgumentException("Every offline verification needs an id.", nameof(entries));
-            }
-
-            if (!KnownVerificationResults.Contains(entry.Result))
-            {
-                throw new ArgumentException($"Unknown offline verification result '{entry.Result}'.", nameof(entries));
-            }
-
-            if (entry.VerifiedAt < 0 || entry.VerifiedAt > MaxUnixSeconds)
-            {
-                throw new ArgumentException("An offline verification time is out of range.", nameof(entries));
-            }
-        }
-    }
+    // Checked one entry at a time, so a single bad entry is reported back and the rest of the batch is still recorded.
+    private static bool IsValidOfflineVerification(OfflineVerificationEntryDto entry, DateTimeOffset receivedAt) =>
+        entry.Id != Guid.Empty
+        && ResultCodePattern.IsMatch(entry.Result)
+        && entry.VerifiedAt >= 0
+        && entry.VerifiedAt <= receivedAt.Add(MaxScanClockAhead).ToUnixTimeSeconds()
+        && entry.RevocationIndex is null or >= 0;
 
     private static AuditLog ToOfflineAuditLog(
         OfflineVerificationEntryDto entry,
@@ -479,5 +460,5 @@ public sealed class OfflinePackageService : IOfflinePackageService
     }
 
     private static string EncodeJson(JsonObject json) =>
-        Base64Url.EncodeToString(Encoding.UTF8.GetBytes(json.ToJsonString(WireJsonOptions)));
+        Base64Url.EncodeToString(Encoding.UTF8.GetBytes(json.ToJsonString(SdJwtCredentialFactory.WireJsonOptions)));
 }

@@ -89,11 +89,11 @@ public class OfflinePackageServiceTests
         public Task<IReadOnlyDictionary<int, Credential>> GetCredentialsByRevocationIndexAsync(IReadOnlyCollection<int> revocationIndexes, CancellationToken cancellationToken) =>
             Task.FromResult<IReadOnlyDictionary<int, Credential>>(CredentialsByIndex.Where(entry => revocationIndexes.Contains(entry.Key)).ToDictionary());
 
-        public Task AddAuditLogsAsync(IReadOnlyCollection<AuditLog> auditLogs, CancellationToken cancellationToken)
+        public Task<bool> TryAddAuditLogsAsync(IReadOnlyCollection<AuditLog> auditLogs, CancellationToken cancellationToken)
         {
             AuditLogs.AddRange(auditLogs);
 
-            return Task.CompletedTask;
+            return Task.FromResult(true);
         }
     }
 

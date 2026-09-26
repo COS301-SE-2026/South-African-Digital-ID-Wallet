@@ -16,6 +16,7 @@ public class OfflinePackageRepository : IOfflinePackageRepository
     // SQLite reports every constraint failure as error 19, so the extended code is what distinguishes
     // a duplicate revocation index from an FK or NOT NULL bug that should not be retried.
     private const int SqliteUniqueConstraint = 2067;
+    private const int SqlitePrimaryKeyConstraint = 1555;
     private readonly AppDbContext _context;
 
     public OfflinePackageRepository(AppDbContext context)
@@ -102,10 +103,25 @@ public class OfflinePackageRepository : IOfflinePackageRepository
             .Where(c => c.RevocationIndex != null && revocationIndexes.Contains(c.RevocationIndex.Value))
             .ToDictionaryAsync(c => c.RevocationIndex!.Value, cancellationToken);
 
-    public async Task AddAuditLogsAsync(IReadOnlyCollection<AuditLog> auditLogs, CancellationToken cancellationToken)
+    public async Task<bool> TryAddAuditLogsAsync(IReadOnlyCollection<AuditLog> auditLogs, CancellationToken cancellationToken)
     {
         _context.AuditLogs.AddRange(auditLogs);
 
-        await _context.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+        catch (DbUpdateException due) when (IsDuplicateKey(due))
+        {
+            // Two uploads of the same scans raced and the other stored them first. The rows that failed are
+            // untracked, so the context is clean if it is used again in this request.
+            _context.ChangeTracker.Clear();
+            return false;
+        }
     }
+
+    // The audit id is the primary key. SQL Server reports a duplicate as 2627; SQLite uses its own extended code.
+    private static bool IsDuplicateKey(DbUpdateException due) =>
+        IsUniqueIndexViolation(due) || due.InnerException is SqliteException { SqliteExtendedErrorCode: SqlitePrimaryKeyConstraint };
 }

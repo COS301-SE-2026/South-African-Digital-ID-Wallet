@@ -124,9 +124,12 @@ public class OfflinePackageControllerIntegrationTests
     private static OfflineVerificationEntryDto OfflineEntry(string result, int? revocationIndex) =>
         new(Guid.NewGuid(), revocationIndex, result, DateTimeOffset.UtcNow.AddMinutes(-10).ToUnixTimeSeconds());
 
-    private static async Task<OfflineVerificationSyncResultDto> PostOfflineVerificationsAsync(HttpClient client, OfflineVerificationEntryDto entry)
+    private static Task<OfflineVerificationSyncResultDto> PostOfflineVerificationsAsync(HttpClient client, OfflineVerificationEntryDto entry) =>
+        PostOfflineBatchAsync(client, [entry]);
+
+    private static async Task<OfflineVerificationSyncResultDto> PostOfflineBatchAsync(HttpClient client, IReadOnlyList<OfflineVerificationEntryDto> entries)
     {
-        var response = await client.PostAsJsonAsync("/api/credentials/offline-verifications", new OfflineVerificationBatchDto([entry]), JsonOptions, TestContext.Current.CancellationToken);
+        var response = await client.PostAsJsonAsync("/api/credentials/offline-verifications", new OfflineVerificationBatchDto(entries), JsonOptions, TestContext.Current.CancellationToken);
         response.EnsureSuccessStatusCode();
 
         return (await response.Content.ReadFromJsonAsync<OfflineVerificationSyncResultDto>(JsonOptions, TestContext.Current.CancellationToken))!;
@@ -754,16 +757,74 @@ public class OfflinePackageControllerIntegrationTests
     }
 
     [Fact]
-    public async Task RecordOfflineVerifications_UnknownResult_ReturnsBadRequestAndStoresNothing()
+    public async Task RecordOfflineVerifications_MalformedEntry_IsRejectedAndTheRestRecorded()
     {
         await using var factory = new TestApiFactory();
         var db = await factory.CreateInitializedContextAsync();
         var official = await SeedUserAsync(db, UserRole.Official);
-        var entry = OfflineEntry("DEFINITELY_REAL", null);
+        var good = OfflineEntry("STALE_PRESENTATION", null);
+        var bad = OfflineEntry("not a result code", null);
 
-        var response = await ClientFor(factory, official).PostAsJsonAsync("/api/credentials/offline-verifications", new OfflineVerificationBatchDto([entry]), JsonOptions, TestContext.Current.CancellationToken);
+        var result = await PostOfflineBatchAsync(ClientFor(factory, official), [good, bad]);
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(1, result.Recorded);
+        Assert.Equal(new[] { bad.Id }, result.Rejected);
+        Assert.True(await db.AuditLogs.AnyAsync(a => a.Id == good.Id, TestContext.Current.CancellationToken));
+        Assert.False(await db.AuditLogs.AnyAsync(a => a.Id == bad.Id, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task RecordOfflineVerifications_ResultCodeTheServerHasNotSeen_IsStillRecordedAsRejected()
+    {
+        await using var factory = new TestApiFactory();
+        var db = await factory.CreateInitializedContextAsync();
+        var official = await SeedUserAsync(db, UserRole.Official);
+        var entry = OfflineEntry("A_CODE_ADDED_LATER", null);
+
+        await PostOfflineBatchAsync(ClientFor(factory, official), [entry]);
+
+        var auditLog = await db.AuditLogs.AsNoTracking().FirstAsync(a => a.Id == entry.Id, TestContext.Current.CancellationToken);
+
+        Assert.Equal(AuditEventType.OfflineVerificationRejected, auditLog.EventType);
+    }
+
+    [Fact]
+    public async Task RecordOfflineVerifications_ScanTimeADayAhead_IsRejected()
+    {
+        await using var factory = new TestApiFactory();
+        var db = await factory.CreateInitializedContextAsync();
+        var official = await SeedUserAsync(db, UserRole.Official);
+        var future = new OfflineVerificationEntryDto(Guid.NewGuid(), null, "VERIFIED", DateTimeOffset.UtcNow.AddDays(2).ToUnixTimeSeconds());
+
+        var result = await PostOfflineBatchAsync(ClientFor(factory, official), [future]);
+
+        Assert.Equal(new[] { future.Id }, result.Rejected);
+    }
+
+    [Fact]
+    public async Task RecordOfflineVerifications_NegativeRevocationIndex_IsRejected()
+    {
+        await using var factory = new TestApiFactory();
+        var db = await factory.CreateInitializedContextAsync();
+        var official = await SeedUserAsync(db, UserRole.Official);
+        var entry = OfflineEntry("VERIFIED", -1);
+
+        var result = await PostOfflineBatchAsync(ClientFor(factory, official), [entry]);
+
+        Assert.Equal(new[] { entry.Id }, result.Rejected);
+    }
+
+    [Fact]
+    public async Task RecordOfflineVerifications_AsCitizen_ReturnsForbiddenAndStoresNothing()
+    {
+        await using var factory = new TestApiFactory();
+        var db = await factory.CreateInitializedContextAsync();
+        var citizen = await SeedUserAsync(db, UserRole.Citizen);
+        var entry = OfflineEntry("VERIFIED", 1);
+
+        var response = await ClientFor(factory, citizen).PostAsJsonAsync("/api/credentials/offline-verifications", new OfflineVerificationBatchDto([entry]), JsonOptions, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.False(await db.AuditLogs.AnyAsync(a => a.Id == entry.Id, TestContext.Current.CancellationToken));
     }
 

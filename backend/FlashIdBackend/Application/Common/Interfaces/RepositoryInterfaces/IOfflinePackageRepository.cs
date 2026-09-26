@@ -27,6 +27,6 @@ public interface IOfflinePackageRepository
     // Offline audit entries carry a revocation index, not a credential id, so they are mapped back here.
     Task<IReadOnlyDictionary<int, Credential>> GetCredentialsByRevocationIndexAsync(IReadOnlyCollection<int> revocationIndexes, CancellationToken cancellationToken);
 
-    Task AddAuditLogsAsync(IReadOnlyCollection<AuditLog> auditLogs, CancellationToken cancellationToken);
-
+    // Returns false when another request stored one of these ids first, in which case nothing was written.
+    Task<bool> TryAddAuditLogsAsync(IReadOnlyCollection<AuditLog> auditLogs, CancellationToken cancellationToken);
 }
