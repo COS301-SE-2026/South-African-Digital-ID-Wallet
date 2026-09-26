@@ -77,7 +77,7 @@ describe('<CredentialCard/> icon and pattern', () => {
     await render(<CredentialCard {...base} testID="card" />)
     const colours = iconCalls().map((props) => props.color)
     expect(colours).toContain(colors.primaryGreen)
-    expect(colours.filter((colour) => colour === colors.green).length).toBe(
+    expect(colours.filter((colour) => colour === colors.green)).toHaveLength(
       CREDENTIAL_PATTERN.filter((item) => item.strong).length + 1
     )
   })
@@ -100,6 +100,11 @@ describe('<CredentialCard/> icon and pattern', () => {
     })
   })
 
+  it('Should give every pattern icon a unique position', () => {
+    const keys = CREDENTIAL_PATTERN.map((item) => `${item.right}-${item.top}`)
+    expect(new Set(keys).size).toBe(CREDENTIAL_PATTERN.length)
+  })
+
   it('Should hide the decorative pattern from screen readers and touches', async () => {
     await render(<CredentialCard {...base} testID="card" />)
     const pattern = screen.getByTestId('card-pattern', HIDDEN)
@@ -111,6 +116,7 @@ describe('<CredentialCard/> icon and pattern', () => {
   it('Should skip pattern and hint test ids without a card test id', async () => {
     await render(<CredentialCard {...base} hint="Tap to unlock" />)
     expect(screen.queryByTestId('undefined-pattern', HIDDEN)).toBeNull()
+    expect(screen.queryByTestId('undefined-hint')).toBeNull()
     expect(screen.getByText('Tap to unlock')).toBeTruthy()
   })
 })

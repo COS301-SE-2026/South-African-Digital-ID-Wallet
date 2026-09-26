@@ -1,26 +1,45 @@
-import { File } from 'expo-file-system'
+import { Directory } from 'expo-file-system'
 import { startActivityAsync } from 'expo-intent-launcher'
 import * as Sharing from 'expo-sharing'
 import { Platform } from 'react-native'
 
-import { openPdf, savePdf } from '../pdf-file'
+import { clearCertifiedCopies, deletePdf, openPdf, savePdf } from '../pdf-file'
 
 jest.mock('expo-file-system', () => {
+  const existing = new Set<string>()
+  class MockDirectory {
+    static existing = existing
+    static instances: MockDirectory[] = []
+    uri: string
+    create = jest.fn(() => existing.add(this.uri))
+    delete = jest.fn(() => existing.delete(this.uri))
+    constructor(parent: { uri: string }, name: string) {
+      this.uri = `${parent.uri}${name}/`
+      MockDirectory.instances.push(this)
+    }
+    get exists() {
+      return existing.has(this.uri)
+    }
+  }
   class MockFile {
-    static existing = new Set<string>()
     uri: string
     contentUri: string
-    exists: boolean
-    create = jest.fn()
-    delete = jest.fn()
+    create = jest.fn(() => existing.add(this.uri))
+    delete = jest.fn(() => existing.delete(this.uri))
     write = jest.fn()
     constructor(directory: { uri: string }, name: string) {
       this.uri = `${directory.uri}${name}`
       this.contentUri = `content://flashid/${name}`
-      this.exists = MockFile.existing.has(name)
+    }
+    get exists() {
+      return existing.has(this.uri)
     }
   }
-  return { File: MockFile, Paths: { cache: { uri: 'file:///cache/' } } }
+  return {
+    Directory: MockDirectory,
+    File: MockFile,
+    Paths: { cache: { uri: 'file:///cache/' } },
+  }
 })
 jest.mock('expo-intent-launcher', () => ({ startActivityAsync: jest.fn() }))
 jest.mock('expo-sharing', () => ({
@@ -28,7 +47,7 @@ jest.mock('expo-sharing', () => ({
   shareAsync: jest.fn(),
 }))
 
-type MockFileInstance = {
+type MockEntry = {
   contentUri: string
   create: jest.Mock
   delete: jest.Mock
@@ -37,43 +56,111 @@ type MockFileInstance = {
   write: jest.Mock
 }
 
+const MockDirectory = Directory as unknown as {
+  existing: Set<string>
+  instances: MockEntry[]
+}
 const startActivity = startActivityAsync as jest.Mock
 const isAvailable = Sharing.isAvailableAsync as jest.Mock
 const share = Sharing.shareAsync as jest.Mock
 const originalOS = Platform.OS
 
+const COPY_DIRECTORY = 'file:///cache/certified-copies/'
+
 const setPlatform = (os: typeof Platform.OS) =>
   Object.defineProperty(Platform, 'OS', { configurable: true, value: os })
 
 const fileNamed = (name: string) =>
-  savePdf(new Uint8Array([1]), name) as unknown as MockFileInstance
+  savePdf(new Uint8Array([1]), name) as unknown as MockEntry
+
+const resetFileSystem = () => {
+  MockDirectory.existing.clear()
+  MockDirectory.instances.length = 0
+}
 
 describe('savePdf', () => {
-  beforeEach(() => jest.clearAllMocks())
-
-  it('Should write the bytes into a cache file with the given name', () => {
-    const bytes = new Uint8Array([37, 80, 68, 70])
-    const file = savePdf(bytes, 'copy.pdf') as unknown as MockFileInstance
-    expect(file.uri).toBe('file:///cache/copy.pdf')
-    expect(file.create).toHaveBeenCalled()
-    expect(file.write).toHaveBeenCalledWith(bytes)
-    expect(file.delete).not.toHaveBeenCalled()
+  beforeEach(() => {
+    jest.clearAllMocks()
+    resetFileSystem()
   })
 
-  it('Should replace a previous copy with the same name', () => {
-    const existing = (File as unknown as { existing: Set<string> }).existing
-    existing.add('old.pdf')
-    const file = fileNamed('old.pdf')
-    expect(file.delete).toHaveBeenCalled()
+  it('Should write the bytes into the certified copies cache folder', () => {
+    const bytes = new Uint8Array([37, 80, 68, 70])
+    const file = savePdf(bytes, 'copy.pdf') as unknown as MockEntry
+    expect(file.uri).toBe(`${COPY_DIRECTORY}copy.pdf`)
     expect(file.create).toHaveBeenCalled()
-    expect(file.write).toHaveBeenCalled()
-    existing.clear()
+    expect(file.write).toHaveBeenCalledWith(bytes)
+  })
+
+  it('Should create the folder before writing', () => {
+    savePdf(new Uint8Array([1]), 'copy.pdf')
+    const folder = MockDirectory.instances.at(-1)
+    expect(folder?.create).toHaveBeenCalledWith({
+      idempotent: true,
+      intermediates: true,
+    })
+  })
+
+  it('Should clear older certified copies before writing a new one', () => {
+    MockDirectory.existing.add(COPY_DIRECTORY)
+    MockDirectory.existing.add(`${COPY_DIRECTORY}old.pdf`)
+    savePdf(new Uint8Array([1]), 'new.pdf')
+    const [cleared] = MockDirectory.instances
+    expect(cleared.delete).toHaveBeenCalled()
+  })
+
+  it('Should not try to clear a folder that does not exist yet', () => {
+    savePdf(new Uint8Array([1]), 'copy.pdf')
+    const [first] = MockDirectory.instances
+    expect(first.delete).not.toHaveBeenCalled()
+  })
+})
+
+describe('clearCertifiedCopies', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    resetFileSystem()
+  })
+
+  it('Should delete the certified copies folder when present', () => {
+    MockDirectory.existing.add(COPY_DIRECTORY)
+    clearCertifiedCopies()
+    expect(MockDirectory.instances[0].delete).toHaveBeenCalled()
+    expect(MockDirectory.existing.has(COPY_DIRECTORY)).toBe(false)
+  })
+
+  it('Should do nothing when there is no folder', () => {
+    clearCertifiedCopies()
+    expect(MockDirectory.instances[0].delete).not.toHaveBeenCalled()
+  })
+})
+
+describe('deletePdf', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    resetFileSystem()
+  })
+
+  it('Should remove a saved copy', () => {
+    const file = fileNamed('copy.pdf')
+    deletePdf(file as never)
+    expect(file.delete).toHaveBeenCalled()
+    expect(file.exists).toBe(false)
+  })
+
+  it('Should skip a copy that is already gone', () => {
+    const file = fileNamed('copy.pdf')
+    deletePdf(file as never)
+    file.delete.mockClear()
+    deletePdf(file as never)
+    expect(file.delete).not.toHaveBeenCalled()
   })
 })
 
 describe('openPdf', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    resetFileSystem()
     isAvailable.mockResolvedValue(true)
   })
   afterAll(() => setPlatform(originalOS))
@@ -91,16 +178,23 @@ describe('openPdf', () => {
     expect(share).not.toHaveBeenCalled()
   })
 
-  it('Should fall back to the share sheet when android has no viewer', async () => {
+  it('Should warn and fall back to the share sheet when android has no viewer', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(jest.fn())
     setPlatform('android')
-    startActivity.mockRejectedValue(new Error('No Activity found'))
+    const failure = new Error('No Activity found')
+    startActivity.mockRejectedValue(failure)
     const file = fileNamed('copy.pdf')
     await openPdf(file as never)
-    expect(share).toHaveBeenCalledWith('file:///cache/copy.pdf', {
+    expect(warn).toHaveBeenCalledWith(
+      'No PDF viewer, falling back to share',
+      failure
+    )
+    expect(share).toHaveBeenCalledWith(`${COPY_DIRECTORY}copy.pdf`, {
       dialogTitle: 'Certified copy',
       mimeType: 'application/pdf',
       UTI: 'com.adobe.pdf',
     })
+    warn.mockRestore()
   })
 
   it('Should present the pdf through the share sheet on ios', async () => {
@@ -109,7 +203,7 @@ describe('openPdf', () => {
     await openPdf(file as never)
     expect(startActivity).not.toHaveBeenCalled()
     expect(share).toHaveBeenCalledWith(
-      'file:///cache/copy.pdf',
+      `${COPY_DIRECTORY}copy.pdf`,
       expect.objectContaining({ UTI: 'com.adobe.pdf' })
     )
   })

@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react-native'
 
-import { openPdf, savePdf } from '@/lib/pdf-file'
+import { deletePdf, openPdf, savePdf } from '@/lib/pdf-file'
 import { certifiedCopyService } from '@/services/certified-copy-service'
 import { createQueryWrapper } from '@/test/utils/render-with-providers'
 
@@ -11,6 +11,7 @@ jest.mock('@/services/certified-copy-service/certified-copy-service', () => ({
   default: { generate: jest.fn() },
 }))
 jest.mock('@/lib/pdf-file', () => ({
+  deletePdf: jest.fn(),
   openPdf: jest.fn(),
   savePdf: jest.fn(),
 }))
@@ -18,6 +19,7 @@ jest.mock('@/lib/pdf-file', () => ({
 const generateMock = certifiedCopyService.generate as jest.Mock
 const saveMock = savePdf as jest.Mock
 const openMock = openPdf as jest.Mock
+const deleteMock = deletePdf as jest.Mock
 
 const BYTES = new Uint8Array([37, 80, 68, 70])
 const FILE = { uri: 'file:///cache/copy.pdf' }
@@ -50,6 +52,7 @@ describe('useCertifiedCopy', () => {
     expect(generateMock).toHaveBeenCalledWith('c-1')
     expect(saveMock).toHaveBeenCalledWith(BYTES, 'copy.pdf')
     expect(openMock).toHaveBeenCalledWith(FILE)
+    expect(deleteMock).toHaveBeenCalledWith(FILE)
     expect(onSuccess.mock.calls[0][0]).toBe(FILE.uri)
   })
 
@@ -64,6 +67,7 @@ describe('useCertifiedCopy', () => {
     await waitFor(() => expect(result.current.error).toBeInstanceOf(Error))
     expect(saveMock).not.toHaveBeenCalled()
     expect(openMock).not.toHaveBeenCalled()
+    expect(deleteMock).not.toHaveBeenCalled()
   })
 
   it('Should surface a failure to open the file', async () => {
@@ -76,6 +80,7 @@ describe('useCertifiedCopy', () => {
       result.current.generate('c-1')
     })
     await waitFor(() => expect(result.current.error?.message).toBe('no viewer'))
+    expect(deleteMock).toHaveBeenCalledWith(FILE)
   })
 
   it('Should clear the error on reset', async () => {

@@ -1,9 +1,14 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react-native'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react-native'
 import * as LocalAuthentication from 'expo-local-authentication'
 import { useRouter } from 'expo-router'
 import { Alert } from 'react-native'
 
+import {
+  CREDENTIAL_LIST_CARD_HEIGHT,
+  CredentialList,
+} from '@/components/organisms'
 import api from '@/lib/api'
+import type { WalletCredential } from '@/services'
 import { useCredentialUnlockStore } from '@/stores/credential-unlock-store'
 import { renderWithProviders } from '@/test/utils/render-with-providers'
 
@@ -20,8 +25,19 @@ jest.mock('@/lib/secure-session', () => ({
   loadSession: jest.fn(),
   saveSession: jest.fn().mockResolvedValue(undefined),
 }))
-jest.mock('@/lib/pdf-file', () => ({ openPdf: jest.fn(), savePdf: jest.fn() }))
+jest.mock('@/lib/pdf-file', () => ({
+  deletePdf: jest.fn(),
+  openPdf: jest.fn(),
+  savePdf: jest.fn(),
+}))
 jest.mock('expo-router', () => ({ useRouter: jest.fn() }))
+jest.mock('@/components/organisms', () => {
+  const actual = jest.requireActual('@/components/organisms')
+  return {
+    ...actual,
+    CredentialList: jest.fn((props) => actual.CredentialList(props)),
+  }
+})
 jest.mock('expo-local-authentication', () => ({
   authenticateAsync: jest.fn(),
   hasHardwareAsync: jest.fn(),
@@ -33,6 +49,17 @@ const hasHardware = LocalAuthentication.hasHardwareAsync as jest.Mock
 const isEnrolled = LocalAuthentication.isEnrolledAsync as jest.Mock
 const authenticate = LocalAuthentication.authenticateAsync as jest.Mock
 const push = jest.fn()
+
+type ListProps = {
+  credentials: WalletCredential[]
+  onSelect: (credential: WalletCredential) => Promise<void>
+}
+
+const latestListProps = () =>
+  (CredentialList as unknown as jest.Mock).mock.calls.at(-1)[0] as ListProps
+
+const settle = () =>
+  act(() => new Promise<void>((resolve) => setTimeout(resolve, 0)))
 
 const CREDENTIALS = [
   {
@@ -67,6 +94,16 @@ describe('<CitizenWalletPage/>', () => {
     getMock.mockReturnValue(new Promise(() => undefined))
     await renderWithProviders(<CitizenWalletPage />)
     expect(screen.getByTestId('wallet-loading')).toBeTruthy()
+  })
+
+  it('Should size the skeletons like the credential cards', async () => {
+    getMock.mockReturnValue(new Promise(() => undefined))
+    await renderWithProviders(<CitizenWalletPage />)
+    const skeletons = screen.getAllByTestId('wallet-skeleton')
+    expect(skeletons).toHaveLength(2)
+    for (const skeleton of skeletons) {
+      expect(skeleton).toHaveStyle({ height: CREDENTIAL_LIST_CARD_HEIGHT })
+    }
   })
 
   it('Should show an error when the credentials fail to load', async () => {
@@ -130,7 +167,7 @@ describe('<CitizenWalletPage/>', () => {
     alert.mockRestore()
   })
 
-  it('Should ignore a second tap while the biometric prompt is open', async () => {
+  it('Should ignore a second tap made before the first prompt re-renders', async () => {
     let resolvePrompt: (value: { success: boolean }) => void = () => undefined
     authenticate.mockReturnValue(
       new Promise((resolve) => {
@@ -138,18 +175,53 @@ describe('<CitizenWalletPage/>', () => {
       })
     )
     await renderWithProviders(<CitizenWalletPage />)
-    const firstCard = await screen.findByTestId('credential-card-id-1')
-    const secondCard = screen.getByTestId('credential-card-dl-1')
-    const firstPress = fireEvent.press(firstCard)
+    await screen.findByTestId('credential-card-id-1')
+    const { credentials, onSelect } = latestListProps()
+    let taps: Promise<void>[] = []
+    await act(async () => {
+      taps = [onSelect(credentials[0]), onSelect(credentials[1])]
+    })
     await waitFor(() => expect(authenticate).toHaveBeenCalledTimes(1))
-    const secondPress = fireEvent.press(secondCard)
-    resolvePrompt({ success: true })
-    await Promise.all([firstPress, secondPress])
-    await waitFor(() => expect(push).toHaveBeenCalledTimes(1))
+    await act(async () => {
+      resolvePrompt({ success: true })
+      await Promise.all(taps)
+    })
+    expect(hasHardware).toHaveBeenCalledTimes(1)
     expect(authenticate).toHaveBeenCalledTimes(1)
+    expect(push).toHaveBeenCalledTimes(1)
     expect(push).toHaveBeenCalledWith({
       params: { id: 'id-1' },
       pathname: '/citizen/wallet/[id]',
     })
+  })
+
+  it('Should allow another tap once a cancelled prompt has finished', async () => {
+    authenticate
+      .mockResolvedValueOnce({ error: 'user_cancel', success: false })
+      .mockResolvedValueOnce({ success: true })
+    await renderWithProviders(<CitizenWalletPage />)
+    await fireEvent.press(await screen.findByTestId('credential-card-id-1'))
+    await waitFor(() => expect(authenticate).toHaveBeenCalledTimes(1))
+    await settle()
+    await fireEvent.press(screen.getByTestId('credential-card-dl-1'))
+    await waitFor(() =>
+      expect(push).toHaveBeenCalledWith({
+        params: { id: 'dl-1' },
+        pathname: '/citizen/wallet/[id]',
+      })
+    )
+    expect(authenticate).toHaveBeenCalledTimes(2)
+  })
+
+  it('Should allow another tap after the device lock alert', async () => {
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn())
+    isEnrolled.mockResolvedValue(false)
+    await renderWithProviders(<CitizenWalletPage />)
+    await fireEvent.press(await screen.findByTestId('credential-card-id-1'))
+    await waitFor(() => expect(alert).toHaveBeenCalledTimes(1))
+    await settle()
+    await fireEvent.press(screen.getByTestId('credential-card-id-1'))
+    await waitFor(() => expect(alert).toHaveBeenCalledTimes(2))
+    alert.mockRestore()
   })
 })

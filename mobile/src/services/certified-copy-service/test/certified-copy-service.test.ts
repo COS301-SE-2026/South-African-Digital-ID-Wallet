@@ -61,6 +61,16 @@ describe('certifiedCopyService', () => {
     expect(result.bytes).toHaveLength(0)
   })
 
+  it('Should encode the credential id in the path', async () => {
+    postMock.mockResolvedValue({ data: new ArrayBuffer(0), headers: {} })
+    await certifiedCopyService.generate('a/b c?')
+    expect(postMock).toHaveBeenCalledWith(
+      '/api/certified-copies/credentials/a%2Fb%20c%3F',
+      undefined,
+      expect.any(Object)
+    )
+  })
+
   it('Should propagate transport failures', async () => {
     postMock.mockRejectedValue(new Error('network down'))
     await expect(certifiedCopyService.generate('c-1')).rejects.toThrow(

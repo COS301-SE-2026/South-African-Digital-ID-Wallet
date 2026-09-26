@@ -21,7 +21,7 @@ describe('toCertifiedCopyFileName', () => {
       'copy.pdf'
     )
   })
-  it('Should keep a malformed encoded name as-is', () => {
+  it('Should sanitise a malformed encoded name without throwing', () => {
     expect(
       toCertifiedCopyFileName("attachment; filename*=UTF-8''bad%E0.pdf")
     ).toBe('bad-E0.pdf')
