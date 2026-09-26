@@ -1,0 +1,14 @@
+mobile/src/lib/offline/qr-frame-accumulator.ts
+  h_99fca60b892ff4 40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "8eaa03a28adfcc7acc20eeebb4de92e258d2746e",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

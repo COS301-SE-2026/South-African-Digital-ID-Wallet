@@ -1,0 +1,14 @@
+web/src/components/molecules/gen-copy-progress/test/gen-copy-progress.test.tsx
+  h_0aff3b71f739b1 1-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "029720c3c46f0a083e39a6a03e8331d454d86edb",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

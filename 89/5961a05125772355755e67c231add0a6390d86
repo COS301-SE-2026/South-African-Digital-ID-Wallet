@@ -1,0 +1,17 @@
+backend/FlashIdBackend/Application/Common/Services/OfflinePackageService.cs
+  h_99fca60b892ff4 5-7,30-49,369-478,481-482
+  h_99fca60b892ff4 479-480
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IOfflinePackageService.cs
+  h_99fca60b892ff4 20-30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "895961a05125772355755e67c231add0a6390d86",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

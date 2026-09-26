@@ -1,0 +1,28 @@
+mobile/src/hooks/use-offline-scan.ts
+  h_99fca60b892ff4 3-6,16-22,27,34-35,40,49-51,61
+  h_99fca60b892ff4 7,60,62-64
+mobile/src/lib/offline/test/key-binding.test.ts
+  h_99fca60b892ff4 5,59-75
+mobile/src/lib/offline/test/qr-frame-accumulator.test.ts
+  h_99fca60b892ff4 67,84,136-174
+mobile/src/hooks/test/use-offline-scan.test.tsx
+  h_99fca60b892ff4 149-167
+mobile/src/lib/offline/key-binding.ts
+  h_99fca60b892ff4 27-41
+mobile/src/lib/offline/test/offline-flow.test.ts
+  h_99fca60b892ff4 5,10-12,14,18,27-30,34-43,60,63,72,81,84,87,90-92,95-97,114,135,150,173,183-263
+  h_99fca60b892ff4 9,13,31-33,44,264-268
+mobile/src/lib/offline/qr-frame-accumulator.ts
+  h_99fca60b892ff4 3,5-7,11-12,18,20,25-26,33-37,40-44,46,51-60,63-64,68-69,74-81,83,86,88,92-100,104,106-108,111-121,124,146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a889ad899d1d1a650ed0b20cd7da04e482a777b3",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

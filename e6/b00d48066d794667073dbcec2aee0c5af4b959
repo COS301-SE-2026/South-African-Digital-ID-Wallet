@@ -1,0 +1,23 @@
+mobile/src/services/offline-service/schema.ts
+  h_99fca60b892ff4 26-31
+mobile/src/services/offline-service/offline-urls.ts
+  h_99fca60b892ff4 5-6
+mobile/src/services/offline-service/offline-service.ts
+  h_99fca60b892ff4 9,12,18,26-32,59-65,81-85,89-110,112,140,153-154,157,162,170,182-186,189,197-198,202-205,207-208,213,224-228,231,239-281,289-290
+  h_99fca60b892ff4 66,86,111,187,229,282-283
+mobile/src/lib/offline/offline-cache.ts
+  h_99fca60b892ff4 16-24,31-32
+mobile/src/services/offline-service/test/offline-service.test.ts
+  h_99fca60b892ff4 10,37-41,46,109,371-524
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e6b00d48066d794667073dbcec2aee0c5af4b959",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

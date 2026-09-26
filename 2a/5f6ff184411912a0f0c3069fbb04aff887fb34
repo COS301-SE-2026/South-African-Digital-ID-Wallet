@@ -1,0 +1,15 @@
+mobile/src/lib/offline/device-keys.ts
+  h_99fca60b892ff4 1-74
+  h_99fca60b892ff4 75-76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2a5f6ff184411912a0f0c3069fbb04aff887fb34",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
