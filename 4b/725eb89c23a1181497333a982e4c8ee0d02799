@@ -1,0 +1,18 @@
+web/src/components/molecules/certified-copy-verification-progress/types.ts
+  h_0aff3b71f739b1 1-3
+web/src/components/molecules/certified-copy-verification-progress/certified-copy-verification-progress.tsx
+  h_0aff3b71f739b1 1-123
+web/src/components/molecules/certified-copy-verification-progress/index.ts
+  h_0aff3b71f739b1 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4b725eb89c23a1181497333a982e4c8ee0d02799",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
