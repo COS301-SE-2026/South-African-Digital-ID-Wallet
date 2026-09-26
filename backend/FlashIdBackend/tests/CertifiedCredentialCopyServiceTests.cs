@@ -3,6 +3,7 @@ using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Mapping;
 using Application.Common.Services;
 using Application.Features.CertifiedCredentialCopies.Models;
+using Application.Features.Credentials.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.Extensions.Configuration;
@@ -233,6 +234,124 @@ public class CertifiedCredentialCopyServiceTests
 
         _pdfProvider.Verify(x => x.Generate(It.Is<CertifiedCredentialSnapshot>(snapshot => snapshot.LicenseNumber == "DL123456" && snapshot.LicenseCode == "B"),
                 It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<byte[]?>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GenerateAsync_UsesPhotoFromBlobStorage()
+    {
+        var userId = Guid.NewGuid();
+
+        var credential = CreateIdentityCredential(userId);
+
+        _credentialRepository.Setup(x => x.GetByIdAsync(credential.Id)).ReturnsAsync(credential);
+
+        SetupCryptography();
+
+        _photoStorageProvider.Setup(x => x.OpenReadAsync("photos/kayla.jpg", It.IsAny<CancellationToken>())).ReturnsAsync(new MemoryStream(PhotoBytes));
+
+        _pdfProvider.Setup(x => x.Generate(
+                It.IsAny<CertifiedCredentialSnapshot>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
+                It.IsAny<DateTime>(),
+                It.Is<byte[]?>(bytes => bytes != null && bytes.SequenceEqual(PhotoBytes)))).Returns(PdfBytes);
+
+        _certifiedCopyRepository.Setup(x => x.AddAsync(It.IsAny<CertifiedCredentialCopy>())).Returns(Task.CompletedTask);
+
+        _certifiedCopyRepository.Setup(x => x.SaveChangesAsync()).Returns(Task.CompletedTask);
+
+        var service = CreateService();
+
+        await service.GenerateAsync(credential.Id, userId);
+
+        _photoStorageProvider.Verify(x => x.OpenReadAsync("photos/kayla.jpg", It.IsAny<CancellationToken>()), Times.Once);
+
+        _pdfProvider.Verify(
+            x => x.Generate(
+                It.IsAny<CertifiedCredentialSnapshot>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
+                It.IsAny<DateTime>(),
+                It.Is<byte[]?>(bytes => bytes != null && bytes.SequenceEqual(PhotoBytes))), Times.Once);
+    }
+
+    [Fact]
+    public async Task GenerateAsync_PhotoNotFound_StillGeneratesPdfWithoutPhoto()
+    {
+        var userId = Guid.NewGuid();
+
+        var credential = CreateIdentityCredential(userId);
+
+        _credentialRepository.Setup(x => x.GetByIdAsync(credential.Id)).ReturnsAsync(credential);
+
+        SetupCryptography();
+
+        _photoStorageProvider.Setup(x => x.OpenReadAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync((Stream?)null);
+
+        _pdfProvider.Setup(x => x.Generate(
+                It.IsAny<CertifiedCredentialSnapshot>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
+                It.IsAny<DateTime>(),
+                null)).Returns(PdfBytes);
+
+        _certifiedCopyRepository.Setup(x => x.AddAsync(It.IsAny<CertifiedCredentialCopy>())).Returns(Task.CompletedTask);
+
+        _certifiedCopyRepository.Setup(x => x.SaveChangesAsync()).Returns(Task.CompletedTask);
+
+        var service = CreateService();
+
+        var result = await service.GenerateAsync(credential.Id, userId);
+
+        Assert.Equal(PdfBytes, result.PdfBytes);
+
+        _pdfProvider.Verify(x => x.Generate(
+                It.IsAny<CertifiedCredentialSnapshot>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
+                It.IsAny<DateTime>(),
+                null), Times.Once);
+    }
+
+    [Fact]
+    public async Task GenerateAsync_CredentialNotFound_ThrowsCredentialNotFoundException()
+    {
+        var credentialId = Guid.NewGuid();
+
+        _credentialRepository.Setup(x => x.GetByIdAsync(credentialId)).ReturnsAsync((Credential?)null);
+
+        var service = CreateService();
+
+        await Assert.ThrowsAsync<CredentialNotFoundException>(() => service.GenerateAsync(credentialId, Guid.NewGuid()));
+    }
+
+    [Fact]
+    public async Task GenerateAsync_CredentialOwnedByDifferentUser_ThrowsCredentialAccessDeniedException()
+    {
+        var ownerId = Guid.NewGuid();
+        var requestingUserId = Guid.NewGuid();
+
+        var credential = CreateIdentityCredential(ownerId);
+
+        _credentialRepository.Setup(x => x.GetByIdAsync(credential.Id)).ReturnsAsync(credential);
+
+        var service = CreateService();
+
+        await Assert.ThrowsAsync<CredentialAccessDeniedException>(() => service.GenerateAsync(credential.Id, requestingUserId));
+    }
+
+    [Fact]
+    public async Task GenerateAsync_InactiveCredential_ThrowsCredentialNotActiveException()
+    {
+        var userId = Guid.NewGuid();
+
+        var credential = CreateIdentityCredential(userId, CredentialStatus.Inactive);
+
+        _credentialRepository.Setup(x => x.GetByIdAsync(credential.Id)).ReturnsAsync(credential);
+
+        var service = CreateService();
+
+        await Assert.ThrowsAsync<CredentialNotActiveException>(() => service.GenerateAsync(credential.Id, userId));
     }
 
 }
