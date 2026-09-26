@@ -1,0 +1,22 @@
+mobile/src/services/offline-service/test/offline-service.test.ts
+  h_99fca60b892ff4 41,130
+mobile/src/lib/offline/device-key.ts
+  h_99fca60b892ff4 73
+mobile/src/services/offline-service/offline-service.ts
+  h_99fca60b892ff4 25-26
+mobile/src/components/pages/qr-generation/test/qr-generation-page.test.tsx
+  h_99fca60b892ff4 76
+mobile/src/lib/offline/offline-package.ts
+  h_99fca60b892ff4 41-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b3e5a1e2abe515c6b8f1f1d6a038b493f1102308",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

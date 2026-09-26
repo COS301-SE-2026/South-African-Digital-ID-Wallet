@@ -1,0 +1,25 @@
+mobile/src/components/pages/qr-generation/qr-generation-page.tsx
+  h_99fca60b892ff4 97-98,239,244,252-254
+  h_99fca60b892ff4 36-37,106-110,233
+mobile/src/hooks/test/use-key-binding-frame.test.tsx
+  h_99fca60b892ff4 40,48-49,60,74,90,96-97
+mobile/src/hooks/use-offline-scan.ts
+  h_99fca60b892ff4 1,16-22,25-26,30-32,38-39,58-78,84,86-96,98,103
+mobile/src/hooks/use-key-binding-frame.ts
+  h_99fca60b892ff4 15-20,25,27,55-57,67-75
+mobile/src/hooks/test/use-offline-scan.test.tsx
+  h_99fca60b892ff4 168-190
+mobile/src/components/pages/qr-generation/test/qr-generation-page.test.tsx
+  h_99fca60b892ff4 133,281-284,301-315
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "350f46bfbee418a2d2cbbc320a657d160c698204",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

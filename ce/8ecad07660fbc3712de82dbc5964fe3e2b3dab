@@ -1,0 +1,95 @@
+web/src/components/organisms/capture-contact-details/test/capture-contact-details.test.tsx
+  h_99fca60b892ff4 4,24,74
+  h_99fca60b892ff4 1-3,5-23,25-73,75-91
+mobile/src/components/pages/qr-generation/qr-generation-page.tsx
+  h_99fca60b892ff4 36-37
+  h_99fca60b892ff4 97-98,106-110,233,239,244,252-254
+mobile/src/hooks/test/use-offline-scan.test.tsx
+  h_99fca60b892ff4 183-205
+web/src/components/organisms/search-results-table/test/search-results-table.test.tsx
+  h_99fca60b892ff4 4,7-16,28-32,34,37,40,62
+  h_99fca60b892ff4 1-3,5-6,17-27,33,35-36,38-39,41-61,63-97
+web/src/components/organisms/login-form/test/login-form.test.tsx
+  h_99fca60b892ff4 23-26
+  h_99fca60b892ff4 4-7,10-11,13-22,27-38,40-51,54-57,59-62,64-66,68-72,74-83
+web/src/components/organisms/retrieve-identity-record/test/retrieve-identity-record.test.tsx
+  h_99fca60b892ff4 4,20
+  h_99fca60b892ff4 1-3,5-19,21-75
+web/src/components/organisms/liveness-camera-dialog/test/liveness-camera-dialog.test.tsx
+  h_99fca60b892ff4 12
+  h_99fca60b892ff4 1-11,13-108
+web/src/components/organisms/credential-details-modal/test/credential-details-modal.test.tsx
+  h_99fca60b892ff4 5,9,12,17-21
+  h_99fca60b892ff4 1-4,6-8,10-11,13-16,22-106
+backend/FlashIdBackend/Application/Common/Services/SdJwtCredentialFactory.cs
+  s_fa106e73de307e::t_4ca97a8e84ea46 9,138,151,158,177
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/OfflinePackageRequestDto.cs
+  s_fa106e73de307e::t_68b9563187e3e6 3-5
+backend/FlashIdBackend/Application/Features/Credentials/Exceptions/OfflinePackageExceptions.cs
+  s_fa106e73de307e::t_3bcddd5a893f3e 23-29
+backend/FlashIdBackend/tests/OfflinePackageControllerIntegrationTests.cs
+  s_fa106e73de307e::t_db35b47cc7671e 46-49,51,53,56-61,65,328,393-394,411,431,443,530,536,538-572,639
+backend/FlashIdBackend/tests/SdJwtCredentialFactoryTests.cs
+  s_fa106e73de307e::t_b2405911ab6eff 8,331,336,340,351,355,362
+mobile/src/components/pages/qr-generation/test/qr-generation-page.test.tsx
+  s_fa106e73de307e::t_577a3fae8843bc 76,133,281-284,301-315
+mobile/src/hooks/test/use-key-binding-frame.test.tsx
+  s_fa106e73de307e::t_3baa4806844a7c 40,48-49,60,74,90,96-97
+mobile/src/hooks/use-key-binding-frame.ts
+  s_fa106e73de307e::t_55b28777b8e7b8 15-20,25,27,55-57,67-75
+mobile/src/hooks/use-offline-scan.ts
+  s_fa106e73de307e::t_c5f1e05a9ed42e 1,16-22,25-26,31,38-39,58-78,84,91,103
+mobile/src/lib/offline/device-key.ts
+  s_fa106e73de307e::t_60898d87ee0c11 73
+mobile/src/lib/offline/offline-package.ts
+  s_fa106e73de307e::t_84b750b8fdfa00 41-42
+mobile/src/services/offline-service/offline-service.ts
+  s_fa106e73de307e::t_3bf2f6021cdaed 31-32
+mobile/src/services/offline-service/test/offline-service.test.ts
+  s_fa106e73de307e::t_444c066ad9d88b 48,138
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_99fca60b892ff4 373,376,389,403,431,433
+web/src/components/molecules/ready-item/test/ready-item.test.tsx
+  h_99fca60b892ff4 1-22
+web/src/components/molecules/update-email-card/test/update-email-card.test.tsx
+  h_99fca60b892ff4 1-28
+web/src/components/molecules/update-email-modal/index.ts
+  h_99fca60b892ff4 1
+web/src/components/molecules/update-email-modal/test/update-email-modal.test.tsx
+  h_99fca60b892ff4 1-68
+web/src/components/molecules/update-password-card/test/update-password-card.test.tsx
+  h_99fca60b892ff4 1-28
+web/src/components/molecules/update-password-modal/test/update-password-modal.test.tsx
+  h_99fca60b892ff4 1-45
+web/src/components/molecules/verification-success-modal/test/verification-success-modal.test.tsx
+  h_99fca60b892ff4 1-47
+web/src/components/organisms/liveness-camera-dialog/index.ts
+  h_99fca60b892ff4 1
+web/src/components/organisms/physical-identity-form/test/physical-identity-form.test.tsx
+  h_99fca60b892ff4 1-60
+web/src/components/organisms/verification-failure/index.ts
+  h_99fca60b892ff4 1
+web/src/components/organisms/verification-failure/test/verification-failure.test.tsx
+  h_99fca60b892ff4 1-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ce8ecad07660fbc3712de82dbc5964fe3e2b3dab",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_fa106e73de307e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "180af5aa-4add-4348-b027-cde60f77f32d",
+        "model": "unknown"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

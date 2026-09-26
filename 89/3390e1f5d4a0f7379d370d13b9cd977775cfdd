@@ -1,0 +1,29 @@
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_99fca60b892ff4 373,376,389,403
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/OfflinePackageRequestDto.cs
+  h_99fca60b892ff4 3-4
+  s_fa106e73de307e::t_625b710ab08fa5 5
+backend/FlashIdBackend/tests/OfflinePackageControllerIntegrationTests.cs
+  h_99fca60b892ff4 5,46-49,51,53,56-61,65,278,343-344,361,381,393,480-493,498-502,504,506-522
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "893390e1f5d4a0f7379d370d13b9cd977775cfdd",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_fa106e73de307e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "180af5aa-4add-4348-b027-cde60f77f32d",
+        "model": "unknown"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

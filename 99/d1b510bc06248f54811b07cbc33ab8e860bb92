@@ -1,0 +1,28 @@
+mobile/src/components/organisms/index.ts
+  h_712d174fc3f309 7
+mobile/src/components/molecules/credential-card/credential-card.tsx
+  h_712d174fc3f309 1,4,7-20,24-25,30-53,55-68,71-102,104-106
+mobile/src/components/molecules/credential-card/test/credential-card.test.tsx
+  h_712d174fc3f309 2-3,5-9,12-14,18-24,26-34,39,43-48,55,62-136
+mobile/src/components/molecules/credential-card/types.ts
+  h_712d174fc3f309 1,5-6,11-18
+mobile/src/components/organisms/credential-list/credential-list.tsx
+  h_712d174fc3f309 1-2,6,8,10-13,15-16,18-41
+mobile/src/components/organisms/credential-list/index.ts
+  h_712d174fc3f309 1
+mobile/src/components/organisms/credential-list/test/credential-list.test.tsx
+  h_712d174fc3f309 2,7-10,12-16,23,26,29-36,38-46,49,51,54-56,59-60,62,64,66-67,70,72,74-76,78-82,84-93,95-100
+mobile/src/components/organisms/credential-list/types.ts
+  h_712d174fc3f309 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "99d1b510bc06248f54811b07cbc33ab8e860bb92",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

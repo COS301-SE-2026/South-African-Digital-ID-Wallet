@@ -1,0 +1,18 @@
+mobile/src/lib/pdf-file.ts
+  h_712d174fc3f309 1-44
+mobile/src/hooks/index.ts
+  h_712d174fc3f309 7
+mobile/src/hooks/use-certified-copy.ts
+  h_712d174fc3f309 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "27d98f3326a50a8a77852ec3c2c6395daed3981c",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

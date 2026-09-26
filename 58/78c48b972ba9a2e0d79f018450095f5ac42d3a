@@ -1,0 +1,30 @@
+mobile/package.json
+  h_712d174fc3f309 18-19,25
+mobile/src/services/certified-copy-service/certified-copy-dto.ts
+  h_712d174fc3f309 1-28
+mobile/src/services/certified-copy-service/certified-copy-errors.ts
+  h_712d174fc3f309 1-16
+mobile/src/services/certified-copy-service/certified-copy-service.ts
+  h_712d174fc3f309 1-22
+mobile/src/services/certified-copy-service/certified-copy-urls.ts
+  h_712d174fc3f309 1-6
+mobile/src/services/certified-copy-service/index.ts
+  h_712d174fc3f309 1-8
+mobile/src/services/certified-copy-service/types.ts
+  h_712d174fc3f309 1-4
+mobile/src/services/index.ts
+  h_712d174fc3f309 7
+pnpm-lock.yaml
+  h_712d174fc3f309 48-53,69-71,1034-1036,1043-1045,1148-1155,4433-4434,4453-4457,4541-4547,8987-9005,9027-9028,9256-9265,12933,12990,13040,13400,13418-13421,13529-13540,13583
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "5878c48b972ba9a2e0d79f018450095f5ac42d3a",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
