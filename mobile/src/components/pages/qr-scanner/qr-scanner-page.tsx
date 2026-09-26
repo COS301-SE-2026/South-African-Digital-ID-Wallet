@@ -16,7 +16,8 @@ import {
   useOfflineScan,
   useScanCredential,
   useVerifierTrust,
- useRecordOfflineVerification } from '@/hooks'
+  useRecordOfflineVerification,
+} from '@/hooks'
 import {
   describeVerificationFailure,
   toOfflineScanDisplay,
