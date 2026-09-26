@@ -120,19 +120,27 @@ public class CertifiedCredentialCopiesController : ControllerBase
                 });
             }
 
-            if (!string.Equals(document.ContentType, "application/pdf", StringComparison.OrdinalIgnoreCase))
+            await using var memoryStream = new MemoryStream();
+
+            await document.CopyToAsync(memoryStream);
+
+            var documentBytes = memoryStream.ToArray();
+
+            var hasPdfSignature =
+                documentBytes.Length >= 5 &&
+                documentBytes[0] == (byte)'%' &&
+                documentBytes[1] == (byte)'P' &&
+                documentBytes[2] == (byte)'D' &&
+                documentBytes[3] == (byte)'F' &&
+                documentBytes[4] == (byte)'-';
+
+            if (!hasPdfSignature)
             {
                 return BadRequest(new
                 {
                     message = "Only PDF documents are supported."
                 });
             }
-
-            await using var memoryStream = new MemoryStream();
-
-            await document.CopyToAsync(memoryStream);
-
-            var documentBytes = memoryStream.ToArray();
 
             var result = await _certifiedCopyService.VerifyDocumentAsync(verificationToken, documentBytes);
 
