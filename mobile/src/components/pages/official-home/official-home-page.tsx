@@ -9,7 +9,7 @@ import {
 } from '@/components/organisms'
 import { CitizenDashboardScreen } from '@/components/templates'
 import { officialQuickActions } from '@/config'
-import { useOfficerBadge, useOfficialStats } from '@/hooks'
+import { useOfficerBadge, useOfficialStats, useVerifierTrust } from '@/hooks'
 import { greetingForHour } from '@/lib/format-date'
 import { useAuthStore } from '@/stores/auth-store'
 import { colors } from '@/theme/colors'
@@ -22,6 +22,8 @@ export const OfficialHomePage = () => {
   const user = useAuthStore((state) => state.user)
   const { badge, isPending, refetch } = useOfficerBadge()
   const stats = useOfficialStats()
+  // Downloads the issuer keys at login, so the first offline scan works without opening the scanner online
+  useVerifierTrust()
 
   return (
     <CitizenDashboardScreen

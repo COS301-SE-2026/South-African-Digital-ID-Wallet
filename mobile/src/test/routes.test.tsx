@@ -76,7 +76,7 @@ describe('app routes', () => {
     'citizen/home',
     'citizen/activity',
     'citizen/profile',
-    'citizen/present',
+    'citizen/wallet/present',
     'official/home',
     'official/history',
     'official/audit-log',

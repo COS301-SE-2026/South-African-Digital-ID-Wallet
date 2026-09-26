@@ -130,8 +130,14 @@ public static class DependencyInjection
         services.AddScoped<IPhysicalIdentityVerificationRepository, PhysicalIdentityVerificationRepository>();
 
         services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
+        services.AddScoped<IFraudDetectionRepository, FraudDetectionRepository>();
 
         services.AddSingleton<ICredentialSigningProvider, LocalEs256SigningProvider>();
+
+        services.AddSingleton(PortraitProcessingLimits.Default);
+        services.AddSingleton<IPortraitProcessor, ImageSharpPortraitProcessor>();
+
+        services.AddScoped<IOfflinePackageRepository, OfflinePackageRepository>();
 
         services.AddScoped<ICertifiedCredentialCopyRepository, CertifiedCredentialCopyRepository>();
         services.AddSingleton<ICertifiedCopyCryptographyProvider, CertifiedCopyCryptographyProvider>();
