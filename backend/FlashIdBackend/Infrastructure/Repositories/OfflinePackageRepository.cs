@@ -1,5 +1,6 @@
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Data;
 using Microsoft.Data.Sqlite;
 using Microsoft.Data.SqlClient;
@@ -75,6 +76,35 @@ public class OfflinePackageRepository : IOfflinePackageRepository
         }
 
         _context.AuditLogs.Add(auditLog);
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<int>> GetRevokedIndexesAsync(CancellationToken cancellationToken) =>
+        await _context.Credentials
+            .AsNoTracking()
+            .Where(c => c.RevocationIndex != null && c.Status != CredentialStatus.Active)
+            .OrderBy(c => c.RevocationIndex)
+            .Select(c => c.RevocationIndex!.Value)
+            .ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlySet<Guid>> GetExistingAuditLogIdsAsync(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken) =>
+        (await _context.AuditLogs
+            .AsNoTracking()
+            .Where(a => ids.Contains(a.Id))
+            .Select(a => a.Id)
+            .ToListAsync(cancellationToken))
+        .ToHashSet();
+
+    public async Task<IReadOnlyDictionary<int, Credential>> GetCredentialsByRevocationIndexAsync(IReadOnlyCollection<int> revocationIndexes, CancellationToken cancellationToken) =>
+        await _context.Credentials
+            .AsNoTracking()
+            .Where(c => c.RevocationIndex != null && revocationIndexes.Contains(c.RevocationIndex.Value))
+            .ToDictionaryAsync(c => c.RevocationIndex!.Value, cancellationToken);
+
+    public async Task AddAuditLogsAsync(IReadOnlyCollection<AuditLog> auditLogs, CancellationToken cancellationToken)
+    {
+        _context.AuditLogs.AddRange(auditLogs);
 
         await _context.SaveChangesAsync(cancellationToken);
     }

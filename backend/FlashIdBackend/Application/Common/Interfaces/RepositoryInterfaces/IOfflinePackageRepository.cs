@@ -17,4 +17,16 @@ public interface IOfflinePackageRepository
 
     // For the failure path. A plain save would store a package whose write was never accepted
     Task SaveAuditLogDiscardingChangesAsync(AuditLog auditLog, CancellationToken cancellationToken);
+
+    // Revocation indexes of credentials that must no longer verify offline: any status other than Active.
+    Task<IReadOnlyList<int>> GetRevokedIndexesAsync(CancellationToken cancellationToken);
+
+    // The audit ids among these that are already stored, so an upload retried by the phone is not written twice.
+    Task<IReadOnlySet<Guid>> GetExistingAuditLogIdsAsync(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken);
+
+    // Offline audit entries carry a revocation index, not a credential id, so they are mapped back here.
+    Task<IReadOnlyDictionary<int, Credential>> GetCredentialsByRevocationIndexAsync(IReadOnlyCollection<int> revocationIndexes, CancellationToken cancellationToken);
+
+    Task AddAuditLogsAsync(IReadOnlyCollection<AuditLog> auditLogs, CancellationToken cancellationToken);
+
 }
