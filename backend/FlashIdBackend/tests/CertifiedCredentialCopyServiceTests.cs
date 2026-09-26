@@ -564,4 +564,78 @@ public class CertifiedCredentialCopyServiceTests
         Assert.Equal("CredentialInactive", result.Status);
     }
 
+    [Fact]
+    public async Task VerifyDocumentAsync_OriginalDocument_ReturnsValid()
+    {
+        var credential = CreateIdentityCredential();
+
+        var certifiedCopy = CreateCertifiedCopy(credential);
+
+        _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
+
+        _certifiedCopyRepository.Setup(x => x.GetByVerificationTokenHashAsync(VerificationTokenHash)).ReturnsAsync(certifiedCopy);
+
+        _cryptographyProvider.Setup(x => x.VerifyDocumentHash(PdfBytes, DocumentHash)).Returns(true);
+
+        var service = CreateService();
+
+        var result = await service.VerifyDocumentAsync(VerificationToken, PdfBytes);
+
+        Assert.True(result.IsValid);
+        Assert.True(result.DocumentIntegrityValid);
+        Assert.Equal("Valid", result.Status);
+        Assert.Equal(certifiedCopy.Id, result.CertificationId);
+        Assert.Equal("IdentityDocument", result.CredentialType);
+        Assert.Equal("Kayla Patel", result.FullName);
+    }
+
+    [Fact]
+    public async Task VerifyDocumentAsync_ModifiedDocument_ReturnsDocumentIntegrityFailed()
+    {
+        var credential = CreateIdentityCredential();
+
+        var certifiedCopy = CreateCertifiedCopy(credential);
+
+        var modifiedBytes = "%PDF-modified-document"u8.ToArray();
+
+        _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
+
+        _certifiedCopyRepository.Setup(x => x.GetByVerificationTokenHashAsync(VerificationTokenHash)).ReturnsAsync(certifiedCopy);
+
+        _cryptographyProvider.Setup(x => x.VerifyDocumentHash(modifiedBytes, DocumentHash)).Returns(false);
+
+        var service = CreateService();
+
+        var result = await service.VerifyDocumentAsync(VerificationToken, modifiedBytes);
+
+        Assert.False(result.IsValid);
+        Assert.False(result.DocumentIntegrityValid);
+        Assert.Equal("DocumentIntegrityFailed", result.Status);
+    }
+
+    [Fact]
+    public async Task VerifyDocumentAsync_UnknownToken_ReturnsInvalid()
+    {
+        _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
+
+        _certifiedCopyRepository.Setup(x => x.GetByVerificationTokenHashAsync(VerificationTokenHash)).ReturnsAsync((CertifiedCredentialCopy?)null);
+
+        var service = CreateService();
+
+        var result = await service.VerifyDocumentAsync(VerificationToken, PdfBytes);
+
+        Assert.False(result.IsValid);
+        Assert.False(result.DocumentIntegrityValid);
+        Assert.Equal("Invalid", result.Status);
+    }
+
+    [Fact]
+    public async Task VerifyDocumentAsync_EmptyDocument_ThrowsArgumentException()
+    {
+        var service = CreateService();
+
+        await Assert.ThrowsAsync<ArgumentException>(() => service.VerifyDocumentAsync(VerificationToken, []));
+    }
+
+
 }
