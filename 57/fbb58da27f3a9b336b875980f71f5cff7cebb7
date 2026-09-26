@@ -1,0 +1,18 @@
+web/src/config/page-headers/page-headers.ts
+  h_0aff3b71f739b1 87-91
+web/src/config/navigation/navigation.ts
+  h_0aff3b71f739b1 111-115
+web/src/app/(portal)/officials/verify-document/page.tsx
+  h_0aff3b71f739b1 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "57fbb58da27f3a9b336b875980f71f5cff7cebb7",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
