@@ -448,4 +448,51 @@ public class CredentialsController : ControllerBase
 
         return Ok(keys);
     }
+
+    /// <summary>
+    /// Returns the signed list of revocation indexes that must no longer verify offline, for a verifier to cache.
+    /// </summary>
+    /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
+    /// <response code="200">The list as a compact JWS signed by the credential key.</response>
+    [HttpGet("revocation-list")]
+    [ProducesResponseType(typeof(RevocationListResponseDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetRevocationList(CancellationToken cancellationToken)
+    {
+        var revocationList = await _offlinePackageService.GetRevocationListAsync(cancellationToken);
+
+        return Ok(revocationList);
+    }
+
+    /// <summary>
+    /// Records scans a verifier's phone made while offline, once it has signal again.
+    /// </summary>
+    /// <param name="batch">Up to 100 offline scans, each with an id generated on the phone.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
+    /// <response code="200">How many scans were recorded, and how many an earlier upload had already recorded.</response>
+    /// <response code="400">Too many scans, a missing id, an unknown result or a time out of range.</response>
+    [HttpPost("offline-verifications")]
+    [ProducesResponseType(typeof(OfflineVerificationSyncResultDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> RecordOfflineVerifications([FromBody] OfflineVerificationBatchDto batch, CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirst("userId")?.Value;
+
+        if (userIdClaim == null)
+        {
+            return Unauthorized(new { error = "Invalid token." });
+        }
+
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownIpAddress;
+
+        try
+        {
+            var result = await _offlinePackageService.RecordOfflineVerificationsAsync(Guid.Parse(userIdClaim), batch.Entries, ipAddress, cancellationToken);
+
+            return Ok(result);
+        }
+        catch (ArgumentException ae)
+        {
+            return BadRequest(new { error = ae.Message });
+        }
+    }
 }
