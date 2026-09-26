@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useFocusEffect, useNavigation, useRouter } from 'expo-router'
-import { BottomTabNavigationProp } from 'expo-router/tabs'
+import type { BottomTabNavigationProp } from 'expo-router/tabs'
 import { HelpCircle, ShieldAlert, Zap, ZapOff } from 'lucide-react-native'
 import { ActivityIndicator, View } from 'react-native'
 import { Button, Card, IconTile, Text } from '@/components/atoms'
