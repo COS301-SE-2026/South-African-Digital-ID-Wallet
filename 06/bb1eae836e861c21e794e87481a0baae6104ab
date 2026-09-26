@@ -1,0 +1,26 @@
+docs/demo4/SRS-v4.md
+  h_99fca60b892ff4 1-321
+docs/demo4/TESTING_POLICY.md
+  h_99fca60b892ff4 1-112
+docs/demo4/architecture-v4.md
+  h_99fca60b892ff4 1-201
+docs/demo4/coding_standards.md
+  h_99fca60b892ff4 1-267
+docs/demo4/epics-and-user-stories-v4.md
+  h_99fca60b892ff4 1-910
+docs/demo4/openapi-government-registry.yaml
+  h_99fca60b892ff4 1-48
+docs/demo4/use-cases-v4.md
+  h_99fca60b892ff4 1-295
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "06bb1eae836e861c21e794e87481a0baae6104ab",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
