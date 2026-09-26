@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Application.Common.Interfaces.ProviderInterfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.ManageUserAccountCard.DTOs;
 using Application.Features.Officials.DTOs;
 using Domain.Entities;
@@ -25,12 +26,26 @@ public class OfficialsControllerIntegrationTests
     private const string JwtKey = "integration-test-secret-key-which-is-long-enough"; // NOSONAR - test-only dummy key, not a real secret
     private const string JwtIssuer = "FlashId";
     private const string JwtAudience = "FlashIdWeb";
-    private const string QrPrivateKey = "8O/E1cl/UPWEcxPaC6NvN2GSh1ged35YBOP8ACZf0K0="; // NOSONAR - test-only dummy key, not a real secret
-
     private sealed class StubEmailSenderProvider : IEmailSenderProvider
     {
         public Task SendEmailAsync(string toEmail, string subject, string message, CancellationToken ct = default) =>
             Task.CompletedTask;
+    }
+    private sealed class StubQrSigningProvider : IQrSigningProvider
+    {
+        private static readonly EcPublicJwk StubJwk = new("EC", "P-256", "stub-kid", "stub-x", "stub-y");
+        private static readonly QrSigningKey StubKey = new("stub-kid", "ES256", StubJwk);
+
+        public Task<QrSigningKey> GetActiveKeyAsync(CancellationToken cancellationToken) => Task.FromResult(StubKey);
+
+        public Task<byte[]> SignAsync(string keyId, byte[] signingInput, CancellationToken cancellationToken) =>
+            Task.FromResult(System.Text.Encoding.UTF8.GetBytes("stub-signature"));
+    }
+
+    private sealed class StubQrSignatureVerifier : IQrSignatureVerifier
+    {
+        public Task<bool> VerifyAsync(string kid, string alg, byte[] signingInput, byte[] signature, CancellationToken cancellationToken) =>
+            Task.FromResult(true);
     }
 
     private sealed class StubIpGeolocationProvider : IIpGeolocationProvider
@@ -54,7 +69,6 @@ public class OfficialsControllerIntegrationTests
                     ["Jwt:Key"] = JwtKey,
                     ["Jwt:Issuer"] = JwtIssuer,
                     ["Jwt:Audience"] = JwtAudience,
-                    ["Qr:Ed25519PrivateKey"] = QrPrivateKey,
                 });
             });
 
@@ -69,7 +83,10 @@ public class OfficialsControllerIntegrationTests
 
                 services.RemoveAll(typeof(IIpGeolocationProvider));
                 services.AddScoped<IIpGeolocationProvider, StubIpGeolocationProvider>();
-
+                services.RemoveAll(typeof(IQrSigningProvider));
+                services.AddSingleton<IQrSigningProvider, StubQrSigningProvider>();
+                services.RemoveAll(typeof(IQrSignatureVerifier));
+                services.AddScoped<IQrSignatureVerifier, StubQrSignatureVerifier>();
                 services.RemoveAll(typeof(IHostedService));
             });
         }

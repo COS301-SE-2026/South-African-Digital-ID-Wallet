@@ -29,6 +29,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<DeviceVerification> DeviceVerifications => Set<DeviceVerification>();
     public DbSet<JobRun> JobRuns => Set<JobRun>();
     public DbSet<PhysicalIdentityVerification> PhysicalIdentityVerifications => Set<PhysicalIdentityVerification>();
+    public DbSet<SigningKey> SigningKeys => Set<SigningKey>();
     public DbSet<SecurityEvent> SecurityEvents => Set<SecurityEvent>();
     public DbSet<FraudAlert> FraudAlerts => Set<FraudAlert>();
     public DbSet<UserSecurityProfile> UserSecurityProfiles => Set<UserSecurityProfile>();

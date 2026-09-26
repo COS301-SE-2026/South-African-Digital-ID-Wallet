@@ -9,6 +9,9 @@ using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Azure.Core;
+using Azure.Identity;
 using Azure.Storage.Blobs;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Services;
@@ -22,7 +25,7 @@ namespace Infrastructure;
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(
-        this IServiceCollection services)
+        this IServiceCollection services, IConfiguration rootConfiguration)
     {
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         services.AddScoped<IPasswordHashingProvider, PasswordHashingProvider>();
@@ -34,16 +37,41 @@ public static class DependencyInjection
         services.AddScoped<ICitizenRepository, CitizenRepository>();
         services.AddScoped<ICredentialRepository, CredentialRepository>();
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
+        services.AddScoped<ISigningKeyRepository, SigningKeyRepository>();
+        services.AddScoped<IKeyRotationRepository, KeyRotationRepository>();
         services.AddScoped<ITrustedDeviceRepository, TrustedDeviceRepository>();
         services.AddScoped<IActivityOverviewRepository, ActivityOverviewRepository>();
         services.AddScoped<IDashboardAccountCardRepository, DashboardAccountCardRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddSingleton<IDeviceTokenProvider, DeviceTokenProvider>();
+        services.AddSingleton<TokenCredential, DefaultAzureCredential>();
+        services.AddScoped<IQrSigningProvider>(sp =>
+        {
+            var config = sp.GetRequiredService<IConfiguration>();
+            var vaultUri = config["AzureKeyVault:VaultUri"];
 
+            if (string.IsNullOrWhiteSpace(vaultUri))
+            {
+                var env = sp.GetRequiredService<IHostEnvironment>();
+                if (env.IsDevelopment() || env.IsEnvironment("Testing"))
+                {
+                    return ActivatorUtilities.CreateInstance<StubQrSigningProvider>(sp);
+                }
+
+                throw new InvalidOperationException("AzureKeyVault:VaultUri is not configured.");
+            }
+
+            return ActivatorUtilities.CreateInstance<AzureKeyVaultQrSigningProvider>(sp);
+        });
+        var vaultUriConfigured = !string.IsNullOrWhiteSpace(rootConfiguration["AzureKeyVault:VaultUri"]);
+        if (vaultUriConfigured)
+        {
+            services.AddSingleton<IQrSigningKeyVaultInspector, AzureQrSigningKeyVaultInspector>();
+        }
+        services.AddScoped<IQrSignatureVerifier, QrSignatureVerifier>();
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
 
         services.AddScoped<ICredentialRepository, CredentialRepository>();
-        services.AddSingleton<IQrSigningProvider, Ed25519SigningProvider>();
         services.AddSingleton(n =>
         {
             var configuration = n.GetRequiredService<IConfiguration>();
@@ -120,7 +148,10 @@ public static class DependencyInjection
         services.AddScoped<CredentialExpiryRepository>();
         services.AddScoped<ICredentialExpiryRepository>(sp => new RetryingCredentialExpiryRepositoryDecorator(sp.GetRequiredService<CredentialExpiryRepository>()));
         services.AddHostedService<CredentialExpiryBackgroundService>();
-
+        if (vaultUriConfigured)
+        {
+            services.AddHostedService<KeyRotationBackgroundService>();
+        }
         services.AddScoped<CredentialUpdateRepository>();
         services.AddScoped<ICredentialUpdateRepository>(sp => new RetryingCredentialUpdateRepositoryDecorator(sp.GetRequiredService<CredentialUpdateRepository>()));
         services.AddHostedService<CredentialUpdateBackgroundService>();

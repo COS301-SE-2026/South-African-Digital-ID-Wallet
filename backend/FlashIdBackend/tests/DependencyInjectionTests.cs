@@ -6,11 +6,14 @@ using Application.Common.Services;
 using Azure.Storage.Blobs;
 using Domain.Entities;
 using Infrastructure;
+using Infrastructure.BackgroundJobs;
 using Infrastructure.Repositories;
 using Infrastructure.Providers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Presentation.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Infrastructure.Data;
@@ -21,11 +24,23 @@ namespace tests;
 
 public class DependencyInjectionTests
 {
+    private static IConfiguration CreateConfiguration(string? vaultUri = null)
+    {
+        var data = new Dictionary<string, string?>();
+        if (vaultUri != null)
+        {
+            data["AzureKeyVault:VaultUri"] = vaultUri;
+            data["QrSigning:KeyName"] = "some-key";
+        }
+
+        return new ConfigurationBuilder().AddInMemoryCollection(data).Build();
+    }
+
     [Fact]
     public void AddInfrastructure_ReturnsSameServiceCollectionInstance()
     {
         var services = new ServiceCollection();
-        var result = services.AddInfrastructure();
+        var result = services.AddInfrastructure(CreateConfiguration());
 
         Assert.Same(services, result);
     }
@@ -45,7 +60,7 @@ public class DependencyInjectionTests
         yield return new object[] { typeof(IDashboardAccountCardRepository), typeof(DashboardAccountCardRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(INotificationRepository), typeof(NotificationRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(IEmailSenderProvider), typeof(EmailSenderProvider), ServiceLifetime.Transient };
-        yield return new object[] { typeof(IQrSigningProvider), typeof(Ed25519SigningProvider), ServiceLifetime.Singleton };
+        yield return new object[] { typeof(IKeyRotationRepository), typeof(KeyRotationRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(IQrDisclosureTokenRepository), typeof(CosmosQrDisclosureTokenRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(IPhotoStorageProvider), typeof(AzureBlobPhotoStorageProvider), ServiceLifetime.Singleton };
         yield return new object[] { typeof(IDisclosedFieldsValueResolver), typeof(DisclosedFieldValueResolver), ServiceLifetime.Scoped };
@@ -62,7 +77,7 @@ public class DependencyInjectionTests
     public void AddInfrastructure_RegistersExpectedServiceWithLifetime(Type serviceType, Type implementationType, ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        services.AddInfrastructure();
+        services.AddInfrastructure(CreateConfiguration());
 
         Assert.Contains(services, sd =>
             sd.ServiceType == serviceType &&
@@ -75,7 +90,7 @@ public class DependencyInjectionTests
     public void AddInfrastructure_RegistersBlobServiceClient()
     {
         var services = new ServiceCollection();
-        services.AddInfrastructure();
+        services.AddInfrastructure(CreateConfiguration());
 
         Assert.Contains(services, sd =>
             sd.ServiceType == typeof(BlobServiceClient) &&
@@ -88,9 +103,77 @@ public class DependencyInjectionTests
     public void AddInfrastructure_RegistersTypedHttpClient_ForGovernmentRegistryGateway()
     {
         var services = new ServiceCollection();
-        services.AddInfrastructure();
+        services.AddInfrastructure(CreateConfiguration());
 
         Assert.Contains(services, sd => sd.ServiceType == typeof(IGovernmentRegistryGateway));
+    }
+
+    private sealed class FakeHostEnvironment : IHostEnvironment
+    {
+        public string EnvironmentName { get; set; } = "Development";
+        public string ApplicationName { get; set; } = "tests";
+        public string ContentRootPath { get; set; } = AppContext.BaseDirectory;
+        public Microsoft.Extensions.FileProviders.IFileProvider ContentRootFileProvider { get; set; } = null!;
+    }
+
+    [Fact]
+    public void AddInfrastructure_QrSigningProvider_UsesStub_WhenVaultUriNotConfigured()
+    {
+        var services = new ServiceCollection();
+        var config = CreateConfiguration();
+        services.AddSingleton(config);
+        services.AddSingleton<IHostEnvironment>(new FakeHostEnvironment());
+        services.AddDbContext<AppDbContext>(o => o.UseSqlite("DataSource=:memory:"));
+        services.AddInfrastructure(config);
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var qrSigningProvider = scope.ServiceProvider.GetRequiredService<IQrSigningProvider>();
+
+        Assert.IsType<StubQrSigningProvider>(qrSigningProvider);
+    }
+
+    [Fact]
+    public void AddInfrastructure_QrSigningProvider_UsesAzureKeyVault_WhenVaultUriConfigured()
+    {
+        var services = new ServiceCollection();
+        var config = CreateConfiguration("https://example.vault.azure.net/");
+        services.AddSingleton(config);
+        services.AddDbContext<AppDbContext>(o => o.UseSqlite("DataSource=:memory:"));
+        services.AddInfrastructure(config);
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var qrSigningProvider = scope.ServiceProvider.GetRequiredService<IQrSigningProvider>();
+
+        Assert.IsType<AzureKeyVaultQrSigningProvider>(qrSigningProvider);
+    }
+
+    [Fact]
+    public void AddInfrastructure_DoesNotRegisterKeyVaultInspectorOrRotationJob_WhenVaultUriNotConfigured()
+    {
+        var services = new ServiceCollection();
+        services.AddInfrastructure(CreateConfiguration());
+
+        Assert.DoesNotContain(services, sd => sd.ServiceType == typeof(IQrSigningKeyVaultInspector));
+        Assert.DoesNotContain(services, sd =>
+            sd.ServiceType == typeof(IHostedService) &&
+            sd.ImplementationType == typeof(KeyRotationBackgroundService));
+    }
+
+    [Fact]
+    public void AddInfrastructure_RegistersKeyVaultInspectorAndRotationJob_WhenVaultUriConfigured()
+    {
+        var services = new ServiceCollection();
+        services.AddInfrastructure(CreateConfiguration("https://example.vault.azure.net/"));
+
+        Assert.Contains(services, sd =>
+            sd.ServiceType == typeof(IQrSigningKeyVaultInspector) &&
+            sd.ImplementationType == typeof(AzureQrSigningKeyVaultInspector) &&
+            sd.Lifetime == ServiceLifetime.Singleton);
+        Assert.Contains(services, sd =>
+            sd.ServiceType == typeof(IHostedService) &&
+            sd.ImplementationType == typeof(KeyRotationBackgroundService));
     }
 
     [Fact]
@@ -98,7 +181,7 @@ public class DependencyInjectionTests
     {
         var services = new ServiceCollection();
         services.AddApplication();
-        services.AddInfrastructure();
+        services.AddInfrastructure(CreateConfiguration());
 
         var applicationAssembly = typeof(IAdminDashboardService).Assembly;
         var registered = services.Select(sd => sd.ServiceType).ToHashSet();

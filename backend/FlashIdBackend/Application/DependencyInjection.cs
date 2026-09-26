@@ -36,6 +36,7 @@ public static class DependencyInjection
         services.AddScoped<IDeleteAccountService, DeleteAccountService>();
         services.AddScoped<ICredentialExpiryService, CredentialExpiryService>();
         services.AddSingleton<CredentialExpiryMapper>();
+        services.AddScoped<IKeyRotationService, KeyRotationService>();
         services.AddScoped<IOfficialActivityService, OfficialActivityService>();
         services.AddScoped<IIssueCredentialService, IssueCredentialService>();
         services.AddScoped<ICredentialUpdateService, CredentialUpdateService>();
