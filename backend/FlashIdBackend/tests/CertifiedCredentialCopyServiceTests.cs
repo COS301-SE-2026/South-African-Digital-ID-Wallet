@@ -354,4 +354,85 @@ public class CertifiedCredentialCopyServiceTests
         await Assert.ThrowsAsync<CredentialNotActiveException>(() => service.GenerateAsync(credential.Id, userId));
     }
 
+    [Fact]
+    public async Task GenerateAsync_UnsupportedCredentialType_ThrowsInvalidOperationException()
+    {
+        var userId = Guid.NewGuid();
+
+        var citizen = new Citizen
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId
+        };
+
+        var credential = new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Citizen = citizen,
+            Status = CredentialStatus.Active
+        };
+
+        _credentialRepository.Setup(x => x.GetByIdAsync(credential.Id)).ReturnsAsync(credential);
+
+        var service = CreateService();
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.GenerateAsync(credential.Id, userId));
+    }
+
+    [Fact]
+    public async Task GenerateAsync_MissingFrontendUrl_ThrowsInvalidOperationException()
+    {
+        var userId = Guid.NewGuid();
+
+        var credential = CreateIdentityCredential(userId);
+
+        _credentialRepository.Setup(x => x.GetByIdAsync(credential.Id)).ReturnsAsync(credential);
+
+        SetupCryptography();
+
+        var service = CreateService(frontendBaseUrl: null);
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>((() => service.GenerateAsync(credential.Id, userId)));
+
+        Assert.Equal("Frontend URL is not configured.", exception.Message);
+    }
+
+    [Fact]
+    public async Task GenerateAsync_GeneratesVerificationUrlUsingRawToken()
+    {
+        var userId = Guid.NewGuid();
+
+        var credential = CreateIdentityCredential(userId);
+
+        _credentialRepository.Setup(x => x.GetByIdAsync(credential.Id)).ReturnsAsync(credential);
+
+        SetupCryptography();
+
+        _photoStorageProvider.Setup(x => x.OpenReadAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync((Stream?)null);
+
+        _pdfProvider.Setup(x => x.Generate(
+                It.IsAny<CertifiedCredentialSnapshot>(),
+                It.IsAny<Guid>(),
+                $"{FrontendBaseUrl}/verify-certified-copy/{VerificationToken}",
+                It.IsAny<DateTime>(),
+                It.IsAny<byte[]?>())).Returns(PdfBytes);
+
+        _certifiedCopyRepository.Setup(x => x.AddAsync(
+                It.IsAny<CertifiedCredentialCopy>())).Returns(Task.CompletedTask);
+
+        _certifiedCopyRepository.Setup(x => x.SaveChangesAsync()).Returns(Task.CompletedTask);
+
+        var service = CreateService();
+
+        await service.GenerateAsync(credential.Id, userId);
+
+        _pdfProvider.Verify(x => x.Generate(
+                It.IsAny<CertifiedCredentialSnapshot>(),
+                It.IsAny<Guid>(),
+                $"{FrontendBaseUrl}/verify-certified-copy/{VerificationToken}",
+                It.IsAny<DateTime>(),
+                It.IsAny<byte[]?>()), Times.Once);
+    }
+
 }
