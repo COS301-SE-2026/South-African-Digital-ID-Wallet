@@ -1,0 +1,14 @@
+mobile/src/hooks/use-offline-scan.ts
+  h_99fca60b892ff4 16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "41fd9721a9de4c85f76f31e6ff1dedeef1d50316",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

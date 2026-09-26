@@ -1,0 +1,16 @@
+mobile/src/components/pages/qr-scanner/qr-scanner-page.tsx
+  h_99fca60b892ff4 3
+mobile/src/hooks/use-offline-scan.ts
+  h_99fca60b892ff4 16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2cb29484ba291a272d2b7205b6165f86540132b5",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

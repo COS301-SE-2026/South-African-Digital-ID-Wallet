@@ -1,0 +1,15 @@
+web/src/components/molecules/credential-detail-card/test/credential-detail-card.test.tsx
+  h_0aff3b71f739b1 91-97,103,115,122-123,129-131,134-144,148,165,190
+  h_0aff3b71f739b1 132-133,224
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "255225d9695981170955c2b319915d09c0f139bc",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
