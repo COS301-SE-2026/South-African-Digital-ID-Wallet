@@ -2,6 +2,8 @@ using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Mapping;
 using Application.Common.Services;
+using Domain.Entities;
+using Domain.Enums;
 using Microsoft.Extensions.Configuration;
 using Moq;
 
@@ -44,5 +46,79 @@ public class CertifiedCredentialCopyServiceTests
             new CertifiedCredentialSnapshotMapper(),
             configuration,
             _photoStorageProvider.Object);
+    }
+
+    private static Credential CreateIdentityCredential(Guid? userId = null, CredentialStatus status = CredentialStatus.Active)
+    {
+        var citizen = new Citizen
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId ?? Guid.NewGuid(),
+            SaId = "9000000000000",
+            Names = "Kayla",
+            Surname = "Patel",
+            DateOfBirth = new DateTime(1990, 1, 1)
+        };
+
+        var credential = new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Citizen = citizen,
+            Status = status,
+            IssuedBy = "Department of Home Affairs",
+            IssueDate = new DateTime(2026, 7, 12)
+        };
+
+        credential.IdentityDocument = new IdentityDocument
+        {
+            Id = Guid.NewGuid(),
+            CredentialId = credential.Id,
+            Credential = credential,
+            Citizenship = "South African",
+            CountryOfBirth = "South Africa",
+            Nationality = "South African",
+            PhotoPath = "photos/kayla.jpg"
+        };
+
+        return credential;
+    }
+
+    private static Credential CreateDriversLicenseCredential(Guid? userId = null, CredentialStatus status = CredentialStatus.Active)
+    {
+        var citizen = new Citizen
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId ?? Guid.NewGuid(),
+            SaId = "9000000000000",
+            Names = "Kayla",
+            Surname = "Patel",
+            DateOfBirth = new DateTime(1990, 1, 1)
+        };
+
+        var credential = new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Citizen = citizen,
+            Status = status,
+            IssuedBy = "RTMC",
+            IssueDate = new DateTime(2026, 7, 12)
+        };
+
+        credential.DriversLicense = new DriversLicense
+        {
+            Id = Guid.NewGuid(),
+            CredentialId = credential.Id,
+            Credential = credential,
+            LicenseNumber = "DL123456",
+            LicenseCode = LicenseCode.B,
+            Restrictions = "None",
+            ExpiryDate = new DateTime(2031, 7, 12),
+            CountryOfIssue = "South Africa",
+            PhotoPath = "photos/kayla-license.jpg"
+        };
+
+        return credential;
     }
 }
