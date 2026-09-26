@@ -13,12 +13,23 @@ export type OfflinePackage = {
   expiresAt: string
 }
 
+// One offline scan waiting to be uploaded to the audit log. The id becomes the audit row's id on the
+// backend, so a retried upload is recognised and not recorded twice.
+export type OfflineVerification = {
+  id: string
+  revocationIndex: number | null
+  result: string
+  verifiedAt: number
+}
+
 export type OfflineCache = {
   // One package per credential. A citizen holds an ID and a licence, and presenting the wrong one
   // would show a verifier a different credential from the one the citizen chose.
   packages: Readonly<Record<string, OfflinePackage>>
   trust: TrustData | null
   savedAt: number
+  // Optional, so caches written before audit sync still read without a version bump.
+  pendingVerifications?: readonly OfflineVerification[]
 }
 
 const CACHE_KEY_NAME = 'flashid.offline.cache-key'
