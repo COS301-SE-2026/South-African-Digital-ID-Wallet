@@ -1,0 +1,28 @@
+mobile/src/components/atoms/skeleton/skeleton.tsx
+  h_712d174fc3f309 7,11
+mobile/src/components/atoms/skeleton/types.ts
+  h_712d174fc3f309 1-2,5
+mobile/src/components/molecules/credential-card/credential-card.tsx
+  h_712d174fc3f309 55,57
+mobile/src/components/pages/citizen-wallet/citizen-wallet-page.tsx
+  h_712d174fc3f309 1,6-9,15-16,21-22,26,29-48,51,61-70
+mobile/src/components/pages/credential-detail/credential-detail-page.tsx
+  h_712d174fc3f309 100
+mobile/src/hooks/use-certified-copy.ts
+  h_712d174fc3f309 3,12-16
+mobile/src/lib/pdf-file.ts
+  h_712d174fc3f309 1,10,12-18,20-26,32-37,58-60
+mobile/src/services/certified-copy-service/certified-copy-urls.ts
+  h_712d174fc3f309 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9616ea168757cda2b237901dbc562188b6b152c9",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
