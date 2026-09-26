@@ -181,6 +181,28 @@ The credential expiry background job separates persistence from resilience: `Cre
 - Repeat
 All while leaving the 2 variant steps (`HasCompletedTodayAsync`, `RunOnceAsync`) abstract. `CredentialExpiryBackgroundService` is the first concrete subclass; any future daily job can extend the same base class without reimplementing the scheduling and catch-up logic.
 
+### 3.11 Strategy Pattern (Credential Signing)
+`ICredentialSigningProvider` hides where the credential signing key lives. `LocalEs256SigningProvider` signs with a development key today; a Key Vault provider can replace it through dependency injection alone, as R9.1.3 requires. The rest of the system asks the provider for the active key and a signature and never sees the private key.
+
+### 3.12 Factory Pattern (Offline Credentials)
+`SdJwtCredentialFactory` builds a signed SD-JWT credential from a request: it salts and hashes each claim, shuffles the digests, adds the device key as `cnf`, and signs the result. The variation between an identity document and a driver's licence is in the data, not in the construction steps, so a single factory method fits better than a GoF Builder, which was considered and rejected.
+
+### 3.13 Parameter Object (Credential Request)
+`SdJwtCredentialRequest` carries the credential type, claims, mandatory claim names, revocation index, document expiry and device key as one object, so the factory's signature stays stable as fields are added. The test data builder `SdJwtCredentialRequestBuilder` is where the Builder pattern is used properly: tests change one field at a time from a valid default.
+
+### 3.14 Facade Pattern (Offline Package Service)
+`OfflinePackageService` gives the controller one call, `GetOrMintAsync`, over the field resolver, photo storage, portrait processor, credential factory, signing provider and repository. It decides whether a stored package can be reused or must be minted again, and it also signs the revocation list and records offline verifications.
+
+### 3.15 Adapter Pattern (Network State)
+TanStack Query needs to know whether the phone is online, and NetInfo reports it in its own event format. The root layout adapts one to the other with `onlineManager.setEventListener`, so every query pauses offline instead of failing and replacing cached data with an error.
+
+### 3.16 Observer Pattern (Offline Sync)
+`OfflineVerificationSync` subscribes to app state and network changes and uploads queued offline scans when the phone comes back to the foreground or regains signal, the same way `SessionLockWatcher` observes app state for session locking.
+
+### 3.17 Patterns Considered and Not Used
+- **Chain of Responsibility for the 12 verification steps:** the steps run in a fixed order defined by the wire format, and each is a small pure function returning a result code. A chain of handler objects would add indirection without allowing any reordering the standard permits.
+- **GoF Builder for credentials:** see 3.12.
+
 ---
 
 ## 4. Architectural Constraints
@@ -197,5 +219,11 @@ All while leaving the 2 variant steps (`HasCompletedTodayAsync`, `RunOnceAsync`)
 | CI/CD | Must use GitHub Actions for pipeline automation |
 | Code Quality | All PRs must pass automated build, lint, format, and test checks before merging |
 | Version Control | All contributions must be tracked via Git with meaningful commit messages |
+
+---
+
+## 5. Offline Verification Architecture
+
+Offline verification moves the verifier into the mobile app. While online, the backend signs each credential as an SD-JWT bound to the citizen's device key, and publishes its issuer keys and a signed revocation list. The citizen's phone keeps its packages, and the verifier's phone keeps the keys and revocation list, in an AES-GCM encrypted file whose key lives in the device's secure storage. Offline, the citizen's phone splits a presentation into animated QR frames and re-signs a key binding frame every 5 seconds. The verifier's phone reassembles the frames and runs the full verification on the device. Results are queued and uploaded to the audit log when the verifier reconnects. The byte-level rules are in [wire-format.md](offline-verification/wire-format.md) and the reasoning in [decisions.md](offline-verification/decisions.md).
 
 ---

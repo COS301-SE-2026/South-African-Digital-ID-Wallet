@@ -4,7 +4,7 @@
 > COS 301 Capstone Project 2026  
 > Team: Tech Titans  
 > Client: Agile Bridge (Pty) Ltd  
-> Version: 0.1
+> Version: 0.4 (Demo 4)
 
 ---
 
@@ -83,6 +83,7 @@ The FlashID prototype will:
 - Allow officials to verify credentials through QR scanning
 - Support credential revocation and audit tracking
 - Demonstrate secure, scalable identity verification workflows
+- Allow citizens to present, and officials to verify, credentials with no internet connection on either phone
 
 The prototype will simulate institutional integrations using mock or controlled government services.
 
@@ -154,9 +155,9 @@ Officials may:
 ---
 ## 3.2 Epics and User Stories
 
-The full epics and user stories, including acceptance criteria and definitions of done for all 12 epics and 49 user stories are documented in:
+The full epics and user stories, including acceptance criteria and definitions of done for all 13 epics and 55 user stories are documented in:
 
- **[Epics and User Stories](../demo3/epics-and-user-stories-v3.md)**
+ **[Epics and User Stories](../demo4/epics-and-user-stories-v4.md)**
 
 ### Epic Summary
 
@@ -174,6 +175,7 @@ The full epics and user stories, including acceptance criteria and definitions o
 | E10 | Audit Logging & POPIA Compliance |
 | E11 | Account Management & Device Security |
 | E12 | Advanced Features & Certified Documents |
+| E13 | Offline Verification |
 
 ---
 
@@ -181,7 +183,7 @@ The full epics and user stories, including acceptance criteria and definitions o
 
 The complete functional requirements, subsystems R1 through R10 are documented in:
 
- **[Functional Requirements](../demo3/functional-requirements-v3.md)**
+ **[Functional Requirements](../demo4/functional-requirements-v4.md)**
 
 ### Subsystem Summary
 
@@ -189,13 +191,13 @@ The complete functional requirements, subsystems R1 through R10 are documented i
 |---|---|
 | 4.1 - R1: Authentication & User Management | Citizen registration, login, gov admin registration, official auth |
 | 4.2 - R2: Credential Management | Issuance, revocation, lifecycle, API-based issuance, updates |
-| 4.3 - R3: QR Verification | QR generation, one-time use, selective disclosure, additional disclosure |
+| 4.3 - R3: QR Verification | QR generation, one-time use, selective disclosure, additional disclosure, offline presentation and verification |
 | 4.4 - R4: Role-Based Access Control | Role separation, admin permissions, emergency responder access |
 | 4.5 - R5: Audit Logging & POPIA | Immutable audit trail, POPIA compliance |
 | 4.6 - R6: Notifications | Credential and push notification requirements |
 | 4.7 - R7: Analytics & Reporting | Verification analytics, admin report export |
 | 4.8 - R8: Institution Registration & API Keys | Institution onboarding, API key generation and management |
-| 4.9 - R9: Cryptographic Security | Ed25519 signing, key vault, signature verification, key rotation |
+| 4.9 - R9: Cryptographic Security | ES256 signing, signing provider, signature verification online and offline, key rotation |
 | 4.10 - R10: Account Management & Device Security | Password management, device trust, account deletion, duress PIN |
 
 ---
@@ -218,6 +220,9 @@ All administrative accounts need multi-factor authentication (OTP) during authen
 #### NFR1.5
 Sensitive configuration values are to be stored using environment variables or GitHub Secrets
 
+#### NFR1.6
+Offline credentials must be stored encrypted on the device, bound to the device's own key, and refused by verifiers when presented without a fresh signature from that device.
+
 ---
 
 ### 5.2 Performance
@@ -237,6 +242,9 @@ QR code verification requests must return a verification result within 3 seconds
 #### NFR2.5
 The system must support at least 500 concurrent authenticated users without degradation in response times.
 
+#### NFR2.6
+An offline presentation of a driver's licence, including the portrait and key binding, must scan within 5 seconds on the reference phones. Measured: about 4.2 seconds for 28 frames.
+
 ---
 
 ### 5.3 Reliability & Availability
@@ -255,6 +263,9 @@ The system must recover from critical service failures within 5 minutes.
 
 #### NFR3.5
 Credential information and user account data must remain consistent.
+
+#### NFR3.6
+Credential presentation and verification must keep working with no network connection on either phone, using data cached while online.
 
 ---
 
@@ -298,7 +309,7 @@ The architecture should support the onboarding of additional government departme
 
 ## 6. Use Cases
 
-See [Use Cases](../demo3/use-cases-v3.md) for the Use Cases and their Use Case Diagrams.
+See [Use Cases](../demo4/use-cases-v4.md) for the Use Cases and their Use Case Diagrams.
 
 ---
 ## 7. Domain Model
@@ -319,3 +330,5 @@ See [Use Cases](../demo3/use-cases-v3.md) for the Use Cases and their Use Case D
 - Citizens possess smartphones
 - Institutions have internet access
 - Mock integrations represent real-world systems
+- Verifiers connect to the internet at least once every 7 days to refresh verification data
+- Each citizen's phone is online at least once before it is used offline

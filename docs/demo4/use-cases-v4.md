@@ -293,3 +293,46 @@ The Audit Logs subsystem allows an authenticated Government Administrator to vie
 - **Section 23 - Access to Personal Information:** Audit log entries that reference a citizen or official's actions are only accessible to administrators for legitimate oversight purposes, not for general browsing.
 
 ---
+
+## 10. Offline Verification
+
+The Offline Verification subsystem lets a Citizen present a credential, and an Official verify it, when neither phone has an internet connection. The credential is prepared and signed while online, bound to the Citizen's phone, and checked entirely on the Official's phone against verification data cached while online. Scans made offline are added to the audit log when the Official's phone reconnects.
+
+![Offline Verification Use Case Diagram](../images/offline-verification.drawio.svg)
+
+### Prepare Offline Credential
+
+**TUCBW:** This use case begins when a signed-in Citizen opens the FlashID home screen while online.
+
+**TUCEW:** This use case ends with a signed offline package, bound to the Citizen's phone, stored encrypted on the phone for each active credential.
+
+### Present Offline Code
+
+**TUCBW:** This use case begins when a Citizen chooses to share a credential and selects the offline code, with or without a connection.
+
+**TUCEW:** This use case ends with an animated QR code showing only the chosen fields, re-signed by the Citizen's phone every 5 seconds while it is displayed.
+
+### Refresh Verification Data
+
+**TUCBW:** This use case begins when an Official's phone is online and the Official opens FlashID or the scanner.
+
+**TUCEW:** This use case ends with the issuer keys and a signed revocation list stored on the Official's phone, ready for offline verification.
+
+### Verify Offline Code
+
+**TUCBW:** This use case begins when an Official scans a Citizen's animated offline QR code.
+
+**TUCEW:** This use case ends with the result shown on the Official's phone: the disclosed fields and portrait when verified, or a specific reason when refused.
+
+### Sync Offline Verifications
+
+**TUCBW:** This use case begins when an Official's phone that made offline scans regains a connection, signs in, or returns to the foreground.
+
+**TUCEW:** This use case ends with each queued scan recorded once in the audit log and removed from the phone.
+
+### POPIA Compliance
+
+- **Section 10 - Minimality:** Only the fields the Citizen chooses to share leave the phone; every other field travels as a salted digest that reveals nothing.
+- **Sections 19-22 - Security Safeguards:** Offline packages are encrypted on the device and bound to the Citizen's phone, recordings stop verifying within about 90 seconds, screenshots are blocked on the sharing screen, and offline data is wiped on sign-out.
+- **Section 8 - Accountability:** Every offline scan is attributed to the Official who made it and recorded in the audit log, with the phone's time and the server's receipt time.
+- **Section 11 - Consent:** An offline presentation happens only when the Citizen explicitly chooses to show the offline code.

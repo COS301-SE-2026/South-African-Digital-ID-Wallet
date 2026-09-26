@@ -2,7 +2,7 @@
 **Tech Titans · COS 301 Capstone 2026**
 
 > This document contains all epics and user stories for the FlashID system, including acceptance criteria and definition of done for each story.
-> See [SRS](./SRS-v3.md) for the full Software Requirements Specification.
+> See [SRS](./SRS-v4.md) for the full Software Requirements Specification.
 
 ---
 ## 3.2 Epics and User Stories
@@ -80,13 +80,13 @@ As a citizen, I want to register on FlashID using my physical ID document and a 
 **Acceptance Criteria:**
 - Citizen can upload or capture an image of their SA ID document
 - Citizen can take a selfie via the app for liveness verification
-- System performs a liveness check (Azure Face API mock for Demo 1)
+- System performs a liveness check 
 - System validates the ID document against the MockGov registry
 - Citizen account is created on successful identity verification
 - Registration is blocked if liveness check fails or ID is not found in the registry
 
 **Definition of Done:**
-- Self-registration liveness check integrated (mock for Demo 1)
+- Self-registration liveness check integrated 
 - Identity matched against MockGov before account creation
 
 ---
@@ -463,7 +463,7 @@ As a government administrator, issuing a credential must result in it being sign
 **Acceptance Criteria:**
 - Every credential has an Ed25519 signature stored at the point of issuance
 - The signature covers all credential fields
-- Private key is stored in Azure Key Vault (LocalSigningStrategy for Demo 1)
+- Private key is stored in Azure Key Vault 
 - The private key is never stored in the application database
 - Signing failure prevents the credential from being saved
 
@@ -908,3 +908,88 @@ As a citizen, I want to configure which information is included in my emergency 
 
 ---
 
+## 3.2.13 Epic 13: Offline Verification
+
+---
+
+#### US-13.1
+As a citizen, I want to show an offline QR code for my credential when I have no signal, so that I can prove my identity anywhere.
+
+**Acceptance Criteria:**
+- The share screen offers an offline code whenever an offline package is on the phone
+- The citizen chooses which optional fields to share; mandatory fields are always included
+- Changing the shared fields while offline produces a new offline code
+- A clear message is shown when no offline package is available yet
+
+**Definition of Done:**
+- Offline code shown for both identity documents and driver's licences with no network connection
+- Verified on two physical phones in aeroplane mode
+
+---
+#### US-13.2
+As a citizen, I want my offline credentials prepared automatically while I am online, so that I do not have to remember to prepare them before losing signal.
+
+**Acceptance Criteria:**
+- Every active credential's offline package downloads when the citizen home screen loads online
+- Packages are stored encrypted on the device and refreshed before they expire
+- Signing out removes all offline packages from the device
+
+**Definition of Done:**
+- Packages available offline after one online visit to the home screen
+- Offline cache cleared on sign-out
+
+---
+#### US-13.3
+As a citizen, I want my offline code to work only from my own phone, so that a screenshot or recording of it cannot be used to impersonate me.
+
+**Acceptance Criteria:**
+- Each offline credential is bound to a key created on the citizen's phone
+- The phone re-signs the code every 5 seconds while it is shown
+- A recording replayed after about 90 seconds, or a code copied to another phone, is refused
+- Screenshots are blocked on the sharing screen
+
+**Definition of Done:**
+- Replayed recording refused on physical phones (device test protocol step 5)
+- A package request without the device key is refused by the backend
+
+---
+#### US-13.4
+As an official, I want to verify a citizen's offline QR code without an internet connection, so that I can check identity in places with no signal.
+
+**Acceptance Criteria:**
+- The scanner collects the animated frames in any order and shows its progress
+- The result shows the disclosed fields and the portrait, verified on the official's own phone
+- Every failure shows a specific reason
+- Scanning an online code without signal tells the official to ask for the offline code
+
+**Definition of Done:**
+- Offline verification works with both phones in aeroplane mode
+- Scan completes within 5 seconds for a driver's licence
+
+---
+#### US-13.5
+As an official, I want revoked credentials to be refused even when I am offline, so that a revoked credential cannot be used where there is no signal.
+
+**Acceptance Criteria:**
+- The official's phone downloads a signed revocation list with the issuer keys while online
+- The list is trusted only if its signature verifies
+- A credential on the list is refused offline with "This credential has been revoked."
+- The official is warned when verification data is over 24 hours old, and verification is refused when it is over 7 days old
+
+**Definition of Done:**
+- Revoked licence refused offline on physical phones (device test protocol step 6)
+
+---
+#### US-13.6
+As a government administrator, I want scans made offline to appear in the audit log once the verifier reconnects, so that every verification remains accountable.
+
+**Acceptance Criteria:**
+- Offline results are kept on the verifier's phone and uploaded when it is online again
+- Each scan is recorded once, however often the upload is retried
+- Each record shows the verifier, the result, the phone's scan time and the server's receipt time
+- Only verified scans are linked to the citizen's credential
+
+**Definition of Done:**
+- Offline scan visible in the audit log after reconnecting (device test protocol step 7)
+
+---
