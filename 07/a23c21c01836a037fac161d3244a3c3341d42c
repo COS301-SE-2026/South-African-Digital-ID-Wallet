@@ -1,0 +1,53 @@
+mobile/src/stores/test/auth-store.test.ts
+  h_99fca60b892ff4 10,33-34,88,91
+  h_99fca60b892ff4 92-93,169,179
+mobile/src/hooks/use-record-offline-verification.ts
+  h_99fca60b892ff4 4,6,11-14,18-22,26-30,33-35
+  h_99fca60b892ff4 41
+mobile/src/lib/offline/test/verify.test.ts
+  h_99fca60b892ff4 532-535,580-583
+  s_fa106e73de307e::t_cde0df4702713a 584-587
+mobile/src/services/offline-service/offline-service.ts
+  h_99fca60b892ff4 5,31,89-90,100-102,106-109,113-115,165,168-169,263-271,275,278-279,282-284,286-291,296-298,306-324,332
+mobile/src/components/utility/offline-verification-sync.tsx
+  h_99fca60b892ff4 8,10-12,16,21,34
+mobile/src/hooks/test/use-record-offline-verification.test.tsx
+  h_99fca60b892ff4 6,22-28,49,63,87-97
+mobile/src/lib/offline/offline-audit.ts
+  h_99fca60b892ff4 9-10,13
+mobile/src/lib/offline/verify.ts
+  h_99fca60b892ff4 40,251-258,262,284,286-287,289
+mobile/src/lib/offline/offline-cache.ts
+  h_99fca60b892ff4 20
+mobile/src/lib/offline/test/offline-audit.test.ts
+  h_99fca60b892ff4 18-19,23,34-35,39
+mobile/src/services/offline-service/test/offline-service.test.ts
+  h_99fca60b892ff4 4,31,48,111,378,383,404-407,419,442-492,527-532,535-538,541-543,547,550,561-563,568-585,590,592-594,596,608-610,612,621-623,627-643
+  s_fa106e73de307e::t_06ac8abae2d15c 377,379-382,384,493-498,644-652
+mobile/src/components/utility/test/offline-verification-sync.test.tsx
+  h_99fca60b892ff4 24-25,49
+  h_99fca60b892ff4 22-23,26-31
+mobile/src/stores/auth-store.ts
+  h_99fca60b892ff4 11,71,108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "07a23c21c01836a037fac161d3244a3c3341d42c",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_fa106e73de307e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "180af5aa-4add-4348-b027-cde60f77f32d",
+        "model": "unknown"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
