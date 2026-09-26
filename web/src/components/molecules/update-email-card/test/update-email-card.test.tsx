@@ -9,9 +9,7 @@ describe('UpdateEmailCard', () => {
       screen.getByRole('heading', { name: 'Update Email' })
     ).toBeInTheDocument()
     expect(
-      screen.getByText(
-        'Change the email address associated with your account.'
-      )
+      screen.getByText('Change the email address associated with your account.')
     ).toBeInTheDocument()
     expect(screen.getByText('✓ Change your email address')).toBeInTheDocument()
     expect(screen.getByText('✓ Verify your new email')).toBeInTheDocument()

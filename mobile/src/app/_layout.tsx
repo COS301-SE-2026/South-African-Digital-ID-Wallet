@@ -1,5 +1,4 @@
 import '../../global.css'
-
 import { useEffect } from 'react'
 import NetInfo from '@react-native-community/netinfo'
 import {
@@ -10,9 +9,9 @@ import {
 import { Stack } from 'expo-router'
 import { ActivityIndicator, View } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-
 import {
   BiometricLockOverlay,
+  OfflineVerificationSync,
   PrivacyScreenOverlay,
   SessionLockWatcher,
 } from '@/components/utility'
@@ -49,6 +48,7 @@ export default function RootLayout() {
           <>
             <Stack screenOptions={{ headerShown: false }} />
             <SessionLockWatcher />
+            <OfflineVerificationSync />
             <PrivacyScreenOverlay />
             <BiometricLockOverlay />
           </>

@@ -61,6 +61,7 @@ export type VerificationResult =
 const ISSUER = 'urn:flashid:issuer'
 const CREDENTIAL_TYP = 'dc+sd-jwt'
 const KEY_BINDING_TYP = 'kb+jwt'
+const REVOCATION_LIST_TYP = 'revocation-list+jwt'
 const ALGORITHM = 'ES256'
 const DIGEST_ALGORITHM = 'sha-256'
 const COORDINATE_BYTES = 32
@@ -243,6 +244,41 @@ const checkIssuerSignature = (
   return verifyJws(parsed.segments, publicKey)
     ? undefined
     : 'BAD_ISSUER_SIGNATURE'
+}
+
+// The revocation list is signed with the credential key, so it is checked against the same cached key set
+// before a single index is trusted. Returns the revoked indexes, or null when the list cannot be trusted.
+export const verifyRevocationList = (
+  jws: string,
+  keys: readonly IssuerKey[]
+): readonly number[] | null => {
+  const parsed = parseJwt(jws)
+
+  if (
+    !parsed ||
+    parsed.header.alg !== ALGORITHM ||
+    parsed.header.typ !== REVOCATION_LIST_TYP ||
+    parsed.payload.iss !== ISSUER
+  ) {
+    return null
+  }
+
+  const key = keys.find(
+    (candidate) =>
+      candidate.kid === parsed.header.kid && candidate.status !== 'revoked'
+  )
+  const publicKey = key ? publicKeyBytes(key) : null
+
+  if (!publicKey || !verifyJws(parsed.segments, publicKey)) {
+    return null
+  }
+
+  const revoked = parsed.payload.revoked
+
+  return Array.isArray(revoked) &&
+    revoked.every((index) => Number.isInteger(index))
+    ? (revoked as number[])
+    : null
 }
 
 // Steps 5 and 6. Everything from here on is signed content.

@@ -41,4 +41,6 @@ public enum AuditEventType
     SecuritySettingsUpdated,
     OfflinePackageMinted,
     OfflinePackageMintFailed,
+    OfflineCredentialVerified,
+    OfflineVerificationRejected,
 }

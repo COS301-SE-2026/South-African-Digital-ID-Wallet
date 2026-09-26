@@ -8,6 +8,7 @@ import { base64urlnopad } from '@scure/base'
 import {
   REVOCATION_NOT_CHECKED_WARNING,
   verifyPresentation,
+  verifyRevocationList,
   type PublicJwk,
   type TrustData,
 } from '../verify'
@@ -507,5 +508,72 @@ describe('verifyPresentation', () => {
         true
       )
     })
+  })
+})
+
+describe('verifyRevocationList', () => {
+  const issuerKey = p256.utils.randomSecretKey()
+  const keys = [{ kid: KID, status: 'active' as const, ...jwkFor(issuerKey) }]
+  const LIST_PAYLOAD = {
+    iss: 'urn:flashid:issuer',
+    iat: NOW,
+    next_update: NOW + 86400,
+    revoked: [3, 7],
+  }
+  const LIST_HEADER = { alg: 'ES256', typ: 'revocation-list+jwt', kid: KID }
+
+  const listSignedWith = (
+    secretKey: Uint8Array,
+    payload: Record<string, unknown> = LIST_PAYLOAD,
+    header: Record<string, string> = LIST_HEADER
+  ) => signJws(header, payload, secretKey)
+
+  it('Should return the revoked indexes from a list signed by a trusted key', () => {
+    expect(verifyRevocationList(listSignedWith(issuerKey), keys)).toEqual([
+      3, 7,
+    ])
+  })
+
+  it('Should refuse a list signed by a key the phone does not trust', () => {
+    expect(
+      verifyRevocationList(listSignedWith(p256.utils.randomSecretKey()), keys)
+    ).toBeNull()
+  })
+
+  it('Should refuse a list whose indexes were changed after signing', () => {
+    const [header, , signature] = listSignedWith(issuerKey).split('.')
+    const emptied = encodeJson({ ...LIST_PAYLOAD, revoked: [] })
+
+    expect(
+      verifyRevocationList(`${header}.${emptied}.${signature}`, keys)
+    ).toBeNull()
+  })
+
+  it('Should refuse a list signed by a revoked key', () => {
+    expect(
+      verifyRevocationList(listSignedWith(issuerKey), [
+        { ...keys[0], status: 'revoked' },
+      ])
+    ).toBeNull()
+  })
+
+  it('Should refuse a signed credential passed off as a revocation list', () => {
+    const credentialHeader = { alg: 'ES256', typ: 'dc+sd-jwt', kid: KID }
+
+    expect(
+      verifyRevocationList(
+        listSignedWith(issuerKey, LIST_PAYLOAD, credentialHeader),
+        keys
+      )
+    ).toBeNull()
+  })
+
+  it('Should refuse a list with an index that is not a whole number', () => {
+    expect(
+      verifyRevocationList(
+        listSignedWith(issuerKey, { ...LIST_PAYLOAD, revoked: [1.5] }),
+        keys
+      )
+    ).toBeNull()
   })
 })

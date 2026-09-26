@@ -7,7 +7,7 @@ paths:
   /api/activate-credentials:
     post:
       tags:
-        - ActivateCredentials
+      - ActivateCredentials
       requestBody:
         content:
           application/json:
@@ -35,15 +35,18 @@ paths:
   /api/activity/me:
     get:
       tags:
-        - ActivityOverview
+      - ActivityOverview
       responses:
         '200':
           description: OK
   /api/admin/dashboard-summary:
     get:
       tags:
-        - AdminDashboard
-      summary: "Returns the admin dashboard landing page summary: system status, headline counts (users, institutions,\r\ncredentials issued), and a system wide recent activity feed. The feed is restricted to an explicit allow\r\nlist of institution/system-level event types so it never surfaces citizen-level data across institution boundaries."
+      - AdminDashboard
+      summary: "Returns the admin dashboard landing page summary: system status, headline counts (users,\
+        \ institutions,\r\ncredentials issued), and a system wide recent activity feed. The feed is restricted\
+        \ to an explicit allow\r\nlist of institution/system-level event types so it never surfaces citizen-level\
+        \ data across institution boundaries."
       responses:
         '200':
           description: The dashboard summary.
@@ -72,14 +75,17 @@ paths:
   /api/admin/analytics:
     get:
       tags:
-        - AdminDashboard
-      summary: "Returns the system-wide analytics for the requested date range: verifications, credentials issued, \r\nactive officials, and active institutions, each with a value, a percentage change against the immediately\r\npreceding period of equal length, and a daily-bucketed series. Computed live with no pre-aggregation."
+      - AdminDashboard
+      summary: "Returns the system-wide analytics for the requested date range: verifications, credentials\
+        \ issued, \r\nactive officials, and active institutions, each with a value, a percentage change\
+        \ against the immediately\r\npreceding period of equal length, and a daily-bucketed series. Computed\
+        \ live with no pre-aggregation."
       parameters:
-        - name: range
-          in: query
-          description: 'One of the "7d", "30d", "90d". Defaults to "30d" if omitted.'
-          schema:
-            type: string
+      - name: range
+        in: query
+        description: One of the "7d", "30d", "90d". Defaults to "30d" if omitted.
+        schema:
+          type: string
       responses:
         '200':
           description: The requested analytics.
@@ -120,19 +126,19 @@ paths:
   /api/auth/me:
     get:
       tags:
-        - Auth
+      - Auth
       responses:
         '200':
           description: OK
   /api/auth/login:
     post:
       tags:
-        - Auth
+      - Auth
       parameters:
-        - name: X-Client
-          in: header
-          schema:
-            type: string
+      - name: X-Client
+        in: header
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
@@ -150,12 +156,12 @@ paths:
   /api/auth/verify-device:
     post:
       tags:
-        - Auth
+      - Auth
       parameters:
-        - name: X-Client
-          in: header
-          schema:
-            type: string
+      - name: X-Client
+        in: header
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
@@ -173,7 +179,7 @@ paths:
   /api/auth/resend-device-verification:
     post:
       tags:
-        - Auth
+      - Auth
       requestBody:
         content:
           application/json:
@@ -191,15 +197,16 @@ paths:
   /api/auth/logout:
     post:
       tags:
-        - Auth
+      - Auth
       responses:
         '200':
           description: OK
   /api/citizens/register:
     post:
       tags:
-        - Citizens
-      summary: Registers a new citizen account and sends an email verification OTP. Rate-limited to prevent registration abuse.
+      - Citizens
+      summary: Registers a new citizen account and sends an email verification OTP. Rate-limited to prevent
+        registration abuse.
       requestBody:
         description: The citizen's registration details.
         content:
@@ -224,7 +231,7 @@ paths:
   /api/citizens/verify-email:
     post:
       tags:
-        - Citizens
+      - Citizens
       summary: Verifies a citizen's email address using the OTP sent during registration.
       requestBody:
         description: The email and OTP code to verify.
@@ -244,12 +251,13 @@ paths:
         '201':
           description: The email was verified.
         '400':
-          description: 'The OTP was invalid, expired, already used, or too many attempts were made.'
+          description: The OTP was invalid, expired, already used, or too many attempts were made.
   /api/citizens/resend-otp:
     post:
       tags:
-        - Citizens
-      summary: Resends the email verification OTP to a citizen who has not yet verified their emails. Rate-limited to prevent abuse.
+      - Citizens
+      summary: Resends the email verification OTP to a citizen who has not yet verified their emails.
+        Rate-limited to prevent abuse.
       requestBody:
         description: The email address to resend the OTP to.
         content:
@@ -272,28 +280,28 @@ paths:
   /api/credentials/me:
     get:
       tags:
-        - Credentials
+      - Credentials
       responses:
         '200':
           description: OK
   /api/credentials/mine:
     get:
       tags:
-        - Credentials
+      - Credentials
       responses:
         '200':
           description: OK
-  '/api/credentials/{credentialId}/qr-token':
+  /api/credentials/{credentialId}/qr-token:
     post:
       tags:
-        - Credentials
+      - Credentials
       parameters:
-        - name: credentialId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: credentialId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         content:
           application/json:
@@ -311,7 +319,7 @@ paths:
   /api/credentials/resolve:
     post:
       tags:
-        - Credentials
+      - Credentials
       requestBody:
         content:
           application/json:
@@ -329,11 +337,13 @@ paths:
   /api/credentials/expiry-check:
     post:
       tags:
-        - Credentials
-      summary: "Manually triggers the daily credential-expiry check. Government Administrator only.\r\nIdempotent. If today's check already completed or is currently running, returns that result instead of reprocessing."
+      - Credentials
+      summary: "Manually triggers the daily credential-expiry check. Government Administrator only.\r\n\
+        Idempotent. If today's check already completed or is currently running, returns that result instead\
+        \ of reprocessing."
       responses:
         '200':
-          description: 'The check ran, or had already completed for today.'
+          description: The check ran, or had already completed for today.
           content:
             text/plain:
               schema:
@@ -368,18 +378,19 @@ paths:
             text/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/api/credentials/citizens/{saId}/status':
+  /api/credentials/citizens/{saId}/status:
     get:
       tags:
-        - Credentials
-      summary: Looks up a citizen in FlashID by SA ID and returns their onboarding status and existing credentials.
+      - Credentials
+      summary: Looks up a citizen in FlashID by SA ID and returns their onboarding status and existing
+        credentials.
       parameters:
-        - name: saId
-          in: path
-          description: The citizen's 13 digit SA ID number
-          required: true
-          schema:
-            type: string
+      - name: saId
+        in: path
+        description: The citizen's 13 digit SA ID number
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: The citizen was found.
@@ -420,7 +431,7 @@ paths:
   /api/credentials/issue:
     post:
       tags:
-        - Credentials
+      - Credentials
       summary: Fetches a citizen's credential from the government registry and issues it into FlashID.
       requestBody:
         content:
@@ -447,7 +458,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CredentialResponseDto'
         '400':
-          description: 'Validation error, or consent not given.'
+          description: Validation error, or consent not given.
           content:
             text/plain:
               schema:
@@ -459,7 +470,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
         '404':
-          description: 'Citizen not found in FlashID, or no matching record at the government registry.'
+          description: Citizen not found in FlashID, or no matching record at the government registry.
           content:
             text/plain:
               schema:
@@ -471,7 +482,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
         '409':
-          description: 'Citizen is not Activated, or already has an active credential of that type.'
+          description: Citizen is not Activated, or already has an active credential of that type.
           content:
             text/plain:
               schema:
@@ -482,17 +493,17 @@ paths:
             text/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/api/credentials/{credentialId}/revoke':
+  /api/credentials/{credentialId}/revoke:
     post:
       tags:
-        - Credentials
+      - Credentials
       parameters:
-        - name: credentialId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: credentialId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         content:
           application/json:
@@ -507,17 +518,17 @@ paths:
       responses:
         '200':
           description: OK
-  '/api/credentials/{credentialId}/reinstate':
+  /api/credentials/{credentialId}/reinstate:
     post:
       tags:
-        - Credentials
+      - Credentials
       parameters:
-        - name: credentialId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: credentialId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         content:
           application/json:
@@ -535,45 +546,45 @@ paths:
   /api/credentials/search:
     get:
       tags:
-        - Credentials
+      - Credentials
       parameters:
-        - name: query
-          in: query
-          schema:
-            type: string
-        - name: page
-          in: query
-          schema:
-            type: integer
-            format: int32
-            default: 1
-        - name: pageSize
-          in: query
-          schema:
-            type: integer
-            format: int32
-            default: 15
+      - name: query
+        in: query
+        schema:
+          type: string
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: pageSize
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 15
       responses:
         '200':
           description: OK
-  '/api/credentials/citizen/{citizenId}':
+  /api/credentials/citizen/{citizenId}:
     get:
       tags:
-        - Credentials
+      - Credentials
       parameters:
-        - name: citizenId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: citizenId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: OK
   /api/credentials/update-check:
     post:
       tags:
-        - Credentials
+      - Credentials
       summary: Manually runs the daily citizen-credential update check.
       responses:
         '200':
@@ -612,22 +623,36 @@ paths:
             text/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/api/credentials/{credentialId}/offline-package':
+  /api/credentials/{credentialId}/offline-package:
     post:
       tags:
-        - Credentials
-      summary: 'Prepares the citizen''s offline credential package, minting it if none is stored or the stored one is stale.'
+      - Credentials
+      summary: Prepares the citizen's offline credential package, minting it if none is stored or the
+        stored one is stale.
       parameters:
-        - name: credentialId
-          in: path
-          description: The credential to prepare for offline presentation.
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: credentialId
+        in: path
+        description: The credential to prepare for offline presentation.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: The wallet's device public key, bound into the credential as cnf so only that phone
+          can present it.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfflinePackageRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/OfflinePackageRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/OfflinePackageRequestDto'
       responses:
         '200':
-          description: 'The offline package, ready to be cached on the device.'
+          description: The offline package, ready to be cached on the device.
           content:
             text/plain:
               schema:
@@ -639,7 +664,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/OfflinePackageResponseDto'
         '400':
-          description: The credential is not active.
+          description: The credential is not active, or the device key is missing or not a valid P-256
+            public key.
           content:
             text/plain:
               schema:
@@ -675,7 +701,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
         '409':
-          description: 'The credential cannot produce a presentation: missing a photograph, or the document has expired.'
+          description: 'The credential cannot produce a presentation: missing a photograph, or the document
+            has expired.'
           content:
             text/plain:
               schema:
@@ -691,11 +718,12 @@ paths:
   /api/credentials/issuer-keys:
     get:
       tags:
-        - Credentials
-      summary: 'Returns the public keys that verify offline credentials, for a verifier to cache before going offline.'
+      - Credentials
+      summary: Returns the public keys that verify offline credentials, for a verifier to cache before
+        going offline.
       responses:
         '200':
-          description: 'The issuer key set, with the time it was retrieved so the verifier can age it.'
+          description: The issuer key set, with the time it was retrieved so the verifier can age it.
           content:
             text/plain:
               schema:
@@ -706,53 +734,114 @@ paths:
             text/json:
               schema:
                 $ref: '#/components/schemas/IssuerKeysResponseDto'
+  /api/credentials/revocation-list:
+    get:
+      tags:
+      - Credentials
+      summary: Returns the signed list of revocation indexes that must no longer verify offline, for a
+        verifier to cache.
+      responses:
+        '200':
+          description: The list as a compact JWS signed by the credential key.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/RevocationListResponseDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevocationListResponseDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/RevocationListResponseDto'
+  /api/credentials/offline-verifications:
+    post:
+      tags:
+      - Credentials
+      summary: Records scans a verifier's phone made while offline, once it has signal again.
+      requestBody:
+        description: Up to 100 offline scans, each with an id generated on the phone.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfflineVerificationBatchDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/OfflineVerificationBatchDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/OfflineVerificationBatchDto'
+      responses:
+        '200':
+          description: How many scans were recorded, and how many an earlier upload had already recorded.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/OfflineVerificationSyncResultDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfflineVerificationSyncResultDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/OfflineVerificationSyncResultDto'
+        '400':
+          description: Too many scans, a missing id, an unknown result or a time out of range.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /api/dashboard-account-card/me:
     get:
       tags:
-        - DashboardAccountCard
+      - DashboardAccountCard
       responses:
         '200':
           description: OK
   /api/account:
     delete:
       tags:
-        - DeleteAccount
+      - DeleteAccount
       responses:
         '200':
           description: OK
   /api/admin/audit-log:
     get:
       tags:
-        - GovAdminAuditLog
+      - GovAdminAuditLog
       parameters:
-        - name: search
-          in: query
-          schema:
-            type: string
-        - name: action
-          in: query
-          schema:
-            type: string
-        - name: dateFrom
-          in: query
-          schema:
-            type: string
-            format: date-time
-        - name: dateTo
-          in: query
-          schema:
-            type: string
-            format: date-time
-        - name: page
-          in: query
-          schema:
-            type: integer
-            format: int32
-        - name: pageSize
-          in: query
-          schema:
-            type: integer
-            format: int32
+      - name: search
+        in: query
+        schema:
+          type: string
+      - name: action
+        in: query
+        schema:
+          type: string
+      - name: dateFrom
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: dateTo
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: pageSize
+        in: query
+        schema:
+          type: integer
+          format: int32
       responses:
         '200':
           description: OK
@@ -781,7 +870,7 @@ paths:
   /api/institutions/register:
     post:
       tags:
-        - Institutions
+      - Institutions
       summary: Registers a new institution and assigns it an admin.
       requestBody:
         description: The institution's registration details.
@@ -811,24 +900,24 @@ paths:
   /api/institutions:
     get:
       tags:
-        - Institutions
+      - Institutions
       summary: Returns all registered institutions.
       responses:
         '200':
           description: The list of institutions.
-  '/api/institutions/{institutionId}':
+  /api/institutions/{institutionId}:
     get:
       tags:
-        - Institutions
+      - Institutions
       summary: Returns a single institution by its ID.
       parameters:
-        - name: institutionId
-          in: path
-          description: The institution's unique identifier.
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: institutionId
+        in: path
+        description: The institution's unique identifier.
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: The requested institutions.
@@ -837,7 +926,7 @@ paths:
   /api/manage-user-account/me:
     get:
       tags:
-        - ManageUserAccount
+      - ManageUserAccount
       responses:
         '200':
           description: OK
@@ -866,7 +955,7 @@ paths:
   /api/manage-user-account/email/verify-password:
     post:
       tags:
-        - ManageUserAccount
+      - ManageUserAccount
       requestBody:
         content:
           application/json:
@@ -920,7 +1009,7 @@ paths:
   /api/manage-user-account/email/request-change:
     post:
       tags:
-        - ManageUserAccount
+      - ManageUserAccount
       requestBody:
         content:
           application/json:
@@ -986,7 +1075,7 @@ paths:
   /api/manage-user-account/email/resend-otp:
     post:
       tags:
-        - ManageUserAccount
+      - ManageUserAccount
       responses:
         '200':
           description: OK
@@ -1017,7 +1106,7 @@ paths:
   /api/manage-user-account/email/confirm:
     post:
       tags:
-        - ManageUserAccount
+      - ManageUserAccount
       requestBody:
         content:
           application/json:
@@ -1081,21 +1170,21 @@ paths:
   /api/notifications/me:
     get:
       tags:
-        - Notification
+      - Notification
       responses:
         '200':
           description: OK
   /api/officials/badge-token:
     post:
       tags:
-        - Officials
+      - Officials
       responses:
         '200':
           description: OK
   /api/officials/verify-badge:
     post:
       tags:
-        - Officials
+      - Officials
       requestBody:
         content:
           application/json:
@@ -1113,15 +1202,16 @@ paths:
   /api/officials/activity/me:
     get:
       tags:
-        - Officials
-      summary: 'Returns the authenticated official''s own recent activity (audit log entries they performed), most recent first.'
+      - Officials
+      summary: Returns the authenticated official's own recent activity (audit log entries they performed),
+        most recent first.
       parameters:
-        - name: limit
-          in: query
-          description: 'Maximum number of items to return. Clamped server side to [1, 20], default 5'
-          schema:
-            type: integer
-            format: int32
+      - name: limit
+        in: query
+        description: Maximum number of items to return. Clamped server side to [1, 20], default 5
+        schema:
+          type: integer
+          format: int32
       responses:
         '200':
           description: The official's recent activity.
@@ -1136,7 +1226,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MyActivityResponseDto'
         '401':
-          description: 'The caller is not authenticated, or the token could not be resolved to a user.'
+          description: The caller is not authenticated, or the token could not be resolved to a user.
           content:
             text/plain:
               schema:
@@ -1150,48 +1240,50 @@ paths:
   /api/officials/history:
     get:
       tags:
-        - Officials
-      summary: "Returns a paginated, filterable audit history for every official at the caller's own instaitution.\r\nInstitution is always derived server side from the authenticated official. Never accepted as a parameter.\r\nEvery call is itself audit-logged for POPIA accountability."
+      - Officials
+      summary: "Returns a paginated, filterable audit history for every official at the caller's own instaitution.\r\
+        \nInstitution is always derived server side from the authenticated official. Never accepted as\
+        \ a parameter.\r\nEvery call is itself audit-logged for POPIA accountability."
       parameters:
-        - name: search
-          in: query
-          description: 'Free text filter matching action, citizen name, performing official''s name, or outcome/type.'
-          schema:
-            type: string
-        - name: action
-          in: query
-          description: Filters to a specific audit event type.
-          schema:
-            type: string
-        - name: dateFrom
-          in: query
-          description: Inclusive lower bound on the entity's timestamp.
-          schema:
-            type: string
-            format: date-time
-        - name: dateTo
-          in: query
-          description: Inclusive upper bound on the entity's timestamp.
-          schema:
-            type: string
-            format: date-time
-        - name: type
-          in: query
-          description: 'Filters by outcome: "Success" or "Failed".'
-          schema:
-            type: string
-        - name: page
-          in: query
-          description: 1-based page number. Clamped server side to >= 1.
-          schema:
-            type: integer
-            format: int32
-        - name: pageSize
-          in: query
-          description: 'Items per page. Clamped server side to [1, 100], default 7.'
-          schema:
-            type: integer
-            format: int32
+      - name: search
+        in: query
+        description: Free text filter matching action, citizen name, performing official's name, or outcome/type.
+        schema:
+          type: string
+      - name: action
+        in: query
+        description: Filters to a specific audit event type.
+        schema:
+          type: string
+      - name: dateFrom
+        in: query
+        description: Inclusive lower bound on the entity's timestamp.
+        schema:
+          type: string
+          format: date-time
+      - name: dateTo
+        in: query
+        description: Inclusive upper bound on the entity's timestamp.
+        schema:
+          type: string
+          format: date-time
+      - name: type
+        in: query
+        description: 'Filters by outcome: "Success" or "Failed".'
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: 1-based page number. Clamped server side to >= 1.
+        schema:
+          type: integer
+          format: int32
+      - name: pageSize
+        in: query
+        description: Items per page. Clamped server side to [1, 100], default 7.
+        schema:
+          type: integer
+          format: int32
       responses:
         '200':
           description: The requested page of institution audit history.
@@ -1206,7 +1298,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/OfficialHistoryResponseDto'
         '401':
-          description: 'The caller is not authenticated, or the token could not be resolved to a user.'
+          description: The caller is not authenticated, or the token could not be resolved to a user.
           content:
             text/plain:
               schema:
@@ -1220,7 +1312,7 @@ paths:
   /api/officials/history/actions:
     get:
       tags:
-        - Officials
+      - Officials
       responses:
         '200':
           description: OK
@@ -1249,7 +1341,7 @@ paths:
   /api/officials/stats/me:
     get:
       tags:
-        - Officials
+      - Officials
       responses:
         '200':
           description: OK
@@ -1275,23 +1367,23 @@ paths:
             text/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/api/onboarding/verify/{idNumber}':
+  /api/onboarding/verify/{idNumber}:
     get:
       tags:
-        - Onboarding
+      - Onboarding
       parameters:
-        - name: idNumber
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: idNumber
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: OK
   /api/onboarding/citizen:
     post:
       tags:
-        - Onboarding
+      - Onboarding
       requestBody:
         content:
           application/json:
@@ -1306,31 +1398,398 @@ paths:
       responses:
         '200':
           description: OK
-  /api/trusted-devices/me:
+  /api/security/overview:
     get:
       tags:
-        - TrustedDevices
+      - Security
       responses:
         '200':
           description: OK
-  '/api/trusted-devices/{deviceId}':
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/SecurityOverviewDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityOverviewDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/SecurityOverviewDto'
+  /api/security/activity:
+    get:
+      tags:
+      - Security
+      parameters:
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SecurityActivityItemDto'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SecurityActivityItemDto'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SecurityActivityItemDto'
+  /api/security/alerts:
+    get:
+      tags:
+      - Security
+      parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/FraudAlertStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FraudAlertSummaryDto'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FraudAlertSummaryDto'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FraudAlertSummaryDto'
+  /api/security/alerts/{alertId}:
+    get:
+      tags:
+      - Security
+      parameters:
+      - name: alertId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/FraudAlertDetailsDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FraudAlertDetailsDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/FraudAlertDetailsDto'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/security/alerts/{alertId}/secure:
+    post:
+      tags:
+      - Security
+      parameters:
+      - name: alertId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Client
+        in: header
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecureAccountRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/SecureAccountRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/SecureAccountRequestDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/SecureAccountResultDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecureAccountResultDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/SecureAccountResultDto'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Conflict
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/security/alerts/{alertId}/dismiss:
+    post:
+      tags:
+      - Security
+      parameters:
+      - name: alertId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DismissFraudAlertRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/DismissFraudAlertRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/DismissFraudAlertRequestDto'
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Conflict
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/security/settings:
+    get:
+      tags:
+      - Security
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/SecuritySettingsDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecuritySettingsDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/SecuritySettingsDto'
+    put:
+      tags:
+      - Security
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSecuritySettingsRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSecuritySettingsRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UpdateSecuritySettingsRequestDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/SecuritySettingsDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecuritySettingsDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/SecuritySettingsDto'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/security/simulate:
+    post:
+      tags:
+      - Security
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimulateSecurityEventRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/SimulateSecurityEventRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/SimulateSecurityEventRequestDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/FraudAssessmentResultDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FraudAssessmentResultDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/FraudAssessmentResultDto'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/trusted-devices/me:
+    get:
+      tags:
+      - TrustedDevices
+      responses:
+        '200':
+          description: OK
+  /api/trusted-devices/{deviceId}:
     delete:
       tags:
-        - TrustedDevices
+      - TrustedDevices
       parameters:
-        - name: deviceId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: deviceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: OK
   /api/UpdatePassword:
     put:
       tags:
-        - UpdatePassword
+      - UpdatePassword
       requestBody:
         content:
           application/json:
@@ -1348,7 +1807,7 @@ paths:
   /api/citizen-verification/activate-token:
     post:
       tags:
-        - Verification
+      - Verification
       requestBody:
         content:
           application/json:
@@ -1366,28 +1825,28 @@ paths:
   /api/citizen-verification/physical:
     post:
       tags:
-        - Verification
+      - Verification
       responses:
         '200':
           description: OK
-  '/api/citizen-verification/physical/{verificationId}/consent':
+  /api/citizen-verification/physical/{verificationId}/consent:
     post:
       tags:
-        - Verification
+      - Verification
       parameters:
-        - name: verificationId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: verificationId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: OK
   /api/citizen-verification/physical/liveness-session:
     post:
       tags:
-        - Verification
+      - Verification
       requestBody:
         content:
           application/json:
@@ -1402,31 +1861,31 @@ paths:
       responses:
         '200':
           description: OK
-  '/api/citizen-verification/physical/{verificationId}/liveness-result':
+  /api/citizen-verification/physical/{verificationId}/liveness-result:
     post:
       tags:
-        - Verification
+      - Verification
       parameters:
-        - name: verificationId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: verificationId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: OK
-  '/api/citizen-verification/physical/{verificationId}':
+  /api/citizen-verification/physical/{verificationId}:
     get:
       tags:
-        - Verification
+      - Verification
       parameters:
-        - name: verificationId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: verificationId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: OK
@@ -1515,11 +1974,11 @@ components:
       additionalProperties: false
     CitizenStatus:
       enum:
-        - Pending
-        - Activated
-        - Deactivated
-        - Suspended
-        - Verified
+      - Pending
+      - Activated
+      - Deactivated
+      - Suspended
+      - Verified
       type: string
     ConfirmEmailChangeRequestDto:
       type: object
@@ -1628,16 +2087,16 @@ components:
       additionalProperties: false
     CredentialStatus:
       enum:
-        - Active
-        - Inactive
-        - Investigation
-        - Revoked
-        - Expired
+      - Active
+      - Inactive
+      - Investigation
+      - Revoked
+      - Expired
       type: string
     CredentialType:
       enum:
-        - IdentityDocument
-        - DriversLicense
+      - IdentityDocument
+      - DriversLicense
       type: string
     CredentialUpdateCheckResponseDto:
       type: object
@@ -1700,14 +2159,37 @@ components:
             $ref: '#/components/schemas/AdminActivityItemDto'
           nullable: true
       additionalProperties: false
+    DevicePublicKeyDto:
+      type: object
+      properties:
+        kty:
+          type: string
+          nullable: true
+        crv:
+          type: string
+          nullable: true
+        x:
+          type: string
+          nullable: true
+        y:
+          type: string
+          nullable: true
+      additionalProperties: false
     DeviceType:
       enum:
-        - Desktop
-        - Mobile
-        - Tablet
-        - Laptop
-        - Unknown
+      - Desktop
+      - Mobile
+      - Tablet
+      - Laptop
+      - Unknown
       type: string
+    DismissFraudAlertRequestDto:
+      type: object
+      properties:
+        password:
+          type: string
+          nullable: true
+      additionalProperties: false
     DriversLicenseDetailDto:
       type: object
       properties:
@@ -1736,6 +2218,183 @@ components:
         issueDate:
           type: string
           format: date-time
+      additionalProperties: false
+    FraudAlertDetailsDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        riskScore:
+          type: integer
+          format: int32
+        riskLevel:
+          $ref: '#/components/schemas/FraudRiskLevel'
+        status:
+          $ref: '#/components/schemas/FraudAlertStatus'
+        isImpossibleTravel:
+          type: boolean
+        eventType:
+          $ref: '#/components/schemas/SecurityEventType'
+        detectedAt:
+          type: string
+          format: date-time
+        previousLocationLabel:
+          type: string
+          nullable: true
+        suspiciousLocationLabel:
+          type: string
+          nullable: true
+        ipAddress:
+          type: string
+          nullable: true
+        deviceDescription:
+          type: string
+          nullable: true
+        isNewDevice:
+          type: boolean
+        isTrustedDevice:
+          type: boolean
+        distanceKm:
+          type: number
+          format: double
+          nullable: true
+        elapsedMinutes:
+          type: number
+          format: double
+          nullable: true
+        impliedSpeedKmh:
+          type: number
+          format: double
+          nullable: true
+        previousLocation:
+          $ref: '#/components/schemas/SecurityLocationDto'
+        suspiciousLocation:
+          $ref: '#/components/schemas/SecurityLocationDto'
+        signals:
+          type: array
+          items:
+            $ref: '#/components/schemas/FraudSignalDto'
+          nullable: true
+        availableActions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SecureActionOptionDto'
+          nullable: true
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        resolutionAction:
+          $ref: '#/components/schemas/SecureAccountAction'
+      additionalProperties: false
+    FraudAlertStatus:
+      enum:
+      - Open
+      - Secured
+      - Dismissed
+      type: string
+    FraudAlertSummaryDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        riskScore:
+          type: integer
+          format: int32
+        riskLevel:
+          $ref: '#/components/schemas/FraudRiskLevel'
+        status:
+          $ref: '#/components/schemas/FraudAlertStatus'
+        isImpossibleTravel:
+          type: boolean
+        eventType:
+          $ref: '#/components/schemas/SecurityEventType'
+        detectedAt:
+          type: string
+          format: date-time
+        previousLocationLabel:
+          type: string
+          nullable: true
+        suspiciousLocationLabel:
+          type: string
+          nullable: true
+      additionalProperties: false
+    FraudAssessmentResultDto:
+      type: object
+      properties:
+        assessed:
+          type: boolean
+        securityEventId:
+          type: string
+          format: uuid
+          nullable: true
+        riskScore:
+          type: integer
+          format: int32
+        riskLevel:
+          $ref: '#/components/schemas/FraudRiskLevel'
+        signals:
+          type: array
+          items:
+            type: string
+          nullable: true
+        isTrustedDevice:
+          type: boolean
+        isNewDevice:
+          type: boolean
+        distanceKm:
+          type: number
+          format: double
+          nullable: true
+        impliedSpeedKmh:
+          type: number
+          format: double
+          nullable: true
+        alertId:
+          type: string
+          format: uuid
+          nullable: true
+        requiresStepUp:
+          type: boolean
+        qrRestrictedUntil:
+          type: string
+          format: date-time
+          nullable: true
+        notice:
+          $ref: '#/components/schemas/SecurityAlertNoticeDto'
+      additionalProperties: false
+    FraudRiskLevel:
+      enum:
+      - Low
+      - Medium
+      - High
+      type: string
+    FraudSignalDto:
+      type: object
+      properties:
+        code:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        weight:
+          type: integer
+          format: int32
       additionalProperties: false
     GenerateQrRequestDto:
       type: object
@@ -1831,11 +2490,11 @@ components:
       additionalProperties: false
     InstitutionType:
       enum:
-        - HomeAffairs
-        - LicensingDepartment
-        - LawEnforcement
-        - Healthcare
-        - FinancialInstitution
+      - HomeAffairs
+      - LicensingDepartment
+      - LawEnforcement
+      - Healthcare
+      - FinancialInstitution
       type: string
     IssueCredentialRequestDto:
       type: object
@@ -1884,9 +2543,9 @@ components:
       additionalProperties: false
     JobRunStatus:
       enum:
-        - Running
-        - Completed
-        - Failed
+      - Running
+      - Completed
+      - Failed
       type: string
     LoginRequestDto:
       type: object
@@ -1902,9 +2561,9 @@ components:
       additionalProperties: false
     ManageUserAccountDto:
       required:
-        - accountStatus
-        - dateOfBirth
-        - memberSince
+      - accountStatus
+      - dateOfBirth
+      - memberSince
       type: object
       properties:
         fullName:
@@ -2040,6 +2699,12 @@ components:
         isCapped:
           type: boolean
       additionalProperties: false
+    OfflinePackageRequestDto:
+      type: object
+      properties:
+        deviceKey:
+          $ref: '#/components/schemas/DevicePublicKeyDto'
+      additionalProperties: false
     OfflinePackageResponseDto:
       type: object
       properties:
@@ -2057,6 +2722,42 @@ components:
         expiresAt:
           type: string
           format: date-time
+      additionalProperties: false
+    OfflineVerificationBatchDto:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/OfflineVerificationEntryDto'
+          nullable: true
+      additionalProperties: false
+    OfflineVerificationEntryDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        revocationIndex:
+          type: integer
+          format: int32
+          nullable: true
+        result:
+          type: string
+          nullable: true
+        verifiedAt:
+          type: integer
+          format: int64
+      additionalProperties: false
+    OfflineVerificationSyncResultDto:
+      type: object
+      properties:
+        recorded:
+          type: integer
+          format: int32
+        duplicates:
+          type: integer
+          format: int32
       additionalProperties: false
     OnboardCitizenRequest:
       type: object
@@ -2092,7 +2793,7 @@ components:
         instance:
           type: string
           nullable: true
-      additionalProperties: { }
+      additionalProperties: {}
     RegisterCitizenRequestDto:
       type: object
       properties:
@@ -2153,12 +2854,238 @@ components:
           type: string
           nullable: true
       additionalProperties: false
+    RevocationListResponseDto:
+      type: object
+      properties:
+        revocationList:
+          type: string
+          nullable: true
+        retrievedAt:
+          type: string
+          format: date-time
+      additionalProperties: false
     RevokeCredentialRequestDto:
       type: object
       properties:
         newStatus:
           $ref: '#/components/schemas/CredentialStatus'
         reason:
+          type: string
+          nullable: true
+      additionalProperties: false
+    SecureAccountAction:
+      enum:
+      - LogOutOtherDevices
+      - ResetPassword
+      - AddExtraVerification
+      type: string
+    SecureAccountRequestDto:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/SecureAccountAction'
+        password:
+          type: string
+          nullable: true
+      additionalProperties: false
+    SecureAccountResultDto:
+      type: object
+      properties:
+        alertId:
+          type: string
+          format: uuid
+        action:
+          $ref: '#/components/schemas/SecureAccountAction'
+        title:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        nextSteps:
+          type: array
+          items:
+            type: string
+          nullable: true
+        devicesRemoved:
+          type: integer
+          format: int32
+        requiresPasswordChange:
+          type: boolean
+        token:
+          type: string
+          nullable: true
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+      additionalProperties: false
+    SecureActionOptionDto:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/SecureAccountAction'
+        title:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        isRecommended:
+          type: boolean
+      additionalProperties: false
+    SecurityActivityItemDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventType:
+          $ref: '#/components/schemas/SecurityEventType'
+        title:
+          type: string
+          nullable: true
+        locationLabel:
+          type: string
+          nullable: true
+        occurredAt:
+          type: string
+          format: date-time
+        deviceDescription:
+          type: string
+          nullable: true
+        isTrustedDevice:
+          type: boolean
+        riskScore:
+          type: integer
+          format: int32
+        riskLevel:
+          $ref: '#/components/schemas/FraudRiskLevel'
+        isSuspicious:
+          type: boolean
+      additionalProperties: false
+    SecurityAlertNoticeDto:
+      type: object
+      properties:
+        alertId:
+          type: string
+          format: uuid
+        title:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        riskLevel:
+          $ref: '#/components/schemas/FraudRiskLevel'
+        riskScore:
+          type: integer
+          format: int32
+        location:
+          type: string
+          nullable: true
+        occurredAt:
+          type: string
+          format: date-time
+        deviceDescription:
+          type: string
+          nullable: true
+        qrGenerationRestricted:
+          type: boolean
+        qrRestrictedUntil:
+          type: string
+          format: date-time
+          nullable: true
+      additionalProperties: false
+    SecurityEventType:
+      enum:
+      - Login
+      - DeviceVerified
+      - QrGenerated
+      type: string
+    SecurityLocationDto:
+      type: object
+      properties:
+        city:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          format: double
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          nullable: true
+        label:
+          type: string
+          nullable: true
+        occurredAt:
+          type: string
+          format: date-time
+      additionalProperties: false
+    SecurityOverviewDto:
+      type: object
+      properties:
+        hasActiveAlert:
+          type: boolean
+        activeAlertCount:
+          type: integer
+          format: int32
+        latestAlert:
+          $ref: '#/components/schemas/FraudAlertSummaryDto'
+        qrGenerationRestricted:
+          type: boolean
+        qrRestrictedUntil:
+          type: string
+          format: date-time
+          nullable: true
+        recentActivity:
+          type: array
+          items:
+            $ref: '#/components/schemas/SecurityActivityItemDto'
+          nullable: true
+      additionalProperties: false
+    SecuritySettingsDto:
+      type: object
+      properties:
+        deviceVerificationEnabled:
+          type: boolean
+        enhancedVerificationEnabled:
+          type: boolean
+        impossibleTravelDetectionEnabled:
+          type: boolean
+        trustedDeviceCount:
+          type: integer
+          format: int32
+        qrGenerationRestricted:
+          type: boolean
+        qrRestrictedUntil:
+          type: string
+          format: date-time
+          nullable: true
+      additionalProperties: false
+    SimulateSecurityEventRequestDto:
+      type: object
+      properties:
+        eventType:
+          $ref: '#/components/schemas/SecurityEventType'
+        city:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        deviceToken:
           type: string
           nullable: true
       additionalProperties: false
@@ -2181,6 +3108,19 @@ components:
           type: string
           nullable: true
         confirmPassword:
+          type: string
+          nullable: true
+      additionalProperties: false
+    UpdateSecuritySettingsRequestDto:
+      type: object
+      properties:
+        impossibleTravelDetectionEnabled:
+          type: boolean
+          nullable: true
+        enhancedVerificationEnabled:
+          type: boolean
+          nullable: true
+        password:
           type: string
           nullable: true
       additionalProperties: false
@@ -2245,20 +3185,21 @@ components:
           nullable: true
       additionalProperties: false
 tags:
-  - name: ActivateCredentials
-  - name: ActivityOverview
-  - name: AdminDashboard
-  - name: Auth
-  - name: Citizens
-  - name: Credentials
-  - name: DashboardAccountCard
-  - name: DeleteAccount
-  - name: GovAdminAuditLog
-  - name: Institutions
-  - name: ManageUserAccount
-  - name: Notification
-  - name: Officials
-  - name: Onboarding
-  - name: TrustedDevices
-  - name: UpdatePassword
-  - name: Verification
+- name: ActivateCredentials
+- name: ActivityOverview
+- name: AdminDashboard
+- name: Auth
+- name: Citizens
+- name: Credentials
+- name: DashboardAccountCard
+- name: DeleteAccount
+- name: GovAdminAuditLog
+- name: Institutions
+- name: ManageUserAccount
+- name: Notification
+- name: Officials
+- name: Onboarding
+- name: Security
+- name: TrustedDevices
+- name: UpdatePassword
+- name: Verification

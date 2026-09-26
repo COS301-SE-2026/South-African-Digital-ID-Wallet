@@ -166,6 +166,21 @@ describe('useOfflineScan', () => {
     })
   })
 
+  it('Should report each result to the caller exactly once', async () => {
+    const onResult = jest.fn()
+    const { result } = await renderHook(() =>
+      useOfflineScan(trust, false, onResult)
+    )
+    const frames = framesFor(PRESENTATION, 'abcdef')
+
+    for (const frame of [...frames, ...frames]) {
+      await act(async () => result.current.addFrame(frame))
+    }
+
+    expect(onResult).toHaveBeenCalledTimes(1)
+    expect(onResult).toHaveBeenCalledWith(verified)
+  })
+
   it('Should verify a bound code without its key binding frame once the wait is over', async () => {
     const encodeJson = (value: unknown) =>
       Buffer.from(JSON.stringify(value)).toString('base64url')

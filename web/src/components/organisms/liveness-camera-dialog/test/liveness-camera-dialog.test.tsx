@@ -6,9 +6,13 @@ jest.mock('@azure/ai-vision-face-ui', () => ({}), { virtual: true })
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0))
 const mockCreateElement = (impl: (tagName: string) => HTMLElement) => {
   const realCreateElement = document.createElement.bind(document)
-  jest.spyOn(document, 'createElement').mockImplementation(((
-    tagName: string
-  ) => impl(tagName) ?? realCreateElement(tagName)) as any)
+  jest
+    .spyOn(document, 'createElement')
+    .mockImplementation(
+      ((tagName: string) =>
+        impl(tagName) ??
+        realCreateElement(tagName)) as unknown as typeof document.createElement
+    )
 }
 describe('LivenessCameraDialog', () => {
   const originalWhenDefined = customElements.whenDefined
@@ -96,7 +100,9 @@ describe('LivenessCameraDialog', () => {
         onComplete={jest.fn()}
       />
     )
-    await user.click(screen.getByRole('button', { name: /close verification/i }))
+    await user.click(
+      screen.getByRole('button', { name: /close verification/i })
+    )
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 })

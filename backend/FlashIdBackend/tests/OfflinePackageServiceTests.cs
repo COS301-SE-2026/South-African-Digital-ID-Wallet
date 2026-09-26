@@ -33,6 +33,8 @@ public class OfflinePackageServiceTests
         public List<int> AllocatedIndexes { get; } = [];
         public List<AuditLog> AuditLogs { get; } = [];
         public bool DiscardedChanges { get; private set; }
+        public List<int> RevokedIndexes { get; } = [];
+        public Dictionary<int, Credential> CredentialsByIndex { get; } = [];
 
         public Task<Credential?> GetForPackagingAsync(Guid credentialId, CancellationToken cancellationToken) =>
             Task.FromResult(Stored?.Id == credentialId ? Stored : null);
@@ -76,6 +78,22 @@ public class OfflinePackageServiceTests
             AuditLogs.Add(auditLog);
 
             return Task.CompletedTask;
+        }
+
+        public Task<IReadOnlyList<int>> GetRevokedIndexesAsync(CancellationToken cancellationToken) =>
+            Task.FromResult<IReadOnlyList<int>>(RevokedIndexes);
+
+        public Task<IReadOnlySet<Guid>> GetExistingAuditLogIdsAsync(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken) =>
+            Task.FromResult<IReadOnlySet<Guid>>(AuditLogs.Select(auditLog => auditLog.Id).Where(ids.Contains).ToHashSet());
+
+        public Task<IReadOnlyDictionary<int, Credential>> GetCredentialsByRevocationIndexAsync(IReadOnlyCollection<int> revocationIndexes, CancellationToken cancellationToken) =>
+            Task.FromResult<IReadOnlyDictionary<int, Credential>>(CredentialsByIndex.Where(entry => revocationIndexes.Contains(entry.Key)).ToDictionary());
+
+        public Task<bool> TryAddAuditLogsAsync(IReadOnlyCollection<AuditLog> auditLogs, CancellationToken cancellationToken)
+        {
+            AuditLogs.AddRange(auditLogs);
+
+            return Task.FromResult(true);
         }
     }
 

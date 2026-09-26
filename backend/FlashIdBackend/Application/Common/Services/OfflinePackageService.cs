@@ -2,6 +2,10 @@ using System.Buffers.Text;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Globalization;
+using System.Text.Encodings.Web;
+using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
@@ -23,6 +27,18 @@ public sealed class OfflinePackageService : IOfflinePackageService
     private const int MaxMintAttempts = 4;
     private const int MinRetryDelayMs = 10;
     private const int MaxRetryDelayMs = 40;
+
+    private const string RevocationListType = "revocation-list+jwt";
+    // A day before a verifier is told its list is stale, matching the 24-hour trust data warning (D-009).
+    private static readonly TimeSpan RevocationListLifetime = TimeSpan.FromHours(24);
+
+    private const int MaxOfflineVerificationsPerBatch = 100;
+    private const string VerifiedResult = "VERIFIED";
+    // A phone clock can be wrong, but not by a day, so a scan time further ahead than that is refused as impossible.
+    private static readonly TimeSpan MaxScanClockAhead = TimeSpan.FromDays(1);
+    // Result codes are stored as sent rather than checked against a copy of the wallet's list, so a code added to
+    // verify.ts later is still recorded. The pattern only stops arbitrary text from reaching the audit log.
+    private static readonly Regex ResultCodePattern = new("^[A-Z_]{1,40}$", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
 
     private readonly IOfflinePackageRepository _repository;
     private readonly IDisclosedFieldsValueResolver _fieldResolver;
@@ -343,4 +359,106 @@ public sealed class OfflinePackageService : IOfflinePackageService
             _timeProvider.GetUtcNow());
     }
 
+    public async Task<RevocationListResponseDto> GetRevocationListAsync(CancellationToken cancellationToken)
+    {
+        var signingKey = await _signingProvider.GetActiveKeyAsync(cancellationToken);
+        var revokedIndexes = await _repository.GetRevokedIndexesAsync(cancellationToken);
+        var now = _timeProvider.GetUtcNow();
+
+        var header = new JsonObject
+        {
+            ["alg"] = signingKey.Algorithm,
+            ["typ"] = RevocationListType,
+            ["kid"] = signingKey.KeyId,
+        };
+        var payload = new JsonObject
+        {
+            ["iss"] = SdJwtCredentialFactory.Issuer,
+            ["iat"] = now.ToUnixTimeSeconds(),
+            ["next_update"] = now.Add(RevocationListLifetime).ToUnixTimeSeconds(),
+            ["revoked"] = new JsonArray(revokedIndexes.Select(index => (JsonNode?)JsonValue.Create(index)).ToArray()),
+        };
+
+        // Signed with the credential key, so a verifier checks it against the same cached key set as the credentials.
+        var signingInput = $"{EncodeJson(header)}.{EncodeJson(payload)}";
+        var signature = await _signingProvider.SignAsync(signingKey.KeyId, Encoding.ASCII.GetBytes(signingInput), cancellationToken);
+
+        return new RevocationListResponseDto($"{signingInput}.{Base64Url.EncodeToString(signature)}", now);
+    }
+
+    public async Task<OfflineVerificationSyncResultDto> RecordOfflineVerificationsAsync(
+        Guid verifierUserId,
+        IReadOnlyList<OfflineVerificationEntryDto> entries,
+        string ipAddress,
+        CancellationToken cancellationToken
+    )
+    {
+        if (entries.Count > MaxOfflineVerificationsPerBatch)
+        {
+            throw new ArgumentException($"At most {MaxOfflineVerificationsPerBatch} offline verifications can be sent at once.", nameof(entries));
+        }
+
+        var receivedAt = _timeProvider.GetUtcNow();
+        var valid = entries.Where(entry => IsValidOfflineVerification(entry, receivedAt)).ToList();
+        var rejected = entries.Where(entry => !IsValidOfflineVerification(entry, receivedAt)).Select(entry => entry.Id).ToList();
+
+        var existing = await _repository.GetExistingAuditLogIdsAsync(valid.Select(entry => entry.Id).ToList(), cancellationToken);
+        // A retried upload repeats entries already stored. The phone's id is the audit row's id, so those are skipped.
+        var fresh = valid.Where(entry => !existing.Contains(entry.Id)).DistinctBy(entry => entry.Id).ToList();
+
+        var verifiedIndexes = fresh
+            .Where(entry => entry.Result == VerifiedResult && entry.RevocationIndex is not null)
+            .Select(entry => entry.RevocationIndex!.Value)
+            .Distinct()
+            .ToList();
+        var credentials = await _repository.GetCredentialsByRevocationIndexAsync(verifiedIndexes, cancellationToken);
+
+        var auditLogs = fresh.Select(entry => ToOfflineAuditLog(entry, verifierUserId, ipAddress, receivedAt, credentials)).ToList();
+
+        if (auditLogs.Count > 0 && !await _repository.TryAddAuditLogsAsync(auditLogs, cancellationToken))
+        {
+            throw new OfflineVerificationConflictException();
+        }
+
+        return new OfflineVerificationSyncResultDto(auditLogs.Count, valid.Count - auditLogs.Count, rejected);
+    }
+
+    // Checked one entry at a time, so a single bad entry is reported back and the rest of the batch is still recorded.
+    private static bool IsValidOfflineVerification(OfflineVerificationEntryDto entry, DateTimeOffset receivedAt) =>
+        entry.Id != Guid.Empty
+        && ResultCodePattern.IsMatch(entry.Result)
+        && entry.VerifiedAt >= 0
+        && entry.VerifiedAt <= receivedAt.Add(MaxScanClockAhead).ToUnixTimeSeconds()
+        && entry.RevocationIndex is null or >= 0;
+
+    private static AuditLog ToOfflineAuditLog(
+        OfflineVerificationEntryDto entry,
+        Guid verifierUserId,
+        string ipAddress,
+        DateTimeOffset receivedAt,
+        IReadOnlyDictionary<int, Credential> credentials)
+    {
+        var isVerified = entry.Result == VerifiedResult;
+        // Only a verified scan proved the issuer signed this revocation index. A failed one may carry a forged index, so it is
+        // never linked to a citizen, which would let anyone fill a citizen's history with fake rejections.
+        var credential = isVerified && entry.RevocationIndex is { } index && credentials.TryGetValue(index, out var match) ? match : null;
+        var scannedAt = DateTimeOffset.FromUnixTimeSeconds(entry.VerifiedAt);
+        var revocationIndex = entry.RevocationIndex?.ToString(CultureInfo.InvariantCulture) ?? "none";
+
+        return new AuditLog
+        {
+            Id = entry.Id,
+            EventType = isVerified ? AuditEventType.OfflineCredentialVerified : AuditEventType.OfflineVerificationRejected,
+            // Both times, because the phone's clock may be wrong after days offline and only the receipt time is the server's own.
+            Details = $"Offline verification. Result: {entry.Result}. Revocation index: {revocationIndex}. Scanned at {scannedAt:O} by the verifier's device clock; received at {receivedAt:O}.",
+            IpAddress = ipAddress,
+            ActorId = verifierUserId,
+            CredentialId = credential?.Id,
+            CitizenId = credential?.CitizenId,
+            CreatedAt = receivedAt.UtcDateTime,
+        };
+    }
+
+    private static string EncodeJson(JsonObject json) =>
+        Base64Url.EncodeToString(Encoding.UTF8.GetBytes(json.ToJsonString(SdJwtCredentialFactory.WireJsonOptions)));
 }

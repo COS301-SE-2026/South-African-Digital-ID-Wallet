@@ -16,7 +16,7 @@ public sealed class SdJwtCredentialFactory : ISdJwtCredentialFactory
     // JSON and parses back to dc+sd-jwt, and the signature covers the exact bytes sent either way.
     private const string TokenType = "dc+sd-jwt";
     // SD-JWT VC requires iss to be a URI, and standard verifiers resolve issuer metadata from it.
-    private const string Issuer = "urn:flashid:issuer";
+    internal const string Issuer = "urn:flashid:issuer";
     private const string DigestAlgorithm = "sha-256";
     private const int SaltBytes = 16;
     // P-256 coordinates are exactly 32 bytes
@@ -24,7 +24,7 @@ public sealed class SdJwtCredentialFactory : ISdJwtCredentialFactory
     // D-007: 30 days max, which bounds how long a retired signing key must stay published.
     private static readonly TimeSpan MaxValidity = TimeSpan.FromDays(30);
     // Relaxed escaping keeps typ as dc+sd-jwt and leaves accented names intact, instead of emitting \u002B & \u00EB
-    private static readonly JsonSerializerOptions WireJsonOptions = new()
+    internal static readonly JsonSerializerOptions WireJsonOptions = new()
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };

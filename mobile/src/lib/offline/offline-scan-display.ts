@@ -3,34 +3,6 @@ import { base64, base64urlnopad } from '@scure/base'
 import type { VerificationFailureCode } from './verify'
 import { CLAIM_LABELS } from './claim-labels'
 
-// Labels match QrFieldDefinitions, so an offline result reads exactly like an online one.
-const FIELD_LABELS: Readonly<Record<string, Readonly<Record<string, string>>>> =
-  {
-    'urn:flashid:identity-document:1': {
-      portrait: 'Photograph',
-      date_of_birth: 'Date of birth',
-      identity_number: 'Identity number',
-      surname: 'Full surname',
-      forenames: 'Full forenames',
-      citizenship_status: 'Citizenship status',
-      gender: 'Gender',
-      country_of_birth: 'Country of birth',
-      card_issue_date_and_number: 'Card issue date and number',
-    },
-    'urn:flashid:drivers-license:1': {
-      portrait: 'Photo',
-      expiry_date: 'Expiry date',
-      date_of_birth: 'Date of birth',
-      full_name: 'Full name',
-      identity_number: 'SA ID number',
-      license_number: 'License number',
-      license_code: 'License code',
-      country_of_issue: 'Country of issue',
-      vehicle_restrictions: 'Vehicle restrictions',
-      issue_date: 'Date of issue',
-    },
-  }
-
 const CREDENTIAL_TYPES: Readonly<Record<string, string>> = {
   'urn:flashid:identity-document:1': 'Identity Document',
   'urn:flashid:drivers-license:1': "Driver's License",

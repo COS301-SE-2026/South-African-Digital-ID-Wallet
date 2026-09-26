@@ -1,5 +1,4 @@
 import { isAxiosError, type AxiosResponse } from 'axios'
-
 import api from '@/lib/api'
 import { getDevicePublicJwk } from '@/lib/offline/device-key'
 import {
@@ -7,20 +6,27 @@ import {
   writeOfflineCache,
   type OfflineCache,
   type OfflinePackage,
+  type OfflineVerification,
 } from '@/lib/offline/offline-cache'
 import { isPackageUsable } from '@/lib/offline/offline-package'
-
+import { verifyRevocationList } from '@/lib/offline/verify'
 import offlineUrls from './offline-urls'
 import {
   issuerKeySchema,
   issuerKeysResponseSchema,
   offlinePackageResponseSchema,
+  revocationListResponseSchema,
 } from './schema'
 import type { IssuerKeysResponse, OfflinePackageResponse } from './types'
 
 // 400 not active, 403 not this citizen's, 404 gone. The backend will never issue this package again,
 // so keeping the old one would let a revoked or deleted credential be presented offline.
 const PERMANENT_PACKAGE_FAILURES = new Set([400, 403, 404])
+
+// The backend accepts at most 100 scans per upload.
+const SYNC_BATCH_SIZE = 100
+// A verifier offline for weeks could otherwise grow the cache without limit, so past this the oldest go.
+const MAX_QUEUED_VERIFICATIONS = 1000
 
 // The public key goes with every request: the backend binds the credential to it as cnf and re-mints when it changes.
 // On Android a reinstall create a new key. On iOS the Keychain usually keeps it across one.
@@ -50,6 +56,14 @@ const requestIssuerKeys = (): Promise<IssuerKeysResponse> =>
     }
   })
 
+const requestRevocationList = (): Promise<string> =>
+  api
+    .get(offlineUrls.revocationList())
+    .then(
+      (res: AxiosResponse<unknown>) =>
+        revocationListResponseSchema.parse(res.data).revocationList
+    )
+
 const toOfflinePackage = (
   response: OfflinePackageResponse
 ): OfflinePackage => ({
@@ -64,17 +78,38 @@ const nowInSeconds = () => Math.floor(Date.now() / 1000)
 const messageOf = (reason: unknown) =>
   reason instanceof Error ? reason.message : String(reason)
 
-const toTrustData = (
-  response: IssuerKeysResponse,
-  existing: OfflineCache['trust']
-): NonNullable<OfflineCache['trust']> => ({
-  keys: response.keys,
+const nextTrustData = (
+  keysResult: PromiseSettledResult<IssuerKeysResponse>,
+  listResult: PromiseSettledResult<string>,
+  existing: OfflineCache['trust'],
+  now: number
+): OfflineCache['trust'] => {
   // The phone's own clock, deliberately not the server's retrievedAt: the verifier compares against
   // this clock, so the age is exact even when the phone's clock is wrong.
-  retrievedAt: nowInSeconds(),
-  revokedIndexes: existing?.revokedIndexes ?? [],
-  revocationRetrievedAt: existing?.revocationRetrievedAt ?? null,
-})
+  const keySet =
+    keysResult.status === 'fulfilled'
+      ? { keys: keysResult.value.keys, retrievedAt: now }
+      : existing && { keys: existing.keys, retrievedAt: existing.retrievedAt }
+
+  if (!keySet) {
+    return null
+  }
+
+  // A list only counts once its signature checks out against the keys it will be used with. One that
+  // fails is ignored, and the last verified list stays.
+  const revokedIndexes =
+    listResult.status === 'fulfilled'
+      ? verifyRevocationList(listResult.value, keySet.keys)
+      : null
+
+  return {
+    ...keySet,
+    revokedIndexes: revokedIndexes ?? existing?.revokedIndexes ?? [],
+    revocationRetrievedAt: revokedIndexes
+      ? now
+      : (existing?.revocationRetrievedAt ?? null),
+  }
+}
 
 const nextPackages = (
   existing: OfflineCache['packages'],
@@ -102,7 +137,7 @@ const nextPackages = (
 
 let refreshQueue: Promise<unknown> = Promise.resolve()
 
-// Every refresh reads the cache, changes part of it and writes it back. Two running at once would
+// Every change reads the cache, changes part of it and writes it back. Two running at once would
 // both start from the same cache, and the later write would drop the other's change.
 const serialised = <T>(task: () => Promise<T>): Promise<T> => {
   const run = refreshQueue.then(task, task)
@@ -115,15 +150,16 @@ const refreshOfflineCache = (credentialId: string): Promise<OfflineCache> =>
   serialised(async () => {
     const existing = await readOfflineCache()
 
-    // Independent requests, so one failing never blocks the other.
-    const [packageResult, trustResult] = await Promise.allSettled([
+    // Independent requests, so one failing never blocks the others.
+    const [packageResult, keysResult, listResult] = await Promise.allSettled([
       requestOfflinePackage(credentialId),
       requestIssuerKeys(),
+      requestRevocationList(),
     ])
 
     if (
       packageResult.status === 'rejected' &&
-      trustResult.status === 'rejected'
+      keysResult.status === 'rejected'
     ) {
       if (existing) {
         return existing
@@ -131,7 +167,7 @@ const refreshOfflineCache = (credentialId: string): Promise<OfflineCache> =>
 
       // Both causes are kept: offline, the key fetch failure is often the more useful one.
       throw new Error(
-        `Offline data could not be refreshed. Package: ${messageOf(packageResult.reason)}. Issuer keys: ${messageOf(trustResult.reason)}.`
+        `Offline data could not be refreshed. Package: ${messageOf(packageResult.reason)}. Issuer keys: ${messageOf(keysResult.reason)}.`
       )
     }
 
@@ -143,11 +179,14 @@ const refreshOfflineCache = (credentialId: string): Promise<OfflineCache> =>
         packageResult,
         now
       ),
-      trust:
-        trustResult.status === 'fulfilled'
-          ? toTrustData(trustResult.value, existing?.trust ?? null)
-          : (existing?.trust ?? null),
+      trust: nextTrustData(
+        keysResult,
+        listResult,
+        existing?.trust ?? null,
+        now
+      ),
       savedAt: now,
+      pendingVerifications: existing?.pendingVerifications ?? [],
     }
 
     await writeOfflineCache(refreshed)
@@ -155,22 +194,23 @@ const refreshOfflineCache = (credentialId: string): Promise<OfflineCache> =>
     return refreshed
   })
 
-// For the verifier's phone: issuer keys only, since a verifier may hold no credential of its own.
-// Serialised like refreshOfflineCache, because it reads and rewrites the same cache.
+// For the verifier's phone: issuer keys and the revocation list only, since a verifier may hold no
+// credential of its own.
 const refreshTrustData = (): Promise<OfflineCache> =>
   serialised(async () => {
     const existing = await readOfflineCache()
+    const [keysResult, listResult] = await Promise.allSettled([
+      requestIssuerKeys(),
+      requestRevocationList(),
+    ])
 
-    let keys: IssuerKeysResponse
-    try {
-      keys = await requestIssuerKeys()
-    } catch (error) {
-      // Out of signal or the request failed: keep verifying with what the phone already has.
+    if (keysResult.status === 'rejected' && listResult.status === 'rejected') {
+      // Out of signal or the requests failed: keep verifying with what the phone already has.
       if (existing) {
         return existing
       }
 
-      throw error
+      throw keysResult.reason
     }
 
     const now = nowInSeconds()
@@ -181,8 +221,14 @@ const refreshTrustData = (): Promise<OfflineCache> =>
           isPackageUsable(offlinePackage, now)
         )
       ),
-      trust: toTrustData(keys, existing?.trust ?? null),
+      trust: nextTrustData(
+        keysResult,
+        listResult,
+        existing?.trust ?? null,
+        now
+      ),
       savedAt: now,
+      pendingVerifications: existing?.pendingVerifications ?? [],
     }
 
     await writeOfflineCache(refreshed)
@@ -190,11 +236,58 @@ const refreshTrustData = (): Promise<OfflineCache> =>
     return refreshed
   })
 
+const queueOfflineVerification = (
+  verification: OfflineVerification
+): Promise<void> =>
+  serialised(async () => {
+    const existing = await readOfflineCache()
+
+    await writeOfflineCache({
+      packages: existing?.packages ?? {},
+      trust: existing?.trust ?? null,
+      savedAt: existing?.savedAt ?? nowInSeconds(),
+      pendingVerifications: [
+        ...(existing?.pendingVerifications ?? []),
+        verification,
+      ].slice(-MAX_QUEUED_VERIFICATIONS),
+    })
+  })
+
+// Uploads the queue in batches, saving after each one, so a failure part-way keeps what was sent.
+const syncOfflineVerifications = (): Promise<number> =>
+  serialised(async () => {
+    const existing = await readOfflineCache()
+    let remaining = existing?.pendingVerifications ?? []
+    let uploaded = 0
+
+    while (existing && remaining.length > 0) {
+      const batch = remaining.slice(0, SYNC_BATCH_SIZE)
+
+      try {
+        await api.post(offlineUrls.offlineVerifications(), { entries: batch })
+      } catch (error) {
+        // A 400 means the backend will never accept this batch, so it is dropped rather than
+        // blocking every later upload. Anything else is kept for the next attempt.
+        if (!isAxiosError(error) || error.response?.status !== 400) {
+          throw error
+        }
+      }
+
+      remaining = remaining.slice(batch.length)
+      uploaded += batch.length
+      await writeOfflineCache({ ...existing, pendingVerifications: remaining })
+    }
+
+    return uploaded
+  })
+
 const offlineService = {
   requestOfflinePackage,
   requestIssuerKeys,
   refreshOfflineCache,
   refreshTrustData,
+  queueOfflineVerification,
+  syncOfflineVerifications,
 }
 
 export default offlineService
