@@ -13,7 +13,7 @@ export const useOfflineScan = (
   trust: TrustData | null,
   isTrustLoading = false
 ) => {
-  // useState's lazy intialiser builds the accumulator on the first render only, never again
+  // useState's lazy initialiser builds the accumulator on the first render only, never again
   const [accumulator] = useState(() => new PayloadFrameAccumulator())
   const [progress, setProgress] = useState<OfflineScanProgress | null>(null)
   const [result, setResult] = useState<VerificationResult | null>(null)
