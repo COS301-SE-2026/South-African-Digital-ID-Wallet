@@ -1,0 +1,15 @@
+docs/demo4/functional-requirements-v4.md
+  h_99fca60b892ff4 124,190,193,271,320-344,532,538,545,558
+  h_99fca60b892ff4 345
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "37de29746e7bf9a87c2abbb4f912eb180cbfc818",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

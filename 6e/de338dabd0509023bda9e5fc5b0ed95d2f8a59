@@ -1,0 +1,25 @@
+docs/demo4/architecture-v4.md
+  h_99fca60b892ff4 184-205,224-229
+docs/demo4/use-cases-v4.md
+  h_99fca60b892ff4 295-338
+docs/demo4/epics-and-user-stories-v4.md
+  h_99fca60b892ff4 5,911-995
+  h_99fca60b892ff4 83,89,466
+docs/demo4/SAS-v4.md
+  h_99fca60b892ff4 53,774-780,797,839-878
+docs/demo4/SRS-v4.md
+  h_99fca60b892ff4 7,86,158,160,178,186,194,200,223-225,245-247,267-269,312,333-334
+docs/images/offline-verification.drawio.svg
+  h_99fca60b892ff4 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "6ede338dabd0509023bda9e5fc5b0ed95d2f8a59",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
