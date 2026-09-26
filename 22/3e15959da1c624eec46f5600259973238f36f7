@@ -1,0 +1,16 @@
+web/src/components/molecules/certified-copy-verification/certified-copy-verification.tsx
+  h_0aff3b71f739b1 1-34
+web/src/components/molecules/integrity-failed-result/integrity-failed-result.tsx
+  h_0aff3b71f739b1 1-77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "223e15959da1c624eec46f5600259973238f36f7",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
