@@ -84,6 +84,11 @@ export const pageHeaders: Record<string, PageHeader> = {
     description:
       'Browse and search all registered institutions on the FlashID platform.',
   },
+  '/officials/verify-document': {
+    title: 'Verify a Certified Copy',
+    description:
+      'Upload a certified copy PDF to verify its authenticity and integrity.',
+  },
 }
 
 export const defaultPageHeader: PageHeader = {
