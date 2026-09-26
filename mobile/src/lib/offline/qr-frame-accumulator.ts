@@ -37,7 +37,7 @@ type KeyBindingFrame = {
 }
 
 export class PayloadFrameAccumulator {
-  private frames = new Map<number, PayloadFrame>()
+  private readonly frames = new Map<number, PayloadFrame>()
 
   private keyBindingJwt: string | null = null
 
