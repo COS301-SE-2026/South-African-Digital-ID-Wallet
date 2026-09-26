@@ -2,6 +2,7 @@ using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Mapping;
 using Application.Common.Services;
+using Application.Features.CertifiedCredentialCopies.Models;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.Extensions.Configuration;
@@ -120,5 +121,33 @@ public class CertifiedCredentialCopyServiceTests
         };
 
         return credential;
+    }
+
+    private static CertifiedCredentialCopy CreateCertifiedCopy(Credential credential, CertifiedCopyStatus status = CertifiedCopyStatus.Active, DateTime? expiresAt = null)
+    {
+        return new CertifiedCredentialCopy
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = credential.CitizenId,
+            CredentialId = credential.Id,
+            Credential = credential,
+            VerificationTokenHash = VerificationTokenHash,
+            CredentialSnapshotHash = SnapshotHash,
+            DocumentHash = DocumentHash,
+            GeneratedAt = DateTime.UtcNow.AddMinutes(-5),
+            ExpiresAt = expiresAt,
+            Status = status
+        };
+    }
+
+    private void SetupCryptography()
+    {
+        _cryptographyProvider.Setup(x => x.GenerateVerificationToken()).Returns(VerificationToken);
+
+        _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
+
+        _cryptographyProvider.Setup(x => x.HashCredentialSnapshot(It.IsAny<CertifiedCredentialSnapshot>())).Returns(SnapshotHash);
+
+        _cryptographyProvider.Setup(x => x.HashDocument(It.IsAny<byte[]>())).Returns(DocumentHash);
     }
 }
