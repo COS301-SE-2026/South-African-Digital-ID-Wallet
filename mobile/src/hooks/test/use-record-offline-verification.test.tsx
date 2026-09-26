@@ -3,6 +3,7 @@ import { toOfflineVerification } from '@/lib/offline/offline-audit'
 import { offlineService } from '@/services/offline-service'
 import { useNetworkStatus } from '../use-network-status'
 import { useRecordOfflineVerification } from '../use-record-offline-verification'
+import { useAuthStore } from '@/stores/auth-store'
 
 jest.mock('../use-network-status', () => ({ useNetworkStatus: jest.fn() }))
 jest.mock('@/lib/offline/offline-audit', () => ({
@@ -18,6 +19,13 @@ jest.mock('@/services/offline-service', () => ({
 const networkMock = useNetworkStatus as jest.Mock
 const queueMock = offlineService.queueOfflineVerification as jest.Mock
 const syncMock = offlineService.syncOfflineVerifications as jest.Mock
+const initialAuthStore = useAuthStore.getState()
+const OFFICIAL = {
+  userId: 'official-1',
+  role: 'Official',
+  names: 'Thandi',
+  surname: 'Nkosi',
+}
 
 const ENTRY = {
   id: 'scan-id',
@@ -38,6 +46,7 @@ const flush = () => act(async () => {})
 describe('useRecordOfflineVerification', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    useAuthStore.setState({ ...initialAuthStore, user: OFFICIAL })
     ;(toOfflineVerification as jest.Mock).mockReturnValue(ENTRY)
     queueMock.mockResolvedValue(undefined)
     syncMock.mockResolvedValue(1)
@@ -51,7 +60,7 @@ describe('useRecordOfflineVerification', () => {
     await flush()
 
     expect(queueMock).toHaveBeenCalledWith(ENTRY)
-    expect(syncMock).toHaveBeenCalledTimes(1)
+    expect(syncMock).toHaveBeenCalledWith('official-1')
   })
 
   it('Should only queue the scan when offline', async () => {
@@ -74,5 +83,16 @@ describe('useRecordOfflineVerification', () => {
     await flush()
 
     expect(syncMock).not.toHaveBeenCalled()
+  })
+
+  it("Should not queue a citizen's scan, which the audit trail does not take", async () => {
+    networkMock.mockReturnValue({ isOffline: false })
+    useAuthStore.setState({ user: { ...OFFICIAL, role: 'Citizen' } })
+    const { result } = await renderHook(() => useRecordOfflineVerification())
+
+    result.current(RESULT)
+    await flush()
+
+    expect(queueMock).not.toHaveBeenCalled()
   })
 })

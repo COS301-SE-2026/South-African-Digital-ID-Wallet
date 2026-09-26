@@ -17,6 +17,7 @@ export type OfflinePackage = {
 // backend, so a retried upload is recognised and not recorded twice.
 export type OfflineVerification = {
   id: string
+  verifierId: string
   revocationIndex: number | null
   result: string
   verifiedAt: number

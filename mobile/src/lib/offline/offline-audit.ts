@@ -6,9 +6,11 @@ import type { VerificationResult } from './verify'
 // the backend would otherwise be asked to link a forged index to a real citizen.
 export const toOfflineVerification = (
   result: VerificationResult,
-  verifiedAt: number
+  verifiedAt: number,
+  verifierId: string
 ): OfflineVerification => ({
   id: Crypto.randomUUID(),
+  verifierId,
   revocationIndex: result.ok ? result.revocationIndex : null,
   result: result.ok ? 'VERIFIED' : result.code,
   verifiedAt,

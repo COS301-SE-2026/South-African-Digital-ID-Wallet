@@ -19,7 +19,16 @@ describe('OfflineVerificationSync', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    useAuthStore.setState({ ...initialAuthState, isAuthenticated: true })
+    useAuthStore.setState({
+      ...initialAuthState,
+      isAuthenticated: true,
+      user: {
+        userId: 'official-1',
+        role: 'Official',
+        names: 'Thandi',
+        surname: 'Nkosi',
+      },
+    })
     networkMock.mockReturnValue({ isOnline: true })
     syncMock.mockResolvedValue(0)
     jest
@@ -37,7 +46,7 @@ describe('OfflineVerificationSync', () => {
   it('Should upload queued scans when signed in with signal', async () => {
     await render(<OfflineVerificationSync />)
 
-    expect(syncMock).toHaveBeenCalledTimes(1)
+    expect(syncMock).toHaveBeenCalledWith('official-1')
   })
 
   it('Should not upload while offline', async () => {

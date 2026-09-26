@@ -37,7 +37,7 @@ export type TrustData = {
   /** Unix seconds when the issuer key set was last fetched. */
   retrievedAt: number
   revokedIndexes: readonly number[]
-  /** Unix seconds when the revocation list was last fetched, or null until one has been (checklist 5.1). */
+  /** Unix seconds when the revocation list in use was issued (its signed iat), or null until one has been verified. */
   revocationRetrievedAt: number | null
 }
 
@@ -248,10 +248,18 @@ const checkIssuerSignature = (
 
 // The revocation list is signed with the credential key, so it is checked against the same cached key set
 // before a single index is trusted. Returns the revoked indexes, or null when the list cannot be trusted.
+export type VerifiedRevocationList = {
+  revokedIndexes: readonly number[]
+  // The list's own signed issue time, so a stored list can never be replaced by an older one.
+  issuedAt: number
+}
+
+// The revocation list is signed with the credential key, so it is checked against the same cached key set
+// before a single index is trusted. Returns the list, or null when it cannot be trusted.
 export const verifyRevocationList = (
   jws: string,
   keys: readonly IssuerKey[]
-): readonly number[] | null => {
+): VerifiedRevocationList | null => {
   const parsed = parseJwt(jws)
 
   if (
@@ -273,11 +281,12 @@ export const verifyRevocationList = (
     return null
   }
 
-  const revoked = parsed.payload.revoked
+  const { iat, revoked } = parsed.payload
 
-  return Array.isArray(revoked) &&
+  return typeof iat === 'number' &&
+    Array.isArray(revoked) &&
     revoked.every((index) => Number.isInteger(index))
-    ? (revoked as number[])
+    ? { revokedIndexes: revoked as number[], issuedAt: iat }
     : null
 }
 

@@ -529,9 +529,10 @@ describe('verifyRevocationList', () => {
   ) => signJws(header, payload, secretKey)
 
   it('Should return the revoked indexes from a list signed by a trusted key', () => {
-    expect(verifyRevocationList(listSignedWith(issuerKey), keys)).toEqual([
-      3, 7,
-    ])
+    expect(verifyRevocationList(listSignedWith(issuerKey), keys)).toEqual({
+      revokedIndexes: [3, 7],
+      issuedAt: NOW,
+    })
   })
 
   it('Should refuse a list signed by a key the phone does not trust', () => {
@@ -574,6 +575,14 @@ describe('verifyRevocationList', () => {
         listSignedWith(issuerKey, { ...LIST_PAYLOAD, revoked: [1.5] }),
         keys
       )
+    ).toBeNull()
+  })
+
+  it('Should refuse a list without a signed issue time', () => {
+    const { iat: _iat, ...withoutIssueTime } = LIST_PAYLOAD
+
+    expect(
+      verifyRevocationList(listSignedWith(issuerKey, withoutIssueTime), keys)
     ).toBeNull()
   })
 })

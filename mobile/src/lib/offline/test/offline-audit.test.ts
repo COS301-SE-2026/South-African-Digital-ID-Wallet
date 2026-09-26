@@ -15,10 +15,12 @@ describe('toOfflineVerification', () => {
           claims: {},
           warnings: [],
         },
-        VERIFIED_AT
+        VERIFIED_AT,
+        'official-1'
       )
     ).toEqual({
       id: 'scan-id',
+      verifierId: 'official-1',
       revocationIndex: 7,
       result: 'VERIFIED',
       verifiedAt: VERIFIED_AT,
@@ -29,10 +31,12 @@ describe('toOfflineVerification', () => {
     expect(
       toOfflineVerification(
         { ok: false, code: 'BAD_ISSUER_SIGNATURE', warnings: [] },
-        VERIFIED_AT
+        VERIFIED_AT,
+        'official-1'
       )
     ).toEqual({
       id: 'scan-id',
+      verifierId: 'official-1',
       revocationIndex: null,
       result: 'BAD_ISSUER_SIGNATURE',
       verifiedAt: VERIFIED_AT,

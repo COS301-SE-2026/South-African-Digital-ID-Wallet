@@ -2,6 +2,7 @@ import { isAxiosError, type AxiosResponse } from 'axios'
 import api from '@/lib/api'
 import { getDevicePublicJwk } from '@/lib/offline/device-key'
 import {
+  clearOfflineCache,
   readOfflineCache,
   writeOfflineCache,
   type OfflineCache,
@@ -27,6 +28,7 @@ const PERMANENT_PACKAGE_FAILURES = new Set([400, 403, 404])
 const SYNC_BATCH_SIZE = 100
 // A verifier offline for weeks could otherwise grow the cache without limit, so past this the oldest go.
 const MAX_QUEUED_VERIFICATIONS = 1000
+const PERMANENT_SYNC_FAILURES = new Set([400, 403])
 
 // The public key goes with every request: the backend binds the credential to it as cnf and re-mints when it changes.
 // On Android a reinstall create a new key. On iOS the Keychain usually keeps it across one.
@@ -84,8 +86,8 @@ const nextTrustData = (
   existing: OfflineCache['trust'],
   now: number
 ): OfflineCache['trust'] => {
-  // The phone's own clock, deliberately not the server's retrievedAt: the verifier compares against
-  // this clock, so the age is exact even when the phone's clock is wrong.
+  // The phone's own clock for the key set, deliberately not the server's retrievedAt: the verifier compares
+  // against this clock, so the age is exact even when the phone's clock is wrong.
   const keySet =
     keysResult.status === 'fulfilled'
       ? { keys: keysResult.value.keys, retrievedAt: now }
@@ -95,19 +97,22 @@ const nextTrustData = (
     return null
   }
 
-  // A list only counts once its signature checks out against the keys it will be used with. One that
-  // fails is ignored, and the last verified list stays.
-  const revokedIndexes =
+  // A list only counts once its signature checks out against the keys it will be used with, and never
+  // replaces a newer one: a replayed older list would un-revoke a credential and reset the staleness clock.
+  const list =
     listResult.status === 'fulfilled'
       ? verifyRevocationList(listResult.value, keySet.keys)
+      : null
+  const newer =
+    list && list.issuedAt > (existing?.revocationRetrievedAt ?? -Infinity)
+      ? list
       : null
 
   return {
     ...keySet,
-    revokedIndexes: revokedIndexes ?? existing?.revokedIndexes ?? [],
-    revocationRetrievedAt: revokedIndexes
-      ? now
-      : (existing?.revocationRetrievedAt ?? null),
+    revokedIndexes: newer?.revokedIndexes ?? existing?.revokedIndexes ?? [],
+    revocationRetrievedAt:
+      newer?.issuedAt ?? existing?.revocationRetrievedAt ?? null,
   }
 }
 
@@ -157,9 +162,11 @@ const refreshOfflineCache = (credentialId: string): Promise<OfflineCache> =>
       requestRevocationList(),
     ])
 
+    // Only when all three fail: a list fetched on its own still verifies against the keys already stored.
     if (
       packageResult.status === 'rejected' &&
-      keysResult.status === 'rejected'
+      keysResult.status === 'rejected' &&
+      listResult.status === 'rejected'
     ) {
       if (existing) {
         return existing
@@ -253,32 +260,66 @@ const queueOfflineVerification = (
     })
   })
 
-// Uploads the queue in batches, saving after each one, so a failure part-way keeps what was sent.
-const syncOfflineVerifications = (): Promise<number> =>
+// The verifier is known from the session, so it is not sent with each entry.
+const toUploadEntry = ({
+  verifierId: _verifierId,
+  ...entry
+}: OfflineVerification) => entry
+
+// Uploads this official's queued scans in batches, saving after each one, so a failure part-way keeps what was
+// sent. Scans queued by anyone else stay until they sign in, or uploading them would name the wrong verifier.
+const syncOfflineVerifications = (verifierId: string): Promise<number> =>
   serialised(async () => {
     const existing = await readOfflineCache()
     let remaining = existing?.pendingVerifications ?? []
+    let mine = remaining.filter((entry) => entry.verifierId === verifierId)
     let uploaded = 0
 
-    while (existing && remaining.length > 0) {
-      const batch = remaining.slice(0, SYNC_BATCH_SIZE)
+    while (existing && mine.length > 0) {
+      const batch = mine.slice(0, SYNC_BATCH_SIZE)
 
       try {
-        await api.post(offlineUrls.offlineVerifications(), { entries: batch })
+        await api.post(offlineUrls.offlineVerifications(), {
+          entries: batch.map(toUploadEntry),
+        })
       } catch (error) {
-        // A 400 means the backend will never accept this batch, so it is dropped rather than
-        // blocking every later upload. Anything else is kept for the next attempt.
-        if (!isAxiosError(error) || error.response?.status !== 400) {
+        // These can never succeed for this batch, so it is dropped rather than blocking every later upload. Anything
+        // else, such as no signal, a 409 race or a server error, keeps the batch for the next attempt.
+        if (
+          !isAxiosError(error) ||
+          !PERMANENT_SYNC_FAILURES.has(error.response?.status ?? 0)
+        ) {
           throw error
         }
       }
 
-      remaining = remaining.slice(batch.length)
+      const sent = new Set(batch.map((entry) => entry.id))
+      remaining = remaining.filter((entry) => !sent.has(entry.id))
+      mine = mine.slice(batch.length)
       uploaded += batch.length
       await writeOfflineCache({ ...existing, pendingVerifications: remaining })
     }
 
     return uploaded
+  })
+
+// Called when a session ends. Serialised with every other cache write, so a sync still running cannot write the
+// signed-out user's data back afterwards. Queued scans survive: an official whose session expires offline must not
+// lose them, and they upload only when that official signs in again.
+const clearOfflineData = (): Promise<void> =>
+  serialised(async () => {
+    const pending = (await readOfflineCache())?.pendingVerifications ?? []
+
+    await clearOfflineCache()
+
+    if (pending.length > 0) {
+      await writeOfflineCache({
+        packages: {},
+        trust: null,
+        savedAt: nowInSeconds(),
+        pendingVerifications: pending,
+      })
+    }
   })
 
 const offlineService = {
@@ -288,6 +329,7 @@ const offlineService = {
   refreshTrustData,
   queueOfflineVerification,
   syncOfflineVerifications,
+  clearOfflineData,
 }
 
 export default offlineService

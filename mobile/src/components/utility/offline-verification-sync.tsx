@@ -5,18 +5,20 @@ import { offlineService } from '@/services/offline-service'
 import { useAuthStore } from '@/stores/auth-store'
 
 // Uploads scans queued while offline: when someone signs in, when signal returns, and whenever the
-// app comes back to the foreground (checklist 5.5).
+// app comes back to the foreground (checklist 5.5). Only the signed-in official's own scans are sent.
 export const OfflineVerificationSync = () => {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const verifierId = useAuthStore((state) =>
+    state.isAuthenticated ? state.user?.userId : undefined
+  )
   const { isOnline } = useNetworkStatus()
 
   useEffect(() => {
-    if (!isAuthenticated || !isOnline) {
+    if (!verifierId || !isOnline) {
       return
     }
 
     const sync = () => {
-      void offlineService.syncOfflineVerifications().catch(() => {
+      void offlineService.syncOfflineVerifications(verifierId).catch(() => {
         // Still queued; the next trigger tries again.
       })
     }
@@ -29,7 +31,7 @@ export const OfflineVerificationSync = () => {
     })
 
     return () => subscription.remove()
-  }, [isAuthenticated, isOnline])
+  }, [isOnline, verifierId])
 
   return null
 }

@@ -1,6 +1,7 @@
 import api from '@/lib/api'
 import {
   readOfflineCache,
+  clearOfflineCache,
   writeOfflineCache,
   type OfflineCache,
 } from '@/lib/offline/offline-cache'
@@ -27,6 +28,7 @@ jest.mock('@/lib/api', () => ({
 
 jest.mock('@/lib/offline/offline-cache', () => ({
   readOfflineCache: jest.fn(),
+  clearOfflineCache: jest.fn(),
   writeOfflineCache: jest.fn(),
 }))
 
@@ -43,6 +45,7 @@ const getMock = api.get as jest.Mock
 const postMock = api.post as jest.Mock
 const readOfflineCacheMock = readOfflineCache as jest.Mock
 const writeOfflineCacheMock = writeOfflineCache as jest.Mock
+const clearOfflineCacheMock = clearOfflineCache as jest.Mock
 const verifyListMock = verifyRevocationList as jest.Mock
 const deviceKeyMock = getDevicePublicJwk as jest.Mock
 const DEVICE_KEY = { kty: 'EC', crv: 'P-256', x: 'device-x', y: 'device-y' }
@@ -105,6 +108,7 @@ describe('offlineService', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     readOfflineCacheMock.mockResolvedValue(null)
+    clearOfflineCacheMock.mockResolvedValue(undefined)
     writeOfflineCacheMock.mockResolvedValue(undefined)
     verifyListMock.mockReturnValue(null)
     deviceKeyMock.mockResolvedValue(DEVICE_KEY)
@@ -371,6 +375,14 @@ describe('offlineService', () => {
 
   const queuedScan = {
     id: 'scan-1',
+    verifierId: 'official-1',
+    revocationIndex: 7,
+    result: 'VERIFIED',
+    verifiedAt: 1_790_000_000,
+  }
+
+  const uploadScan = {
+    id: 'scan-1',
     revocationIndex: 7,
     result: 'VERIFIED',
     verifiedAt: 1_790_000_000,
@@ -389,7 +401,10 @@ describe('offlineService', () => {
   it('Should store a revocation list whose signature checks out', async () => {
     readOfflineCacheMock.mockResolvedValue(existingCache)
     respondWithList()
-    verifyListMock.mockReturnValue([4, 9])
+    verifyListMock.mockReturnValue({
+      revokedIndexes: [4, 9],
+      issuedAt: 1_790_009_000,
+    })
 
     await offlineService.refreshTrustData()
 
@@ -401,7 +416,7 @@ describe('offlineService', () => {
       expect.objectContaining({
         trust: expect.objectContaining({
           revokedIndexes: [4, 9],
-          revocationRetrievedAt: 1_790_010_000,
+          revocationRetrievedAt: 1_790_009_000,
         }),
       })
     )
@@ -419,6 +434,63 @@ describe('offlineService', () => {
         trust: expect.objectContaining({
           revokedIndexes: existingCache.trust!.revokedIndexes,
           revocationRetrievedAt: existingCache.trust!.revocationRetrievedAt,
+        }),
+      })
+    )
+  })
+
+  it('Should never replace a newer revocation list with an older one', async () => {
+    readOfflineCacheMock.mockResolvedValue({
+      ...existingCache,
+      trust: {
+        ...existingCache.trust!,
+        revokedIndexes: [4, 8],
+        revocationRetrievedAt: 1_790_009_000,
+      },
+    })
+    respondWithList()
+    verifyListMock.mockReturnValue({
+      revokedIndexes: [],
+      issuedAt: 1_790_000_000,
+    })
+
+    await offlineService.refreshTrustData()
+
+    expect(writeOfflineCacheMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        trust: expect.objectContaining({
+          revokedIndexes: [4, 8],
+          revocationRetrievedAt: 1_790_009_000,
+        }),
+      })
+    )
+  })
+
+  it('Should keep a fresh revocation list when the package and keys cannot be fetched', async () => {
+    readOfflineCacheMock.mockResolvedValue(existingCache)
+    postMock.mockRejectedValue(new Error('package request failed'))
+    getMock.mockImplementation((url: string) =>
+      url === '/api/credentials/revocation-list'
+        ? Promise.resolve({
+            data: {
+              revocationList: 'signed.revocation.list',
+              retrievedAt: 'now',
+            },
+          })
+        : Promise.reject(new Error('issuer keys request failed'))
+    )
+    verifyListMock.mockReturnValue({
+      revokedIndexes: [9],
+      issuedAt: 1_790_009_000,
+    })
+
+    await offlineService.refreshOfflineCache('credential-1')
+
+    expect(writeOfflineCacheMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        trust: expect.objectContaining({
+          keys: existingCache.trust!.keys,
+          revokedIndexes: [9],
         }),
       })
     )
@@ -452,21 +524,30 @@ describe('offlineService', () => {
     )
   })
 
-  it('Should upload queued scans and remove them once accepted', async () => {
+  it("Should upload only the signed-in official's scans and remove them once accepted", async () => {
+    const someoneElses = {
+      ...queuedScan,
+      id: 'scan-2',
+      verifierId: 'official-2',
+    }
     readOfflineCacheMock.mockResolvedValue({
       ...existingCache,
-      pendingVerifications: [queuedScan],
+      pendingVerifications: [queuedScan, someoneElses],
     })
-    postMock.mockResolvedValue({ data: { recorded: 1, duplicates: 0 } })
+    postMock.mockResolvedValue({
+      data: { recorded: 1, duplicates: 0, rejected: [] },
+    })
 
-    await expect(offlineService.syncOfflineVerifications()).resolves.toBe(1)
+    await expect(
+      offlineService.syncOfflineVerifications('official-1')
+    ).resolves.toBe(1)
 
     expect(postMock).toHaveBeenCalledWith(
       '/api/credentials/offline-verifications',
-      { entries: [queuedScan] }
+      { entries: [uploadScan] }
     )
     expect(writeOfflineCacheMock).toHaveBeenCalledWith(
-      expect.objectContaining({ pendingVerifications: [] })
+      expect.objectContaining({ pendingVerifications: [someoneElses] })
     )
   })
 
@@ -477,25 +558,42 @@ describe('offlineService', () => {
     })
     postMock.mockRejectedValue(new Error('no signal'))
 
-    await expect(offlineService.syncOfflineVerifications()).rejects.toThrow(
-      'no signal'
-    )
+    await expect(
+      offlineService.syncOfflineVerifications('official-1')
+    ).rejects.toThrow('no signal')
 
     expect(writeOfflineCacheMock).not.toHaveBeenCalled()
   })
 
-  it('Should drop a batch the backend refuses as invalid', async () => {
+  it.each([400, 403])(
+    'Should drop a batch the backend will never accept (%i)',
+    async (status) => {
+      readOfflineCacheMock.mockResolvedValue({
+        ...existingCache,
+        pendingVerifications: [queuedScan],
+      })
+      postMock.mockRejectedValue(axiosError(status))
+
+      await offlineService.syncOfflineVerifications('official-1')
+
+      expect(writeOfflineCacheMock).toHaveBeenCalledWith(
+        expect.objectContaining({ pendingVerifications: [] })
+      )
+    }
+  )
+
+  it('Should keep the batch when another upload of it raced ahead', async () => {
     readOfflineCacheMock.mockResolvedValue({
       ...existingCache,
       pendingVerifications: [queuedScan],
     })
-    postMock.mockRejectedValue(axiosError(400))
+    postMock.mockRejectedValue(axiosError(409))
 
-    await offlineService.syncOfflineVerifications()
+    await expect(
+      offlineService.syncOfflineVerifications('official-1')
+    ).rejects.toThrow()
 
-    expect(writeOfflineCacheMock).toHaveBeenCalledWith(
-      expect.objectContaining({ pendingVerifications: [] })
-    )
+    expect(writeOfflineCacheMock).not.toHaveBeenCalled()
   })
 
   it('Should upload a long queue in batches of one hundred', async () => {
@@ -507,9 +605,11 @@ describe('offlineService', () => {
       ...existingCache,
       pendingVerifications: queue,
     })
-    postMock.mockResolvedValue({ data: { recorded: 0, duplicates: 0 } })
+    postMock.mockResolvedValue({
+      data: { recorded: 0, duplicates: 0, rejected: [] },
+    })
 
-    await offlineService.syncOfflineVerifications()
+    await offlineService.syncOfflineVerifications('official-1')
 
     expect(postMock).toHaveBeenCalledTimes(2)
     expect(postMock.mock.calls[1][1].entries).toHaveLength(50)
@@ -518,8 +618,36 @@ describe('offlineService', () => {
   it('Should not call the backend when no scans are queued', async () => {
     readOfflineCacheMock.mockResolvedValue(existingCache)
 
-    await expect(offlineService.syncOfflineVerifications()).resolves.toBe(0)
+    await expect(
+      offlineService.syncOfflineVerifications('official-1')
+    ).resolves.toBe(0)
 
     expect(postMock).not.toHaveBeenCalled()
+  })
+
+  it('Should keep only the queued scans when a session ends', async () => {
+    readOfflineCacheMock.mockResolvedValue({
+      ...existingCache,
+      pendingVerifications: [queuedScan],
+    })
+
+    await offlineService.clearOfflineData()
+
+    expect(clearOfflineCacheMock).toHaveBeenCalled()
+    expect(writeOfflineCacheMock).toHaveBeenCalledWith({
+      packages: {},
+      trust: null,
+      savedAt: 1_790_010_000,
+      pendingVerifications: [queuedScan],
+    })
+  })
+
+  it('Should leave nothing behind when a session ends with no queued scans', async () => {
+    readOfflineCacheMock.mockResolvedValue(existingCache)
+
+    await offlineService.clearOfflineData()
+
+    expect(clearOfflineCacheMock).toHaveBeenCalled()
+    expect(writeOfflineCacheMock).not.toHaveBeenCalled()
   })
 })
