@@ -1,0 +1,22 @@
+backend/FlashIdBackend/Application/Features/Credentials/Exceptions/OfflinePackageExceptions.cs
+  h_99fca60b892ff4 23-29
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_99fca60b892ff4 377,432,434
+backend/FlashIdBackend/tests/OfflinePackageControllerIntegrationTests.cs
+  h_99fca60b892ff4 546
+backend/FlashIdBackend/tests/SdJwtCredentialFactoryTests.cs
+  h_99fca60b892ff4 8,331,336,340,351,355,362
+backend/FlashIdBackend/Application/Common/Services/SdJwtCredentialFactory.cs
+  h_99fca60b892ff4 9,138,151,158,177
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "980dd10bff60186094a6372f8ec6b3fd080c1d8b",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
