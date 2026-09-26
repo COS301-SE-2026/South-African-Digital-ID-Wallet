@@ -637,5 +637,68 @@ public class CertifiedCredentialCopyServiceTests
         await Assert.ThrowsAsync<ArgumentException>(() => service.VerifyDocumentAsync(VerificationToken, []));
     }
 
+    [Fact]
+    public async Task VerifyDocumentAsync_RevokedCertificationWithOriginalDocument_ReturnsRevokedButIntegrityValid()
+    {
+        var credential = CreateIdentityCredential();
+
+        var certifiedCopy = CreateCertifiedCopy(credential, CertifiedCopyStatus.Revoked);
+
+        SetupValidDocumentVerification(certifiedCopy);
+
+        var service = CreateService();
+
+        var result = await service.VerifyDocumentAsync(VerificationToken, PdfBytes);
+
+        Assert.False(result.IsValid);
+        Assert.True(result.DocumentIntegrityValid);
+        Assert.Equal("Revoked", result.Status);
+    }
+
+    [Fact]
+    public async Task VerifyDocumentAsync_ExpiredCertificationWithOriginalDocument_ReturnsExpiredButIntegrityValid()
+    {
+        var credential = CreateIdentityCredential();
+
+        var certifiedCopy = CreateCertifiedCopy(credential, expiresAt: DateTime.UtcNow.AddMinutes(-1));
+
+        SetupValidDocumentVerification(certifiedCopy);
+
+        var service = CreateService();
+
+        var result = await service.VerifyDocumentAsync(VerificationToken, PdfBytes);
+
+        Assert.False(result.IsValid);
+        Assert.True(result.DocumentIntegrityValid);
+        Assert.Equal("Expired", result.Status);
+    }
+
+    [Fact]
+    public async Task VerifyDocumentAsync_InactiveCredentialWithOriginalDocument_ReturnsCredentialInactiveButIntegrityValid()
+    {
+        var credential = CreateIdentityCredential(status: CredentialStatus.Revoked);
+
+        var certifiedCopy = CreateCertifiedCopy(credential);
+
+        SetupValidDocumentVerification(certifiedCopy);
+
+        var service = CreateService();
+
+        var result = await service.VerifyDocumentAsync(VerificationToken, PdfBytes);
+
+        Assert.False(result.IsValid);
+        Assert.True(result.DocumentIntegrityValid);
+        Assert.Equal("CredentialInactive", result.Status);
+    }
+
+    private void SetupValidDocumentVerification(CertifiedCredentialCopy certifiedCopy)
+    {
+        _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
+
+        _certifiedCopyRepository.Setup(x => x.GetByVerificationTokenHashAsync(VerificationTokenHash)).ReturnsAsync(certifiedCopy);
+
+        _cryptographyProvider.Setup(x => x.VerifyDocumentHash(PdfBytes, DocumentHash)).Returns(true);
+    }
+
 
 }
