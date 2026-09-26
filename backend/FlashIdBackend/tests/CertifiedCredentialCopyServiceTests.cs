@@ -435,4 +435,133 @@ public class CertifiedCredentialCopyServiceTests
                 It.IsAny<byte[]?>()), Times.Once);
     }
 
+    [Fact]
+    public async Task VerifyAsync_ValidToken_ReturnsValidIdentityCredential()
+    {
+        var credential = CreateIdentityCredential();
+
+        var certifiedCopy = CreateCertifiedCopy(credential);
+
+        _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
+
+        _certifiedCopyRepository.Setup(x => x.GetByVerificationTokenHashAsync(VerificationTokenHash)).ReturnsAsync(certifiedCopy);
+
+        var service = CreateService();
+
+        var result = await service.VerifyAsync(VerificationToken);
+
+        Assert.True(result.IsValid);
+        Assert.Equal("Valid", result.Status);
+        Assert.Equal(certifiedCopy.Id, result.CertificationId);
+        Assert.Equal("IdentityDocument", result.CredentialType);
+        Assert.Equal("Kayla Patel", result.FullName);
+        Assert.Equal("9000000000000", result.IdNumber);
+        Assert.Equal("South African", result.Citizenship);
+        Assert.Equal("South Africa", result.CountryOfBirth);
+        Assert.Equal("South African", result.Nationality);
+    }
+
+    [Fact]
+    public async Task VerifyAsync_ValidDriversLicense_ReturnsLicenseDetails()
+    {
+        var credential = CreateDriversLicenseCredential();
+
+        var certifiedCopy = CreateCertifiedCopy(credential);
+
+        _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
+
+        _certifiedCopyRepository.Setup(x => x.GetByVerificationTokenHashAsync(VerificationTokenHash)).ReturnsAsync(certifiedCopy);
+
+        var service = CreateService();
+
+        var result = await service.VerifyAsync(VerificationToken);
+
+        Assert.True(result.IsValid);
+        Assert.Equal("DriversLicense", result.CredentialType);
+        Assert.Equal("DL123456", result.LicenseNumber);
+        Assert.Equal("B", result.LicenseCode);
+        Assert.Equal("None", result.Restrictions);
+        Assert.Equal("South Africa", result.CountryOfIssue);
+    }
+
+    [Fact]
+    public async Task VerifyAsync_UnknownToken_ReturnsInvalid()
+    {
+        _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
+
+        _certifiedCopyRepository.Setup(x => x.GetByVerificationTokenHashAsync(VerificationTokenHash)).ReturnsAsync((CertifiedCredentialCopy?)null);
+
+        var service = CreateService();
+
+        var result = await service.VerifyAsync(VerificationToken);
+
+        Assert.False(result.IsValid);
+        Assert.Equal("Invalid", result.Status);
+    }
+
+    [Fact]
+    public async Task VerifyAsync_EmptyToken_ThrowsArgumentException()
+    {
+        var service = CreateService();
+
+        await Assert.ThrowsAsync<ArgumentException>(() => service.VerifyAsync(""));
+    }
+
+    [Fact]
+    public async Task VerifyAsync_RevokedCertification_ReturnsRevoked()
+    {
+        var credential = CreateIdentityCredential();
+
+        var certifiedCopy = CreateCertifiedCopy(credential, CertifiedCopyStatus.Revoked);
+
+        _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
+
+        _certifiedCopyRepository.Setup(x => x.GetByVerificationTokenHashAsync(VerificationTokenHash)).ReturnsAsync(certifiedCopy);
+
+        var service = CreateService();
+
+        var result = await service.VerifyAsync(VerificationToken);
+
+        Assert.False(result.IsValid);
+        Assert.Equal("Revoked", result.Status);
+    }
+
+    [Fact]
+    public async Task VerifyAsync_ExpiredCertification_ReturnsExpired()
+    {
+        var credential = CreateIdentityCredential();
+
+        var certifiedCopy = CreateCertifiedCopy(credential, expiresAt: DateTime.UtcNow.AddMinutes(-1));
+
+        _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
+
+        _certifiedCopyRepository.Setup(x => x.GetByVerificationTokenHashAsync(VerificationTokenHash)).ReturnsAsync(certifiedCopy);
+
+        var service = CreateService();
+
+        var result = await service.VerifyAsync(VerificationToken);
+
+        Assert.False(result.IsValid);
+        Assert.Equal("Expired", result.Status);
+    }
+
+    [Fact]
+    public async Task VerifyAsync_InactiveUnderlyingCredential_ReturnsCredentialInactive()
+    {
+        var credential = CreateIdentityCredential(status: CredentialStatus.Revoked);
+
+        var certifiedCopy = CreateCertifiedCopy(credential);
+
+        _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
+
+        _certifiedCopyRepository.Setup(x => x.GetByVerificationTokenHashAsync(VerificationTokenHash)).ReturnsAsync(certifiedCopy);
+
+        var service = CreateService();
+
+        var result = await service.VerifyAsync(VerificationToken);
+
+        Assert.False(result.IsValid);
+        Assert.Equal("CredentialInactive", result.Status);
+    }
+
 }
