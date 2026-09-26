@@ -28,8 +28,8 @@ const SYNC_BATCH_SIZE = 100
 // A verifier offline for weeks could otherwise grow the cache without limit, so past this the oldest go.
 const MAX_QUEUED_VERIFICATIONS = 1000
 
-// The public key goes with every request: the backend binds the credential to it as cnf, and re-mints
-// when it changes, for example after a reinstall.
+// The public key goes with every request: the backend binds the credential to it as cnf and re-mints when it changes.
+// On Android a reinstall create a new key. On iOS the Keychain usually keeps it across one.
 const requestOfflinePackage = async (
   credentialId: string
 ): Promise<OfflinePackageResponse> => {

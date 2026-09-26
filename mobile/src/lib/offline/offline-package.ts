@@ -38,5 +38,5 @@ export const isPackageUsable = (
   return claims !== null && claims.exp > nowInSeconds
 }
 
-export const isDeviceBound = (offlinePakcge: OfflinePackage): boolean =>
-  readIssuerClaims(offlinePakcge)?.isDeviceBound === true
+export const isDeviceBound = (offlinePackage: OfflinePackage): boolean =>
+  readIssuerClaims(offlinePackage)?.isDeviceBound === true

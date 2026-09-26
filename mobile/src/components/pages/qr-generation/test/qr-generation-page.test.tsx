@@ -73,7 +73,7 @@ jest.mock('@/lib/offline/offline-presentation', () => ({
 jest.mock('@/lib/offline/qr-frames', () => ({
   ...jest.requireActual('@/lib/offline/qr-frames'),
   splitPayloadFrames: jest.fn(() => [
-    { encoded: 'FID1:P:abcdef:0/2:first', tid: 'abcedf' },
+    { encoded: 'FID1:P:abcdef:0/2:first', tid: 'abcdef' },
     { encoded: 'FID1:P:abcdef:1/2:second', tid: 'abcdef' },
   ]),
 }))
@@ -130,7 +130,7 @@ describe('QrGenerationPage', () => {
       token: null,
     })
     presentationMock.mockReturnValue('presentation')
-    keyBindingFrameMock.mockReturnValue(null)
+    keyBindingFrameMock.mockReturnValue({ frame: null, isUnavailable: false })
   })
 
   it('Should request an online code with the mandatory and chosen fields when online', async () => {
@@ -278,7 +278,10 @@ describe('QrGenerationPage', () => {
   })
 
   it('Should add the signed key binding frame to the offline code', async () => {
-    keyBindingFrameMock.mockReturnValue('FID1:K:abcdef:kb')
+    keyBindingFrameMock.mockReturnValue({
+      frame: 'FID1:K:abcdef:kb',
+      isUnavailable: false,
+    })
     networkMock.mockReturnValue({ isOffline: true, isOnline: false })
     await renderPage()
 
@@ -294,5 +297,20 @@ describe('QrGenerationPage', () => {
     await fireEvent.press(screen.getByTestId('mock-share-licence-number'))
 
     expect(keyBindingFrameMock).toHaveBeenLastCalledWith(null)
+  })
+
+  it('Should explain instead of showing a code this phone cannot sign', async () => {
+    keyBindingFrameMock.mockReturnValue({ frame: null, isUnavailable: true })
+    networkMock.mockReturnValue({ isOffline: true, isOnline: false })
+    await renderPage()
+
+    await fireEvent.press(screen.getByTestId('mock-share-licence-number'))
+
+    expect(screen.queryByTestId('offline-qr-card')).toBeNull()
+    expect(
+      screen.getByText(
+        "This code can't be verified on this phone. Connect and open Share again."
+      )
+    ).toBeTruthy()
   })
 })

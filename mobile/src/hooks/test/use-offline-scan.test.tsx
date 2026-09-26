@@ -180,4 +180,27 @@ describe('useOfflineScan', () => {
     expect(onResult).toHaveBeenCalledTimes(1)
     expect(onResult).toHaveBeenCalledWith(verified)
   })
+
+  it('Should verify a bound code without its key binding frame once the wait is over', async () => {
+    const encodeJson = (value: unknown) =>
+      Buffer.from(JSON.stringify(value)).toString('base64url')
+    const bound = `${encodeJson({ alg: 'ES256' })}.${encodeJson({ cnf: { jwk: {} } })}.sig~${'d'.repeat(900)}~`
+    const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(1_790_000_000_000)
+    const { result } = await renderHook(() => useOfflineScan(trust))
+    const frames = framesFor(bound, 'abcdef')
+
+    for (const frame of frames) {
+      await act(async () => result.current.addFrame(frame))
+    }
+
+    expect(verifyMock).not.toHaveBeenCalled()
+
+    nowSpy.mockReturnValue(1_790_000_004_001)
+    await act(async () => result.current.addFrame(frames[0]))
+
+    expect(verifyMock).toHaveBeenCalledWith(bound, trust, {
+      now: expect.any(Number),
+    })
+    nowSpy.mockRestore()
+  })
 })

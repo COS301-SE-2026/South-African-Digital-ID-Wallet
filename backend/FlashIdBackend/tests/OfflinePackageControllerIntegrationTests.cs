@@ -43,17 +43,26 @@ public class OfflinePackageControllerIntegrationTests
         return Convert.ToBase64String(key.ExportPkcs8PrivateKey());
     }
 
-    private static async Task<OfflinePackageResponseDto> RequestPackageAsync(HttpClient client, Guid credentialId)
-    {
-        var response = await client.PostAsync($"/api/credentials/{credentialId}/offline-package", null, TestContext.Current.CancellationToken);
-        response.EnsureSuccessStatusCode();
+    // One key for the whole test class, so a second request from the "same phone" reuses its package.
+    private static readonly OfflinePackageRequestDto DefaultDeviceKeyBody = CreateDefaultDeviceKeyBody();
 
-        return (await response.Content.ReadFromJsonAsync<OfflinePackageResponseDto>(JsonOptions, TestContext.Current.CancellationToken))!;
+    private static OfflinePackageRequestDto CreateDefaultDeviceKeyBody()
+    {
+        using var deviceKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+
+        return DeviceKeyBody(deviceKey);
     }
+
+    private static Task<HttpResponseMessage> PostPackageAsync(HttpClient client, Guid credentialId) =>
+        client.PostAsJsonAsync($"/api/credentials/{credentialId}/offline-package", DefaultDeviceKeyBody, JsonOptions, TestContext.Current.CancellationToken);
+
+    private static Task<OfflinePackageResponseDto> RequestPackageAsync(HttpClient client, Guid credentialId) =>
+        RequestPackageWithBodyAsync(client, credentialId, DefaultDeviceKeyBody);
 
     private static async Task<OfflinePackageResponseDto> RequestPackageWithBodyAsync(HttpClient client, Guid credentialId, OfflinePackageRequestDto body)
     {
         var response = await client.PostAsJsonAsync($"/api/credentials/{credentialId}/offline-package", body, JsonOptions, TestContext.Current.CancellationToken);
+
         response.EnsureSuccessStatusCode();
 
         return (await response.Content.ReadFromJsonAsync<OfflinePackageResponseDto>(JsonOptions, TestContext.Current.CancellationToken))!;
@@ -316,7 +325,7 @@ public class OfflinePackageControllerIntegrationTests
         var db = await factory.CreateInitializedContextAsync();
         var (user, credential) = await SeedCitizenWithLicenceAsync(db);
 
-        var response = await ClientFor(factory, user).PostAsync($"/api/credentials/{credential.Id}/offline-package", null, TestContext.Current.CancellationToken);
+        var response = await PostPackageAsync(ClientFor(factory, user), credential.Id);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -381,8 +390,8 @@ public class OfflinePackageControllerIntegrationTests
         var (firstUser, firstCredential) = await SeedCitizenWithLicenceAsync(db);
         var (secondUser, secondCredential) = await SeedCitizenWithLicenceAsync(db);
 
-        await ClientFor(factory, firstUser).PostAsync($"/api/credentials/{firstCredential.Id}/offline-package", null, TestContext.Current.CancellationToken);
-        await ClientFor(factory, secondUser).PostAsync($"/api/credentials/{secondCredential.Id}/offline-package", null, TestContext.Current.CancellationToken);
+        await PostPackageAsync(ClientFor(factory, firstUser), firstCredential.Id);
+        await PostPackageAsync(ClientFor(factory, secondUser), secondCredential.Id);
 
         var first = await ReloadAsync(db, firstCredential.Id);
         var second = await ReloadAsync(db, secondCredential.Id);
@@ -399,7 +408,7 @@ public class OfflinePackageControllerIntegrationTests
         var (_, credential) = await SeedCitizenWithLicenceAsync(db);
         var (intruder, _) = await SeedCitizenWithLicenceAsync(db);
 
-        var response = await ClientFor(factory, intruder).PostAsync($"/api/credentials/{credential.Id}/offline-package", null, TestContext.Current.CancellationToken);
+        var response = await PostPackageAsync(ClientFor(factory, intruder), credential.Id);
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
@@ -419,7 +428,7 @@ public class OfflinePackageControllerIntegrationTests
         tracked.Status = CredentialStatus.Revoked;
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var response = await ClientFor(factory, user).PostAsync($"/api/credentials/{credential.Id}/offline-package", null, TestContext.Current.CancellationToken);
+        var response = await PostPackageAsync(ClientFor(factory, user), credential.Id);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -431,7 +440,7 @@ public class OfflinePackageControllerIntegrationTests
         var db = await factory.CreateInitializedContextAsync();
         var (user, _) = await SeedCitizenWithLicenceAsync(db);
 
-        var response = await ClientFor(factory, user).PostAsync($"/api/credentials/{Guid.NewGuid()}/offline-package", null, TestContext.Current.CancellationToken);
+        var response = await PostPackageAsync(ClientFor(factory, user), Guid.NewGuid());
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -518,16 +527,49 @@ public class OfflinePackageControllerIntegrationTests
     }
 
     [Fact]
-    public async Task RequestOfflinePackage_WithoutABody_MintsAnUnboundPackage()
+    public async Task RequestOfflinePackage_WithoutADeviceKey_ReturnsBadRequestAndStoresNothing()
     {
         await using var factory = new TestApiFactory();
         var db = await factory.CreateInitializedContextAsync();
         var (user, credential) = await SeedCitizenWithLicenceAsync(db);
 
-        var package = await RequestPackageAsync(ClientFor(factory, user), credential.Id);
+        var response = await ClientFor(factory, user).PostAsJsonAsync($"/api/credentials/{credential.Id}/offline-package", new { }, JsonOptions, TestContext.Current.CancellationToken);
 
-        Assert.False(PayloadOf(package.IssuerSignedCredential).TryGetProperty("cnf", out _));
-        Assert.Null((await ReloadAsync(db, credential.Id)).HolderKeyThumbprint);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Null((await ReloadAsync(db, credential.Id)).IssuerSignedCredential);
+    }
+
+    [Fact]
+    public async Task RequestOfflinePackage_BoundCredential_CannotBeDowngradedWithoutADeviceKey()
+    {
+        await using var factory = new TestApiFactory();
+        var db = await factory.CreateInitializedContextAsync();
+        var (user, credential) = await SeedCitizenWithLicenceAsync(db);
+        var client = ClientFor(factory, user);
+        await RequestPackageAsync(client, credential.Id);
+        var bound = await ReloadAsync(db, credential.Id);
+
+        var response = await client.PostAsJsonAsync($"/api/credentials/{credential.Id}/offline-package", new { }, JsonOptions, TestContext.Current.CancellationToken);
+
+        var after = await ReloadAsync(db, credential.Id);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(bound.HolderKeyThumbprint, after.HolderKeyThumbprint);
+        Assert.Equal(bound.IssuerSignedCredential, after.IssuerSignedCredential);
+    }
+
+    [Fact]
+    public async Task RequestOfflinePackage_DeviceKeyMissingCoordinates_ReturnsBadRequest()
+    {
+        await using var factory = new TestApiFactory();
+        var db = await factory.CreateInitializedContextAsync();
+        var (user, credential) = await SeedCitizenWithLicenceAsync(db);
+        using var body = new StringContent("""{ "deviceKey": { "kty": "EC", "crv": "P-256" } }""", Encoding.UTF8, "application/json");
+
+        var response = await ClientFor(factory, user).PostAsync($"/api/credentials/{credential.Id}/offline-package", body, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Null((await ReloadAsync(db, credential.Id)).IssuerSignedCredential);
     }
 
     [Fact]
@@ -594,6 +636,7 @@ public class OfflinePackageControllerIntegrationTests
         var response = await ClientFor(factory, user).PostAsJsonAsync($"/api/credentials/{credential.Id}/offline-package", body, JsonOptions, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Null((await ReloadAsync(db, credential.Id)).IssuerSignedCredential);
     }
 
     [Fact]

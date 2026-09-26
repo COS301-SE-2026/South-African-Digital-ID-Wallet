@@ -33,6 +33,8 @@ const PREPARING_MESSAGE = 'Preparing your offline code. Try again in a moment.'
 const CONNECT_ONCE_MESSAGE = 'Connect once to prepare offline verification.'
 const OFFLINE_CODE_FAILED_MESSAGE =
   'Your offline code could not be prepared. Connect to the internet and open Share again.'
+const KEY_BINDING_UNAVAILABLE_MESSAGE =
+  "This code can't be verified on this phone. Connect and open Share again."
 
 type OfflineCodeOutcome =
   | { frames: readonly string[]; keyBindingSource: KeyBindingSource | null }
@@ -92,7 +94,8 @@ export const QrGenerationPage = ({ credentialId }: QrGenerationPageProps) => {
   const secondsRemaining = useCountdown(token?.expiresAt)
   const credentialType = toQrCredentialType(credential?.type)
 
-  const keyBindingFrame = useKeyBindingFrame(keyBindingSource)
+  const { frame: keyBindingFrame, isUnavailable: isKeyBindingUnavailable } =
+    useKeyBindingFrame(keyBindingSource)
   const displayedFrames = useMemo(
     () =>
       keyBindingFrame
@@ -100,6 +103,11 @@ export const QrGenerationPage = ({ credentialId }: QrGenerationPageProps) => {
         : offlineFrames,
     [keyBindingFrame, offlineFrames]
   )
+  const displayedError =
+    offlineError ??
+    (isOfflineMode && isKeyBindingUnavailable
+      ? KEY_BINDING_UNAVAILABLE_MESSAGE
+      : null)
 
   const scrollRef = useRef<ScrollView>(null)
 
@@ -222,18 +230,18 @@ export const QrGenerationPage = ({ credentialId }: QrGenerationPageProps) => {
       scrollRef={scrollRef}
       title="Share Identity"
     >
-      {offlineError ? (
+      {displayedError ? (
         <Card
           className="items-center gap-3 rounded-3xl p-8"
           testID="offline-qr-error"
         >
           <Text variant="sub-sm" className="text-center">
-            {offlineError}
+            {displayedError}
           </Text>
         </Card>
       ) : null}
 
-      {isOfflineMode ? (
+      {isOfflineMode && !isKeyBindingUnavailable ? (
         <QrCodeCard
           offlineFrames={displayedFrames}
           onCancel={handleBack}
@@ -241,7 +249,9 @@ export const QrGenerationPage = ({ credentialId }: QrGenerationPageProps) => {
           secondsRemaining={Number.MAX_SAFE_INTEGER}
           testID="offline-qr-card"
         />
-      ) : (
+      ) : null}
+
+      {isOfflineMode ? null : (
         <OnlineQrState
           credentialTitle={credential.title}
           error={error}

@@ -45,7 +45,7 @@ const readOfflineCacheMock = readOfflineCache as jest.Mock
 const writeOfflineCacheMock = writeOfflineCache as jest.Mock
 const verifyListMock = verifyRevocationList as jest.Mock
 const deviceKeyMock = getDevicePublicJwk as jest.Mock
-const DEVICE_KEY = { key: 'EC', crv: 'P-256', x: 'device-x', y: 'device-y' }
+const DEVICE_KEY = { kty: 'EC', crv: 'P-256', x: 'device-x', y: 'device-y' }
 
 const packageResponse = {
   issuerSignedCredential: credentialExpiringAt(1_800_000_000),
@@ -135,7 +135,7 @@ describe('offlineService', () => {
       offlineService.requestOfflinePackage('credential-1')
     ).rejects.toThrow('secure storage unavailable')
 
-    expect(postMock).not.toHaveBeenCalled
+    expect(postMock).not.toHaveBeenCalled()
   })
 
   it('Should get issuer keys from the issuer keys endpoint', async () => {

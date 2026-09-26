@@ -1,4 +1,5 @@
 namespace Application.Features.Credentials.DTOs;
 
-// Body of the offline package request. Without a device key the package is minted unbound, which Emergency QR relies on.
-public sealed record OfflinePackageRequestDto(DevicePublicKeyDto? DeviceKey);
+// Every wallet package is bound to the phone that asked for it. An unbound package would let anyone holding
+// the citizen's session mint a credential that verifies without key binding, and would downgrade a bound one.
+public sealed record OfflinePackageRequestDto(DevicePublicKeyDto DeviceKey);

@@ -37,7 +37,7 @@ describe('useKeyBindingFrame', () => {
   it('Should show no frame when the credential is not bound', async () => {
     const { result } = await renderHook(() => useKeyBindingFrame(null))
 
-    expect(result.current).toBeNull()
+    expect(result.current.frame).toBeNull()
     expect(loadSignerMock).not.toHaveBeenCalled()
   })
 
@@ -45,8 +45,8 @@ describe('useKeyBindingFrame', () => {
     const { result } = await renderHook(() => useKeyBindingFrame(SOURCE))
     await flushSigner()
 
-    expect(result.current).toMatch(/^FID1:K:abcdef:/)
-    expect(iatOf(result.current)).toBe(START_MS / 1000)
+    expect(result.current.frame).toMatch(/^FID1:K:abcdef:/)
+    expect(iatOf(result.current.frame)).toBe(START_MS / 1000)
   })
 
   it('Should re-sign every five seconds with a fresh iat', async () => {
@@ -57,7 +57,7 @@ describe('useKeyBindingFrame', () => {
       jest.advanceTimersByTime(5000)
     })
 
-    expect(iatOf(result.current)).toBe(START_MS / 1000 + 5)
+    expect(iatOf(result.current.frame)).toBe(START_MS / 1000 + 5)
     expect(loadSignerMock).toHaveBeenCalledTimes(1)
   })
 
@@ -71,7 +71,7 @@ describe('useKeyBindingFrame', () => {
 
     await rerender({ source: { sdJwt: 'other~', tid: 'ghijkl' } })
 
-    expect(result.current).toBeNull()
+    expect(result.current.frame).toBeNull()
   })
 
   it('Should stop signing once the code closes', async () => {
@@ -87,12 +87,13 @@ describe('useKeyBindingFrame', () => {
     expect(signMock).toHaveBeenCalledTimes(signedBefore)
   })
 
-  it('Should show no frame when the device key cannot be loaded', async () => {
+  it("Should report the code as unavailable when the device key can't be loaded", async () => {
     loadSignerMock.mockRejectedValue(new Error('secure store unavailable'))
 
     const { result } = await renderHook(() => useKeyBindingFrame(SOURCE))
     await flushSigner()
 
-    expect(result.current).toBeNull()
+    expect(result.current.frame).toBeNull()
+    expect(result.current.isUnavailable).toBe(true)
   })
 })
