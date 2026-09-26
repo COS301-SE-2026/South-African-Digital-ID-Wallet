@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | 1.1, updated on 2026-09-19. A change needs a new version and a decision entry |
+| Status | 1.2, updated on 2026-09-26. A change needs a new version and a decision entry |
 | Owner | Nathan Chisadza |
 | Used by | Backend offline package builder, mobile wallet, mobile verifier |
 | Decisions | [decisions.md](decisions.md) |
@@ -125,7 +125,7 @@ sd_jwt = issuer_jwt + "~" + disclosure_1 + "~" + ... + "~" + disclosure_n + "~"
 - The stored offline package holds all disclosures. A presentation holds every mandatory claim plus the optional claims the citizen chose.
 - An SD-JWT always ends with `~`.
 
-## 8. Key Binding JWT (Phase 4)
+## 8. Key Binding JWT
 
 | Header field | Value |
 |---|---|
@@ -142,9 +142,10 @@ kb_jwt       = JWS signed by the device private key, same signature rules as sec
 presentation = sd_jwt + kb_jwt
 ```
 
-- The device key is P-256; its public key is embedded as `cnf.jwk` at minting.
+- The device key is P-256, generated on the phone and stored only there. Its public key is sent on every package request and embedded as `cnf.jwk` at minting; the request is refused without it (D-022).
 - The wallet re-signs the Key Binding JWT every 5 seconds while presenting.
-- A verifier accepts it when `iat` is at most 30 seconds old, allowing 60 seconds of clock skew.
+- A verifier accepts it when `iat` is at most 30 seconds old, allowing 60 seconds of clock skew either way (D-023).
+- A verifier requires key binding whenever `cnf` is present, so a bound credential never verifies from its payload alone.
 
 ## 9. QR frames
 
@@ -163,7 +164,9 @@ FID1:K:<tid>:<kb_jwt>
 | `chunk` | Consecutive slice of `sd_jwt`, at most 450 characters (D-019) |
 
 - Payload frames never change during a presentation; only K frames do.
-- One K frame is shown after every third P frame.
+- One K frame is shown after every third P frame and after the last one, so even a one-frame code carries one.
+- A bound code waits at most 4 seconds for a K frame, then verifies without it (`MISSING_KEY_BINDING`) (D-023).
+- Offline frames render at error correction level L, 280 px (D-024).
 - Display rate is 8 frames per second (D-019).
 - Scan time is about one display cycle: payload frames plus key binding frames, divided by 8.
 - Reassembly joins chunks in `idx` order to recover `sd_jwt`, then appends the `kb_jwt` from the newest K frame.
@@ -187,11 +190,12 @@ FID1:K:<tid>:<kb_jwt>
 | 12 | Age of the key set and revocation list | Warning over 24 hours; `STALE_TRUST_DATA` over 7 days | no |
 
 - Until step 4 passes, the credential identity is attacker-controlled, so those failures are logged but never notified.
-- Failure notifications are limited to one per credential per hour.
+- Failure notifications are limited to one per credential per hour. Notifications after sync are not implemented in this release. The column records the intended rule.
 
 ## 11. Deviations from the standards
 
 - The Key Binding JWT has no `aud` or `nonce`, because a single scan gives the holder no verifier challenge. Mitigated by the 30-second freshness window and the portrait check.
+- Because freshness is judged only from `iat`, a recording replayed within about 90 seconds (30 seconds plus 60 of skew) can still verify. Removing that window needs a verifier challenge over a two-way channel such as Bluetooth (D-023).
 - The `FID1` QR frame transport is FlashID's own, not an ISO/IEC 18013-5 transport.
 - Prototype trust anchor: the issuer key set is fetched over TLS rather than signed by an IACA root (D-009).
 
@@ -207,16 +211,65 @@ A driver's licence presenting 5 of 11 claims, including the portrait. The portra
 | **Payload frames** | **7 to 14 typical, 23 worst case** | Measured, Spike C |
 | **Scan time at 8 fps** | **1 to 2.5s typical, about 3.9s worst case** | Spike B. Worst case predicted |
 
-## 13. Test vectors
+## 13. Revocation list
+
+`GET /api/credentials/revocation-list` returns `{ "revocationList": "<jws>", "retrievedAt": "<ISO 8601>" }`. The JWS follows the signature rules of section 6.
+
+| Header field | Value |
+|---|---|
+| `alg` | `ES256` |
+| `typ` | `revocation-list+jwt` |
+| `kid` | Credential signing key |
+
+| Payload claim | Meaning |
+|---|---|
+| `iss` | `urn:flashid:issuer` |
+| `iat` | Signing time |
+| `next_update` | `iat` plus 24 hours |
+| `revoked` | Array of revocation indexes (`ri`) for every credential whose status is not `Active`, ascending |
+
+- The verifier stores the list only if it verifies against its cached issuer keys: fixed `alg`, expected `typ` and `iss`, a known key that is not revoked, a valid signature and whole-number indexes (D-025).
+- A list that fails is ignored and the last verified list stays.
+- Its age counts in step 12 of section 10, using the phone's own clock at download.
+
+## 14. Offline verification upload
+
+`POST /api/credentials/offline-verifications` with:
+
+```json
+{ "entries": [ { "id": "<uuid>", "revocationIndex": 7, "result": "VERIFIED", "verifiedAt": 1790000000 } ] }
+```
+
+**d. Section 12, Size budget.** Replace everything from the line under `## 12. Size budget` down to the line above the next heading (the intro sentence and the whole table) with:
+
+```markdown
+Measured on 2026-09-21 and 2026-09-25 against the dev environment, using a real seeded driver's licence with its ID photo.
+```
+
+| Part | Size | Source |
+|---|---|---|
+| Issuer JWT | about 750 characters | Measured |
+| Eight text disclosures | about 600 characters together | Measured |
+| Portrait, sent inline | the rest of the package | Measured |
+| Full package | 9,121 characters | Measured |
+| **Payload frames** | **21** at 450 characters | Measured |
+| **With key binding** | **28 frames** (21 payload, 7 K) | Measured |
+| **Scan time at 8 fps** | **3.5 s per cycle; about 4.2 s observed**, S23 showing, S24 scanning | Measured |
+
+- The portrait is almost the whole payload, so dropping optional claims saves about one frame. The portrait recipe is the only real lever (D-018).
+- A budget phone as the scanner is still unmeasured.
+
+
+## 15. Test vectors
 
 The cross-stack fixture (checklist 1.11) contains a public key and a presentation only.
 **Private keys are never committed.** The .NET test suite and the mobile Jest suite verify the same file.
 
-## 14. Changelog
+## 16. Changelog
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-09-14 | Initial draft; Spike A result recorded in section 6 |
 | 1.0 | 2026-09-15 | Frozen. Portrait recipe (D-018), frame size and rate (D-019) from Spikes B and C, with size budget measured |
 | 1.1 | 2026-09-19 | `iss` becomes the URI `urn:flashid:issuer` (D-020); JSON escaping relaxed so `typ` and non-ASCII claim values travel unescaped (D-021) |
-
+| 1.2 | 2026-09-26 | Device key required (D-022); key binding timing and scanner wait (D-023); offline frames at level L, 280 px (D-024); revocation list format (D-025) and offline verification upload (D-026) added as sections 13 and 14; size budget replaced with measured values |
