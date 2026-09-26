@@ -12,12 +12,19 @@ const KEY_BINDING_REFRESH_MS = 5000
 
 export type KeyBindingSource = { sdJwt: string; tid: string }
 
+export type KeyBindingFrameState = {
+  frame: string | null
+  // The device key could not be loaded, so this bound code can never verify and must not be shown.
+  isUnavailable: boolean
+}
+
 const nowInSeconds = () => Math.floor(Date.now() / 1000)
 
 export const useKeyBindingFrame = (
   source: KeyBindingSource | null
-): string | null => {
+): KeyBindingFrameState => {
   const [frame, setFrame] = useState<string | null>(null)
+  const [failedTid, setFailedTid] = useState<string | null>(null)
 
   useEffect(() => {
     if (!source) {
@@ -45,7 +52,9 @@ export const useKeyBindingFrame = (
         signNow()
       })
       .catch(() => {
-        // No key means no K frame, and the verifier says the code cannot be linked to this phone.
+        if (isActive) {
+          setFailedTid(source.tid)
+        }
       })
     const interval = setInterval(signNow, KEY_BINDING_REFRESH_MS)
 
@@ -55,9 +64,13 @@ export const useKeyBindingFrame = (
     }
   }, [source])
 
-  // A frame signed for an earlier presentation is never shown alongside a new one.
-  return source &&
-    frame?.startsWith(`${KEY_BINDING_FRAME_PREFIX}:${source.tid}:`)
-    ? frame
-    : null
+  // State is keyed by tid rather than cleared inside the effect, so a frame or failure from an earlier
+  // presentation is never reported for a new one.
+  return {
+    frame:
+      source && frame?.startsWith(`${KEY_BINDING_FRAME_PREFIX}:${source.tid}:`)
+        ? frame
+        : null,
+    isUnavailable: source !== null && failedTid === source.tid,
+  }
 }

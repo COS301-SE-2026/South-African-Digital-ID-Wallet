@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 import { requiresKeyBinding } from '@/lib/offline/key-binding'
 import {
@@ -13,21 +13,30 @@ import {
 
 export type OfflineScanProgress = { received: number; total: number }
 
-// Every payload frame is in, and a bound credential also has its K frame.
-const isReadyToVerify = (snapshot: AccumulatedPayload): boolean =>
+// Longer than one full cycle of a licence code with its K frames (28 frames at 8 fps is 3.5 s), so a K
+// frame that exists has certainly been shown before the scanner stops waiting for it.
+const KEY_BINDING_WAIT_MS = 4000
+
+type KeyBindingWait = { tid: string | null; since: number }
+
+const isAwaitingKeyBinding = (snapshot: AccumulatedPayload): boolean =>
   snapshot.complete &&
   snapshot.presentation !== null &&
-  (snapshot.keyBindingJwt !== null ||
-    !requiresKeyBinding(snapshot.presentation))
+  snapshot.keyBindingJwt === null &&
+  requiresKeyBinding(snapshot.presentation)
 
 export const useOfflineScan = (
   trust: TrustData | null,
-  isTrustLoading = false
+  isTrustLoading = false,
+  // Told about each result once, for example to queue it for the audit log.
+  onResult?: (result: VerificationResult) => void
 ) => {
   // useState's lazy initialiser builds the accumulator on the first render only, never again.
   const [accumulator] = useState(() => new PayloadFrameAccumulator())
   const [progress, setProgress] = useState<OfflineScanProgress | null>(null)
   const [result, setResult] = useState<VerificationResult | null>(null)
+  // A ref, not state: it only decides what to do with the next frame and never changes what is shown.
+  const keyBindingWait = useRef<KeyBindingWait | null>(null)
 
   const addFrame = useCallback(
     (rawText: string) => {
@@ -46,30 +55,52 @@ export const useOfflineScan = (
         return
       }
 
-      // Still collecting, waiting for a bound credential's K frame, or waiting for the verifier's
-      // keys. The code keeps cycling, so a later frame completes it once everything is in.
-      if (!isReadyToVerify(snapshot) || isTrustLoading) {
+      const now = Date.now()
+
+      // A bound code whose K frame never arrives (the wallet could not load its key, or a recording was
+      // cropped) is verified anyway after the wait, so the officer gets MISSING_KEY_BINDING rather than
+      // a scanner stuck at N of N.
+      if (!isAwaitingKeyBinding(snapshot)) {
+        keyBindingWait.current = null
+      } else if (keyBindingWait.current?.tid !== snapshot.tid) {
+        keyBindingWait.current = { tid: snapshot.tid, since: now }
+      }
+
+      const isStillWaiting =
+        keyBindingWait.current !== null &&
+        now - keyBindingWait.current.since < KEY_BINDING_WAIT_MS
+
+      if (
+        !snapshot.complete ||
+        !snapshot.presentation ||
+        isStillWaiting ||
+        isTrustLoading
+      ) {
         setProgress({ received: snapshot.received, total: snapshot.total })
         return
       }
 
       accumulator.reset()
+      keyBindingWait.current = null
       setProgress(null)
-      setResult(
-        trust
-          ? verifyPresentation(
-              `${snapshot.presentation}${snapshot.keyBindingJwt ?? ''}`,
-              trust,
-              { now: Math.floor(Date.now() / 1000) }
-            )
-          : { ok: false, code: 'STALE_TRUST_DATA', warnings: [] }
-      )
+
+      const verification: VerificationResult = trust
+        ? verifyPresentation(
+            `${snapshot.presentation}${snapshot.keyBindingJwt ?? ''}`,
+            trust,
+            { now: Math.floor(now / 1000) }
+          )
+        : { ok: false, code: 'STALE_TRUST_DATA', warnings: [] }
+
+      setResult(verification)
+      onResult?.(verification)
     },
-    [accumulator, isTrustLoading, result, trust]
+    [accumulator, isTrustLoading, onResult, result, trust]
   )
 
   const reset = useCallback(() => {
     accumulator.reset()
+    keyBindingWait.current = null
     setProgress(null)
     setResult(null)
   }, [accumulator])
