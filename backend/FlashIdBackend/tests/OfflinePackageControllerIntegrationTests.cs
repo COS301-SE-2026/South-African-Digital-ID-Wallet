@@ -543,5 +543,6 @@ public class OfflinePackageControllerIntegrationTests
         var response = await ClientFor(factory, user).PostAsJsonAsync($"/api/credentials/{credential.Id}/offline-package", body, JsonOptions, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Null((await ReloadAsync(db, credential.Id)).IssuerSignedCredential);
     }
 }

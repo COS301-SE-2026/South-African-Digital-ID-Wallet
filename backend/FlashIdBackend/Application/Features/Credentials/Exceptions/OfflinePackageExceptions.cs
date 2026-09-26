@@ -20,3 +20,10 @@ public class OfflinePackageDocumentExpiredException : Exception
     public OfflinePackageDocumentExpiredException()
         : base("The offline package could not be prepared: the document has already expired.") { }
 }
+
+// The wallet sent a device key that is not a usable P-256 public key, so nothing can be bound to it
+public class InvalidDeviceKeyException : Exception
+{
+    public InvalidDeviceKeyException(string reason, Exception? innerException = null)
+        : base($"The device key is not a valid: {reason}", innerException) { }
+}

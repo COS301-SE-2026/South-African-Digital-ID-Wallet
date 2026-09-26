@@ -374,7 +374,7 @@ public class CredentialsController : ControllerBase
     /// <param name="request">Optional. The wallet's device public key, bound into the credential as cnf so only that phone can present it.</param>
     /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
     /// <response code="200">The offline package, ready to be cached on the device.</response>
-    /// <response code="400">The credential is not active, or the device key is not a valid P-256 public key..</response>
+    /// <response code="400">The credential is not active, or the device key is not a valid P-256 public key.</response>
     /// <response code="403">The credential belongs to another citizen.</response>
     /// <response code="404">No credential with that id.</response>
     /// <response code="409">The credential cannot produce a presentation: missing a photograph, or the document has expired.</response>
@@ -429,9 +429,9 @@ public class CredentialsController : ControllerBase
         {
             return StatusCode(503, new { error = opdee.Message });
         }
-        catch (ArgumentException ae) when (ae.ParamName == "deviceKey")
+        catch (InvalidDeviceKeyException idke)
         {
-            return BadRequest(new { error = ae.Message });
+            return BadRequest(new { error = idke.Message });
         }
     }
 
