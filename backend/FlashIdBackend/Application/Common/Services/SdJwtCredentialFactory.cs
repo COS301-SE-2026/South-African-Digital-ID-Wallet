@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using System.Text.Encodings.Web;
+using Application.Features.Credentials.Exceptions;
 
 namespace Application.Common.Services;
 
@@ -134,7 +135,7 @@ public sealed class SdJwtCredentialFactory : ISdJwtCredentialFactory
 
         if (deviceKey.Kty != "EC" || deviceKey.Crv != "P-256")
         {
-            throw new ArgumentException("The device key must be an EC P-256 key.", nameof(deviceKey));
+            throw new InvalidDeviceKeyException("it must be an EC P-256 key.");
         }
 
         byte[] x;
@@ -147,14 +148,14 @@ public sealed class SdJwtCredentialFactory : ISdJwtCredentialFactory
         }
         catch (FormatException fe)
         {
-            throw new ArgumentException("The device key coordinates are not valid base64url.", nameof(deviceKey), fe);
+            throw new InvalidDeviceKeyException("its coordinates are not valid base64url.", fe);
         }
 
         // Checked here rather than left to the import, because a wrong length is reported differently
         // on each platform: PlatformNotSupportedException on Windows, CryptographicException on Linux.
         if (x.Length != CoordinateBytes || y.Length != CoordinateBytes)
         {
-            throw new ArgumentException($"The device key coordinates must be {CoordinateBytes} bytes each.", nameof(deviceKey));
+            throw new InvalidDeviceKeyException($"its coordinates must be {CoordinateBytes} bytes each.");
         }
 
         try
@@ -173,7 +174,7 @@ public sealed class SdJwtCredentialFactory : ISdJwtCredentialFactory
         }
         catch (Exception e) when (e is CryptographicException or NotSupportedException or ArgumentException)
         {
-            throw new ArgumentException("The device key is not a valid P-256 public key.", nameof(deviceKey), e);
+            throw new InvalidDeviceKeyException("it is not a point on P-256.", e);
         }
     }
 

@@ -64,6 +64,7 @@ describe('PayloadFrameAccumulator', () => {
       complete: true,
       received: 1,
       missingIndexes: [],
+      keyBindingJwt: null,
       presentation: 'credential',
       tid: 'abcdef',
       total: 1,
@@ -80,6 +81,7 @@ describe('PayloadFrameAccumulator', () => {
       complete: false,
       received: 0,
       missingIndexes: [],
+      keyBindingJwt: null,
       presentation: null,
       tid: null,
       total: 0,
@@ -130,5 +132,44 @@ describe('PayloadFrameAccumulator', () => {
     expect(() =>
       accumulator.add(`FID1:P:abcdef:0/1:${oversizedChunk}`)
     ).toThrow('Invalid offline payload frame indexes.')
+  })
+
+  it('Should keep the newest key binding frame', () => {
+    const accumulator = new PayloadFrameAccumulator()
+
+    accumulator.add('FID1:P:abcdef:0/1:credential~')
+    accumulator.add('FID1:K:abcdef:old.kb.jwt')
+    const result = accumulator.add('FID1:K:abcdef:new.kb.jwt')
+
+    expect(result.keyBindingJwt).toBe('new.kb.jwt')
+    expect(result.presentation).toBe('credential~')
+  })
+
+  it('Should keep a key binding frame that arrives before any payload frame', () => {
+    const accumulator = new PayloadFrameAccumulator()
+
+    const first = accumulator.add('FID1:K:abcdef:h.p.s')
+    const second = accumulator.add('FID1:P:abcdef:0/1:credential~')
+
+    expect(first.complete).toBe(false)
+    expect(second.complete).toBe(true)
+    expect(second.keyBindingJwt).toBe('h.p.s')
+  })
+
+  it('Should drop the key binding frame when a new presentation begins', () => {
+    const accumulator = new PayloadFrameAccumulator()
+
+    accumulator.add('FID1:K:abcdef:h.p.s')
+    const result = accumulator.add('FID1:P:ghijkl:0/1:credential~')
+
+    expect(result.keyBindingJwt).toBeNull()
+  })
+
+  it('Should reject a key binding frame far larger than the wallet makes', () => {
+    const accumulator = new PayloadFrameAccumulator()
+
+    expect(() =>
+      accumulator.add(`FID1:K:abcdef:h.${'p'.repeat(1100)}.s`)
+    ).toThrow('Invalid offline key binding frame.')
   })
 })

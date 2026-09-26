@@ -1,7 +1,6 @@
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Exceptions;
-using Application.Common.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -371,9 +370,10 @@ public class CredentialsController : ControllerBase
     /// Prepares the citizen's offline credential package, minting it if none is stored or the stored one is stale.
     /// </summary>
     /// <param name="credentialId">The credential to prepare for offline presentation.</param>
+    /// <param name="request">The wallet's device public key, bound into the credential as cnf so only that phone can present it.</param>
     /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
     /// <response code="200">The offline package, ready to be cached on the device.</response>
-    /// <response code="400">The credential is not active.</response>
+    /// <response code="400">The credential is not active, or the device key is missing or not a valid P-256 public key.</response>
     /// <response code="403">The credential belongs to another citizen.</response>
     /// <response code="404">No credential with that id.</response>
     /// <response code="409">The credential cannot produce a presentation: missing a photograph, or the document has expired.</response>
@@ -386,7 +386,7 @@ public class CredentialsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-    public async Task<IActionResult> RequestOfflinePackage(Guid credentialId, CancellationToken cancellationToken)
+    public async Task<IActionResult> RequestOfflinePackage(Guid credentialId, [FromBody] OfflinePackageRequestDto request, CancellationToken cancellationToken)
     {
         var userIdClaim = User.FindFirst("userId")?.Value;
 
@@ -400,8 +400,7 @@ public class CredentialsController : ControllerBase
 
         try
         {
-            // deviceKey stays null until Phase 4, when the wallet sends its holder key and this becomes a POST.
-            var package = await _offlinePackageService.GetOrMintAsync(credentialId, userId, null, ipAddress, cancellationToken);
+            var package = await _offlinePackageService.GetOrMintAsync(credentialId, userId, request.DeviceKey.ToJwk(), ipAddress, cancellationToken);
 
             return Ok(package);
         }
@@ -428,6 +427,10 @@ public class CredentialsController : ControllerBase
         catch (OfflinePackageDocumentExpiredException opdee)
         {
             return StatusCode(503, new { error = opdee.Message });
+        }
+        catch (InvalidDeviceKeyException idke)
+        {
+            return BadRequest(new { error = idke.Message });
         }
     }
 
