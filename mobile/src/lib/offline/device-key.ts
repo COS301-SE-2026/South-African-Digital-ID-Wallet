@@ -70,7 +70,7 @@ export const loadDeviceSigner = async (): Promise<DeviceSigner> => {
   const secretKey = await getOrCreateSecretKey()
 
   // extraEntropy false gives RFC 6979 deterministic nonces, so signing never depends on the runtime providing crypto.getRandomValues,
-  // which Hermes does not guarentee.
+  // which Hermes does not guarantee.
   return (message) =>
     p256.sign(message, secretKey, { prehash: true, extraEntropy: false })
 }

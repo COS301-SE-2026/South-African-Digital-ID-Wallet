@@ -22,7 +22,8 @@ import type { IssuerKeysResponse, OfflinePackageResponse } from './types'
 // so keeping the old one would let a revoked or deleted credential be presented offline.
 const PERMANENT_PACKAGE_FAILURES = new Set([400, 403, 404])
 
-// The public key goes with every request: the backend binds the credential to it as cnf, and re-mints when it changes, for example after a reinstall.
+// The public key goes with every request: the backend binds the credential to it as cnf and re-mints when it changes.
+// On Android a reinstall create a new key. On iOS the Keychain usually keeps it across one.
 const requestOfflinePackage = async (
   credentialId: string
 ): Promise<OfflinePackageResponse> => {

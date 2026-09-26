@@ -73,7 +73,7 @@ jest.mock('@/lib/offline/offline-presentation', () => ({
 jest.mock('@/lib/offline/qr-frames', () => ({
   ...jest.requireActual('@/lib/offline/qr-frames'),
   splitPayloadFrames: jest.fn(() => [
-    { encoded: 'FID1:P:abcdef:0/2:first', tid: 'abcedf' },
+    { encoded: 'FID1:P:abcdef:0/2:first', tid: 'abcdef' },
     { encoded: 'FID1:P:abcdef:1/2:second', tid: 'abcdef' },
   ]),
 }))
