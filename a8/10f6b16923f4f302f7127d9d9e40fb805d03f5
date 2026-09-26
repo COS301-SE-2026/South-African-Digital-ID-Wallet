@@ -1,0 +1,20 @@
+web/src/components/molecules/authentic-result/authentic-result.tsx
+  h_0aff3b71f739b1 1-124
+web/src/components/molecules/index.ts
+  h_0aff3b71f739b1 31
+web/src/components/molecules/authentic-result/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/molecules/authentic-result/types.ts
+  h_0aff3b71f739b1 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a810f6b16923f4f302f7127d9d9e40fb805d03f5",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
