@@ -1,12 +1,17 @@
 import { useCallback, useEffect } from 'react'
 import { useRouter } from 'expo-router'
-import { QrCode } from 'lucide-react-native'
-import { ActivityIndicator, View } from 'react-native'
+import { FileBadge, QrCode } from 'lucide-react-native'
+import { ActivityIndicator, Alert, View } from 'react-native'
 
 import { Button, Text } from '@/components/atoms'
 import { CredentialDetailCard } from '@/components/organisms'
 import { DetailScreen } from '@/components/templates'
-import { useBiometricUnlock, useWalletCredential } from '@/hooks'
+import {
+  useBiometricUnlock,
+  useCertifiedCopy,
+  useWalletCredential,
+} from '@/hooks'
+import { resolveCertifiedCopyError } from '@/services/certified-copy-service'
 import { useAuthStore } from '@/stores/auth-store'
 import {
   isUnlockValid,
@@ -24,6 +29,7 @@ export const CredentialDetailPage = ({ id }: CredentialDetailPageProps) => {
   const unlockedAt = useCredentialUnlockStore((state) => state.unlockedAt)
   const unlockedId = useCredentialUnlockStore((state) => state.unlockedId)
   const { status, unlock } = useBiometricUnlock()
+  const { generate: generateCertifiedCopy, isGenerating } = useCertifiedCopy()
 
   const isUnlocked = isUnlockValid(id, unlockedId, unlockedAt)
 
@@ -41,6 +47,16 @@ export const CredentialDetailPage = ({ id }: CredentialDetailPageProps) => {
   }, [credential, grantUnlock, isUnlocked, router, status, unlock])
 
   const handleBack = useCallback(() => router.back(), [router])
+
+  const handleCertifiedCopy = useCallback(() => {
+    if (!credential) {
+      return
+    }
+    generateCertifiedCopy(credential.id, {
+      onError: (error) =>
+        Alert.alert('Certified copy failed', resolveCertifiedCopyError(error)),
+    })
+  }, [credential, generateCertifiedCopy])
 
   const holderName = [user?.names, user?.surname].filter(Boolean).join(' ')
 
@@ -79,6 +95,15 @@ export const CredentialDetailPage = ({ id }: CredentialDetailPageProps) => {
           })
         }
         testID="share-identity-button"
+      />
+      <Button
+        disabled={credential.status !== 'Active'}
+        isLoading={isGenerating}
+        label="Generate Certified Copy"
+        LeftIcon={FileBadge}
+        onPress={handleCertifiedCopy}
+        testID="certified-copy-button"
+        variant="secondary"
       />
     </DetailScreen>
   )
