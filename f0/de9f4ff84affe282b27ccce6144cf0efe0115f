@@ -1,0 +1,17 @@
+backend/FlashIdBackend/tests/OfflinePackageControllerIntegrationTests.cs
+  h_99fca60b892ff4 5,76-125,598-600,604-623,627-654,658-677,681-694,698-714,718-728,732-735
+  h_99fca60b892ff4 601-603,624-626,655-657,678-680,695-697,715-717,729-731,736-738
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_99fca60b892ff4 451-497
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f0de9f4ff84affe282b27ccce6144cf0efe0115f",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
