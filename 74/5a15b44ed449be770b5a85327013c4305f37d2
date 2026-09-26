@@ -1,0 +1,27 @@
+web/src/components/molecules/integrity-failed-result/types.ts
+  h_0aff3b71f739b1 1-4
+web/src/components/molecules/certified-copy-verification-progress/certified-copy-verification-progress.tsx
+  h_0aff3b71f739b1 36
+web/src/components/molecules/certified-copy-verification/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/molecules/verification-check/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/molecules/integrity-failed-result/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/molecules/authentic-result/authentic-result.tsx
+  h_0aff3b71f739b1 6,83,85-86,88,91-92,94,96,99
+  h_0aff3b71f739b1 58
+web/src/components/molecules/certified-copy-verification/types.ts
+  h_0aff3b71f739b1 1-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "745a15b44ed449be770b5a85327013c4305f37d2",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
