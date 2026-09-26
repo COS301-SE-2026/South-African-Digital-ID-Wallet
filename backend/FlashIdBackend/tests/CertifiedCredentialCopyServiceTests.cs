@@ -1,5 +1,8 @@
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
+using Application.Common.Mapping;
+using Application.Common.Services;
+using Microsoft.Extensions.Configuration;
 using Moq;
 
 namespace tests;
@@ -21,4 +24,25 @@ public class CertifiedCredentialCopyServiceTests
     private readonly Mock<ICertifiedCopyCryptographyProvider> _cryptographyProvider = new();
     private readonly Mock<ICertifiedCopyPdfProvider> _pdfProvider = new();
     private readonly Mock<IPhotoStorageProvider> _photoStorageProvider = new();
+
+    private CertifiedCredentialCopyService CreateService(string? frontendBaseUrl = FrontendBaseUrl)
+    {
+        var values = new Dictionary<string, string?>();
+
+        if (frontendBaseUrl is not null)
+        {
+            values["Activation:FrontendBaseUrl"] = frontendBaseUrl;
+        }
+
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(values).Build();
+
+        return new CertifiedCredentialCopyService(
+            _credentialRepository.Object,
+            _certifiedCopyRepository.Object,
+            _cryptographyProvider.Object,
+            _pdfProvider.Object,
+            new CertifiedCredentialSnapshotMapper(),
+            configuration,
+            _photoStorageProvider.Object);
+    }
 }
