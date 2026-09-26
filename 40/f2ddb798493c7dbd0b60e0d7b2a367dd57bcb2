@@ -1,0 +1,20 @@
+mobile/src/hooks/test/use-certified-copy.test.tsx
+  h_712d174fc3f309 1-95
+mobile/src/lib/test/pdf-file.test.ts
+  h_712d174fc3f309 1-126
+mobile/src/services/certified-copy-service/test/certified-copy-dto.test.ts
+  h_712d174fc3f309 1-47
+mobile/src/services/certified-copy-service/test/certified-copy-service.test.ts
+  h_712d174fc3f309 1-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "40f2ddb798493c7dbd0b60e0d7b2a367dd57bcb2",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
