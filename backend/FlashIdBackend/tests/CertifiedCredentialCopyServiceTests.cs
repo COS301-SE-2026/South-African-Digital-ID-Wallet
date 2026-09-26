@@ -150,4 +150,89 @@ public class CertifiedCredentialCopyServiceTests
 
         _cryptographyProvider.Setup(x => x.HashDocument(It.IsAny<byte[]>())).Returns(DocumentHash);
     }
+
+    [Fact]
+    public async Task GenerateAsync_ValidIdentityCredential_ReturnsPdfAndPersistsCertifiedCopy()
+    {
+        var userId = Guid.NewGuid();
+        var credential = CreateIdentityCredential(userId);
+
+        _credentialRepository.Setup(x => x.GetByIdAsync(credential.Id)).ReturnsAsync(credential);
+
+        SetupCryptography();
+
+        _photoStorageProvider.Setup(x => x.OpenReadAsync(credential.IdentityDocument!.PhotoPath, It.IsAny<CancellationToken>())).ReturnsAsync(new MemoryStream(PhotoBytes));
+
+        _pdfProvider.Setup(x => x.Generate(
+                It.IsAny<CertifiedCredentialSnapshot>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
+                It.IsAny<DateTime>(),
+                It.IsAny<byte[]?>())).Returns(PdfBytes);
+
+        CertifiedCredentialCopy? savedCopy = null;
+
+        _certifiedCopyRepository.Setup(x => x.AddAsync(It.IsAny<CertifiedCredentialCopy>()))
+            .Callback<CertifiedCredentialCopy>(copy => savedCopy = copy).Returns(Task.CompletedTask);
+
+        _certifiedCopyRepository.Setup(x => x.SaveChangesAsync()).Returns(Task.CompletedTask);
+
+        var service = CreateService();
+
+        var result = await service.GenerateAsync(credential.Id, userId);
+
+        Assert.NotNull(savedCopy);
+        Assert.Equal(PdfBytes, result.PdfBytes);
+        Assert.Equal(savedCopy!.Id, result.CertifiedCopyId);
+        Assert.Equal(credential.Id, savedCopy.CredentialId);
+        Assert.Equal(credential.CitizenId, savedCopy.CitizenId);
+        Assert.Equal(VerificationTokenHash, savedCopy.VerificationTokenHash);
+        Assert.Equal(SnapshotHash, savedCopy.CredentialSnapshotHash);
+        Assert.Equal(DocumentHash, savedCopy.DocumentHash);
+        Assert.Equal(CertifiedCopyStatus.Active, savedCopy.Status);
+        Assert.Null(savedCopy.ExpiresAt);
+        Assert.Null(savedCopy.RevokedAt);
+        Assert.Contains("Identity-Document", result.FileName);
+        Assert.EndsWith(".pdf", result.FileName);
+
+        _certifiedCopyRepository.Verify(x => x.AddAsync(It.IsAny<CertifiedCredentialCopy>()), Times.Once);
+        _certifiedCopyRepository.Verify(x => x.SaveChangesAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task GenerateAsync_ValidDriversLicense_ReturnsPdf()
+    {
+        var userId = Guid.NewGuid();
+
+        var credential = CreateDriversLicenseCredential(userId);
+
+        _credentialRepository.Setup(x => x.GetByIdAsync(credential.Id)).ReturnsAsync(credential);
+
+        SetupCryptography();
+
+        _photoStorageProvider.Setup(x => x.OpenReadAsync(credential.DriversLicense!.PhotoPath, It.IsAny<CancellationToken>())).ReturnsAsync(new MemoryStream(PhotoBytes));
+
+        _pdfProvider.Setup(x => x.Generate(
+                It.Is<CertifiedCredentialSnapshot>(snapshot => snapshot.CredentialType == "DriversLicense"),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
+                It.IsAny<DateTime>(),
+                It.IsAny<byte[]?>())).Returns(PdfBytes);
+
+        _certifiedCopyRepository.Setup(x => x.AddAsync(It.IsAny<CertifiedCredentialCopy>())).Returns(Task.CompletedTask);
+
+        _certifiedCopyRepository.Setup(x => x.SaveChangesAsync()).Returns(Task.CompletedTask);
+
+        var service = CreateService();
+
+        var result = await service.GenerateAsync(credential.Id, userId);
+
+        Assert.Equal(PdfBytes, result.PdfBytes);
+
+        Assert.Contains("Drivers-License", result.FileName);
+
+        _pdfProvider.Verify(x => x.Generate(It.Is<CertifiedCredentialSnapshot>(snapshot => snapshot.LicenseNumber == "DL123456" && snapshot.LicenseCode == "B"),
+                It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<byte[]?>()), Times.Once);
+    }
+
 }
