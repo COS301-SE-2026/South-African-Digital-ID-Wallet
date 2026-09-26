@@ -1,0 +1,20 @@
+mobile/src/components/utility/index.ts
+  h_99fca60b892ff4 4
+mobile/src/app/_layout.tsx
+  h_99fca60b892ff4 14,51
+mobile/src/components/utility/test/offline-verification-sync.test.tsx
+  h_99fca60b892ff4 1-76
+mobile/src/components/utility/offline-verification-sync.tsx
+  h_99fca60b892ff4 1-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4f7462c26c4610606e40b48d7a5550bba23c6c3c",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
