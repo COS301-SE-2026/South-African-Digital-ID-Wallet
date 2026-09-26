@@ -33,7 +33,7 @@ export function CertifiedCopyVerificationProgress({
   currentStep,
 }: Readonly<CertifiedCopyVerificationProgressProps>) {
   return (
-    <div className="w-full max-w-xl">
+    <div className="flex w-full max-w-xl flex-col">
       <div className="mb-6">
         <Text
           as="h2"

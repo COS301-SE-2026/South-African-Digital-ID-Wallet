@@ -3,7 +3,7 @@ import {
   FileText,
   ShieldCheck,
 } from 'lucide-react'
-import { Text } from '@/components/atoms'
+import { Button, Text } from '@/components/atoms'
 import { VerificationCheck } from '../verification-check'
 import type { AuthenticResultProps } from './types'
 
@@ -55,10 +55,7 @@ export function AuthenticResult({
             <FileText className="h-6 w-6" />
           </div>
           <div className="min-w-0 flex-1">
-            <Text
-              variant="sub-sm"
-              className="font-bold text-deep-green"
-            >
+            <Text variant="sub-sm" className="font-bold text-deep-green">
               South African Identity Document
             </Text>
             <div className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
@@ -83,26 +80,27 @@ export function AuthenticResult({
         </div>
       </div>
       <div className="mt-5 flex flex-col gap-3">
-        <button
+        <Button
           type="button"
+          variant="primary"
+          LeftIcon={ShieldCheck}
           onClick={onViewCredentialDetails}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-deep-green px-5 text-sm font-semibold text-clean-white transition-colors hover:bg-primary-green"
+          className="!h-11 !w-full rounded-xl px-5"
         >
-          <ShieldCheck className="h-4 w-4" />
           View Credential Details
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="secondary"
           onClick={onVerifyAnotherDocument}
-          className="inline-flex h-11 items-center justify-center rounded-xl border border-deep-green px-5 text-sm font-semibold text-deep-green transition-colors hover:bg-primary-green/5"
+          className="!h-11 !w-full rounded-xl px-5"
         >
           Verify Another Document
-        </button>
+        </Button>
       </div>
     </div>
   )
 }
-
 function DetailRow({
   label,
   value,
