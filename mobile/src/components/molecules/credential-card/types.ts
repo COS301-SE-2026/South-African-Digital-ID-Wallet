@@ -1,11 +1,19 @@
-import type { CredentialTone } from '@/theme/credential-tones'
+import type { LucideIcon } from 'lucide-react-native'
 
 export type CredentialCardProps = {
   height: number
-  isVerified?: boolean
+  hint?: string
+  Icon: LucideIcon
   issuedBy: string
   onPress?: () => void
   testID?: string
   title: string
-  tone: CredentialTone
+}
+
+export type CredentialPatternIcon = {
+  opacity: number
+  right: number
+  size: number
+  strong?: boolean
+  top: number
 }
