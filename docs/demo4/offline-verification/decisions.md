@@ -331,6 +331,95 @@ unaffected, since they always cover the exact bytes sent. Raised in review on PR
 
 ---
 
+### D-022 The device key is required on every offline package request
+
+**Status:** Accepted, 2026-09-26
+
+**Context.** Phase 4 made the device key optional so that Emergency QR could mint unbound packages. Review on PR #559 showed that a request without a key re-minted a bound package without `cnf`. Anyone holding a citizen's session could therefore downgrade the credential to one that verifies without key binding, and the wallet and Emergency QR would keep re-minting each other's packages.
+
+**Decision.** `POST /api/credentials/{id}/offline-package` requires `deviceKey`. A missing or invalid key is refused with 400 and nothing is stored. Emergency QR gets its own minting path and claim set, minted without `cnf`.
+
+**Alternatives.** Keeping the key optional and auditing unbound mints. Rejected: the downgrade would still happen and only be noticed afterwards. Refusing a keyless request only when the credential is already bound. Rejected: the first mint could still be unbound.
+
+**Consequences.** A phone cannot present offline until it has sent its key once (D-027). Emergency QR codes still verify, because the verifier requires key binding only when `cnf` is present.
+
+---
+
+### D-023 Key binding freshness: 30 seconds with 60 seconds of clock skew
+
+**Status:** Accepted, 2026-09-26
+
+**Context.** A single QR scan is one-way, so the verifier cannot send the wallet a challenge to sign. Freshness can only be judged from the signing time, and both phones are offline, so their clocks drift and cannot be corrected.
+
+**Decision.** The wallet re-signs the Key Binding JWT every 5 seconds while the code is showing. The verifier accepts an `iat` at most 30 seconds old, with 60 seconds of skew either way. On a bound code the scanner waits at most 4 seconds for a K frame, longer than one full display cycle, and then verifies without one, so the officer sees `MISSING_KEY_BINDING` rather than a scanner stuck at N of N.
+
+**Alternatives.** A tighter window, such as 15 seconds with 30 of skew. Rejected: honest scans from phones with drifting clocks would fail. A verifier challenge over Bluetooth, which removes the window entirely. Deferred with the BLE stretch goal (D-002).
+
+**Consequences.** A recording replayed within about 90 seconds can still verify, a stated deviation (wire-format section 11). The portrait check still applies. Measured on two phones on 2026-09-25: a recording replayed straight away verified, and the same recording replayed after 2 minutes was rejected with `STALE_PRESENTATION`.
+
+---
+
+### D-024 Offline QR frames use error correction level L at 280 px
+
+**Status:** Accepted, 2026-09-26
+
+**Context.** An offline frame carries about 470 bytes. At the library default, level M, in a 236 px code, the modules are small and cycle at 8 frames per second. Offline frames already drop the centre logo, which is what level M's extra redundancy was covering.
+
+**Decision.** Offline frames render at error correction level L and 280 px. The online code keeps level M, the logo and 236 px.
+
+**Alternatives.** Keeping level M. Rejected: smaller modules for redundancy nothing uses. Smaller frames. Rejected: more frames and a longer scan (D-019).
+
+**Consequences.** Larger modules for the same data. Measured on an S23 showing and an S24 scanning: a bound licence code of 28 frames scans in about 4.2 seconds. A budget phone as the scanner is still unmeasured. Raised in review on PR #558.
+
+---
+
+### D-025 The revocation list is a signed JWS of revocation indexes
+
+**Status:** Accepted, 2026-09-26
+
+**Context.** A verifier with no signal must still refuse a credential that was revoked after the package was issued. The only credential identifier in a presentation is the revocation index (D-012).
+
+**Decision.** `GET /api/credentials/revocation-list` returns a compact JWS with `typ` `revocation-list+jwt`, signed by the credential key. Its payload holds `iss`, `iat`, `next_update` (24 hours later) and `revoked`: the revocation index of every credential whose status is not `Active`. The verifier fetches it with the issuer keys and stores it only when it verifies against those keys. A list that fails is ignored and the last verified list stays.
+
+**Alternatives.** A status list bitstring (IETF Token Status List). Rejected for the prototype: more code for a list that stays small. Plain JSON over TLS. Rejected: it would be trusted only at download time, and a stored copy could be edited on the phone.
+
+**Consequences.** A revocation reaches a verifier only when that verifier next refreshes online. The age warnings in wire-format section 10, step 12, cover this. `Investigation`, `Inactive` and `Expired` are refused offline as well as `Revoked`. The list grows by one integer per such credential.
+
+---
+
+### D-026 Offline scans are uploaded as audit rows keyed by the phone's id
+
+**Status:** Accepted, 2026-09-26
+
+**Context.** A scan made offline is not recorded anywhere, yet the audit trail must show who checked a credential and when. The phone's clock cannot be trusted after days offline, and an upload interrupted by lost signal will be retried.
+
+**Decision.** The verifier's phone queues each result in the encrypted offline cache and uploads it to `POST /api/credentials/offline-verifications` in batches of up to 100: straight away when online, otherwise at sign-in, when signal returns and when the app returns to the foreground. The id each entry gets on the phone becomes the audit row's primary key, so a retried upload is recorded once. Rows use the new event types `OfflineCredentialVerified` and `OfflineVerificationRejected`, keep the phone's scan time in `Details` and the server's receipt time in `CreatedAt`. Only a verified scan carries a revocation index and is linked to a credential and citizen.
+
+**Alternatives.** A separate table with a unique client id. Rejected: a migration during the sprint for no gain over the primary key. Linking failed scans to a citizen too. Rejected: a failed scan may carry a forged index, which would let anyone fill a citizen's history with fake rejections.
+
+**Consequences.** No migration: event types are stored as strings. Any signed-in user may upload entries, as with online `POST /resolve`, and every row records the uploader. The queue is wiped on sign-out so one user's scans are never uploaded under another's account, which means scans still queued when a verifier signs out while offline are lost. The queue is capped at 1,000 entries. Citizen notifications after sync were cut for time.
+
+---
+
+### D-027 Changing or losing a phone
+
+**Status:** Accepted, 2026-09-26
+
+**Context.** Holder binding ties each offline package to the phone that requested it (D-005, D-022), and the private key never leaves that phone.
+
+**Decision.** These are accepted as limitations of the prototype:
+
+- A new or reset phone cannot present offline until it has been online once, because its key is generated on that phone and the package is re-minted around it (D-007). On Android a reinstall creates a new key; on iOS the Keychain usually keeps the old one.
+- Signing out wipes the offline cache, including packages. A lost phone that is still signed in keeps a working package until it expires, at most 30 days and re-minted weekly (D-007). Presenting it still needs the device biometric check.
+- The compensating control for a lost phone is revoking the credential: verifiers refuse it offline once they refresh their revocation list (D-025).
+- A verifier needs cached issuer keys and a revocation list regardless of whose credential it scans, so a verifier's own phone change needs one online refresh too.
+
+**Alternatives.** Remote wipe of a lost phone. Rejected: nothing can reach an offline phone, which is the scenario this feature exists for.
+
+**Consequences.** Demo phones must each be online once before the offline part of the demo.
+
+---
+
 ## Open questions
 
 | Id | Question | Owner | Status |
