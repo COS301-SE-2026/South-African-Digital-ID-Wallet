@@ -52,9 +52,9 @@ export const CredentialCard = ({
       pointerEvents="none"
       testID={testID ? `${testID}-pattern` : undefined}
     >
-      {CREDENTIAL_PATTERN.map((item, index) => (
+      {CREDENTIAL_PATTERN.map((item) => (
         <View
-          key={index}
+          key={`${item.right}-${item.top}`}
           style={{
             opacity: item.opacity,
             position: 'absolute',

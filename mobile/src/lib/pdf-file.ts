@@ -1,4 +1,4 @@
-import { File, Paths } from 'expo-file-system'
+import { Directory, File, Paths } from 'expo-file-system'
 import { startActivityAsync } from 'expo-intent-launcher'
 import * as Sharing from 'expo-sharing'
 import { Platform } from 'react-native'
@@ -7,15 +7,32 @@ const PDF_MIME_TYPE = 'application/pdf'
 const PDF_UTI = 'com.adobe.pdf'
 const ANDROID_VIEW_ACTION = 'android.intent.action.VIEW'
 const FLAG_GRANT_READ_URI_PERMISSION = 1
+const CERTIFIED_COPY_DIRECTORY = 'certified-copies'
+
+const certifiedCopyDirectory = () =>
+  new Directory(Paths.cache, CERTIFIED_COPY_DIRECTORY)
+
+export const clearCertifiedCopies = (): void => {
+  const directory = certifiedCopyDirectory()
+  if (directory.exists) {
+    directory.delete()
+  }
+}
 
 export const savePdf = (bytes: Uint8Array, fileName: string): File => {
-  const file = new File(Paths.cache, fileName)
-  if (file.exists) {
-    file.delete()
-  }
+  clearCertifiedCopies()
+  const directory = certifiedCopyDirectory()
+  directory.create({ idempotent: true, intermediates: true })
+  const file = new File(directory, fileName)
   file.create()
   file.write(bytes)
   return file
+}
+
+export const deletePdf = (file: File): void => {
+  if (file.exists) {
+    file.delete()
+  }
 }
 
 const sharePdf = async (file: File): Promise<void> => {
@@ -38,7 +55,9 @@ export const openPdf = async (file: File): Promise<void> => {
         type: PDF_MIME_TYPE,
       })
       return
-    } catch {}
+    } catch (error) {
+      console.warn('No PDF viewer, falling back to share', error)
+    }
   }
   await sharePdf(file)
 }

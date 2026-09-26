@@ -97,7 +97,7 @@ export const CredentialDetailPage = ({ id }: CredentialDetailPageProps) => {
         testID="share-identity-button"
       />
       <Button
-        disabled={!credential.isVerified}
+        disabled={credential.status !== 'Active'}
         isLoading={isGenerating}
         label="Generate Certified Copy"
         LeftIcon={FileBadge}
