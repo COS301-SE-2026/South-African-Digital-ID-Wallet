@@ -36,7 +36,7 @@ public class CertifiedCopyCryptographyProviderTests
 
         Assert.Equal(first, second);
     }
-    
+
     [Fact]
     public void HashVerificationToken_DifferentTokens_ReturnDifferentHashes()
     {
@@ -66,7 +66,7 @@ public class CertifiedCopyCryptographyProviderTests
 
         Assert.Equal(first, second);
     }
-    
+
     [Fact]
     public void HashDocument_ChangedBytes_ReturnsDifferentHash()
     {

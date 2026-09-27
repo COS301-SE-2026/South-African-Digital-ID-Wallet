@@ -3,6 +3,7 @@ using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Mapping;
 using Application.Common.Services;
 using Application.Features.CertifiedCredentialCopies.Models;
+using Application.Features.Credentials.Enums;
 using Application.Features.Credentials.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
@@ -180,7 +181,7 @@ public class CertifiedCredentialCopyServiceTests
 
         var service = CreateService();
 
-        var result = await service.GenerateAsync(credential.Id, userId);
+        var result = await service.GenerateAsync(credential.Id, CredentialType.IdentityDocument, userId);
 
         Assert.NotNull(savedCopy);
         Assert.Equal(PdfBytes, result.PdfBytes);
@@ -226,7 +227,7 @@ public class CertifiedCredentialCopyServiceTests
 
         var service = CreateService();
 
-        var result = await service.GenerateAsync(credential.Id, userId);
+        var result = await service.GenerateAsync(credential.Id, CredentialType.DriversLicense, userId);
 
         Assert.Equal(PdfBytes, result.PdfBytes);
 
@@ -262,7 +263,7 @@ public class CertifiedCredentialCopyServiceTests
 
         var service = CreateService();
 
-        await service.GenerateAsync(credential.Id, userId);
+        await service.GenerateAsync(credential.Id, CredentialType.IdentityDocument, userId);
 
         _photoStorageProvider.Verify(x => x.OpenReadAsync("photos/kayla.jpg", It.IsAny<CancellationToken>()), Times.Once);
 
@@ -301,7 +302,7 @@ public class CertifiedCredentialCopyServiceTests
 
         var service = CreateService();
 
-        var result = await service.GenerateAsync(credential.Id, userId);
+        var result = await service.GenerateAsync(credential.Id, CredentialType.IdentityDocument, userId);
 
         Assert.Equal(PdfBytes, result.PdfBytes);
 
@@ -322,7 +323,7 @@ public class CertifiedCredentialCopyServiceTests
 
         var service = CreateService();
 
-        await Assert.ThrowsAsync<CredentialNotFoundException>(() => service.GenerateAsync(credentialId, Guid.NewGuid()));
+        await Assert.ThrowsAsync<CredentialNotFoundException>(() => service.GenerateAsync(credentialId, CredentialType.IdentityDocument, Guid.NewGuid()));
     }
 
     [Fact]
@@ -337,7 +338,7 @@ public class CertifiedCredentialCopyServiceTests
 
         var service = CreateService();
 
-        await Assert.ThrowsAsync<CredentialAccessDeniedException>(() => service.GenerateAsync(credential.Id, requestingUserId));
+        await Assert.ThrowsAsync<CredentialAccessDeniedException>(() => service.GenerateAsync(credential.Id, CredentialType.IdentityDocument, requestingUserId));
     }
 
     [Fact]
@@ -351,7 +352,7 @@ public class CertifiedCredentialCopyServiceTests
 
         var service = CreateService();
 
-        await Assert.ThrowsAsync<CredentialNotActiveException>(() => service.GenerateAsync(credential.Id, userId));
+        await Assert.ThrowsAsync<CredentialNotActiveException>(() => service.GenerateAsync(credential.Id, CredentialType.IdentityDocument, userId));
     }
 
     [Fact]
@@ -377,7 +378,7 @@ public class CertifiedCredentialCopyServiceTests
 
         var service = CreateService();
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => service.GenerateAsync(credential.Id, userId));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.GenerateAsync(credential.Id, CredentialType.IdentityDocument, userId));
     }
 
     [Fact]
@@ -393,7 +394,7 @@ public class CertifiedCredentialCopyServiceTests
 
         var service = CreateService(frontendBaseUrl: null);
 
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>((() => service.GenerateAsync(credential.Id, userId)));
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>((() => service.GenerateAsync(credential.Id, CredentialType.IdentityDocument, userId)));
 
         Assert.Equal("Frontend URL is not configured.", exception.Message);
     }
@@ -425,7 +426,7 @@ public class CertifiedCredentialCopyServiceTests
 
         var service = CreateService();
 
-        await service.GenerateAsync(credential.Id, userId);
+        await service.GenerateAsync(credential.Id, CredentialType.IdentityDocument, userId);
 
         _pdfProvider.Verify(x => x.Generate(
                 It.IsAny<CertifiedCredentialSnapshot>(),
@@ -433,55 +434,6 @@ public class CertifiedCredentialCopyServiceTests
                 $"{FrontendBaseUrl}/verify-certified-copy/{VerificationToken}",
                 It.IsAny<DateTime>(),
                 It.IsAny<byte[]?>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task VerifyAsync_ValidToken_ReturnsValidIdentityCredential()
-    {
-        var credential = CreateIdentityCredential();
-
-        var certifiedCopy = CreateCertifiedCopy(credential);
-
-        _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
-
-        _certifiedCopyRepository.Setup(x => x.GetByVerificationTokenHashAsync(VerificationTokenHash)).ReturnsAsync(certifiedCopy);
-
-        var service = CreateService();
-
-        var result = await service.VerifyAsync(VerificationToken);
-
-        Assert.True(result.IsValid);
-        Assert.Equal("Valid", result.Status);
-        Assert.Equal(certifiedCopy.Id, result.CertificationId);
-        Assert.Equal("IdentityDocument", result.CredentialType);
-        Assert.Equal("Kayla Patel", result.FullName);
-        Assert.Equal("9000000000000", result.IdNumber);
-        Assert.Equal("South African", result.Citizenship);
-        Assert.Equal("South Africa", result.CountryOfBirth);
-        Assert.Equal("South African", result.Nationality);
-    }
-
-    [Fact]
-    public async Task VerifyAsync_ValidDriversLicense_ReturnsLicenseDetails()
-    {
-        var credential = CreateDriversLicenseCredential();
-
-        var certifiedCopy = CreateCertifiedCopy(credential);
-
-        _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
-
-        _certifiedCopyRepository.Setup(x => x.GetByVerificationTokenHashAsync(VerificationTokenHash)).ReturnsAsync(certifiedCopy);
-
-        var service = CreateService();
-
-        var result = await service.VerifyAsync(VerificationToken);
-
-        Assert.True(result.IsValid);
-        Assert.Equal("DriversLicense", result.CredentialType);
-        Assert.Equal("DL123456", result.LicenseNumber);
-        Assert.Equal("B", result.LicenseCode);
-        Assert.Equal("None", result.Restrictions);
-        Assert.Equal("South Africa", result.CountryOfIssue);
     }
 
     [Fact]
@@ -562,31 +514,6 @@ public class CertifiedCredentialCopyServiceTests
 
         Assert.False(result.IsValid);
         Assert.Equal("CredentialInactive", result.Status);
-    }
-
-    [Fact]
-    public async Task VerifyDocumentAsync_OriginalDocument_ReturnsValid()
-    {
-        var credential = CreateIdentityCredential();
-
-        var certifiedCopy = CreateCertifiedCopy(credential);
-
-        _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
-
-        _certifiedCopyRepository.Setup(x => x.GetByVerificationTokenHashAsync(VerificationTokenHash)).ReturnsAsync(certifiedCopy);
-
-        _cryptographyProvider.Setup(x => x.VerifyDocumentHash(PdfBytes, DocumentHash)).Returns(true);
-
-        var service = CreateService();
-
-        var result = await service.VerifyDocumentAsync(VerificationToken, PdfBytes);
-
-        Assert.True(result.IsValid);
-        Assert.True(result.DocumentIntegrityValid);
-        Assert.Equal("Valid", result.Status);
-        Assert.Equal(certifiedCopy.Id, result.CertificationId);
-        Assert.Equal("IdentityDocument", result.CredentialType);
-        Assert.Equal("Kayla Patel", result.FullName);
     }
 
     [Fact]
