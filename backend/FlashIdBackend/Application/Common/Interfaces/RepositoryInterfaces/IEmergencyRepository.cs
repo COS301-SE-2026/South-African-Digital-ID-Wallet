@@ -19,4 +19,16 @@ public interface IEmergencyRepository
     Task AddAccessAsync(EmergencyAccess access, CancellationToken ct);
     Task AddProfileAsync(EmergencyProfile profile, CancellationToken ct);
     Task SaveChangesAsync(CancellationToken ct);
+
+    Task<int> NextRevocationIndexAsync(CancellationToken ct);
+
+    Task<bool> TrySaveChangesAsync(CancellationToken ct);
+
+    Task AddRetiredRevocationIndexAsync(RetiredEmergencyRevocationIndex retired, CancellationToken ct);
+
+    Task<EmergencyProfile?> GetProfileByRevocationIndexAsync(int revocationIndex, CancellationToken ct);
+
+    Task<bool> AccessExistsAsync(Guid accessId, CancellationToken ct);
+
+    Task<Official?> GetOfficialAsync(Guid userId, CancellationToken ct);
 }

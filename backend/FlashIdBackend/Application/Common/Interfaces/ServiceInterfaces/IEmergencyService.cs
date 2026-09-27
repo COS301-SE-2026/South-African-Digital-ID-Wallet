@@ -16,4 +16,7 @@ public interface IEmergencyService
 
     Task<OfflineCredentialResponseDto> BuildOfflineCredentialAsync(Guid userId, CancellationToken ct);
     Task<List<EmergencyAccessDto>> GetMyAccessHistoryAsync(Guid userId, CancellationToken ct);
+
+    Task RecordOfflineAccessAsync(
+        RecordOfflineEmergencyAccessRequestDto request, Guid responderUserId, string ipAddress, CancellationToken ct);
 }

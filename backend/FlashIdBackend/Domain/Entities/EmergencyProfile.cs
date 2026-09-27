@@ -21,6 +21,8 @@ public class EmergencyProfile : BaseEntity
 
     public DateTime? MedicalLastUpdatedAt { get; set; }
 
+    public int? RevocationIndex { get; set; }
+
     public ICollection<EmergencyContact> Contacts { get; set; } = new List<EmergencyContact>();
     public ICollection<EmergencyAccess> Accesses { get; set; } = new List<EmergencyAccess>();
 }

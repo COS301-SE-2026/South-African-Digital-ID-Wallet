@@ -74,10 +74,19 @@ public record EmergencyProfileResponseDto
     public DateTime AccessedAt { get; init; }
 }
 
+public record RecordOfflineEmergencyAccessRequestDto
+{
+    public Guid Id { get; init; }
+    public int RevocationIndex { get; init; }
+    public string Justification { get; init; } = string.Empty;
+    public long AccessedAt { get; init; }
+    public double? Latitude { get; init; }
+    public double? Longitude { get; init; }
+}
+
 public record OfflineCredentialResponseDto
 {
-    public string Payload { get; init; } = string.Empty;
-    public string Signature { get; init; } = string.Empty;
+    public string SdJwt { get; init; } = string.Empty;
     public DateTime ExpiresAt { get; init; }
 }
 
