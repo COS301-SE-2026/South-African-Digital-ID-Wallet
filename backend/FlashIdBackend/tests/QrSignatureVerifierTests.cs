@@ -182,4 +182,62 @@ public class QrSignatureVerifierTests
 
         Assert.False(result);
     }
+
+    [Fact]
+    public async Task VerifyAsync_JwkCoordinatesNotStrings_ReturnsFalse()
+    {
+        var repo = new FakeSigningKeyRepository();
+        var (key, _) = CreateActiveKey();
+        key.PublicKeyJwk = JsonSerializer.Serialize(new { crv = "P-256", x = 123, y = 456 });
+        repo.KeyToReturn = key;
+        var verifier = new QrSignatureVerifier(repo);
+
+        var result = await verifier.VerifyAsync(key.Kid, key.Algorithm, "data"u8.ToArray(), new byte[64], CancellationToken.None);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task VerifyAsync_JwkNotAnObject_ReturnsFalse()
+    {
+        var repo = new FakeSigningKeyRepository();
+        var (key, _) = CreateActiveKey();
+        key.PublicKeyJwk = "[1,2,3]";
+        repo.KeyToReturn = key;
+        var verifier = new QrSignatureVerifier(repo);
+
+        var result = await verifier.VerifyAsync(key.Kid, key.Algorithm, "data"u8.ToArray(), new byte[64], CancellationToken.None);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task VerifyAsync_JwkCoordinatesNotBase64Url_ReturnsFalse()
+    {
+        var repo = new FakeSigningKeyRepository();
+        var (key, _) = CreateActiveKey();
+        key.PublicKeyJwk = JsonSerializer.Serialize(new { crv = "P-256", x = "!!!not-base64!!!", y = "!!!not-base64!!!" });
+        repo.KeyToReturn = key;
+        var verifier = new QrSignatureVerifier(repo);
+
+        var result = await verifier.VerifyAsync(key.Kid, key.Algorithm, "data"u8.ToArray(), new byte[64], CancellationToken.None);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task VerifyAsync_JwkCoordinatesInvalidForCurve_ReturnsFalse()
+    {
+        var repo = new FakeSigningKeyRepository();
+        var (key, _) = CreateActiveKey();
+        var x = Base64Url.EncodeToString(new byte[32]);
+        var y = Base64Url.EncodeToString(new byte[16]);
+        key.PublicKeyJwk = JsonSerializer.Serialize(new { crv = "P-256", x, y });
+        repo.KeyToReturn = key;
+        var verifier = new QrSignatureVerifier(repo);
+
+        var result = await verifier.VerifyAsync(key.Kid, key.Algorithm, "data"u8.ToArray(), new byte[64], CancellationToken.None);
+
+        Assert.False(result);
+    }
 }
