@@ -7,6 +7,7 @@ import {
   getBiometricPreference,
   loadSession,
 } from '@/lib/secure-session'
+import { clearOfflineCache } from '@/lib/offline/offline-cache'
 
 jest.mock('@/lib/secure-session', () => ({
   clearSession: jest.fn(),
@@ -27,6 +28,10 @@ jest.mock('@/lib/api', () => ({
   default: { post: jest.fn() },
   setAuthToken: jest.fn(),
   setDeviceToken: jest.fn(),
+}))
+
+jest.mock('@/lib/offline/offline-cache', () => ({
+  clearOfflineCache: jest.fn().mockResolvedValue(undefined),
 }))
 
 const session: LoginResponse = {
@@ -76,6 +81,17 @@ describe('useAuthStore', () => {
       expiresAt: null,
     })
     expect(setAuthToken).toHaveBeenLastCalledWith(null)
+  })
+  it('Should delete the offline cache on sign out', () => {
+    useAuthStore.getState().signIn(session)
+    useAuthStore.getState().signOut()
+    expect(clearOfflineCache).toHaveBeenCalledTimes(1)
+  })
+  it('Should still sign out when the offline cache cannot be deleted', () => {
+    ;(clearOfflineCache as jest.Mock).mockRejectedValueOnce(new Error('disk'))
+    useAuthStore.getState().signIn(session)
+    useAuthStore.getState().signOut()
+    expect(useAuthStore.getState().isAuthenticated).toBe(false)
   })
 })
 
@@ -140,5 +156,24 @@ describe('useAuthStore.restore', () => {
     await useAuthStore.getState().restore()
     expect(clearSession).toHaveBeenCalled()
     expect(useAuthStore.getState().isAuthenticated).toBe(false)
+  })
+  it('Should delete the offline cache when a stored session is discarded', async () => {
+    ;(loadSession as jest.Mock).mockResolvedValue({
+      expiresAt: '2020-01-01T00:00:00Z',
+      token: 'stale',
+      user: session,
+    })
+    await useAuthStore.getState().restore()
+    expect(clearOfflineCache).toHaveBeenCalledTimes(1)
+  })
+  it('Should keep the offline cache when a live session is restored', async () => {
+    ;(getBiometricPreference as jest.Mock).mockResolvedValue(true)
+    ;(loadSession as jest.Mock).mockResolvedValue({
+      expiresAt: '2099-01-01T00:00:00Z',
+      token: 'jwt-token',
+      user: session,
+    })
+    await useAuthStore.getState().restore()
+    expect(clearOfflineCache).not.toHaveBeenCalled()
   })
 })

@@ -17,8 +17,16 @@ public class LocalEs256SigningProviderTests
     // Each test generates a fresh key at runtime, so no private key is ever committed.
     private static string NewPrivateKey(ECCurve curve)
     {
-        using var key = ECDsa.Create(curve);
-        return Convert.ToBase64String(key.ExportPkcs8PrivateKey());
+        try
+        {
+            using var key = ECDsa.Create(curve);
+            return Convert.ToBase64String(key.ExportPkcs8PrivateKey());
+        }
+        catch (PlatformNotSupportedException)
+        {
+            Assert.Skip($"Curve {curve.Oid.FriendlyName ?? curve.Oid.Value} is not supported by this platform's crypto provider.");
+            throw;
+        }
     }
 
     private static IConfiguration CreateConfiguration(string? kid, string? privateKey)
@@ -150,55 +158,56 @@ public class LocalEs256SigningProviderTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void Constructor_MissingOrBlankPrivateKey_ThrowsInvalidOperationException(string? privateKey)
+    public async Task GetActiveKeyAsync_MissingOrBlankPrivateKey_ThrowsInvalidOperationException(string? privateKey)
     {
-        var config = CreateConfiguration(Kid, privateKey);
+        var provider = new LocalEs256SigningProvider(CreateConfiguration(Kid, privateKey));
 
-        Assert.Throws<InvalidOperationException>(() => new LocalEs256SigningProvider(config));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => provider.GetActiveKeyAsync(TestContext.Current.CancellationToken));
     }
 
     [Theory]
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void Constructor_MissingOrBlankKid_ThrowsInvalidOperationException(string? kid)
+    public async Task GetActiveKeyAsync_MissingOrBlankKid_ThrowsInvalidOperationException(string? kid)
     {
-        var config = CreateConfiguration(kid, NewPrivateKey(ECCurve.NamedCurves.nistP256));
+        var provider = new LocalEs256SigningProvider(CreateConfiguration(kid, NewPrivateKey(ECCurve.NamedCurves.nistP256)));
 
-        Assert.Throws<InvalidOperationException>(() => new LocalEs256SigningProvider(config));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => provider.GetActiveKeyAsync(TestContext.Current.CancellationToken));
     }
 
     [Fact]
-    public void Constructor_InvalidBase64_ThrowsFormatException()
+    public async Task GetActiveKeyAsync_InvalidBase64_ThrowsFormatException()
     {
-        var config = CreateConfiguration(Kid, "not base64!");
+        var provider = new LocalEs256SigningProvider(CreateConfiguration(Kid, "not base64!"));
 
-        Assert.Throws<FormatException>(() => new LocalEs256SigningProvider(config));
+        await Assert.ThrowsAsync<FormatException>(() => provider.GetActiveKeyAsync(TestContext.Current.CancellationToken));
     }
 
     [Fact]
-    public void Constructor_P384Key_ThrowsInvalidOperationException()
+    public async Task GetActiveKeyAsync_P384Key_ThrowsInvalidOperationException()
     {
-        var config = CreateConfiguration(Kid, NewPrivateKey(ECCurve.NamedCurves.nistP384));
+        var provider = new LocalEs256SigningProvider(CreateConfiguration(Kid, NewPrivateKey(ECCurve.NamedCurves.nistP384)));
 
-        Assert.Throws<InvalidOperationException>(() => new LocalEs256SigningProvider(config));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => provider.GetActiveKeyAsync(TestContext.Current.CancellationToken));
     }
 
     [Fact]
-    public void Constructor_BrainpoolP256Key_ThrowsInvalidOperationException()
+    public async Task GetActiveKeyAsync_BrainpoolP256Key_ThrowsInvalidOperationException()
     {
-        var config = CreateConfiguration(Kid, NewPrivateKey(ECCurve.NamedCurves.brainpoolP256r1));
+        var provider = new LocalEs256SigningProvider(CreateConfiguration(Kid, NewPrivateKey(ECCurve.NamedCurves.brainpoolP256r1)));
 
-        Assert.Throws<InvalidOperationException>(() => new LocalEs256SigningProvider(config));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => provider.GetActiveKeyAsync(TestContext.Current.CancellationToken));
     }
 
     [Fact]
-    public void Constructor_Secp256k1Key_ThrowsInvalidOperationException()
+    public async Task GetActiveKeyAsync_Secp256k1Key_ThrowsInvalidOperationException()
     {
-        var config = CreateConfiguration(Kid, NewPrivateKey(ECCurve.CreateFromValue("1.3.132.0.10")));
+        var provider = new LocalEs256SigningProvider(CreateConfiguration(Kid, NewPrivateKey(ECCurve.CreateFromValue("1.3.132.0.10"))));
 
-        Assert.Throws<InvalidOperationException>(() => new LocalEs256SigningProvider(config));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => provider.GetActiveKeyAsync(TestContext.Current.CancellationToken));
     }
+
 
     [Fact]
     public async Task GetActiveKeyAsync_CalledTwice_ReturnsSameSnapshot()

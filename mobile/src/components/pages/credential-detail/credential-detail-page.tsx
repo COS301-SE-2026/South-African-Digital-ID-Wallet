@@ -1,5 +1,5 @@
-import { useCallback, useEffect } from 'react'
-import { useRouter } from 'expo-router'
+import { useCallback } from 'react'
+import { useFocusEffect, useRouter } from 'expo-router'
 import { FileBadge, QrCode } from 'lucide-react-native'
 import { ActivityIndicator, Alert, View } from 'react-native'
 
@@ -32,19 +32,21 @@ export const CredentialDetailPage = ({ id }: CredentialDetailPageProps) => {
   const { generate: generateCertifiedCopy, isGenerating } = useCertifiedCopy()
 
   const isUnlocked = isUnlockValid(id, unlockedId, unlockedAt)
-
-  useEffect(() => {
-    if (isUnlocked || status !== 'idle' || !credential) {
-      return
-    }
-    void unlock(`Unlock ${credential.title}`).then((result) => {
-      if (result === 'unlocked') {
-        grantUnlock(credential.id)
+  // only the screen on top prompts.
+  useFocusEffect(
+    useCallback(() => {
+      if (isUnlocked || status !== 'idle' || !credential) {
         return
       }
-      router.back()
-    })
-  }, [credential, grantUnlock, isUnlocked, router, status, unlock])
+      void unlock(`Unlock ${credential.title}`).then((result) => {
+        if (result === 'unlocked') {
+          grantUnlock(credential.id)
+          return
+        }
+        router.back()
+      })
+    }, [credential, grantUnlock, isUnlocked, router, status, unlock])
+  )
 
   const handleBack = useCallback(() => router.back(), [router])
 
@@ -91,7 +93,7 @@ export const CredentialDetailPage = ({ id }: CredentialDetailPageProps) => {
         onPress={() =>
           router.push({
             params: { credentialId: credential.id },
-            pathname: '/citizen/present',
+            pathname: '/citizen/wallet/present',
           })
         }
         testID="share-identity-button"

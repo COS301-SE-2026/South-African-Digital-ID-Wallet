@@ -28,7 +28,11 @@ jest.mock('@/lib/pdf-file', () => ({
   openPdf: jest.fn(),
   savePdf: jest.fn(),
 }))
-jest.mock('expo-router', () => ({ useRouter: jest.fn() }))
+jest.mock('expo-router', () => ({
+  useFocusEffect: (callback: () => void) =>
+    require('react').useEffect(callback, [callback]),
+  useRouter: jest.fn(),
+}))
 jest.mock('expo-local-authentication', () => ({
   authenticateAsync: jest.fn(),
   hasHardwareAsync: jest.fn(),
@@ -125,7 +129,7 @@ describe('<CredentialDetailPage/>', () => {
     await fireEvent.press(screen.getByTestId('share-identity-button'))
     expect(push).toHaveBeenCalledWith({
       params: { credentialId: 'dl-1' },
-      pathname: '/citizen/present',
+      pathname: '/citizen/wallet/present',
     })
   })
 

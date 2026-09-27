@@ -9,6 +9,7 @@ import {
   saveSession,
   setBiometricPreference,
 } from '@/lib/secure-session'
+import { clearOfflineCache } from '@/lib/offline/offline-cache'
 import type { LoginResponse } from '@/services/login-service'
 
 export type AuthUser = {
@@ -68,6 +69,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     // Without one there is nothing guarding it, so discard it.
     if (!session || hasExpired(session.expiresAt) || !isBiometricEnabled) {
       await clearSession()
+      await clearOfflineCache().catch(() => {})
       setAuthToken(null)
       set({ ...SIGNED_OUT, isBiometricEnabled })
       return
@@ -104,6 +106,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   signOut: () => {
     setAuthToken(null)
     void clearSession()
+    void clearOfflineCache().catch(() => {})
     set(SIGNED_OUT)
   },
 }))
