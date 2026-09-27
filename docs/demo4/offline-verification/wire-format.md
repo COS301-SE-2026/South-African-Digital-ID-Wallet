@@ -201,15 +201,20 @@ FID1:K:<tid>:<kb_jwt>
 
 ## 12. Size budget
 
-A driver's licence presenting 5 of 11 claims, including the portrait. The portrait figures were measured on 10 test photos with the D-018 recipe. The other parts remain estimates until Phase 1.
+Measured on 2026-09-21 and 2026-09-25 against the dev environment, using a real seeded driver's licence with its ID photo.
 
 | Part | Size | Source |
 |---|---|---|
-| Issuer JWT, 11 digests plus `cnf` | about 1,150 bytes | Estimate |
-| 4 text disclosures | about 270 bytes | Estimate |
-| Portrait, sent inline | WebP of 772 to 4814 bytes | Measured, Spike C |
-| **Payload frames** | **7 to 14 typical, 23 worst case** | Measured, Spike C |
-| **Scan time at 8 fps** | **1 to 2.5s typical, about 3.9s worst case** | Spike B. Worst case predicted |
+| Issuer JWT | about 750 characters | Measured |
+| Eight text disclosures | about 600 characters together | Measured |
+| Portrait, sent inline | the rest of the package | Measured |
+| Full package | 9,121 characters | Measured |
+| **Payload frames** | **21** at 450 characters | Measured |
+| **With key binding** | **28 frames** (21 payload, 7 K) | Measured |
+| **Scan time at 8 fps** | **3.5 s per cycle; about 4.2 s observed**, S23 showing, S24 scanning | Measured |
+
+- The portrait is almost the whole payload, so dropping optional claims saves about one frame. The portrait recipe is the only real lever (D-018).
+- A budget phone as the scanner is still unmeasured.
 
 ## 13. Revocation list
 
@@ -230,35 +235,27 @@ A driver's licence presenting 5 of 11 claims, including the portrait. The portra
 
 - The verifier stores the list only if it verifies against its cached issuer keys: fixed `alg`, expected `typ` and `iss`, a known key that is not revoked, a valid signature and whole-number indexes (D-025).
 - A list that fails is ignored and the last verified list stays.
-- Its age counts in step 12 of section 10, using the phone's own clock at download.
+- A list is never replaced by one with an older `iat`, and its age in step 12 of section 10 is measured from its `iat` (D-025).
 
 ## 14. Offline verification upload
 
 `POST /api/credentials/offline-verifications` with:
 
-```json
+```json 
 { "entries": [ { "id": "<uuid>", "revocationIndex": 7, "result": "VERIFIED", "verifiedAt": 1790000000 } ] }
 ```
 
-**d. Section 12, Size budget.** Replace everything from the line under `## 12. Size budget` down to the line above the next heading (the intro sentence and the whole table) with:
+| Field | Rule |
+|---|---|
+| `id` | UUID generated on the verifier's phone; becomes the audit row id, so a retried entry is recorded once |
+| `revocationIndex` | The `ri`, only when `result` is `VERIFIED`; otherwise `null` |
+| `result` | `VERIFIED` or a failure code from section 10 |
+| `verifiedAt` | Unix seconds by the phone's clock |
 
-```markdown
-Measured on 2026-09-21 and 2026-09-25 against the dev environment, using a real seeded driver's licence with its ID photo.
-```
-
-| Part | Size | Source |
-|---|---|---|
-| Issuer JWT | about 750 characters | Measured |
-| Eight text disclosures | about 600 characters together | Measured |
-| Portrait, sent inline | the rest of the package | Measured |
-| Full package | 9,121 characters | Measured |
-| **Payload frames** | **21** at 450 characters | Measured |
-| **With key binding** | **28 frames** (21 payload, 7 K) | Measured |
-| **Scan time at 8 fps** | **3.5 s per cycle; about 4.2 s observed**, S23 showing, S24 scanning | Measured |
-
-- The portrait is almost the whole payload, so dropping optional claims saves about one frame. The portrait recipe is the only real lever (D-018).
-- A budget phone as the scanner is still unmeasured.
-
+- Officials only (`403` for anyone else). At most 100 entries per request (`400` beyond that).
+- Each entry is checked on its own: a missing `id`, a `result` that is not an upper-case code, a `verifiedAt` more than a day ahead of the server, or a negative `revocationIndex` is returned in `rejected`, and the rest are recorded (D-026).
+- The response is `{ "recorded": n, "duplicates": n, "rejected": [ids] }`; `409` means another upload of the same ids was stored first, so the phone retries.
+- Verified entries are linked to the credential and citizen through `ri`; failed entries never are.
 
 ## 15. Test vectors
 

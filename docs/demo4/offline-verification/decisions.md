@@ -397,7 +397,7 @@ unaffected, since they always cover the exact bytes sent. Raised in review on PR
 
 **Alternatives.** A separate table with a unique client id. Rejected: a migration during the sprint for no gain over the primary key. Linking failed scans to a citizen too. Rejected: a failed scan may carry a forged index, which would let anyone fill a citizen's history with fake rejections.
 
-**Consequences.** No migration: event types are stored as strings. Any signed-in user may upload entries, as with online `POST /resolve`, and every row records the uploader. The queue is wiped on sign-out so one user's scans are never uploaded under another's account, which means scans still queued when a verifier signs out while offline are lost. The queue is capped at 1,000 entries. Citizen notifications after sync were cut for time.
+**Consequences.** No migration: event types are stored as strings. Only officials may upload (`403` otherwise), and the app queues only officials' scans; an official could still forge rows, but every row names them as the actor. Result codes are stored as sent, if well formed, so the server keeps no copy of the app's list; each entry is validated on its own and invalid ones are returned in `rejected` while the rest are recorded. Two uploads racing on the same ids get `409` and the phone retries. Queued scans are tagged with the official and survive sign-out or an expired session, uploading only when that official signs in again. The queue is capped at 1,000 entries. Citizen notifications after sync were cut for time. Changed after review on PR #568.
 
 ---
 
