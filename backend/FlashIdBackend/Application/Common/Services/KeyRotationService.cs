@@ -94,9 +94,15 @@ public class KeyRotationService : IKeyRotationService
 
             await _jobRunRepo.MarkJobRunCompletedAsync(jobRunId.Value, processedCount, cancellationToken);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            await _jobRunRepo.MarkJobRunFailedAsync(jobRunId.Value, "Cancelled before completion.", processedCount, CancellationToken.None);
+            throw;
+        }
         catch (Exception e)
         {
-            await _jobRunRepo.MarkJobRunFailedAsync(jobRunId.Value, e.Message, processedCount, cancellationToken);
+            await _jobRunRepo.MarkJobRunFailedAsync(jobRunId.Value, e.Message, processedCount, CancellationToken.None);
+            throw;
         }
     }
 }

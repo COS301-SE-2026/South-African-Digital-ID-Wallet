@@ -44,9 +44,14 @@ public class KeyRotationBackgroundService : DailyScheduledBackgroundService
             await service.RotateQrSigningKeyAsync(cancellationToken);
             _logger.LogInformation("{Job}: run finished.", JobDisplayName);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogInformation("{Job}: run cancelled during shutdown.", JobDisplayName);
+            throw;
+        }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "{Job}: run failed, will retry at next scheduled check.", JobDisplayName);
+            _logger.LogError(ex, "{Job}: run failed, will retry at next scheduled check.", JobDisplayName);
         }
     }
 }
