@@ -1,28 +1,13 @@
 'use client'
 
-import {
-  DragEvent,
-  FC,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
-import {
-  ArrowLeft,
-  FileText,
-  QrCode,
-  Upload,
-} from 'lucide-react'
+import { DragEvent, FC, useEffect, useRef, useState } from 'react'
+import { ArrowLeft, FileText, QrCode, Upload } from 'lucide-react'
 
 import { Modal, Text } from '@/components/atoms'
 import { CertifiedCopyVerification } from '@/components/molecules'
 import { QrCameraScanner } from '@/components/organisms/qr-camera-scanner'
 
-type VerificationState =
-  | 'progress'
-  | 'authentic'
-  | 'failed'
-  | null
+type VerificationState = 'progress' | 'authentic' | 'failed' | null
 
 export const VerifyCertifiedCopyPage: FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -52,9 +37,7 @@ export const VerifyCertifiedCopyPage: FC = () => {
     }, 1800)
 
     const resultTimer = window.setTimeout(() => {
-      setVerificationState(
-        shouldFail ? 'failed' : 'authentic'
-      )
+      setVerificationState(shouldFail ? 'failed' : 'authentic')
     }, 3000)
 
     return () => {
@@ -129,11 +112,7 @@ export const VerifyCertifiedCopyPage: FC = () => {
                 <FileText className="h-7 w-7" />
               </div>
 
-              <Text
-                as="h2"
-                variant="h4"
-                className="mt-4 text-text-primary"
-              >
+              <Text as="h2" variant="h4" className="mt-4 text-text-primary">
                 Upload Certified Copy PDF
               </Text>
 
@@ -151,9 +130,7 @@ export const VerifyCertifiedCopyPage: FC = () => {
                 accept="application/pdf,.pdf"
                 className="hidden"
                 onChange={(event) => {
-                  handleFileSelected(
-                    event.target.files?.[0]
-                  )
+                  handleFileSelected(event.target.files?.[0])
 
                   event.target.value = ''
                 }}
@@ -176,9 +153,7 @@ export const VerifyCertifiedCopyPage: FC = () => {
             <div className="my-5 flex items-center gap-3">
               <div className="h-px flex-1 bg-border-grey" />
 
-              <Text variant="caption">
-                Alternatively
-              </Text>
+              <Text variant="caption">Alternatively</Text>
 
               <div className="h-px flex-1 bg-border-grey" />
             </div>
@@ -198,10 +173,7 @@ export const VerifyCertifiedCopyPage: FC = () => {
                   Scan QR Code
                 </Text>
 
-                <Text
-                  variant="caption"
-                  className="mt-1 block"
-                >
+                <Text variant="caption" className="mt-1 block">
                   Use your camera to scan the verification QR code
                 </Text>
               </span>

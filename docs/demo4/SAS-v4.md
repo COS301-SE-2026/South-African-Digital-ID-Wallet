@@ -50,7 +50,7 @@ FlashID is composed of four subsystems: Next.js for web portal for citizens, adm
 
 The full architectural requirements, including architectural patterns, design patterns, constraints and mapping can be found in:
 
- **[architecture-v2.md](../demo3/architecture-v3.md)**
+ **[architecture-v2.md](../demo4/architecture-v4.md)**
 
 ### Architectural Diagram
 ![Architectural Diagram](../images/_architecture_diagram_final.drawio.svg)
@@ -771,6 +771,13 @@ Returns the citizen's offline credential package, minting it if none is stored o
 **Path parameters:**
 - `credentialId` - the credential to prepare for offline presentation.
 
+**Request body:** required (D-022).
+```json
+{ "deviceKey": { "kty": "EC", "crv": "P-256", "x": "qdHQBxh_no3hO8faJ-QU9bguirYPb6hDoEZTq3rWbkg", "y": "dDlHz1bvfdVFBt-vfyZVnxmCxuS3-MPduE49uAt9znU" } }
+```
+
+The public half of the key the wallet created on the phone. It is embedded in the credential as `cnf`, and a change of key re-mints the package.
+
 **Response 200:**
 ```json
 {
@@ -787,7 +794,7 @@ Returns the citizen's offline credential package, minting it if none is stored o
 
 `disclosures` is keyed by claim name so the wallet can offer the citizen a choice without decoding each disclosure first. Every value is the base64url of `[salt, claim_name, claim_value]`.
 
-**Response 400:** the credential is not active.
+**Response 400:** the credential is not active, or the device key is missing or not a valid P-256 public key.
 
 **Response 403:** the credential belongs to another citizen.
 
@@ -828,6 +835,46 @@ officials (D-001).
 `status` is `active` for the key signing now, or `retired` for a key whose private half is disabled but whose existing signatures must still verify for up to 45 days (D-008).
 
 ---
+
+#### GET /api/credentials/revocation-list
+
+Returns the signed list of revocation indexes that must no longer verify offline, for a verifier to cache before going offline (D-025). The list follows wire-format section 13.
+
+**Authentication:** Required, any role.
+
+**Response 200:**
+```json
+{
+    "revocationList": "eyJhbGciOiJFUzI1NiIsInR5cCI6InJldm9jYXRpb24tbGlzdCtqd3QiLCJraWQiOiJmbGFzaGlkLWNyZWQtZGV2LTIwMjYtMDkifQ.eyJpc3MiOiJ1cm46Zmxhc2hpZDppc3N1ZXIiLCJpYXQiOjE3OTAwMDAwMDAsIm5leHRfdXBkYXRlIjoxNzkwMDg2NDAwLCJyZXZva2VkIjpbN119.signature",
+    "retrievedAt": "2026-09-26T10:00:00+02:00"
+}
+```
+
+The payload holds `iss`, `iat`, `next_update` (24 hours later) and `revoked`, the revocation index of every credential that is not `Active`. The verifier stores the list only if its signature verifies against the cached issuer keys.
+
+#### POST /api/credentials/offline-verifications
+
+Records scans a verifier's phone made while offline, once it has signal again (D-026). Each entry's `id` is generated on the phone and becomes the audit row's id, so a retried upload is recorded once.
+
+**Authentication:** Required, any role. Every row records the caller as the actor.
+
+**Request body:**
+```json
+{
+    "entries": [
+        { "id": "3f0e8a52-4c1d-4b8e-9d2a-6f1b7c9e0a11", "revocationIndex": 7, "result": "VERIFIED", "verifiedAt": 1790000000 }
+    ]
+}
+```
+
+`revocationIndex` is sent only when `result` is `VERIFIED`; failed scans are recorded against the verifier and never linked to a citizen. `verifiedAt` is Unix seconds by the phone's clock.
+
+**Response 200:**
+```json
+{ "recorded": 1, "duplicates": 0 }
+```
+
+**Response 400:** more than 100 entries, a missing id, an unknown result or a time out of range.
 
 #### Physical Identity Account Linking Rules
 

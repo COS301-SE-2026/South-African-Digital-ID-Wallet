@@ -2,7 +2,13 @@ import type { ButtonHTMLAttributes, ElementType, HTMLAttributes } from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SearchResultsTable } from '../search-results-table'
-import type { SearchResultsTableProps } from '../types'
+import {
+  ButtonHTMLAttributes,
+  ComponentProps,
+  ElementType,
+  HTMLAttributes,
+  ReactNode,
+} from 'react'
 
 jest.mock('@/components/atoms/button', () => ({
   Button: ({
@@ -10,10 +16,11 @@ jest.mock('@/components/atoms/button', () => ({
     dataCy,
     variant: _variant,
     ...props
-  }: ButtonHTMLAttributes<HTMLButtonElement> & {
+  }: {
+    children?: ReactNode
     dataCy?: string
     variant?: string
-  }) => (
+  } & ButtonHTMLAttributes<HTMLButtonElement>) => (
     <button {...props} data-cy={dataCy}>
       {children}
     </button>
@@ -25,10 +32,13 @@ jest.mock('@/components/atoms/text', () => ({
     as: Component = 'span',
     variant: _variant,
     ...props
-  }: HTMLAttributes<HTMLElement> & {
+  }: {
+    children?: ReactNode
     as?: ElementType
     variant?: string
-  }) => <Component {...props}>{children}</Component>,
+  } & HTMLAttributes<HTMLElement>) => (
+    <Component {...props}>{children}</Component>
+  ),
 }))
 jest.mock('@/components/atoms/avatar/avatar', () => ({
   Avatar: ({ initials }: { initials: string }) => <div>{initials}</div>,
@@ -58,7 +68,7 @@ const createProps = (overrides = {}) =>
     onPageChange: jest.fn(),
     onViewCredentials: jest.fn(),
     ...overrides,
-  }) as unknown as SearchResultsTableProps
+  }) as unknown as ComponentProps<typeof SearchResultsTable>
 describe('SearchResultsTable', () => {
   it('displays the empty state when there are no results', () => {
     render(<SearchResultsTable {...createProps({ rows: [] })} />)

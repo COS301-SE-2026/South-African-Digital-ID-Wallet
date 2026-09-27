@@ -1,8 +1,4 @@
-import {
-  Check,
-  Circle,
-  LoaderCircle,
-} from 'lucide-react'
+import { Check, Circle, LoaderCircle } from 'lucide-react'
 import { Text } from '@/components/atoms'
 import type { CertifiedCopyVerificationProgressProps } from './types'
 
@@ -35,11 +31,7 @@ export function CertifiedCopyVerificationProgress({
   return (
     <div className="flex w-full max-w-xl flex-col">
       <div className="mb-6">
-        <Text
-          as="h2"
-          variant="h3"
-          className="text-text-primary"
-        >
+        <Text as="h2" variant="h3" className="text-text-primary">
           Verifying Document
         </Text>
         <Text variant="sub-sm" className="mt-1">
@@ -54,16 +46,11 @@ export function CertifiedCopyVerificationProgress({
             const isActive = stepNumber === currentStep
             const isPending = stepNumber > currentStep
             return (
-              <li
-                key={step.title}
-                className="relative flex gap-3"
-              >
+              <li key={step.title} className="relative flex gap-3">
                 {index < VERIFICATION_STEPS.length - 1 && (
                   <span
                     className={`absolute left-4 top-8 h-[calc(100%+1.25rem)] w-px ${
-                      isComplete
-                        ? 'bg-primary-green'
-                        : 'bg-border-grey'
+                      isComplete ? 'bg-primary-green' : 'bg-border-grey'
                     }`}
                     aria-hidden="true"
                   />
@@ -76,26 +63,18 @@ export function CertifiedCopyVerificationProgress({
                   }`}
                 >
                   {isComplete ? (
-                    <Check
-                      className="h-4 w-4"
-                      strokeWidth={3}
-                    />
+                    <Check className="h-4 w-4" strokeWidth={3} />
                   ) : isActive ? (
                     <LoaderCircle className="h-4 w-4 animate-spin" />
                   ) : (
-                    <Circle
-                      className="h-3 w-3"
-                      fill="currentColor"
-                    />
+                    <Circle className="h-3 w-3" fill="currentColor" />
                   )}
                 </span>
                 <div className="min-w-0 pt-0.5">
                   <Text
                     variant="sub-sm"
                     className={`font-semibold ${
-                      isPending
-                        ? 'text-muted-text'
-                        : 'text-deep-green'
+                      isPending ? 'text-muted-text' : 'text-deep-green'
                     }`}
                   >
                     {step.title}
@@ -110,12 +89,8 @@ export function CertifiedCopyVerificationProgress({
         </ol>
       </div>
       <div className="mt-5 rounded-xl bg-national-blue/5 px-4 py-3">
-        <Text
-          variant="caption"
-          className="text-national-blue"
-        >
-          This usually takes a few seconds. Please do not close
-          this window.
+        <Text variant="caption" className="text-national-blue">
+          This usually takes a few seconds. Please do not close this window.
         </Text>
       </div>
     </div>

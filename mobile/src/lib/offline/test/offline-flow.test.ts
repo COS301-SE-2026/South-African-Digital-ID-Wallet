@@ -2,14 +2,20 @@ import { p256 } from '@noble/curves/nist.js'
 import { sha256 } from '@noble/hashes/sha2.js'
 import { base64urlnopad } from '@scure/base'
 
+import { createKeyBindingJwt } from '../key-binding'
 import type { OfflinePackage } from '../offline-cache'
 import { createOfflinePresentation } from '../offline-presentation'
 import { PayloadFrameAccumulator } from '../qr-frame-accumulator'
-import { splitPayloadFrames } from '../qr-frames'
-import { verifyPresentation, type TrustData } from '../verify'
+import {
+  encodeKeyBindingFrame,
+  interleaveKeyBindingFrame,
+  splitPayloadFrames,
+} from '../qr-frames'
+import { verifyPresentation, type PublicJwk, type TrustData } from '../verify'
 
 const NOW = 1_790_000_000
 const KID = 'flashid-test-key'
+const TID = 'abcdef'
 const LICENCE_VCT = 'urn:flashid:drivers-license:1'
 const SMALL_FRAME_SIZE = 120
 
@@ -18,7 +24,24 @@ const encodeJson = (value: unknown) =>
   base64urlnopad.encode(utf8(JSON.stringify(value)))
 const digestOf = (text: string) => base64urlnopad.encode(sha256(utf8(text)))
 
-const mintLicencePackage = (claims: Record<string, string>) => {
+const jwkFor = (secretKey: Uint8Array): PublicJwk => {
+  const point = p256.getPublicKey(secretKey, false)
+
+  return {
+    kty: 'EC',
+    crv: 'P-256',
+    x: base64urlnopad.encode(point.slice(1, 33)),
+    y: base64urlnopad.encode(point.slice(33)),
+  }
+}
+
+const signerFor = (secretKey: Uint8Array) => (message: Uint8Array) =>
+  p256.sign(message, secretKey, { prehash: true, extraEntropy: false })
+
+const mintLicencePackage = (
+  claims: Record<string, string>,
+  deviceKey?: PublicJwk
+) => {
   const issuerKey = p256.utils.randomSecretKey()
   const disclosures = Object.fromEntries(
     Object.entries(claims).map(([name, value], index) => [
@@ -34,12 +57,10 @@ const mintLicencePackage = (claims: Record<string, string>) => {
     ri: 3,
     _sd_alg: 'sha-256',
     _sd: Object.values(disclosures).map(digestOf),
+    ...(deviceKey ? { cnf: { jwk: deviceKey } } : {}),
   }
   const signingInput = `${encodeJson({ alg: 'ES256', typ: 'dc+sd-jwt', kid: KID })}.${encodeJson(payload)}`
-  const signature = p256.sign(utf8(signingInput), issuerKey, {
-    prehash: true,
-  })
-  const point = p256.getPublicKey(issuerKey, false)
+  const signature = signerFor(issuerKey)(utf8(signingInput))
 
   const offlinePackage: OfflinePackage = {
     issuerSignedCredential: `${signingInput}.${base64urlnopad.encode(signature)}`,
@@ -48,16 +69,7 @@ const mintLicencePackage = (claims: Record<string, string>) => {
     expiresAt: '2026-10-25T08:00:00Z',
   }
   const trust: TrustData = {
-    keys: [
-      {
-        kid: KID,
-        status: 'active',
-        kty: 'EC',
-        crv: 'P-256',
-        x: base64urlnopad.encode(point.slice(1, 33)),
-        y: base64urlnopad.encode(point.slice(33)),
-      },
-    ],
+    keys: [{ kid: KID, status: 'active', ...jwkFor(issuerKey) }],
     retrievedAt: NOW - 3600,
     revokedIndexes: [],
     revocationRetrievedAt: NOW - 3600,
@@ -66,16 +78,22 @@ const mintLicencePackage = (claims: Record<string, string>) => {
   return { offlinePackage, trust }
 }
 
+// What the scan hook verifies: the SD-JWT from the payload frames plus the newest K frame's JWT.
 const reassemble = (encodedFrames: readonly string[]) => {
   const accumulator = new PayloadFrameAccumulator()
-  let presentation: string | null = null
+  let snapshot = accumulator.getSnapshot()
 
   for (const frame of encodedFrames) {
-    presentation = accumulator.add(frame).presentation
+    snapshot = accumulator.add(frame)
   }
 
-  return presentation
+  return snapshot.presentation === null
+    ? null
+    : `${snapshot.presentation}${snapshot.keyBindingJwt ?? ''}`
 }
+
+const payloadFramesOf = (presentation: string, frameSize?: number) =>
+  splitPayloadFrames(presentation, TID, frameSize).map((frame) => frame.encoded)
 
 const LICENCE_CLAIMS = {
   portrait: 'UklGRgAAAABXRUJQ',
@@ -93,11 +111,7 @@ describe('offline flow from package to verified result', () => {
       'Date of birth',
       'Full name',
     ])
-    const frames = splitPayloadFrames(
-      presentation,
-      'abcdef',
-      SMALL_FRAME_SIZE
-    ).map((frame) => frame.encoded)
+    const frames = payloadFramesOf(presentation, SMALL_FRAME_SIZE)
 
     expect(frames.length).toBeGreaterThan(2)
 
@@ -118,9 +132,7 @@ describe('offline flow from package to verified result', () => {
     ])
 
     const result = verifyPresentation(
-      reassemble(
-        splitPayloadFrames(presentation, 'abcdef').map((frame) => frame.encoded)
-      )!,
+      reassemble(payloadFramesOf(presentation))!,
       trust,
       { now: NOW }
     )
@@ -135,11 +147,7 @@ describe('offline flow from package to verified result', () => {
     const presentation = createOfflinePresentation(offlinePackage, [
       'Full name',
     ])
-    const frames = splitPayloadFrames(
-      presentation,
-      'abcdef',
-      SMALL_FRAME_SIZE
-    ).map((frame) => frame.encoded)
+    const frames = payloadFramesOf(presentation, SMALL_FRAME_SIZE)
     const last = frames.length - 1
     const tampered = frames.map((frame, index) =>
       index === last
@@ -162,9 +170,7 @@ describe('offline flow from package to verified result', () => {
     const presentation = createOfflinePresentation(offlinePackage, [])
 
     const result = verifyPresentation(
-      reassemble(
-        splitPayloadFrames(presentation, 'abcdef').map((frame) => frame.encoded)
-      )!,
+      reassemble(payloadFramesOf(presentation))!,
       otherIssuer,
       { now: NOW }
     )
@@ -172,5 +178,91 @@ describe('offline flow from package to verified result', () => {
     expect(result.ok).toBe(false)
     if (result.ok) return
     expect(result.code).toBe('BAD_ISSUER_SIGNATURE')
+  })
+})
+
+describe('offline flow for a credential bound to the citizen phone', () => {
+  const phoneKey = p256.utils.randomSecretKey()
+
+  const boundCode = (
+    keyBindingSigner = signerFor(phoneKey),
+    signedAt = NOW
+  ) => {
+    const { offlinePackage, trust } = mintLicencePackage(
+      LICENCE_CLAIMS,
+      jwkFor(phoneKey)
+    )
+    const presentation = createOfflinePresentation(offlinePackage, [
+      'Full name',
+    ])
+    const keyBindingFrame = encodeKeyBindingFrame(
+      TID,
+      createKeyBindingJwt(presentation, keyBindingSigner, signedAt)
+    )
+    const frames = interleaveKeyBindingFrame(
+      payloadFramesOf(presentation, SMALL_FRAME_SIZE),
+      keyBindingFrame
+    )
+
+    return { frames, presentation, trust }
+  }
+
+  it('Should verify a bound code carrying a fresh signature from the same phone', () => {
+    const { frames, trust } = boundCode()
+
+    const result = verifyPresentation(reassemble(frames)!, trust, { now: NOW })
+
+    expect(result.ok).toBe(true)
+  })
+
+  it('Should reject a bound code shown without its key binding frame', () => {
+    const { presentation, trust } = boundCode()
+
+    const result = verifyPresentation(
+      reassemble(payloadFramesOf(presentation, SMALL_FRAME_SIZE))!,
+      trust,
+      { now: NOW }
+    )
+
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.code).toBe('MISSING_KEY_BINDING')
+  })
+
+  it('Should reject a screen recording replayed two minutes later', () => {
+    const { frames, trust } = boundCode(signerFor(phoneKey), NOW - 120)
+
+    const result = verifyPresentation(reassemble(frames)!, trust, { now: NOW })
+
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.code).toBe('STALE_PRESENTATION')
+  })
+
+  it('Should reject a bound code signed by a different phone', () => {
+    const { frames, trust } = boundCode(signerFor(p256.utils.randomSecretKey()))
+
+    const result = verifyPresentation(reassemble(frames)!, trust, { now: NOW })
+
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.code).toBe('BAD_KEY_BINDING_SIGNATURE')
+  })
+
+  it('Should use the newest key binding frame when an old one was also seen', () => {
+    const { frames, presentation, trust } = boundCode(
+      signerFor(phoneKey),
+      NOW - 120
+    )
+    const fresh = encodeKeyBindingFrame(
+      TID,
+      createKeyBindingJwt(presentation, signerFor(phoneKey), NOW)
+    )
+
+    const result = verifyPresentation(reassemble([...frames, fresh])!, trust, {
+      now: NOW,
+    })
+
+    expect(result.ok).toBe(true)
   })
 })

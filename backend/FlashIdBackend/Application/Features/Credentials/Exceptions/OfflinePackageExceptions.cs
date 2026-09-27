@@ -20,3 +20,18 @@ public class OfflinePackageDocumentExpiredException : Exception
     public OfflinePackageDocumentExpiredException()
         : base("The offline package could not be prepared: the document has already expired.") { }
 }
+
+// The wallet sent a device key that is not a usable P-256 public key, so nothing can be bound to it
+public class InvalidDeviceKeyException : Exception
+{
+    public InvalidDeviceKeyException(string reason, Exception? innerException = null)
+        : base($"The device key is not a valid: {reason}", innerException) { }
+}
+
+// Another upload of the same scans was stored first, so this one wrote nothing and should be retried (409).
+public class OfflineVerificationConflictException : Exception
+{
+    public OfflineVerificationConflictException()
+        : base("These offline verifications were being recorded by another request. Retry the upload.") { }
+}
+

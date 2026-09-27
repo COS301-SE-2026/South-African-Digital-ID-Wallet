@@ -1,4 +1,5 @@
 import { act, fireEvent, screen } from '@testing-library/react-native'
+import { useFocusEffect } from 'expo-router'
 import { View } from 'react-native'
 import {
   useNetworkStatus,
@@ -21,6 +22,7 @@ jest.mock('expo-router', () => ({
 jest.mock('@/hooks', () => ({
   useNetworkStatus: jest.fn(),
   useOfflineScan: jest.fn(),
+  useRecordOfflineVerification: jest.fn(),
   useScanCredential: jest.fn(),
   useVerifierTrust: jest.fn(),
 }))
@@ -40,6 +42,7 @@ jest.mock('@/components/organisms', () => ({
 const offlineScanMock = useOfflineScan as jest.Mock
 const resetOnlineMock = jest.fn()
 const resetOfflineMock = jest.fn()
+const refetchTrustMock = jest.fn()
 
 const VERIFIED = {
   ok: true,
@@ -64,13 +67,27 @@ describe('QrScannerPage', () => {
     jest.clearAllMocks()
     mockAddListener.mockReturnValue(jest.fn())
     ;(useNetworkStatus as jest.Mock).mockReturnValue({ isOffline: false })
-    ;(useVerifierTrust as jest.Mock).mockReturnValue({ trust: null })
+    ;(useVerifierTrust as jest.Mock).mockReturnValue({
+      refetch: refetchTrustMock,
+      trust: null,
+    })
     ;(useScanCredential as jest.Mock).mockReturnValue({
       isResolving: false,
       reset: resetOnlineMock,
       resolve: jest.fn(),
       result: null,
     })
+  })
+
+  it('Should refresh the trust data each time the scanner comes into focus', async () => {
+    ;(useFocusEffect as jest.Mock).mockImplementationOnce(
+      (effect: () => void) => effect()
+    )
+    withOfflineResult(null)
+
+    await renderWithSafeArea(<QrScannerPage />)
+
+    expect(refetchTrustMock).toHaveBeenCalled()
   })
 
   it('Should show the offline result with its warning', async () => {

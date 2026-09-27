@@ -16,6 +16,7 @@ import {
   useOfflineScan,
   useScanCredential,
   useVerifierTrust,
+  useRecordOfflineVerification,
 } from '@/hooks'
 import {
   describeVerificationFailure,
@@ -32,26 +33,33 @@ export const QrScannerPage = () => {
   const [isTorchOn, setIsTorchOn] = useState(false)
   const { isResolving, reset, resolve, result } = useScanCredential()
   const { isOffline } = useNetworkStatus()
-  const { isLoading: isTrustLoading, trust } = useVerifierTrust()
+  const {
+    isLoading: isTrustLoading,
+    refetch: refetchTrust,
+    trust,
+  } = useVerifierTrust()
+  const recordOfflineVerification = useRecordOfflineVerification()
   const {
     addFrame,
     progress: offlineProgress,
     reset: resetOfflineScan,
     result: offlineResult,
-  } = useOfflineScan(trust, isTrustLoading)
+  } = useOfflineScan(trust, isTrustLoading, recordOfflineVerification)
 
   // Leaving the tab does not unmount this screen, so the result and any half-collected offline code are cleared on the way out,
   // and coming back alwats starts a fresh scan.
   useFocusEffect(
     useCallback(() => {
       setIsFocused(true)
+      // Officials keep the app open all shift, so each visit pulls the newest revocation list while there is signal.
+      void refetchTrust()
       return () => {
         setIsFocused(false)
         setErrorMessage('')
         reset()
         resetOfflineScan()
       }
-    }, [reset, resetOfflineScan])
+    }, [refetchTrust, reset, resetOfflineScan])
   )
 
   const handleScan = useCallback(

@@ -1,7 +1,4 @@
-export type CertifiedCopyVerificationState =
-  | 'progress'
-  | 'authentic'
-  | 'failed'
+export type CertifiedCopyVerificationState = 'progress' | 'authentic' | 'failed'
 
 export type CertifiedCopyVerificationModalProps = {
   state: CertifiedCopyVerificationState

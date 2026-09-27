@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { CaptureContactDetails } from '../capture-contact-details'
-import type { CaptureContactDetailsProps } from '../types'
+import { ComponentProps } from 'react'
 
 jest.mock('react-hot-toast', () => ({
   __esModule: true,
@@ -21,7 +21,7 @@ const baseProps = {
   errors: {},
   setErrors: jest.fn(),
   onboardResponse: null,
-} as unknown as CaptureContactDetailsProps
+} as unknown as ComponentProps<typeof CaptureContactDetails>
 describe('CaptureContactDetails', () => {
   beforeEach(() => jest.clearAllMocks())
   it('renders and handles input changes', async () => {

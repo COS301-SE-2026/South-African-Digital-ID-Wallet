@@ -20,18 +20,12 @@ export function VerificationCheck({
         {failed ? (
           <X className="h-3 w-3" />
         ) : (
-          <Check
-            className="h-3 w-3"
-            strokeWidth={3}
-          />
+          <Check className="h-3 w-3" strokeWidth={3} />
         )}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <Text
-            variant="sub-sm"
-            className="font-semibold text-deep-green"
-          >
+          <Text variant="sub-sm" className="font-semibold text-deep-green">
             {title}
           </Text>
           <span

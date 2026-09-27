@@ -1,8 +1,4 @@
-import {
-  Check,
-  FileText,
-  ShieldCheck,
-} from 'lucide-react'
+import { Check, FileText, ShieldCheck } from 'lucide-react'
 import { Button, Text } from '@/components/atoms'
 import { VerificationCheck } from '../verification-check'
 import type { AuthenticResultProps } from './types'
@@ -19,11 +15,7 @@ export function AuthenticResult({
             <Check className="h-5 w-5" strokeWidth={3} />
           </div>
           <div>
-            <Text
-              as="h2"
-              variant="h4"
-              className="text-deep-green"
-            >
+            <Text as="h2" variant="h4" className="text-deep-green">
               Document Authentic
             </Text>
             <Text variant="caption" className="mt-1">
@@ -59,18 +51,9 @@ export function AuthenticResult({
               South African Identity Document
             </Text>
             <div className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
-              <DetailRow
-                label="Issued to"
-                value="Verified citizen"
-              />
-              <DetailRow
-                label="ID Number"
-                value="••••••••••••"
-              />
-              <DetailRow
-                label="Generated"
-                value="16 May 2025 · 10:24"
-              />
+              <DetailRow label="Issued to" value="Verified citizen" />
+              <DetailRow label="ID Number" value="••••••••••••" />
+              <DetailRow label="Generated" value="16 May 2025 · 10:24" />
               <DetailRow
                 label="Certification ID"
                 value="FC-8F42A91C-37D-4E2F"
@@ -101,20 +84,11 @@ export function AuthenticResult({
     </div>
   )
 }
-function DetailRow({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) {
+function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <Text variant="caption">{label}</Text>
-      <Text
-        variant="sub-sm"
-        className="font-semibold text-deep-green"
-      >
+      <Text variant="sub-sm" className="font-semibold text-deep-green">
         {value}
       </Text>
     </div>

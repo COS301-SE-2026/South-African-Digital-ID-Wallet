@@ -11,11 +11,7 @@ export function CertifiedCopyVerification({
   onContactSupport,
 }: Readonly<CertifiedCopyVerificationModalProps>) {
   if (state === 'progress') {
-    return (
-      <CertifiedCopyVerificationProgress
-        currentStep={currentStep}
-      />
-    )
+    return <CertifiedCopyVerificationProgress currentStep={currentStep} />
   }
   if (state === 'authentic') {
     return (

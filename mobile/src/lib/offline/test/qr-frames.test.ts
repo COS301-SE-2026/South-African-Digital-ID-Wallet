@@ -1,5 +1,7 @@
 import {
   createPresentationId,
+  encodeKeyBindingFrame,
+  interleaveKeyBindingFrame,
   PAYLOAD_FRAME_SIZE,
   splitPayloadFrames,
 } from '../qr-frames'
@@ -71,5 +73,48 @@ describe('splitPayloadFrames', () => {
     expect(() => splitPayloadFrames('presentation', 'abcdef', 0)).toThrow(
       'The frame size must be a positive integer.'
     )
+  })
+})
+
+describe('encodeKeyBindingFrame', () => {
+  it('Should write the K frame with the presentation id', () => {
+    expect(encodeKeyBindingFrame('abcdef', 'h.p.s')).toBe('FID1:K:abcdef:h.p.s')
+  })
+})
+
+describe('interleaveKeyBindingFrame', () => {
+  const payload = (count: number) =>
+    Array.from({ length: count }, (_, index) => `P${index}`)
+
+  it('Should add a K frame after every third payload frame', () => {
+    expect(interleaveKeyBindingFrame(payload(6), 'K')).toEqual([
+      'P0',
+      'P1',
+      'P2',
+      'K',
+      'P3',
+      'P4',
+      'P5',
+      'K',
+    ])
+  })
+
+  it('Should end a partial group with a K frame', () => {
+    expect(interleaveKeyBindingFrame(payload(4), 'K')).toEqual([
+      'P0',
+      'P1',
+      'P2',
+      'K',
+      'P3',
+      'K',
+    ])
+  })
+
+  it('Should give even a one-frame code a K frame', () => {
+    expect(interleaveKeyBindingFrame(payload(1), 'K')).toEqual(['P0', 'K'])
+  })
+
+  it('Should turn 21 payload frames into 28, as measured on a real licence', () => {
+    expect(interleaveKeyBindingFrame(payload(21), 'K')).toHaveLength(28)
   })
 })
