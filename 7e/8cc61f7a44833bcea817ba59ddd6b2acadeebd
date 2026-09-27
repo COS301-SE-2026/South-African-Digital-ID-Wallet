@@ -1,0 +1,14 @@
+mobile/src/lib/offline/verify.ts
+  h_99fca60b892ff4 487
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "7e8cc61f7a44833bcea817ba59ddd6b2acadeebd",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_99fca60b892ff4 470-473,475,478-479,482,491,499-502
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IOfflinePackageRepository.cs
+  h_99fca60b892ff4 30-31
+backend/FlashIdBackend/tests/OfflinePackageServiceTests.cs
+  h_99fca60b892ff4 92,96
+backend/FlashIdBackend/Infrastructure/Repositories/OfflinePackageRepository.cs
+  h_99fca60b892ff4 19,106,110-121,123-126
+backend/FlashIdBackend/tests/OfflinePackageControllerIntegrationTests.cs
+  h_99fca60b892ff4 127-130,132,760,765-766,768,770-827
+backend/FlashIdBackend/Application/Common/Services/OfflinePackageService.cs
+  h_99fca60b892ff4 8,37-41,376,396-399,401-405,407,418,420,423,426-432,463
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/OfflineVerificationSyncResultDto.cs
+  h_99fca60b892ff4 3-5
+backend/FlashIdBackend/Application/Common/Services/SdJwtCredentialFactory.cs
+  h_99fca60b892ff4 19,27
+backend/FlashIdBackend/Application/Features/Credentials/Exceptions/OfflinePackageExceptions.cs
+  h_99fca60b892ff4 30-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1d9c33da84ab67a44e985327d56291985d9a57bf",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

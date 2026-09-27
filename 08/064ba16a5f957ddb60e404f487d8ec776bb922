@@ -1,0 +1,24 @@
+docs/demo4/openapi.yaml
+  s_fa106e73de307e::t_237728dc443a5a 775-776,788-812,2786-2791
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "08064ba16a5f957ddb60e404f487d8ec776bb922",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_fa106e73de307e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "180af5aa-4add-4348-b027-cde60f77f32d",
+        "model": "unknown"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
