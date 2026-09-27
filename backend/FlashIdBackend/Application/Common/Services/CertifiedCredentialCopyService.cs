@@ -138,10 +138,7 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
         if (string.IsNullOrWhiteSpace(photoPath))
             return null;
 
-        await using var photoStream =
-            await _photoStorageProvider.OpenReadAsync(
-                photoPath,
-                CancellationToken.None);
+        await using var photoStream = await _photoStorageProvider.OpenReadAsync(photoPath, CancellationToken.None);
 
         if (photoStream is null)
             return null;
