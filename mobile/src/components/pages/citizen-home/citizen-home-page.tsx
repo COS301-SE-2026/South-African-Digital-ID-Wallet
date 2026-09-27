@@ -7,14 +7,18 @@ import {
   IdentityStatusPanel,
   QuickActionsGrid,
   RecentActivityList,
+  SecurityAlertCard,
 } from '@/components/organisms'
-import { CitizenDashboardScreen } from '@/components/templates'
-import { citizenQuickActions } from '@/config'
+
 import {
   usePrefetchOfflinePackages,
   useRecentActivity,
+  useSecurityOverview,
   useWalletCredentials,
 } from '@/hooks'
+
+import { CitizenDashboardScreen } from '@/components/templates'
+import { citizenQuickActions } from '@/config'
 import { useAuthStore } from '@/stores/auth-store'
 import { colors } from '@/theme/colors'
 
@@ -33,11 +37,17 @@ export const CitizenHomePage = () => {
     credentials.credentials.map((credential) => credential.id)
   )
 
+  const security = useSecurityOverview()
+
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true)
-    await Promise.all([credentials.refetch(), activity.refetch()])
+    await Promise.all([
+      credentials.refetch(),
+      activity.refetch(),
+      security.refetch(),
+    ])
     setIsRefreshing(false)
-  }, [activity, credentials])
+  }, [activity, credentials, security])
 
   return (
     <CitizenDashboardScreen
@@ -57,6 +67,14 @@ export const CitizenHomePage = () => {
       }
     >
       <IdentityStatusPanel onPress={() => router.push('/citizen/wallet')} />
+      <SecurityAlertCard
+        onPress={(alertId) =>
+          router.push({
+            params: { alertId },
+            pathname: '/citizen/security/[alertId]',
+          })
+        }
+      />
       <QuickActionsGrid
         actions={citizenQuickActions}
         onSelect={(action) => router.push(action.href)}
