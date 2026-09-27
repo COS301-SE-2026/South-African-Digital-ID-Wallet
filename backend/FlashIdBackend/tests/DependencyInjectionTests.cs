@@ -156,6 +156,7 @@ public class DependencyInjectionTests
         services.AddInfrastructure(CreateConfiguration());
 
         Assert.DoesNotContain(services, sd => sd.ServiceType == typeof(IQrSigningKeyVaultInspector));
+        Assert.DoesNotContain(services, sd => sd.ServiceType == typeof(IKeyRotationService));
         Assert.DoesNotContain(services, sd =>
             sd.ServiceType == typeof(IHostedService) &&
             sd.ImplementationType == typeof(KeyRotationBackgroundService));
@@ -171,6 +172,10 @@ public class DependencyInjectionTests
             sd.ServiceType == typeof(IQrSigningKeyVaultInspector) &&
             sd.ImplementationType == typeof(AzureQrSigningKeyVaultInspector) &&
             sd.Lifetime == ServiceLifetime.Singleton);
+        Assert.Contains(services, sd =>
+            sd.ServiceType == typeof(IKeyRotationService) &&
+            sd.ImplementationType == typeof(KeyRotationService) &&
+            sd.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, sd =>
             sd.ServiceType == typeof(IHostedService) &&
             sd.ImplementationType == typeof(KeyRotationBackgroundService));
@@ -200,6 +205,34 @@ public class DependencyInjectionTests
                 .Where(p => p.ParameterType.Assembly == applicationAssembly)
                 .Where(p => !registered.Contains(p.ParameterType))
                 .Select(p => $"{cont.Name} -> {p.ParameterType.Name}"))
+            .Distinct()
+            .ToList();
+
+        Assert.Empty(missing);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("https://example.vault.azure.net/")]
+    public void AddApplicationAndInfrastructure_EveryRegisteredServiceHasItsApplicationDependenciesRegistered(string? vaultUri)
+    {
+        var services = new ServiceCollection();
+        services.AddApplication();
+        services.AddInfrastructure(CreateConfiguration(vaultUri));
+
+        var applicationAssembly = typeof(IAdminDashboardService).Assembly;
+        var registered = services.Select(sd => sd.ServiceType).ToHashSet();
+
+        var missing = services
+            .Where(sd => sd.ImplementationType != null)
+            .SelectMany(sd => sd.ImplementationType!
+                .GetConstructors()
+                .OrderByDescending(c => c.GetParameters().Length)
+                .Take(1)
+                .SelectMany(c => c.GetParameters())
+                .Where(p => p.ParameterType.Assembly == applicationAssembly)
+                .Where(p => !registered.Contains(p.ParameterType))
+                .Select(p => $"{sd.ImplementationType!.Name} -> {p.ParameterType.Name}"))
             .Distinct()
             .ToList();
 
