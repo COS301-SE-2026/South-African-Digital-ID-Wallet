@@ -591,4 +591,12 @@ public class OfflinePackageServiceTests
 
         Assert.Equal(0, repository.SaveAttempts);
     }
+
+    [Theory]
+    [InlineData(AuditEventType.OfflineCredentialVerified, "Success")]
+    [InlineData(AuditEventType.OfflineVerificationRejected, "Failed")]
+    public void ToOutcome_ReportsOfflineRejectionsAsFailed(AuditEventType eventType, string expected)
+    {
+        Assert.Equal(expected, eventType.ToOutcome());
+    }
 }

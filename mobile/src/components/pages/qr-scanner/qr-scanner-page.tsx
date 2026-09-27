@@ -33,7 +33,11 @@ export const QrScannerPage = () => {
   const [isTorchOn, setIsTorchOn] = useState(false)
   const { isResolving, reset, resolve, result } = useScanCredential()
   const { isOffline } = useNetworkStatus()
-  const { isLoading: isTrustLoading, trust } = useVerifierTrust()
+  const {
+    isLoading: isTrustLoading,
+    refetch: refetchTrust,
+    trust,
+  } = useVerifierTrust()
   const recordOfflineVerification = useRecordOfflineVerification()
   const {
     addFrame,
@@ -47,13 +51,15 @@ export const QrScannerPage = () => {
   useFocusEffect(
     useCallback(() => {
       setIsFocused(true)
+      // Officials keep the app open all shift, so each visit pulls the newest revocation list while there is signal.
+      void refetchTrust()
       return () => {
         setIsFocused(false)
         setErrorMessage('')
         reset()
         resetOfflineScan()
       }
-    }, [reset, resetOfflineScan])
+    }, [refetchTrust, reset, resetOfflineScan])
   )
 
   const handleScan = useCallback(

@@ -79,4 +79,15 @@ describe('useVerifierTrust', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false))
     expect(result.current.trust).toBeNull()
   })
+
+  it('Should fetch the newest trust data again when asked', async () => {
+    const { result } = await renderTrustHook()
+    await waitFor(() => expect(result.current.trust).toEqual(TRUST))
+
+    await act(async () => {
+      await result.current.refetch()
+    })
+
+    expect(refreshTrustMock).toHaveBeenCalledTimes(2)
+  })
 })

@@ -6,7 +6,7 @@ import { useNetworkStatus } from './use-network-status'
 export const useVerifierTrust = () => {
   const { isOffline } = useNetworkStatus()
 
-  const { data, isPending } = useQuery({
+  const { data, isPending, refetch } = useQuery({
     queryKey: ['verifier-trust', isOffline],
     queryFn: () =>
       isOffline ? readOfflineCache() : offlineService.refreshTrustData(),
@@ -16,5 +16,5 @@ export const useVerifierTrust = () => {
     networkMode: 'always',
   })
 
-  return { trust: data?.trust ?? null, isLoading: isPending }
+  return { trust: data?.trust ?? null, isLoading: isPending, refetch }
 }

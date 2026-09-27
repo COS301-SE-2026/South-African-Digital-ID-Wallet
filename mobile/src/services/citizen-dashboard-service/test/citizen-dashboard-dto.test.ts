@@ -133,6 +133,24 @@ describe('toActivityEntries', () => {
     expect(entry.title).toBe('Account activity')
     expect(entry.tone).toBe('neutral')
   })
+  it('Should list offline checks under verifications', () => {
+    const entries = toActivityEntries(
+      [
+        { ...SAMPLE_EVENT, type: 'OfflineCredentialVerified' },
+        { ...SAMPLE_EVENT, type: 'OfflineVerificationRejected' },
+      ],
+      REF_TIME
+    )
+
+    expect(entries.map((entry) => entry.category)).toEqual([
+      'verification',
+      'verification',
+    ])
+    expect(entries.map((entry) => entry.tone)).toEqual([
+      'soft-green',
+      'soft-red',
+    ])
+  })
   it('Should return an empty list for undefined activity', () => {
     const result = toActivityEntries(undefined)
     expect(result).toEqual([])
