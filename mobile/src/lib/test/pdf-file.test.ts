@@ -3,7 +3,7 @@ import { startActivityAsync } from 'expo-intent-launcher'
 import * as Sharing from 'expo-sharing'
 import { Platform } from 'react-native'
 
-import { clearCertifiedCopies, deletePdf, openPdf, savePdf } from '../pdf-file'
+import { clearCertifiedCopies, openPdf, savePdf } from '../pdf-file'
 
 jest.mock('expo-file-system', () => {
   const existing = new Set<string>()
@@ -132,28 +132,6 @@ describe('clearCertifiedCopies', () => {
   it('Should do nothing when there is no folder', () => {
     clearCertifiedCopies()
     expect(MockDirectory.instances[0].delete).not.toHaveBeenCalled()
-  })
-})
-
-describe('deletePdf', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    resetFileSystem()
-  })
-
-  it('Should remove a saved copy', () => {
-    const file = fileNamed('copy.pdf')
-    deletePdf(file as never)
-    expect(file.delete).toHaveBeenCalled()
-    expect(file.exists).toBe(false)
-  })
-
-  it('Should skip a copy that is already gone', () => {
-    const file = fileNamed('copy.pdf')
-    deletePdf(file as never)
-    file.delete.mockClear()
-    deletePdf(file as never)
-    expect(file.delete).not.toHaveBeenCalled()
   })
 })
 

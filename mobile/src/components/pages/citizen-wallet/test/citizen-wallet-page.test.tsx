@@ -26,7 +26,6 @@ jest.mock('@/lib/secure-session', () => ({
   saveSession: jest.fn().mockResolvedValue(undefined),
 }))
 jest.mock('@/lib/pdf-file', () => ({
-  deletePdf: jest.fn(),
   openPdf: jest.fn(),
   savePdf: jest.fn(),
 }))

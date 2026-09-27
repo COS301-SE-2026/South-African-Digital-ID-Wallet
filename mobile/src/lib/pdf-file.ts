@@ -29,12 +29,6 @@ export const savePdf = (bytes: Uint8Array, fileName: string): File => {
   return file
 }
 
-export const deletePdf = (file: File): void => {
-  if (file.exists) {
-    file.delete()
-  }
-}
-
 const sharePdf = async (file: File): Promise<void> => {
   if (!(await Sharing.isAvailableAsync())) {
     throw new Error('Sharing is not available on this device.')

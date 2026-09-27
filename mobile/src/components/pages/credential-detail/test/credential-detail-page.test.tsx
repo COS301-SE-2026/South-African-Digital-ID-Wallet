@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router'
 import { Alert } from 'react-native'
 
 import api from '@/lib/api'
-import { deletePdf, openPdf, savePdf } from '@/lib/pdf-file'
+import { openPdf, savePdf } from '@/lib/pdf-file'
 import { useAuthStore } from '@/stores/auth-store'
 import { useCredentialUnlockStore } from '@/stores/credential-unlock-store'
 import { renderWithProviders } from '@/test/utils/render-with-providers'
@@ -24,7 +24,6 @@ jest.mock('@/lib/secure-session', () => ({
   saveSession: jest.fn().mockResolvedValue(undefined),
 }))
 jest.mock('@/lib/pdf-file', () => ({
-  deletePdf: jest.fn(),
   openPdf: jest.fn(),
   savePdf: jest.fn(),
 }))
@@ -43,7 +42,6 @@ const getMock = api.get as jest.Mock
 const postMock = api.post as jest.Mock
 const saveMock = savePdf as jest.Mock
 const openMock = openPdf as jest.Mock
-const deleteMock = deletePdf as jest.Mock
 const hasHardware = LocalAuthentication.hasHardwareAsync as jest.Mock
 const isEnrolled = LocalAuthentication.isEnrolledAsync as jest.Mock
 const authenticate = LocalAuthentication.authenticateAsync as jest.Mock
@@ -145,7 +143,6 @@ describe('<CredentialDetailPage/>', () => {
     const [bytes, fileName] = saveMock.mock.calls[0]
     expect(Array.from(bytes as Uint8Array)).toEqual(PDF_BYTES)
     expect(fileName).toBe('licence.pdf')
-    expect(deleteMock).toHaveBeenCalledWith(FILE)
   })
 
   it('Should show a spinner while the certified copy is generating', async () => {

@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 
-import { deletePdf, openPdf, savePdf } from '@/lib/pdf-file'
+import { openPdf, savePdf } from '@/lib/pdf-file'
 import { certifiedCopyService } from '@/services/certified-copy-service'
 
 export const useCertifiedCopy = () => {
@@ -9,11 +9,7 @@ export const useCertifiedCopy = () => {
       const { bytes, fileName } =
         await certifiedCopyService.generate(credentialId)
       const file = savePdf(bytes, fileName)
-      try {
-        await openPdf(file)
-      } finally {
-        deletePdf(file)
-      }
+      await openPdf(file)
       return file.uri
     },
   })
