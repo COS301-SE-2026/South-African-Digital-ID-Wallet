@@ -1,9 +1,7 @@
 import { DashboardModal } from '@/components/molecules/dashboard-modal/dashboard-modal'
-
-import { FraudAlertSummary } from '../fraud-alert-summary'
 import { FraudAlertDetails } from '../fraud-alert-details'
 import { FraudAlertGuidance } from '../fraud-alert-guidance'
-
+import { FraudAlertSummary } from '../fraud-alert-summary'
 import type { FraudAlertModalProps } from './types'
 
 export function FraudAlertModal({
@@ -11,7 +9,6 @@ export function FraudAlertModal({
   layer,
   actionMessage,
   onClose,
-  onViewDetails,
   onOpenGuidance,
   onChangePassword,
   onReviewActivity,
@@ -24,26 +21,16 @@ export function FraudAlertModal({
         open
         title="Suspicious login activity"
         onClose={onClose}
+        showBottomClose={false}
       >
-        <FraudAlertSummary
-          alert={alert}
-          onViewDetails={onViewDetails}
-        />
-      </DashboardModal>
-    )
-  }
+        <div className="space-y-6">
+          <FraudAlertSummary alert={alert} />
 
-  if (layer === 'details') {
-    return (
-      <DashboardModal
-        open
-        title="Security event details"
-        onClose={onClose}
-      >
-        <FraudAlertDetails
-          alert={alert}
-          onOpenGuidance={onOpenGuidance}
-        />
+          <FraudAlertDetails
+            alert={alert}
+            onOpenGuidance={onOpenGuidance}
+          />
+        </div>
       </DashboardModal>
     )
   }
@@ -53,6 +40,7 @@ export function FraudAlertModal({
       open
       title="Keep your account secure"
       onClose={onClose}
+      showBottomClose={false}
     >
       <FraudAlertGuidance
         actionMessage={actionMessage}

@@ -1,10 +1,8 @@
 import {
   ArrowRight,
   History,
-  Laptop2,
   LockKeyhole,
   ShieldCheck,
-  Smartphone,
 } from 'lucide-react'
 import { Text } from '@/components/atoms/text'
 import { Button } from '@/components/ui/button'
@@ -20,10 +18,11 @@ function SecurityAction({
   onClick,
 }: SecurityActionProps) {
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       onClick={onClick}
-      className="flex w-full items-center gap-3 rounded-2xl border border-primary-green/10 bg-primary-green/5 p-4 text-left transition hover:bg-primary-green/10"
+      className="h-auto w-full justify-start gap-3 whitespace-normal rounded-2xl border border-primary-green/10 bg-primary-green/5 p-4 text-left transition hover:bg-primary-green/10"
     >
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-green text-clean-white">
         <Icon className="h-5 w-5" />
@@ -45,7 +44,7 @@ function SecurityAction({
         </Text>
       </div>
       <ArrowRight className="h-5 w-5 shrink-0 text-deep-green" />
-    </button>
+    </Button>
   )
 }
 
@@ -102,16 +101,6 @@ export function FraudAlertGuidance({
         />
         <SecurityAction
           icon={ShieldCheck}
-          title="Enable two-factor authentication"
-          description="Add an extra layer of security to your account."
-          onClick={() =>
-            onUnavailableAction(
-              'Two-factor authentication is not available in this frontend demo yet.'
-            )
-          }
-        />
-        <SecurityAction
-          icon={Smartphone}
           title="Review trusted devices"
           description="Check which devices have access to your account."
           onClick={onReviewTrustedDevices}
@@ -121,16 +110,6 @@ export function FraudAlertGuidance({
           title="Check recent activity"
           description="Look for any unfamiliar logins or actions."
           onClick={onReviewActivity}
-        />
-        <SecurityAction
-          icon={Laptop2}
-          title="Keep your device secure"
-          description="Use a PIN, fingerprint or face ID and keep your device updated."
-          onClick={() =>
-            onUnavailableAction(
-              'Device-security guidance is informational only in this frontend demo.'
-            )
-          }
         />
       </div>
       <div className="rounded-2xl bg-primary-green/10 p-4">
