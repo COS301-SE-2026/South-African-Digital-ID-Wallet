@@ -10,6 +10,7 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.Extensions.Configuration;
+using Application.Common.Validation;
 
 namespace Application.Common.Services;
 
@@ -37,7 +38,7 @@ public class OnboardingService : IOnboardingService
         if (cleanSaId is null)
             throw new ArgumentException("Invalid South African ID Number.");
 
-        if (!Regex.IsMatch(cleanSaId, @"^\d{13}$", RegexOptions.None, TimeSpan.FromMilliseconds(600)))
+        if (!SaIdValidator.IsValid(cleanSaId))
             throw new ArgumentException("Invalid South African ID number");
 
         var citizenRecord = await _governmentRegistryGateway.GetCitizenBySaIdAsync(cleanSaId);
@@ -66,6 +67,11 @@ public class OnboardingService : IOnboardingService
 
     public async Task<OnboardCitizenResponse> OnboardCitizenAsync(OnboardCitizenRequest request, Guid officialId, string ipAddress)
     {
+        // Onboarding previously skipped format validation entirely
+        if (!SaIdValidator.IsValid(request.SaId))
+            throw new ArgumentException("Invalid South African ID number");
+        var saId = request.SaId.Trim();
+
         if (!request.ConsentGiven)
             throw new CitizenConsentRequiredException();
 
@@ -77,7 +83,7 @@ public class OnboardingService : IOnboardingService
             ? null
             : NormalizeSaPhoneNumber(request.PhoneNumber);
 
-        var citizenRecord = await _governmentRegistryGateway.GetCitizenBySaIdAsync(request.SaId);
+        var citizenRecord = await _governmentRegistryGateway.GetCitizenBySaIdAsync(saId);
 
         if (citizenRecord is null)
             throw new IdentityRecordNotFoundException();
@@ -94,7 +100,7 @@ public class OnboardingService : IOnboardingService
                 , TimeSpan.FromMilliseconds(600)))
             throw new ArgumentException("Invalid email address format.", nameof(email));
 
-        var existingCitizen = await _onboardingRepository.GetCitizenBySaIdAsync(request.SaId);
+        var existingCitizen = await _onboardingRepository.GetCitizenBySaIdAsync(saId);
 
         if (existingCitizen is not null)
             throw new DuplicateIdRegisteredException();

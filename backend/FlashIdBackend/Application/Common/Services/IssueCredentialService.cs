@@ -10,6 +10,7 @@ using Application.Features.Credentials.Exceptions;
 using Application.Features.Onboarding.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
+using Application.Common.Validation;
 
 namespace Application.Common.Services;
 
@@ -30,7 +31,7 @@ public class IssueCredentialService : IIssueCredentialService
 
     private static void ValidateSaId(string saId)
     {
-        if (string.IsNullOrWhiteSpace(saId) || !Regex.IsMatch(saId.Trim(), @"^\d{13}$", RegexOptions.None, TimeSpan.FromMilliseconds(600)))
+        if (!SaIdValidator.IsValid(saId))
         {
             throw new ArgumentException("A valid 13-digit South African ID number is required.");
         }
