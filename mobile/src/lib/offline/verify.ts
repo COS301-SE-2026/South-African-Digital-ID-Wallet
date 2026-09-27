@@ -484,8 +484,7 @@ const trustWarnings = (trust: TrustData, now: number): string[] => {
     warnings.push('Verification data is over 24 hours old.')
   }
 
-  // Until the revocation list ships (checklist 5.1 and 5.2), a revoked credential cannot be
-  // detected offline, so the result must say so rather than imply it was checked.
+  // Only a phone that has never received a revocation list gets this. The result must not imply a check it could not make.
   if ((trust.revocationRetrievedAt ?? null) === null) {
     warnings.push(REVOCATION_NOT_CHECKED_WARNING)
   }
