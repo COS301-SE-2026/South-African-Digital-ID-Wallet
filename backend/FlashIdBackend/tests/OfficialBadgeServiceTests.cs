@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
@@ -32,9 +33,17 @@ public class OfficialBadgeServiceTests
     private sealed class FakeQrSignatureVerifier : IQrSignatureVerifier
     {
         public bool ShouldVerify { get; set; } = true;
+        public Exception? ExceptionToThrow { get; set; }
 
-        public Task<bool> VerifyAsync(string kid, string alg, byte[] signingInput, byte[] signature, CancellationToken cancellationToken) =>
-            Task.FromResult(ShouldVerify);
+        public Task<bool> VerifyAsync(string kid, string alg, byte[] signingInput, byte[] signature, CancellationToken cancellationToken)
+        {
+            if (ExceptionToThrow != null)
+            {
+                throw ExceptionToThrow;
+            }
+
+            return Task.FromResult(ShouldVerify);
+        }
     }
 
     private static Official ValidOfficial(InstitutionType institutionType)
@@ -160,5 +169,49 @@ public class OfficialBadgeServiceTests
         fakeRepository.OfficialToReturn = null;
 
         await Assert.ThrowsAsync<InvalidBadgeTokenException>(() => service.VerifyBadgeAsync(badge.Token));
+    }
+
+    [Fact]
+    public async Task VerifyBadgeAsync_VerifierThrowsCryptographicException_ThrowsInvalidBadgeTokenException()
+    {
+        var official = ValidOfficial(InstitutionType.LawEnforcement);
+        var fakeRepository = new FakeOfficialRepository { OfficialToReturn = official };
+        var fakeSigningProvider = new FakeQrSigningProvider();
+        var fakeSignatureVerifier = new FakeQrSignatureVerifier();
+        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider, fakeSignatureVerifier);
+
+        var badge = await service.GenerateBadgeTokenAsync(official.UserId);
+        fakeSignatureVerifier.ExceptionToThrow = new CryptographicException("bad signature length");
+
+        await Assert.ThrowsAsync<InvalidBadgeTokenException>(() => service.VerifyBadgeAsync(badge.Token));
+    }
+
+    [Fact]
+    public async Task VerifyBadgeAsync_VerifierThrowsPlatformNotSupportedException_ThrowsInvalidBadgeTokenException()
+    {
+        var official = ValidOfficial(InstitutionType.LawEnforcement);
+        var fakeRepository = new FakeOfficialRepository { OfficialToReturn = official };
+        var fakeSigningProvider = new FakeQrSigningProvider();
+        var fakeSignatureVerifier = new FakeQrSignatureVerifier();
+        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider, fakeSignatureVerifier);
+
+        var badge = await service.GenerateBadgeTokenAsync(official.UserId);
+        fakeSignatureVerifier.ExceptionToThrow = new PlatformNotSupportedException("ECDSA not supported");
+
+        await Assert.ThrowsAsync<InvalidBadgeTokenException>(() => service.VerifyBadgeAsync(badge.Token));
+    }
+
+    [Fact]
+    public async Task VerifyBadgeAsync_NullPayloadInEnvelope_ThrowsInvalidBadgeTokenException()
+    {
+        var fakeRepository = new FakeOfficialRepository();
+        var fakeSigningProvider = new FakeQrSigningProvider();
+        var fakeSignatureVerifier = new FakeQrSignatureVerifier();
+        var service = new OfficialBadgeService(fakeRepository, fakeSigningProvider, fakeSignatureVerifier);
+
+        var envelopeJson = "{\"Payload\":null,\"Signature\":\"AAAA\",\"Kid\":\"fake-kid\",\"Alg\":\"ES256\"}";
+        var token = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(envelopeJson));
+
+        await Assert.ThrowsAsync<InvalidBadgeTokenException>(() => service.VerifyBadgeAsync(token));
     }
 }
