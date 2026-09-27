@@ -20,7 +20,13 @@ jest.mock('react-hot-toast', () => ({
   default: { success: jest.fn(), error: jest.fn() },
 }))
 jest.mock('@/components/templates/otp-modal/otp-modal', () => ({
-  OtpModal: ({ open, onSuccess }: any) =>
+  OtpModal: ({
+    open,
+    onSuccess,
+  }: {
+    open: boolean
+    onSuccess: (code: string) => void
+  }) =>
     open ? <button onClick={() => onSuccess('123456')}>OTP</button> : null,
 }))
 const push = jest.fn()

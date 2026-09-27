@@ -1,3 +1,4 @@
+import type { ImgHTMLAttributes, ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { CredentialDetailsModal } from '../credential-details-modal'
@@ -5,13 +6,25 @@ import type { CredentialDetail } from '../types'
 
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: ({ fill: _fill, ...props }: any) => <img {...props} />,
+  default: ({
+    fill: _fill,
+    ...props
+  }: ImgHTMLAttributes<HTMLImageElement> & { fill?: boolean }) => (
+    <img {...props} />
+  ),
 }))
 jest.mock('@/components/atoms/modal', () => ({
-  Modal: ({ children, isOpen }: any) => (isOpen ? <div>{children}</div> : null),
+  Modal: ({ children, isOpen }: { children?: ReactNode; isOpen: boolean }) =>
+    isOpen ? <div>{children}</div> : null,
 }))
 jest.mock('@/components/organisms/revoke-credentials-modal', () => ({
-  RevokeCredentialModal: ({ isOpen, onConfirm }: any) =>
+  RevokeCredentialModal: ({
+    isOpen,
+    onConfirm,
+  }: {
+    isOpen: boolean
+    onConfirm: (values: { reason: string; notes: string }) => void
+  }) =>
     isOpen ? (
       <button onClick={() => onConfirm({ reason: 'Other', notes: 'Test' })}>
         Confirm Revoke

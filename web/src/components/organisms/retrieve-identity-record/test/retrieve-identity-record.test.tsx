@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { RetrieveIdentityRecord } from '../retrieve-identity-record'
+import type { RetrieveIdentityRecordProps } from '../types'
 
 const createProps = (overrides = {}) =>
   ({
@@ -16,7 +17,7 @@ const createProps = (overrides = {}) =>
     },
     setErrors: jest.fn(),
     ...overrides,
-  }) as any
+  }) as unknown as RetrieveIdentityRecordProps
 describe('RetrieveIdentityRecord', () => {
   it('renders the form and disables retrieval until valid', () => {
     render(<RetrieveIdentityRecord {...createProps()} />)

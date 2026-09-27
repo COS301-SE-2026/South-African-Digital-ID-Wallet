@@ -9,7 +9,9 @@ const mockCreateElement = (impl: (tagName: string) => HTMLElement) => {
   jest
     .spyOn(document, 'createElement')
     .mockImplementation(
-      ((tagName: string) => impl(tagName) ?? realCreateElement(tagName)) as any
+      ((tagName: string) =>
+        impl(tagName) ??
+        realCreateElement(tagName)) as unknown as typeof document.createElement
     )
 }
 describe('LivenessCameraDialog', () => {
