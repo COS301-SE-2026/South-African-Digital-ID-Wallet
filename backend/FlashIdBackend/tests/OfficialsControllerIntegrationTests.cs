@@ -1,8 +1,11 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Application.Common.Interfaces.ProviderInterfaces;
+using Application.Common.Services;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.ManageUserAccountCard.DTOs;
 using Application.Features.Officials.DTOs;
@@ -30,22 +33,6 @@ public class OfficialsControllerIntegrationTests
     {
         public Task SendEmailAsync(string toEmail, string subject, string message, CancellationToken ct = default) =>
             Task.CompletedTask;
-    }
-    private sealed class StubQrSigningProvider : IQrSigningProvider
-    {
-        private static readonly EcPublicJwk StubJwk = new("EC", "P-256", "stub-kid", "stub-x", "stub-y");
-        private static readonly QrSigningKey StubKey = new("stub-kid", "ES256", StubJwk);
-
-        public Task<QrSigningKey> GetActiveKeyAsync(CancellationToken cancellationToken) => Task.FromResult(StubKey);
-
-        public Task<byte[]> SignAsync(string keyId, byte[] signingInput, CancellationToken cancellationToken) =>
-            Task.FromResult(System.Text.Encoding.UTF8.GetBytes("stub-signature"));
-    }
-
-    private sealed class StubQrSignatureVerifier : IQrSignatureVerifier
-    {
-        public Task<bool> VerifyAsync(string kid, string alg, byte[] signingInput, byte[] signature, CancellationToken cancellationToken) =>
-            Task.FromResult(true);
     }
 
     private sealed class StubIpGeolocationProvider : IIpGeolocationProvider
@@ -84,9 +71,9 @@ public class OfficialsControllerIntegrationTests
                 services.RemoveAll(typeof(IIpGeolocationProvider));
                 services.AddScoped<IIpGeolocationProvider, StubIpGeolocationProvider>();
                 services.RemoveAll(typeof(IQrSigningProvider));
-                services.AddSingleton<IQrSigningProvider, StubQrSigningProvider>();
+                services.AddScoped<IQrSigningProvider, StubQrSigningProvider>();
                 services.RemoveAll(typeof(IQrSignatureVerifier));
-                services.AddScoped<IQrSignatureVerifier, StubQrSignatureVerifier>();
+                services.AddScoped<IQrSignatureVerifier, QrSignatureVerifier>();
                 services.RemoveAll(typeof(IHostedService));
             });
         }
@@ -253,6 +240,21 @@ public class OfficialsControllerIntegrationTests
 
     private static async Task<JsonElement> ReadBodyAsync(HttpResponseMessage response) =>
         await response.Content.ReadFromJsonAsync<JsonElement>(TestContext.Current.CancellationToken);
+
+    private static string TamperBadgePayloadPreservingMeaning(string token)
+    {
+        var envelope = JsonNode.Parse(Encoding.UTF8.GetString(Convert.FromBase64String(token)))!.AsObject();
+        var payloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(envelope["Payload"]!.GetValue<string>()));
+        envelope["Payload"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(payloadJson + " "));
+        return Convert.ToBase64String(Encoding.UTF8.GetBytes(envelope.ToJsonString()));
+    }
+
+    private static async Task<string> IssueBadgeTokenAsync(HttpClient officialClient)
+    {
+        var issued = await officialClient.PostAsync("/api/officials/badge-token", null, TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK, issued.StatusCode);
+        return (await ReadBodyAsync(issued)).GetProperty("token").GetString()!;
+    }
 
     private static async Task<JsonElement> GetHistoryAsync(HttpClient client, string query = "")
     {
@@ -734,5 +736,46 @@ public class OfficialsControllerIntegrationTests
         var response = await client.GetAsync("/api/officials/stats/me", TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task VerifyBadge_WithATamperedToken_ReturnsBadRequest()
+    {
+        using var factory = new TestApiFactory();
+        var seed = await SeedAsync(factory);
+        var client = ClientFor(factory, seed.OfficialUser);
+
+        var token = await IssueBadgeTokenAsync(client);
+        var tampered = TamperBadgePayloadPreservingMeaning(token);
+
+        var response = await client.PostAsJsonAsync(
+            "/api/officials/verify-badge",
+            new VerifyBadgeRequestDto { Token = tampered },
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task VerifyBadge_AfterTheSigningKeyIsRevoked_ReturnsBadRequest()
+    {
+        using var factory = new TestApiFactory();
+        var seed = await SeedAsync(factory);
+        var ct = TestContext.Current.CancellationToken;
+        var client = ClientFor(factory, seed.OfficialUser);
+
+        var token = await IssueBadgeTokenAsync(client);
+
+        var db = await factory.CreateInitializedContextAsync();
+        var signingKey = await db.SigningKeys.SingleAsync(ct);
+        signingKey.Status = SigningKeyStatus.Revoked;
+        await db.SaveChangesAsync(ct);
+
+        var response = await client.PostAsJsonAsync(
+            "/api/officials/verify-badge",
+            new VerifyBadgeRequestDto { Token = token },
+            ct);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 }
