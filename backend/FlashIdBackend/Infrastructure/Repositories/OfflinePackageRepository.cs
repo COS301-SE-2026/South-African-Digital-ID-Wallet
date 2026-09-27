@@ -1,5 +1,6 @@
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Data;
 using Microsoft.Data.Sqlite;
 using Microsoft.Data.SqlClient;
@@ -15,6 +16,7 @@ public class OfflinePackageRepository : IOfflinePackageRepository
     // SQLite reports every constraint failure as error 19, so the extended code is what distinguishes
     // a duplicate revocation index from an FK or NOT NULL bug that should not be retried.
     private const int SqliteUniqueConstraint = 2067;
+    private const int SqlitePrimaryKeyConstraint = 1555;
     private readonly AppDbContext _context;
 
     public OfflinePackageRepository(AppDbContext context)
@@ -78,4 +80,48 @@ public class OfflinePackageRepository : IOfflinePackageRepository
 
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<IReadOnlyList<int>> GetRevokedIndexesAsync(CancellationToken cancellationToken) =>
+        await _context.Credentials
+            .AsNoTracking()
+            .Where(c => c.RevocationIndex != null && c.Status != CredentialStatus.Active)
+            .OrderBy(c => c.RevocationIndex)
+            .Select(c => c.RevocationIndex!.Value)
+            .ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlySet<Guid>> GetExistingAuditLogIdsAsync(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken) =>
+        (await _context.AuditLogs
+            .AsNoTracking()
+            .Where(a => ids.Contains(a.Id))
+            .Select(a => a.Id)
+            .ToListAsync(cancellationToken))
+        .ToHashSet();
+
+    public async Task<IReadOnlyDictionary<int, Credential>> GetCredentialsByRevocationIndexAsync(IReadOnlyCollection<int> revocationIndexes, CancellationToken cancellationToken) =>
+        await _context.Credentials
+            .AsNoTracking()
+            .Where(c => c.RevocationIndex != null && revocationIndexes.Contains(c.RevocationIndex.Value))
+            .ToDictionaryAsync(c => c.RevocationIndex!.Value, cancellationToken);
+
+    public async Task<bool> TryAddAuditLogsAsync(IReadOnlyCollection<AuditLog> auditLogs, CancellationToken cancellationToken)
+    {
+        _context.AuditLogs.AddRange(auditLogs);
+
+        try
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+        catch (DbUpdateException due) when (IsDuplicateKey(due))
+        {
+            // Two uploads of the same scans raced and the other stored them first. The rows that failed are
+            // untracked, so the context is clean if it is used again in this request.
+            _context.ChangeTracker.Clear();
+            return false;
+        }
+    }
+
+    // The audit id is the primary key. SQL Server reports a duplicate as 2627; SQLite uses its own extended code.
+    private static bool IsDuplicateKey(DbUpdateException due) =>
+        IsUniqueIndexViolation(due) || due.InnerException is SqliteException { SqliteExtendedErrorCode: SqlitePrimaryKeyConstraint };
 }

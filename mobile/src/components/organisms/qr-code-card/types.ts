@@ -3,5 +3,6 @@ export type QrCodeCardProps = {
   onRefresh: () => void
   secondsRemaining: number
   testID?: string
-  token: string
+  token?: string
+  offlineFrames?: readonly string[]
 }

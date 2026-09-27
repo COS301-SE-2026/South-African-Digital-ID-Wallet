@@ -14,3 +14,15 @@ ignore:
   - "backend/FlashIdBackend/Infrastructure/Providers/SmsPortalProvider.cs"
   - "backend/FlashIdBackend/Infrastructure/Providers/EmailSenderProvider.cs"
   
+flag_management:
+  default_rules:
+    carryforward: true   # reuse a flag's last report when this commit didn't upload it
+  individual_flags:
+    - name: backend
+      paths: [backend/]
+    - name: mobile
+      paths: [mobile/]
+    - name: web
+      paths: [web/]
+    - name: gov-registry
+      paths: [government-registry/]

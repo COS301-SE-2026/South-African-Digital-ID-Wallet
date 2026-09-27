@@ -121,7 +121,7 @@ The system shall allow administrators to issue South African digital identity cr
 The system shall generate a unique credential identifier for every issued credential.
 
 ##### R2.1.3:
-The system shall cryptographically sign each credential using Ed25519 at the point of issuance.
+The system shall cryptographically sign each credential using ES256 at the point of issuance.
 
 ##### R2.1.4:
 The system shall associate issued credentials with the correct citizen profile.
@@ -187,10 +187,10 @@ The system shall prevent unauthorized access to stored credentials.
 The system shall support offline credential viewing for previously issued credentials.
 
 ##### R2.4.4:
-The system shall prevent raw personally identifiable information from being exposed in QR payloads.
+The system shall prevent raw personally identifiable information from being exposed in online QR payloads. An offline presentation, explicitly selected by the citizen, may carry only the fields the citizen chose to disclose, while undisclosed fields remain salted digests. Compensating controls: selective disclosure, holder binding that makes a copied or recorded code step verifying within about 90 seconds, the embedded portrait, blocked screenshots on the sharing screen, animated frames, and packages that expire after at most 30 days.
 
 #### R2.4.5
-Citizen photographs referenced by a credential shall be stored in a location that does not allow public access. A link granting temporary access to a photograph shall only be created at the moment a credential is being verified, and that link shall stop working after a short, fixed period of time.
+Citizen photographs referenced by a credential shall be stored in a location that does not allow public access. For online credential, a link granting temporary access to a photograph shall only be created at the moment a credential is being verified, and that link shall stop working after a short, fixed period of time. For offline verification, the credential carries a downscaled 160 x 160 WebP copy of the portrait inside the signed credential, never a link.
 
 ---
 
@@ -268,7 +268,7 @@ The system shall allow officials to enter a credential token manually as an alte
 The system shall return one of four distinct failure reasons when a credential fails verification: revoked, expired, qr_expired, or tampered.
 
 ##### R3.2.8:
-The system shall not include any citizen personally identifiable information in the verification response. The response shall contain only the result, credential type, failure reason if applicable, and timestamp.
+The system shall not include any citizen personally identifiable information in the verification response. The response shall contain only the result, credential type, failure reason if applicable, and timestamp. Offline presentations are the exception defined in R2.4.4.
 
 ---
 
@@ -316,6 +316,32 @@ For any field the citizen denies, the system shall return a not_disclosed indica
 
 ##### R3.5.5:
 The system shall log the citizen's approval or denial decision to the audit trail, including citizen ID, official ID, fields requested, fields approved, and timestamp.
+
+#### R3.6: Offline Verification
+
+##### R3.6.1:
+The citizen shall be able to present a credential without an internet connection as an animated QR code, choosing which optional fields to disclose. Mandatory fields for the credential type shall always be included.
+
+##### R3.6.2:
+The wallet shall prepare an offline package for each credential while the device is online, store it in encrypted storage on the device, and discard it once expired. A package shall be valid for at most 30 days.
+
+##### R3.6.3:
+Every offline presentation shall be bound to the citizen's device. The wallet shall sign it with a device key at least every 5 seconds while it is shown, and a verifier shall refuse a presentation whose binding is missing, invalid or older than 30 seconds, allowing 60 seconds of clock difference.
+
+##### R3.6.4:
+A verifier shall verify an offline presentation entirely on its own device, using a cached issuer key set and revocation list, and shall show the disclosed fields, the portrait and any warning.
+
+##### R3.6.5:
+A verifier shall refuse a credential that appears on its cached revocation list. It shall warn when its verification data is over 24 hours old and refuse to verify when it is over 7 days old.
+
+##### R3.6.6:
+Every offline verification result shall be kept on the verifier's device and recorded in the audit trail once the device is online, including both the device's scan time and the server's receipt time. A result shall be recorded only once however often the upload is retried.
+
+##### R3.6.7:
+A failed offline verification shall show the verifier a specific reason, including that the credential is revoked or expired, that the code could not be linked to the citizen's phone, or that the code has expired and must be shown again.
+
+##### R3.6.8:
+When a verifier without connection scans an online QR code, the system shall tell the verifier to ask the citizen for the offline code.
 
 ---
 
@@ -503,20 +529,20 @@ The system shall log all institution registration, deactivation, and key regener
 #### R9.1: Credential Signing
 
 ##### R9.1.1:
-The system shall sign every credential with an Ed25519 digital signature at the point of issuance. The signature shall cover all credential fields.
+Every credential with ES256 at the point of issuance. The signature shall cover all credential fields and it covers all credential fields through salted digests and binds for offline verification.
 
 ##### R9.1.2:
 A signing failure shall prevent the credential from being saved. Partial credential creation without a valid signature is not permitted.
 
 ##### R9.1.3:
-Private signing keys shall be stored in Azure Key Vault. For Demo 1, a LocalSigningStrategy with a secured test key is permitted. The switch to KeyVaultSigningStrategy shall require only a dependency injection configuration change.
+Private signing keys shall be stored in Azure Key Vault.
 
 ---
 
 #### R9.2: Signature Verification
 
 ##### R9.2.1:
-The system shall perform a live Ed25519 signature verification on every QR scan. Verification results shall never be cached.
+The system shall verify the issuer signature on every credential presentation using ES256. Online presentation shall be verified live by the backend and verification results shall not be cached. Offline presentations shall be verified on the verifier's device against a cached issuer key set and revocation list, whose age shall be shown to the verifier.
 
 ##### R9.2.2:
 Any credential whose fields have been altered after signing shall fail signature verification and return INVALID with reason tampered.
@@ -529,7 +555,7 @@ Any credential whose fields have been altered after signing shall fail signature
 The system shall support cryptographic key rotation without invalidating existing valid credentials signed with a previous key.
 
 ##### R9.3.2:
-Credentials shall be re-signed with the current active key after every update. The previous signed version shall be archived before the update is applied.
+Every credential shall be signed with ES256 before it can be presented offline. The signature covers all credential fields through salted digests and binds the credential to the holder's device key. The credential shall be re-signed after every update.
 
 ---
 

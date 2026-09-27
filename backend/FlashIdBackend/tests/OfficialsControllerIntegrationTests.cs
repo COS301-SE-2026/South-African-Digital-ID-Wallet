@@ -704,6 +704,27 @@ public class OfficialsControllerIntegrationTests
     }
 
     [Fact]
+    public async Task GetMyStats_CountsOfflineVerificationsButNotOfflineRejections()
+    {
+        using var factory = new TestApiFactory();
+        var seed = await SeedAsync(factory);
+        var db = await factory.CreateInitializedContextAsync();
+        var ct = TestContext.Current.CancellationToken;
+        await db.AuditLogs.AddRangeAsync(new[]
+        {
+            Log(AuditEventType.OfflineCredentialVerified, seed.OfficialUser.Id, "Offline verification.", DateTime.UtcNow),
+            Log(AuditEventType.OfflineVerificationRejected, seed.OfficialUser.Id, "Offline rejection.", DateTime.UtcNow),
+        }, ct);
+        await db.SaveChangesAsync(ct);
+        var client = ClientFor(factory, seed.OfficialUser);
+
+        var response = await client.GetAsync("/api/officials/stats/me", ct);
+
+        var body = await ReadBodyAsync(response);
+        Assert.Equal(3, body.GetProperty("todayCount").GetInt32());
+    }
+
+    [Fact]
     public async Task GetMyStats_AsCitizen_ReturnsForbidden()
     {
         using var factory = new TestApiFactory();
