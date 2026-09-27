@@ -1,0 +1,17 @@
+web/src/components/molecules/dashboard-modal/dashboard-modal.tsx
+  h_0aff3b71f739b1 2-4,11,13,15,21-24,27-28,30-31,33-34,37,42,44,47,50,52
+  h_0aff3b71f739b1 14,25-26,39-40,43,45-46,48-49,51,56
+web/src/components/organisms/fraud-alert-details/fraud-alert-details.tsx
+  h_0aff3b71f739b1 11-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "22d87644eefdc96974106931a71478747cd26c5c",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
