@@ -36,6 +36,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<EmergencyContact> EmergencyContacts => Set<EmergencyContact>();
     public DbSet<EmergencyDevice> EmergencyDevices => Set<EmergencyDevice>();
     public DbSet<EmergencyAccess> EmergencyAccesses => Set<EmergencyAccess>();
+    public DbSet<RetiredEmergencyRevocationIndex> RetiredEmergencyRevocationIndexes => Set<RetiredEmergencyRevocationIndex>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

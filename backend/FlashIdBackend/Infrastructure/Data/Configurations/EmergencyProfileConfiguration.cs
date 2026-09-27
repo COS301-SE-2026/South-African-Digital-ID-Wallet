@@ -12,6 +12,10 @@ public class EmergencyProfileConfiguration : IEntityTypeConfiguration<EmergencyP
 
         builder.HasIndex(p => p.CitizenId).IsUnique();
 
+        builder.HasIndex(p => p.RevocationIndex)
+            .IsUnique()
+            .HasFilter("[RevocationIndex] IS NOT NULL");
+
         builder.Property(p => p.OfflineFieldsJson)
             .IsRequired()
             .HasMaxLength(500);
