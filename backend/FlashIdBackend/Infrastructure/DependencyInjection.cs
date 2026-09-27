@@ -67,6 +67,7 @@ public static class DependencyInjection
         if (vaultUriConfigured)
         {
             services.AddSingleton<IQrSigningKeyVaultInspector, AzureQrSigningKeyVaultInspector>();
+            services.AddScoped<IKeyRotationService, KeyRotationService>();
         }
         services.AddScoped<IQrSignatureVerifier, QrSignatureVerifier>();
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
