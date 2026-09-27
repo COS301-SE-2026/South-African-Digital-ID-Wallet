@@ -1,0 +1,20 @@
+mobile/src/components/pages/credential-detail/test/credential-detail-page.test.tsx
+  h_712d174fc3f309 8
+mobile/src/hooks/test/use-certified-copy.test.tsx
+  h_712d174fc3f309 3
+mobile/src/hooks/use-certified-copy.ts
+  h_712d174fc3f309 3,12
+mobile/src/lib/test/pdf-file.test.ts
+  h_712d174fc3f309 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1521d44a19b69cd7a742028122679accfe502939",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
