@@ -772,7 +772,8 @@ paths:
               $ref: '#/components/schemas/OfflineVerificationBatchDto'
       responses:
         '200':
-          description: How many scans were recorded, and how many an earlier upload had already recorded.
+          description: How many scans were recorded, how many an earlier upload had already recorded,
+            and the ids that can never be recorded.
           content:
             text/plain:
               schema:
@@ -784,7 +785,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/OfflineVerificationSyncResultDto'
         '400':
-          description: Too many scans, a missing id, an unknown result or a time out of range.
+          description: More than 100 scans in one upload.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: The caller is not an official; only officials' scans belong in the audit trail.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Another upload of the same scans was stored first; retry.
           content:
             text/plain:
               schema:
@@ -2758,6 +2783,12 @@ components:
         duplicates:
           type: integer
           format: int32
+        rejected:
+          type: array
+          items:
+            type: string
+            format: uuid
+          nullable: true
       additionalProperties: false
     OnboardCitizenRequest:
       type: object
