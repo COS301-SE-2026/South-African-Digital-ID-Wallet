@@ -1,9 +1,19 @@
+import type { ButtonHTMLAttributes, ElementType, HTMLAttributes } from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SearchResultsTable } from '../search-results-table'
+import type { SearchResultsTableProps } from '../types'
 
 jest.mock('@/components/atoms/button', () => ({
-  Button: ({ children, dataCy, variant: _variant, ...props }: any) => (
+  Button: ({
+    children,
+    dataCy,
+    variant: _variant,
+    ...props
+  }: ButtonHTMLAttributes<HTMLButtonElement> & {
+    dataCy?: string
+    variant?: string
+  }) => (
     <button {...props} data-cy={dataCy}>
       {children}
     </button>
@@ -15,15 +25,20 @@ jest.mock('@/components/atoms/text', () => ({
     as: Component = 'span',
     variant: _variant,
     ...props
-  }: any) => <Component {...props}>{children}</Component>,
+  }: HTMLAttributes<HTMLElement> & {
+    as?: ElementType
+    variant?: string
+  }) => <Component {...props}>{children}</Component>,
 }))
 jest.mock('@/components/atoms/avatar/avatar', () => ({
-  Avatar: ({ initials }: any) => <div>{initials}</div>,
+  Avatar: ({ initials }: { initials: string }) => <div>{initials}</div>,
 }))
 jest.mock('@/components/molecules/table-pagination', () => ({
-  TablePagination: ({ onPageChange }: any) => (
-    <button onClick={() => onPageChange(2)}>Next Page</button>
-  ),
+  TablePagination: ({
+    onPageChange,
+  }: {
+    onPageChange: (page: number) => void
+  }) => <button onClick={() => onPageChange(2)}>Next Page</button>,
 }))
 const row = {
   id: '1',
@@ -43,7 +58,7 @@ const createProps = (overrides = {}) =>
     onPageChange: jest.fn(),
     onViewCredentials: jest.fn(),
     ...overrides,
-  }) as any
+  }) as unknown as SearchResultsTableProps
 describe('SearchResultsTable', () => {
   it('displays the empty state when there are no results', () => {
     render(<SearchResultsTable {...createProps({ rows: [] })} />)
