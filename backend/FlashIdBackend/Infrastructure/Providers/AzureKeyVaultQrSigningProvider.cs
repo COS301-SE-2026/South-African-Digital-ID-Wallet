@@ -39,12 +39,17 @@ public class AzureKeyVaultQrSigningProvider : IQrSigningProvider
 
     public async Task<byte[]> SignAsync(string keyId, byte[] signingInput, CancellationToken cancellationToken)
     {
-        var signingKey = await _signingKeyRepository.GetActiveKeyAsync(SigningKeyPurpose.Qr)
-            ?? throw new InvalidOperationException("No active QR signing key configured.");
+        var signingKey = await _signingKeyRepository.GetByKidAsync(keyId)
+            ?? throw new InvalidOperationException($"QR signing key '{keyId}' was not found.");
 
-        if (keyId != signingKey.Kid)
+        if (signingKey.Purpose != SigningKeyPurpose.Qr)
         {
-            throw new InvalidOperationException($"QR signing key '{keyId}' is not the active key.");
+            throw new InvalidOperationException($"Signing key '{keyId}' is not a QR signing key.");
+        }
+
+        if (signingKey.Status is not (SigningKeyStatus.Active or SigningKeyStatus.Retired))
+        {
+            throw new InvalidOperationException($"QR signing key '{keyId}' is not usable for signing (status: {signingKey.Status}).");
         }
 
         var keyIdentifier = new Uri($"{_vaultUri}/keys/{signingKey.KeyVaultKeyName}/{signingKey.KeyVaultKeyVersion}");
