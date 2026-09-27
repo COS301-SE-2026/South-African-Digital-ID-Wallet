@@ -2,6 +2,7 @@ using Application.Common.Services;
 using Domain.Entities;
 using Domain.Enums;
 using Application.Common.Interfaces.ProviderInterfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
 
 namespace tests;
 
@@ -13,6 +14,12 @@ public class DisclosedFieldValueResolverTests
     {
         public Task<string> GenerateReadSasUrlAsync(string blobName, TimeSpan ttl) => Task.FromResult($"https://fake-blob-sas.local/{blobName}");
         public Task<Stream?> OpenReadAsync(string blobName, CancellationToken cancellationToken) => Task.FromResult<Stream?>(null);
+    }
+
+    private sealed class ThrowingPhotoStorageProvider : IPhotoStorageProvider
+    {
+        public Task<string> GenerateReadSasUrlAsync(string blobName, TimeSpan ttl) => throw new InvalidOperationException("Storage must not be touched.");
+        public Task<Stream?> OpenReadAsync(string blobName, CancellationToken cancellationToken) => throw new InvalidOperationException("Storage must not be touched.");
     }
 
     private static DisclosedFieldValueResolver CreateResolver() => new(new FakePhotoStorageProvider());
@@ -151,5 +158,65 @@ public class DisclosedFieldValueResolverTests
         var cred = IdentityDocumentCredential();
         var res = await CreateResolver().ResolveAsync(cred, new[] { field });
         Assert.Equal(string.Empty, res[field]);
+    }
+
+    [Theory]
+    [InlineData("Identity number", "9001015800083")]
+    [InlineData("Full surname", "Mokoena")]
+    [InlineData("Date of birth", "1990-01-01")]
+    [InlineData("Citizenship status", "Citizen")]
+    [InlineData("Country of birth", "South Africa")]
+    public void Describe_TextField_ReturnsTextKindWithTheValue(string field, string expected)
+    {
+        var source = CreateResolver().Describe(IdentityDocumentCredential(), field);
+
+        Assert.Equal(DisclosedFieldKind.Text, source.Kind);
+        Assert.Equal(expected, source.Value);
+    }
+
+    [Fact]
+    public void Describe_Photograph_ReturnsPhotoKindWithTheBlobName()
+    {
+        var source = CreateResolver().Describe(IdentityDocumentCredential(), "Photograph");
+
+        Assert.Equal(DisclosedFieldKind.Photo, source.Kind);
+        Assert.Equal("id-photo.jpg", source.Value);
+    }
+
+    [Fact]
+    public void Describe_DriversLicensePhoto_ReturnsPhotoKindWithTheBlobName()
+    {
+        var source = CreateResolver().Describe(DriversLicenseCredential(), "Photo");
+
+        Assert.Equal(DisclosedFieldKind.Photo, source.Kind);
+        Assert.Equal("license-photo.jpg", source.Value);
+    }
+
+    [Fact]
+    public void Describe_PhotographWithNoStoredPhoto_ReturnsPhotoKindWithEmptyValue()
+    {
+        var cred = IdentityDocumentCredential();
+        cred.IdentityDocument!.PhotoPath = null;
+
+        var source = CreateResolver().Describe(cred, "Photograph");
+
+        Assert.Equal(DisclosedFieldKind.Photo, source.Kind);
+        Assert.Equal(string.Empty, source.Value);
+    }
+
+    [Fact]
+    public void Describe_AnyField_DoesNotTouchPhotoStorage()
+    {
+        var resolver = new DisclosedFieldValueResolver(new ThrowingPhotoStorageProvider());
+        var cred = IdentityDocumentCredential();
+
+        Assert.Equal(DisclosedFieldKind.Photo, resolver.Describe(cred, "Photograph").Kind);
+        Assert.Equal(DisclosedFieldKind.Text, resolver.Describe(cred, "Full surname").Kind);
+    }
+
+    [Fact]
+    public void Describe_UnknownField_ThrowsInvalidOperationException()
+    {
+        Assert.Throws<InvalidOperationException>(() => CreateResolver().Describe(IdentityDocumentCredential(), "This is not a real field"));
     }
 }

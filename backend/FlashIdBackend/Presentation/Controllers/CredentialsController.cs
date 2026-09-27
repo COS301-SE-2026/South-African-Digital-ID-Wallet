@@ -1,11 +1,12 @@
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Exceptions;
-using Application.Common.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.RateLimiting;
+using Application.Features.FraudDetection.Exceptions;
+using Presentation.Security;
 
 namespace Presentation.Controllers;
 
@@ -14,12 +15,15 @@ namespace Presentation.Controllers;
 [Authorize]
 public class CredentialsController : ControllerBase
 {
+    // The audit trail records where a request came from. This is the fallback when the socket has no address.
+    private const string UnknownIpAddress = "unknown";
     private readonly ICredentialService _credentialService;
     private readonly IQrService _qrService;
     private readonly ICredentialActivationService _credentialActivationService;
     private readonly ICredentialExpiryService _credentialExpiryService;
     private readonly IIssueCredentialService _issueCredentialService;
     private readonly ICredentialUpdateService _credentialUpdateService;
+    private readonly IOfflinePackageService _offlinePackageService;
 
     public CredentialsController(
       ICredentialService credentialService,
@@ -27,7 +31,8 @@ public class CredentialsController : ControllerBase
       ICredentialActivationService credentialActivationService,
       ICredentialExpiryService credentialExpiryService,
       IIssueCredentialService issueCredentialService,
-      ICredentialUpdateService credentialUpdateService)
+      ICredentialUpdateService credentialUpdateService,
+      IOfflinePackageService offlinePackageService)
     {
         _credentialService = credentialService;
         _qrService = qrService;
@@ -35,6 +40,7 @@ public class CredentialsController : ControllerBase
         _credentialExpiryService = credentialExpiryService;
         _issueCredentialService = issueCredentialService;
         _credentialUpdateService = credentialUpdateService;
+        _offlinePackageService = offlinePackageService;
     }
 
     [HttpGet("me")]
@@ -83,7 +89,8 @@ public class CredentialsController : ControllerBase
     [HttpPost("{credentialId}/qr-token")]
     public async Task<IActionResult> GenerateQr(
         Guid credentialId,
-        [FromBody] GenerateQrRequestDto request)
+        [FromBody] GenerateQrRequestDto request,
+        [FromServices] IFraudDetectionService fraudDetectionService)
     {
         try
         {
@@ -94,7 +101,14 @@ public class CredentialsController : ControllerBase
             }
 
             var userId = Guid.Parse(userIdClaim);
+
+            var securityContext = SecurityEventContextFactory.Create(HttpContext, userId, Domain.Enums.SecurityEventType.QrGenerated);
+            await fraudDetectionService.EnsureQrGenerationAllowedAsync(securityContext, HttpContext.RequestAborted);
+
             var result = await _qrService.GenerateQrAsync(credentialId, userId, request);
+
+            // Only successful generations are recorded. A high-risk result withholds this QR and blocks new ones.
+            await fraudDetectionService.RecordQrGenerationAsync(securityContext, HttpContext.RequestAborted);
             return Ok(result);
         }
         catch (CredentialNotFoundException ex)
@@ -113,6 +127,10 @@ public class CredentialsController : ControllerBase
         {
             return BadRequest(new { error = ex.Message });
         }
+        catch (QrGenerationRestrictedException ex)
+        {
+            return StatusCode(403, new { error = ex.Message, code = ex.Code, restrictedUntil = ex.RestrictedUntil, alertId = ex.AlertId });
+        }
         catch (Exception)
         {
             return StatusCode(500, new { error = "An unexpected error occurred." });
@@ -128,7 +146,7 @@ public class CredentialsController : ControllerBase
             if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
 
             var userId = Guid.Parse(userIdClaim);
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownIpAddress;
             var res = await _qrService.ResolveAsync(req.Token, userId, ipAddress);
             return Ok(res);
         }
@@ -195,7 +213,7 @@ public class CredentialsController : ControllerBase
             return Unauthorized(new { message = "The authenticated official could not be identified." });
         }
 
-        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownIpAddress;
         var response = await _issueCredentialService.GetCitizenStatusAsync(saId, officialId, ipAddress, cancellationToken);
 
         return Ok(response);
@@ -225,7 +243,7 @@ public class CredentialsController : ControllerBase
             return Unauthorized(new { message = "The authenticated official could not be identified." });
         }
 
-        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownIpAddress;
         var response = await _issueCredentialService.IssueCredentialAsync(request, officialId, ipAddress, cancellationToken);
 
         return StatusCode(201, response);
@@ -241,7 +259,7 @@ public class CredentialsController : ControllerBase
             if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
 
             var adminUserId = Guid.Parse(userIdClaim);
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownIpAddress;
             var result = await _credentialService.RevokeCredentialAsync(credentialId, adminUserId, request, ipAddress);
             return Ok(result);
         }
@@ -268,7 +286,7 @@ public class CredentialsController : ControllerBase
             if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
 
             var adminUserId = Guid.Parse(userIdClaim);
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownIpAddress;
             var result = await _credentialService.ReinstateCredentialAsync(credentialId, adminUserId, request, ipAddress);
             return Ok(result);
         }
@@ -345,6 +363,142 @@ public class CredentialsController : ControllerBase
         catch (Exception)
         {
             return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    /// <summary>
+    /// Prepares the citizen's offline credential package, minting it if none is stored or the stored one is stale.
+    /// </summary>
+    /// <param name="credentialId">The credential to prepare for offline presentation.</param>
+    /// <param name="request">The wallet's device public key, bound into the credential as cnf so only that phone can present it.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
+    /// <response code="200">The offline package, ready to be cached on the device.</response>
+    /// <response code="400">The credential is not active, or the device key is missing or not a valid P-256 public key.</response>
+    /// <response code="403">The credential belongs to another citizen.</response>
+    /// <response code="404">No credential with that id.</response>
+    /// <response code="409">The credential cannot produce a presentation: missing a photograph, or the document has expired.</response>
+    /// <response code="503">The package could not be prepared right now. The wallet should retry later.</response>
+    [HttpPost("{credentialId:guid}/offline-package")]
+    [Authorize(Roles = "Citizen")]
+    [ProducesResponseType(typeof(OfflinePackageResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<IActionResult> RequestOfflinePackage(Guid credentialId, [FromBody] OfflinePackageRequestDto request, CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirst("userId")?.Value;
+
+        if (userIdClaim == null)
+        {
+            return Unauthorized(new { error = "Invalid token." });
+        }
+
+        var userId = Guid.Parse(userIdClaim);
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownIpAddress;
+
+        try
+        {
+            var package = await _offlinePackageService.GetOrMintAsync(credentialId, userId, request.DeviceKey.ToJwk(), ipAddress, cancellationToken);
+
+            return Ok(package);
+        }
+        catch (CredentialNotFoundException cnfe)
+        {
+            return NotFound(new { error = cnfe.Message });
+        }
+        catch (CredentialAccessDeniedException cade)
+        {
+            return StatusCode(403, new { error = cade.Message });
+        }
+        catch (CredentialNotActiveException cnae)
+        {
+            return BadRequest(new { error = cnae.Message });
+        }
+        catch (OfflinePackageDataMissingException opdme)
+        {
+            return Conflict(new { error = opdme.Message });
+        }
+        catch (OfflinePackageUnavailableException opue)
+        {
+            return StatusCode(503, new { error = opue.Message });
+        }
+        catch (OfflinePackageDocumentExpiredException opdee)
+        {
+            return StatusCode(503, new { error = opdee.Message });
+        }
+        catch (InvalidDeviceKeyException idke)
+        {
+            return BadRequest(new { error = idke.Message });
+        }
+    }
+
+    /// <summary>
+    /// Returns the public keys that verify offline credentials, for a verifier to cache before going offline.
+    /// </summary>
+    /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
+    /// <response code="200">The issuer key set, with the time it was retrieved so the verifier can age it.</response>
+    [HttpGet("issuer-keys")]
+    [ProducesResponseType(typeof(IssuerKeysResponseDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetIssuerKeys(CancellationToken cancellationToken)
+    {
+        var keys = await _offlinePackageService.GetIssuerKeysAsync(cancellationToken);
+
+        return Ok(keys);
+    }
+
+    /// <summary>
+    /// Returns the signed list of revocation indexes that must no longer verify offline, for a verifier to cache.
+    /// </summary>
+    /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
+    /// <response code="200">The list as a compact JWS signed by the credential key.</response>
+    [HttpGet("revocation-list")]
+    [ProducesResponseType(typeof(RevocationListResponseDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetRevocationList(CancellationToken cancellationToken)
+    {
+        var revocationList = await _offlinePackageService.GetRevocationListAsync(cancellationToken);
+
+        return Ok(revocationList);
+    }
+
+    /// <summary>
+    /// Records scans a verifier's phone made while offline, once it has signal again.
+    /// </summary>
+    /// <param name="batch">Up to 100 offline scans, each with an id generated on the phone.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
+    /// <response code="200">How many scans were recorded, how many an earlier upload had already recorded, and the ids that can never be recorded.</response>
+    /// <response code="400">More than 100 scans in one upload.</response>
+    /// <response code="403">The caller is not an official; only officials' scans belong in the audit trail.</response>
+    /// <response code="409">Another upload of the same scans was stored first; retry.</response>
+    [HttpPost("offline-verifications")]
+    [Authorize(Roles = "Official")]
+    [ProducesResponseType(typeof(OfflineVerificationSyncResultDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> RecordOfflineVerifications([FromBody] OfflineVerificationBatchDto batch, CancellationToken cancellationToken)
+    {
+        if (!Guid.TryParse(User.FindFirst("userId")?.Value, out var userId))
+        {
+            return Unauthorized(new { error = "Invalid token." });
+        }
+
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownIpAddress;
+
+        try
+        {
+            var result = await _offlinePackageService.RecordOfflineVerificationsAsync(userId, batch.Entries, ipAddress, cancellationToken);
+
+            return Ok(result);
+        }
+        catch (ArgumentException ae)
+        {
+            return BadRequest(new { error = ae.Message });
+        }
+        catch (OfflineVerificationConflictException ovce)
+        {
+            return Conflict(new { error = ovce.Message });
         }
     }
 }

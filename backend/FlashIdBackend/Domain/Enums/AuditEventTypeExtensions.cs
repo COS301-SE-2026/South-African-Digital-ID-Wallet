@@ -11,6 +11,8 @@ public static class AuditEventTypeExtensions
         AuditEventType.CitizenCredentialsActivationFailed,
         AuditEventType.DeviceVerificationFailed,
         AuditEventType.EmergencyProfileAccessFailed,
+        AuditEventType.QrGenerationBlocked,
+        AuditEventType.OfflineVerificationRejected,
     };
 
     public static readonly HashSet<AuditEventType> ViewEvents = new()

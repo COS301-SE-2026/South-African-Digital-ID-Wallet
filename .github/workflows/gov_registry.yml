@@ -7,6 +7,7 @@ on:
   pull_request:
     branches: ["main", "dev"]
     paths: ['government-registry/**']
+  workflow_dispatch:
 
 jobs:
   build-and-test:
@@ -35,5 +36,6 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           files: ./government-registry/TestResults/**/*.cobertura.xml
+          flags: gov-registry
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
