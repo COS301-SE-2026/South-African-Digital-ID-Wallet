@@ -22,9 +22,7 @@ describe('UpdatePasswordCard', () => {
     const user = userEvent.setup()
     const onAction = jest.fn()
     render(<UpdatePasswordCard onAction={onAction} />)
-    await user.click(
-      screen.getByRole('button', { name: 'Update Password' })
-    )
+    await user.click(screen.getByRole('button', { name: 'Update Password' }))
     expect(onAction).toHaveBeenCalledTimes(1)
   })
 })

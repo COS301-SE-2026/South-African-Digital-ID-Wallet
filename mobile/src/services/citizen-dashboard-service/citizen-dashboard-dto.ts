@@ -227,6 +227,18 @@ const ACTIVITY_PRESENTATION: Record<string, ActivityPresentation> = {
     title: 'Official verified',
     tone: 'soft-green',
   },
+  offlinecredentialverified: {
+    category: 'verification',
+    Icon: ShieldCheck,
+    title: 'Offline credential verified',
+    tone: 'soft-green',
+  },
+  offlineverificationrejected: {
+    category: 'verification',
+    Icon: ShieldAlert,
+    title: 'Offline verification rejected',
+    tone: 'soft-red',
+  },
   onboardcitizen: {
     category: 'other',
     Icon: UserPlus,

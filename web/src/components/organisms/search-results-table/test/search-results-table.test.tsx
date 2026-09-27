@@ -1,6 +1,13 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SearchResultsTable } from '../search-results-table'
+import {
+  ButtonHTMLAttributes,
+  ComponentProps,
+  ElementType,
+  HTMLAttributes,
+  ReactNode,
+} from 'react'
 
 jest.mock('@/components/atoms/button', () => ({
   Button: ({
@@ -8,7 +15,11 @@ jest.mock('@/components/atoms/button', () => ({
     dataCy,
     variant: _variant,
     ...props
-  }: any) => (
+  }: {
+    children?: ReactNode
+    dataCy?: string
+    variant?: string
+  } & ButtonHTMLAttributes<HTMLButtonElement>) => (
     <button {...props} data-cy={dataCy}>
       {children}
     </button>
@@ -20,15 +31,23 @@ jest.mock('@/components/atoms/text', () => ({
     as: Component = 'span',
     variant: _variant,
     ...props
-  }: any) => <Component {...props}>{children}</Component>,
+  }: {
+    children?: ReactNode
+    as?: ElementType
+    variant?: string
+  } & HTMLAttributes<HTMLElement>) => (
+    <Component {...props}>{children}</Component>
+  ),
 }))
 jest.mock('@/components/atoms/avatar/avatar', () => ({
-  Avatar: ({ initials }: any) => <div>{initials}</div>,
+  Avatar: ({ initials }: { initials: string }) => <div>{initials}</div>,
 }))
 jest.mock('@/components/molecules/table-pagination', () => ({
-  TablePagination: ({ onPageChange }: any) => (
-    <button onClick={() => onPageChange(2)}>Next Page</button>
-  ),
+  TablePagination: ({
+    onPageChange,
+  }: {
+    onPageChange: (page: number) => void
+  }) => <button onClick={() => onPageChange(2)}>Next Page</button>,
 }))
 const row = {
   id: '1',
@@ -48,7 +67,7 @@ const createProps = (overrides = {}) =>
     onPageChange: jest.fn(),
     onViewCredentials: jest.fn(),
     ...overrides,
-  }) as any
+  }) as unknown as ComponentProps<typeof SearchResultsTable>
 describe('SearchResultsTable', () => {
   it('displays the empty state when there are no results', () => {
     render(<SearchResultsTable {...createProps({ rows: [] })} />)
@@ -70,9 +89,7 @@ describe('SearchResultsTable', () => {
     const user = userEvent.setup()
     const props = createProps()
     render(<SearchResultsTable {...props} />)
-    await user.click(
-      screen.getByRole('button', { name: 'View Credentials' })
-    )
+    await user.click(screen.getByRole('button', { name: 'View Credentials' }))
     await user.click(screen.getByRole('button', { name: 'Next Page' }))
     expect(props.onViewCredentials).toHaveBeenCalledWith(row)
     expect(props.onPageChange).toHaveBeenCalledWith(2)

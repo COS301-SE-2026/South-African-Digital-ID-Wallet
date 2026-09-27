@@ -447,4 +447,58 @@ public class CredentialsController : ControllerBase
 
         return Ok(keys);
     }
+
+    /// <summary>
+    /// Returns the signed list of revocation indexes that must no longer verify offline, for a verifier to cache.
+    /// </summary>
+    /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
+    /// <response code="200">The list as a compact JWS signed by the credential key.</response>
+    [HttpGet("revocation-list")]
+    [ProducesResponseType(typeof(RevocationListResponseDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetRevocationList(CancellationToken cancellationToken)
+    {
+        var revocationList = await _offlinePackageService.GetRevocationListAsync(cancellationToken);
+
+        return Ok(revocationList);
+    }
+
+    /// <summary>
+    /// Records scans a verifier's phone made while offline, once it has signal again.
+    /// </summary>
+    /// <param name="batch">Up to 100 offline scans, each with an id generated on the phone.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation if the request is aborted.</param>
+    /// <response code="200">How many scans were recorded, how many an earlier upload had already recorded, and the ids that can never be recorded.</response>
+    /// <response code="400">More than 100 scans in one upload.</response>
+    /// <response code="403">The caller is not an official; only officials' scans belong in the audit trail.</response>
+    /// <response code="409">Another upload of the same scans was stored first; retry.</response>
+    [HttpPost("offline-verifications")]
+    [Authorize(Roles = "Official")]
+    [ProducesResponseType(typeof(OfflineVerificationSyncResultDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> RecordOfflineVerifications([FromBody] OfflineVerificationBatchDto batch, CancellationToken cancellationToken)
+    {
+        if (!Guid.TryParse(User.FindFirst("userId")?.Value, out var userId))
+        {
+            return Unauthorized(new { error = "Invalid token." });
+        }
+
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownIpAddress;
+
+        try
+        {
+            var result = await _offlinePackageService.RecordOfflineVerificationsAsync(userId, batch.Entries, ipAddress, cancellationToken);
+
+            return Ok(result);
+        }
+        catch (ArgumentException ae)
+        {
+            return BadRequest(new { error = ae.Message });
+        }
+        catch (OfflineVerificationConflictException ovce)
+        {
+            return Conflict(new { error = ovce.Message });
+        }
+    }
 }

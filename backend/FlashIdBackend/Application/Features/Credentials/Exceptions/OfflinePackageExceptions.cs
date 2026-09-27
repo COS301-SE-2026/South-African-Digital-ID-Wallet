@@ -27,3 +27,11 @@ public class InvalidDeviceKeyException : Exception
     public InvalidDeviceKeyException(string reason, Exception? innerException = null)
         : base($"The device key is not a valid: {reason}", innerException) { }
 }
+
+// Another upload of the same scans was stored first, so this one wrote nothing and should be retried (409).
+public class OfflineVerificationConflictException : Exception
+{
+    public OfflineVerificationConflictException()
+        : base("These offline verifications were being recorded by another request. Retry the upload.") { }
+}
+

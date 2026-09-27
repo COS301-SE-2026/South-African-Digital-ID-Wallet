@@ -7,26 +7,36 @@ import loginService from '@/services/login-service/login-service'
 import { useUser } from '@/context/user-context'
 
 jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(), useSearchParams: jest.fn(),
+  useRouter: jest.fn(),
+  useSearchParams: jest.fn(),
 }))
 jest.mock('@/context/user-context', () => ({ useUser: jest.fn() }))
 jest.mock('@/services/login-service/login-service', () => ({
-  __esModule: true, default: { login: jest.fn(), verifyDevice: jest.fn() },
+  __esModule: true,
+  default: { login: jest.fn(), verifyDevice: jest.fn() },
 }))
 jest.mock('react-hot-toast', () => ({
-  __esModule: true, default: { success: jest.fn(), error: jest.fn() },
+  __esModule: true,
+  default: { success: jest.fn(), error: jest.fn() },
 }))
 jest.mock('@/components/templates/otp-modal/otp-modal', () => ({
-  OtpModal: ({ open, onSuccess }: any) =>
+  OtpModal: ({
+    open,
+    onSuccess,
+  }: {
+    open: boolean
+    onSuccess: (code: string) => void
+  }) =>
     open ? <button onClick={() => onSuccess('123456')}>OTP</button> : null,
 }))
 const push = jest.fn()
 const refresh = jest.fn()
-const renderForm = () => render(
-  <QueryClientProvider client={new QueryClient()}>
-    <LoginForm />
-  </QueryClientProvider>
-)
+const renderForm = () =>
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <LoginForm />
+    </QueryClientProvider>
+  )
 beforeEach(() => {
   jest.clearAllMocks()
   ;(useRouter as jest.Mock).mockReturnValue({ push })
@@ -57,11 +67,13 @@ describe('LoginForm', () => {
   })
   it('handles OTP verification', async () => {
     ;(loginService.login as jest.Mock).mockResolvedValue({
-      role: 'citizen', requiresDeviceVerification: true,
+      role: 'citizen',
+      requiresDeviceVerification: true,
       deviceVerificationId: 'dv-1',
     })
     ;(loginService.verifyDevice as jest.Mock).mockResolvedValue({
-      role: 'citizen', expiresAt: '2026-01-01',
+      role: 'citizen',
+      expiresAt: '2026-01-01',
     })
     renderForm()
     const user = await fill()

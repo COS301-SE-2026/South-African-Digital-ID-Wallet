@@ -1,12 +1,13 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { CaptureContactDetails } from '../capture-contact-details'
+import { ComponentProps } from 'react'
 
 jest.mock('react-hot-toast', () => ({
   __esModule: true,
   default: { success: jest.fn() },
 }))
-const baseProps: any = {
+const baseProps = {
   record: { saId: '9001015009087' },
   phone: '',
   setPhone: jest.fn(),
@@ -20,7 +21,7 @@ const baseProps: any = {
   errors: {},
   setErrors: jest.fn(),
   onboardResponse: null,
-}
+} as unknown as ComponentProps<typeof CaptureContactDetails>
 describe('CaptureContactDetails', () => {
   beforeEach(() => jest.clearAllMocks())
   it('renders and handles input changes', async () => {
@@ -70,6 +71,7 @@ describe('CaptureContactDetails', () => {
         contactDetailsConsent
         accountCreated
         onboardResponse={{
+          citizenId: 'citizen-1',
           saId: '9001015009087',
           status: 'Pending',
           activationPin: '123456',
@@ -77,7 +79,9 @@ describe('CaptureContactDetails', () => {
         }}
       />
     )
-    expect(screen.getByText('Citizen onboarded successfully')).toBeInTheDocument()
+    expect(
+      screen.getByText('Citizen onboarded successfully')
+    ).toBeInTheDocument()
     expect(screen.getByText('9001015009087')).toBeInTheDocument()
     expect(screen.getByText('Pending')).toBeInTheDocument()
     expect(screen.getByText('123456')).toBeInTheDocument()

@@ -7,7 +7,7 @@ import {
   getBiometricPreference,
   loadSession,
 } from '@/lib/secure-session'
-import { clearOfflineCache } from '@/lib/offline/offline-cache'
+import { offlineService } from '@/services/offline-service'
 
 jest.mock('@/lib/secure-session', () => ({
   clearSession: jest.fn(),
@@ -30,8 +30,8 @@ jest.mock('@/lib/api', () => ({
   setDeviceToken: jest.fn(),
 }))
 
-jest.mock('@/lib/offline/offline-cache', () => ({
-  clearOfflineCache: jest.fn().mockResolvedValue(undefined),
+jest.mock('@/services/offline-service', () => ({
+  offlineService: { clearOfflineData: jest.fn().mockResolvedValue(undefined) },
 }))
 
 const session: LoginResponse = {
@@ -85,10 +85,12 @@ describe('useAuthStore', () => {
   it('Should delete the offline cache on sign out', () => {
     useAuthStore.getState().signIn(session)
     useAuthStore.getState().signOut()
-    expect(clearOfflineCache).toHaveBeenCalledTimes(1)
+    expect(offlineService.clearOfflineData).toHaveBeenCalledTimes(1)
   })
   it('Should still sign out when the offline cache cannot be deleted', () => {
-    ;(clearOfflineCache as jest.Mock).mockRejectedValueOnce(new Error('disk'))
+    ;(offlineService.clearOfflineData as jest.Mock).mockRejectedValueOnce(
+      new Error('disk')
+    )
     useAuthStore.getState().signIn(session)
     useAuthStore.getState().signOut()
     expect(useAuthStore.getState().isAuthenticated).toBe(false)
@@ -164,7 +166,7 @@ describe('useAuthStore.restore', () => {
       user: session,
     })
     await useAuthStore.getState().restore()
-    expect(clearOfflineCache).toHaveBeenCalledTimes(1)
+    expect(offlineService.clearOfflineData).toHaveBeenCalledTimes(1)
   })
   it('Should keep the offline cache when a live session is restored', async () => {
     ;(getBiometricPreference as jest.Mock).mockResolvedValue(true)
@@ -174,6 +176,6 @@ describe('useAuthStore.restore', () => {
       user: session,
     })
     await useAuthStore.getState().restore()
-    expect(clearOfflineCache).not.toHaveBeenCalled()
+    expect(offlineService.clearOfflineData).not.toHaveBeenCalled()
   })
 })
