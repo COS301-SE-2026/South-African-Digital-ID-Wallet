@@ -271,7 +271,6 @@ public class CertifiedCopyPdfProvider : ICertifiedCopyPdfProvider
 
                 AddTwoFields(column, "CITIZENSHIP", snapshot.Citizenship, "COUNTRY OF BIRTH", snapshot.CountryOfBirth);
                 AddTwoFields(column, "NATIONALITY", snapshot.Nationality, "ISSUE DATE", FormatDate(snapshot.IssueDate));
-                AddTwoFields(column, "ISSUED BY", snapshot.IssuedBy, "", "");
             });
     }
 
@@ -289,7 +288,6 @@ public class CertifiedCopyPdfProvider : ICertifiedCopyPdfProvider
                 AddTwoFields(column, "LICENCE NUMBER", snapshot.LicenseNumber, "LICENCE CODE", snapshot.LicenseCode);
                 AddTwoFields(column, "RESTRICTIONS", snapshot.Restrictions, "COUNTRY OF ISSUE", snapshot.CountryOfIssue);
                 AddTwoFields(column, "ISSUE DATE", FormatDate(snapshot.IssueDate), "EXPIRY DATE", FormatDate(snapshot.ExpiryDate));
-                AddTwoFields(column, "ISSUED BY", snapshot.IssuedBy, "", "");
             });
     }
 
