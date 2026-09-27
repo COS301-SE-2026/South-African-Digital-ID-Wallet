@@ -80,7 +80,19 @@ public class KeyRotationServiceTests
     {
         public VaultKeyVersion VersionToReturn = new("version-1", new EcPublicJwk("EC", "P-256", "qr-key-version1", "fake-x", "fake-y"));
 
-        public Task<VaultKeyVersion> GetLatestKeyVersionAsync(CancellationToken cancellationToken) => Task.FromResult(VersionToReturn);
+        public Exception? ExceptionToThrow;
+
+        public Task<VaultKeyVersion> GetLatestKeyVersionAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (ExceptionToThrow != null)
+            {
+                throw ExceptionToThrow;
+            }
+
+            return Task.FromResult(VersionToReturn);
+        }
     }
 
     private static IConfiguration CreateConfiguration()
@@ -193,5 +205,37 @@ public class KeyRotationServiceTests
         var result = await service.HasCompletedTodayAsync(CancellationToken.None);
 
         Assert.True(result);
+    }
+
+    [Fact]
+    public async Task RotateQrSigningKeyAsync_VaultInspectorThrows_MarksJobRunFailedAndRethrows()
+    {
+        var (service, jobRunRepo, signingKeyRepo, vaultInspector) = CreateService();
+        vaultInspector.ExceptionToThrow = new InvalidOperationException("Key Vault unavailable");
+
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => service.RotateQrSigningKeyAsync(CancellationToken.None));
+
+        Assert.Equal("Key Vault unavailable", ex.Message);
+        Assert.Equal(JobRunStatus.Failed, jobRunRepo.ExistingJobRun!.Status);
+        Assert.Equal("Key Vault unavailable", jobRunRepo.ExistingJobRun.ErrorMessage);
+        Assert.Equal(0, jobRunRepo.ExistingJobRun.ProcessedCount);
+        Assert.Empty(signingKeyRepo.AddedKeys);
+        Assert.Empty(signingKeyRepo.UpdatedKeys);
+        Assert.Equal(0, signingKeyRepo.SaveChangesCalls);
+    }
+
+    [Fact]
+    public async Task RotateQrSigningKeyAsync_Cancelled_MarksJobRunFailedAsCancelledAndRethrows()
+    {
+        var (service, jobRunRepo, signingKeyRepo, _) = CreateService();
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => service.RotateQrSigningKeyAsync(cts.Token));
+
+        Assert.Equal(JobRunStatus.Failed, jobRunRepo.ExistingJobRun!.Status);
+        Assert.Equal("Cancelled before completion.", jobRunRepo.ExistingJobRun.ErrorMessage);
+        Assert.Empty(signingKeyRepo.AddedKeys);
+        Assert.Equal(0, signingKeyRepo.SaveChangesCalls);
     }
 }
