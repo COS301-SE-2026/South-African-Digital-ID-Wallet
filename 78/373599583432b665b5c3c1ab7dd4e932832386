@@ -1,0 +1,41 @@
+mobile/src/components/pages/secure-account/types.ts
+  h_99fca60b892ff4 1-3
+mobile/src/components/pages/security-event/security-event-page.tsx
+  h_99fca60b892ff4 1-96
+  h_99fca60b892ff4 97-100
+mobile/src/components/pages/security-confirmation/security-confirmation-page.tsx
+  h_99fca60b892ff4 1-69
+  h_99fca60b892ff4 70-77
+mobile/src/components/pages/security-overview/index.ts
+  h_99fca60b892ff4 1
+mobile/src/components/pages/security-event/types.ts
+  h_99fca60b892ff4 1-3
+mobile/src/components/pages/index.ts
+  h_99fca60b892ff4 12-15
+mobile/src/components/pages/security-confirmation/index.ts
+  h_99fca60b892ff4 1
+mobile/src/components/pages/security-overview/types.ts
+  h_99fca60b892ff4 1-6
+mobile/src/components/pages/security-confirmation/types.ts
+  h_99fca60b892ff4 1-3
+mobile/src/components/pages/security-event/index.ts
+  h_99fca60b892ff4 1
+mobile/src/components/pages/secure-account/secure-account-page.tsx
+  h_99fca60b892ff4 1-130
+mobile/src/components/pages/security-overview/security-overview-page.tsx
+  h_99fca60b892ff4 1-89
+  h_99fca60b892ff4 90-96
+mobile/src/components/pages/secure-account/index.ts
+  h_99fca60b892ff4 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "78373599583432b665b5c3c1ab7dd4e932832386",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
