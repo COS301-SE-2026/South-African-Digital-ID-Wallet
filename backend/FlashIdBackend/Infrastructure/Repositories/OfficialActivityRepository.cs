@@ -45,7 +45,8 @@ public class OfficialActivityRepository : IOfficialActivityRepository
             where official.InstitutionId == institutionId
                   && auditLog.CreatedAt >= fromUtc
                   && auditLog.CreatedAt < toUtc
-                  && auditLog.EventType == AuditEventType.CredentialVerified
+                  && (auditLog.EventType == AuditEventType.CredentialVerified
+                    || auditLog.EventType == AuditEventType.OfflineCredentialVerified)
             select auditLog.Id
         ).CountAsync();
     }

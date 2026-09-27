@@ -17,8 +17,16 @@ public class LocalEs256SigningProviderTests
     // Each test generates a fresh key at runtime, so no private key is ever committed.
     private static string NewPrivateKey(ECCurve curve)
     {
-        using var key = ECDsa.Create(curve);
-        return Convert.ToBase64String(key.ExportPkcs8PrivateKey());
+        try
+        {
+            using var key = ECDsa.Create(curve);
+            return Convert.ToBase64String(key.ExportPkcs8PrivateKey());
+        }
+        catch (PlatformNotSupportedException)
+        {
+            Assert.Skip($"Curve {curve.Oid.FriendlyName ?? curve.Oid.Value} is not supported by this platform's crypto provider.");
+            throw;
+        }
     }
 
     private static IConfiguration CreateConfiguration(string? kid, string? privateKey)
