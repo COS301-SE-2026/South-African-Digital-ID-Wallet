@@ -1,0 +1,34 @@
+backend/FlashIdBackend/Application/Common/Services/PhysicalIdentityVerificationService.cs
+  h_99fca60b892ff4 10,99
+backend/FlashIdBackend/Application/Common/Services/IssueCredentialService.cs
+  h_99fca60b892ff4 13,34
+backend/FlashIdBackend/Application/Common/Services/CitizenVerificationService.cs
+  h_99fca60b892ff4 9,114
+backend/FlashIdBackend/Application/Common/Services/OnboardingService.cs
+  h_99fca60b892ff4 13,41,70-74,86,103
+backend/FlashIdBackend/Application/Common/Validation/SaIdValidator.cs
+  h_99fca60b892ff4 1-41
+backend/FlashIdBackend/Infrastructure/Gateways/GovernmentRegistry/GovernmentRegistryGateway.cs
+  h_99fca60b892ff4 7,67
+backend/FlashIdBackend/tests/CitizenVerificationSeviceTests.cs
+  h_99fca60b892ff4 13,149,209
+backend/FlashIdBackend/tests/CredentialControllerIntegrationTests.cs
+  h_99fca60b892ff4 290,337,380,405,416,430,441,455,475
+backend/FlashIdBackend/tests/IssueCredentialServiceTests.cs
+  h_99fca60b892ff4 22
+backend/FlashIdBackend/tests/OnboardingServiceTests.cs
+  h_99fca60b892ff4 18
+backend/FlashIdBackend/tests/PhysicalIdentityVerificationServiceTests.cs
+  h_99fca60b892ff4 16-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "8f220cb3d99d96b75b72dd4d0a3cd8a63e890d47",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
