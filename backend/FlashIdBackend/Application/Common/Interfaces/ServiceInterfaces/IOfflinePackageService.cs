@@ -17,4 +17,15 @@ public interface IOfflinePackageService
 
     // The public keys a verifier needs to check issuer signatures while offline
     Task<IssuerKeysResponseDto> GetIssuerKeysAsync(CancellationToken cancellationToken);
+
+    // A signed list of revocation indexes that must no longer verify, for a verifier to cache before going offline.
+    Task<RevocationListResponseDto> GetRevocationListAsync(CancellationToken cancellationToken);
+
+    // Writes one audit row per scan a verifier's phone made offline, skipping entries an earlier upload already recorded.
+    Task<OfflineVerificationSyncResultDto> RecordOfflineVerificationsAsync(
+        Guid verifierUserId,
+        IReadOnlyList<OfflineVerificationEntryDto> entries,
+        string ipAddress,
+        CancellationToken cancellationToken
+    );
 }

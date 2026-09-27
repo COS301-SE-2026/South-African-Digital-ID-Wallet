@@ -1,6 +1,7 @@
 import { p256 } from '@noble/curves/nist.js'
 import { sha256 } from '@noble/hashes/sha2.js'
 import { base64urlnopad } from '@scure/base'
+import { CLAIM_LABELS } from './claim-labels'
 
 export type VerificationFailureCode =
   | 'MALFORMED'
@@ -36,7 +37,7 @@ export type TrustData = {
   /** Unix seconds when the issuer key set was last fetched. */
   retrievedAt: number
   revokedIndexes: readonly number[]
-  /** Unix seconds when the revocation list was last fetched, or null until one has been (checklist 5.1). */
+  /** Unix seconds when the revocation list in use was issued (its signed iat), or null until one has been verified. */
   revocationRetrievedAt: number | null
 }
 
@@ -60,6 +61,7 @@ export type VerificationResult =
 const ISSUER = 'urn:flashid:issuer'
 const CREDENTIAL_TYP = 'dc+sd-jwt'
 const KEY_BINDING_TYP = 'kb+jwt'
+const REVOCATION_LIST_TYP = 'revocation-list+jwt'
 const ALGORITHM = 'ES256'
 const DIGEST_ALGORITHM = 'sha-256'
 const COORDINATE_BYTES = 32
@@ -78,31 +80,14 @@ export const MANDATORY_CLAIMS: Readonly<Record<string, readonly string[]>> = {
   'urn:flashid:drivers-license:1': ['portrait', 'expiry_date', 'date_of_birth'],
 }
 
-const ALLOWED_CLAIMS: Readonly<Record<string, readonly string[]>> = {
-  'urn:flashid:identity-document:1': [
-    'date_of_birth',
-    'portrait',
-    'identity_number',
-    'surname',
-    'forenames',
-    'citizenship_status',
-    'gender',
-    'country_of_birth',
-    'card_issue_date_and_number',
-  ],
-  'urn:flashid:drivers-license:1': [
-    'portrait',
-    'expiry_date',
-    'date_of_birth',
-    'full_name',
-    'identity_number',
-    'license_number',
-    'license_code',
-    'country_of_issue',
-    'vehicle_restrictions',
-    'issue_date',
-  ],
-}
+// Derived from the shared label table, so any claim the phone can show is exactly a claim it accepts.
+const ALLOWED_CLAIMS: Readonly<Record<string, readonly string[]>> =
+  Object.fromEntries(
+    Object.entries(CLAIM_LABELS).map(([vct, labels]) => [
+      vct,
+      Object.keys(labels),
+    ])
+  )
 
 type JsonObject = Record<string, unknown>
 type Failure = { failure: VerificationFailureCode }
@@ -259,6 +244,50 @@ const checkIssuerSignature = (
   return verifyJws(parsed.segments, publicKey)
     ? undefined
     : 'BAD_ISSUER_SIGNATURE'
+}
+
+// The revocation list is signed with the credential key, so it is checked against the same cached key set
+// before a single index is trusted. Returns the revoked indexes, or null when the list cannot be trusted.
+export type VerifiedRevocationList = {
+  revokedIndexes: readonly number[]
+  // The list's own signed issue time, so a stored list can never be replaced by an older one.
+  issuedAt: number
+}
+
+// The revocation list is signed with the credential key, so it is checked against the same cached key set
+// before a single index is trusted. Returns the list, or null when it cannot be trusted.
+export const verifyRevocationList = (
+  jws: string,
+  keys: readonly IssuerKey[]
+): VerifiedRevocationList | null => {
+  const parsed = parseJwt(jws)
+
+  if (
+    !parsed ||
+    parsed.header.alg !== ALGORITHM ||
+    parsed.header.typ !== REVOCATION_LIST_TYP ||
+    parsed.payload.iss !== ISSUER
+  ) {
+    return null
+  }
+
+  const key = keys.find(
+    (candidate) =>
+      candidate.kid === parsed.header.kid && candidate.status !== 'revoked'
+  )
+  const publicKey = key ? publicKeyBytes(key) : null
+
+  if (!publicKey || !verifyJws(parsed.segments, publicKey)) {
+    return null
+  }
+
+  const { iat, revoked } = parsed.payload
+
+  return typeof iat === 'number' &&
+    Array.isArray(revoked) &&
+    revoked.every((index) => Number.isInteger(index))
+    ? { revokedIndexes: revoked as number[], issuedAt: iat }
+    : null
 }
 
 // Steps 5 and 6. Everything from here on is signed content.
@@ -455,8 +484,7 @@ const trustWarnings = (trust: TrustData, now: number): string[] => {
     warnings.push('Verification data is over 24 hours old.')
   }
 
-  // Until the revocation list ships (checklist 5.1 and 5.2), a revoked credential cannot be
-  // detected offline, so the result must say so rather than imply it was checked.
+  // Only a phone that has never received a revocation list gets this. The result must not imply a check it could not make.
   if ((trust.revocationRetrievedAt ?? null) === null) {
     warnings.push(REVOCATION_NOT_CHECKED_WARNING)
   }

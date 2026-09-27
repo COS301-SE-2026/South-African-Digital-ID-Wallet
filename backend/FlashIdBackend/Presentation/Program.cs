@@ -17,6 +17,7 @@ using Microsoft.Azure.Cosmos;
 using Presentation.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpOverrides;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,8 @@ if (!builder.Environment.IsEnvironment("Testing"))
 builder.Services.AddInfrastructure();
 
 builder.Services.AddApplication();
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -233,7 +236,6 @@ app.UseCors(FrontendCorsPolicy);
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
 
 app.MapHealthChecks("/health", new HealthCheckOptions { Predicate = check => !check.Tags.Contains("readiness") });
 

@@ -49,6 +49,9 @@ public static class DependencyInjection
             sp.GetService<Microsoft.Extensions.Configuration.IConfiguration>()));
         services.AddScoped<IFraudDetectionService, FraudDetectionService>();
         services.AddScoped<IOfflinePackageService, OfflinePackageService>();
+        services.AddSingleton<CertifiedCredentialSnapshotMapper>();
+        services.AddScoped<ICertifiedCredentialCopyService, CertifiedCredentialCopyService>();
+
         return services;
     }
 }

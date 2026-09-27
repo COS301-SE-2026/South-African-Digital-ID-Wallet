@@ -23,3 +23,9 @@ export const issuerKeysResponseSchema = z.object({
   keys: z.array(z.unknown()),
   retrievedAt: z.string(),
 })
+
+// The list itself is checked by verifyRevocationList, against the issuer keys it will be used with.
+export const revocationListResponseSchema = z.object({
+  revocationList: z.string().min(1),
+  retrievedAt: z.string(),
+})

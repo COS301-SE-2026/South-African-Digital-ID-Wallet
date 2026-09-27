@@ -138,6 +138,10 @@ public static class DependencyInjection
         services.AddSingleton<IPortraitProcessor, ImageSharpPortraitProcessor>();
 
         services.AddScoped<IOfflinePackageRepository, OfflinePackageRepository>();
+
+        services.AddScoped<ICertifiedCredentialCopyRepository, CertifiedCredentialCopyRepository>();
+        services.AddSingleton<ICertifiedCopyCryptographyProvider, CertifiedCopyCryptographyProvider>();
+        services.AddSingleton<ICertifiedCopyPdfProvider, CertifiedCopyPdfProvider>();
         return services;
     }
 }

@@ -116,6 +116,59 @@ namespace Infrastructure.Migrations
                     b.ToTable("Biometrics");
                 });
 
+            modelBuilder.Entity("Domain.Entities.CertifiedCredentialCopy", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CitizenId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CredentialId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CredentialSnapshotHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("DocumentHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("GeneratedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("VerificationTokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CitizenId");
+
+                    b.HasIndex("CredentialId");
+
+                    b.HasIndex("VerificationTokenHash")
+                        .IsUnique();
+
+                    b.ToTable("CertifiedCredentialCopies", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Citizen", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1380,6 +1433,17 @@ namespace Infrastructure.Migrations
                         .WithOne("Biometrics")
                         .HasForeignKey("Domain.Entities.Biometrics", "CredentialId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Credential");
+                });
+
+            modelBuilder.Entity("Domain.Entities.CertifiedCredentialCopy", b =>
+                {
+                    b.HasOne("Domain.Entities.Credential", "Credential")
+                        .WithMany()
+                        .HasForeignKey("CredentialId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Credential");

@@ -33,6 +33,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<FraudAlert> FraudAlerts => Set<FraudAlert>();
     public DbSet<UserSecurityProfile> UserSecurityProfiles => Set<UserSecurityProfile>();
 
+    public DbSet<CertifiedCredentialCopy> CertifiedCredentialCopies => Set<CertifiedCredentialCopy>();
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
