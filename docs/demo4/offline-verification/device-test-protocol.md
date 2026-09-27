@@ -26,8 +26,8 @@ Each step lists what to do, what should happen and what happened. The unit and i
 | 3 | Citizen online shows an online code; verifier in aeroplane mode scans it | "No connection. Ask the citizen to show their offline code." | Pass, 2026-09-24 |
 | 4 | Citizen changes the shared fields while offline; verifier scans the new code | The result shows only the new selection | Pass, 2026-09-24 |
 | 5 | Replay. Package bound to the citizen's phone ("Frame 1 of 28"). Film the offline code with a third phone, replay it at once, then again after 2 minutes | Live code verifies; immediate replay may verify (the D-023 window); replay after 2 minutes fails with "This code has expired. Ask the citizen to show it again." | Pass, 2026-09-25. 28 frames, about 4.2 s. Immediate replay verified, replay after 2 minutes rejected |
-| 6 | Revocation. Verifier online downloads the list; citizen stays offline; an administrator revokes the licence; verifier refreshes online, then scans offline | Before revocation: no "Revocation status was not checked" line. After: "This credential has been revoked." | Pending |
-| 7 | Audit sync. Scan offline, then reconnect the verifier | An `OfflineCredentialVerified` audit row with the phone's scan time and the receipt time | Pending |
+| 6 | Revocation. Verifier online downloads the list; citizen stays offline; an administrator revokes the licence; verifier refreshes online, then scans offline | Before revocation: no "Revocation status was not checked" line. After: "This credential has been revoked." | Pass, 2026-09-27 |
+| 7 | Audit sync. Scan offline, then reconnect the verifier | An `OfflineCredentialVerified` audit row with the phone's scan time and the receipt time | Pass, 2026-09-27 |
 
 ## Findings from device testing
 
@@ -38,3 +38,9 @@ Device testing on 2026-09-24 found issues no unit test caught, all fixed before 
 - Offline reads of the cache were reused for minutes, so a newly downloaded package was not seen. Offline reads are now fresh each time.
 - The scanner stayed on the result screen when Verify was pressed again.
 - Switching codes left the new code partly scrolled off screen, where it could not be scanned.
+
+Device testing on 2026-09-27 found three more, also fixed:
+
+- The verifier fetched the revocation list once per app session, so a revocation was missed until the app restarted. The scanner now refreshes it every time it opens with signal.
+- Offline scans showed as grey "Account activity" and were missing from the Verifications tab. They now have their own entries.
+- The "Verifications today" counter ignored offline scans. It now counts verified ones.

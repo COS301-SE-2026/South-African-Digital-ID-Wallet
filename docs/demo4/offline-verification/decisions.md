@@ -383,7 +383,7 @@ unaffected, since they always cover the exact bytes sent. Raised in review on PR
 
 **Alternatives.** A status list bitstring (IETF Token Status List). Rejected for the prototype: more code for a list that stays small. Plain JSON over TLS. Rejected: it would be trusted only at download time, and a stored copy could be edited on the phone.
 
-**Consequences.** A revocation reaches a verifier only when that verifier next refreshes online. The age warnings in wire-format section 10, step 12, cover this. `Investigation`, `Inactive` and `Expired` are refused offline as well as `Revoked`. The list grows by one integer per such credential.
+**Consequences.** A revocation reaches a verifier only when that verifier next refreshes online, which happens everytime the scanner opens with aignal. The age warnings in wire-format section 10, step 12, cover this. `Investigation`, `Inactive` and `Expired` are refused offline as well as `Revoked`. The list grows by one integer per such credential.
 
 ---
 
@@ -397,7 +397,7 @@ unaffected, since they always cover the exact bytes sent. Raised in review on PR
 
 **Alternatives.** A separate table with a unique client id. Rejected: a migration during the sprint for no gain over the primary key. Linking failed scans to a citizen too. Rejected: a failed scan may carry a forged index, which would let anyone fill a citizen's history with fake rejections.
 
-**Consequences.** No migration: event types are stored as strings. Only officials may upload (`403` otherwise), and the app queues only officials' scans; an official could still forge rows, but every row names them as the actor. Result codes are stored as sent, if well formed, so the server keeps no copy of the app's list; each entry is validated on its own and invalid ones are returned in `rejected` while the rest are recorded. Two uploads racing on the same ids get `409` and the phone retries. Queued scans are tagged with the official and survive sign-out or an expired session, uploading only when that official signs in again. The queue is capped at 1,000 entries. Citizen notifications after sync were cut for time. Changed after review on PR #568.
+**Consequences.** No migration: event types are stored as strings. Only officials may upload (`403` otherwise), and the app queues only officials' scans; an official could still forge rows, but every row names them as the actor. Result codes are stored as sent, if well formed, so the server keeps no copy of the app's list; each entry is validated on its own and invalid ones are returned in `rejected` while the rest are recorded. Two uploads racing on the same ids get `409` and the phone retries. Queued scans are tagged with the official and survive sign-out or an expired session, uploading only when that official signs in again. The queue is capped at 1,000 entries. Citizen notifications after sync were cut for time. Verified offline scans count towrads the institution's verifications today, and rejected ones show as Failed in the audit log. Changed after review on PR #568.
 
 ---
 
