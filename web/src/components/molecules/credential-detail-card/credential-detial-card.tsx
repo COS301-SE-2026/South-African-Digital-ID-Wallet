@@ -1,21 +1,21 @@
 'use client'
-
 import { FC, useEffect, useRef, useState } from 'react'
-import { Share2 } from 'lucide-react'
+import { Download, Share2 } from 'lucide-react'
 import { StatusPill, Text } from '@/components/atoms'
 import { FieldSelectionForm, QrDisplay } from '@/components/organisms'
 import { MANDATORY_FIELDS } from '@/services/qr-service/qr-field-definitions'
 import type { QrDisclosureSelection } from '@/services/qr-service'
-import { type CredentialDetailCardProps } from './types'
+import type { CredentialDetailCardProps } from './types'
 
 export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
   credential,
+  onGenerateCertifiedCopy,
 }) => {
   const Icon = credential.icon
-
   const [isShareOpen, setIsShareOpen] = useState(false)
-
-  const [shareStep, setShareStep] = useState<'disclosure' | 'qr'>('disclosure')
+  const [shareStep, setShareStep] = useState<'disclosure' | 'qr'>(
+    'disclosure'
+  )
 
   const [selection, setSelection] = useState<QrDisclosureSelection>(() => ({
     credentialId: credential.id,
@@ -23,19 +23,16 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
     mandatoryFields: MANDATORY_FIELDS[credential.qrCredentialType],
     selectedOptionalFields: [],
   }))
-
   const dialogRef = useRef<HTMLDialogElement>(null)
-
   useEffect(() => {
     const dialog = dialogRef.current
-
     if (!dialog) {
       return
     }
-
     if (isShareOpen && !dialog.open) {
       dialog.showModal()
-    } else if (!isShareOpen && dialog.open) {
+    }
+    if (!isShareOpen && dialog.open) {
       dialog.close()
     }
   }, [isShareOpen])
@@ -45,21 +42,21 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
       <div className="rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
         <div className="relative overflow-hidden rounded-[24px] bg-card p-5 sm:p-6">
           <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary-green/5" />
-
           <div className="pointer-events-none absolute -bottom-20 -left-16 h-40 w-40 rounded-full bg-national-blue/5" />
-
           <div className="relative grid gap-6 lg:grid-cols-[1fr_180px]">
             <div>
               <div className="mb-6 flex items-center gap-4">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-primary-green/20 bg-gradient-to-br from-primary-green/10 to-national-blue/10 shadow-sm sm:h-16 sm:w-16">
                   <Icon className="h-7 w-7 text-primary-green sm:h-8 sm:w-8" />
                 </div>
-
                 <div className="min-w-0">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-text sm:text-xs">
+                  <Text
+                    as="p"
+                    variant="caption"
+                    className="font-bold uppercase tracking-wider"
+                  >
                     Digital Credential
-                  </p>
-
+                  </Text>
                   <Text
                     as="h2"
                     variant="h4"
@@ -67,7 +64,6 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
                   >
                     {credential.title}
                   </Text>
-
                   <Text
                     as="p"
                     variant="sub-sm"
@@ -77,7 +73,6 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
                   </Text>
                 </div>
               </div>
-
               <div>
                 <Text
                   as="h3"
@@ -86,33 +81,38 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
                 >
                   Credential Details
                 </Text>
-
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {credential.rows.map((row) => (
                     <div
                       key={row.label}
                       className="rounded-xl border border-border-grey bg-muted/30 px-4 py-3 transition hover:bg-primary-green/5"
                     >
-                      <p className="text-[11px] font-bold uppercase tracking-wide text-muted-text">
+                      <Text
+                        as="p"
+                        variant="caption"
+                        className="font-bold uppercase tracking-wide"
+                      >
                         {row.label}
-                      </p>
-
-                      <p className="mt-1 truncate text-sm font-semibold text-deep-green">
+                      </Text>
+                      <Text
+                        as="p"
+                        variant="sub-sm"
+                        className="mt-1 truncate font-semibold text-deep-green"
+                      >
                         {row.value}
-                      </p>
+                      </Text>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-
             <div className="flex items-start justify-start lg:justify-end">
               <StatusPill intent={credential.statusIntent}>
                 {credential.statusLabel}
               </StatusPill>
             </div>
           </div>
-          <div className="relative mt-5 flex justify-end border-t border-border-grey pt-5">
+          <div className="relative mt-5 flex flex-col gap-3 border-t border-border-grey pt-5 sm:flex-row sm:items-center sm:justify-between">
             <button
               type="button"
               onClick={() => {
@@ -124,10 +124,17 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
               <Share2 className="h-4 w-4" />
               Share Credential
             </button>
+            <button
+              type="button"
+              onClick={onGenerateCertifiedCopy}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-deep-green px-5 text-sm font-semibold text-clean-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-green sm:w-auto"
+            >
+              <Download className="h-4 w-4" />
+              Generate Certified Copy
+            </button>
           </div>
         </div>
       </div>
-
       <dialog
         ref={dialogRef}
         aria-labelledby="share-credential-title"
@@ -138,17 +145,14 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
         <div className="flex h-full items-end justify-center px-0 sm:items-center sm:px-4 sm:py-6">
           <div className="relative z-10 flex h-[100dvh] w-full max-w-6xl flex-col overflow-hidden rounded-none border border-border-grey bg-card shadow-2xl sm:h-[min(92dvh,900px)] sm:rounded-[32px]">
             <div className="flex items-start justify-between gap-4 border-b border-border-grey px-4 py-4 sm:px-6 sm:py-5">
-              <div className="space-y-1">
-                <Text
-                  as="h2"
-                  variant="h4"
-                  className="text-deep-green"
-                  id="share-credential-title"
-                >
-                  Share {credential.title}
-                </Text>
-              </div>
-
+              <Text
+                as="h2"
+                variant="h4"
+                className="text-deep-green"
+                id="share-credential-title"
+              >
+                Share {credential.title}
+              </Text>
               <button
                 type="button"
                 onClick={() => setIsShareOpen(false)}
@@ -157,7 +161,6 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
                 Close
               </button>
             </div>
-
             <div className="min-h-0 flex-1 overflow-y-auto bg-card p-4 sm:p-6">
               {shareStep === 'disclosure' ? (
                 <FieldSelectionForm
