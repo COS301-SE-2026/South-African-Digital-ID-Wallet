@@ -108,6 +108,11 @@ export const officialsNavSections: SidebarNavSection[] = [
         href: '/officials/verifications',
         icon: 'users',
       },
+      {
+        label: 'Verify Documents',
+        href: '/officials/verify-document',
+        icon: 'users',
+      },
     ],
   },
 
