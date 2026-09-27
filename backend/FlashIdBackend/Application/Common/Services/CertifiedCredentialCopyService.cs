@@ -4,6 +4,7 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Mapping;
 using Application.Features.CertifiedCredentialCopies.DTOs;
 using Application.Features.CertifiedCredentialCopies.Models;
+using Application.Features.Credentials.Enums;
 using Application.Features.Credentials.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
@@ -39,7 +40,7 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
         _photoStorageProvider = photoStorageProvider;
     }
 
-    public async Task<GeneratedCertifiedCopyResultDto> GenerateAsync(Guid credentialId, Guid requestingUserId)
+    public async Task<GeneratedCertifiedCopyResultDto> GenerateAsync(Guid credentialId, CredentialType credentialType, Guid requestingUserId)
     {
         var credential = await _credentialRepository.GetByIdAsync(credentialId);
 
@@ -52,7 +53,7 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
         if (credential.Status != CredentialStatus.Active)
             throw new CredentialNotActiveException();
 
-        var snapshot = CreateSnapshot(credential);
+        var snapshot = CreateSnapshot(credential, credentialType);
 
         var certifiedCopyId = Guid.NewGuid();
 
@@ -103,16 +104,24 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
         };
     }
 
-    private CertifiedCredentialSnapshot CreateSnapshot(Credential credential)
+    private CertifiedCredentialSnapshot CreateSnapshot(Credential credential, CredentialType credentialType)
     {
-        if (credential.IdentityDocument is not null)
-            return _snapshotMapper.MapIdentityDocument(credential);
+        return credentialType switch
+        {
+            CredentialType.IdentityDocument when credential.IdentityDocument is not null
+                => _snapshotMapper.MapIdentityDocument(credential),
 
-        if (credential.DriversLicense is not null)
-            return _snapshotMapper.MapDriversLicense(credential);
+            CredentialType.DriversLicense when credential.DriversLicense is not null
+                => _snapshotMapper.MapDriversLicense(credential),
 
-        throw new InvalidOperationException(
-            "Credential type is not supported for certified copies.");
+            CredentialType.IdentityDocument
+                => throw new InvalidOperationException("No identity document is associated with this credential."),
+
+            CredentialType.DriversLicense
+                => throw new InvalidOperationException("No driver's licence is associated with this credential."),
+
+            _ => throw new ArgumentOutOfRangeException(nameof(credentialType))
+        };
     }
 
     private string CreateVerificationUrl(string verificationToken)
@@ -163,8 +172,7 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
 
         var tokenHash = _cryptographyProvider.HashVerificationToken(verificationToken);
 
-        var certifiedCopy =
-            await _certifiedCopyRepository.GetByVerificationTokenHashAsync(tokenHash);
+        var certifiedCopy = await _certifiedCopyRepository.GetByVerificationTokenHashAsync(tokenHash);
 
         if (certifiedCopy is null)
         {
@@ -213,7 +221,7 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
             };
         }
 
-        var snapshot = CreateSnapshot(credential);
+        var snapshot = ResolveCertifiedSnapshot(certifiedCopy);
 
         return new VerifyCertifiedCopyResponseDto
         {
@@ -329,7 +337,7 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
             };
         }
 
-        var snapshot = CreateSnapshot(credential);
+        var snapshot = ResolveCertifiedSnapshot(certifiedCopy);
 
         return new VerifyCertifiedCopyDocumentResponseDto
         {
@@ -343,5 +351,29 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
             ExpiresAt = certifiedCopy.ExpiresAt,
             Message = "The document is a valid and unmodified FlashID certified copy."
         };
+    }
+
+    private CertifiedCredentialSnapshot ResolveCertifiedSnapshot(CertifiedCredentialCopy certifiedCopy)
+    {
+        var credential = certifiedCopy.Credential;
+
+        if (credential.IdentityDocument is not null)
+        {
+            var snapshot = _snapshotMapper.MapIdentityDocument(credential);
+
+            if (_cryptographyProvider.VerifyCredentialSnapshotHash(snapshot, certifiedCopy.CredentialSnapshotHash))
+                return snapshot;
+        }
+
+        if (credential.DriversLicense is not null)
+        {
+            var snapshot = _snapshotMapper.MapDriversLicense(credential);
+
+            if (_cryptographyProvider.VerifyCredentialSnapshotHash(snapshot, certifiedCopy.CredentialSnapshotHash))
+                return snapshot;
+        }
+
+        throw new InvalidOperationException(
+            $"The credential snapshot for certified copy {certifiedCopy.Id} could not be resolved.");
     }
 }

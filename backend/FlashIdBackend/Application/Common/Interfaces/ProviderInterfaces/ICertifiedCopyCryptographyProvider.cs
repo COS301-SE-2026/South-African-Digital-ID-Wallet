@@ -13,4 +13,6 @@ public interface ICertifiedCopyCryptographyProvider
     string HashDocument(byte[] documentBytes);
 
     bool VerifyDocumentHash(byte[] documentBytes, string expectedHash);
+
+    bool VerifyCredentialSnapshotHash(CertifiedCredentialSnapshot snapshot, string expectedHash);
 }

@@ -3,6 +3,7 @@ using Application.Features.Credentials.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Application.Features.CertifiedCredentialCopies.DTOs;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -23,7 +24,7 @@ public class CertifiedCredentialCopiesController : ControllerBase
 
     [Authorize(Roles = "Citizen")]
     [HttpPost("credentials/{credentialId:guid}")]
-    public async Task<IActionResult> GenerateCertifiedCopy(Guid credentialId)
+    public async Task<IActionResult> GenerateCertifiedCopy(Guid credentialId, [FromBody] GenerateCertifiedCopyRequestDto request)
     {
         try
         {
@@ -37,7 +38,7 @@ public class CertifiedCredentialCopiesController : ControllerBase
                 });
             }
 
-            var result = await _certifiedCopyService.GenerateAsync(credentialId, userId);
+            var result = await _certifiedCopyService.GenerateAsync(credentialId, request.CredentialType, userId);
 
             return File(result.PdfBytes, "application/pdf", result.FileName);
         }

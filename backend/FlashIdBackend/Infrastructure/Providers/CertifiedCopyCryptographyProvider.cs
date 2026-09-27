@@ -72,9 +72,17 @@ public class CertifiedCopyCryptographyProvider : ICertifiedCopyCryptographyProvi
             return false;
         }
 
-        return CryptographicOperations.FixedTimeEquals(
-            actualHashBytes,
-            expectedHashBytes);
+        return CryptographicOperations.FixedTimeEquals(actualHashBytes, expectedHashBytes);
+    }
+
+    public bool VerifyCredentialSnapshotHash(CertifiedCredentialSnapshot snapshot, string expectedHash)
+    {
+        var actualHash = HashCredentialSnapshot(snapshot);
+
+        var actualBytes = Convert.FromHexString(actualHash);
+        var expectedBytes = Convert.FromHexString(expectedHash);
+
+        return CryptographicOperations.FixedTimeEquals(actualBytes, expectedBytes);
     }
 
     private static string CreateCanonicalSnapshot(CertifiedCredentialSnapshot snapshot)
