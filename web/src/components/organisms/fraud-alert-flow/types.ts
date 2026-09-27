@@ -1,4 +1,4 @@
-export type SecurityAlertLayer = 'summary' | 'details' | 'guidance'
+export type SecurityAlertLayer = 'summary' | 'guidance'
 
 export type SecurityAlert = {
   id: string

@@ -8,7 +8,6 @@ export type FraudAlertModalProps = {
   layer: SecurityAlertLayer
   actionMessage?: string
   onClose: () => void
-  onViewDetails: () => void
   onOpenGuidance: () => void
   onChangePassword: () => void
   onReviewActivity: () => void

@@ -2,5 +2,4 @@ import type { SecurityAlert } from '@/components/organisms/fraud-alert-flow/type
 
 export type FraudAlertSummaryProps = {
   alert: SecurityAlert
-  onViewDetails: () => void
 }
