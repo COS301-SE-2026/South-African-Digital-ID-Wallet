@@ -1,5 +1,4 @@
 import {
-  AlertTriangle,
   Clock3,
   Gauge,
   History,
@@ -9,7 +8,10 @@ import {
 } from 'lucide-react'
 import { Text } from '@/components/atoms/text'
 import { Button } from '@/components/ui/button'
-import type { DetailRowProps, FraudAlertDetailsProps,} from './types'
+import type {
+  DetailRowProps,
+  FraudAlertDetailsProps,
+} from './types'
 
 function DetailRow({
   icon: Icon,
@@ -27,7 +29,6 @@ function DetailRow({
         >
           {label}
         </Text>
-
         <Text
           as="p"
           variant="sub-sm"
@@ -46,27 +47,6 @@ export function FraudAlertDetails({
 }: FraudAlertDetailsProps) {
   return (
     <div className="space-y-5">
-      <div className="flex items-start gap-3 rounded-2xl border border-danger-red/20 bg-danger-red/10 p-4">
-        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-danger-red" />
-
-        <div>
-          <Text
-            as="p"
-            variant="sub-sm"
-            className="font-bold text-danger-red"
-          >
-            High risk
-          </Text>
-          <Text
-            as="p"
-            variant="sub-sm"
-            className="mt-1 text-text-primary"
-          >
-            {alert.detailsDescription}
-          </Text>
-        </div>
-      </div>
-
       <section>
         <Text
           as="h3"
@@ -75,7 +55,6 @@ export function FraudAlertDetails({
         >
           Login information
         </Text>
-
         <div className="space-y-4 rounded-2xl border border-border-grey p-4">
           <DetailRow
             icon={MapPin}
@@ -115,7 +94,6 @@ export function FraudAlertDetails({
           />
         </div>
       </section>
-
       <section>
         <Text
           as="h3"
