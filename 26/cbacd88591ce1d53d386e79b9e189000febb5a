@@ -1,0 +1,16 @@
+backend/FlashIdBackend/tests/CertifiedCredentialCopyServiceTests.cs
+  h_293a8616118f65 6,184,230,266,305,326,341,355,381,397,429
+backend/FlashIdBackend/tests/CertifiedCopyCryptographyProviderTests.cs
+  h_293a8616118f65 39,69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "26cbacd88591ce1d53d386e79b9e189000febb5a",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
