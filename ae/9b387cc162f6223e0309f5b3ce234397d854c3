@@ -1,0 +1,26 @@
+backend/FlashIdBackend/Presentation/Controllers/CertifiedCredentialCopiesController.cs
+  h_293a8616118f65 6,27,41
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/ICertifiedCredentialCopyService.cs
+  h_293a8616118f65 2,10
+backend/FlashIdBackend/Application/Features/CertifiedCredentialCopies/DTOs/GenerateCertifiedCopyRequestDto.cs
+  h_293a8616118f65 1-10
+backend/FlashIdBackend/Infrastructure/Providers/CertifiedCopyCryptographyProvider.cs
+  h_293a8616118f65 77-85
+  h_293a8616118f65 75-76
+backend/FlashIdBackend/Application/Common/Services/CertifiedCredentialCopyService.cs
+  h_293a8616118f65 7,43,56,107,109-112,114-115,117-123,175,224,340,355-377
+  h_293a8616118f65 124,378
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/ICertifiedCopyCryptographyProvider.cs
+  h_293a8616118f65 16-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ae9b387cc162f6223e0309f5b3ce234397d854c3",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

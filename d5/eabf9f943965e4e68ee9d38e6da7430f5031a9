@@ -1,0 +1,20 @@
+backend/FlashIdBackend/Infrastructure/Providers/CertifiedCopyPdfProvider.cs
+  h_293a8616118f65 1,7,13-22,38-79,81-100,102-112,114-121,123-131,133-140,142-153,155-160,162-167,169-175,177-203,205,207-213,215-219,222-226,229,231-258,261,263-270,272-276,278-287,289-473
+web/src/lib/api.ts
+  h_293a8616118f65 4
+backend/FlashIdBackend/Application/Common/Services/CertifiedCredentialCopyService.cs
+  h_293a8616118f65 141
+backend/FlashIdBackend/Presentation/Presentation.csproj
+  h_293a8616118f65 24-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d5eabf9f943965e4e68ee9d38e6da7430f5031a9",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
