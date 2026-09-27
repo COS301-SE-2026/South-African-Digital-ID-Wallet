@@ -26,29 +26,44 @@ public class DisclosedFieldValueResolver : IDisclosedFieldsValueResolver
         return res;
     }
 
-    private async Task<string> ResolveFieldAsync(Credential cred, string field) => field switch
+    public DisclosedFieldSource Describe(Credential credential, string field)
     {
-        "Identity number" => cred.Citizen.SaId,
-        "SA ID number" => cred.Citizen.SaId,
-        "Full surname" => cred.Citizen.Surname,
-        "Full forenames" => cred.Citizen.Names,
-        "Full name" => $"{cred.Citizen.Names} {cred.Citizen.Surname}",
-        "Date of birth" => cred.Citizen.DateOfBirth.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-        "Gender" => cred.Citizen.Gender.ToString(),
-        "Citizenship status" => cred.IdentityDocument?.Citizenship ?? string.Empty,
-        "Country of birth" => cred.IdentityDocument?.CountryOfBirth ?? string.Empty,
-        "Photograph" => await ResolvePhotoAsync(cred.IdentityDocument?.PhotoPath),
-        "Photo" => await ResolvePhotoAsync(cred.DriversLicense?.PhotoPath),
-        "Signature" => await ResolvePhotoAsync(cred.Signature),
-        "Card issue date and number" => string.Empty,
-        "License number" => cred.DriversLicense?.LicenseNumber ?? string.Empty,
-        "License code" => cred.DriversLicense?.LicenseCode.ToString() ?? string.Empty,
-        "Expiry date" => cred.DriversLicense?.ExpiryDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? string.Empty,
-        "Country of issue" => cred.DriversLicense?.CountryOfIssue ?? string.Empty,
-        "Vehicle restrictions" => cred.DriversLicense?.Restrictions ?? string.Empty,
-        "Date of issue" => cred.IssueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-        _ => throw new InvalidOperationException($"No resolver defined for this disclosed field: '{field}'."),
-    };
+        ArgumentNullException.ThrowIfNull(credential);
+
+        return field switch
+        {
+            "Identity number" => DisclosedFieldSource.Text(credential.Citizen.SaId),
+            "SA ID number" => DisclosedFieldSource.Text(credential.Citizen.SaId),
+            "Full surname" => DisclosedFieldSource.Text(credential.Citizen.Surname),
+            "Full forenames" => DisclosedFieldSource.Text(credential.Citizen.Names),
+            "Full name" => DisclosedFieldSource.Text($"{credential.Citizen.Names} {credential.Citizen.Surname}"),
+            "Date of birth" => DisclosedFieldSource.Text(credential.Citizen.DateOfBirth.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
+            "Gender" => DisclosedFieldSource.Text(credential.Citizen.Gender.ToString()),
+            "Citizenship status" => DisclosedFieldSource.Text(credential.IdentityDocument?.Citizenship),
+            "Country of birth" => DisclosedFieldSource.Text(credential.IdentityDocument?.CountryOfBirth),
+            "Photograph" => DisclosedFieldSource.Photo(credential.IdentityDocument?.PhotoPath),
+            "Photo" => DisclosedFieldSource.Photo(credential.DriversLicense?.PhotoPath),
+            "Signature" => DisclosedFieldSource.Photo(credential.Signature),
+            "Card issue date and number" => DisclosedFieldSource.Text(string.Empty),
+            "License number" => DisclosedFieldSource.Text(credential.DriversLicense?.LicenseNumber),
+            "License code" => DisclosedFieldSource.Text(credential.DriversLicense?.LicenseCode.ToString()),
+            "Expiry date" => DisclosedFieldSource.Text(credential.DriversLicense?.ExpiryDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
+            "Country of issue" => DisclosedFieldSource.Text(credential.DriversLicense?.CountryOfIssue),
+            "Vehicle restrictions" => DisclosedFieldSource.Text(credential.DriversLicense?.Restrictions),
+            "Date of issue" => DisclosedFieldSource.Text(credential.IssueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
+            _ => throw new InvalidOperationException($"No resolver defined for this disclosed field: '{field}'."),
+        };
+    }
+
+    private async Task<string> ResolveFieldAsync(Credential cred, string field)
+    {
+        var source = Describe(cred, field);
+
+        // Online callers get a short-lived SAS URL. The blob itself is never read here.
+        return source.Kind == DisclosedFieldKind.Photo
+            ? await ResolvePhotoAsync(source.Value)
+            : source.Value;
+    }
 
     private async Task<string> ResolvePhotoAsync(string? blobName) =>
         string.IsNullOrEmpty(blobName) ? string.Empty : await _photoStorageProvider.GenerateReadSasUrlAsync(blobName, PhotoSasTtl);

@@ -1,0 +1,430 @@
+# Offline Verification Decision Log
+
+Each entry records what was decided, what else was considered, and why. Status is **Accepted**, **Proposed** (needs evidence or team agreement) or **Superseded**. An accepted decision is never edited; it is superseded by a new entry.
+
+The byte-level rules are in [wire-format.md](wire-format.md).
+
+---
+
+### D-001 One scan per verification
+
+**Status:** Accepted, 2026-09-11
+
+**Context.** Officials scan citizens and citizens scan citizens. Citizens scanning officials is ruled out.
+
+**Decision.** A verification is exactly one scan: the verifier scans the holder.
+
+**Alternatives.** A two-QR handshake in which the holder also scans the verifier, which would allow encrypting to the verifier. Rejected because it requires citizens to scan officials.
+
+**Consequences.** Without a radio link, the offline payload cannot be encrypted in transit, so R2.4.4 must be amended with compensating controls.
+
+---
+
+### D-002 Animated QR with holder binding is the baseline; BLE is a stretch goal
+
+**Status:** Accepted, 2026-09-11
+
+**Context.** ISO/IEC 18013-5 uses BLE for offline transfer, and the lecturer favours it.
+
+**Decision.** Single-scan animated QR with holder binding on every phone. BLE only after the baseline is complete, Android to Android.
+
+**Alternatives.** BLE as the baseline. Rejected: any phone can be a verifier, so every phone would need the BLE peripheral role, which needs Swift and Kotlin native modules that cannot be delivered on iOS in time.
+
+**Consequences.** Works on every phone. BLE can be added later without touching the cryptography.
+
+---
+
+### D-003 SD-JWT with JWS instead of ISO mdoc with CBOR and COSE
+
+**Status:** Accepted, 2026-09-13
+
+**Context.** Both are standards. ISO/IEC 18013-5 mdoc uses CBOR and COSE; IETF SD-JWT uses JSON and JWS.
+
+**Decision.** SD-JWT with JWS compact serialisation.
+
+**Alternatives.** mdoc with COSE_Sign1. Rejected because:
+
+1. Without an ISO transport (NFC, BLE or Wi-Fi Aware), device engagement and a session transcript, the result would be ISO-shaped but not ISO-conformant.
+2. COSE signs re-encoded CBOR, so .NET and JavaScript must produce identical bytes. JWS signs the exact text that travels.
+3. No maintained COSE library runs in React Native without Node's `crypto` module.
+
+**Consequences.** About 20 to 25 percent larger than CBOR, roughly two more QR frames. The format is isolated in the backend builder and the JavaScript verifier, so it could be changed later.
+
+---
+
+### D-004 ES256 with raw 64-byte signatures; local key before Key Vault
+
+**Status:** Accepted, 2026-09-13
+
+**Context.** Azure Key Vault cannot hold Ed25519 keys, and the rolling-keys work moves signing to ES256.
+
+**Decision.** ES256 with IEEE P1363 raw signatures. A local ES256 provider is built first; the Key Vault provider replaces it through the same interface.
+
+**Alternatives.** Waiting for Key Vault, which blocks this work. Staying on Ed25519, which rules out Key Vault key custody and has weaker browser support.
+
+**Consequences.** Development and CI need no Azure access. The interface shape must be agreed with the rolling-keys owner (Q-3).
+
+---
+
+### D-005 Holder binding with a Key Binding JWT
+
+**Status:** Accepted, 2026-09-13
+
+**Context.** Without binding, a leaked copy of stored packages or a copied wallet could be presented from any phone, and a filmed QR could be replayed.
+
+**Decision.** Each wallet generates a P-256 device key whose public key is embedded as `cnf` at minting. Every presentation carries a Key Binding JWT with `iat` and `sd_hash`, re-signed every 5 seconds and accepted for 30 seconds.
+
+**Alternatives.** No binding. A hardware-backed key in the Secure Enclave or StrongBox, which needs a native module.
+
+**Consequences.** A new phone receives a freshly minted package. A software key in SecureStore is a stated limitation. The Key Binding JWT has no verifier `nonce` or `aud` (wire-format section 11).
+
+---
+
+### D-006 Online presentation stays the default
+
+**Status:** Accepted, 2026-09-11
+
+**Decision.** The wallet shows the existing online QR whenever it has signal. The citizen chooses "Show offline code", after a warning, when the verifier is offline. Verifiers prefer online resolution when they have signal, and offline results are flagged in the audit log.
+
+**Consequences.** Showing readable fields is an informed citizen choice. Forcing offline mode to dodge the one-time-use check becomes visible in the audit log.
+
+---
+
+### D-007 Offline packages last 30 days and are minted on request
+
+**Status:** Accepted, 2026-09-13
+
+**Decision.** A package is minted on the first request and minted again when it has expired, is older than 7 days, the device key has changed, the credential was updated, or its signing key was
+revoked. Its `exp` is the earlier of the document's expiry and 30 days.
+
+**Alternatives.** Minting at issuance, which touches three services and needs a backfill. Long-lived packages, which force keeping retired keys for years and leave revocation stale.
+
+**Consequences.** Retired key retention is bounded at 45 days. After a key revocation, wallets receive fresh packages automatically on their next connection.
+
+---
+
+### D-008 Retiring and revoking keys are different operations
+
+**Status:** Accepted, 2026-09-13
+
+**Context.** The question was raised whether keeping old keys defeats key rotation.
+
+**Decision.** A retired key's private key is disabled and never signs again, but its public key stays published for 45 days so existing packages still verify. A revoked key's signatures stop verifying. Credential signing uses its own key (`Purpose = Credential`), separate from the QR token key.
+
+**Consequences.** Rotation still limits how much any one key signs and for how long. Keeping public keys exposes nothing. Separate keys per purpose mean a token signed for one purpose cannot pass as
+another.
+
+---
+
+### D-009 The prototype trust anchor is the issuer key set over TLS
+
+**Status:** Accepted, 2026-09-13
+
+**Decision.** Verifiers fetch and cache the issuer key set from the backend over TLS. Offline verification warns when trust data is over 24 hours old and refuses when it is over 7 days old.
+
+**Alternatives.** An IACA root key that signs the key set, as ISO/IEC 18013-5 does. This is the production design, deferred for time.
+
+**Consequences.** Stated limitation: whoever controls the backend or its TLS certificate at fetch time controls which keys are trusted.
+
+---
+
+### D-010 Stable claim names
+
+**Status:** Proposed, 2026-09-13
+
+**Context.** `QrFieldDefinitions.cs` uses display labels such as "Full surname".
+
+**Decision.** Use snake_case claim names mapped from the labels (wire-format section 5).
+
+**Alternatives.** Using the labels as claim names. Rejected: rewording the interface would break verification of packages already on phones.
+
+---
+
+### D-011 Signature image excluded from offline presentations
+
+**Status:** Proposed, 2026-09-13
+
+**Context.** The handwritten signature is an image of several kilobytes and is not a mandatory field.
+
+**Decision.** Leave it out of offline packages; it remains available online.
+
+**Alternatives.** Including it, which would roughly double the number of QR frames.
+
+---
+
+### D-012 The revocation index is the only credential identifier
+
+**Status:** Proposed, 2026-09-13
+
+**Context.** The online QR carries the database credential id. A stable identifier in every presentation lets verifiers link a citizen's presentations together.
+
+**Decision.** Offline presentations carry only the revocation index. The backend maps it back to the credential when audit entries sync.
+
+**Consequences.** Presentations are still linkable through the revocation index and the portrait, a stated limitation. Internal database ids are not exposed.
+
+---
+
+### D-013 No rename of `Credential.Signature` during the sprint
+
+**Status:** Accepted, 2026-09-13
+
+**Decision.** Add `IssuerSignedCredential` as a new column. Rename `Signature` to `SignatureImagePath` after 27 September.
+
+**Alternatives.** Renaming now. Rejected: a repository-wide rename during a team sprint causes merge conflicts.
+
+---
+
+### D-014 Verifiers accept high-S signatures
+
+**Status:** Accepted, 2026-09-14
+
+**Context.** `@noble/curves` version 2 rejects high-S ECDSA signatures by default. .NET and Azure Key Vault do not normalise S.
+
+**Decision.** Verify with `{ lowS: false }`. Never use signature bytes as an identifier.
+
+**Alternatives.** Normalising S on the backend after every signing operation, including Key Vault output.
+
+**Evidence.** Spike A, 2026-09-14: two batches of 50 fixtures, each fixture signed by a fresh .NET key. With noble defaults, 21 of 50 and 24 of 50 verified, so 29 and 26 signatures were high-S. With `lowS: false`, 50 of 50 verified in both batches. Forcing `lowS: true` reproduced the 21 of 50 failure with a non-zero exit code.
+
+---
+
+### D-015 Develop in Expo Go or a debug build; measure on release builds
+
+**Status:** Accepted, 2026-09-13
+
+**Decision.** Everything this feature needs is JavaScript or an Expo module, so it runs both in Expo Go and in the `pnpm android` debug build that the team runbook uses. Both run the same
+JavaScript from the same Metro server and can sit side by side on one device, so teammates are not split. Scan timing and the demo use a release build, because development-mode JavaScript is much slower in both.
+
+**Consequences.** The choice stays reversible until native code lands. The Emergency QR lock screen tile or the BLE stretch goal each end Expo Go for the shared app, and the whole team then moves to a development build together.
+
+---
+
+### D-016 Credentials are signed on the first offline package request, not at issuance
+
+**Status:** Accepted, 2026-09-14
+
+**Context.** R2.1.3 and R9.1.1 require every credential to be signed with Ed25519 at the point of issuance, and R9.3.2 requires the previous signed version to be archived after an update. Holder
+binding (D-005) embeds the phone's public key in the signed credential, and that key does not exist at issuance: the wallet creates it and sends it with its first offline package request.
+
+**Decision.** Sign on the first offline package request, and sign again after every update, expiry, device key change or signing key revocation (D-007). Amend R2.1.3, R9.1.1 and R9.3.2 to:
+"Every credential shall be signed with ES256 before it can be presented offline. The signature covers all credential fields through salted digests and binds the credential to the holder's
+device key. The credential shall be re-signed after every update."
+
+**Alternatives.** Also signing an unbound copy at issuance. Rejected: verifiers require key binding (wire-format section 10, step 9), so an unbound credential could never be presented and
+the signature would be for show.
+
+**Consequences.** Requirements R2.1.3, R9.1.1 and R9.3.2 are amended (checklist 6.1). Credentials never used offline are never signed. Signed packages are not archived, because each is disposable and can be minted again from the archived credential version (R2.5.4).
+
+---
+
+### D-017 ImageSharp 3.1.12 for portrait processing
+
+**Status:** Accepted, 2026-09-14
+
+**Context.** The backend must downscale and re-encode portraits for offline packages (Spike C). The candidates were ImageSharp and SkiaSharp (Q-4). ImageSharp 4.x adds a build-time licence check: without a Six Labors licence key, Release builds fail, and the backend deploys with
+`dotnet publish`, which builds Release.
+
+**Decision.** Use SixLabors.ImageSharp 3.1.12. It is pure .NET, supports every operation the portrait recipe needs, has no build-time licence check and no known vulnerabilities. It is used under the Six Labors Split License clause granting Apache 2.0 to "a For-profit company/individual with less than 1M USD annual gross revenue"; FlashID is a student project with no revenue.
+
+**Alternatives.** ImageSharp 4.1.2, rejected because Release builds need a licence key and community licences are application-based. SkiaSharp 4.152.0 under the MIT licence, kept as the fallback; it needs the native `SkiaSharp.NativeAssets.Linux.NoDependencies` package on Linux App
+Service and different code.
+
+**Consequences.** Q-4 is closed. Do not upgrade to ImageSharp 4.x without a licence key. Watch for security updates on the 3.1 line: 3.1.10 had a known vulnerability, fixed in 3.1.11.
+
+---
+
+### D-018 Portrait: 160 x 160 colour WebP, sent inline
+
+**Status:** Accepted, 2026-09-15
+
+**Context.** R3.4.2 makes the photograph mandatory, so every offline presentation carries a portrait, and it is most of the payload. Spike C (2026-09-14) rendered 10 photos (5 people, each normal and artificially darkened) across four rounds on ImageSharp 3.1.12, measuring bytes, QR
+frames and recognisability.
+
+**Decision.** AutoOrient, centre crop to 160 x 160, bicubic resize, colour, WebP lossy quality 40, metadata stripped. The portrait travels inline as a standard SD-JWT disclosure whose value is the base64url of the WebP.
+
+**Alternatives.**
+
+- 64 and 96 px: facial features blur together. 128 px: acceptable but visibly softer.
+- JPEG: blocky at the same size; WebP looked cleaner.
+- Greyscale: with WebP only 0 to 1 frame smaller, and it loses skin tone, hair and eye colour.
+- Portrait (3:4), tight and natural-proportion crops: no clearer, and tall photos get a small face.
+- Lanczos3 with sharpening: crisper but not clearer, and about 15 percent larger. Adaptive contrast: blotchy and 2 to 3 times larger.
+- Detached portrait (a hash in the disclosure, the image as a separate segment): saves 1 to 5 frames, at most about a second at 8 fps (D-019), but adds a custom structure and another deviation from SD-JWT.
+
+**Evidence.** Recipe C2: 772 to 4,814 bytes; inline 7 to 14 frames for nine photos and 23 for the worst (a 518 px source with a busy background). React Native `Image` displayed a WebP data URI on Samsung Android 16 (Spike B).
+
+**Consequences.** Every portrait scans within about 4 seconds at 8 fps. Data URIs need standard base64, converted from base64url. Official ID photos with plain backgrounds should compress smaller than the test photos. The 23-frame worst case was predicted, not measured (checklist 3.7).
+
+---
+
+### D-019 QR frames carry 450 characters at 8 frames per second
+
+**Status:** Accepted, 2026-09-15
+
+**Context.** Wire-format section 9 splits a presentation into QR frames. The chunk size and frame rate were estimates: 450 characters at 5 fps.
+
+**Decision.** 450 characters per payload frame, displayed at 8 frames per second, with one key binding frame after every third payload frame.
+
+**Alternatives.** 700 characters per frame: fewer frames but denser codes, unreliable in dim light. 5 fps: reliable but slower.
+
+**Evidence.** Spike B, 2026-09-15, release build; display phone Samsung Galaxy S23, scanner Samsung Galaxy S24, both Android 16. Scan time was about one display cycle: payload frames plus key binding frames, divided by fps. The camera decoded about 27 QR codes per second, about 3 reads per frame at 8 fps.
+
+| Preset | Light | fps | Seconds, 3 runs |
+|---|---|---|---|
+| 8 x 450 | normal | 5 | 1.9, 2.0, 2.2 |
+| 12 x 450 | normal | 5 | 3.1, 2.9, 3.0 |
+| 18 x 450 | normal | 5 | 4.8, 4.7, 4.7 |
+| 6 x 700 | normal | 5 | 1.4, 1.3, 1.4 |
+| 8 x 700 | normal | 5 | 2.0, 1.8, 1.8 |
+| 12 x 700 | normal | 5 | 3.0, 2.8, 3.0 |
+| 12 x 450 | dim | 5 | 3.1, 3.2, 3.0 |
+| 18 x 450 | dim | 5 | 4.8, 4.7, 4.7 |
+| 8 x 700 | dim | 5 | 4.4, 2.0, 3.9 |
+| 12 x 700 | dim | 5 | 6.0, 9.3, 3.2 |
+| 8 x 450 | dim | 8 | 1.4, 1.3, 1.3 |
+| 12 x 450 | normal | 8 | 1.9, 1.8, 1.9 |
+| 12 x 450 | dim | 8 | 1.9, 2.0, 2.0 |
+| 18 x 450 | normal | 8 | 3.0, 3.1, 3.1 |
+| 18 x 450 | dim | 8 | 3.1, 3.0, 2.9 |
+
+**Consequences.** Typical presentations scan in 1 to 2.5 seconds; the worst-case inline presentation (23 payload frames, 31 per cycle) is predicted at about 3.9 seconds. Both test phones are flagships, so timing must be confirmed on a budget Android phone (checklist 3.7). Frame rates above 8 fps were not tested.
+
+---
+
+### D-020 `iss` is a URI
+
+**Status:** Accepted, 2026-09-19
+
+**Context.** Version 1.0 used the bare string `flashid`. SD-JWT VC requires `iss` to be a URI, and
+standard verifiers use it to resolve issuer metadata.
+
+**Decision.** `iss` is `urn:flashid:issuer`, matching the `urn:flashid:` form already used for `vct`.
+
+**Alternatives.** An HTTPS URL pointing at a published JWKS endpoint, which is the production shape.
+Deferred because the prototype trust anchor is the key set fetched over TLS (D-009), not issuer
+metadata resolution.
+
+**Consequences.** Nothing is deployed, so no credential has to be re-minted. Changing this after
+release would have meant re-minting every package in the field. Raised in review on PR #538.
+
+---
+
+### D-021 JSON on the wire is serialised with relaxed escaping
+
+**Status:** Accepted, 2026-09-19
+
+**Context.** System.Text.Json escapes `+` and every non-ASCII character by default, so the header
+travelled as `dc\u002Bsd-jwt` and a name such as `Zoë` as `Zo\u00EB`.
+
+**Decision.** Serialise the header, payload and disclosures with
+`JavaScriptEncoder.UnsafeRelaxedJsonEscaping`.
+
+**Alternatives.** Keeping the default encoder and documenting the escaping. Rejected: no other
+SD-JWT issuer emits an escaped `typ`, some verifiers compare `typ` against the raw decoded header
+rather than the parsed value, and the whole point of the cross-stack fixture is that another
+implementation can consume our output.
+
+**Consequences.** Escaped characters cost six bytes each, so names with diacritics were quietly
+costing QR frames. The encoder is named "unsafe" because it does not escape characters that matter
+in HTML; this JSON is base64url encoded immediately and never rendered as HTML. Signatures are
+unaffected, since they always cover the exact bytes sent. Raised in review on PR #538.
+
+---
+
+### D-022 The device key is required on every offline package request
+
+**Status:** Accepted, 2026-09-26
+
+**Context.** Phase 4 made the device key optional so that Emergency QR could mint unbound packages. Review on PR #559 showed that a request without a key re-minted a bound package without `cnf`. Anyone holding a citizen's session could therefore downgrade the credential to one that verifies without key binding, and the wallet and Emergency QR would keep re-minting each other's packages.
+
+**Decision.** `POST /api/credentials/{id}/offline-package` requires `deviceKey`. A missing or invalid key is refused with 400 and nothing is stored. Emergency QR gets its own minting path and claim set, minted without `cnf`.
+
+**Alternatives.** Keeping the key optional and auditing unbound mints. Rejected: the downgrade would still happen and only be noticed afterwards. Refusing a keyless request only when the credential is already bound. Rejected: the first mint could still be unbound.
+
+**Consequences.** A phone cannot present offline until it has sent its key once (D-027). Emergency QR codes still verify, because the verifier requires key binding only when `cnf` is present.
+
+---
+
+### D-023 Key binding freshness: 30 seconds with 60 seconds of clock skew
+
+**Status:** Accepted, 2026-09-26
+
+**Context.** A single QR scan is one-way, so the verifier cannot send the wallet a challenge to sign. Freshness can only be judged from the signing time, and both phones are offline, so their clocks drift and cannot be corrected.
+
+**Decision.** The wallet re-signs the Key Binding JWT every 5 seconds while the code is showing. The verifier accepts an `iat` at most 30 seconds old, with 60 seconds of skew either way. On a bound code the scanner waits at most 4 seconds for a K frame, longer than one full display cycle, and then verifies without one, so the officer sees `MISSING_KEY_BINDING` rather than a scanner stuck at N of N.
+
+**Alternatives.** A tighter window, such as 15 seconds with 30 of skew. Rejected: honest scans from phones with drifting clocks would fail. A verifier challenge over Bluetooth, which removes the window entirely. Deferred with the BLE stretch goal (D-002).
+
+**Consequences.** A recording replayed within about 90 seconds can still verify, a stated deviation (wire-format section 11). The portrait check still applies. Measured on two phones on 2026-09-25: a recording replayed straight away verified, and the same recording replayed after 2 minutes was rejected with `STALE_PRESENTATION`.
+
+---
+
+### D-024 Offline QR frames use error correction level L at 280 px
+
+**Status:** Accepted, 2026-09-26
+
+**Context.** An offline frame carries about 470 bytes. At the library default, level M, in a 236 px code, the modules are small and cycle at 8 frames per second. Offline frames already drop the centre logo, which is what level M's extra redundancy was covering.
+
+**Decision.** Offline frames render at error correction level L and 280 px. The online code keeps level M, the logo and 236 px.
+
+**Alternatives.** Keeping level M. Rejected: smaller modules for redundancy nothing uses. Smaller frames. Rejected: more frames and a longer scan (D-019).
+
+**Consequences.** Larger modules for the same data. Measured on an S23 showing and an S24 scanning: a bound licence code of 28 frames scans in about 4.2 seconds. A budget phone as the scanner is still unmeasured. Raised in review on PR #558.
+
+---
+
+### D-025 The revocation list is a signed JWS of revocation indexes
+
+**Status:** Accepted, 2026-09-26
+
+**Context.** A verifier with no signal must still refuse a credential that was revoked after the package was issued. The only credential identifier in a presentation is the revocation index (D-012).
+
+**Decision.** `GET /api/credentials/revocation-list` returns a compact JWS with `typ` `revocation-list+jwt`, signed by the credential key. Its payload holds `iss`, `iat`, `next_update` (24 hours later) and `revoked`: the revocation index of every credential whose status is not `Active`. The verifier fetches it with the issuer keys and stores it only when it verifies against those keys. A list that fails is ignored and the last verified list stays.
+
+**Alternatives.** A status list bitstring (IETF Token Status List). Rejected for the prototype: more code for a list that stays small. Plain JSON over TLS. Rejected: it would be trusted only at download time, and a stored copy could be edited on the phone.
+
+**Consequences.** A revocation reaches a verifier only when that verifier next refreshes online, which happens everytime the scanner opens with aignal. The age warnings in wire-format section 10, step 12, cover this. `Investigation`, `Inactive` and `Expired` are refused offline as well as `Revoked`. The list grows by one integer per such credential.
+
+---
+
+### D-026 Offline scans are uploaded as audit rows keyed by the phone's id
+
+**Status:** Accepted, 2026-09-26
+
+**Context.** A scan made offline is not recorded anywhere, yet the audit trail must show who checked a credential and when. The phone's clock cannot be trusted after days offline, and an upload interrupted by lost signal will be retried.
+
+**Decision.** The verifier's phone queues each result in the encrypted offline cache and uploads it to `POST /api/credentials/offline-verifications` in batches of up to 100: straight away when online, otherwise at sign-in, when signal returns and when the app returns to the foreground. The id each entry gets on the phone becomes the audit row's primary key, so a retried upload is recorded once. Rows use the new event types `OfflineCredentialVerified` and `OfflineVerificationRejected`, keep the phone's scan time in `Details` and the server's receipt time in `CreatedAt`. Only a verified scan carries a revocation index and is linked to a credential and citizen.
+
+**Alternatives.** A separate table with a unique client id. Rejected: a migration during the sprint for no gain over the primary key. Linking failed scans to a citizen too. Rejected: a failed scan may carry a forged index, which would let anyone fill a citizen's history with fake rejections.
+
+**Consequences.** No migration: event types are stored as strings. Only officials may upload (`403` otherwise), and the app queues only officials' scans; an official could still forge rows, but every row names them as the actor. Result codes are stored as sent, if well formed, so the server keeps no copy of the app's list; each entry is validated on its own and invalid ones are returned in `rejected` while the rest are recorded. Two uploads racing on the same ids get `409` and the phone retries. Queued scans are tagged with the official and survive sign-out or an expired session, uploading only when that official signs in again. The queue is capped at 1,000 entries. Citizen notifications after sync were cut for time. Verified offline scans count towrads the institution's verifications today, and rejected ones show as Failed in the audit log. Changed after review on PR #568.
+
+---
+
+### D-027 Changing or losing a phone
+
+**Status:** Accepted, 2026-09-26
+
+**Context.** Holder binding ties each offline package to the phone that requested it (D-005, D-022), and the private key never leaves that phone.
+
+**Decision.** These are accepted as limitations of the prototype:
+
+- A new or reset phone cannot present offline until it has been online once, because its key is generated on that phone and the package is re-minted around it (D-007). On Android a reinstall creates a new key; on iOS the Keychain usually keeps the old one.
+- Signing out wipes the offline cache, including packages. A lost phone that is still signed in keeps a working package until it expires, at most 30 days and re-minted weekly (D-007). Presenting it still needs the device biometric check.
+- The compensating control for a lost phone is revoking the credential: verifiers refuse it offline once they refresh their revocation list (D-025).
+- A verifier needs cached issuer keys and a revocation list regardless of whose credential it scans, so a verifier's own phone change needs one online refresh too.
+
+**Alternatives.** Remote wipe of a lost phone. Rejected: nothing can reach an offline phone, which is the scenario this feature exists for.
+
+**Consequences.** Demo phones must each be online once before the offline part of the demo.
+
+---
+
+## Open questions
+
+| Id | Question | Owner | Status |
+|---|---|---|---|
+| Q-1 | The stubbed badge flow has citizens scan officials, contradicting D-001. Drop it, or keep it as a separate step? | Team | Closed: the badge flow is not used |
+| Q-2 | `QrFieldDefinitions.cs` marks fewer fields mandatory than R3.4.2. Which is authoritative? | SRS owner | Closed: `QrFieldDefinitions.cs` is authoritative; R3.4.2 amended to match |
+| Q-3 | Shape of the widened signing interface | Nathan and the rolling-keys owner | Deferred: agree before checklist 1.1 |
+| Q-4 | Image library licence: ImageSharp or SkiaSharp | Nathan | Closed by D-017 |

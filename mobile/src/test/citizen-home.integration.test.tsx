@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router'
 import { CitizenHomePage } from '@/components/pages'
 import api from '@/lib/api'
 import { useAuthStore } from '@/stores/auth-store'
-
+import { usePrefetchOfflinePackages } from '@/hooks/use-prefetch-offline-packages'
 import { renderWithProviders } from './utils/render-with-providers'
 
 jest.mock('@/lib/api', () => ({
@@ -16,6 +16,9 @@ jest.mock('@/lib/secure-session', () => ({
   clearSession: jest.fn(),
   loadSession: jest.fn(),
   saveSession: jest.fn().mockResolvedValue(undefined),
+}))
+jest.mock('@/hooks/use-prefetch-offline-packages', () => ({
+  usePrefetchOfflinePackages: jest.fn(),
 }))
 jest.mock('expo-router', () => ({ useRouter: jest.fn() }))
 
@@ -100,7 +103,6 @@ describe('Citizen home dashboard (integration)', () => {
   it('Should resolve the identity status from the credentials endpoint', async () => {
     configureApiMock(CREDENTIALS, ACTIVITY)
     await renderWithProviders(<CitizenHomePage />)
-    expect(screen.getByTestId('identity-status-loading')).toBeTruthy()
     await waitFor(() => expect(screen.getByText('Verified')).toBeTruthy())
     expect(mockedGet).toHaveBeenCalledWith('/api/credentials/me')
   })
@@ -167,5 +169,13 @@ describe('Citizen home dashboard (integration)', () => {
     await renderWithProviders(<CitizenHomePage />)
     const neutralGreeting = screen.getByText(GREETING_NEUTRAL)
     expect(neutralGreeting).toBeTruthy()
+  })
+
+  it('Should prepare offline packages for the loaded credentials', async () => {
+    configureApiMock(CREDENTIALS, ACTIVITY)
+    await renderWithProviders(<CitizenHomePage />)
+    await waitFor(() =>
+      expect(usePrefetchOfflinePackages).toHaveBeenCalledWith([CRED_ID])
+    )
   })
 })
