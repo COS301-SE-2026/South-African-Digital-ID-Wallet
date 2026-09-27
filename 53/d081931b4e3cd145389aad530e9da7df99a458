@@ -1,0 +1,32 @@
+mobile/src/services/index.ts
+  h_99fca60b892ff4 8
+mobile/src/services/security-service/types.ts
+  h_99fca60b892ff4 1-130
+mobile/src/services/security-service/mock-security-service.ts
+  h_99fca60b892ff4 1-200
+  h_99fca60b892ff4 201-203
+mobile/src/services/security-service/security-errors.ts
+  h_99fca60b892ff4 1-24
+mobile/src/services/security-service/security-urls.ts
+  h_99fca60b892ff4 1-13
+mobile/src/services/security-service/security-service.ts
+  h_99fca60b892ff4 1-40
+mobile/src/services/security-service/test/security-dto.test.ts
+  h_99fca60b892ff4 1-87
+mobile/src/services/security-service/index.ts
+  h_99fca60b892ff4 1-20
+mobile/src/services/security-service/security-dto.ts
+  h_99fca60b892ff4 1-107
+  h_99fca60b892ff4 108-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "53d081931b4e3cd145389aad530e9da7df99a458",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
