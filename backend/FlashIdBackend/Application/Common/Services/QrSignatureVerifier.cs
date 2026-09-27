@@ -28,38 +28,48 @@ public class QrSignatureVerifier : IQrSignatureVerifier
             return false;
         }
 
-        JsonElement jwk;
+        string? x;
+        string? y;
         try
         {
-            jwk = JsonDocument.Parse(signingKey.PublicKeyJwk).RootElement;
+            using var doc = JsonDocument.Parse(signingKey.PublicKeyJwk);
+            var jwk = doc.RootElement;
+
+            if (!jwk.TryGetProperty("x", out var xProp) || !jwk.TryGetProperty("y", out var yProp))
+            {
+                return false;
+            }
+
+            x = xProp.GetString();
+            y = yProp.GetString();
         }
-        catch (JsonException)
+        catch (Exception e) when (e is JsonException or InvalidOperationException)
         {
             return false;
         }
 
-        if (!jwk.TryGetProperty("x", out var xProp) || !jwk.TryGetProperty("y", out var yProp))
-        {
-            return false;
-        }
-
-        var x = xProp.GetString();
-        var y = yProp.GetString();
         if (string.IsNullOrEmpty(x) || string.IsNullOrEmpty(y))
         {
             return false;
         }
 
-        using var verifier = ECDsa.Create(new ECParameters
+        try
         {
-            Curve = ECCurve.NamedCurves.nistP256,
-            Q = new ECPoint
+            using var verifier = ECDsa.Create(new ECParameters
             {
-                X = Base64Url.DecodeFromChars(x),
-                Y = Base64Url.DecodeFromChars(y),
-            },
-        });
+                Curve = ECCurve.NamedCurves.nistP256,
+                Q = new ECPoint
+                {
+                    X = Base64Url.DecodeFromChars(x),
+                    Y = Base64Url.DecodeFromChars(y),
+                },
+            });
 
-        return verifier.VerifyData(signingInput, signature, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
+            return verifier.VerifyData(signingInput, signature, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
+        }
+        catch (Exception e) when (e is FormatException or CryptographicException)
+        {
+            return false;
+        }
     }
 }
