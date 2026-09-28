@@ -15,11 +15,13 @@ const credential = {
   driversLicense: null,
 } as CredentialResponse
 const generatedAt = '2026-09-25T19:55:00.000Z'
+const pdfUrl = 'blob:http://localhost/certified-copy'
+const fileName = 'FlashID-Certified-Copy.pdf'
 const renderComponent = (onBack = jest.fn()) =>
   render(
     <CertifiedCopyGenerated
-      credential={credential}
-      generatedAt={generatedAt}
+      pdfUrl={pdfUrl}
+      fileName={fileName}
       onBack={onBack}
     />
   )
@@ -44,9 +46,6 @@ describe('CertifiedCopyGenerated', () => {
     renderComponent()
     expect(
       screen.getByRole('button', { name: /download pdf/i })
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /send to email/i })
     ).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: /view in new tab/i })
