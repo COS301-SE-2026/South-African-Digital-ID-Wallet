@@ -1,0 +1,24 @@
+mobile/src/hooks/test/use-emergency-device.test.tsx
+  h_712d174fc3f309 35-38,90
+mobile/src/hooks/test/use-emergency-offline-read.test.tsx
+  h_712d174fc3f309 1-215
+mobile/src/hooks/test/use-emergency-profile.test.tsx
+  h_712d174fc3f309 1-141
+mobile/src/hooks/use-emergency-offline-read.ts
+  h_712d174fc3f309 1-89
+mobile/src/hooks/use-emergency-profile.ts
+  h_712d174fc3f309 1-62
+mobile/src/hooks/use-offline-scan.ts
+  h_712d174fc3f309 10,33-34,93,100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e34cc06875116f1a99e95d6fad252cd3f14d0db1",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

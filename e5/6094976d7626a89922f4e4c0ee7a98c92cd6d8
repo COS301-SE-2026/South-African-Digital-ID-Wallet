@@ -1,0 +1,20 @@
+web/src/components/pages/verify-certified-copy/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/organisms/public-certified-copy-frame/public-certified-copy-frame.tsx
+  h_0aff3b71f739b1 1-30
+web/src/components/organisms/public-certified-copy-frame/types.ts
+  h_0aff3b71f739b1 1-4
+web/src/components/organisms/public-certified-copy-frame/index.ts
+  h_0aff3b71f739b1 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e56094976d7626a89922f4e4c0ee7a98c92cd6d8",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

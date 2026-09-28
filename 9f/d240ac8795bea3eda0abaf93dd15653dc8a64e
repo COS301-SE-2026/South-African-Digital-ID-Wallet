@@ -1,0 +1,24 @@
+backend/FlashIdBackend/Infrastructure/Repositories/EmergencyRepository.cs
+  h_712d174fc3f309 8-9,18-20,109-172
+backend/FlashIdBackend/Infrastructure/Repositories/OfflinePackageRepository.cs
+  h_712d174fc3f309 84-86,92-105
+backend/FlashIdBackend/Presentation/Controllers/EmergencyController.cs
+  h_712d174fc3f309 36-53
+backend/FlashIdBackend/tests/EmergencyCrossStackFixtureTests.cs
+  h_712d174fc3f309 1-180
+backend/FlashIdBackend/tests/EmergencyNotifierTests.cs
+  h_712d174fc3f309 45-56
+backend/FlashIdBackend/tests/EmergencyServiceTests.cs
+  h_712d174fc3f309 12-13,15,27,36-50,422-431,435,437-444,446-468,472-729,731-734
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9fd240ac8795bea3eda0abaf93dd15653dc8a64e",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
