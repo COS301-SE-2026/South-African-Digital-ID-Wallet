@@ -57,8 +57,9 @@ public class AuthController : ControllerBase
         }
     }
 
-    // Login is anonymous — no [Authorize] needed because the user does not have a token yet.
+    // Login is anonymous - no [Authorize] needed because the user does not have a token yet.
     [HttpPost("login")]
+    [EnableRateLimiting("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto request, [FromHeader(Name = "X-Client")] string? client, [FromServices] IFraudDetectionService fraudDetectionService, CancellationToken cancellationToken)
     {
         try
@@ -127,6 +128,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("verify-device")]
+    [EnableRateLimiting("verify-device")]
     public async Task<IActionResult> VerifyDevice([FromBody] VerifyDeviceRequestDto request,
         [FromHeader(Name = "X-Client")] string? client,
         [FromServices] IFraudDetectionService fraudDetectionService,

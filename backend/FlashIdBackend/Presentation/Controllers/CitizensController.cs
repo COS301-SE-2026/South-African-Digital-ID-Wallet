@@ -54,6 +54,7 @@ public class CitizensController : ControllerBase
     /// <response code="201">The email was verified.</response>
     /// <response code="400">The OTP was invalid, expired, already used, or too many attempts were made.</response>
     [HttpPost("verify-email")]
+    [EnableRateLimiting("verify-email")]
     public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequestDto request)
     {
         try

@@ -5,6 +5,7 @@ using Application.Features.Officials.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Presentation.Controllers;
 
@@ -46,6 +47,7 @@ public class OfficialsController : ControllerBase
     }
 
     [HttpPost("verify-badge")]
+    [EnableRateLimiting("verify-badge")]
     public async Task<IActionResult> VerifyBadge([FromBody] VerifyBadgeRequestDto req)
     {
         try
