@@ -34,4 +34,19 @@ public class AzureBlobPhotoStorageProvider : IPhotoStorageProvider
 
         return Task.FromResult(blobClient.GenerateSasUri(sasBuilder).ToString());
     }
+
+    public async Task<Stream?> OpenReadAsync(string blobName, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(blobName))
+        {
+            return null;
+        }
+
+        var blobClient = _containerClient.GetBlobClient(blobName);
+
+        if (!await blobClient.ExistsAsync(cancellationToken)) return null;
+
+        var response = await blobClient.DownloadStreamingAsync(cancellationToken: cancellationToken);
+        return response.Value.Content;
+    }
 }

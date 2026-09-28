@@ -12,17 +12,12 @@ describe('ActivateCredentialsForm', () => {
   it('renders the heading and both credential cards', () => {
     render(
       <ActivateCredentialsForm
-        identityDocumentAvailable={true}
-        driversLicenseAvailable={true}
         selection={baseSelection}
         onSelectionChange={() => {}}
         onSubmit={() => {}}
         onBack={() => {}}
       />
     )
-    expect(
-      screen.getByText('Activate your digital credentials')
-    ).toBeInTheDocument()
     expect(
       screen.getByText('South African Identity Document')
     ).toBeInTheDocument()
@@ -32,8 +27,6 @@ describe('ActivateCredentialsForm', () => {
   it('renders the "Why activate credentials?" info panel', () => {
     render(
       <ActivateCredentialsForm
-        identityDocumentAvailable={true}
-        driversLicenseAvailable={true}
         selection={baseSelection}
         onSelectionChange={() => {}}
         onSubmit={() => {}}
@@ -49,8 +42,6 @@ describe('ActivateCredentialsForm', () => {
   it('disables the submit button when nothing is selected', () => {
     render(
       <ActivateCredentialsForm
-        identityDocumentAvailable={true}
-        driversLicenseAvailable={true}
         selection={baseSelection}
         onSelectionChange={() => {}}
         onSubmit={() => {}}
@@ -65,8 +56,6 @@ describe('ActivateCredentialsForm', () => {
   it('enables the submit button once a credential is selected', () => {
     render(
       <ActivateCredentialsForm
-        identityDocumentAvailable={true}
-        driversLicenseAvailable={true}
         selection={{ identityDocument: true, driversLicense: false }}
         onSelectionChange={() => {}}
         onSubmit={() => {}}
@@ -83,8 +72,6 @@ describe('ActivateCredentialsForm', () => {
     const onSelectionChange = jest.fn()
     render(
       <ActivateCredentialsForm
-        identityDocumentAvailable={true}
-        driversLicenseAvailable={true}
         selection={baseSelection}
         onSelectionChange={onSelectionChange}
         onSubmit={() => {}}
@@ -104,8 +91,6 @@ describe('ActivateCredentialsForm', () => {
     const onSubmit = jest.fn()
     render(
       <ActivateCredentialsForm
-        identityDocumentAvailable={true}
-        driversLicenseAvailable={true}
         selection={{ identityDocument: true, driversLicense: false }}
         onSelectionChange={() => {}}
         onSubmit={onSubmit}
@@ -123,8 +108,6 @@ describe('ActivateCredentialsForm', () => {
     const onBack = jest.fn()
     render(
       <ActivateCredentialsForm
-        identityDocumentAvailable={true}
-        driversLicenseAvailable={true}
         selection={baseSelection}
         onSelectionChange={() => {}}
         onSubmit={() => {}}
@@ -133,19 +116,5 @@ describe('ActivateCredentialsForm', () => {
     )
     await user.click(screen.getByRole('button', { name: /back/i }))
     expect(onBack).toHaveBeenCalledTimes(1)
-  })
-
-  it('shows credentials as unavailable when available is false', () => {
-    render(
-      <ActivateCredentialsForm
-        identityDocumentAvailable={false}
-        driversLicenseAvailable={false}
-        selection={baseSelection}
-        onSelectionChange={() => {}}
-        onSubmit={() => {}}
-        onBack={() => {}}
-      />
-    )
-    expect(screen.getAllByText('Unavailable')).toHaveLength(2)
   })
 })

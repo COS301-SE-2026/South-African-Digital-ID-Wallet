@@ -1,11 +1,10 @@
-import { View } from 'react-native'
+import { ActivityPage } from '@/components/pages'
 
-import { Text } from '@/components/atoms'
-
-export default function OfficialScreen() {
+export default function OfficialHistoryScreen() {
   return (
-    <View className="flex-1 items-center justify-center bg-cream-background">
-      <Text variant="h2">history</Text>
-    </View>
+    <ActivityPage
+      subtitle="Every check and issue you have carried out."
+      title="History"
+    />
   )
 }

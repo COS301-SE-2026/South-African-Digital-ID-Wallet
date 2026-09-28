@@ -10,4 +10,5 @@ public class OfficialHistoryItemDto
     public string? CitizenSaId { get; set; }
     public string PerformedBy { get; set; } = string.Empty;
     public string Outcome { get; set; } = string.Empty;
+    public string? IpAddress { get; set; }
 }

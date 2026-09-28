@@ -139,7 +139,7 @@ public class OnboardingServiceTest
         Assert.Equal(1, emailSender.SendCount);
         Assert.Equal(NormalizedEmail, emailSender.LastToEmail);
         Assert.Equal("Your FlashID Activation Link", emailSender.LastSubject);
-        Assert.Contains($"{FrontendBaseUrl}/citizen/activate-credentials?token=", emailSender.LastMessage!);
+        Assert.Contains($"{FrontendBaseUrl}/citizen/verify-identity?token=", emailSender.LastMessage!);
         Assert.DoesNotContain(activation.TokenHash, emailSender.LastMessage!);
     }
 

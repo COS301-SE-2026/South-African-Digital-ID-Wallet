@@ -13,6 +13,7 @@ import loginService from '@/services/login-service/login-service'
 import { OtpModal } from '@/components/templates/otp-modal/otp-modal'
 import type { LoginFormProps } from '@/types/login-form'
 import { DeviceType } from '@/types'
+import { de } from 'zod/v4/locales'
 
 const DASHBOARD_ROUTES: Record<string, string> = {
   citizen: '/citizen/citizen-dashboard',
@@ -284,6 +285,7 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
         open={otpModalOpen}
         onClose={() => setOtpModalOpen(false)}
         onSuccess={handleOtpSuccess}
+        deviceVerificationId={deviceVerificationId}
       />
     </>
   )

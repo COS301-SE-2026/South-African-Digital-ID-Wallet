@@ -71,4 +71,36 @@ public class OfficialActivityService : IOfficialActivityService
             TotalCount = totalCount,
         };
     }
+
+    public async Task<OfficialHistoryActionsResponseDto> GetInstitutionActionsAsync(Guid userId)
+    {
+        var official = await _officialRepository.GetByUserIdAsync(userId)
+            ?? throw new UnauthorizedAccessException("The authenticated official could not be identified.");
+
+        var actions = await _officialActivityRepository.GetInstitutionActionsAsync(official.InstitutionId);
+
+        return new OfficialHistoryActionsResponseDto { Actions = actions };
+    }
+
+    public async Task<OfficialStatsResponseDto> GetMyStatsAsync(Guid userId)
+    {
+        var official = await _officialRepository.GetByUserIdAsync(userId)
+            ?? throw new UnauthorizedAccessException(
+                "The authenticated official could not be identified.");
+
+        var startOfTodayUtc = DateTime.UtcNow.Date;
+        var startOfTomorrowUtc = startOfTodayUtc.AddDays(1);
+
+        var todayCount =
+            await _officialActivityRepository.CountVerificationsTodayByInstitutionAsync(
+                official.InstitutionId,
+                startOfTodayUtc,
+                startOfTomorrowUtc);
+
+        return new OfficialStatsResponseDto
+        {
+            TodayCount = todayCount,
+            IsCapped = false,
+        };
+    }
 }

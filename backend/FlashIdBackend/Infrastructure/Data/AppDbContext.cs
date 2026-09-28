@@ -28,13 +28,15 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<DeviceVerification> DeviceVerifications => Set<DeviceVerification>();
     public DbSet<JobRun> JobRuns => Set<JobRun>();
+    public DbSet<PhysicalIdentityVerification> PhysicalIdentityVerifications => Set<PhysicalIdentityVerification>();
+    public DbSet<SecurityEvent> SecurityEvents => Set<SecurityEvent>();
+    public DbSet<FraudAlert> FraudAlerts => Set<FraudAlert>();
+    public DbSet<UserSecurityProfile> UserSecurityProfiles => Set<UserSecurityProfile>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        //this lets IdentityDbContext set up its own tables
         base.OnModelCreating(builder);
 
-        //scan the Infrastructure assembly and automatically find every class that implements IEntityTypeConfiguration<T>
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

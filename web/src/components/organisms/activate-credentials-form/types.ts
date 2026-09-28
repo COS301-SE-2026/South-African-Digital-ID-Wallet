@@ -4,8 +4,6 @@ export type ActivateCredentialsSelection = {
 }
 
 export type ActivateCredentialsFormProps = {
-  identityDocumentAvailable: boolean
-  driversLicenseAvailable: boolean
   selection: ActivateCredentialsSelection
   onSelectionChange: (selection: ActivateCredentialsSelection) => void
   onSubmit: () => void

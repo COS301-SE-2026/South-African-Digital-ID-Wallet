@@ -1,8 +1,8 @@
 import {
   History,
   Home,
-  Inbox,
   ScanLine,
+  ScrollText,
   ShieldCheck,
   User,
   Wallet,
@@ -21,7 +21,7 @@ export const citizenTabs: NavTabConfig[] = [
 
 export const officialTabs: NavTabConfig[] = [
   { name: 'home', label: 'Home', Icon: Home },
-  { name: 'requests', label: 'Requests', Icon: Inbox },
+  { name: 'audit-log', label: 'Audit Log', Icon: ScrollText },
   { name: 'verify', label: 'Verify', Icon: ScanLine, variant: 'center' },
   { name: 'history', label: 'History', Icon: History },
   { name: 'profile', label: 'Profile', Icon: User },

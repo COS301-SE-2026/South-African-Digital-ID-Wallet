@@ -1,12 +1,7 @@
 import { citizenQuickActions } from '../quick-actions'
 
 const EXPECTED_ACTION_COUNT = 4
-const EXPECTED_LABELS = [
-  'Scan QR',
-  'Share ID',
-  'My Documents',
-  'Verify Identity',
-]
+const EXPECTED_LABELS = ['Scan QR', 'Share ID', 'My Documents', 'Activity']
 const CITIZEN_ROUTE_PREFIX = '/citizen/'
 
 describe('citizenQuickActions', () => {

@@ -5,6 +5,7 @@ using Application.Features.Institutions.DTOs;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Mapping;
 using Application.Common.Services;
+using Application.Features.ManageUserAccountCard.DTOs;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
@@ -14,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace tests;
 
@@ -71,6 +73,19 @@ public class BackendIntegrationTests
         public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
     }
 
+    private class FakeIpGeolocationProvider : IIpGeolocationProvider
+    {
+        public Task<IpLocationResult?> GetLocationAsync(string ipAddress,
+            CancellationToken cancellationToken)
+        {
+            return Task.FromResult<IpLocationResult?>(new IpLocationResult
+            {
+                City = "Play",
+                Country = "Played"
+            });
+        }
+    }
+
     private static AppDbContext CreateContext()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
@@ -106,6 +121,7 @@ public class BackendIntegrationTests
         var deviceTokenProvider = new FakeDeviceTokenProvider();
         var emailSenderProvider = new FakeEmailSenderProvide();
         var environment = new FakeHostEnvironment();
+        var ipGeolocationProvider = new FakeIpGeolocationProvider();
 
         return new AuthService(
             authRepository,
@@ -114,7 +130,7 @@ public class BackendIntegrationTests
             citizenService,
             mapper,
             trustedDevicesRepository,
-            deviceTokenProvider, emailSenderProvider, environment);
+            deviceTokenProvider, emailSenderProvider, environment, ipGeolocationProvider, NullLogger<AuthService>.Instance);
     }
 
     private static InstitutionService CreateInstitutionService(AppDbContext context)

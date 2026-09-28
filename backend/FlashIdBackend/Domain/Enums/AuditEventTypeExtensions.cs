@@ -10,6 +10,8 @@ public static class AuditEventTypeExtensions
         AuditEventType.CitizenVerificationFailed,
         AuditEventType.CitizenCredentialsActivationFailed,
         AuditEventType.DeviceVerificationFailed,
+        AuditEventType.QrGenerationBlocked,
+        AuditEventType.OfflineVerificationRejected,
     };
 
     public static readonly HashSet<AuditEventType> ViewEvents = new()
@@ -19,5 +21,7 @@ public static class AuditEventTypeExtensions
     };
 
     public static string ToOutcome(this AuditEventType eventType) =>
-        FailedEvents.Contains(eventType) ? "Failed" : "Success";
+        ViewEvents.Contains(eventType) ? "Access"
+        : FailedEvents.Contains(eventType) ? "Failed"
+        : "Success";
 }

@@ -17,6 +17,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -51,6 +52,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.MapHealthChecks("/health");
+app.UseMiddleware<ApiKeyMiddleware>();
+app.MapControllers();
 app.UseMiddleware<ApiKeyMiddleware>();
 app.MapControllers();
 

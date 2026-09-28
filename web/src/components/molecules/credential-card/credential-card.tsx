@@ -8,7 +8,6 @@ export function CredentialCard({
   icon: Icon,
   title,
   description,
-  available,
   activated,
   onToggle,
 }: Readonly<CredentialCardProps>) {
@@ -24,9 +23,6 @@ export function CredentialCard({
               <Text variant="sub-md" className="font-bold text-text-primary">
                 {title}
               </Text>
-              <StatusPill intent={available ? 'active' : 'inactive'}>
-                {available ? 'Available' : 'Unavailable'}
-              </StatusPill>
             </div>
             <Text variant="sub-sm" className="mt-1 text-muted-foreground">
               {description}
@@ -39,7 +35,6 @@ export function CredentialCard({
             <Checkbox
               checked={activated}
               onCheckedChange={(checked) => onToggle(checked === true)}
-              disabled={!available}
             />
             <Text variant="sub-sm" className="font-semibold text-text-primary">
               Activate this credential

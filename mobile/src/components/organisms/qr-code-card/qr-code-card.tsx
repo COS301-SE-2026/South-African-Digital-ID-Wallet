@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { RefreshCw } from 'lucide-react-native'
 import { View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
@@ -10,6 +11,9 @@ import { colors } from '@/theme/colors'
 import type { QrCodeCardProps } from './types'
 
 const QR_SIZE = 236
+const OFFLINE_QR_SIZE = 280
+const OFFLINE_FRAME_RATE = 8
+const OFFLINE_FRAME_INTERVAL_MS = 1000 / OFFLINE_FRAME_RATE
 
 export const QrCodeCard = ({
   onCancel,
@@ -17,8 +21,32 @@ export const QrCodeCard = ({
   secondsRemaining,
   testID = 'qr-code-card',
   token,
+  offlineFrames = [],
 }: QrCodeCardProps) => {
+  const [frameIndex, setFrameIndex] = useState(0)
+  const isOffline = offlineFrames.length > 0
   const isExpired = secondsRemaining <= 0
+
+  useEffect(() => {
+    if (!isOffline || offlineFrames.length <= 1) {
+      return
+    }
+
+    const interval = setInterval(() => {
+      setFrameIndex((currentIndex) => (currentIndex + 1) % offlineFrames.length)
+    }, OFFLINE_FRAME_INTERVAL_MS)
+
+    return () => clearInterval(interval)
+  }, [isOffline, offlineFrames.length])
+
+  const currentFrameIndex =
+    isOffline && offlineFrames.length > 0
+      ? frameIndex % offlineFrames.length
+      : 0
+
+  const qrValue = isOffline
+    ? (offlineFrames[currentFrameIndex] ?? '')
+    : (token ?? '')
 
   return (
     <View
@@ -29,15 +57,17 @@ export const QrCodeCard = ({
         <QRCode
           backgroundColor={colors.white}
           color={colors.black}
-          logo={require('../../../../assets/icon.png')}
+          ecl={isOffline ? 'L' : 'M'}
+          logo={isOffline ? undefined : require('../../../../assets/icon.png')}
           logoBackgroundColor={colors.white}
           logoBorderRadius={12}
           logoSize={46}
           quietZone={12}
-          size={QR_SIZE}
-          value={token}
+          size={isOffline ? OFFLINE_QR_SIZE : QR_SIZE}
+          value={qrValue}
         />
-        {isExpired ? (
+
+        {!isOffline && isExpired ? (
           <View
             className="absolute inset-0 items-center justify-center bg-clean-white/90"
             testID="qr-expired-overlay"
@@ -50,17 +80,35 @@ export const QrCodeCard = ({
         ) : null}
       </View>
 
-      <Text variant="sub-md" className="text-center text-text-primary">
-        Present this QR code to verify your identity
-      </Text>
+      {isOffline ? (
+        <View className="items-center gap-1" testID="offline-frame-status">
+          <Text variant="sub-md" className="text-center text-text-primary">
+            Showing offline verification code
+          </Text>
+          <Text
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+            testID="offline-frame-progress"
+            variant="caption"
+          >
+            Frame {currentFrameIndex + 1} of {offlineFrames.length}
+          </Text>
+        </View>
+      ) : (
+        <Text variant="sub-md" className="text-center text-text-primary">
+          Present this QR code to verify your identity
+        </Text>
+      )}
 
-      <View className="items-center gap-2">
-        <Text variant="caption">This code expires in</Text>
-        <CountdownRing
-          secondsRemaining={secondsRemaining}
-          totalSeconds={QR_LIFETIME_SECONDS}
-        />
-      </View>
+      {isOffline ? null : (
+        <View className="items-center gap-2">
+          <Text variant="caption">This code expires in</Text>
+          <CountdownRing
+            secondsRemaining={secondsRemaining}
+            totalSeconds={QR_LIFETIME_SECONDS}
+          />
+        </View>
+      )}
 
       <View className="w-full gap-3">
         <Button

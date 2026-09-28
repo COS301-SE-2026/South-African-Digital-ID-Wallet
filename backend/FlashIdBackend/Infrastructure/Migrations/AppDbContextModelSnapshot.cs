@@ -267,6 +267,13 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
+                    b.Property<string>("DisclosureSet")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HolderKeyThumbprint")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
                     b.Property<string>("IdBackImagePath")
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
@@ -283,6 +290,15 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("IssuerSignedCredential")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("PackageExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("RevocationIndex")
+                        .HasColumnType("int");
+
                     b.Property<string>("SelfieImagePath")
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
@@ -291,6 +307,13 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
+
+                    b.Property<DateTimeOffset?>("SignedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("SigningKid")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -304,6 +327,10 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CitizenId");
+
+                    b.HasIndex("RevocationIndex")
+                        .IsUnique()
+                        .HasFilter("[RevocationIndex] IS NOT NULL");
 
                     b.ToTable("Credentials");
                 });
@@ -401,6 +428,77 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("DriversLicenses");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FraudAlert", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double?>("DistanceKm")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("ElapsedMinutes")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("ImpliedSpeedKmh")
+                        .HasColumnType("float");
+
+                    b.Property<bool>("IsImpossibleTravel")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("PreviousSecurityEventId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ResolutionAction")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RiskLevel")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<int>("RiskScore")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("SecurityEventId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Signals")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PreviousSecurityEventId");
+
+                    b.HasIndex("SecurityEventId");
+
+                    b.HasIndex("UserId", "CreatedAt");
+
+                    b.HasIndex("UserId", "Status");
+
+                    b.ToTable("FraudAlerts");
                 });
 
             modelBuilder.Entity("Domain.Entities.GovernmentAdministrator", b =>
@@ -680,6 +778,151 @@ namespace Infrastructure.Migrations
                     b.ToTable("Officials");
                 });
 
+            modelBuilder.Entity("Domain.Entities.PhysicalIdentityVerification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AttemptCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("AzureLivenessSessionId")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool?>("CardFaceMatchedLiveFace")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ConsentGrantedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FailureReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool?>("LivenessPassed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OcrIdNumberHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<bool?>("RegistryFaceMatched")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("RegistryIdentityMatched")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("SubmittedSaId")
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("VerifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AzureLivenessSessionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PhysicalIdentityVerifications", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.SecurityEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("City")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Country")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeviceDescription")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("DeviceTokenHash")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(45)
+                        .HasColumnType("nvarchar(45)");
+
+                    b.Property<bool>("IsNewDevice")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsTrustedDevice")
+                        .HasColumnType("bit");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RiskLevel")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<int>("RiskScore")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "DeviceTokenHash");
+
+                    b.HasIndex("UserId", "OccurredAt");
+
+                    b.ToTable("SecurityEvents");
+                });
+
             modelBuilder.Entity("Domain.Entities.TrustedDevice", b =>
                 {
                     b.Property<Guid>("Id")
@@ -873,6 +1116,28 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("UserPreferences");
+                });
+
+            modelBuilder.Entity("Domain.Entities.UserSecurityProfile", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("EnhancedVerificationEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ImpossibleTravelDetectionEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("QrRestrictedUntil")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("UserSecurityProfiles");
                 });
 
             modelBuilder.Entity("Infrastructure.Identity.ApplicationUser", b =>
@@ -1174,6 +1439,32 @@ namespace Infrastructure.Migrations
                     b.Navigation("Credential");
                 });
 
+            modelBuilder.Entity("Domain.Entities.FraudAlert", b =>
+                {
+                    b.HasOne("Domain.Entities.SecurityEvent", "PreviousSecurityEvent")
+                        .WithMany()
+                        .HasForeignKey("PreviousSecurityEventId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Domain.Entities.SecurityEvent", "SecurityEvent")
+                        .WithMany()
+                        .HasForeignKey("SecurityEventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PreviousSecurityEvent");
+
+                    b.Navigation("SecurityEvent");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.GovernmentAdministrator", b =>
                 {
                     b.HasOne("Domain.Entities.User", "User")
@@ -1237,6 +1528,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.Entities.SecurityEvent", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.TrustedDevice", b =>
                 {
                     b.HasOne("Domain.Entities.User", "User")
@@ -1253,6 +1555,17 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.User", "User")
                         .WithOne("Preference")
                         .HasForeignKey("Domain.Entities.UserPreferences", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.UserSecurityProfile", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithOne()
+                        .HasForeignKey("Domain.Entities.UserSecurityProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

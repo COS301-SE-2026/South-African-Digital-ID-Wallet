@@ -8,6 +8,7 @@ export type IconTileTone =
   | 'soft-green'
   | 'soft-amber'
   | 'soft-red'
+  | 'soft-blue'
   | 'neutral'
 
 export type IconTileShape = 'rounded' | 'circle'

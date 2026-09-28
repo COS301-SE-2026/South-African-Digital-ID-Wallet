@@ -15,6 +15,8 @@ public class CitizenRecord
 
     public DateOnly DateOfBirth { get; set; }
 
+    public string? PhotoBlobName { get; set; }
+
     public ICollection<Credential> Credentials { get; set; } = [];
 
 }

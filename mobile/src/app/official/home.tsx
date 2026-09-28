@@ -1,11 +1,5 @@
-import { View } from 'react-native'
-
-import { Text } from '@/components/atoms'
+import { OfficialHomePage } from '@/components/pages'
 
 export default function OfficialScreen() {
-  return (
-    <View className="flex-1 items-center justify-center bg-cream-background">
-      <Text variant="h2">home</Text>
-    </View>
-  )
+  return <OfficialHomePage />
 }

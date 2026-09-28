@@ -17,7 +17,7 @@ env:
 
 jobs:
   deploy-main:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,9 +29,43 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
+      - name: Get Azure Face client assets token
+        id: azure-face-assets
+        shell: bash
+        env: 
+          AZURE_FACE_API_KEY: ${{ secrets.AZUREFACEAPIKEY }}
+        run: |
+          set -euo pipefail
+
+          response=$(curl --fail-with-body --silent --show-error \
+            -H "Ocp-Apim-Subscription-Key: $AZURE_FACE_API_KEY" \
+            "https://face-digitalwallet-dev.cognitiveservices.azure.com/face/v1.3-preview.1/settings/getClientAssetsAccessToken")
+
+          token=$(echo "$response" | jq -r '.base64AccessToken')
+          expiry=$(echo "$response" | jq -r '.expiry')
+
+          if [ -z "$token" ] || [ "$token" = "null" ]; then
+            echo "::error::Azure Face did not return a client assets access token."
+            exit 1
+          fi
+
+          echo "::add-mask::$token"
+          echo "AZUREFACEAPIPASSWORD=$token" >> "$GITHUB_ENV"
+
+          echo "Azure Face client assets token acquired."
+          echo "Token expires: $expiry"
+
       - name: Build and push prod image
+        env:
+          AZUREFACEAPIREGISTRY: ${{ secrets.AZUREFACEAPIREGISTRY }}
+          AZUREFACEAPIUSERNAME: ${{ secrets.AZUREFACEAPIUSERNAME }}
+          AZUREFACEAPIEMAIL: ${{ secrets.AZUREFACEAPIEMAIL }}
         run: |
           docker build -f dockerfile.web \
+            --secret id=AZUREFACEAPIREGISTRY,env=AZUREFACEAPIREGISTRY \
+            --secret id=AZUREFACEAPIUSERNAME,env=AZUREFACEAPIUSERNAME \
+            --secret id=AZUREFACEAPIPASSWORD,env=AZUREFACEAPIPASSWORD \
+            --secret id=AZUREFACEAPIEMAIL,env=AZUREFACEAPIEMAIL \
             --build-arg NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL_PROD }} \
             --build-arg API_INTERNAL_URL=${{ vars.NEXT_PUBLIC_API_URL_PROD }} \
             -t ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:prod-${{ github.sha }} \

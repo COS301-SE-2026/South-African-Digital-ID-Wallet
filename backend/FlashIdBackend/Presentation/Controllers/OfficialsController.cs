@@ -130,4 +130,53 @@ public class OfficialsController : ControllerBase
             return Unauthorized(new { error = uae.Message });
         }
     }
+
+    [HttpGet("history/actions")]
+    [Authorize(Roles = "Official")]
+    [ProducesResponseType(typeof(OfficialHistoryActionsResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetHistoryActions()
+    {
+        var userIdClaim = User.FindFirst("userId")?.Value;
+
+        if (userIdClaim == null) return Unauthorized(new { error = "Invalid token." });
+
+        var userId = Guid.Parse(userIdClaim);
+
+        try
+        {
+            var result = await _officialActivityService.GetInstitutionActionsAsync(userId);
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException uae)
+        {
+            return Unauthorized(new { error = uae.Message });
+        }
+    }
+
+    [HttpGet("stats/me")]
+    [Authorize(Roles = "Official")]
+    [ProducesResponseType(
+    typeof(OfficialStatsResponseDto),
+    StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetMyStats()
+    {
+        var userIdClaim = User.FindFirst("userId")?.Value;
+
+        if (userIdClaim == null)
+            return Unauthorized(new { error = "Invalid token." });
+
+        var userId = Guid.Parse(userIdClaim);
+
+        try
+        {
+            var result = await _officialActivityService.GetMyStatsAsync(userId);
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            return Unauthorized(new { error = exception.Message });
+        }
+    }
 }
