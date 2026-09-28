@@ -306,7 +306,6 @@ public static class DbSeeder
 
         await context.SaveChangesAsync();
     }
-
     private static async Task RepairInvalidPasswordHashesAsync(AppDbContext context)
     {
         var allUsers = await context.DomainUsers.ToListAsync();

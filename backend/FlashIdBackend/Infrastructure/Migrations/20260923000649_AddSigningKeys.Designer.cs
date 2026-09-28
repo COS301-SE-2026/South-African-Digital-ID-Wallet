@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260923000649_AddSigningKeys")]
+    partial class AddSigningKeys
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -430,77 +433,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("DriversLicenses");
                 });
 
-            modelBuilder.Entity("Domain.Entities.FraudAlert", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double?>("DistanceKm")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("ElapsedMinutes")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("ImpliedSpeedKmh")
-                        .HasColumnType("float");
-
-                    b.Property<bool>("IsImpossibleTravel")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("PreviousSecurityEventId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ResolutionAction")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<DateTime?>("ResolvedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RiskLevel")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<int>("RiskScore")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("SecurityEventId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Signals")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PreviousSecurityEventId");
-
-                    b.HasIndex("SecurityEventId");
-
-                    b.HasIndex("UserId", "CreatedAt");
-
-                    b.HasIndex("UserId", "Status");
-
-                    b.ToTable("FraudAlerts");
-                });
-
             modelBuilder.Entity("Domain.Entities.GovernmentAdministrator", b =>
                 {
                     b.Property<Guid>("Id")
@@ -849,80 +781,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("PhysicalIdentityVerifications", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.SecurityEvent", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("City")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Country")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeviceDescription")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("DeviceTokenHash")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("EventType")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("IpAddress")
-                        .IsRequired()
-                        .HasMaxLength(45)
-                        .HasColumnType("nvarchar(45)");
-
-                    b.Property<bool>("IsNewDevice")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsTrustedDevice")
-                        .HasColumnType("bit");
-
-                    b.Property<double?>("Latitude")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("Longitude")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("OccurredAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RiskLevel")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<int>("RiskScore")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId", "DeviceTokenHash");
-
-                    b.HasIndex("UserId", "OccurredAt");
-
-                    b.ToTable("SecurityEvents");
-                });
-
             modelBuilder.Entity("Domain.Entities.SigningKey", b =>
                 {
                     b.Property<Guid>("Id")
@@ -984,9 +842,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Kid")
                         .IsUnique();
 
-                    b.HasIndex("Purpose")
-                        .IsUnique()
-                        .HasFilter("[Status] = 'Active'");
+                    b.HasIndex("Purpose", "Status");
 
                     b.ToTable("SigningKeys");
                 });
@@ -1184,28 +1040,6 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("UserPreferences");
-                });
-
-            modelBuilder.Entity("Domain.Entities.UserSecurityProfile", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("EnhancedVerificationEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("ImpossibleTravelDetectionEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("QrRestrictedUntil")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("UserSecurityProfiles");
                 });
 
             modelBuilder.Entity("Infrastructure.Identity.ApplicationUser", b =>
@@ -1507,32 +1341,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("Credential");
                 });
 
-            modelBuilder.Entity("Domain.Entities.FraudAlert", b =>
-                {
-                    b.HasOne("Domain.Entities.SecurityEvent", "PreviousSecurityEvent")
-                        .WithMany()
-                        .HasForeignKey("PreviousSecurityEventId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Domain.Entities.SecurityEvent", "SecurityEvent")
-                        .WithMany()
-                        .HasForeignKey("SecurityEventId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PreviousSecurityEvent");
-
-                    b.Navigation("SecurityEvent");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Domain.Entities.GovernmentAdministrator", b =>
                 {
                     b.HasOne("Domain.Entities.User", "User")
@@ -1596,17 +1404,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Domain.Entities.SecurityEvent", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Domain.Entities.TrustedDevice", b =>
                 {
                     b.HasOne("Domain.Entities.User", "User")
@@ -1623,17 +1420,6 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.User", "User")
                         .WithOne("Preference")
                         .HasForeignKey("Domain.Entities.UserPreferences", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Domain.Entities.UserSecurityProfile", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "User")
-                        .WithOne()
-                        .HasForeignKey("Domain.Entities.UserSecurityProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
