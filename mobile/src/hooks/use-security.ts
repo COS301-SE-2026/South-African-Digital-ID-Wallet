@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  mockSecurityService,
+  securityService,
   toOpenAlert,
   toSecurityActivityEntries,
 } from '@/services/security-service'
@@ -11,7 +11,7 @@ import type {
 } from '@/services/security-service'
 
 // INTEGRATION: swap to securityService (same interface) to use the real API
-const service: SecurityService = mockSecurityService
+const service: SecurityService = securityService
 
 export const securityKeys = {
   activity: ['security', 'activity'] as const,

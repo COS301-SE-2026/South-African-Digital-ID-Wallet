@@ -32,6 +32,7 @@ type AuthState = {
   token: string | null
   unlock: () => void
   user: AuthUser | null
+  replaceToken: (token: string, expiresAt: string) => Promise<void>
 }
 
 const hasExpired = (expiresAt: string) =>
@@ -83,6 +84,26 @@ export const useAuthStore = create<AuthState>((set) => ({
       isRestoring: false,
       token: session.token,
       user: session.user,
+    })
+  },
+  replaceToken: async (token, expiresAt) => {
+    const { user } = useAuthStore.getState()
+
+    if (!user) {
+      return
+    }
+
+    setAuthToken(token)
+
+    await saveSession({
+      expiresAt,
+      token,
+      user,
+    }).catch(() => {})
+
+    set({
+      expiresAt,
+      token,
     })
   },
   signIn: ({ deviceToken, expiresAt, names, role, surname, token, userId }) => {
