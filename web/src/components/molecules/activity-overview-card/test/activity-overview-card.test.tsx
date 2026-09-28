@@ -26,12 +26,10 @@ const mockActivity = [
     type: 'biometriclogin',
   },
 ]
-
 describe('ActivityOverviewCard', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
-
   it('shows the loading state while activity is being fetched', () => {
     mockedApi.get.mockReturnValue(new Promise(() => {}))
     render(<ActivityOverviewCard />)
@@ -40,7 +38,6 @@ describe('ActivityOverviewCard', () => {
     ).toBeInTheDocument()
     expect(screen.getByText(/loading activity/i)).toBeInTheDocument()
   })
-
   it('renders the activity overview heading', async () => {
     mockedApi.get.mockResolvedValue({ data: mockActivity })
     render(<ActivityOverviewCard />)
@@ -48,7 +45,6 @@ describe('ActivityOverviewCard', () => {
       await screen.findByRole('heading', { name: /activity overview/i })
     ).toBeInTheDocument()
   })
-
   it('renders all recent activity items', async () => {
     mockedApi.get.mockResolvedValue({ data: mockActivity })
     render(<ActivityOverviewCard />)
@@ -58,9 +54,10 @@ describe('ActivityOverviewCard', () => {
     expect(
       screen.getByText(/driver's licence credential issued/i)
     ).toBeInTheDocument()
-    expect(screen.getByText(/biometric login successful/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/biometric login successful/i)
+    ).toBeInTheDocument()
   })
-
   it('renders the View all button', async () => {
     mockedApi.get.mockResolvedValue({ data: mockActivity })
     render(<ActivityOverviewCard />)
@@ -68,7 +65,6 @@ describe('ActivityOverviewCard', () => {
       await screen.findByRole('button', { name: /view all/i })
     ).toBeInTheDocument()
   })
-
   it('opens the activity history modal when View all is clicked', async () => {
     mockedApi.get.mockResolvedValue({ data: mockActivity })
     const user = userEvent.setup()
@@ -80,35 +76,29 @@ describe('ActivityOverviewCard', () => {
     expect(
       screen.getByRole('heading', { name: /activity history/i })
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument()
+    expect(screen.getByLabelText('Close')).toBeInTheDocument()
   })
   it('shows all activity items inside the activity history modal', async () => {
     mockedApi.get.mockResolvedValue({ data: mockActivity })
     const user = userEvent.setup()
-
     render(<ActivityOverviewCard />)
-
     const viewAllButton = await screen.findByRole('button', {
       name: /view all/i,
     })
-
     await user.click(viewAllButton)
-
     expect(
       screen.getByRole('heading', { name: /activity history/i })
     ).toBeInTheDocument()
-
     expect(
       screen.getAllByText(/credential verified by bank official/i)
     ).toHaveLength(2)
-
     expect(
       screen.getAllByText(/driver's licence credential issued/i)
     ).toHaveLength(2)
-
-    expect(screen.getAllByText(/biometric login successful/i)).toHaveLength(2)
+    expect(
+      screen.getAllByText(/biometric login successful/i)
+    ).toHaveLength(2)
   })
-
   it('closes the activity history modal when Close is clicked', async () => {
     mockedApi.get.mockResolvedValue({ data: mockActivity })
     const user = userEvent.setup()
@@ -120,11 +110,7 @@ describe('ActivityOverviewCard', () => {
     expect(
       screen.getByRole('heading', { name: /activity history/i })
     ).toBeInTheDocument()
-    await user.click(
-      screen.getByRole('button', {
-        name: /close/i,
-      })
-    )
+    await user.click(screen.getByLabelText('Close'))
     await waitFor(() => {
       expect(
         screen.queryByRole('heading', {
@@ -133,13 +119,13 @@ describe('ActivityOverviewCard', () => {
       ).not.toBeInTheDocument()
     })
   })
-
   it('shows a message when there is no activity', async () => {
     mockedApi.get.mockResolvedValue({ data: [] })
     render(<ActivityOverviewCard />)
-    expect(await screen.findByText(/no activity found/i)).toBeInTheDocument()
+    expect(
+      await screen.findByText(/no activity found/i)
+    ).toBeInTheDocument()
   })
-
   it('shows no activity in the modal when there is no activity', async () => {
     mockedApi.get.mockResolvedValue({ data: [] })
     const user = userEvent.setup()
@@ -153,7 +139,6 @@ describe('ActivityOverviewCard', () => {
     ).toBeInTheDocument()
     expect(screen.getAllByText(/no activity found/i)).toHaveLength(2)
   })
-
   it('handles an API error without crashing', async () => {
     mockedApi.get.mockRejectedValue(new Error('API error'))
     const consoleErrorSpy = jest
@@ -163,7 +148,6 @@ describe('ActivityOverviewCard', () => {
     await waitFor(() => {
       expect(screen.getByText(/no activity found/i)).toBeInTheDocument()
     })
-
     consoleErrorSpy.mockRestore()
   })
 })
