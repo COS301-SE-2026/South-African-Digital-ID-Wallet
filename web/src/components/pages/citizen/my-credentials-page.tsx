@@ -2,7 +2,7 @@
 import { FC, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { Modal, Text } from '@/components/atoms'
+import { Text } from '@/components/atoms'
 import {
   CertifiedCopyGenerated,
   CredentialDetailCard,
@@ -13,6 +13,7 @@ import {
   toCredentialView,
   type CredentialResponse,
 } from '@/services/credential-service'
+import { certifiedCopyService } from '@/services/certified-copy-service'
 
 type CopyModalState = 'progress' | 'generated' | null
 export const MyCredentialsPage: FC = () => {
@@ -32,34 +33,46 @@ export const MyCredentialsPage: FC = () => {
   const selected = views.find((view) => view.id === selectedId) ?? views[0]
   const selectedResponse =
     data?.find((credential) => credential.id === selected?.id) ?? null
+  const [generatedPdfUrl, setGeneratedPdfUrl] = useState<string | null>(null)
+  const [generatedFileName, setGeneratedFileName] = useState('')
 
-  useEffect(() => {
-    if (copyModal !== 'progress' || !selectedCredential) {
-      return
-    }
-    //setCurrentStep(1)
-    const stepTwoTimer = window.setTimeout(() => {
-      setCurrentStep(2)
-    }, 850)
-    const stepThreeTimer = window.setTimeout(() => {
-      setCurrentStep(3)
-    }, 1700)
-    const completeTimer = window.setTimeout(() => {
-      setGeneratedAt(new Date().toISOString())
-      setCopyModal('generated')
-    }, 2800)
-    return () => {
-      window.clearTimeout(stepTwoTimer)
-      window.clearTimeout(stepThreeTimer)
-      window.clearTimeout(completeTimer)
-    }
-  }, [copyModal, selectedCredential])
-  const handleGenerateCertifiedCopy = (credential: CredentialResponse) => {
+  const handleGenerateCertifiedCopy = async (
+    credential: CredentialResponse
+  ) => {
     setSelectedCredential(credential)
     setGeneratedAt('')
+
+    setGeneratedPdfUrl(null)
+    setCurrentStep(1)
     setCopyModal('progress')
+
+    try {
+      setCurrentStep(2)
+
+      const result = await certifiedCopyService.generate(credential.id, {
+        credentialType: credential.type,
+      })
+
+      setCurrentStep(3)
+
+      const pdfUrl = URL.createObjectURL(result.blob)
+
+      setGeneratedPdfUrl(pdfUrl)
+      setGeneratedFileName(result.fileName)
+      setGeneratedAt(new Date().toISOString())
+      setCopyModal('generated')
+    } catch (error) {
+      console.error('Failed to generate certified copy', error)
+      setCopyModal(null)
+    }
   }
   const closeCopyModal = () => {
+    if (generatedPdfUrl) {
+      URL.revokeObjectURL(generatedPdfUrl)
+    }
+
+    setGeneratedPdfUrl(null)
+    setGeneratedFileName('')
     setCopyModal(null)
     setSelectedCredential(null)
   }
@@ -133,10 +146,12 @@ export const MyCredentialsPage: FC = () => {
       {copyModal === 'progress' && (
         <GenCopyProgress currentStep={currentStep} />
       )}
-      {copyModal === 'generated' && selectedCredential && (
+      {copyModal === 'generated' && selectedCredential && generatedPdfUrl && (
         <CertifiedCopyGenerated
           credential={selectedCredential}
           generatedAt={generatedAt}
+          pdfUrl={generatedPdfUrl}
+          fileName={generatedFileName}
           onBack={closeCopyModal}
         />
       )}

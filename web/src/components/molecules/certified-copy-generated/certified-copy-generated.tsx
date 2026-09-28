@@ -3,6 +3,10 @@ import { Button, Text } from '@/components/atoms'
 import type { CertifiedCopyGeneratedProps } from './types'
 
 export function CertifiedCopyGenerated({
+  credential,
+  generatedAt,
+  pdfUrl,
+  fileName,
   onBack,
 }: Readonly<CertifiedCopyGeneratedProps>) {
   return (
@@ -27,14 +31,16 @@ export function CertifiedCopyGenerated({
           </div>
         </div>
         <div className="mt-5">
-          <Button
-            type="button"
-            variant="primary"
-            className="!w-full"
-            LeftIcon={Download}
-          >
-            Download PDF
-          </Button>
+          <a href={pdfUrl} download={fileName} className="block">
+            <Button
+              type="button"
+              variant="primary"
+              className="!w-full"
+              LeftIcon={Download}
+            >
+              Download PDF
+            </Button>
+          </a>
         </div>
         <div className="mt-5 border-t border-border-grey pt-4">
           <div className="space-y-2">
