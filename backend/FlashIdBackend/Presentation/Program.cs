@@ -227,6 +227,10 @@ if (!app.Environment.IsEnvironment("Testing"))
 
 app.UseForwardedHeaders();
 app.UseExceptionHandler();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHsts();
+}
 app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);
 app.UseRateLimiter();
