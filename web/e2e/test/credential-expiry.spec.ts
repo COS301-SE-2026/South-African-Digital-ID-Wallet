@@ -7,27 +7,20 @@ test.describe.serial('Automatic credential expiry', () => {
     })
     const page = await context.newPage()
     const cookies = await context.cookies()
-    console.log(
-      'COOKIES:',
-      cookies.map(
-        (c) =>
-          `${c.name}=${c.value.slice(0, 8)}... (domain=${c.domain}, path=${c.path})`
-      )
-    )
     const csrfToken = cookies.find((c) => c.name === 'csrf_token')?.value
-    const decodedCsrfToken = csrfToken
-      ? decodeURIComponent(csrfToken)
-      : undefined
-    console.log('CSRF TOKEN FOUND:', csrfToken ?? 'NONE')
+    expect(
+      csrfToken,
+      'csrf_token cookie missing from gov-admin storage state'
+    ).toBeDefined()
+
     const response = await page.request.post('/api/credentials/expiry-check', {
-      headers: decodedCsrfToken ? { 'X-CSRF-Token': decodedCsrfToken } : {},
+      headers: { 'X-CSRF-Token': decodeURIComponent(csrfToken!) },
     })
 
-    if (!response.ok()) {
-      console.log('STATUS:', response.status())
-      console.log('BODY:', await response.text())
-    }
-    expect(response.ok()).toBeTruthy()
+    expect(
+      response.ok(),
+      `expiry-check failed with status ${response.status()}`
+    ).toBeTruthy()
 
     const body = await response.json()
     expect(body.status).toBe('Completed')
