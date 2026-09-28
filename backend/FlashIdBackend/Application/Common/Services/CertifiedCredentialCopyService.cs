@@ -376,4 +376,84 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
         throw new InvalidOperationException(
             $"The credential snapshot for certified copy {certifiedCopy.Id} could not be resolved.");
     }
+
+    public async Task<VerifyCertifiedCopyDocumentResponseDto>
+    VerifyDocumentAsync(byte[] documentBytes)
+    {
+        ArgumentNullException.ThrowIfNull(documentBytes);
+        if (documentBytes.Length == 0)
+        {
+            throw new ArgumentException(
+                "Document cannot be empty.",
+                nameof(documentBytes));
+        }
+        var documentHash = _cryptographyProvider.HashDocument(documentBytes);
+        var certifiedCopy = await _certifiedCopyRepository.GetByDocumentHashAsync(documentHash);
+        if (certifiedCopy is null)
+        {
+            return new VerifyCertifiedCopyDocumentResponseDto
+            {
+                IsValid = false,
+                DocumentIntegrityValid = false,
+                Status = "Invalid",
+                Message = "The uploaded document could not be verified."
+            };
+        }
+        var credential = certifiedCopy.Credential;
+        if (certifiedCopy.Status == CertifiedCopyStatus.Revoked)
+        {
+            return new VerifyCertifiedCopyDocumentResponseDto
+            {
+                IsValid = false,
+                DocumentIntegrityValid = true,
+                Status = "Revoked",
+                CertificationId = certifiedCopy.Id,
+                GeneratedAt = certifiedCopy.GeneratedAt,
+                ExpiresAt = certifiedCopy.ExpiresAt,
+                Message =
+                    "The document is authentic, but its certification has been revoked."
+            };
+        }
+        if (certifiedCopy.ExpiresAt.HasValue && certifiedCopy.ExpiresAt.Value <= DateTime.UtcNow)
+        {
+            return new VerifyCertifiedCopyDocumentResponseDto
+            {
+                IsValid = false,
+                DocumentIntegrityValid = true,
+                Status = "Expired",
+                CertificationId = certifiedCopy.Id,
+                GeneratedAt = certifiedCopy.GeneratedAt,
+                ExpiresAt = certifiedCopy.ExpiresAt,
+                Message = "The document is authentic, but its certification has expired."
+            };
+        }
+        if (credential.Status != CredentialStatus.Active)
+        {
+            return new VerifyCertifiedCopyDocumentResponseDto
+            {
+                IsValid = false,
+                DocumentIntegrityValid = true,
+                Status = "CredentialInactive",
+                CertificationId = certifiedCopy.Id,
+                GeneratedAt = certifiedCopy.GeneratedAt,
+                ExpiresAt = certifiedCopy.ExpiresAt,
+                Message =
+                    "The document is authentic, but the underlying credential is no longer active."
+            };
+        }
+        var snapshot = ResolveCertifiedSnapshot(certifiedCopy);
+        return new VerifyCertifiedCopyDocumentResponseDto
+        {
+            IsValid = true,
+            DocumentIntegrityValid = true,
+            Status = "Valid",
+            CertificationId = certifiedCopy.Id,
+            CredentialType = snapshot.CredentialType,
+            FullName = snapshot.FullName,
+            IdNumber = snapshot.IdNumber,
+            GeneratedAt = certifiedCopy.GeneratedAt,
+            ExpiresAt = certifiedCopy.ExpiresAt,
+            Message = "The document is a valid and unmodified FlashID certified copy."
+        };
+    }
 }
