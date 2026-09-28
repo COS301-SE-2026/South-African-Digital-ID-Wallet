@@ -1,0 +1,94 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/IFieldCryptoProvider.cs
+  h_712d174fc3f309 5-7
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IEmergencyRepository.cs
+  h_712d174fc3f309 33-34
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IEmergencyNotificationQueue.cs
+  h_712d174fc3f309 1-6
+backend/FlashIdBackend/Application/Common/Services/EmergencyClaimNames.cs
+  h_712d174fc3f309 22
+backend/FlashIdBackend/Application/Common/Services/EmergencyNotifier.cs
+  h_712d174fc3f309 5,14,19-20,25,35-37,44,63,65-66,77-80,98
+backend/FlashIdBackend/Application/Common/Services/EmergencyPresentationVerifier.cs
+  h_712d174fc3f309 1-129
+backend/FlashIdBackend/Application/Common/Services/EmergencyService.cs
+  h_712d174fc3f309 21-25,49-50,59-60,68-69,82-83,118-120,137,143,167,170-171,175,180,262-263,265,288-297,361-362,364,378-393,396-405,422,446-459,462-466,468-477,490-491,522-528,594-595,604,612
+backend/FlashIdBackend/Application/Features/Emergency/DTOs/EmergencyDtos.cs
+  h_712d174fc3f309 83
+backend/FlashIdBackend/Infrastructure/BackgroundJobs/EmergencyNotificationBackgroundService.cs
+  h_712d174fc3f309 1-49
+backend/FlashIdBackend/Infrastructure/BackgroundJobs/EmergencyNotificationQueue.cs
+  h_712d174fc3f309 1-14
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_712d174fc3f309 168-170
+backend/FlashIdBackend/Infrastructure/Providers/AesFieldCryptoProvider.cs
+  h_712d174fc3f309 10,25,33,35-39,43,47-63,67-70,74,77-79
+backend/FlashIdBackend/Infrastructure/Repositories/EmergencyRepository.cs
+  h_712d174fc3f309 17,99-107
+backend/FlashIdBackend/Presentation/Controllers/EmergencyController.cs
+  h_712d174fc3f309 14-15,28,33,38,45,50,57-60,65-67,73-75,80-82,87-92,94-95
+backend/FlashIdBackend/Presentation/Program.cs
+  h_712d174fc3f309 186
+backend/FlashIdBackend/tests/AesFieldCryptoProviderTests.cs
+  h_712d174fc3f309 10-11,32,40,46,49,56,59,75-109
+backend/FlashIdBackend/tests/DependencyInjectionTests.cs
+  h_712d174fc3f309 243-255
+backend/FlashIdBackend/tests/EmergencyNotificationBackgroundServiceTests.cs
+  h_712d174fc3f309 1-75
+backend/FlashIdBackend/tests/EmergencyNotifierTests.cs
+  h_712d174fc3f309 6,58-59,137,154,171,187,201,216
+backend/FlashIdBackend/tests/EmergencyRevocationIntegrationTests.cs
+  h_712d174fc3f309 141-142,173-174
+backend/FlashIdBackend/tests/EmergencyServiceTests.cs
+  h_712d174fc3f309 27-29,37,39,50,261,281,445,660-664,668,670-671,674-685,687-691,703-708,710,713,727,739-753,759,766,770,772,781-838,849-855,868,877-992
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/EmergencyKeys.kt
+  h_712d174fc3f309 28,83
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/EmergencyQrActivity.kt
+  h_712d174fc3f309 43-48,73-78,94-111
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/EmergencyQrTileService.kt
+  h_712d174fc3f309 13-17
+mobile/modules/flashid-emergency/android/src/main/res/values/strings.xml
+  h_712d174fc3f309 11
+mobile/src/app/_layout.tsx
+  h_712d174fc3f309 14,53
+mobile/src/components/organisms/break-glass-gate/break-glass-gate.tsx
+  h_712d174fc3f309 11,49
+mobile/src/components/organisms/break-glass-gate/test/break-glass-gate.test.tsx
+  h_712d174fc3f309 70-74
+mobile/src/components/pages/emergency-profile/emergency-profile-page.tsx
+  h_712d174fc3f309 179-187,395-403
+mobile/src/components/pages/emergency-profile/test/emergency-profile-page.test.tsx
+  h_712d174fc3f309 78,238-244
+mobile/src/components/utility/emergency-lock-screen-refresh.tsx
+  h_712d174fc3f309 1-54
+mobile/src/components/utility/index.ts
+  h_712d174fc3f309 5
+mobile/src/components/utility/test/emergency-lock-screen-refresh.test.tsx
+  h_712d174fc3f309 1-117
+mobile/src/hooks/test/use-emergency-offline-read.test.tsx
+  h_712d174fc3f309 147
+mobile/src/hooks/test/use-emergency-profile.test.tsx
+  h_712d174fc3f309 116-119,121
+mobile/src/hooks/use-emergency-offline-read.ts
+  h_712d174fc3f309 18,32,59,70
+mobile/src/hooks/use-emergency-profile.ts
+  h_712d174fc3f309 9,13,16,20,22,36-38,40-41,50
+mobile/src/hooks/use-offline-scan.ts
+  h_712d174fc3f309 40,90,92-95,98,109,113
+mobile/src/lib/offline/offline-cache.ts
+  h_712d174fc3f309 32-37,49
+mobile/src/services/offline-service/offline-service.ts
+  h_712d174fc3f309 12,201,245,268,319-320,334,342-343,347,352-353,357-358,361-364,367,372,387,391-395,402
+mobile/src/services/offline-service/test/offline-service.test.ts
+  h_712d174fc3f309 643,662,752,770-775
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "08f4d9985911e5a9bf404a62d98befc6998d9818",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
