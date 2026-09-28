@@ -27,6 +27,8 @@ namespace Infrastructure.Data;
 // scanning features are built out.
 public static class DbSeeder
 {
+    private const string SouthAfrica = "South Africa";
+
     private sealed record DeviceTemplate(string DeviceType, string OperatingSystem, string Browser);
     private sealed record LocationTemplate(string City, string Country);
     private sealed record NotificationTemplate(string Title, string Description, string Tone);
@@ -80,6 +82,7 @@ public static class DbSeeder
         await SeedGovernmentAdministratorUsersAsync(context, usedEmails, usedPhones);
         await SeedOfficialUsersAsync(context, usedEmails, usedPhones);
         await SeedE2ETestUsersAsync(context);
+        await SeedNfrTestUsersAsync(context);
         await RepairInvalidPasswordHashesAsync(context);
         await SeedCredentialsAsync(context);
         await SeedUserPreferencesAsync(context);
@@ -87,6 +90,86 @@ public static class DbSeeder
         await SeedTrustedDevicesAsync(context);
         await SeedNotificationsAsync(context);
         await SeedExpiryE2ECitizenAsync(context);
+    }
+
+    internal static async Task SeedNfrTestUsersAsync(AppDbContext context)
+    {
+        var now = DateTime.UtcNow;
+
+        async Task<User> EnsureUserAsync(string email, string phone, UserRole role)
+        {
+            var existing = await context.DomainUsers.FirstOrDefaultAsync(u => u.Email == email);
+            if (existing != null) return existing;
+
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                Email = email,
+                PhoneNumber = phone,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
+                IsDeleted = false,
+                IsEmailVerified = true,
+                Role = role,
+                CreatedAt = now,
+                UpdatedAt = now
+            };
+            await context.DomainUsers.AddAsync(user);
+            await context.SaveChangesAsync();
+            return user;
+        }
+
+        async Task EnsureTrustedDeviceAsync(Guid userId, string rawDeviceToken)
+        {
+            var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(rawDeviceToken)));
+            if (await context.TrustedDevices.AnyAsync(d => d.UserId == userId && d.DeviceTokenHash == hash)) return;
+
+            await context.TrustedDevices.AddAsync(new TrustedDevice
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                DeviceTokenHash = hash,
+                DeviceType = DeviceType.Desktop,
+                OperatingSystem = "k6",
+                Browser = "k6",
+                LastKnownCity = "Pretoria",
+                LastKnownCountry = SouthAfrica,
+                LastActive = now,
+                IsTrusted = true,
+                CreatedAt = now,
+                UpdatedAt = now,
+            });
+            await context.SaveChangesAsync();
+        }
+
+        // Fixed pool of 10 NFR-only citizens: nfr-citizen-00@flashid.local .. nfr-citizen-09@flashid.local
+        for (int i = 0; i < 10; i++)
+        {
+            var email = $"nfr-citizen-{i:00}@flashid.local";
+            var user = await EnsureUserAsync(email, $"+2782000{i:0000}", UserRole.Citizen);
+            await EnsureTrustedDeviceAsync(user.Id, $"nfr-k6-device-{i:00}");
+
+            if (!await context.Citizens.AnyAsync(c => c.UserId == user.Id))
+            {
+                await context.Citizens.AddAsync(new Citizen
+                {
+                    Id = Guid.NewGuid(),
+                    SaId = $"800000000{i:0000}", // reserved NFR SA ID block, distinct from real seed ranges
+                    Names = "NFR",
+                    Surname = $"Citizen{i:00}",
+                    DateOfBirth = now.AddYears(-30),
+                    Gender = Gender.Other,
+                    Status = CitizenStatus.Activated,
+                    UserId = user.Id,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                });
+                await context.SaveChangesAsync();
+            }
+        }
+
+        // One dedicated GovernmentAdministrator for expiry-check load testing
+        var govAdminUser = await EnsureUserAsync("nfr-govadmin@flashid.local", "+27820009999", UserRole.GovernmentAdministrator);
+        await EnsureTrustedDeviceAsync(govAdminUser.Id, "nfr-k6-device-govadmin");
     }
 
     internal static async Task SeedE2ETestUsersAsync(AppDbContext context)
@@ -746,7 +829,7 @@ public static class DbSeeder
 
         var citizenships = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
         var nationalities = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
-        var countries = new[] { "South Africa", "Zimbabwe", "Mozambique", "Namibia" };
+        var countries = new[] { SouthAfrica, "Zimbabwe", "Mozambique", "Namibia" };
         var idStatuses = new[] { IdentityDocumentStatus.Citizen, IdentityDocumentStatus.PermanentResident };
         var licenseCodes = new[] { LicenseCode.B, LicenseCode.EB };
 
@@ -967,12 +1050,12 @@ public static class DbSeeder
 
         var locations = new[]
         {
-            new LocationTemplate("Pretoria", "South Africa"),
-            new LocationTemplate("Johannesburg", "South Africa"),
-            new LocationTemplate("Cape Town", "South Africa"),
-            new LocationTemplate("Durban", "South Africa"),
-            new LocationTemplate("Bloemfontein", "South Africa"),
-            new LocationTemplate("Gqeberha", "South Africa")
+            new LocationTemplate("Pretoria", SouthAfrica),
+            new LocationTemplate("Johannesburg", SouthAfrica),
+            new LocationTemplate("Cape Town", SouthAfrica),
+            new LocationTemplate("Durban", SouthAfrica),
+            new LocationTemplate("Bloemfontein", SouthAfrica),
+            new LocationTemplate("Gqeberha", SouthAfrica)
         };
 
         var devicesToAdd = new List<TrustedDevice>();
