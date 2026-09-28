@@ -1,0 +1,20 @@
+mobile/src/services/emergency-service/test/emergency-service.test.ts
+  h_712d174fc3f309 52
+mobile/src/services/offline-service/offline-service.ts
+  h_712d174fc3f309 11,15,199,242,264,311-364,370-372,376,382,394-395
+mobile/src/services/offline-service/test/offline-service.test.ts
+  h_712d174fc3f309 642,654-784
+mobile/src/services/scan-service/test/emergency-token.test.ts
+  h_712d174fc3f309 9-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d68f5cd77729607cf94b49066123f3da767174ae",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
