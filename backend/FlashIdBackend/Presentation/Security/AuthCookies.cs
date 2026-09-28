@@ -14,7 +14,7 @@ public static class AuthCookies
         {
             HttpOnly = true,
             Secure = !environment.IsDevelopment(),
-            SameSite = environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
+            SameSite = SameSiteMode.Lax,
             Path = "/",
             Expires = expires,
             IsEssential = true,
@@ -28,7 +28,7 @@ public static class AuthCookies
         {
             HttpOnly = true,
             Secure = !environment.IsDevelopment(),
-            SameSite = environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
+            SameSite = SameSiteMode.Lax,
             Path = "/",
         };
 
@@ -44,7 +44,7 @@ public static class AuthCookies
         {
             HttpOnly = false,
             Secure = !environment.IsDevelopment(),
-            SameSite = environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
+            SameSite = SameSiteMode.Lax,
             Path = "/",
             Expires = expires,
             IsEssential = true,
