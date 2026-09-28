@@ -13,6 +13,18 @@ const readLatestOtp = (): string | null => {
   ]
   return matches.length ? matches[matches.length - 1][1] : null
 }
+const waitForLatestOtp = async (
+  previousOtp: string | null
+): Promise<string> => {
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const otp = readLatestOtp()
+    if (otp && otp !== previousOtp) {
+      return otp
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500))
+  }
+  throw new Error('Timed out waiting for a new OTP to appear in backend.log')
+}
 
 const roles = [
   {
@@ -53,10 +65,8 @@ setup.describe.serial('device-verified logins', () => {
         .then(() => true)
         .catch(() => false)
       if (needsOtp) {
-        const otp = readLatestOtp()
-        if (!otp) {
-          throw new Error(`Could not find OTP in backend.log for ${role.name}`)
-        }
+        const previousOtp = readLatestOtp()
+        const otp = await waitForLatestOtp(previousOtp)
         const boxes = page.locator('input[maxlength="1"]')
         for (let i = 0; i < otp.length; i++) {
           await boxes.nth(i).fill(otp[i])
