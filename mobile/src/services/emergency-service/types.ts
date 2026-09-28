@@ -1,26 +1,36 @@
 export type EmergencyFieldKey =
   | 'allergies'
-  | 'bloodThinners'
   | 'bloodType'
   | 'communication'
   | 'conditions'
   | 'implants'
-  | 'medicalAid'
+  | 'medicalAidNumber'
+  | 'medicalAidScheme'
   | 'medication'
   | 'name'
 
 export type EmergencyContact = {
-  email: string
+  email?: string | null
   name: string
-  phone?: string
+  phone?: string | null
+  priority: number
   relationship: string
 }
 
 export type EmergencyProfile = {
+  consentGivenAt: string | null
   contacts: EmergencyContact[]
   fields: Partial<Record<EmergencyFieldKey, string>>
   isEnabled: boolean
   medicalLastUpdatedAt: string | null
+  offlineFields: EmergencyFieldKey[]
+}
+
+export type SaveEmergencyProfileRequest = {
+  consentGiven: boolean
+  contacts: EmergencyContact[]
+  fields: Partial<Record<EmergencyFieldKey, string>>
+  isEnabled: boolean
   offlineFields: EmergencyFieldKey[]
 }
 
@@ -35,8 +45,7 @@ export type RegisterDeviceResponse = { handle: string }
 
 export type OfflineCredential = {
   expiresAt: string
-  payload: string
-  signature: string
+  sdJwt: string
 }
 
 export type ResolveEmergencyRequest = {
@@ -55,7 +64,7 @@ export type ResolveEmergencyResponse = {
     photoUrl: string | null
     surname: string
   }
-  medical: { key: EmergencyFieldKey; label: string; value: string }[]
+  medical: { key: string; label: string; value: string }[]
   medicalLastUpdatedAt: string | null
   contacts: EmergencyContact[]
 }

@@ -10,6 +10,7 @@ import type {
   RegisterDeviceResponse,
   ResolveEmergencyRequest,
   ResolveEmergencyResponse,
+  SaveEmergencyProfileRequest,
 } from './types'
 
 const getProfile = () =>
@@ -17,9 +18,9 @@ const getProfile = () =>
     .get(emergencyUrls.profile())
     .then((res: AxiosResponse<EmergencyProfile>) => res.data)
 
-const saveProfile = (profile: EmergencyProfile) =>
+const saveProfile = (request: SaveEmergencyProfileRequest) =>
   api
-    .put(emergencyUrls.profile(), profile)
+    .put(emergencyUrls.profile(), request)
     .then((res: AxiosResponse<EmergencyProfile>) => res.data)
 
 const registerDevice = (dto: RegisterDeviceRequest) =>
