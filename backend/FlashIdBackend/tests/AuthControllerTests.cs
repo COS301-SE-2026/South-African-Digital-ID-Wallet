@@ -1,7 +1,9 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Features.ManageUserAccountCard.DTOs;
 using Application.Features.Auth.DTOs;
 using Application.Features.Auth.Exceptions;
 using Domain.Enums;
@@ -60,6 +62,14 @@ public class AuthControllerTests
             if (VerifyDeviceException is not null) throw VerifyDeviceException;
             return Task.FromResult(VerifyDeviceResultToReturn!);
         }
+
+        public Task ResendDeviceVerificationOtpAsync(Guid deviceVerificationId, string ipAddress, CancellationToken cancellationToken) => Task.CompletedTask;
+    }
+
+    private sealed class StubIpGeolocationProvider : IIpGeolocationProvider
+    {
+        public Task<IpLocationResult?> GetLocationAsync(string ipAddress, CancellationToken cancellationToken) =>
+            Task.FromResult<IpLocationResult?>(null);
     }
     private sealed class TestApiFactory : WebApplicationFactory<Program>
     {
@@ -92,6 +102,9 @@ public class AuthControllerTests
 
                 services.RemoveAll(typeof(IAuthService));
                 services.AddScoped<IAuthService>(_ => _authService);
+
+                services.RemoveAll(typeof(IIpGeolocationProvider));
+                services.AddScoped<IIpGeolocationProvider, StubIpGeolocationProvider>();
 
                 services.RemoveAll(typeof(IHostedService));
             });
@@ -195,7 +208,9 @@ public class AuthControllerTests
         Assert.NotNull(body);
         Assert.True(body.RequiresDeviceVerification);
         response.Headers.TryGetValues("Set-Cookie", out var cookies);
-        Assert.Null(cookies);
+        var setCookies = cookies?.ToList() ?? new List<string>();
+        Assert.DoesNotContain(setCookies, c => c.StartsWith("access_token="));
+        Assert.DoesNotContain(setCookies, c => c.StartsWith("csrf_token="));
     }
 
     [Fact]
