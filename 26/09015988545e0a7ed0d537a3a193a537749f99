@@ -1,0 +1,16 @@
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/OfflineFrames.kt
+  h_712d174fc3f309 1-96
+mobile/modules/flashid-emergency/android/src/test/java/expo/modules/flashidemergency/OfflineFramesTest.kt
+  h_712d174fc3f309 1-144
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2609015988545e0a7ed0d537a3a193a537749f99",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
