@@ -1,0 +1,16 @@
+web/src/components/molecules/certified-copy-generated/certified-copy-generated.tsx
+  h_293a8616118f65 13,74
+web/src/components/pages/citizen/my-credentials-page.tsx
+  h_293a8616118f65 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "04661ff1a4ac6b604b099eb3388e747f9c034a5f",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

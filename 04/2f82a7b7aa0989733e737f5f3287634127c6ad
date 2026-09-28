@@ -1,0 +1,15 @@
+web/src/components/molecules/certified-copy-generated/certified-copy-generated.tsx
+  h_293a8616118f65 10-13,20,34-57,68-75,79
+  h_293a8616118f65 58-67,80-81,83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "042f82a7b7aa0989733e737f5f3287634127c6ad",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+web/src/components/pages/citizen/my-credentials-page.tsx
+  h_293a8616118f65 16,36-37,39,42-49,51-55,57-61,64-65,70-73
+  h_293a8616118f65 5,40-41,66,74-75,149,153-154
+web/src/components/molecules/certified-copy-generated/types.ts
+  h_293a8616118f65 6-7
+web/src/components/molecules/certified-copy-generated/certified-copy-generated.tsx
+  h_293a8616118f65 6-9,34,43
+  h_293a8616118f65 35-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4cb32a58d4c06aa7b11d3c051d8de75a9e08f9b4",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

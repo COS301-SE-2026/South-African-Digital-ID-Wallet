@@ -1,0 +1,15 @@
+web/src/services/certified-copy-service/certified-copy-service.ts
+  h_293a8616118f65 1-4,6-32
+  h_293a8616118f65 5,33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c1fd9ed42045074620b6f57b2a01d635ca71a9ed",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

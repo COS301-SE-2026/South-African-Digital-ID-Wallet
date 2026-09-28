@@ -1,0 +1,23 @@
+mobile/src/services/certified-copy-service/types.ts
+  h_293a8616118f65 5-10
+mobile/src/components/pages/credential-detail/credential-detail-page.tsx
+  h_293a8616118f65 57-68,70-72
+  h_293a8616118f65 69,73-81
+mobile/src/services/certified-copy-service/certified-copy-service.ts
+  h_293a8616118f65 7,9
+  h_293a8616118f65 8,10,12-15,17-24
+mobile/src/hooks/use-certified-copy.ts
+  h_293a8616118f65 4,6-10,16,18
+  h_293a8616118f65 5,11-12,17,19-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "7d412aa48b7b7196089e2bccd239af94bcb52df4",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
