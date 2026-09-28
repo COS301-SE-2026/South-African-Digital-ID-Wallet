@@ -32,7 +32,10 @@ const setBundle = FlashidEmergency.setOfflineBundle as jest.Mock
 const registerDevice = emergencyService.registerDevice as jest.Mock
 const getOffline = emergencyService.getOfflineCredential as jest.Mock
 
-const CREDENTIAL = { expiresAt: '2026-12-01', payload: 'p', signature: 's' }
+const CREDENTIAL = {
+  expiresAt: '2026-12-01',
+  sdJwt: 'issuer.jwt.sig~disclosure~',
+}
 
 describe('useRegisterEmergencyDevice', () => {
   beforeEach(() => {
@@ -84,7 +87,7 @@ describe('useRegisterEmergencyDevice', () => {
 
     await waitFor(() => expect(setBundle).toHaveBeenCalled())
     expect(setHandle).toHaveBeenCalledWith('handle-1')
-    expect(setBundle).toHaveBeenCalledWith(JSON.stringify(CREDENTIAL))
+    expect(setBundle).toHaveBeenCalledWith(CREDENTIAL.sdJwt)
   })
 
   it('Should never store a handle when the server rejects the device', async () => {

@@ -7,6 +7,7 @@ import {
 } from '@/lib/offline/qr-frame-accumulator'
 import {
   verifyPresentation,
+  type ClaimSet,
   type TrustData,
   type VerificationResult,
 } from '@/lib/offline/verify'
@@ -29,7 +30,8 @@ export const useOfflineScan = (
   trust: TrustData | null,
   isTrustLoading = false,
   // Told about each result once, for example to queue it for the audit log.
-  onResult?: (result: VerificationResult) => void
+  onResult?: (result: VerificationResult) => void,
+  claimSet?: ClaimSet
 ) => {
   // useState's lazy initialiser builds the accumulator on the first render only, never again.
   const [accumulator] = useState(() => new PayloadFrameAccumulator())
@@ -88,14 +90,14 @@ export const useOfflineScan = (
         ? verifyPresentation(
             `${snapshot.presentation}${snapshot.keyBindingJwt ?? ''}`,
             trust,
-            { now: Math.floor(now / 1000) }
+            { now: Math.floor(now / 1000), claimSet }
           )
         : { ok: false, code: 'STALE_TRUST_DATA', warnings: [] }
 
       setResult(verification)
       onResult?.(verification)
     },
-    [accumulator, isTrustLoading, onResult, result, trust]
+    [accumulator, claimSet, isTrustLoading, onResult, result, trust]
   )
 
   const reset = useCallback(() => {
