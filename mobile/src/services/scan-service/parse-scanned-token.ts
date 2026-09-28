@@ -1,7 +1,6 @@
 import type { ParsedScannedToken } from './types'
 
 const EMERGENCY_PREFIX = 'https://flashid.co.za/e#'
-const EMERGENCY_OFFLINE_PREFIX = 'FIDE1/'
 
 const base64ToUtf8 = (base64: string): string => {
   const binary = atob(base64)
@@ -17,9 +16,6 @@ export const parseScannedToken = (
 ): ParsedScannedToken | null => {
   if (rawText.startsWith(EMERGENCY_PREFIX)) {
     return { token: rawText, type: 'emergency' }
-  }
-  if (rawText.startsWith(EMERGENCY_OFFLINE_PREFIX)) {
-    return { frame: rawText, type: 'emergency-offline' }
   }
 
   try {

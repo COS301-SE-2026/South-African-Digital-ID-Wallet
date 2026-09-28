@@ -7,4 +7,3 @@ export type ParsedScannedToken =
   | { type: 'disclosure'; token: string }
   | { type: 'badge'; token: string }
   | { type: 'emergency'; token: string }
-  | { type: 'emergency-offline'; frame: string }

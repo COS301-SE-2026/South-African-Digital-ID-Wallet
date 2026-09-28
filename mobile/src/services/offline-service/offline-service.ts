@@ -8,9 +8,11 @@ import {
   type OfflineCache,
   type OfflinePackage,
   type OfflineVerification,
+  type PendingEmergencyAccess,
 } from '@/lib/offline/offline-cache'
 import { isPackageUsable } from '@/lib/offline/offline-package'
 import { verifyRevocationList } from '@/lib/offline/verify'
+import emergencyUrls from '@/services/emergency-service/emergency-urls'
 import offlineUrls from './offline-urls'
 import {
   issuerKeySchema,
@@ -194,6 +196,7 @@ const refreshOfflineCache = (credentialId: string): Promise<OfflineCache> =>
       ),
       savedAt: now,
       pendingVerifications: existing?.pendingVerifications ?? [],
+      pendingEmergencyAccesses: existing?.pendingEmergencyAccesses ?? [],
     }
 
     await writeOfflineCache(refreshed)
@@ -236,6 +239,7 @@ const refreshTrustData = (): Promise<OfflineCache> =>
       ),
       savedAt: now,
       pendingVerifications: existing?.pendingVerifications ?? [],
+      pendingEmergencyAccesses: existing?.pendingEmergencyAccesses ?? [],
     }
 
     await writeOfflineCache(refreshed)
@@ -257,6 +261,7 @@ const queueOfflineVerification = (
         ...(existing?.pendingVerifications ?? []),
         verification,
       ].slice(-MAX_QUEUED_VERIFICATIONS),
+      pendingEmergencyAccesses: existing?.pendingEmergencyAccesses ?? [],
     })
   })
 
@@ -303,21 +308,78 @@ const syncOfflineVerifications = (verifierId: string): Promise<number> =>
     return uploaded
   })
 
+const MAX_QUEUED_EMERGENCY_ACCESSES = 100
+
+const PERMANENT_EMERGENCY_SYNC_FAILURES = new Set([400, 403, 404])
+
+const queueEmergencyAccess = (access: PendingEmergencyAccess): Promise<void> =>
+  serialised(async () => {
+    const existing = await readOfflineCache()
+
+    await writeOfflineCache({
+      packages: existing?.packages ?? {},
+      trust: existing?.trust ?? null,
+      savedAt: existing?.savedAt ?? nowInSeconds(),
+      pendingVerifications: existing?.pendingVerifications ?? [],
+      pendingEmergencyAccesses: [
+        ...(existing?.pendingEmergencyAccesses ?? []),
+        access,
+      ].slice(-MAX_QUEUED_EMERGENCY_ACCESSES),
+    })
+  })
+
+const syncEmergencyAccesses = (responderId: string): Promise<number> =>
+  serialised(async () => {
+    const existing = await readOfflineCache()
+    let remaining = existing?.pendingEmergencyAccesses ?? []
+    const mine = remaining.filter((entry) => entry.responderId === responderId)
+    let uploaded = 0
+
+    for (const { responderId: _responderId, ...entry } of mine) {
+      if (!existing) {
+        break
+      }
+
+      try {
+        await api.post(emergencyUrls.offlineAccesses(), entry)
+      } catch (error) {
+        if (
+          !isAxiosError(error) ||
+          !PERMANENT_EMERGENCY_SYNC_FAILURES.has(error.response?.status ?? 0)
+        ) {
+          throw error
+        }
+      }
+
+      remaining = remaining.filter((pending) => pending.id !== entry.id)
+      uploaded += 1
+      await writeOfflineCache({
+        ...existing,
+        pendingEmergencyAccesses: remaining,
+      })
+    }
+
+    return uploaded
+  })
+
 // Called when a session ends. Serialised with every other cache write, so a sync still running cannot write the
 // signed-out user's data back afterwards. Queued scans survive: an official whose session expires offline must not
 // lose them, and they upload only when that official signs in again.
 const clearOfflineData = (): Promise<void> =>
   serialised(async () => {
-    const pending = (await readOfflineCache())?.pendingVerifications ?? []
+    const existing = await readOfflineCache()
+    const pending = existing?.pendingVerifications ?? []
+    const pendingEmergency = existing?.pendingEmergencyAccesses ?? []
 
     await clearOfflineCache()
 
-    if (pending.length > 0) {
+    if (pending.length > 0 || pendingEmergency.length > 0) {
       await writeOfflineCache({
         packages: {},
         trust: null,
         savedAt: nowInSeconds(),
         pendingVerifications: pending,
+        pendingEmergencyAccesses: pendingEmergency,
       })
     }
   })
@@ -329,6 +391,8 @@ const offlineService = {
   refreshTrustData,
   queueOfflineVerification,
   syncOfflineVerifications,
+  queueEmergencyAccess,
+  syncEmergencyAccesses,
   clearOfflineData,
 }
 

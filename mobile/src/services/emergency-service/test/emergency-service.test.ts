@@ -49,10 +49,10 @@ describe('emergencyService', () => {
 
   it('Should put the profile', async () => {
     const profile = {
+      consentGiven: true,
       contacts: [],
       fields: {},
       isEnabled: true,
-      medicalLastUpdatedAt: null,
       offlineFields: [],
     }
     await emergencyService.saveProfile(profile)
