@@ -1,0 +1,18 @@
+web/src/services/certified-copy-service/tests/certified-copy-service.test.ts
+  h_293a8616118f65 1-130
+web/src/components/molecules/certified-copy-generated/certified-copy-generated.tsx
+  h_293a8616118f65 16
+web/src/components/molecules/certified-copy-generated/test/certified-copy-generated.test.tsx
+  h_293a8616118f65 18-19,23-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b9b220fe5ae0943b690b3a0e7289d798ade634a1",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
