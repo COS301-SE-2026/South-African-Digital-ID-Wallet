@@ -1,3 +1,4 @@
+using System.Globalization;
 using Infrastructure.Providers;
 
 namespace tests;
@@ -45,5 +46,16 @@ public class PasswordHashingProviderTests
         var hash = provider.HashPassword(TestPassword);
 
         Assert.False(provider.VerifyPassword(WrongPassword, hash));
+    }
+
+    [Fact]
+    public void HashPassword_UsesBcryptWorkFactorOfAtLeast12()
+    {
+        var provider = new PasswordHashingProvider();
+
+        var hash = provider.HashPassword(TestPassword);
+
+        var workFactor = int.Parse(hash.Split('$')[2], CultureInfo.InvariantCulture);
+        Assert.True(workFactor >= 12, $"Expected BCrypt work factor >= 12 (NFR1.3) but was {workFactor}");
     }
 }
