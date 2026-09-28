@@ -18,9 +18,11 @@ export const EmergencyProfileCard = ({
       <Text variant="h3">
         {profile.identity.names} {profile.identity.surname}
       </Text>
-      <Text variant="sub-sm" className="text-muted-text">
-        Born {profile.identity.dateOfBirth.slice(0, 10)}
-      </Text>
+      {profile.identity.dateOfBirth ? (
+        <Text variant="sub-sm" className="text-muted-text">
+          Born {profile.identity.dateOfBirth.slice(0, 10)}
+        </Text>
+      ) : null}
     </Card>
 
     <View className="flex-row items-start gap-2 rounded-2xl bg-warning-amber/15 p-3">

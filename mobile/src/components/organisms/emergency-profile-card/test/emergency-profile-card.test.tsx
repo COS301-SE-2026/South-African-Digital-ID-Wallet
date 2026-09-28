@@ -9,6 +9,7 @@ const PROFILE = {
       email: 'sipho@example.com',
       name: 'Sipho Dlamini',
       phone: '0821234567',
+      priority: 1,
       relationship: 'Brother',
     },
   ],
