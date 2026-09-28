@@ -54,10 +54,31 @@ export const CredentialDetailPage = ({ id }: CredentialDetailPageProps) => {
     if (!credential) {
       return
     }
-    generateCertifiedCopy(credential.id, {
-      onError: (error) =>
-        Alert.alert('Certified copy failed', resolveCertifiedCopyError(error)),
-    })
+
+    if (
+      credential.type !== 'IdentityDocument' &&
+      credential.type !== 'DriversLicense'
+    ) {
+      Alert.alert(
+        'Certified copy unavailable',
+        'This credential type does not support certified copies.'
+      )
+      return
+    }
+
+    generateCertifiedCopy(
+      {
+        credentialId: credential.id,
+        credentialType: credential.type,
+      },
+      {
+        onError: (error) =>
+          Alert.alert(
+            'Certified copy failed',
+            resolveCertifiedCopyError(error)
+          ),
+      }
+    )
   }, [credential, generateCertifiedCopy])
 
   const holderName = [user?.names, user?.surname].filter(Boolean).join(' ')
