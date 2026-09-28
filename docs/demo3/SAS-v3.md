@@ -1435,4 +1435,3 @@ tap or form submission. Typing into an already-focused field is not counted.
 | View verification history | Dashboard > Verifications | 1 | Yes |
 | Activate a credential | Dashboard > Activate Credentials > select > Activate | 3 | Yes |
 | Update password | Dashboard > Manage Account > Update Password | 4 | Yes |
-

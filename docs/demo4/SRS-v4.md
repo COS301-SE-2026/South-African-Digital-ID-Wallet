@@ -212,7 +212,7 @@ All protected resources require a valid JWT access token before granting access 
 Communication containing sensitive information must be encrypted using HTTPS with TLS 1.2 or later.
 
 #### NFR1.3
-Passwords must never be stored in plaintext and has to be securely hashed using ASP.NET Identity password hashing algorithm before being stored in the database.
+Passwords must never be stored in plaintext and must be securely hashed using the BCrypt password hashing algorithm at a work factor of at least 12 before being stored in the database.
 
 #### NFR1.4
 All administrative accounts need multi-factor authentication (OTP) during authentication.
@@ -222,6 +222,18 @@ Sensitive configuration values are to be stored using environment variables or G
 
 #### NFR1.6
 Offline credentials must be stored encrypted on the device, bound to the device's own key, and refused by verifiers when presented without a fresh signature from that device.
+
+#### NFR1.7
+Accounts must be locked for 30 minutes after 5 consecutive failed login attempts, to mitigate brute-force credential attacks.
+
+#### NFR1.8
+A credential disclosure QR token must be usable exactly once. Any subsequent attempt to redeem the same token must be rejected.
+
+#### NFR1.9
+Sensitive or abuse-prone endpoints (registration, credential issuance, OTP requests) must enforce request rate limits to mitigate automated abuse.
+
+#### NFR1.10
+Upon a citizen's account deletion request, associated personal data must be deleted or rendered irrecoverable within a defined period, in line with POPIA data-subject erasure obligations.
 
 ---
 
@@ -245,6 +257,9 @@ The system must support at least 500 concurrent authenticated users without degr
 #### NFR2.6
 An offline presentation of a driver's licence, including the portrait and key binding, must scan within 5 seconds on the reference phones. Measured: about 4.2 seconds for 28 frames.
 
+#### NFR2.7
+The first request served after a period of application inactivity (cold start) must complete within 5 seconds.
+
 ---
 
 ### 5.3 Reliability & Availability
@@ -266,6 +281,9 @@ Credential information and user account data must remain consistent.
 
 #### NFR3.6
 Credential presentation and verification must keep working with no network connection on either phone, using data cached while online.
+
+#### NFR3.7
+Administrative batch operations (e.g. the daily credential-expiry sweep) must complete within a bounded time proportional to data volume, and must be safely re-runnable without side effects if interrupted.
 
 ---
 

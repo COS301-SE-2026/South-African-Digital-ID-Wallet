@@ -5,7 +5,7 @@ const BASE_URL = __ENV.BASE_URL || 'https://api-flashid-dev.azurewebsites.net';
 
 export const options = { vus: 1, iterations: 4 };
 
-export default function () {
+export default function main() {
   const res = http.post(
     `${BASE_URL}/api/citizens/resend-otp`,
     JSON.stringify({ email: 'nfr-citizen-00@flashid.local' }),

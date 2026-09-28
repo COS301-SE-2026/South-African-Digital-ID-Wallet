@@ -27,6 +27,8 @@ namespace Infrastructure.Data;
 // scanning features are built out.
 public static class DbSeeder
 {
+    private const string SouthAfrica = "South Africa";
+
     private sealed record DeviceTemplate(string DeviceType, string OperatingSystem, string Browser);
     private sealed record LocationTemplate(string City, string Country);
     private sealed record NotificationTemplate(string Title, string Description, string Tone);
@@ -130,7 +132,7 @@ public static class DbSeeder
                 OperatingSystem = "k6",
                 Browser = "k6",
                 LastKnownCity = "Pretoria",
-                LastKnownCountry = "South Africa",
+                LastKnownCountry = SouthAfrica,
                 LastActive = now,
                 IsTrusted = true,
                 CreatedAt = now,
@@ -828,7 +830,7 @@ public static class DbSeeder
 
         var citizenships = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
         var nationalities = new[] { "South African", "Zimbabwean", "Mozambican", "Namibian" };
-        var countries = new[] { "South Africa", "Zimbabwe", "Mozambique", "Namibia" };
+        var countries = new[] { SouthAfrica, "Zimbabwe", "Mozambique", "Namibia" };
         var idStatuses = new[] { IdentityDocumentStatus.Citizen, IdentityDocumentStatus.PermanentResident };
         var licenseCodes = new[] { LicenseCode.B, LicenseCode.EB };
 
@@ -1049,12 +1051,12 @@ public static class DbSeeder
 
         var locations = new[]
         {
-            new LocationTemplate("Pretoria", "South Africa"),
-            new LocationTemplate("Johannesburg", "South Africa"),
-            new LocationTemplate("Cape Town", "South Africa"),
-            new LocationTemplate("Durban", "South Africa"),
-            new LocationTemplate("Bloemfontein", "South Africa"),
-            new LocationTemplate("Gqeberha", "South Africa")
+            new LocationTemplate("Pretoria", SouthAfrica),
+            new LocationTemplate("Johannesburg", SouthAfrica),
+            new LocationTemplate("Cape Town", SouthAfrica),
+            new LocationTemplate("Durban", SouthAfrica),
+            new LocationTemplate("Bloemfontein", SouthAfrica),
+            new LocationTemplate("Gqeberha", SouthAfrica)
         };
 
         var devicesToAdd = new List<TrustedDevice>();

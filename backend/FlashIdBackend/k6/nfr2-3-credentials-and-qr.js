@@ -27,7 +27,7 @@ export const options = {
   },
 };
 
-export default function () {
+export default function main() {
   const i = (__VU - 1) % 10;
   const loginRes = http.post(
     `${BASE_URL}/api/auth/login`,

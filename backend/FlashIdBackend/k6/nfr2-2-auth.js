@@ -21,7 +21,7 @@ export const options = {
   },
 };
 
-export default function () {
+export default function main() {
   const i = (__VU - 1) % 10; // one dedicated NFR citizen per VU, no cross-VU collisions
   const res = http.post(
     `${BASE_URL}/api/auth/login`,
