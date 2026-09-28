@@ -26,12 +26,14 @@ export const useRegisterEmergencyDevice = () => {
       await FlashidEmergency.setEmergencyHandle(handle)
 
       const credential = await emergencyService.getOfflineCredential()
-      await FlashidEmergency.setOfflineBundle(JSON.stringify(credential))
+      await FlashidEmergency.setOfflineBundle(credential.sdJwt)
 
       return { handle, isStrongBoxBacked: key.isStrongBoxBacked }
     },
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: emergencyKeys.profile }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: emergencyKeys.profile })
+      await queryClient.invalidateQueries({ queryKey: emergencyKeys.device })
+    },
   })
 
   return { error, isRegistering: isPending, register: mutate }
