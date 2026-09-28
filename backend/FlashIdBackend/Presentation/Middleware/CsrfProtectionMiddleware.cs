@@ -63,6 +63,11 @@ public class CsrfProtectionMiddleware
             return false;
         }
 
+        if (context.Request.Headers.Authorization.ToString().StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
         var path = context.Request.Path.Value?.TrimEnd('/') ?? string.Empty;
         return !ExemptPaths.Contains(path);
     }

@@ -155,6 +155,29 @@ public class CsrfProtectionMiddlewareTests
     }
 
     [Fact]
+    public async Task PostRequest_FromTheMobileAppWithBearerAndCookiesButNoCsrfHeader_IsNotBlocked()
+    {
+        await using var factory = new TestApiFactory();
+        var db = await factory.CreateInitializedContextAsync();
+
+        var user = BuildUser(UserRole.Citizen);
+        await db.DomainUsers.AddAsync(user, TestContext.Current.CancellationToken);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var token = GenerateTokenFor(user);
+        var client = factory.CreateClient();
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/logout");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Headers.Add("Cookie", $"access_token={token}; csrf_token=cookie-the-phone-kept");
+
+        var response = await client.SendAsync(request, TestContext.Current.CancellationToken);
+
+        Assert.NotEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.NotEqual(HttpStatusCode.Forbidden, response.StatusCode);
+        await AssertNotRejectedByCsrfAsync(response);
+    }
+
+    [Fact]
     public async Task PostRequest_WithCsrfCookieButNoHeader_ReturnsForbidden()
     {
         await using var factory = new TestApiFactory();
