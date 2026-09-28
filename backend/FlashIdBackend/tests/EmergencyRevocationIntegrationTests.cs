@@ -155,6 +155,38 @@ public class EmergencyRevocationIntegrationTests : IDisposable
     }
 
     [Fact]
+    public async Task SaveProfile_ReplacesTheContacts_OfAnExistingProfile()
+    {
+        var (user, citizen) = SeedCitizen("9001010000009");
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var credentials = new Mock<ICredentialRepository>();
+        credentials.Setup(c => c.GetCitizenByUserIdAsync(user.Id)).ReturnsAsync(citizen);
+
+        var service = new EmergencyService(
+            EmergencyRepository(),
+            credentials.Object,
+            Mock.Of<IInstitutionRepository>(),
+            Mock.Of<IPhotoStorageProvider>(),
+            Mock.Of<ISdJwtCredentialFactory>(),
+            Mock.Of<IEmergencyNotifier>(),
+            Mock.Of<IFieldCryptoProvider>());
+
+        SaveEmergencyProfileRequestDto Request(string contactName) => new()
+        {
+            IsEnabled = true,
+            ConsentGiven = true,
+            Contacts = [new EmergencyContactDto { Name = contactName, Relationship = "Brother", Phone = "0821234567", Priority = 1 }],
+        };
+
+        await service.SaveProfileAsync(Request("Sipho"), user.Id, TestContext.Current.CancellationToken);
+        var saved = await service.SaveProfileAsync(Request("Lwazi"), user.Id, TestContext.Current.CancellationToken);
+
+        Assert.Equal("Lwazi", Assert.Single(saved.Contacts).Name);
+        Assert.Equal("Lwazi", Assert.Single(await _context.Set<EmergencyContact>().ToListAsync(TestContext.Current.CancellationToken)).Name);
+    }
+
+    [Fact]
     public async Task EmergencyIndexes_NeverFallInTheCredentialRange()
     {
         var (_, citizen) = SeedCitizen("9001010000004");

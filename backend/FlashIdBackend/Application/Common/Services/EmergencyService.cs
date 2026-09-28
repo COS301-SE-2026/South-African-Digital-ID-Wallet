@@ -267,7 +267,6 @@ public class EmergencyService : IEmergencyService
         {
             profile.Contacts.Add(new EmergencyContact
             {
-                Id = Guid.NewGuid(),
                 EmergencyProfileId = profile.Id,
                 Name = contact.Name,
                 Relationship = contact.Relationship,

@@ -56,6 +56,13 @@ describe('<BreakGlassGate/>', () => {
     expect(onCancel).toHaveBeenCalled()
   })
 
+  it('Should say the citizen is told once an offline phone reconnects', async () => {
+    await setup({ isOffline: true })
+    expect(
+      screen.getByText(/as soon as this phone is back online/)
+    ).toBeTruthy()
+  })
+
   it('Should render a server error', async () => {
     await setup({ error: 'This emergency code is not valid.' })
     expect(screen.getByTestId('break-glass-error')).toBeTruthy()

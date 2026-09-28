@@ -12,6 +12,7 @@ const MIN_REASON_LENGTH = 10
 export const BreakGlassGate = ({
   error,
   isSubmitting = false,
+  isOffline = false,
   onCancel,
   onConfirm,
   testID = 'break-glass-gate',
@@ -33,7 +34,8 @@ export const BreakGlassGate = ({
       <Text variant="sub-sm" className="text-clean-white/70">
         This person has not unlocked their phone for you. FlashID will record
         your name, your institution, the time and the reason you give below, and
-        will tell the citizen and their emergency contacts that you opened it.
+        will tell the citizen and their emergency contacts that you opened it
+        {isOffline ? ' as soon as this phone is back online.' : '.'}
       </Text>
 
       <View className="gap-2">
