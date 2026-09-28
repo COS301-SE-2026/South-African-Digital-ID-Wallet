@@ -37,6 +37,7 @@ export const useOfflineScan = (
   const [accumulator] = useState(() => new PayloadFrameAccumulator())
   const [progress, setProgress] = useState<OfflineScanProgress | null>(null)
   const [result, setResult] = useState<VerificationResult | null>(null)
+  const [presentation, setPresentation] = useState<string | null>(null)
   // A ref, not state: it only decides what to do with the next frame and never changes what is shown.
   const keyBindingWait = useRef<KeyBindingWait | null>(null)
 
@@ -86,14 +87,15 @@ export const useOfflineScan = (
       keyBindingWait.current = null
       setProgress(null)
 
+      const scanned = `${snapshot.presentation}${snapshot.keyBindingJwt ?? ''}`
       const verification: VerificationResult = trust
-        ? verifyPresentation(
-            `${snapshot.presentation}${snapshot.keyBindingJwt ?? ''}`,
-            trust,
-            { now: Math.floor(now / 1000), claimSet }
-          )
+        ? verifyPresentation(scanned, trust, {
+            now: Math.floor(now / 1000),
+            claimSet,
+          })
         : { ok: false, code: 'STALE_TRUST_DATA', warnings: [] }
 
+      setPresentation(scanned)
       setResult(verification)
       onResult?.(verification)
     },
@@ -104,8 +106,9 @@ export const useOfflineScan = (
     accumulator.reset()
     keyBindingWait.current = null
     setProgress(null)
+    setPresentation(null)
     setResult(null)
   }, [accumulator])
 
-  return { addFrame, progress, reset, result }
+  return { addFrame, presentation, progress, reset, result }
 }

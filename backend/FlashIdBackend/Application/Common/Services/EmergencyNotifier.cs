@@ -2,6 +2,7 @@ using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Domain.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Common.Services;
 
@@ -10,15 +11,18 @@ public class EmergencyNotifier : IEmergencyNotifier
     private readonly IEmergencyRepository _repository;
     private readonly IEmailSenderProvider _email;
     private readonly INotificationRepository _notifications;
+    private readonly ILogger<EmergencyNotifier> _logger;
 
     public EmergencyNotifier(
         IEmergencyRepository repository,
         IEmailSenderProvider email,
-        INotificationRepository notifications)
+        INotificationRepository notifications,
+        ILogger<EmergencyNotifier> logger)
     {
         _repository = repository;
         _email = email;
         _notifications = notifications;
+        _logger = logger;
     }
 
     public async Task NotifyEmergencyAccessAsync(Guid accessId, CancellationToken ct)
@@ -28,17 +32,16 @@ public class EmergencyNotifier : IEmergencyNotifier
 
         var citizen = access.EmergencyProfile.Citizen;
 
-        var where = access.Latitude is null
-            ? "Location not supplied"
-            : $"Near {access.Latitude:F4}, {access.Longitude:F4}";
+        var location = access.Latitude is null || access.Longitude is null
+            ? string.Empty
+            : $"\nLocation    Near {access.Latitude:F4}, {access.Longitude:F4}";
 
         var body = $"""
             A FlashID emergency responder opened {citizen.Names}'s emergency profile.
 
             Responder   {access.ResponderName}
             Institution {access.ResponderInstitutionName ?? "Not recorded"}
-            Time        {access.AccessedAt:yyyy-MM-dd HH:mm} UTC
-            Location    {where}
+            Time        {access.AccessedAt:yyyy-MM-dd HH:mm} UTC{location}
             Reason      {access.Justification}
 
             If you believe this was not a genuine emergency, report it in the FlashID
@@ -57,8 +60,10 @@ public class EmergencyNotifier : IEmergencyNotifier
             {
                 await _email.SendEmailAsync(contact.Email!, subject, body, ct);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogWarning(ex, "Emergency access {AccessId}: the email to emergency contact {Priority} failed.",
+                    accessId, contact.Priority);
             }
         }
 
@@ -69,7 +74,10 @@ public class EmergencyNotifier : IEmergencyNotifier
                 await _email.SendEmailAsync(
                     citizen.User.Email, "Your emergency profile was accessed", body, ct);
             }
-            catch (Exception) { }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Emergency access {AccessId}: the email to the citizen failed.", accessId);
+            }
         }
 
         await _notifications.CreateNotificationAsync(new Notification

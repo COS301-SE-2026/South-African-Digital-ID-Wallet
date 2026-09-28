@@ -40,7 +40,12 @@ class EmergencyQrActivity : AppCompatActivity() {
     private val resignKeyBinding = object : Runnable {
         override fun run() {
             if (!isOfflineMode) return
-            signKeyBindingFrame()
+            try {
+                signKeyBindingFrame()
+            } catch (e: Exception) {
+                showUnavailable()
+                return
+            }
             binding.qr.postDelayed(this, KEY_BINDING_REFRESH_MS)
         }
     }
@@ -65,7 +70,12 @@ class EmergencyQrActivity : AppCompatActivity() {
         binding = ActivityEmergencyQrBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        handle = EmergencyStore.handle(applicationContext)
+        handle = try {
+            EmergencyStore.handle(applicationContext)
+        } catch (e: Exception) {
+            showUnavailable()
+            return
+        }
         if (handle == null) {
             binding.message.text = getString(R.string.emergency_not_configured)
             return
@@ -81,6 +91,24 @@ class EmergencyQrActivity : AppCompatActivity() {
     }
 
     private fun render() {
+        try {
+            draw()
+        } catch (e: Exception) {
+            showUnavailable()
+        }
+    }
+
+    private fun showUnavailable() {
+        stopOfflineAnimation()
+        countdown?.cancel()
+        binding.qr.setImageDrawable(null)
+        binding.caption.text = ""
+        binding.countdown.text = ""
+        binding.offlineToggle.visibility = android.view.View.GONE
+        binding.message.text = getString(R.string.emergency_locked_after_restart)
+    }
+
+    private fun draw() {
         val handle = handle ?: return
         stopOfflineAnimation()
         val size = resources.getDimensionPixelSize(R.dimen.emergency_qr_size)

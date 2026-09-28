@@ -24,8 +24,9 @@ public class EmergencyServiceTests
     private readonly Mock<ICredentialRepository> _credentials = new();
     private readonly Mock<IInstitutionRepository> _audit = new();
     private readonly Mock<IPhotoStorageProvider> _photos = new();
-    private readonly ISdJwtCredentialFactory _credentialFactory = RealCredentialFactory();
-    private readonly Mock<IEmergencyNotifier> _notifier = new();
+    private static readonly ICredentialSigningProvider SigningProvider = TestSigningProvider();
+    private readonly ISdJwtCredentialFactory _credentialFactory = new SdJwtCredentialFactory(SigningProvider, TimeProvider.System);
+    private readonly Mock<IEmergencyNotificationQueue> _notifications = new();
     private readonly Mock<IFieldCryptoProvider> _crypto = new();
 
     private readonly Guid _responderUserId = Guid.NewGuid();
@@ -33,9 +34,9 @@ public class EmergencyServiceTests
 
     private EmergencyService Service() => new(
         _repository.Object, _credentials.Object, _audit.Object,
-        _photos.Object, _credentialFactory, _notifier.Object, _crypto.Object);
+        _photos.Object, _credentialFactory, SigningProvider, _notifications.Object, _crypto.Object);
 
-    private static ISdJwtCredentialFactory RealCredentialFactory()
+    private static ICredentialSigningProvider TestSigningProvider()
     {
         using var issuerKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
         var config = new ConfigurationBuilder()
@@ -46,7 +47,7 @@ public class EmergencyServiceTests
             })
             .Build();
 
-        return new SdJwtCredentialFactory(new LocalEs256SigningProvider(config), TimeProvider.System);
+        return new LocalEs256SigningProvider(config);
     }
 
     private static Official Responder(InstitutionType type = InstitutionType.Healthcare) => new()
@@ -257,7 +258,7 @@ public class EmergencyServiceTests
         _credentials
             .Setup(c => c.GetCredentialsByCitizenIdAsync(citizenId))
             .ReturnsAsync(new List<Credential>());
-        _crypto.Setup(c => c.Decrypt(It.IsAny<string>())).Returns("O negative");
+        _crypto.Setup(c => c.Decrypt(It.IsAny<string>(), It.IsAny<string>())).Returns("O negative");
 
         var result = await Service().ResolveAsync(
             Request(BuildCode(key, DateTimeOffset.UtcNow)), _responderUserId, "1.2.3.4", CancellationToken.None);
@@ -277,8 +278,7 @@ public class EmergencyServiceTests
         _audit.Verify(a => a.AddAuditLogAsync(It.Is<AuditLog>(
             l => l.EventType == AuditEventType.EmergencyProfileAccessed)), Times.Once);
 
-        _notifier.Verify(n => n.NotifyEmergencyAccessAsync(
-            It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Once);
+        _notifications.Verify(n => n.Enqueue(It.IsAny<Guid>()), Times.Once);
     }
 
     [Fact]
@@ -442,7 +442,7 @@ public class EmergencyServiceTests
         _repository
             .Setup(r => r.TrySaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
-        _crypto.Setup(c => c.Decrypt(It.IsAny<string>())).Returns("O negative");
+        _crypto.Setup(c => c.Decrypt(It.IsAny<string>(), It.IsAny<string>())).Returns("O negative");
     }
 
     private static JsonElement IssuerPayload(string sdJwt)
@@ -657,16 +657,38 @@ public class EmergencyServiceTests
         Assert.Null(profile.RevocationIndex);
     }
 
+    private readonly ECDsa _phoneKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+    private readonly DateTimeOffset _scannedAt = DateTimeOffset.UtcNow.AddMinutes(-30);
+    private string _presentation = string.Empty;
+    private int _scannedIndex = EmergencyClaimNames.RevocationIndexOffset + 1;
+
     private RecordOfflineEmergencyAccessRequestDto OfflineAccess(Guid? id = null, string justification = "Unconscious at roadside") => new()
     {
         Id = id ?? Guid.NewGuid(),
-        RevocationIndex = EmergencyClaimNames.RevocationIndexOffset + 1,
+        RevocationIndex = _scannedIndex,
         Justification = justification,
-        AccessedAt = DateTimeOffset.UtcNow.AddMinutes(-30).ToUnixTimeSeconds(),
+        AccessedAt = _scannedAt.AddMinutes(2).ToUnixTimeSeconds(),
+        Presentation = _presentation,
     };
 
-    private void OfflineAccessSetup(EmergencyProfile profile, Official? official)
+    private static string KeyBindingJwt(string sdJwt, ECDsa key, DateTimeOffset issuedAt)
     {
+        static string B64(byte[] bytes) => System.Buffers.Text.Base64Url.EncodeToString(bytes);
+
+        var sdHash = B64(SHA256.HashData(Encoding.ASCII.GetBytes(sdJwt)));
+        var header = B64(Encoding.UTF8.GetBytes("{\"alg\":\"ES256\",\"typ\":\"kb+jwt\"}"));
+        var payload = B64(Encoding.UTF8.GetBytes($"{{\"iat\":{issuedAt.ToUnixTimeSeconds()},\"sd_hash\":\"{sdHash}\"}}"));
+        var signature = key.SignData(Encoding.ASCII.GetBytes($"{header}.{payload}"), HashAlgorithmName.SHA256);
+        return $"{header}.{payload}.{B64(signature)}";
+    }
+
+    private async Task OfflineAccessSetupAsync(EmergencyProfile profile, Official? official, ECDsa? scannedPhone = null)
+    {
+        OfflineMintSetup(profile, _phoneKey);
+        var credential = await Service().BuildOfflineCredentialAsync(Guid.NewGuid(), CancellationToken.None);
+        _scannedIndex = profile.RevocationIndex!.Value;
+        _presentation = credential.SdJwt + KeyBindingJwt(credential.SdJwt, scannedPhone ?? _phoneKey, _scannedAt);
+
         _repository
             .Setup(r => r.GetProfileByRevocationIndexAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(profile);
@@ -678,11 +700,17 @@ public class EmergencyServiceTests
             .ReturnsAsync(true);
     }
 
+    private void NothingRecorded()
+    {
+        _repository.Verify(r => r.AddAccessAsync(It.IsAny<EmergencyAccess>(), It.IsAny<CancellationToken>()), Times.Never);
+        _notifications.Verify(n => n.Enqueue(It.IsAny<Guid>()), Times.Never);
+    }
+
     [Fact]
-    public async Task RecordOfflineAccessAsync_RecordsAnOfflineAccessAndNotifies()
+    public async Task RecordOfflineAccessAsync_ScannedCode_RecordsTheAccessAndQueuesTheNotification()
     {
         var profile = Profile(Guid.NewGuid());
-        OfflineAccessSetup(profile, Responder());
+        await OfflineAccessSetupAsync(profile, Responder());
         var request = OfflineAccess();
 
         await Service().RecordOfflineAccessAsync(request, _responderUserId, "1.2.3.4", CancellationToken.None);
@@ -696,7 +724,7 @@ public class EmergencyServiceTests
                 a.ResponderName == "Naledi Khumalo" &&
                 a.AccessedAt == DateTimeOffset.FromUnixTimeSeconds(request.AccessedAt).UtcDateTime),
             It.IsAny<CancellationToken>()), Times.Once);
-        _notifier.Verify(n => n.NotifyEmergencyAccessAsync(request.Id, It.IsAny<CancellationToken>()), Times.Once);
+        _notifications.Verify(n => n.Enqueue(request.Id), Times.Once);
     }
 
     [Fact]
@@ -708,32 +736,104 @@ public class EmergencyServiceTests
 
         await Service().RecordOfflineAccessAsync(OfflineAccess(), _responderUserId, "1.2.3.4", CancellationToken.None);
 
-        _repository.Verify(r => r.AddAccessAsync(It.IsAny<EmergencyAccess>(), It.IsAny<CancellationToken>()), Times.Never);
-        _notifier.Verify(n => n.NotifyEmergencyAccessAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+        NothingRecorded();
+    }
+
+    [Fact]
+    public async Task RecordOfflineAccessAsync_SameScanUploadedUnderANewId_IsNotRecordedTwice()
+    {
+        await OfflineAccessSetupAsync(Profile(Guid.NewGuid()), Responder());
+        _repository
+            .Setup(r => r.OfflineAccessExistsAsync(
+                It.IsAny<Guid>(), _responderUserId, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        await Service().RecordOfflineAccessAsync(OfflineAccess(), _responderUserId, "1.2.3.4", CancellationToken.None);
+
+        NothingRecorded();
     }
 
     [Fact]
     public async Task RecordOfflineAccessAsync_ConcurrentRetryStoredItFirst_DoesNotNotifyAgain()
     {
-        OfflineAccessSetup(Profile(Guid.NewGuid()), Responder());
+        await OfflineAccessSetupAsync(Profile(Guid.NewGuid()), Responder());
         _repository
             .Setup(r => r.TrySaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
         await Service().RecordOfflineAccessAsync(OfflineAccess(), _responderUserId, "1.2.3.4", CancellationToken.None);
 
-        _notifier.Verify(n => n.NotifyEmergencyAccessAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+        _notifications.Verify(n => n.Enqueue(It.IsAny<Guid>()), Times.Never);
     }
 
     [Fact]
-    public async Task RecordOfflineAccessAsync_UnknownIndex_Throws()
+    public async Task RecordOfflineAccessAsync_ProfileNoLongerExists_Throws()
     {
+        await OfflineAccessSetupAsync(Profile(Guid.NewGuid()), Responder());
         _repository
             .Setup(r => r.GetProfileByRevocationIndexAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((EmergencyProfile?)null);
 
         await Assert.ThrowsAsync<EmergencyProfileNotFoundException>(() =>
             Service().RecordOfflineAccessAsync(OfflineAccess(), _responderUserId, "1.2.3.4", CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task RecordOfflineAccessAsync_WithoutAScannedCode_IsRejected()
+    {
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            Service().RecordOfflineAccessAsync(OfflineAccess(), _responderUserId, "1.2.3.4", CancellationToken.None));
+
+        NothingRecorded();
+    }
+
+    [Fact]
+    public async Task RecordOfflineAccessAsync_TamperedCode_IsRejected()
+    {
+        await OfflineAccessSetupAsync(Profile(Guid.NewGuid()), Responder());
+        var last = _presentation[^1] == 'A' ? 'B' : 'A';
+        var request = OfflineAccess() with { Presentation = _presentation[..^1] + last };
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            Service().RecordOfflineAccessAsync(request, _responderUserId, "1.2.3.4", CancellationToken.None));
+
+        NothingRecorded();
+    }
+
+    [Fact]
+    public async Task RecordOfflineAccessAsync_GuessedIndexWithSomeoneElsesCode_IsRejected()
+    {
+        await OfflineAccessSetupAsync(Profile(Guid.NewGuid()), Responder());
+        var request = OfflineAccess() with { RevocationIndex = _scannedIndex + 1 };
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            Service().RecordOfflineAccessAsync(request, _responderUserId, "1.2.3.4", CancellationToken.None));
+
+        NothingRecorded();
+    }
+
+    [Fact]
+    public async Task RecordOfflineAccessAsync_KeyBindingFromAnotherPhone_IsRejected()
+    {
+        using var otherPhone = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        await OfflineAccessSetupAsync(Profile(Guid.NewGuid()), Responder(), otherPhone);
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            Service().RecordOfflineAccessAsync(OfflineAccess(), _responderUserId, "1.2.3.4", CancellationToken.None));
+
+        NothingRecorded();
+    }
+
+    [Fact]
+    public async Task RecordOfflineAccessAsync_AccessTimeFarFromTheScan_IsRejected()
+    {
+        await OfflineAccessSetupAsync(Profile(Guid.NewGuid()), Responder());
+        var request = OfflineAccess() with { AccessedAt = _scannedAt.AddHours(3).ToUnixTimeSeconds() };
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            Service().RecordOfflineAccessAsync(request, _responderUserId, "1.2.3.4", CancellationToken.None));
+
+        NothingRecorded();
     }
 
     [Theory]
@@ -744,6 +844,13 @@ public class EmergencyServiceTests
     {
         await Assert.ThrowsAsync<ArgumentException>(() =>
             Service().RecordOfflineAccessAsync(OfflineAccess(justification: justification), _responderUserId, "1.2.3.4", CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task RecordOfflineAccessAsync_ReasonLongerThanTheColumn_Throws()
+    {
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            Service().RecordOfflineAccessAsync(OfflineAccess(justification: new string('a', 501)), _responderUserId, "1.2.3.4", CancellationToken.None));
     }
 
     [Fact]
@@ -758,7 +865,7 @@ public class EmergencyServiceTests
     [Fact]
     public async Task RecordOfflineAccessAsync_OfficialOutsideHealthcareAndPolice_IsStillRecordedAndFlagged()
     {
-        OfflineAccessSetup(Profile(Guid.NewGuid()), Responder(InstitutionType.HomeAffairs));
+        await OfflineAccessSetupAsync(Profile(Guid.NewGuid()), Responder(InstitutionType.HomeAffairs));
 
         await Service().RecordOfflineAccessAsync(OfflineAccess(), _responderUserId, "1.2.3.4", CancellationToken.None);
 
@@ -766,5 +873,121 @@ public class EmergencyServiceTests
         _audit.Verify(a => a.AddAuditLogAsync(It.Is<AuditLog>(l =>
             l.EventType == AuditEventType.EmergencyProfileAccessed &&
             l.Details!.Contains("outside healthcare and law enforcement"))), Times.Once);
+    }
+
+    [Fact]
+    public async Task ResolveAsync_ReasonTooLong_IsRejectedBeforeTheCodeIsClaimed()
+    {
+        ResponderIs(Responder());
+        using var key = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var request = Request(BuildCode(key, DateTimeOffset.UtcNow)) with { Justification = new string('a', 501) };
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            Service().ResolveAsync(request, _responderUserId, "1.2.3.4", CancellationToken.None));
+
+        _repository.Verify(r => r.TryClaimCodeAsync(
+            It.IsAny<byte[]>(), It.IsAny<DateTimeOffset>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task RegisterDeviceAsync_KeyThatIsNotBase64Url_ThrowsInvalidCode()
+    {
+        _credentials.Setup(c => c.GetCitizenByUserIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(new Citizen { Id = Guid.NewGuid(), Names = "T", Surname = "D" });
+
+        await Assert.ThrowsAsync<InvalidEmergencyCodeException>(() =>
+            Service().RegisterDeviceAsync(
+                new RegisterEmergencyDeviceRequestDto { PublicKeySpki = "not*base64" },
+                Guid.NewGuid(), CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task RegisterDeviceAsync_Other256BitCurve_Throws()
+    {
+        ECDsa brainpool;
+        try
+        {
+            brainpool = ECDsa.Create(ECCurve.NamedCurves.brainpoolP256r1);
+        }
+        catch (Exception ex) when (ex is PlatformNotSupportedException or CryptographicException)
+        {
+            Assert.Skip("This platform cannot create brainpoolP256r1 keys.");
+            return;
+        }
+
+        using (brainpool)
+        {
+            _credentials.Setup(c => c.GetCitizenByUserIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(new Citizen { Id = Guid.NewGuid(), Names = "T", Surname = "D" });
+
+            await Assert.ThrowsAsync<InvalidEmergencyCodeException>(() =>
+                Service().RegisterDeviceAsync(
+                    new RegisterEmergencyDeviceRequestDto
+                    {
+                        PublicKeySpki = EmergencyBase64Url.Encode(brainpool.ExportSubjectPublicKeyInfo()),
+                    },
+                    Guid.NewGuid(), CancellationToken.None));
+        }
+    }
+
+    private EmergencyProfile SavedProfile()
+    {
+        var profile = Profile(Guid.NewGuid());
+        profile.RevocationIndex = EmergencyClaimNames.RevocationIndexOffset + 11;
+        profile.BloodTypeCipher = "O negative";
+        profile.MedicalLastUpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        _crypto.Setup(c => c.Decrypt(It.IsAny<string>(), It.IsAny<string>())).Returns((string cipher, string _) => cipher);
+        _crypto.Setup(c => c.Encrypt(It.IsAny<string>(), It.IsAny<string>())).Returns((string plain, string _) => plain);
+        _repository
+            .Setup(r => r.GetProfileByUserIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(profile);
+        return profile;
+    }
+
+    private static SaveEmergencyProfileRequestDto SaveRequest(string bloodType, string contactName) => new()
+    {
+        IsEnabled = true,
+        ConsentGiven = true,
+        Fields = new Dictionary<string, string> { ["bloodType"] = bloodType },
+        OfflineFields = ["bloodType"],
+        Contacts = [new EmergencyContactDto { Name = contactName, Relationship = "Brother", Priority = 1 }],
+    };
+
+    [Fact]
+    public async Task SaveProfileAsync_ChangingAnOfflineValue_RetiresTheIndex()
+    {
+        var profile = SavedProfile();
+
+        await Service().SaveProfileAsync(SaveRequest("A positive", "Sipho"), Guid.NewGuid(), CancellationToken.None);
+
+        _repository.Verify(r => r.AddRetiredRevocationIndexAsync(
+            It.Is<RetiredEmergencyRevocationIndex>(x => x.RevocationIndex == EmergencyClaimNames.RevocationIndexOffset + 11),
+            It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Null(profile.RevocationIndex);
+        Assert.NotEqual(new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc), profile.MedicalLastUpdatedAt);
+    }
+
+    [Fact]
+    public async Task SaveProfileAsync_OnlyAContactNotReleasedOfflineChanges_KeepsTheIndexAndTheMedicalDate()
+    {
+        var profile = SavedProfile();
+
+        await Service().SaveProfileAsync(SaveRequest("O negative", "Lwazi"), Guid.NewGuid(), CancellationToken.None);
+
+        _repository.Verify(r => r.AddRetiredRevocationIndexAsync(
+            It.IsAny<RetiredEmergencyRevocationIndex>(), It.IsAny<CancellationToken>()), Times.Never);
+        Assert.Equal(EmergencyClaimNames.RevocationIndexOffset + 11, profile.RevocationIndex);
+        Assert.Equal(new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc), profile.MedicalLastUpdatedAt);
+    }
+
+    [Fact]
+    public async Task SaveProfileAsync_EncryptsEachFieldBoundToItsProfileAndName()
+    {
+        var profile = SavedProfile();
+
+        await Service().SaveProfileAsync(SaveRequest("O negative", "Sipho"), Guid.NewGuid(), CancellationToken.None);
+
+        _crypto.Verify(c => c.Encrypt("O negative", $"{profile.Id:N}/bloodType"), Times.Once);
     }
 }

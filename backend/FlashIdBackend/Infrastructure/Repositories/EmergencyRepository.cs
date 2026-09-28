@@ -14,7 +14,7 @@ namespace Infrastructure.Repositories;
 
 public class EmergencyRepository : IEmergencyRepository
 {
-    private const int ClaimTtlSeconds = 300;
+    private static readonly int ClaimTtlSeconds = (int)(2 * EmergencyCodeVerifier.MaxSkew + TimeSpan.FromMinutes(1)).TotalSeconds;
     private const int SqlServerDuplicateKey = 2601;
     private const int SqlServerUniqueConstraint = 2627;
     private const int SqliteUniqueConstraint = 2067;
@@ -95,6 +95,15 @@ public class EmergencyRepository : IEmergencyRepository
             return false;
         }
     }
+
+    public Task<bool> OfflineAccessExistsAsync(Guid profileId, Guid responderUserId, DateTime from, DateTime to, CancellationToken ct) =>
+        _context.EmergencyAccesses.AnyAsync(
+            a => a.EmergencyProfileId == profileId
+                 && a.ResponderUserId == responderUserId
+                 && a.WasOffline
+                 && a.AccessedAt >= from
+                 && a.AccessedAt <= to,
+            ct);
 
     public async Task AddDeviceAsync(EmergencyDevice device, CancellationToken ct) =>
         await _context.EmergencyDevices.AddAsync(device, ct);

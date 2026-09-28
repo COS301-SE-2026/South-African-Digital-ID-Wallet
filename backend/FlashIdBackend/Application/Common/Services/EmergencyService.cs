@@ -1,7 +1,6 @@
 using System.Buffers.Text;
 using System.Globalization;
 using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
@@ -19,6 +18,11 @@ public class EmergencyService : IEmergencyService
     private const int MinJustificationLength = 10;
     private const int MaxJustificationLength = 500;
     private static readonly TimeSpan MaxOfflineClockAhead = TimeSpan.FromDays(1);
+    private static readonly TimeSpan KeyBindingClockSkew = TimeSpan.FromMinutes(1);
+    private static readonly TimeSpan MaxOfflineConfirmDelay = TimeSpan.FromMinutes(30);
+
+    private static readonly HashSet<string> P256CurveNames =
+        new(StringComparer.OrdinalIgnoreCase) { "nistP256", "secp256r1", "prime256v1", "ECDSA_P256" };
 
     private static readonly JsonSerializerOptions CamelCase = new()
     {
@@ -42,7 +46,8 @@ public class EmergencyService : IEmergencyService
     private readonly IInstitutionRepository _auditRepository;
     private readonly IPhotoStorageProvider _photoStorage;
     private readonly ISdJwtCredentialFactory _credentialFactory;
-    private readonly IEmergencyNotifier _notifier;
+    private readonly ICredentialSigningProvider _signingProvider;
+    private readonly IEmergencyNotificationQueue _notificationQueue;
     private readonly IFieldCryptoProvider _fieldCrypto;
 
     public EmergencyService(
@@ -51,7 +56,8 @@ public class EmergencyService : IEmergencyService
         IInstitutionRepository auditRepository,
         IPhotoStorageProvider photoStorage,
         ISdJwtCredentialFactory credentialFactory,
-        IEmergencyNotifier notifier,
+        ICredentialSigningProvider signingProvider,
+        IEmergencyNotificationQueue notificationQueue,
         IFieldCryptoProvider fieldCrypto)
     {
         _repository = repository;
@@ -59,7 +65,8 @@ public class EmergencyService : IEmergencyService
         _auditRepository = auditRepository;
         _photoStorage = photoStorage;
         _credentialFactory = credentialFactory;
-        _notifier = notifier;
+        _signingProvider = signingProvider;
+        _notificationQueue = notificationQueue;
         _fieldCrypto = fieldCrypto;
     }
 
@@ -71,6 +78,8 @@ public class EmergencyService : IEmergencyService
         var responder = await _repository.GetResponderAsync(responderUserId, ct)
             ?? throw await FailAsync(responderUserId, ipAddress,
                 "Official is not attached to a healthcare or law-enforcement institution.", ct);
+
+        var justification = RequireJustification(request.Justification);
 
         if (!EmergencyCodeVerifier.TryParse(request.Code, out var code))
             throw await FailAsync(responderUserId, ipAddress, "Malformed emergency code.", ct);
@@ -106,9 +115,9 @@ public class EmergencyService : IEmergencyService
             EmergencyProfileId = profile.Id,
             ResponderUserId = responderUserId,
             ResponderName = $"{responder.Names} {responder.Surname}",
-            ResponderInstitutionName = responder?.Institution?.Name,
-            InstitutionId = responder?.InstitutionId,
-            Justification = request.Justification,
+            ResponderInstitutionName = responder.Institution?.Name,
+            InstitutionId = responder.InstitutionId,
+            Justification = justification,
             Latitude = request.Latitude,
             Longitude = request.Longitude,
             IpAddress = ipAddress,
@@ -125,13 +134,13 @@ public class EmergencyService : IEmergencyService
             ActorId = responderUserId,
             CitizenId = profile.CitizenId,
             EventType = AuditEventType.EmergencyProfileAccessed,
-            Details = $"Break-glass emergency access. Justification: {request.Justification}",
+            Details = $"Break-glass emergency access. Justification: {justification}",
             IpAddress = ipAddress,
             CreatedAt = now.UtcDateTime,
         });
         await _repository.SaveChangesAsync(ct);
 
-        _ = _notifier.NotifyEmergencyAccessAsync(access.Id, CancellationToken.None);
+        _notificationQueue.Enqueue(access.Id);
 
         return new EmergencyProfileResponseDto
         {
@@ -155,19 +164,20 @@ public class EmergencyService : IEmergencyService
         var citizen = await _credentialRepository.GetCitizenByUserIdAsync(userId)
             ?? throw new EmergencyProfileNotFoundException();
 
-        var publicKey = EmergencyBase64Url.Decode(request.PublicKeySpki);
-
+        byte[] publicKey;
         try
         {
+            publicKey = EmergencyBase64Url.Decode(request.PublicKeySpki ?? string.Empty);
+
             using var probe = ECDsa.Create();
             probe.ImportSubjectPublicKeyInfo(publicKey, out _);
 
-            if (probe.KeySize != 256)
+            if (!IsP256(probe.ExportParameters(false).Curve))
             {
                 throw new InvalidEmergencyCodeException("Device public key must be P-256.");
             }
         }
-        catch (CryptographicException)
+        catch (Exception ex) when (ex is CryptographicException or FormatException)
         {
             throw new InvalidEmergencyCodeException("Device public key is not a valid SubjectPublicKeyInfo.");
         }
@@ -249,15 +259,12 @@ public class EmergencyService : IEmergencyService
             await _repository.AddProfileAsync(profile, ct);
         }
 
-        profile.IsEnabled = request.IsEnabled;
+        var releasedBefore = profile.RevocationIndex is null ? null : ReleasedOfflineClaims(profile);
+        var medicalBefore = MedicalValues(profile);
 
-        if (!profile.IsEnabled)
-        {
-            await RetireRevocationIndexAsync(profile, ct);
-        }
+        profile.IsEnabled = request.IsEnabled;
         profile.ConsentGivenAt = request.ConsentGiven ? profile.ConsentGivenAt ?? now : null;
         profile.OfflineFieldsJson = JsonSerializer.Serialize(request.OfflineFields, CamelCase);
-        profile.MedicalLastUpdatedAt = now;
         profile.UpdatedAt = now;
 
         WriteMedicalFields(profile, request.Fields);
@@ -276,6 +283,16 @@ public class EmergencyService : IEmergencyService
                 CreatedAt = now,
                 UpdatedAt = now,
             });
+        }
+
+        if (profile.MedicalLastUpdatedAt is null || !SameValues(medicalBefore, MedicalValues(profile)))
+        {
+            profile.MedicalLastUpdatedAt = now;
+        }
+
+        if (!profile.IsEnabled || (releasedBefore is not null && !SameValues(releasedBefore, ReleasedOfflineClaims(profile))))
+        {
+            await RetireRevocationIndexAsync(profile, ct);
         }
 
         await _auditRepository.AddAuditLogAsync(new AuditLog
@@ -341,10 +358,10 @@ public class EmergencyService : IEmergencyService
     public async Task RecordOfflineAccessAsync(
         RecordOfflineEmergencyAccessRequestDto request, Guid responderUserId, string ipAddress, CancellationToken ct)
     {
-        var justification = request.Justification?.Trim() ?? string.Empty;
-        if (request.Id == Guid.Empty || justification.Length < MinJustificationLength || justification.Length > MaxJustificationLength)
+        var justification = RequireJustification(request.Justification);
+        if (request.Id == Guid.Empty)
         {
-            throw new ArgumentException("An offline emergency access needs an id and a reason of 10 to 500 characters.", nameof(request));
+            throw new ArgumentException("An offline emergency access needs an id.", nameof(request));
         }
 
         var now = DateTimeOffset.UtcNow;
@@ -358,8 +375,33 @@ public class EmergencyService : IEmergencyService
             return;
         }
 
-        var profile = await _repository.GetProfileByRevocationIndexAsync(request.RevocationIndex, ct)
+        var issuerKey = await _signingProvider.GetActiveKeyAsync(ct);
+        var scanned = EmergencyPresentationVerifier.Verify(request.Presentation, issuerKey);
+        if (scanned is null || scanned.RevocationIndex != request.RevocationIndex)
+        {
+            throw new ArgumentException("The scanned emergency code could not be verified.", nameof(request));
+        }
+
+        var accessedAt = DateTimeOffset.FromUnixTimeSeconds(request.AccessedAt);
+        if (scanned.KeyBoundAt > now.Add(KeyBindingClockSkew)
+            || accessedAt < scanned.KeyBoundAt.Subtract(KeyBindingClockSkew)
+            || accessedAt > scanned.KeyBoundAt.Add(MaxOfflineConfirmDelay))
+        {
+            throw new ArgumentException("The offline access time does not match when the code was scanned.", nameof(request));
+        }
+
+        var profile = await _repository.GetProfileByRevocationIndexAsync(scanned.RevocationIndex, ct)
             ?? throw new EmergencyProfileNotFoundException();
+
+        if (await _repository.OfflineAccessExistsAsync(
+                profile.Id,
+                responderUserId,
+                scanned.KeyBoundAt.Subtract(KeyBindingClockSkew).UtcDateTime,
+                scanned.KeyBoundAt.Add(MaxOfflineConfirmDelay).UtcDateTime,
+                ct))
+        {
+            return;
+        }
 
         var official = await _repository.GetOfficialAsync(responderUserId, ct);
         var authorised = official?.Institution?.Type is InstitutionType.Healthcare or InstitutionType.LawEnforcement;
@@ -377,7 +419,7 @@ public class EmergencyService : IEmergencyService
             Longitude = request.Longitude,
             IpAddress = ipAddress,
             WasOffline = true,
-            AccessedAt = DateTimeOffset.FromUnixTimeSeconds(request.AccessedAt).UtcDateTime,
+            AccessedAt = accessedAt.UtcDateTime,
             CreatedAt = now.UtcDateTime,
             UpdatedAt = now.UtcDateTime,
         };
@@ -401,10 +443,38 @@ public class EmergencyService : IEmergencyService
             return;
         }
 
-        _ = _notifier.NotifyEmergencyAccessAsync(access.Id, CancellationToken.None);
+        _notificationQueue.Enqueue(access.Id);
     }
 
+    private static string RequireJustification(string? justification)
+    {
+        var trimmed = justification?.Trim() ?? string.Empty;
+        if (trimmed.Length < MinJustificationLength || trimmed.Length > MaxJustificationLength)
+        {
+            throw new ArgumentException(
+                $"Give a reason of {MinJustificationLength} to {MaxJustificationLength} characters.",
+                nameof(justification));
+        }
+
+        return trimmed;
+    }
+
+    private static bool IsP256(ECCurve curve) =>
+        curve.IsNamed
+        && (curve.Oid?.Value == ECCurve.NamedCurves.nistP256.Oid.Value
+            || (curve.Oid?.FriendlyName is { } name && P256CurveNames.Contains(name)));
+
     private Dictionary<string, string> BuildOfflineClaims(EmergencyProfile profile)
+    {
+        var claims = ReleasedOfflineClaims(profile);
+
+        var updatedOn = profile.MedicalLastUpdatedAt ?? profile.ConsentGivenAt ?? profile.UpdatedAt;
+        claims[EmergencyClaimNames.MedicalUpdatedOn] = updatedOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+        return claims;
+    }
+
+    private Dictionary<string, string> ReleasedOfflineClaims(EmergencyProfile profile)
     {
         var released = JsonSerializer.Deserialize<HashSet<string>>(profile.OfflineFieldsJson, CamelCase) ?? [];
         var claims = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -417,8 +487,8 @@ public class EmergencyService : IEmergencyService
             }
         }
 
-        var fullName = $"{profile.Citizen.Names} {profile.Citizen.Surname}".Trim();
-        if (released.Contains("name") && fullName.Length > 0)
+        var fullName = $"{profile.Citizen?.Names} {profile.Citizen?.Surname}".Trim();
+        if (released.Contains(EmergencyClaimNames.NameField) && fullName.Length > 0)
         {
             claims[EmergencyClaimNames.FullName] = fullName;
         }
@@ -446,11 +516,15 @@ public class EmergencyService : IEmergencyService
             }
         }
 
-        var updatedOn = profile.MedicalLastUpdatedAt ?? profile.ConsentGivenAt ?? profile.UpdatedAt;
-        claims[EmergencyClaimNames.MedicalUpdatedOn] = updatedOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-
         return claims;
     }
+
+    private Dictionary<string, string> MedicalValues(EmergencyProfile profile) =>
+        ReadMedicalFields(profile).ToDictionary(f => f.Key, f => f.Value, StringComparer.Ordinal);
+
+    private static bool SameValues(IReadOnlyDictionary<string, string> before, IReadOnlyDictionary<string, string> after) =>
+        before.Count == after.Count
+        && before.All(entry => after.TryGetValue(entry.Key, out var value) && value == entry.Value);
 
     private static EcPublicJwk DeviceKeyFor(EmergencyDevice device)
     {
@@ -517,6 +591,8 @@ public class EmergencyService : IEmergencyService
         return new InvalidEmergencyCodeException(reason);
     }
 
+    private static string FieldContext(EmergencyProfile profile, string fieldKey) => $"{profile.Id:N}/{fieldKey}";
+
     private List<EmergencyMedicalFieldDto> ReadMedicalFields(EmergencyProfile profile) =>
         MedicalFields
             .Select(f => (f.Key, f.Label, Cipher: CipherFor(profile, f.Key)))
@@ -525,7 +601,7 @@ public class EmergencyService : IEmergencyService
             {
                 Key = f.Key,
                 Label = f.Label,
-                Value = _fieldCrypto.Decrypt(f.Cipher!),
+                Value = _fieldCrypto.Decrypt(f.Cipher!, FieldContext(profile, f.Key)),
             })
             .ToList();
 
@@ -533,7 +609,7 @@ public class EmergencyService : IEmergencyService
     {
         string? Encrypt(string key) =>
             fields.TryGetValue(key, out var value) && !string.IsNullOrWhiteSpace(value)
-                ? _fieldCrypto.Encrypt(value)
+                ? _fieldCrypto.Encrypt(value, FieldContext(profile, key))
                 : null;
 
         profile.AllergiesCipher = Encrypt("allergies");

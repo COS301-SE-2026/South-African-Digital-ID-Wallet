@@ -8,5 +8,6 @@
   <string name="emergency_no_signal">No signal? Show the offline code</string>
   <string name="emergency_back_online">Back to the live code</string>
   <string name="emergency_no_offline_bundle">No offline copy stored. Open FlashID once while online.</string>
+  <string name="emergency_locked_after_restart">Unlock this phone once after it restarts, then open the emergency code again.</string>
   <string name="emergency_expires_in">Expires in %1$d s</string>
 </resources>

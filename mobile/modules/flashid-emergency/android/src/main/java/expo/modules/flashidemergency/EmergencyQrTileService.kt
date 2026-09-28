@@ -10,7 +10,11 @@ class EmergencyQrTileService : TileService() {
 
     override fun onStartListening() {
         super.onStartListening()
-        val configured = EmergencyStore.handle(applicationContext) != null
+        val configured = try {
+            EmergencyStore.handle(applicationContext) != null
+        } catch (e: Exception) {
+            false
+        }
         qsTile?.apply {
             state = if (configured) Tile.STATE_INACTIVE else Tile.STATE_UNAVAILABLE
             subtitle = if (configured) "Show emergency QR" else "Set up in FlashID"

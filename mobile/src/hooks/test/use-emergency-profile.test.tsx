@@ -113,8 +113,12 @@ describe('useEmergencyProfile', () => {
       wrapper: createQueryWrapper(),
     })
     await act(async () => {
-      await expect(result.current.save(REQUEST)).resolves.toEqual(PROFILE)
+      await expect(result.current.save(REQUEST)).resolves.toEqual({
+        isLockScreenCurrent: false,
+        profile: PROFILE,
+      })
     })
+    expect(result.current.lockScreenOutOfDate).toBe(true)
   })
 
   it('Should report a failed save', async () => {

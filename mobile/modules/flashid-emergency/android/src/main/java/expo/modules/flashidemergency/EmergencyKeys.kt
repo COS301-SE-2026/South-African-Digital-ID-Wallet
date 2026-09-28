@@ -25,7 +25,7 @@ object EmergencyKeys {
         if (existing != null) return Generated(existing, isStrongBox())
 
         return try {
-            Generated(createKey(strongBox = true), isStrongBox())
+            Generated(createKey(strongBox = true), Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
         } catch (_: StrongBoxUnavailableException) {
             Generated(createKey(strongBox = false), false)
         }
@@ -80,8 +80,7 @@ object EmergencyKeys {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             info.securityLevel == KeyProperties.SECURITY_LEVEL_STRONGBOX
         } else {
-            @Suppress("DEPRECATION")
-            info.isInsideSecureHardware
+            false
         }
     }
     private fun keyStore() = KeyStore.getInstance(PROVIDER).apply { load(null) }

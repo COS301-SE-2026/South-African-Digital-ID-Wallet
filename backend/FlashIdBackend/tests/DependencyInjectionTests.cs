@@ -240,4 +240,17 @@ public class DependencyInjectionTests
 
         Assert.Empty(missing);
     }
+
+    [Fact]
+    public void AddInfrastructure_RunsEmergencyNotificationsOnABackgroundQueue()
+    {
+        var services = new ServiceCollection();
+        services.AddInfrastructure(CreateConfiguration());
+
+        Assert.Contains(services, sd =>
+            sd.ServiceType == typeof(IEmergencyNotificationQueue) && sd.Lifetime == ServiceLifetime.Singleton);
+        Assert.Contains(services, sd =>
+            sd.ServiceType == typeof(IHostedService) &&
+            sd.ImplementationType == typeof(EmergencyNotificationBackgroundService));
+    }
 }

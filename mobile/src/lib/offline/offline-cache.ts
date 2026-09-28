@@ -29,6 +29,12 @@ export type PendingEmergencyAccess = {
   revocationIndex: number
   justification: string
   accessedAt: number
+  presentation: string
+}
+
+export type RejectedEmergencyAccess = PendingEmergencyAccess & {
+  rejectedAt: number
+  status: number
 }
 
 export type OfflineCache = {
@@ -40,6 +46,7 @@ export type OfflineCache = {
   // Optional, so caches written before audit sync still read without a version bump.
   pendingVerifications?: readonly OfflineVerification[]
   pendingEmergencyAccesses?: readonly PendingEmergencyAccess[]
+  rejectedEmergencyAccesses?: readonly RejectedEmergencyAccess[]
 }
 
 const CACHE_KEY_NAME = 'flashid.offline.cache-key'

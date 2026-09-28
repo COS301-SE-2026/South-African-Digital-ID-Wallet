@@ -75,6 +75,7 @@ const mockHooks = (overrides = {}) => {
     isLoading: false,
     isSaving: false,
     loadError: null,
+    lockScreenOutOfDate: false,
     profile: PROFILE,
     save,
     saveError: null,
@@ -232,6 +233,13 @@ describe('EmergencyProfilePage', () => {
     expect(
       toSaveRequest({ ...DRAFT, offlineFields: ['contacts'] }).offlineFields
     ).toEqual([])
+  })
+
+  it('Should warn when the lock-screen code could not be updated', async () => {
+    mockHooks({ lockScreenOutOfDate: true })
+    await renderWithSafeArea(<EmergencyProfilePage />)
+    await fireEvent.press(screen.getByTestId('emergency-save'))
+    expect(screen.getByTestId('emergency-lock-screen-stale')).toBeTruthy()
   })
 
   it('Should show a save error', async () => {

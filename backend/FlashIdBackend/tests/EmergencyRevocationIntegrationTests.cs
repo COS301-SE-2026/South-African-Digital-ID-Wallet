@@ -138,7 +138,8 @@ public class EmergencyRevocationIntegrationTests : IDisposable
             Mock.Of<IInstitutionRepository>(),
             Mock.Of<IPhotoStorageProvider>(),
             Mock.Of<ISdJwtCredentialFactory>(),
-            Mock.Of<IEmergencyNotifier>(),
+            Mock.Of<ICredentialSigningProvider>(),
+            Mock.Of<IEmergencyNotificationQueue>(),
             Mock.Of<IFieldCryptoProvider>());
 
         using var newPhone = ECDsa.Create(ECCurve.NamedCurves.nistP256);
@@ -169,7 +170,8 @@ public class EmergencyRevocationIntegrationTests : IDisposable
             Mock.Of<IInstitutionRepository>(),
             Mock.Of<IPhotoStorageProvider>(),
             Mock.Of<ISdJwtCredentialFactory>(),
-            Mock.Of<IEmergencyNotifier>(),
+            Mock.Of<ICredentialSigningProvider>(),
+            Mock.Of<IEmergencyNotificationQueue>(),
             Mock.Of<IFieldCryptoProvider>());
 
         SaveEmergencyProfileRequestDto Request(string contactName) => new()

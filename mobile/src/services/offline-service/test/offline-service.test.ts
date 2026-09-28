@@ -640,6 +640,7 @@ describe('offlineService', () => {
       savedAt: 1_790_010_000,
       pendingVerifications: [queuedScan],
       pendingEmergencyAccesses: [],
+      rejectedEmergencyAccesses: [],
     })
   })
 
@@ -658,6 +659,7 @@ describe('offlineService', () => {
     revocationIndex: 1_000_000_042,
     justification: 'Unconscious at roadside',
     accessedAt: 1_790_000_000,
+    presentation: 'issuer.jwt.sig~disclosure~kb.jwt.sig',
   }
 
   const { responderId: _responderId, ...uploadAccess } = queuedAccess
@@ -747,7 +749,7 @@ describe('offlineService', () => {
   })
 
   it.each([400, 403, 404])(
-    'Should drop an emergency access the backend will never accept (%i)',
+    'Should move an emergency access the backend refuses to the rejected list (%i)',
     async (status) => {
       readOfflineCacheMock.mockResolvedValue({
         ...existingCache,
@@ -765,7 +767,12 @@ describe('offlineService', () => {
       ).resolves.toBe(1)
 
       expect(writeOfflineCacheMock).toHaveBeenCalledWith(
-        expect.objectContaining({ pendingEmergencyAccesses: [] })
+        expect.objectContaining({
+          pendingEmergencyAccesses: [],
+          rejectedEmergencyAccesses: [
+            { ...queuedAccess, rejectedAt: expect.any(Number), status },
+          ],
+        })
       )
     }
   )

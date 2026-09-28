@@ -30,5 +30,7 @@ public interface IEmergencyRepository
 
     Task<bool> AccessExistsAsync(Guid accessId, CancellationToken ct);
 
+    Task<bool> OfflineAccessExistsAsync(Guid profileId, Guid responderUserId, DateTime from, DateTime to, CancellationToken ct);
+
     Task<Official?> GetOfficialAsync(Guid userId, CancellationToken ct);
 }

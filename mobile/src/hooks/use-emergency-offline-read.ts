@@ -15,6 +15,7 @@ export const useEmergencyOfflineRead = () => {
   const { trust, isLoading: isTrustLoading } = useVerifierTrust()
   const {
     addFrame,
+    presentation,
     progress,
     reset: resetScan,
     result,
@@ -28,7 +29,7 @@ export const useEmergencyOfflineRead = () => {
 
   const confirm = useCallback(
     async (justification: string) => {
-      if (!result?.ok || !responderId) {
+      if (!result?.ok || !responderId || !presentation) {
         return
       }
 
@@ -55,6 +56,7 @@ export const useEmergencyOfflineRead = () => {
           revocationIndex: result.revocationIndex,
           justification,
           accessedAt: Math.floor(nowMs / 1000),
+          presentation,
         })
         setAccessedAt(new Date(nowMs))
       } catch {
@@ -65,7 +67,7 @@ export const useEmergencyOfflineRead = () => {
         setIsConfirming(false)
       }
     },
-    [responderId, result, unlock]
+    [presentation, responderId, result, unlock]
   )
 
   const reset = useCallback(() => {

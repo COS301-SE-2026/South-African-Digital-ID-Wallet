@@ -9,6 +9,7 @@ import {
   type OfflinePackage,
   type OfflineVerification,
   type PendingEmergencyAccess,
+  type RejectedEmergencyAccess,
 } from '@/lib/offline/offline-cache'
 import { isPackageUsable } from '@/lib/offline/offline-package'
 import { verifyRevocationList } from '@/lib/offline/verify'
@@ -197,6 +198,7 @@ const refreshOfflineCache = (credentialId: string): Promise<OfflineCache> =>
       savedAt: now,
       pendingVerifications: existing?.pendingVerifications ?? [],
       pendingEmergencyAccesses: existing?.pendingEmergencyAccesses ?? [],
+      rejectedEmergencyAccesses: existing?.rejectedEmergencyAccesses ?? [],
     }
 
     await writeOfflineCache(refreshed)
@@ -240,6 +242,7 @@ const refreshTrustData = (): Promise<OfflineCache> =>
       savedAt: now,
       pendingVerifications: existing?.pendingVerifications ?? [],
       pendingEmergencyAccesses: existing?.pendingEmergencyAccesses ?? [],
+      rejectedEmergencyAccesses: existing?.rejectedEmergencyAccesses ?? [],
     }
 
     await writeOfflineCache(refreshed)
@@ -262,6 +265,7 @@ const queueOfflineVerification = (
         verification,
       ].slice(-MAX_QUEUED_VERIFICATIONS),
       pendingEmergencyAccesses: existing?.pendingEmergencyAccesses ?? [],
+      rejectedEmergencyAccesses: existing?.rejectedEmergencyAccesses ?? [],
     })
   })
 
@@ -312,6 +316,8 @@ const MAX_QUEUED_EMERGENCY_ACCESSES = 100
 
 const PERMANENT_EMERGENCY_SYNC_FAILURES = new Set([400, 403, 404])
 
+const MAX_REJECTED_EMERGENCY_ACCESSES = 50
+
 const queueEmergencyAccess = (access: PendingEmergencyAccess): Promise<void> =>
   serialised(async () => {
     const existing = await readOfflineCache()
@@ -325,6 +331,7 @@ const queueEmergencyAccess = (access: PendingEmergencyAccess): Promise<void> =>
         ...(existing?.pendingEmergencyAccesses ?? []),
         access,
       ].slice(-MAX_QUEUED_EMERGENCY_ACCESSES),
+      rejectedEmergencyAccesses: existing?.rejectedEmergencyAccesses ?? [],
     })
   })
 
@@ -332,30 +339,37 @@ const syncEmergencyAccesses = (responderId: string): Promise<number> =>
   serialised(async () => {
     const existing = await readOfflineCache()
     let remaining = existing?.pendingEmergencyAccesses ?? []
+    let rejected: readonly RejectedEmergencyAccess[] =
+      existing?.rejectedEmergencyAccesses ?? []
     const mine = remaining.filter((entry) => entry.responderId === responderId)
     let uploaded = 0
 
-    for (const { responderId: _responderId, ...entry } of mine) {
+    for (const queued of mine) {
       if (!existing) {
         break
       }
 
+      const { responderId: _responderId, ...entry } = queued
+
       try {
         await api.post(emergencyUrls.offlineAccesses(), entry)
       } catch (error) {
-        if (
-          !isAxiosError(error) ||
-          !PERMANENT_EMERGENCY_SYNC_FAILURES.has(error.response?.status ?? 0)
-        ) {
+        const status = isAxiosError(error) ? (error.response?.status ?? 0) : 0
+        if (!PERMANENT_EMERGENCY_SYNC_FAILURES.has(status)) {
           throw error
         }
+        rejected = [
+          ...rejected,
+          { ...queued, rejectedAt: nowInSeconds(), status },
+        ].slice(-MAX_REJECTED_EMERGENCY_ACCESSES)
       }
 
-      remaining = remaining.filter((pending) => pending.id !== entry.id)
+      remaining = remaining.filter((pending) => pending.id !== queued.id)
       uploaded += 1
       await writeOfflineCache({
         ...existing,
         pendingEmergencyAccesses: remaining,
+        rejectedEmergencyAccesses: rejected,
       })
     }
 
@@ -370,16 +384,22 @@ const clearOfflineData = (): Promise<void> =>
     const existing = await readOfflineCache()
     const pending = existing?.pendingVerifications ?? []
     const pendingEmergency = existing?.pendingEmergencyAccesses ?? []
+    const rejectedEmergency = existing?.rejectedEmergencyAccesses ?? []
 
     await clearOfflineCache()
 
-    if (pending.length > 0 || pendingEmergency.length > 0) {
+    if (
+      pending.length > 0 ||
+      pendingEmergency.length > 0 ||
+      rejectedEmergency.length > 0
+    ) {
       await writeOfflineCache({
         packages: {},
         trust: null,
         savedAt: nowInSeconds(),
         pendingVerifications: pending,
         pendingEmergencyAccesses: pendingEmergency,
+        rejectedEmergencyAccesses: rejectedEmergency,
       })
     }
   })

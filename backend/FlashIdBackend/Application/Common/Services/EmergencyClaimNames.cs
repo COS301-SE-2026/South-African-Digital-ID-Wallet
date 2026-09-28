@@ -19,6 +19,7 @@ public static class EmergencyClaimNames
     public const string MedicalAidNumber = "medical_aid_number";
     public const string MedicalUpdatedOn = "medical_updated_on";
 
+    public const string NameField = "name";
     public const string ContactsField = "contacts";
     public const int MaxOfflineContacts = 3;
 

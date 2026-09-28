@@ -3,6 +3,7 @@ using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Services;
 using Application.Features.Notifications.DTOs;
 using Domain.Entities;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace tests;
 
@@ -53,6 +54,8 @@ public class EmergencyNotifierTests
         public Task<bool> AccessExistsAsync(Guid id, CancellationToken ct) =>
             throw new NotImplementedException();
         public Task<Official?> GetOfficialAsync(Guid id, CancellationToken ct) =>
+            throw new NotImplementedException();
+        public Task<bool> OfflineAccessExistsAsync(Guid p, Guid r, DateTime f, DateTime t, CancellationToken ct) =>
             throw new NotImplementedException();
     }
 
@@ -131,7 +134,7 @@ public class EmergencyNotifierTests
         var repository = new FakeEmergencyRepository { AccessToReturn = null };
         var email = new FakeEmailSender();
         var notifications = new FakeNotificationRepository();
-        var notifier = new EmergencyNotifier(repository, email, notifications);
+        var notifier = new EmergencyNotifier(repository, email, notifications, NullLogger<EmergencyNotifier>.Instance);
 
         await notifier.NotifyEmergencyAccessAsync(Guid.NewGuid(), CancellationToken.None);
 
@@ -148,7 +151,7 @@ public class EmergencyNotifierTests
             Contact("First", "first@example.com", 1));
         var repository = new FakeEmergencyRepository { AccessToReturn = access };
         var email = new FakeEmailSender();
-        var notifier = new EmergencyNotifier(repository, email, new FakeNotificationRepository());
+        var notifier = new EmergencyNotifier(repository, email, new FakeNotificationRepository(), NullLogger<EmergencyNotifier>.Instance);
 
         await notifier.NotifyEmergencyAccessAsync(access.Id, CancellationToken.None);
 
@@ -165,7 +168,7 @@ public class EmergencyNotifierTests
             Contact("Real", "real@example.com", 3));
         var repository = new FakeEmergencyRepository { AccessToReturn = access };
         var email = new FakeEmailSender();
-        var notifier = new EmergencyNotifier(repository, email, new FakeNotificationRepository());
+        var notifier = new EmergencyNotifier(repository, email, new FakeNotificationRepository(), NullLogger<EmergencyNotifier>.Instance);
 
         await notifier.NotifyEmergencyAccessAsync(access.Id, CancellationToken.None);
 
@@ -181,7 +184,7 @@ public class EmergencyNotifierTests
         var repository = new FakeEmergencyRepository { AccessToReturn = access };
         var email = new FakeEmailSender { FailFor = "broken@example.com" };
         var notifications = new FakeNotificationRepository();
-        var notifier = new EmergencyNotifier(repository, email, notifications);
+        var notifier = new EmergencyNotifier(repository, email, notifications, NullLogger<EmergencyNotifier>.Instance);
 
         await notifier.NotifyEmergencyAccessAsync(access.Id, CancellationToken.None);
 
@@ -195,7 +198,7 @@ public class EmergencyNotifierTests
         var access = BuildAccess(Contact("Only", "only@example.com", 1));
         var repository = new FakeEmergencyRepository { AccessToReturn = access };
         var notifications = new FakeNotificationRepository();
-        var notifier = new EmergencyNotifier(repository, new FakeEmailSender(), notifications);
+        var notifier = new EmergencyNotifier(repository, new FakeEmailSender(), notifications, NullLogger<EmergencyNotifier>.Instance);
 
         await notifier.NotifyEmergencyAccessAsync(access.Id, CancellationToken.None);
 
@@ -210,7 +213,7 @@ public class EmergencyNotifierTests
     {
         var access = BuildAccess(Contact("Only", "only@example.com", 1));
         var repository = new FakeEmergencyRepository { AccessToReturn = access };
-        var notifier = new EmergencyNotifier(repository, new FakeEmailSender(), new FakeNotificationRepository());
+        var notifier = new EmergencyNotifier(repository, new FakeEmailSender(), new FakeNotificationRepository(), NullLogger<EmergencyNotifier>.Instance);
 
         await notifier.NotifyEmergencyAccessAsync(access.Id, CancellationToken.None);
 

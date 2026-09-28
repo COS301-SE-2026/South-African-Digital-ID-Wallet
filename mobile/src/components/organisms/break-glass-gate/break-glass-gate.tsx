@@ -8,6 +8,7 @@ import { colors } from '@/theme/colors'
 import type { BreakGlassGateProps } from './types'
 
 const MIN_REASON_LENGTH = 10
+const MAX_REASON_LENGTH = 500
 
 export const BreakGlassGate = ({
   error,
@@ -45,6 +46,7 @@ export const BreakGlassGate = ({
         </Text>
         <TextInput
           accessibilityLabel="Reason for emergency access"
+          maxLength={MAX_REASON_LENGTH}
           className="min-h-[96px] rounded-xl border border-border-grey bg-clean-white p-4 text-base text-text-primary"
           multiline
           onChangeText={setReason}

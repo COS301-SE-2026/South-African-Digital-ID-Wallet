@@ -67,4 +67,9 @@ describe('<BreakGlassGate/>', () => {
     await setup({ error: 'This emergency code is not valid.' })
     expect(screen.getByTestId('break-glass-error')).toBeTruthy()
   })
+
+  it('Should stop the reason at the 500 characters the server accepts', async () => {
+    await render(<BreakGlassGate onCancel={jest.fn()} onConfirm={jest.fn()} />)
+    expect(screen.getByTestId('break-glass-reason').props.maxLength).toBe(500)
+  })
 })

@@ -144,6 +144,7 @@ describe('useEmergencyOfflineRead', () => {
       revocationIndex: emergency.expected.revocationIndex,
       justification: 'Unconscious, no signal at scene',
       accessedAt: emergency.verifyAtUnix,
+      presentation: emergency.presentation,
     })
     expect(result.current.accessedAt).not.toBeNull()
   })

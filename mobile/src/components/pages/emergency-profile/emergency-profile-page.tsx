@@ -176,8 +176,15 @@ export const LockScreenSection = ({ isEnabled }: { isEnabled: boolean }) => {
 
 export const EmergencyProfilePage = () => {
   const router = useRouter()
-  const { isLoading, isSaving, loadError, profile, save, saveError } =
-    useEmergencyProfile()
+  const {
+    isLoading,
+    isSaving,
+    loadError,
+    lockScreenOutOfDate,
+    profile,
+    save,
+    saveError,
+  } = useEmergencyProfile()
   const [draft, setDraft] = useState<Draft | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
   const [isSaved, setIsSaved] = useState(false)
@@ -383,6 +390,15 @@ export const EmergencyProfilePage = () => {
           ) : isSaved ? (
             <Text className="text-primary-green" testID="emergency-saved">
               Emergency profile saved.
+            </Text>
+          ) : null}
+          {isSaved && lockScreenOutOfDate ? (
+            <Text
+              className="text-warning-amber"
+              testID="emergency-lock-screen-stale"
+            >
+              The lock-screen emergency code could not be updated. Open FlashID
+              again when you have signal.
             </Text>
           ) : null}
         </>

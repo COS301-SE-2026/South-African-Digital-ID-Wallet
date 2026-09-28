@@ -80,6 +80,7 @@ public record RecordOfflineEmergencyAccessRequestDto
     public int RevocationIndex { get; init; }
     public string Justification { get; init; } = string.Empty;
     public long AccessedAt { get; init; }
+    public string Presentation { get; init; } = string.Empty;
     public double? Latitude { get; init; }
     public double? Longitude { get; init; }
 }
