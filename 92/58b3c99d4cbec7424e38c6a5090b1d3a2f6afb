@@ -1,0 +1,24 @@
+backend/FlashIdBackend/tests/EmergencyRevocationIntegrationTests.cs
+  h_712d174fc3f309 1-239
+backend/FlashIdBackend/tests/TestData/offline-verification/emergency-cross-stack-fixture.json
+  h_712d174fc3f309 1-26
+mobile/modules/flashid-emergency/android/build.gradle
+  h_712d174fc3f309 27-28
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/EmergencyKeys.kt
+  h_712d174fc3f309 64-67,71
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/EmergencyQrActivity.kt
+  h_712d174fc3f309 16-17,25-47,85,95-98,102,104-112,115-127,147
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/EmergencyQrRenderer.kt
+  h_712d174fc3f309 10,14,27,29-30,32-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9258b3c99d4cbec7424e38c6a5090b1d3a2f6afb",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
