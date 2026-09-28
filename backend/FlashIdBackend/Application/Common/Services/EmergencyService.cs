@@ -423,6 +423,29 @@ public class EmergencyService : IEmergencyService
             claims[EmergencyClaimNames.FullName] = fullName;
         }
 
+        if (released.Contains(EmergencyClaimNames.ContactsField))
+        {
+            var position = 1;
+            foreach (var contact in profile.Contacts.OrderBy(c => c.Priority).Take(EmergencyClaimNames.MaxOfflineContacts))
+            {
+                if (string.IsNullOrWhiteSpace(contact.Name))
+                {
+                    continue;
+                }
+
+                claims[EmergencyClaimNames.ContactClaim(position, "name")] = contact.Name;
+                if (!string.IsNullOrWhiteSpace(contact.Relationship))
+                {
+                    claims[EmergencyClaimNames.ContactClaim(position, "relationship")] = contact.Relationship;
+                }
+                if (!string.IsNullOrWhiteSpace(contact.Phone))
+                {
+                    claims[EmergencyClaimNames.ContactClaim(position, "phone")] = contact.Phone;
+                }
+                position++;
+            }
+        }
+
         var updatedOn = profile.MedicalLastUpdatedAt ?? profile.ConsentGivenAt ?? profile.UpdatedAt;
         claims[EmergencyClaimNames.MedicalUpdatedOn] = updatedOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 

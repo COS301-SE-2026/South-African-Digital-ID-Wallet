@@ -1,14 +1,13 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useFocusEffect } from 'expo-router'
-import { ScrollView } from 'react-native'
 
-import { Button } from '@/components/atoms'
+import { Button, Text } from '@/components/atoms'
 import {
   BreakGlassGate,
   EmergencyProfileCard,
   QrCameraScanner,
 } from '@/components/organisms'
-import { ScannerScreen } from '@/components/templates'
+import { DetailScreen, ScannerScreen } from '@/components/templates'
 import { useEmergencyOfflineRead, useEmergencyResolve } from '@/hooks'
 import { toOfflineEmergencyProfile } from '@/lib/offline/emergency-display'
 import { describeVerificationFailure } from '@/lib/offline/offline-scan-display'
@@ -75,34 +74,32 @@ export const EmergencyScanPage = () => {
 
   if (shownProfile) {
     return (
-      <ScannerScreen
-        footer={
+      <DetailScreen
+        action={
           <Button
-            label="Done"
+            label="Scan another code"
             onPress={handleStartOver}
             testID="emergency-done-button"
           />
         }
         onBack={handleStartOver}
-        subtitle={
-          offlineProfile
-            ? 'Read offline. The citizen is told when this phone reconnects.'
-            : undefined
-        }
         testID="emergency-profile-screen"
         title="Emergency profile"
       >
-        <ScrollView contentContainerStyle={{ paddingTop: 8 }}>
-          <EmergencyProfileCard profile={shownProfile} />
-        </ScrollView>
-      </ScannerScreen>
+        <EmergencyProfileCard profile={shownProfile} />
+        <Text variant="caption" className="text-center">
+          {offlineProfile
+            ? 'Read offline on this phone. The citizen is told when this phone reconnects.'
+            : 'This access has been recorded and the citizen has been notified.'}
+        </Text>
+      </DetailScreen>
     )
   }
 
   if (code !== null || offline.result?.ok) {
     const isOffline = code === null
     return (
-      <ScannerScreen
+      <DetailScreen
         onBack={handleStartOver}
         testID="emergency-gate-screen"
         title="Confirm emergency access"
@@ -118,7 +115,7 @@ export const EmergencyScanPage = () => {
               : handleConfirm
           }
         />
-      </ScannerScreen>
+      </DetailScreen>
     )
   }
 

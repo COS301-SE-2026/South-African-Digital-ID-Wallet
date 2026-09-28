@@ -212,6 +212,28 @@ describe('EmergencyProfilePage', () => {
     )
   })
 
+  it('Should release contacts for offline use', async () => {
+    const { save } = mockHooks()
+    await renderWithSafeArea(<EmergencyProfilePage />)
+    await fireEvent(
+      screen.getByTestId('emergency-offline-contacts-switch'),
+      'valueChange',
+      true
+    )
+    await fireEvent.press(screen.getByTestId('emergency-save'))
+    expect(save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        offlineFields: ['bloodType', 'name', 'contacts'],
+      })
+    )
+  })
+
+  it('Should drop the contacts release when there are no contacts', () => {
+    expect(
+      toSaveRequest({ ...DRAFT, offlineFields: ['contacts'] }).offlineFields
+    ).toEqual([])
+  })
+
   it('Should show a save error', async () => {
     const save = jest.fn().mockRejectedValue(new Error('500'))
     mockHooks({ save, saveError: new Error('500') })

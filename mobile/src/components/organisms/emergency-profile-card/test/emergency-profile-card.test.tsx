@@ -30,7 +30,7 @@ describe('<EmergencyProfileCard/>', () => {
   it('Should render the identity', async () => {
     await render(<EmergencyProfileCard profile={PROFILE} />)
     expect(screen.getByText('Thandiwe Dlamini')).toBeTruthy()
-    expect(screen.getByText('Born 1990-04-12')).toBeTruthy()
+    expect(screen.getByText('1990-04-12')).toBeTruthy()
   })
 
   it('Should render each medical field', async () => {

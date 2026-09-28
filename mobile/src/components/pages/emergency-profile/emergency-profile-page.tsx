@@ -13,6 +13,7 @@ import {
 } from '@/hooks'
 import type {
   EmergencyFieldKey,
+  EmergencyOfflineKey,
   EmergencyProfile,
   SaveEmergencyProfileRequest,
 } from '@/services'
@@ -31,7 +32,7 @@ type Draft = {
   contacts: ContactDraft[]
   fields: Record<MedicalFieldKey, string>
   isEnabled: boolean
-  offlineFields: EmergencyFieldKey[]
+  offlineFields: EmergencyOfflineKey[]
 }
 
 const MAX_CONTACTS = 3
@@ -89,9 +90,15 @@ export const toSaveRequest = (draft: Draft): SaveEmergencyProfileRequest => {
       })),
     fields,
     isEnabled: draft.isEnabled,
-    offlineFields: draft.offlineFields.filter(
-      (key) => key === 'name' || Boolean(fields[key])
-    ),
+    offlineFields: draft.offlineFields.filter((key) => {
+      if (key === 'name') {
+        return true
+      }
+      if (key === 'contacts') {
+        return draft.contacts.some((contact) => contact.name.trim().length > 0)
+      }
+      return Boolean(fields[key])
+    }),
   }
 }
 
@@ -185,7 +192,7 @@ export const EmergencyProfilePage = () => {
   const setField = (key: MedicalFieldKey, value: string) =>
     update({ fields: { ...current.fields, [key]: value } })
 
-  const setOffline = (key: EmergencyFieldKey, isOn: boolean) =>
+  const setOffline = (key: EmergencyOfflineKey, isOn: boolean) =>
     update({
       offlineFields: isOn
         ? [...current.offlineFields.filter((item) => item !== key), key]
@@ -340,6 +347,14 @@ export const EmergencyProfilePage = () => {
                 />
               </View>
             ))}
+            {current.contacts.length > 0 ? (
+              <FieldToggleRow
+                isOn={current.offlineFields.includes('contacts')}
+                label="Show my contacts when there is no signal"
+                onToggle={(isOn) => setOffline('contacts', isOn)}
+                testID="emergency-offline-contacts"
+              />
+            ) : null}
             {current.contacts.length < MAX_CONTACTS ? (
               <Button
                 label="Add emergency contact"

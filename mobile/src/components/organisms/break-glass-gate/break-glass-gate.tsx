@@ -22,39 +22,40 @@ export const BreakGlassGate = ({
   const isTooShort = trimmed.length < MIN_REASON_LENGTH
 
   return (
-    <View className="flex-1 gap-4 px-6 py-6" testID={testID}>
-      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-danger-red/15">
-        <ShieldAlert size={26} color={colors.danger} />
+    <View className="gap-4 py-2" testID={testID}>
+      <View className="items-center gap-3 rounded-3xl border border-border-grey bg-cream-background p-6">
+        <View className="h-14 w-14 items-center justify-center rounded-2xl bg-danger-red/10">
+          <ShieldAlert size={26} color={colors.danger} />
+        </View>
+        <Text variant="h3" className="text-center text-text-primary">
+          You are opening a medical record
+        </Text>
+        <Text variant="sub-sm" className="text-center">
+          This person has not unlocked their phone for you. FlashID will record
+          your name, your institution, the time and the reason you give below,
+          and will tell the citizen and their emergency contacts that you opened
+          it
+          {isOffline ? ' as soon as this phone is back online.' : '.'}
+        </Text>
       </View>
 
-      <Text variant="h3" className="text-clean-white">
-        You are opening a medical record
-      </Text>
-
-      <Text variant="sub-sm" className="text-clean-white/70">
-        This person has not unlocked their phone for you. FlashID will record
-        your name, your institution, the time and the reason you give below, and
-        will tell the citizen and their emergency contacts that you opened it
-        {isOffline ? ' as soon as this phone is back online.' : '.'}
-      </Text>
-
       <View className="gap-2">
-        <Text variant="sub-sm" className="text-clean-white">
+        <Text variant="label" className="text-text-primary">
           Why are you opening this profile?
         </Text>
         <TextInput
           accessibilityLabel="Reason for emergency access"
-          className="min-h-[96px] rounded-2xl bg-clean-white/10 p-4 text-clean-white"
+          className="min-h-[96px] rounded-xl border border-border-grey bg-clean-white p-4 text-base text-text-primary"
           multiline
           onChangeText={setReason}
           placeholder="Unconscious patient, ambulance callout..."
-          placeholderTextColor={colors.neutralMidGrey}
+          placeholderTextColor={colors.textMuted}
           testID="break-glass-reason"
           textAlignVertical="top"
           value={reason}
         />
         {isTooShort && trimmed.length > 0 ? (
-          <Text variant="sub-sm" className="text-warning-amber">
+          <Text variant="caption" className="text-warning-amber">
             Give a little more detail — this is read by the citizen afterwards.
           </Text>
         ) : null}
@@ -70,7 +71,7 @@ export const BreakGlassGate = ({
         </Text>
       ) : null}
 
-      <View className="mt-auto gap-3">
+      <View className="gap-3 pt-2">
         <Button
           disabled={isTooShort || isSubmitting}
           isLoading={isSubmitting}

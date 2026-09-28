@@ -17,13 +17,15 @@ export type EmergencyContact = {
   relationship: string
 }
 
+export type EmergencyOfflineKey = EmergencyFieldKey | 'contacts'
+
 export type EmergencyProfile = {
   consentGivenAt: string | null
   contacts: EmergencyContact[]
   fields: Partial<Record<EmergencyFieldKey, string>>
   isEnabled: boolean
   medicalLastUpdatedAt: string | null
-  offlineFields: EmergencyFieldKey[]
+  offlineFields: EmergencyOfflineKey[]
 }
 
 export type SaveEmergencyProfileRequest = {
@@ -31,7 +33,7 @@ export type SaveEmergencyProfileRequest = {
   contacts: EmergencyContact[]
   fields: Partial<Record<EmergencyFieldKey, string>>
   isEnabled: boolean
-  offlineFields: EmergencyFieldKey[]
+  offlineFields: EmergencyOfflineKey[]
 }
 
 export type RegisterDeviceRequest = {

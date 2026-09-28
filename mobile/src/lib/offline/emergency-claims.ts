@@ -15,8 +15,26 @@ export const EMERGENCY_CLAIM_LABELS: Readonly<Record<string, string>> = {
   medical_updated_on: 'Medical information updated',
 }
 
+export const EMERGENCY_CONTACT_POSITIONS = [1, 2, 3] as const
+
+export type EmergencyContactPart = 'name' | 'phone' | 'relationship'
+
+const CONTACT_PARTS: EmergencyContactPart[] = ['name', 'relationship', 'phone']
+
+export const emergencyContactClaim = (
+  position: number,
+  part: EmergencyContactPart
+) => `contact_${position}_${part}`
+
+export const isEmergencyContactClaim = (claimName: string) =>
+  /^contact_\d+_(name|relationship|phone)$/.test(claimName)
+
+const CONTACT_CLAIMS = EMERGENCY_CONTACT_POSITIONS.flatMap((position) =>
+  CONTACT_PARTS.map((part) => emergencyContactClaim(position, part))
+)
+
 export const EMERGENCY_CLAIM_SET: ClaimSet = {
   vct: EMERGENCY_VCT,
-  allowedClaims: Object.keys(EMERGENCY_CLAIM_LABELS),
+  allowedClaims: [...Object.keys(EMERGENCY_CLAIM_LABELS), ...CONTACT_CLAIMS],
   mandatoryClaims: ['medical_updated_on'],
 }

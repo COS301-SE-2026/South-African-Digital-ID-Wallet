@@ -485,6 +485,40 @@ public class EmergencyServiceTests
     }
 
     [Fact]
+    public async Task BuildOfflineCredentialAsync_ReleasedContacts_AreIncludedInPriorityOrderWithoutEmail()
+    {
+        using var deviceKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var profile = Profile(Guid.NewGuid());
+        profile.OfflineFieldsJson = "[\"contacts\"]";
+        profile.Contacts.First().Phone = "0821234567";
+        profile.Contacts.Add(new EmergencyContact { Id = Guid.NewGuid(), Name = "Lerato", Relationship = "Mother", Priority = 0 });
+        OfflineMintSetup(profile, deviceKey);
+
+        var result = await Service().BuildOfflineCredentialAsync(Guid.NewGuid(), CancellationToken.None);
+
+        var disclosed = Disclosed(result.SdJwt);
+        Assert.Equal("Lerato", disclosed["contact_1_name"]);
+        Assert.Equal("Mother", disclosed["contact_1_relationship"]);
+        Assert.False(disclosed.ContainsKey("contact_1_phone"));
+        Assert.Equal("Sipho", disclosed["contact_2_name"]);
+        Assert.Equal("Brother", disclosed["contact_2_relationship"]);
+        Assert.Equal("0821234567", disclosed["contact_2_phone"]);
+        Assert.DoesNotContain(disclosed.Values, value => value.Contains('@'));
+    }
+
+    [Fact]
+    public async Task BuildOfflineCredentialAsync_ContactsNotReleased_AreLeftOut()
+    {
+        using var deviceKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var profile = Profile(Guid.NewGuid());
+        OfflineMintSetup(profile, deviceKey);
+
+        var result = await Service().BuildOfflineCredentialAsync(Guid.NewGuid(), CancellationToken.None);
+
+        Assert.DoesNotContain(Disclosed(result.SdJwt).Keys, key => key.StartsWith("contact_", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public async Task BuildOfflineCredentialAsync_LeavesOutFieldsTheCitizenDidNotRelease()
     {
         using var deviceKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);

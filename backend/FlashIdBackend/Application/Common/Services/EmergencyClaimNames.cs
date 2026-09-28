@@ -19,6 +19,11 @@ public static class EmergencyClaimNames
     public const string MedicalAidNumber = "medical_aid_number";
     public const string MedicalUpdatedOn = "medical_updated_on";
 
+    public const string ContactsField = "contacts";
+    public const int MaxOfflineContacts = 3;
+
+    public static string ContactClaim(int position, string part) => $"contact_{position}_{part}";
+
     public static readonly IReadOnlyList<string> MandatoryClaims = [MedicalUpdatedOn];
 
     private static readonly FrozenDictionary<string, string> FieldToClaim = new Dictionary<string, string>
