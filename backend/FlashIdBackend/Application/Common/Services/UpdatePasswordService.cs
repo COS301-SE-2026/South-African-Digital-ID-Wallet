@@ -38,6 +38,9 @@ public class UpdatePasswordService : IUpdatePasswordService
         user.PasswordHash =
             _passwordHashingProvider.HashPassword(updatePasswordDto.NewPassword);
 
+        user.TokenVersion++;
+        await _repository.RemoveTrustedDevicesAsync(user.Id);
+
         await _repository.UpdateUserAsync(user);
         await _repository.SaveChangesAsync();
 
