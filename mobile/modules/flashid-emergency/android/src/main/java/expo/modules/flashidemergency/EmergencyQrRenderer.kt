@@ -7,11 +7,11 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
-import org.json.JSONObject
+import java.security.SecureRandom
 
 object EmergencyQrRenderer {
     private const val HELP_URL = "https://flashid.co.za/e"
-    private const val CHUNK = 600
+    private val random = SecureRandom()
 
     fun onlineCodeText(handle: ByteArray, nowSeconds: Long = System.currentTimeMillis() / 1000): String {
         val signature = EmergencyKeys.sign(handle, nowSeconds)
@@ -24,21 +24,14 @@ object EmergencyQrRenderer {
 
     fun online(handle: ByteArray, sizePx: Int): Bitmap = encode(onlineCodeText(handle), sizePx)
 
-    fun offlineFrames(handle: ByteArray, bundleJson: String, sizePx: Int): List<Bitmap> {
-        val bundle = JSONObject(bundleJson)
-        val payload = bundle.getString("payload")
-        val signature = bundle.getString("signature")
+    fun newPresentationId(): String = OfflineFrames.base64Url(ByteArray(4).also { random.nextBytes(it) })
 
-        val chunks = "$payload.$signature".chunked(CHUNK)
-        val total = chunks.size + 1
+    fun offlinePayloadFrames(sdJwt: String, presentationId: String, sizePx: Int): List<Bitmap> =
+        OfflineFrames.payloadFrames(sdJwt, presentationId).map { encode(it, sizePx) }
 
-        val frames = chunks.mapIndexed { index, chunk ->
-            encode("FIDE1/$index/$total/$chunk", sizePx)
-        }
-
-        val now = System.currentTimeMillis() / 1000
-        val proof = "FIDEF1/$now/${EmergencyKeys.sign(handle, now).b64u()}"
-        return frames + encode("FIDE1/${total - 1}/$total/$proof", sizePx)
+    fun offlineKeyBindingFrame(sdJwt: String, presentationId: String, sizePx: Int): Bitmap {
+        val keyBindingJwt = OfflineFrames.keyBindingJwt(sdJwt, System.currentTimeMillis() / 1000, EmergencyKeys::signDer)
+        return encode(OfflineFrames.keyBindingFrame(presentationId, keyBindingJwt), sizePx)
     }
 
     private fun encode(text: String, sizePx: Int): Bitmap {

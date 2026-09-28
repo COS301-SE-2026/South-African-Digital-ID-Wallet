@@ -61,10 +61,14 @@ object EmergencyKeys {
             .putInt(unixSeconds.toInt())
             .array()
 
+        return signDer(message)
+    }
+
+    fun signDer(data: ByteArray): ByteArray {
         val key = keyStore().getKey(ALIAS, null) as PrivateKey
         return Signature.getInstance("SHA256withECDSA").run {
             initSign(key)
-            update(message)
+            update(data)
             sign()
         }
     }

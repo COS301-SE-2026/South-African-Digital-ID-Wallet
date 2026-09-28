@@ -13,13 +13,37 @@ class EmergencyQrActivity : AppCompatActivity() {
     private companion object {
         const val VALID_MS = 120_000L
         const val REFRESH_MS = 45_000L
-        const val FRAME_MS = 700L
+        const val FRAME_MS = 125L
+        const val KEY_BINDING_REFRESH_MS = 5_000L
     }
 
     private lateinit var binding: ActivityEmergencyQrBinding
     private var countdown: CountDownTimer? = null
     private var handle: ByteArray? = null
     private var isOfflineMode = false
+
+    private var offlineSdJwt: String? = null
+    private var presentationId: String? = null
+    private var payloadFrames: List<Bitmap> = emptyList()
+    private var offlineFrames: List<Bitmap> = emptyList()
+    private var offlineFrameIndex = 0
+
+    private val showNextFrame = object : Runnable {
+        override fun run() {
+            if (!isOfflineMode || offlineFrames.isEmpty()) return
+            binding.qr.setImageBitmap(offlineFrames[offlineFrameIndex % offlineFrames.size])
+            offlineFrameIndex++
+            binding.qr.postDelayed(this, FRAME_MS)
+        }
+    }
+
+    private val resignKeyBinding = object : Runnable {
+        override fun run() {
+            if (!isOfflineMode) return
+            signKeyBindingFrame()
+            binding.qr.postDelayed(this, KEY_BINDING_REFRESH_MS)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +82,7 @@ class EmergencyQrActivity : AppCompatActivity() {
 
     private fun render() {
         val handle = handle ?: return
+        stopOfflineAnimation()
         val size = resources.getDimensionPixelSize(R.dimen.emergency_qr_size)
 
         if (!isOfflineMode) {
@@ -67,27 +92,39 @@ class EmergencyQrActivity : AppCompatActivity() {
             return
         }
 
-        val bundle = EmergencyStore.offlineBundle(applicationContext)
-        if (bundle == null) {
+        binding.offlineToggle.setText(R.string.emergency_back_online)
+
+        val sdJwt = EmergencyStore.offlineBundle(applicationContext)?.takeIf(OfflineFrames::isSdJwt)
+        if (sdJwt == null) {
             binding.caption.setText(R.string.emergency_no_offline_bundle)
             return
         }
+
         binding.caption.setText(R.string.emergency_caption_offline)
-        binding.offlineToggle.setText(R.string.emergency_back_online)
-        animateFrames(EmergencyQrRenderer.offlineFrames(handle, bundle, size))
+        val id = EmergencyQrRenderer.newPresentationId()
+        offlineSdJwt = sdJwt
+        presentationId = id
+        payloadFrames = EmergencyQrRenderer.offlinePayloadFrames(sdJwt, id, size)
+        offlineFrameIndex = 0
+        signKeyBindingFrame()
+
+        binding.qr.post(showNextFrame)
+        binding.qr.postDelayed(resignKeyBinding, KEY_BINDING_REFRESH_MS)
     }
 
-    private fun animateFrames(frames: List<Bitmap>) {
-        var index = 0
-        val runnable = object : Runnable {
-            override fun run() {
-                if (!isOfflineMode) return
-                binding.qr.setImageBitmap(frames[index % frames.size])
-                index++
-                binding.qr.postDelayed(this, FRAME_MS)
-            }
-        }
-        binding.qr.post(runnable)
+    private fun signKeyBindingFrame() {
+        val sdJwt = offlineSdJwt ?: return
+        val id = presentationId ?: return
+        val size = resources.getDimensionPixelSize(R.dimen.emergency_qr_size)
+        offlineFrames = OfflineFrames.interleave(
+            payloadFrames,
+            EmergencyQrRenderer.offlineKeyBindingFrame(sdJwt, id, size),
+        )
+    }
+
+    private fun stopOfflineAnimation() {
+        binding.qr.removeCallbacks(showNextFrame)
+        binding.qr.removeCallbacks(resignKeyBinding)
     }
 
     private fun startCountdown() {
@@ -107,6 +144,7 @@ class EmergencyQrActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        stopOfflineAnimation()
         countdown?.cancel()
         super.onDestroy()
     }
