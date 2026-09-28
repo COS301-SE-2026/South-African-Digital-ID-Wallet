@@ -1,0 +1,26 @@
+mobile/src/lib/offline/emergency-claims.ts
+  h_712d174fc3f309 1-22
+mobile/src/lib/offline/emergency-display.ts
+  h_712d174fc3f309 1-30
+mobile/src/lib/offline/offline-cache.ts
+  h_712d174fc3f309 26-33,42
+mobile/src/lib/offline/offline-scan-display.ts
+  h_712d174fc3f309 63-64
+mobile/src/lib/offline/test/emergency-display.test.ts
+  h_712d174fc3f309 1-43
+mobile/src/lib/offline/test/emergency-verify.test.ts
+  h_712d174fc3f309 1-182
+mobile/src/lib/offline/verify.ts
+  h_712d174fc3f309 5,23,46-51,57,359-368,370-371,375,379-386,417-418,420-422,552,558
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c17afdb2ecde21cf1fd0018973ccac54f3d83283",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

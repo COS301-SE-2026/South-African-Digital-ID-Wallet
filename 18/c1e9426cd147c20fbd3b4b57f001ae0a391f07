@@ -1,0 +1,14 @@
+web/src/components/pages/verify-certified-copy/test/verify-certified-copy-page.test.tsx
+  h_0aff3b71f739b1 1-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "18c1e9426cd147c20fbd3b4b57f001ae0a391f07",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

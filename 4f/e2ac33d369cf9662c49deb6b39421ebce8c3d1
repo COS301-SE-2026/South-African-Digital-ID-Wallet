@@ -1,0 +1,14 @@
+web/src/services/fraud-detection-service/types.ts
+  h_0aff3b71f739b1 1-108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4fe2ac33d369cf9662c49deb6b39421ebce8c3d1",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

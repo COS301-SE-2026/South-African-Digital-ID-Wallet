@@ -1,0 +1,16 @@
+web/src/components/molecules/dashboard-modal/types.ts
+  h_0aff3b71f739b1 1-9
+web/src/components/organisms/fraud-alert-flow/types.ts
+  h_0aff3b71f739b1 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "80717d8e32cb23e3b0f3c6fcc6591199cda00f83",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

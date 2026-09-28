@@ -1,0 +1,28 @@
+mobile/src/components/molecules/secure-action-option/test/secure-action-option.test.tsx
+  h_99fca60b892ff4 1-50
+mobile/src/components/molecules/index.ts
+  h_99fca60b892ff4 18-19
+mobile/src/components/molecules/security-detail-row/types.ts
+  h_99fca60b892ff4 1-9
+mobile/src/components/molecules/secure-action-option/types.ts
+  h_99fca60b892ff4 1-11
+mobile/src/components/molecules/secure-action-option/index.ts
+  h_99fca60b892ff4 1-2
+mobile/src/components/molecules/security-detail-row/index.ts
+  h_99fca60b892ff4 1-2
+mobile/src/components/molecules/security-detail-row/security-detail-row.tsx
+  h_99fca60b892ff4 1-24
+mobile/src/components/molecules/secure-action-option/secure-action-option.tsx
+  h_99fca60b892ff4 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2540ba05f4fbd7b6411ae8ec3a61f17e19fd77d0",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

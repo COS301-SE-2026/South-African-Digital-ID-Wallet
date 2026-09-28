@@ -1,0 +1,18 @@
+web/src/services/fraud-detection-service/fraud-detection-urls.ts
+  h_0aff3b71f739b1 1-15
+web/src/services/index.ts
+  h_0aff3b71f739b1 7
+web/src/services/fraud-detection-service/index.ts
+  h_0aff3b71f739b1 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "05a9411c8d07c28d959780875b62f4254e9cf055",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

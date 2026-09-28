@@ -1,0 +1,41 @@
+mobile/src/components/organisms/security-alert-banner/types.ts
+  h_99fca60b892ff4 1-7
+mobile/src/components/organisms/security-activity-list/types.ts
+  h_99fca60b892ff4 1-8
+mobile/src/components/organisms/security-activity-list/security-activity-list.tsx
+  h_99fca60b892ff4 1-49
+  h_99fca60b892ff4 50-53
+mobile/src/components/organisms/travel-route-card/index.ts
+  h_99fca60b892ff4 1-2
+mobile/src/components/organisms/security-alert-banner/index.ts
+  h_99fca60b892ff4 1-2
+mobile/src/components/organisms/index.ts
+  h_99fca60b892ff4 34-37
+mobile/src/components/organisms/travel-route-card/types.ts
+  h_99fca60b892ff4 1-5
+mobile/src/components/organisms/security-alert-banner/security-alert-banner.tsx
+  h_99fca60b892ff4 1-38
+mobile/src/components/organisms/travel-route-card/travel-route-card.tsx
+  h_99fca60b892ff4 1-39
+  h_99fca60b892ff4 40-46
+mobile/src/components/organisms/security-alert-card/security-alert-card.tsx
+  h_99fca60b892ff4 1-43
+  h_99fca60b892ff4 44-46
+mobile/src/components/organisms/security-alert-card/types.ts
+  h_99fca60b892ff4 1-3
+mobile/src/components/organisms/security-activity-list/index.ts
+  h_99fca60b892ff4 1-2
+mobile/src/components/organisms/security-alert-card/index.ts
+  h_99fca60b892ff4 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "7ec5640984adeabb7e68fd1a8b292520fd0cabdd",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

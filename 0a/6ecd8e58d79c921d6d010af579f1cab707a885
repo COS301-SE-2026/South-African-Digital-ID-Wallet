@@ -1,0 +1,16 @@
+mobile/src/hooks/use-security.ts
+  h_99fca60b892ff4 1-84
+mobile/src/hooks/index.ts
+  h_99fca60b892ff4 20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0a6ecd8e58d79c921d6d010af579f1cab707a885",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

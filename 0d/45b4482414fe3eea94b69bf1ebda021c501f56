@@ -1,0 +1,22 @@
+backend/FlashIdBackend/tests/EmergencyRevocationIntegrationTests.cs
+  h_712d174fc3f309 157-188
+mobile/src/app/citizen/emergency.tsx
+  h_712d174fc3f309 1-8
+mobile/src/components/organisms/break-glass-gate/break-glass-gate.tsx
+  h_712d174fc3f309 15,37-38
+mobile/src/components/organisms/break-glass-gate/test/break-glass-gate.test.tsx
+  h_712d174fc3f309 59-65
+mobile/src/components/organisms/break-glass-gate/types.ts
+  h_712d174fc3f309 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0d45b4482414fe3eea94b69bf1ebda021c501f56",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

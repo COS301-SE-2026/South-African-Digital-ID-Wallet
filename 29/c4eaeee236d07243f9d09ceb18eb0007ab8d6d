@@ -1,0 +1,25 @@
+mobile/src/app/citizen/security/_layout.tsx
+  h_99fca60b892ff4 1-8
+mobile/src/app/citizen/security/[alertId]/secured.tsx
+  h_99fca60b892ff4 1-8
+mobile/src/app/citizen/security/[alertId]/secure.tsx
+  h_99fca60b892ff4 1-8
+mobile/src/components/pages/citizen-home/citizen-home-page.tsx
+  h_99fca60b892ff4 10,12,16,19-21,40,46-47,50,70-77
+  h_99fca60b892ff4 41,44-45,48
+mobile/src/app/citizen/security/index.tsx
+  h_99fca60b892ff4 1-5
+mobile/src/app/citizen/security/[alertId]/index.tsx
+  h_99fca60b892ff4 1-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "29c4eaeee236d07243f9d09ceb18eb0007ab8d6d",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

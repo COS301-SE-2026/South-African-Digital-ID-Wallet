@@ -1,0 +1,32 @@
+backend/FlashIdBackend/k6/nfr2-2-auth.js
+  h_99fca60b892ff4 24
+backend/FlashIdBackend/k6/nfr-rate-limit.js
+  h_99fca60b892ff4 8
+backend/FlashIdBackend/k6/nfr-cold-start.js
+  h_99fca60b892ff4 8
+backend/FlashIdBackend/k6/read-throughput.js
+  h_99fca60b892ff4 24
+backend/FlashIdBackend/Infrastructure/Data/DbSeeder.cs
+  h_99fca60b892ff4 30-31,135,833,1054-1059
+backend/FlashIdBackend/k6/nfr2-3-credentials-and-qr.js
+  h_99fca60b892ff4 30
+docs/demo4/SAS-v4.md
+  h_99fca60b892ff4 42,1460-1563
+docs/demo4/SRS-v4.md
+  h_99fca60b892ff4 215,226-237,260-262,285-287
+backend/FlashIdBackend/k6/nfr2-4-qr-verification.js
+  h_99fca60b892ff4 29
+backend/FlashIdBackend/k6/nfr-expiry-batch-timing.js
+  h_99fca60b892ff4 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "6ec1da5eff13e68317ab3156ae10d52374a38f74",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
