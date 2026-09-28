@@ -1,0 +1,38 @@
+backend/FlashIdBackend/Application/Common/Services/EmergencyClaimNames.cs
+  h_712d174fc3f309 22-26
+backend/FlashIdBackend/Application/Common/Services/EmergencyService.cs
+  h_712d174fc3f309 425-447
+backend/FlashIdBackend/tests/EmergencyServiceTests.cs
+  h_712d174fc3f309 487-520
+mobile/src/components/organisms/break-glass-gate/break-glass-gate.tsx
+  h_712d174fc3f309 25-39,43,48,52,58,74
+mobile/src/components/organisms/emergency-profile-card/emergency-profile-card.tsx
+  h_712d174fc3f309 1,4-5,16-17,19-29,32,34-51,53-87,89-103
+mobile/src/components/organisms/emergency-profile-card/test/emergency-profile-card.test.tsx
+  h_712d174fc3f309 33
+mobile/src/components/pages/emergency-profile/emergency-profile-page.tsx
+  h_712d174fc3f309 16,35,93-101,195,350-357
+mobile/src/components/pages/emergency-profile/test/emergency-profile-page.test.tsx
+  h_712d174fc3f309 215-236
+mobile/src/components/pages/emergency-scan/emergency-scan-page.tsx
+  h_712d174fc3f309 4,10,77-78,80,89-95,102,118
+mobile/src/lib/offline/emergency-claims.ts
+  h_712d174fc3f309 18-35,38
+mobile/src/lib/offline/emergency-display.ts
+  h_712d174fc3f309 3-8,13-29,35,44-47
+mobile/src/lib/offline/test/emergency-display.test.ts
+  h_712d174fc3f309 24-54
+mobile/src/services/emergency-service/types.ts
+  h_712d174fc3f309 20-21,28,36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "59d133af822ec6d091cd8da16d2b452d13ce5e26",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
