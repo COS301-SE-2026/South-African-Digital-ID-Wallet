@@ -4,5 +4,6 @@ export type VerifyCertifiedCopySearchParams = {
   id?: string
 }
 export type VerifyCertifiedCopyPageProps = {
-  searchParams: Promise<VerifyCertifiedCopySearchParams>
+  verificationToken?: string
+  searchParams?: Promise<VerifyCertifiedCopySearchParams>
 }
