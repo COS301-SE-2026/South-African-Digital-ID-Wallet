@@ -1,0 +1,18 @@
+backend/FlashIdBackend/Presentation/Middleware/CsrfProtectionMiddleware.cs
+  h_712d174fc3f309 66-70
+backend/FlashIdBackend/tests/CsrfProtectionMiddlewareTests.cs
+  h_712d174fc3f309 157-179
+docs/demo4/security/csrf-protection.md
+  h_712d174fc3f309 7,56-57,88,104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2a11f39934d69aec1fb00e61f051554003a43a96",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
