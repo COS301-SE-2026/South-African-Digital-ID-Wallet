@@ -304,4 +304,51 @@ public class OnboardingServiceTest
         await Assert.ThrowsAsync<ArgumentException>(() => service.VerifyCitizenIdentityAsync(saId));
         Assert.Empty(gateway.RequestedSaIds);
     }
+
+    [Fact]
+    public async Task OnboardCitizen_WhenCitizenIsUnder16_ThrowsAndSavesNothing()
+    {
+        using var context = CreateContext();
+        var record = KnownRecord();
+        // 15 years old
+        record.DateOfBirth = DateTime.UtcNow.Date.AddYears(-15);
+        var gateway = new FakeGovernmentRegistryGateway { CitizenToReturn = record };
+        var emailSender = new FakeEmailSenderProvider();
+        var service = CreateService(context, gateway, emailSender);
+
+        await Assert.ThrowsAsync<CitizenUnderageException>(() =>
+            service.OnboardCitizenAsync(ValidRequest(), Guid.NewGuid(), TestIpAddress));
+
+        Assert.Empty(context.Citizens);
+        Assert.Empty(context.CitizenActivations);
+        Assert.Equal(0, emailSender.SendCount);
+    }
+
+    [Fact]
+    public async Task OnboardCitizen_WhenCitizenTurned16Recently_Succeeds()
+    {
+        using var context = CreateContext();
+        var record = KnownRecord();
+        // Two days past the 16th birthday, so time zones cannot tip it under
+        record.DateOfBirth = DateTime.UtcNow.Date.AddYears(-16).AddDays(-2);
+        var gateway = new FakeGovernmentRegistryGateway { CitizenToReturn = record };
+        var service = CreateService(context, gateway, new FakeEmailSenderProvider());
+
+        var response = await service.OnboardCitizenAsync(ValidRequest(), Guid.NewGuid(), TestIpAddress);
+
+        Assert.Equal("Pending", response.Status);
+    }
+
+    [Fact]
+    public async Task VerifyCitizenIdentity_WhenCitizenIsUnder16_Throws()
+    {
+        using var context = CreateContext();
+        var record = KnownRecord();
+        record.DateOfBirth = DateTime.UtcNow.Date.AddYears(-10);
+        var gateway = new FakeGovernmentRegistryGateway { CitizenToReturn = record };
+        var service = CreateService(context, gateway, new FakeEmailSenderProvider());
+
+        await Assert.ThrowsAsync<CitizenUnderageException>(() =>
+            service.VerifyCitizenIdentityAsync(KnownSaId));
+    }
 }
