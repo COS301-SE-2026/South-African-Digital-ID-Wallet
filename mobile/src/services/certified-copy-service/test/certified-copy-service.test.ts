@@ -33,10 +33,12 @@ describe('certifiedCopyService', () => {
           "attachment; filename=FlashID-Certified-Copy.pdf; filename*=UTF-8''FlashID-Certified-Copy.pdf",
       },
     })
-    await certifiedCopyService.generate('c-1')
+    await certifiedCopyService.generate('c-1', 'IdentityDocument')
     expect(postMock).toHaveBeenCalledWith(
       '/api/certified-copies/credentials/c-1',
-      undefined,
+      {
+        credentialType: 'IdentityDocument',
+      },
       {
         headers: { Accept: 'application/pdf' },
         responseType: 'arraybuffer',
@@ -49,33 +51,41 @@ describe('certifiedCopyService', () => {
       data: new Uint8Array([37, 80, 68, 70]).buffer,
       headers: { 'content-disposition': 'attachment; filename="copy-1.pdf"' },
     })
-    const result = await certifiedCopyService.generate('c-1')
+    const result = await certifiedCopyService.generate(
+      'c-1',
+      'IdentityDocument'
+    )
     expect(Array.from(result.bytes)).toEqual([37, 80, 68, 70])
     expect(result.fileName).toBe('copy-1.pdf')
   })
 
   it('Should fall back to a default file name without a disposition header', async () => {
     postMock.mockResolvedValue({ data: new ArrayBuffer(0), headers: {} })
-    const result = await certifiedCopyService.generate('c-1')
+    const result = await certifiedCopyService.generate(
+      'c-1',
+      'IdentityDocument'
+    )
     expect(result.fileName).toBe('certified-copy.pdf')
     expect(result.bytes).toHaveLength(0)
   })
 
   it('Should encode the credential id in the path', async () => {
     postMock.mockResolvedValue({ data: new ArrayBuffer(0), headers: {} })
-    await certifiedCopyService.generate('a/b c?')
+    await certifiedCopyService.generate('a/b c?', 'DriversLicense')
     expect(postMock).toHaveBeenCalledWith(
       '/api/certified-copies/credentials/a%2Fb%20c%3F',
-      undefined,
+      {
+        credentialType: 'Driverslicense',
+      },
       expect.any(Object)
     )
   })
 
   it('Should propagate transport failures', async () => {
     postMock.mockRejectedValue(new Error('network down'))
-    await expect(certifiedCopyService.generate('c-1')).rejects.toThrow(
-      'network down'
-    )
+    await expect(
+      certifiedCopyService.generate('c-1', 'IdentityDocument')
+    ).rejects.toThrow('network down')
   })
 })
 
