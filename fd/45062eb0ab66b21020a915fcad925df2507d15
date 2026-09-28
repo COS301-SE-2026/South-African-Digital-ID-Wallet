@@ -1,0 +1,50 @@
+web/src/app/verify-certified-copy/page.tsx
+  h_0aff3b71f739b1 1-14
+web/src/components/molecules/certified-copy-verification-progress/test/certified-copy-verification-progress.test.tsx
+  h_0aff3b71f739b1 1-61
+web/src/components/molecules/certified-copy-verification/test/certified-copy-verification.test.tsx
+  h_0aff3b71f739b1 1-145
+web/src/components/organisms/invalid-certified-copy/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/organisms/invalid-certified-copy/invalid-certified-copy.tsx
+  h_0aff3b71f739b1 1-63
+web/src/components/organisms/invalid-certified-copy/test/invalid-certified-copy.test.tsx
+  h_0aff3b71f739b1 1-35
+web/src/components/organisms/invalid-certified-copy/types.ts
+  h_0aff3b71f739b1 1
+web/src/components/organisms/public-certified-copy-frame/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/organisms/public-certified-copy-frame/public-certified-copy-frame.tsx
+  h_0aff3b71f739b1 1-30
+web/src/components/organisms/public-certified-copy-frame/test/public-certified-copy-frame.test.tsx
+  h_0aff3b71f739b1 1-37
+web/src/components/organisms/public-certified-copy-frame/types.ts
+  h_0aff3b71f739b1 1-4
+web/src/components/organisms/valid-certified-copy/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/organisms/valid-certified-copy/test/valid-certified-copy.test.tsx
+  h_0aff3b71f739b1 1-50
+web/src/components/organisms/valid-certified-copy/types.ts
+  h_0aff3b71f739b1 1-11
+web/src/components/organisms/valid-certified-copy/valid-certified-copy.tsx
+  h_0aff3b71f739b1 1-103
+web/src/components/pages/verify-certified-copy/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/pages/verify-certified-copy/test/verify-certified-copy-page.test.tsx
+  h_0aff3b71f739b1 1-65
+web/src/components/pages/verify-certified-copy/types.ts
+  h_0aff3b71f739b1 1-8
+web/src/components/pages/verify-certified-copy/verify-certified-copy.tsx
+  h_0aff3b71f739b1 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "fd45062eb0ab66b21020a915fcad925df2507d15",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
