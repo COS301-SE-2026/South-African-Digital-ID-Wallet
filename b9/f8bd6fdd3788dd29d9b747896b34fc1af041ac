@@ -1,0 +1,19 @@
+backend/FlashIdBackend/Application/Common/Services/OnboardingService.cs
+  h_99fca60b892ff4 49-51,61-72,106-108
+backend/FlashIdBackend/Application/Features/Onboarding/Exceptions/OnboardingExceptions.cs
+  h_99fca60b892ff4 42-46
+  h_99fca60b892ff4 41
+backend/FlashIdBackend/Presentation/ExceptionHandling/GlobalExceptionHandler.cs
+  h_99fca60b892ff4 33-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b9f8bd6fdd3788dd29d9b747896b34fc1af041ac",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
