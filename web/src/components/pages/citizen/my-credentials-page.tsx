@@ -1,5 +1,5 @@
 'use client'
-import { FC, useEffect, useMemo, useState } from 'react'
+import { FC, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { Text } from '@/components/atoms'
@@ -95,7 +95,6 @@ export const MyCredentialsPage: FC = () => {
               {views.map((view) => {
                 const Icon = view.icon
                 const isActive = view.id === selected?.id
-                const credential = data?.find((item) => item.id === view.id)
 
                 return (
                   <div

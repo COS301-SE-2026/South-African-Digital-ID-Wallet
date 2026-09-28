@@ -10,9 +10,8 @@ export function CertifiedCopyGenerated({
   onBack,
 }: Readonly<CertifiedCopyGeneratedProps>) {
   return (
-    <div
+    <dialog
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 px-4 py-6 sm:px-6"
-      role="dialog"
       aria-modal="true"
       aria-label="Certified copy generated"
     >
@@ -72,6 +71,6 @@ export function CertifiedCopyGenerated({
           Back to My Credentials
         </Button>
       </div>
-    </div>
+    </dialog>
   )
 }
