@@ -101,7 +101,9 @@ public class CertifiedCredentialCopiesController : ControllerBase
     [AllowAnonymous]
     [HttpPost("verify-document/{verificationToken}")]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> VerifyCertifiedCopyDocument(string verificationToken, IFormFile document)
+    public async Task<IActionResult> VerifyCertifiedCopyDocument(
+        string verificationToken,
+        [FromForm(Name = "document")] IFormFile document)
     {
         try
         {
@@ -112,21 +114,17 @@ public class CertifiedCredentialCopiesController : ControllerBase
                     message = "A PDF document is required."
                 });
             }
-
             if (document.Length > MaxPdfFileSize)
             {
                 return BadRequest(new
                 {
-                    message = "The PDF document exceeds the maximum allowed size of 10 MB."
+                    message =
+                        "The PDF document exceeds the maximum allowed size of 10 MB."
                 });
             }
-
             await using var memoryStream = new MemoryStream();
-
             await document.CopyToAsync(memoryStream);
-
             var documentBytes = memoryStream.ToArray();
-
             var hasPdfSignature =
                 documentBytes.Length >= 5 &&
                 documentBytes[0] == (byte)'%' &&
@@ -134,7 +132,6 @@ public class CertifiedCredentialCopiesController : ControllerBase
                 documentBytes[2] == (byte)'D' &&
                 documentBytes[3] == (byte)'F' &&
                 documentBytes[4] == (byte)'-';
-
             if (!hasPdfSignature)
             {
                 return BadRequest(new
@@ -142,9 +139,10 @@ public class CertifiedCredentialCopiesController : ControllerBase
                     message = "Only PDF documents are supported."
                 });
             }
-
-            var result = await _certifiedCopyService.VerifyDocumentAsync(verificationToken, documentBytes);
-
+            var result =
+                await _certifiedCopyService.VerifyDocumentAsync(
+                    verificationToken,
+                    documentBytes);
             return Ok(result);
         }
         catch (ArgumentException ex)
@@ -156,4 +154,58 @@ public class CertifiedCredentialCopiesController : ControllerBase
         }
     }
 
+    [AllowAnonymous]
+    [HttpPost("verify-document")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> VerifyCertifiedCopyDocumentWithoutToken(
+        [FromForm(Name = "document")] IFormFile document)
+    {
+        try
+        {
+            if (document is null || document.Length == 0)
+            {
+                return BadRequest(new
+                {
+                    message = "A PDF document is required."
+                });
+            }
+            if (document.Length > MaxPdfFileSize)
+            {
+                return BadRequest(new
+                {
+                    message =
+                        "The PDF document exceeds the maximum allowed size of 10 MB."
+                });
+            }
+
+            await using var memoryStream = new MemoryStream();
+            await document.CopyToAsync(memoryStream);
+            var documentBytes = memoryStream.ToArray();
+            var hasPdfSignature =
+                documentBytes.Length >= 5 &&
+                documentBytes[0] == (byte)'%' &&
+                documentBytes[1] == (byte)'P' &&
+                documentBytes[2] == (byte)'D' &&
+                documentBytes[3] == (byte)'F' &&
+                documentBytes[4] == (byte)'-';
+            if (!hasPdfSignature)
+            {
+                return BadRequest(new
+                {
+                    message = "Only PDF documents are supported."
+                });
+            }
+            var result =
+                await _certifiedCopyService.VerifyDocumentAsync(documentBytes);
+
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
+        }
+    }
 }

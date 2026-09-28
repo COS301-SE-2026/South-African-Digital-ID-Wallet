@@ -16,4 +16,7 @@ public interface ICertifiedCredentialCopyService
     Task<VerifyCertifiedCopyDocumentResponseDto> VerifyDocumentAsync(
         string verificationToken,
         byte[] documentBytes);
+
+    Task<VerifyCertifiedCopyDocumentResponseDto> VerifyDocumentAsync(
+        byte[] documentBytes);
 }
