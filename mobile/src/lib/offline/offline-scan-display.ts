@@ -60,6 +60,8 @@ const FAILURE_MESSAGES: Readonly<Record<VerificationFailureCode, string>> = {
     'This code has expired. Ask the citizen to show it again.',
   STALE_TRUST_DATA:
     'Verification data on this phone is missing or over 7 days old. Connect to update it.',
+  EMERGENCY_CODE:
+    'This is an emergency medical code. Open Emergency scan to read it.',
 }
 
 export const describeVerificationFailure = (

@@ -23,6 +23,14 @@ export type OfflineVerification = {
   verifiedAt: number
 }
 
+export type PendingEmergencyAccess = {
+  id: string
+  responderId: string
+  revocationIndex: number
+  justification: string
+  accessedAt: number
+}
+
 export type OfflineCache = {
   // One package per credential. A citizen holds an ID and a licence, and presenting the wrong one
   // would show a verifier a different credential from the one the citizen chose.
@@ -31,6 +39,7 @@ export type OfflineCache = {
   savedAt: number
   // Optional, so caches written before audit sync still read without a version bump.
   pendingVerifications?: readonly OfflineVerification[]
+  pendingEmergencyAccesses?: readonly PendingEmergencyAccess[]
 }
 
 const CACHE_KEY_NAME = 'flashid.offline.cache-key'
