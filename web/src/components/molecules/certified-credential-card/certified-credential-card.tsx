@@ -14,7 +14,8 @@ const getReference = (credential: CredentialResponse) =>
   credential.identityDocument?.idNumber ??
   credential.driversLicense?.licenseNumber ??
   'Not available'
-const getReferenceLabel = (credential: CredentialResponse) => credential.type === 'DriversLicense' ? 'License number' : 'ID number'
+const getReferenceLabel = (credential: CredentialResponse) =>
+  credential.type === 'DriversLicense' ? 'License number' : 'ID number'
 const getExpiryDate = (credential: CredentialResponse) =>
   credential.driversLicense?.expiryDate
     ? formatDate(credential.driversLicense.expiryDate)
@@ -47,14 +48,20 @@ export function CertifiedCredentialCard({
               </Text>
             </div>
           </div>
-          <StatusPill intent={credential.status === 'Active' ? 'active' : 'inactive'} className="shrink-0 px-3 py-1 text-xs">
+          <StatusPill
+            intent={credential.status === 'Active' ? 'active' : 'inactive'}
+            className="shrink-0 px-3 py-1 text-xs"
+          >
             {credential.status}
           </StatusPill>
         </div>
         <div className="mt-5 grid grid-cols-3 gap-3 border-t border-border-grey pt-4">
           <div className="min-w-0">
             <Text variant="caption">{getReferenceLabel(credential)}</Text>
-            <Text variant="sub-sm" className="mt-1 truncate font-semibold text-deep-green">
+            <Text
+              variant="sub-sm"
+              className="mt-1 truncate font-semibold text-deep-green"
+            >
               {getReference(credential)}
             </Text>
           </div>

@@ -1,10 +1,4 @@
-import {
-  ArrowLeft,
-  Check,
-  Download,
-  ExternalLink,
-  Mail,
-} from 'lucide-react'
+import { ArrowLeft, Check, Download, ExternalLink, Mail } from 'lucide-react'
 import { Button, Text } from '@/components/atoms'
 import type { CertifiedCopyGeneratedProps } from './types'
 

@@ -26,7 +26,9 @@ export const VerifyCertifiedCopyPage: FC = () => {
       return
     }
 
-    setCurrentStep(3)
+    const thirdStepTimer = window.setTimeout(() => {
+      setCurrentStep(3)
+    }, 300)
 
     const fourthStepTimer = window.setTimeout(() => {
       setCurrentStep(4)
@@ -41,6 +43,7 @@ export const VerifyCertifiedCopyPage: FC = () => {
     }, 3000)
 
     return () => {
+      window.clearTimeout(thirdStepTimer)
       window.clearTimeout(fourthStepTimer)
       window.clearTimeout(fifthStepTimer)
       window.clearTimeout(resultTimer)

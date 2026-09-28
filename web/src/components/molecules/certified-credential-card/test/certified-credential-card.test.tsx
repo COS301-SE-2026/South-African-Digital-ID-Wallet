@@ -51,9 +51,7 @@ describe('CertifiedCredentialCard', () => {
   it('calls onViewCredential when View Credential is clicked', async () => {
     const user = userEvent.setup()
     renderCard()
-    await user.click(
-      screen.getByRole('button', { name: /view credential/i })
-    )
+    await user.click(screen.getByRole('button', { name: /view credential/i }))
     expect(onViewCredential).toHaveBeenCalledTimes(1)
     expect(onViewCredential).toHaveBeenCalledWith(credential)
   })

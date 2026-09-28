@@ -19,7 +19,8 @@ export const MyCredentialsPage: FC = () => {
   const searchParams = useSearchParams()
   const preselected = searchParams.get('selected')
   const [selectedId, setSelectedId] = useState<string | null>(preselected)
-  const [selectedCredential, setSelectedCredential] = useState<CredentialResponse | null>(null)
+  const [selectedCredential, setSelectedCredential] =
+    useState<CredentialResponse | null>(null)
   const [copyModal, setCopyModal] = useState<CopyModalState>(null)
   const [currentStep, setCurrentStep] = useState(1)
   const [generatedAt, setGeneratedAt] = useState('')
@@ -29,13 +30,14 @@ export const MyCredentialsPage: FC = () => {
   })
   const views = useMemo(() => (data ?? []).map(toCredentialView), [data])
   const selected = views.find((view) => view.id === selectedId) ?? views[0]
-  const selectedResponse = data?.find((credential) => credential.id === selected?.id) ?? null
+  const selectedResponse =
+    data?.find((credential) => credential.id === selected?.id) ?? null
 
   useEffect(() => {
     if (copyModal !== 'progress' || !selectedCredential) {
       return
     }
-    setCurrentStep(1)
+    //setCurrentStep(1)
     const stepTwoTimer = window.setTimeout(() => {
       setCurrentStep(2)
     }, 850)
@@ -80,17 +82,16 @@ export const MyCredentialsPage: FC = () => {
               {views.map((view) => {
                 const Icon = view.icon
                 const isActive = view.id === selected?.id
-                const credential = data?.find(
-                  (item) => item.id === view.id
-                )
+                const credential = data?.find((item) => item.id === view.id)
 
                 return (
                   <div
                     key={view.id}
-                    className={`rounded-2xl border bg-card p-4 transition ${isActive
+                    className={`rounded-2xl border bg-card p-4 transition ${
+                      isActive
                         ? 'border-deep-green shadow-sm'
                         : 'hover:border-deep-green'
-                      }`}
+                    }`}
                   >
                     <button
                       type="button"
@@ -108,11 +109,7 @@ export const MyCredentialsPage: FC = () => {
                         >
                           {view.title}
                         </Text>
-                        <Text
-                          as="p"
-                          variant="sub-sm"
-                          className="truncate"
-                        >
+                        <Text as="p" variant="sub-sm" className="truncate">
                           {view.issuer}
                         </Text>
                       </div>
@@ -136,13 +133,13 @@ export const MyCredentialsPage: FC = () => {
       {copyModal === 'progress' && (
         <GenCopyProgress currentStep={currentStep} />
       )}
-{copyModal === 'generated' && selectedCredential && (
-  <CertifiedCopyGenerated
-    credential={selectedCredential}
-    generatedAt={generatedAt}
-    onBack={closeCopyModal}
-  />
-)}
+      {copyModal === 'generated' && selectedCredential && (
+        <CertifiedCopyGenerated
+          credential={selectedCredential}
+          generatedAt={generatedAt}
+          onBack={closeCopyModal}
+        />
+      )}
     </main>
   )
 }

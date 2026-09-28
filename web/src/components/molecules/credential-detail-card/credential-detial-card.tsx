@@ -13,9 +13,7 @@ export const CredentialDetailCard: FC<CredentialDetailCardProps> = ({
 }) => {
   const Icon = credential.icon
   const [isShareOpen, setIsShareOpen] = useState(false)
-  const [shareStep, setShareStep] = useState<'disclosure' | 'qr'>(
-    'disclosure'
-  )
+  const [shareStep, setShareStep] = useState<'disclosure' | 'qr'>('disclosure')
 
   const [selection, setSelection] = useState<QrDisclosureSelection>(() => ({
     credentialId: credential.id,
