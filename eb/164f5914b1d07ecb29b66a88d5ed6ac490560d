@@ -1,0 +1,14 @@
+government-registry/GovernmentRegistry/Infrastructure/Data/DbSeeder.cs
+  h_99fca60b892ff4 21-30,32-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "eb164f5914b1d07ecb29b66a88d5ed6ac490560d",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
