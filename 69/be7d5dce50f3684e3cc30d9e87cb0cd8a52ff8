@@ -1,0 +1,14 @@
+web/src/components/molecules/certified-copy-verification-progress/test/certified-copy-verification-progress.test.tsx
+  h_0aff3b71f739b1 1-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "69be7d5dce50f3684e3cc30d9e87cb0cd8a52ff8",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
