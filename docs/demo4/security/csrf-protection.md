@@ -15,12 +15,14 @@ Our `access_token` cookie is `HttpOnly`, which is good and correct, but it solve
 | XSS (script reads the JWT) | HttpOnly cookie | Yes |
 | CSRF (forged request uses the JWT cookie) | SameSite + CSRF token | Only partial |
 
-Our `SameSite` setting (in `AuthCookies.cs`) changes per environment:
+Before this change, our `SameSite` setting changed per environment:
 
 - Development: `SameSite=Lax`, which already blocks most cross-site POST/PUT/PATCH/DELETE attempts.
 - Everywhere else: `SameSite=None`, which means the browser attaches the cookie to cross-site requests too, so there is no built-in CSRF protection at all.
 
-So outside development, before this change, any malicious page could have silently triggered a credential revoke, an account change or a logout just by getting a logged-in user to load it.
+So outside development, any malicious page could have silently triggered a credential revoke, an account change or a logout just by getting a logged-in user to load it.
+
+`AuthCookies.cs` now sets `SameSite=Lax` on both `access_token` and `csrf_token` in every environment. This is safe because the browser only ever talks to our own origin (see below), and it gives us two layers: the browser won't send the cookies on cross-site POST/PUT/PATCH/DELETE requests at all, and if that is ever bypassed (an older browser, a misconfiguration), the CSRF token check still rejects the request.
 
 ### How the browser reaches the API
 
