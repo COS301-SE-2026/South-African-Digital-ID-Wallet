@@ -164,6 +164,12 @@ public static class DependencyInjection
         services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
         services.AddScoped<IFraudDetectionRepository, FraudDetectionRepository>();
 
+        services.AddScoped<IEmergencyRepository, EmergencyRepository>();
+        services.AddSingleton<EmergencyNotificationQueue>();
+        services.AddSingleton<IEmergencyNotificationQueue>(sp => sp.GetRequiredService<EmergencyNotificationQueue>());
+        services.AddHostedService<EmergencyNotificationBackgroundService>();
+        services.AddSingleton<IFieldCryptoProvider, AesFieldCryptoProvider>();
+
         services.AddSingleton<ICredentialSigningProvider, LocalEs256SigningProvider>();
 
         services.AddSingleton(PortraitProcessingLimits.Default);

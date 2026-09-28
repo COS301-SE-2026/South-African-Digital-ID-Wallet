@@ -7,11 +7,15 @@ import { OfflineVerificationSync } from '../offline-verification-sync'
 
 jest.mock('@/hooks/use-network-status', () => ({ useNetworkStatus: jest.fn() }))
 jest.mock('@/services/offline-service', () => ({
-  offlineService: { syncOfflineVerifications: jest.fn() },
+  offlineService: {
+    syncOfflineVerifications: jest.fn(),
+    syncEmergencyAccesses: jest.fn(),
+  },
 }))
 
 const networkMock = useNetworkStatus as jest.Mock
 const syncMock = offlineService.syncOfflineVerifications as jest.Mock
+const syncEmergencyMock = offlineService.syncEmergencyAccesses as jest.Mock
 const initialAuthState = useAuthStore.getState()
 
 describe('OfflineVerificationSync', () => {
@@ -31,6 +35,7 @@ describe('OfflineVerificationSync', () => {
     })
     networkMock.mockReturnValue({ isOnline: true })
     syncMock.mockResolvedValue(0)
+    syncEmergencyMock.mockResolvedValue(0)
     jest
       .spyOn(AppState, 'addEventListener')
       .mockImplementation((_, listener) => {
@@ -44,6 +49,20 @@ describe('OfflineVerificationSync', () => {
   })
 
   it('Should upload queued scans when signed in with signal', async () => {
+    await render(<OfflineVerificationSync />)
+
+    expect(syncMock).toHaveBeenCalledWith('official-1')
+  })
+
+  it('Should upload emergency profiles read offline, which notifies the citizen', async () => {
+    await render(<OfflineVerificationSync />)
+
+    expect(syncEmergencyMock).toHaveBeenCalledWith('official-1')
+  })
+
+  it('Should keep going when the emergency upload fails', async () => {
+    syncEmergencyMock.mockRejectedValue(new Error('no signal'))
+
     await render(<OfflineVerificationSync />)
 
     expect(syncMock).toHaveBeenCalledWith('official-1')

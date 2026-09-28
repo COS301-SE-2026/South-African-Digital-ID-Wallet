@@ -10,6 +10,7 @@ public static class AuditEventTypeExtensions
         AuditEventType.CitizenVerificationFailed,
         AuditEventType.CitizenCredentialsActivationFailed,
         AuditEventType.DeviceVerificationFailed,
+        AuditEventType.EmergencyProfileAccessFailed,
         AuditEventType.QrGenerationBlocked,
         AuditEventType.OfflineVerificationRejected,
     };

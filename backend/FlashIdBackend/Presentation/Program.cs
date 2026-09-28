@@ -182,6 +182,8 @@ builder.Services.AddRateLimiter(options =>
     AddUserPartitionedPolicy(options, "email-change-confirm", permitLimit: 5, window: TimeSpan.FromMinutes(1));
     AddUserPartitionedPolicy(options, "issue-credential", permitLimit: 5, window: TimeSpan.FromMinutes(1));
     AddUserPartitionedPolicy(options, "citizen-status-lookup", permitLimit: 20, window: TimeSpan.FromMinutes(1));
+    AddUserPartitionedPolicy(options, "emergency-resolve", permitLimit: 10, window: TimeSpan.FromMinutes(1));
+    AddUserPartitionedPolicy(options, "emergency-offline-access", permitLimit: 20, window: TimeSpan.FromMinutes(1));
 
     options.RejectionStatusCode = 429;
 });

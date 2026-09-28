@@ -81,13 +81,27 @@ public class OfflinePackageRepository : IOfflinePackageRepository
         await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyList<int>> GetRevokedIndexesAsync(CancellationToken cancellationToken) =>
-        await _context.Credentials
+    public async Task<IReadOnlyList<int>> GetRevokedIndexesAsync(CancellationToken cancellationToken)
+    {
+        var credentials = await _context.Credentials
             .AsNoTracking()
             .Where(c => c.RevocationIndex != null && c.Status != CredentialStatus.Active)
-            .OrderBy(c => c.RevocationIndex)
             .Select(c => c.RevocationIndex!.Value)
             .ToListAsync(cancellationToken);
+
+        var disabledProfiles = await _context.EmergencyProfiles
+            .AsNoTracking()
+            .Where(p => p.RevocationIndex != null && !p.IsEnabled)
+            .Select(p => p.RevocationIndex!.Value)
+            .ToListAsync(cancellationToken);
+
+        var retired = await _context.RetiredEmergencyRevocationIndexes
+            .AsNoTracking()
+            .Select(r => r.RevocationIndex)
+            .ToListAsync(cancellationToken);
+
+        return credentials.Concat(disabledProfiles).Concat(retired).Distinct().Order().ToList();
+    }
 
     public async Task<IReadOnlySet<Guid>> GetExistingAuditLogIdsAsync(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken) =>
         (await _context.AuditLogs

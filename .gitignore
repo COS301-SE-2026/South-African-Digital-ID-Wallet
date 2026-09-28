@@ -20,7 +20,7 @@ node_modules/
 .DS_Store
 
 *.swp
-*.swobin/
+bin/
 obj/
 *.swo
 

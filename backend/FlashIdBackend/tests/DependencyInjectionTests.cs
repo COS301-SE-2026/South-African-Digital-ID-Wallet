@@ -68,6 +68,8 @@ public class DependencyInjectionTests
         yield return new object[] { typeof(IVerificationRepository), typeof(VerificationRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(ICredentialsActivationRepository), typeof(CredentialsActivationRepository), ServiceLifetime.Scoped };
         yield return new object[] { typeof(ICredentialSigningProvider), typeof(LocalEs256SigningProvider), ServiceLifetime.Singleton };
+        yield return new object[] { typeof(IEmergencyRepository), typeof(EmergencyRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IFieldCryptoProvider), typeof(AesFieldCryptoProvider), ServiceLifetime.Singleton };
         yield return new object[] { typeof(IPortraitProcessor), typeof(ImageSharpPortraitProcessor), ServiceLifetime.Singleton };
         yield return new object[] { typeof(IOfflinePackageRepository), typeof(OfflinePackageRepository), ServiceLifetime.Scoped };
     }
@@ -237,5 +239,18 @@ public class DependencyInjectionTests
             .ToList();
 
         Assert.Empty(missing);
+    }
+
+    [Fact]
+    public void AddInfrastructure_RunsEmergencyNotificationsOnABackgroundQueue()
+    {
+        var services = new ServiceCollection();
+        services.AddInfrastructure(CreateConfiguration());
+
+        Assert.Contains(services, sd =>
+            sd.ServiceType == typeof(IEmergencyNotificationQueue) && sd.Lifetime == ServiceLifetime.Singleton);
+        Assert.Contains(services, sd =>
+            sd.ServiceType == typeof(IHostedService) &&
+            sd.ImplementationType == typeof(EmergencyNotificationBackgroundService));
     }
 }

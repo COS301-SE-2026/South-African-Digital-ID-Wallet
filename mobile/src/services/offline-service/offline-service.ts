@@ -8,9 +8,12 @@ import {
   type OfflineCache,
   type OfflinePackage,
   type OfflineVerification,
+  type PendingEmergencyAccess,
+  type RejectedEmergencyAccess,
 } from '@/lib/offline/offline-cache'
 import { isPackageUsable } from '@/lib/offline/offline-package'
 import { verifyRevocationList } from '@/lib/offline/verify'
+import emergencyUrls from '@/services/emergency-service/emergency-urls'
 import offlineUrls from './offline-urls'
 import {
   issuerKeySchema,
@@ -194,6 +197,8 @@ const refreshOfflineCache = (credentialId: string): Promise<OfflineCache> =>
       ),
       savedAt: now,
       pendingVerifications: existing?.pendingVerifications ?? [],
+      pendingEmergencyAccesses: existing?.pendingEmergencyAccesses ?? [],
+      rejectedEmergencyAccesses: existing?.rejectedEmergencyAccesses ?? [],
     }
 
     await writeOfflineCache(refreshed)
@@ -236,6 +241,8 @@ const refreshTrustData = (): Promise<OfflineCache> =>
       ),
       savedAt: now,
       pendingVerifications: existing?.pendingVerifications ?? [],
+      pendingEmergencyAccesses: existing?.pendingEmergencyAccesses ?? [],
+      rejectedEmergencyAccesses: existing?.rejectedEmergencyAccesses ?? [],
     }
 
     await writeOfflineCache(refreshed)
@@ -257,6 +264,8 @@ const queueOfflineVerification = (
         ...(existing?.pendingVerifications ?? []),
         verification,
       ].slice(-MAX_QUEUED_VERIFICATIONS),
+      pendingEmergencyAccesses: existing?.pendingEmergencyAccesses ?? [],
+      rejectedEmergencyAccesses: existing?.rejectedEmergencyAccesses ?? [],
     })
   })
 
@@ -303,21 +312,94 @@ const syncOfflineVerifications = (verifierId: string): Promise<number> =>
     return uploaded
   })
 
+const MAX_QUEUED_EMERGENCY_ACCESSES = 100
+
+const PERMANENT_EMERGENCY_SYNC_FAILURES = new Set([400, 403, 404])
+
+const MAX_REJECTED_EMERGENCY_ACCESSES = 50
+
+const queueEmergencyAccess = (access: PendingEmergencyAccess): Promise<void> =>
+  serialised(async () => {
+    const existing = await readOfflineCache()
+
+    await writeOfflineCache({
+      packages: existing?.packages ?? {},
+      trust: existing?.trust ?? null,
+      savedAt: existing?.savedAt ?? nowInSeconds(),
+      pendingVerifications: existing?.pendingVerifications ?? [],
+      pendingEmergencyAccesses: [
+        ...(existing?.pendingEmergencyAccesses ?? []),
+        access,
+      ].slice(-MAX_QUEUED_EMERGENCY_ACCESSES),
+      rejectedEmergencyAccesses: existing?.rejectedEmergencyAccesses ?? [],
+    })
+  })
+
+const syncEmergencyAccesses = (responderId: string): Promise<number> =>
+  serialised(async () => {
+    const existing = await readOfflineCache()
+    let remaining = existing?.pendingEmergencyAccesses ?? []
+    let rejected: readonly RejectedEmergencyAccess[] =
+      existing?.rejectedEmergencyAccesses ?? []
+    const mine = remaining.filter((entry) => entry.responderId === responderId)
+    let uploaded = 0
+
+    for (const queued of mine) {
+      if (!existing) {
+        break
+      }
+
+      const { responderId: _responderId, ...entry } = queued
+
+      try {
+        await api.post(emergencyUrls.offlineAccesses(), entry)
+      } catch (error) {
+        const status = isAxiosError(error) ? (error.response?.status ?? 0) : 0
+        if (!PERMANENT_EMERGENCY_SYNC_FAILURES.has(status)) {
+          throw error
+        }
+        rejected = [
+          ...rejected,
+          { ...queued, rejectedAt: nowInSeconds(), status },
+        ].slice(-MAX_REJECTED_EMERGENCY_ACCESSES)
+      }
+
+      remaining = remaining.filter((pending) => pending.id !== queued.id)
+      uploaded += 1
+      await writeOfflineCache({
+        ...existing,
+        pendingEmergencyAccesses: remaining,
+        rejectedEmergencyAccesses: rejected,
+      })
+    }
+
+    return uploaded
+  })
+
 // Called when a session ends. Serialised with every other cache write, so a sync still running cannot write the
 // signed-out user's data back afterwards. Queued scans survive: an official whose session expires offline must not
 // lose them, and they upload only when that official signs in again.
 const clearOfflineData = (): Promise<void> =>
   serialised(async () => {
-    const pending = (await readOfflineCache())?.pendingVerifications ?? []
+    const existing = await readOfflineCache()
+    const pending = existing?.pendingVerifications ?? []
+    const pendingEmergency = existing?.pendingEmergencyAccesses ?? []
+    const rejectedEmergency = existing?.rejectedEmergencyAccesses ?? []
 
     await clearOfflineCache()
 
-    if (pending.length > 0) {
+    if (
+      pending.length > 0 ||
+      pendingEmergency.length > 0 ||
+      rejectedEmergency.length > 0
+    ) {
       await writeOfflineCache({
         packages: {},
         trust: null,
         savedAt: nowInSeconds(),
         pendingVerifications: pending,
+        pendingEmergencyAccesses: pendingEmergency,
+        rejectedEmergencyAccesses: rejectedEmergency,
       })
     }
   })
@@ -329,6 +411,8 @@ const offlineService = {
   refreshTrustData,
   queueOfflineVerification,
   syncOfflineVerifications,
+  queueEmergencyAccess,
+  syncEmergencyAccesses,
   clearOfflineData,
 }
 
