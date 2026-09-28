@@ -41,4 +41,17 @@ public class CertifiedCredentialCopyRepository : ICertifiedCredentialCopyReposit
     {
         await _context.SaveChangesAsync();
     }
+
+    public async Task<CertifiedCredentialCopy?> GetByDocumentHashAsync(string documentHash)
+    {
+        return await _context.CertifiedCredentialCopies
+            .AsNoTracking()
+            .Include(c => c.Credential)
+            .ThenInclude(c => c.Citizen)
+            .Include(c => c.Credential)
+            .ThenInclude(c => c.IdentityDocument)
+            .Include(c => c.Credential)
+            .ThenInclude(c => c.DriversLicense)
+            .FirstOrDefaultAsync(c => c.DocumentHash == documentHash);
+    }
 }

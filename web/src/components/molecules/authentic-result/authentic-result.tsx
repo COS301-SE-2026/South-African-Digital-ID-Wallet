@@ -1,10 +1,9 @@
-import { Check, FileText, ShieldCheck } from 'lucide-react'
+import { Check, FileText } from 'lucide-react'
 import { Button, Text } from '@/components/atoms'
 import { VerificationCheck } from '../verification-check'
 import type { AuthenticResultProps } from './types'
 
 export function AuthenticResult({
-  onViewCredentialDetails,
   onVerifyAnotherDocument,
 }: Readonly<AuthenticResultProps>) {
   return (
@@ -53,7 +52,10 @@ export function AuthenticResult({
             <div className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
               <DetailRow label="Issued to" value="Verified citizen" />
               <DetailRow label="ID Number" value="••••••••••••" />
-              <DetailRow label="Generated" value="16 May 2025 · 10:24" />
+              <DetailRow
+                label="Generated"
+                value="16 May 2025 · 10:24"
+              />
               <DetailRow
                 label="Certification ID"
                 value="FC-8F42A91C-37D-4E2F"
@@ -62,16 +64,7 @@ export function AuthenticResult({
           </div>
         </div>
       </div>
-      <div className="mt-5 flex flex-col gap-3">
-        <Button
-          type="button"
-          variant="primary"
-          LeftIcon={ShieldCheck}
-          onClick={onViewCredentialDetails}
-          className="!h-11 !w-full rounded-xl px-5"
-        >
-          View Credential Details
-        </Button>
+      <div className="mt-5">
         <Button
           type="button"
           variant="secondary"
@@ -84,7 +77,13 @@ export function AuthenticResult({
     </div>
   )
 }
-function DetailRow({ label, value }: { label: string; value: string }) {
+function DetailRow({
+  label,
+  value,
+}: {
+  label: string
+  value: string
+}) {
   return (
     <div>
       <Text variant="caption">{label}</Text>
