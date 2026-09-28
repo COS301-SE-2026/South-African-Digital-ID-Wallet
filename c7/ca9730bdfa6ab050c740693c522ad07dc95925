@@ -1,0 +1,18 @@
+mobile/src/components/organisms/emergency-profile-card/emergency-profile-card.tsx
+  h_712d174fc3f309 21-25
+mobile/src/components/organisms/emergency-profile-card/test/emergency-profile-card.test.tsx
+  h_712d174fc3f309 12
+mobile/src/components/pages/index.ts
+  h_712d174fc3f309 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c7ca9730bdfa6ab050c740693c522ad07dc95925",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
