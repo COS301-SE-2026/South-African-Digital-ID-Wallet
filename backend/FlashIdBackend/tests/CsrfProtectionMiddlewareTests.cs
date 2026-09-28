@@ -96,7 +96,7 @@ public class CsrfProtectionMiddlewareTests
     };
 
     [Fact]
-    public async Task PostRequest_WithAccessTokenCookieButNoCsrfToken_ReturnsForbidden()
+    public async Task PostRequest_WithAccessTokenCookieButNoCsrfCookie_ReturnsUnauthorized()
     {
         await using var factory = new TestApiFactory();
         await factory.CreateInitializedContextAsync();
@@ -107,7 +107,9 @@ public class CsrfProtectionMiddlewareTests
 
         var response = await client.SendAsync(request, TestContext.Current.CancellationToken);
 
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        var body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        Assert.Contains("CSRF token missing", body);
     }
 
     [Fact]
@@ -145,5 +147,74 @@ public class CsrfProtectionMiddlewareTests
         var response = await client.SendAsync(request, TestContext.Current.CancellationToken);
 
         Assert.NotEqual(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+    private static async Task AssertNotRejectedByCsrfAsync(HttpResponseMessage response)
+    {
+        var body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        Assert.DoesNotContain("CSRF token", body);
+    }
+
+    [Fact]
+    public async Task PostRequest_WithCsrfCookieButNoHeader_ReturnsForbidden()
+    {
+        await using var factory = new TestApiFactory();
+        await factory.CreateInitializedContextAsync();
+        var client = factory.CreateClient();
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/logout");
+        request.Headers.Add("Cookie", "access_token=some-token-value; csrf_token=some-csrf-token");
+
+        var response = await client.SendAsync(request, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetRequest_WithAccessTokenCookieButNoCsrfToken_IsNotCheckedByCsrf()
+    {
+        await using var factory = new TestApiFactory();
+        await factory.CreateInitializedContextAsync();
+        var client = factory.CreateClient();
+        var request = new HttpRequestMessage(HttpMethod.Get, "/api/auth/me");
+        request.Headers.Add("Cookie", "access_token=some-token-value");
+
+        var response = await client.SendAsync(request, TestContext.Current.CancellationToken);
+
+        Assert.NotEqual(HttpStatusCode.Forbidden, response.StatusCode);
+        await AssertNotRejectedByCsrfAsync(response);
+    }
+
+    [Fact]
+    public async Task PostRequest_WithoutAccessTokenCookie_IsNotCheckedByCsrf()
+    {
+        await using var factory = new TestApiFactory();
+        await factory.CreateInitializedContextAsync();
+        var client = factory.CreateClient();
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/logout");
+
+        var response = await client.SendAsync(request, TestContext.Current.CancellationToken);
+
+        Assert.NotEqual(HttpStatusCode.Forbidden, response.StatusCode);
+        await AssertNotRejectedByCsrfAsync(response);
+    }
+
+    [Theory]
+    [InlineData("/api/auth/login")]
+    [InlineData("/api/auth/verify-device")]
+    [InlineData("/api/auth/resend-device-verification")]
+    public async Task PostToAnonymousAuthEndpoint_WithStaleAccessTokenAndNoCsrf_IsNotBlocked(string path)
+    {
+        await using var factory = new TestApiFactory();
+        await factory.CreateInitializedContextAsync();
+        var client = factory.CreateClient();
+        var request = new HttpRequestMessage(HttpMethod.Post, path)
+        {
+            Content = new StringContent("{}", System.Text.Encoding.UTF8, "application/json"),
+        };
+        request.Headers.Add("Cookie", "access_token=stale-token-from-an-old-session");
+
+        var response = await client.SendAsync(request, TestContext.Current.CancellationToken);
+
+        Assert.NotEqual(HttpStatusCode.Forbidden, response.StatusCode);
+        await AssertNotRejectedByCsrfAsync(response);
     }
 }
