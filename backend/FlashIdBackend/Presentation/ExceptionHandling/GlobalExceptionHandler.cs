@@ -30,6 +30,10 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
                 (StatusCodes.Status422UnprocessableEntity, "Invalid SA phone number format",
                     exception.Message),
 
+            CitizenUnderageException =>
+                (StatusCodes.Status422UnprocessableEntity, "Citizen too young",
+                    exception.Message),
+
             InvalidAuditActionException =>
         (StatusCodes.Status400BadRequest, "Invalid audit action",
             exception.Message),

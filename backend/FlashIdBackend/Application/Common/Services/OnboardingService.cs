@@ -46,6 +46,9 @@ public class OnboardingService : IOnboardingService
         if (citizenRecord is null)
             throw new IdentityRecordNotFoundException();
 
+        if (AgeInYears(citizenRecord.DateOfBirth) < MinimumOnboardingAge)
+            throw new CitizenUnderageException(MinimumOnboardingAge);
+
         return new VerifiedCitizenRecordResponse
         {
             SaId = citizenRecord.SaId,
@@ -53,6 +56,18 @@ public class OnboardingService : IOnboardingService
             DateOfBirth = citizenRecord.DateOfBirth,
             IsVerified = true
         };
+    }
+
+    private const int MinimumOnboardingAge = 16;
+
+    private static int AgeInYears(DateTime dateOfBirth)
+    {
+        var today = SastClock.TodayUtcMidnight(DateTime.UtcNow);
+        var age = today.Year - dateOfBirth.Year;
+        // Birthday not reached yet this year
+        if (dateOfBirth.Date > today.AddYears(-age))
+            age--;
+        return age;
     }
 
     private static string NormalizeSaPhoneNumber(string phoneNumber)
@@ -87,6 +102,9 @@ public class OnboardingService : IOnboardingService
 
         if (citizenRecord is null)
             throw new IdentityRecordNotFoundException();
+
+        if (AgeInYears(citizenRecord.DateOfBirth) < MinimumOnboardingAge)
+            throw new CitizenUnderageException(MinimumOnboardingAge);
 
         if (email is null)
             throw new ArgumentException("Email is required.");
