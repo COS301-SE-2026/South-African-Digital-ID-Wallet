@@ -1490,6 +1490,7 @@ Every quantified NFR from the SRS is mapped below to the architectural tactic cl
 | NFR5.2 | CI passes build/lint/tests on main | GitHub Actions quality gates | Actions history | https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/33838886255 |
 | NFR5.3 | >=80% unit test coverage on critical logic | - | Codecov | >=80% / 63% - **fail**, 17pts short |
 | NFR5.4 | Deploy within 30 min of merge to main | GitHub Actions -> Azure Web Apps deploy | Actions run duration | <30 min / 5m36s (api-flashid), 5m35s (gov-registry), 2m8s (web) - **pass** |
+| NFR5.5 | Architecture supports onboarding additional government departments and institutions | Institutions are data, not code: `InstitutionType` enum + `POST /api/institutions/register` (GovernmentAdministrator only) creates the institution, issues its API key and writes an audit log, with no deployment needed | xUnit integration (`InstitutionsControllerTests`, `InstitutionServiceTests`) | Every institution type onboarded end-to-end through the API / **pass**, `RegisterInstitution_ForEveryInstitutionType_OnboardsThroughTheApiWithoutCodeChanges` (registers, receives API key and reads back each type) and `RegisterInstitution_AsCitizen_ReturnsForbidden` |
 
 ### 6.1 Lighthouse Audit Detail (supports NFR2.1, NFR4.3)
 
