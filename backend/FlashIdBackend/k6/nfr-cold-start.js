@@ -1,7 +1,7 @@
 import http from 'k6/http';
 import { check } from 'k6';
 
-const BASE_URL = __ENV.BASE_URL || 'https://api-flashid-dev.azurewebsites.net';
+const BASE_URL = __ENV.BASE_URL || 'https://api-flashid-dev-bjgng2dxd6hrgbca.southafricanorth-01.azurewebsites.net';
 
 export const options = { vus: 1, iterations: 1 };
 
