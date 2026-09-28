@@ -1,0 +1,16 @@
+mobile/src/components/pages/emergency-profile/emergency-profile-page.tsx
+  h_712d174fc3f309 1-377
+mobile/src/components/pages/emergency-profile/index.ts
+  h_712d174fc3f309 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a5af8db03f857e5806400e3ceca520afa0bc6160",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
