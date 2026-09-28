@@ -298,12 +298,7 @@ public class AuthController : ControllerBase
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
             var result = await _authService.LogoutAsync(userId, ipAddress);
 
-            Response.Cookies.Delete("access_token", new CookieOptions
-            {
-                Path = "/",
-                Secure = !_environment.IsDevelopment(),
-                SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
-            });
+            AuthCookies.DeleteAll(Response, _environment);
 
             return Ok(result);
         }

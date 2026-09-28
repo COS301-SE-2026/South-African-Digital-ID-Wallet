@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.Json.Nodes;
 using Application.Common.Services;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Exceptions;
@@ -7,7 +9,6 @@ using Infrastructure.Data;
 using Infrastructure.Providers;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Data.Sqlite;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
@@ -78,20 +79,6 @@ public class QrServiceIntegrationTests
         context.Database.EnsureCreated();
         return context;
     }
-
-    private static IConfiguration CreateQrConfiguration()
-    {
-        return new ConfigurationBuilder()
-            .AddInMemoryCollection(
-                new Dictionary<string, string?>
-                {
-                    // NOSONAR: not a real secret
-                    ["Qr:EcdsaPrivateKey"] = "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg4rL2CwKmOHL8ahecUNbk2354O+EdVY7MaU24rwv05oihRANCAASYflRXGZ/UXWisbqNl+38j4SFM8giEvNiP661TDuupv89JPQledcyFi1m5ujBZfh2p0YSOmGMtciYvqzjr3xXZ",
-                }
-            )
-            .Build();
-    }
-
     private static QrService CreateQrService(AppDbContext context)
     {
         var (service, _) = CreateQrServiceWithTokenRepo(context);
@@ -103,12 +90,12 @@ public class QrServiceIntegrationTests
     {
         var credentialRepository = new CredentialRepository(context);
         var qrDisclosureTokenRepository = new FakeQrDisclosureTokenRepository();
-        var configuration = CreateQrConfiguration();
-        var signingProvider = new EcdsaSigningProvider(configuration);
+        var signingKeyRepository = new SigningKeyRepository(context);
+        var signingProvider = new StubQrSigningProvider(signingKeyRepository);
+        var signatureVerifier = new QrSignatureVerifier(signingKeyRepository);
         var institutionRepository = new InstitutionRepository(context);
         var disclosedFieldValueResolver = new DisclosedFieldValueResolver(new FakePhotoStorageProvider());
-        var service = new QrService(credentialRepository, signingProvider, qrDisclosureTokenRepository, institutionRepository, disclosedFieldValueResolver);
-
+        var service = new QrService(credentialRepository, signingProvider, signatureVerifier, qrDisclosureTokenRepository, institutionRepository, disclosedFieldValueResolver);
         return (service, qrDisclosureTokenRepository);
     }
 
@@ -181,6 +168,14 @@ public class QrServiceIntegrationTests
             LicenseCodeField, ExpiryDateField, CountryOfIssueField,DateOfBirthField,
         },
     };
+
+    private static string TamperPayloadPreservingMeaning(string token)
+    {
+        var envelope = JsonNode.Parse(Encoding.UTF8.GetString(Convert.FromBase64String(token)))!.AsObject();
+        var payloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(envelope["payload"]!.GetValue<string>()));
+        envelope["payload"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(payloadJson + " "));
+        return Convert.ToBase64String(Encoding.UTF8.GetBytes(envelope.ToJsonString()));
+    }
 
     [Fact]
     public async Task GenerateQrAsync_ActiveCredentialOwnedByUser_ReturnsValidSignedToken()
@@ -342,6 +337,38 @@ public class QrServiceIntegrationTests
         var generated = await service.GenerateQrAsync(cred.Id, user.Id, req);
 
         cred.Status = CredentialStatus.Revoked;
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        await Assert.ThrowsAsync<InvalidDisclosureTokenException>(() => service.ResolveAsync(generated.Token, user.Id, LocalHostIp));
+    }
+
+    [Fact]
+    public async Task ResolveAsync_TamperedPayload_ThrowsInvalidDisclosureTokenException()
+    {
+        using var context = CreateContext();
+        var (service, tokenRepo) = CreateQrServiceWithTokenRepo(context);
+        var (user, _, cred) = await SeedCredentialAsync(context);
+
+        var generated = await service.GenerateQrAsync(cred.Id, user.Id, FullDisclosureRequest());
+        var tampered = TamperPayloadPreservingMeaning(generated.Token);
+
+        await Assert.ThrowsAsync<InvalidDisclosureTokenException>(() => service.ResolveAsync(tampered, user.Id, LocalHostIp));
+
+        // The rejected tampered token must not burn the genuine one.
+        Assert.Null(Assert.Single(tokenRepo.Tokens).UsedAt);
+    }
+
+    [Fact]
+    public async Task ResolveAsync_SigningKeyRevokedAfterGeneration_ThrowsInvalidDisclosureTokenException()
+    {
+        using var context = CreateContext();
+        var service = CreateQrService(context);
+        var (user, _, cred) = await SeedCredentialAsync(context);
+
+        var generated = await service.GenerateQrAsync(cred.Id, user.Id, FullDisclosureRequest());
+
+        var signingKey = await context.SigningKeys.SingleAsync(TestContext.Current.CancellationToken);
+        signingKey.Status = SigningKeyStatus.Revoked;
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         await Assert.ThrowsAsync<InvalidDisclosureTokenException>(() => service.ResolveAsync(generated.Token, user.Id, LocalHostIp));

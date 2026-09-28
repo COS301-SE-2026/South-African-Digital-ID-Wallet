@@ -30,8 +30,7 @@ if (!builder.Environment.IsEnvironment("Testing"))
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 
-builder.Services.AddInfrastructure();
-
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
 builder.Services.AddControllers()
@@ -232,6 +231,7 @@ app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);
 app.UseRateLimiter();
+app.UseMiddleware<Presentation.Middleware.CsrfProtectionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
