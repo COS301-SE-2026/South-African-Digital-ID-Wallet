@@ -1,0 +1,1 @@
+export type InvalidCertifiedCopyProps = Record<string, never>
