@@ -5,6 +5,8 @@ using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -13,6 +15,9 @@ namespace Infrastructure.Repositories;
 public class EmergencyRepository : IEmergencyRepository
 {
     private const int ClaimTtlSeconds = 300;
+    private const int SqlServerDuplicateKey = 2601;
+    private const int SqlServerUniqueConstraint = 2627;
+    private const int SqliteUniqueConstraint = 2067;
 
     private readonly AppDbContext _context;
     private readonly Container _claims;
@@ -101,6 +106,70 @@ public class EmergencyRepository : IEmergencyRepository
         await _context.EmergencyProfiles.AddAsync(profile, ct);
 
     public Task SaveChangesAsync(CancellationToken ct) => _context.SaveChangesAsync(ct);
+
+    public async Task<int> NextRevocationIndexAsync(CancellationToken ct)
+    {
+        var highestLive = await _context.EmergencyProfiles.MaxAsync(p => p.RevocationIndex, ct);
+        var highestRetired = await _context.RetiredEmergencyRevocationIndexes
+            .MaxAsync(r => (int?)r.RevocationIndex, ct);
+
+        var highest = Math.Max(highestLive ?? 0, highestRetired ?? 0);
+
+        return Math.Max(highest + 1, EmergencyClaimNames.RevocationIndexOffset);
+    }
+
+    public async Task<bool> TrySaveChangesAsync(CancellationToken ct)
+    {
+        try
+        {
+            await _context.SaveChangesAsync(ct);
+            return true;
+        }
+        catch (DbUpdateException due) when (IsUniqueIndexViolation(due))
+        {
+            return false;
+        }
+    }
+
+    public async Task AddRetiredRevocationIndexAsync(RetiredEmergencyRevocationIndex retired, CancellationToken ct) =>
+        await _context.RetiredEmergencyRevocationIndexes.AddAsync(retired, ct);
+
+    public async Task<EmergencyProfile?> GetProfileByRevocationIndexAsync(int revocationIndex, CancellationToken ct)
+    {
+        var live = await _context.EmergencyProfiles
+            .Include(p => p.Citizen)
+            .FirstOrDefaultAsync(p => p.RevocationIndex == revocationIndex, ct);
+
+        if (live is not null)
+        {
+            return live;
+        }
+
+        var retired = await _context.RetiredEmergencyRevocationIndexes
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.RevocationIndex == revocationIndex, ct);
+
+        return retired is null
+            ? null
+            : await _context.EmergencyProfiles
+                .Include(p => p.Citizen)
+                .FirstOrDefaultAsync(p => p.Id == retired.EmergencyProfileId, ct);
+    }
+
+    public Task<bool> AccessExistsAsync(Guid accessId, CancellationToken ct) =>
+        _context.EmergencyAccesses.AnyAsync(a => a.Id == accessId, ct);
+
+    public Task<Official?> GetOfficialAsync(Guid userId, CancellationToken ct) =>
+        _context.Officials
+            .Include(o => o.Institution)
+            .FirstOrDefaultAsync(o => o.UserId == userId, ct);
+
+    private static bool IsUniqueIndexViolation(DbUpdateException due) => due.InnerException switch
+    {
+        SqlException se => se.Number is SqlServerDuplicateKey or SqlServerUniqueConstraint,
+        SqliteException sle => sle.SqliteExtendedErrorCode == SqliteUniqueConstraint,
+        _ => false,
+    };
 }
 
 internal sealed class EmergencyCodeClaimDocument

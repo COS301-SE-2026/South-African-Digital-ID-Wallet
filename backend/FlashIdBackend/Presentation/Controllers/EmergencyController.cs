@@ -33,6 +33,24 @@ public class EmergencyController : ControllerBase
         return Ok(await _emergencyService.ResolveAsync(request, responderId, ip, ct));
     }
 
+    [HttpPost("offline-accesses")]
+    [Authorize(Roles = "Official")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RecordOfflineAccess(
+        [FromBody] RecordOfflineEmergencyAccessRequestDto request, CancellationToken ct)
+    {
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var responderId))
+        {
+            return Unauthorized();
+        }
+
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        await _emergencyService.RecordOfflineAccessAsync(request, responderId, ip, ct);
+        return NoContent();
+    }
+
     [HttpPost("devices")]
     [Authorize(Roles = "Citizen")]
     public async Task<IActionResult> RegisterDevice(

@@ -42,6 +42,18 @@ public class EmergencyNotifierTests
             throw new NotImplementedException();
         public Task AddProfileAsync(EmergencyProfile p, CancellationToken ct) =>
             throw new NotImplementedException();
+        public Task<int> NextRevocationIndexAsync(CancellationToken ct) =>
+            throw new NotImplementedException();
+        public Task<bool> TrySaveChangesAsync(CancellationToken ct) =>
+            throw new NotImplementedException();
+        public Task AddRetiredRevocationIndexAsync(RetiredEmergencyRevocationIndex r, CancellationToken ct) =>
+            throw new NotImplementedException();
+        public Task<EmergencyProfile?> GetProfileByRevocationIndexAsync(int index, CancellationToken ct) =>
+            throw new NotImplementedException();
+        public Task<bool> AccessExistsAsync(Guid id, CancellationToken ct) =>
+            throw new NotImplementedException();
+        public Task<Official?> GetOfficialAsync(Guid id, CancellationToken ct) =>
+            throw new NotImplementedException();
     }
 
     private sealed class FakeEmailSender : IEmailSenderProvider

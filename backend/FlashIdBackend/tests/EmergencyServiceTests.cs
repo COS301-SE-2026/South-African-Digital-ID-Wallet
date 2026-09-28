@@ -9,7 +9,10 @@ using Application.Features.Emergency.DTOs;
 using Application.Features.Emergency.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
+using Infrastructure.Providers;
+using Microsoft.Extensions.Configuration;
 using Moq;
+using System.Text.Json;
 
 namespace tests;
 
@@ -21,7 +24,7 @@ public class EmergencyServiceTests
     private readonly Mock<ICredentialRepository> _credentials = new();
     private readonly Mock<IInstitutionRepository> _audit = new();
     private readonly Mock<IPhotoStorageProvider> _photos = new();
-    private readonly Mock<IQrSigningProvider> _signing = new();
+    private readonly ISdJwtCredentialFactory _credentialFactory = RealCredentialFactory();
     private readonly Mock<IEmergencyNotifier> _notifier = new();
     private readonly Mock<IFieldCryptoProvider> _crypto = new();
 
@@ -30,7 +33,21 @@ public class EmergencyServiceTests
 
     private EmergencyService Service() => new(
         _repository.Object, _credentials.Object, _audit.Object,
-        _photos.Object, _signing.Object, _notifier.Object, _crypto.Object);
+        _photos.Object, _credentialFactory, _notifier.Object, _crypto.Object);
+
+    private static ISdJwtCredentialFactory RealCredentialFactory()
+    {
+        using var issuerKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Signing:Credential:Kid"] = "test-issuer-key",
+                ["Signing:Credential:PrivateKey"] = Convert.ToBase64String(issuerKey.ExportPkcs8PrivateKey()),
+            })
+            .Build();
+
+        return new SdJwtCredentialFactory(new LocalEs256SigningProvider(config), TimeProvider.System);
+    }
 
     private static Official Responder(InstitutionType type = InstitutionType.Healthcare) => new()
     {
@@ -402,34 +419,318 @@ public class EmergencyServiceTests
             Service().BuildOfflineCredentialAsync(Guid.NewGuid(), CancellationToken.None));
     }
 
-    [Fact]
-    public async Task BuildOfflineCredentialAsync_ReleasedFieldsOnly_SignsThePayload()
+    private EmergencyDevice RegisteredDevice(Guid citizenId, ECDsa deviceKey) => new()
     {
-        var citizenId = Guid.NewGuid();
+        Id = Guid.NewGuid(),
+        CitizenId = citizenId,
+        Handle = _handle,
+        PublicKeySpki = deviceKey.ExportSubjectPublicKeyInfo(),
+        Platform = "android",
+    };
+
+    private void OfflineMintSetup(EmergencyProfile profile, ECDsa deviceKey)
+    {
         _repository
             .Setup(r => r.GetProfileByUserIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Profile(citizenId));
+            .ReturnsAsync(profile);
         _repository
-            .Setup(r => r.GetActiveDeviceByCitizenIdAsync(citizenId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new EmergencyDevice
-            {
-                Id = Guid.NewGuid(),
-                CitizenId = citizenId,
-                Handle = _handle,
-                PublicKeySpki = new byte[] { 1 },
-                Platform = "android",
-            });
+            .Setup(r => r.GetActiveDeviceByCitizenIdAsync(profile.CitizenId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(RegisteredDevice(profile.CitizenId, deviceKey));
+        _repository
+            .Setup(r => r.NextRevocationIndexAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(EmergencyClaimNames.RevocationIndexOffset);
+        _repository
+            .Setup(r => r.TrySaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
         _crypto.Setup(c => c.Decrypt(It.IsAny<string>())).Returns("O negative");
-        _signing.Setup(s => s.Sign(It.IsAny<string>())).Returns("signature");
+    }
+
+    private static JsonElement IssuerPayload(string sdJwt)
+    {
+        var issuerJwt = sdJwt.Split('~')[0];
+        var payload = System.Buffers.Text.Base64Url.DecodeFromChars(issuerJwt.Split('.')[1]);
+        return JsonDocument.Parse(payload).RootElement;
+    }
+
+    private static Dictionary<string, string> Disclosed(string sdJwt) =>
+        sdJwt.Split('~')
+            .Skip(1)
+            .Where(part => part.Length > 0)
+            .Select(part => JsonDocument.Parse(System.Buffers.Text.Base64Url.DecodeFromChars(part)).RootElement)
+            .ToDictionary(d => d[1].GetString()!, d => d[2].GetString()!);
+
+    [Fact]
+    public async Task BuildOfflineCredentialAsync_IssuesAnEmergencySdJwtBoundToThePhone()
+    {
+        using var deviceKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var profile = Profile(Guid.NewGuid());
+        profile.OfflineFieldsJson = "[\"bloodType\",\"name\"]";
+        OfflineMintSetup(profile, deviceKey);
 
         var result = await Service().BuildOfflineCredentialAsync(Guid.NewGuid(), CancellationToken.None);
 
-        Assert.Equal("signature", result.Signature);
-        Assert.NotEmpty(result.Payload);
-        Assert.True(result.ExpiresAt > DateTime.UtcNow.AddDays(80));
+        var payload = IssuerPayload(result.SdJwt);
+        Assert.Equal(EmergencyClaimNames.Vct, payload.GetProperty("vct").GetString());
+        Assert.Equal(EmergencyClaimNames.RevocationIndexOffset, payload.GetProperty("ri").GetInt32());
 
-        var json = Encoding.UTF8.GetString(EmergencyBase64Url.Decode(result.Payload));
-        Assert.Contains("emergency-offline", json);
-        Assert.Contains("O negative", json);
+        var point = deviceKey.ExportParameters(false).Q;
+        var jwk = payload.GetProperty("cnf").GetProperty("jwk");
+        Assert.Equal(System.Buffers.Text.Base64Url.EncodeToString(point.X!), jwk.GetProperty("x").GetString());
+        Assert.Equal(System.Buffers.Text.Base64Url.EncodeToString(point.Y!), jwk.GetProperty("y").GetString());
+
+        var disclosed = Disclosed(result.SdJwt);
+        Assert.Equal("O negative", disclosed[EmergencyClaimNames.BloodType]);
+        Assert.Equal("Thandiwe Dlamini", disclosed[EmergencyClaimNames.FullName]);
+        Assert.True(disclosed.ContainsKey(EmergencyClaimNames.MedicalUpdatedOn));
+    }
+
+    [Fact]
+    public async Task BuildOfflineCredentialAsync_LeavesOutFieldsTheCitizenDidNotRelease()
+    {
+        using var deviceKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var profile = Profile(Guid.NewGuid());
+        profile.AllergiesCipher = "cipher";
+        profile.OfflineFieldsJson = "[]";
+        OfflineMintSetup(profile, deviceKey);
+
+        var result = await Service().BuildOfflineCredentialAsync(Guid.NewGuid(), CancellationToken.None);
+
+        Assert.Equal([EmergencyClaimNames.MedicalUpdatedOn], Disclosed(result.SdJwt).Keys);
+    }
+
+    [Fact]
+    public async Task BuildOfflineCredentialAsync_ExpiresWithinTheThirtyDayCap()
+    {
+        using var deviceKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        OfflineMintSetup(Profile(Guid.NewGuid()), deviceKey);
+
+        var result = await Service().BuildOfflineCredentialAsync(Guid.NewGuid(), CancellationToken.None);
+
+        Assert.True(result.ExpiresAt <= DateTime.UtcNow.AddDays(30).AddMinutes(1));
+    }
+
+    [Fact]
+    public async Task BuildOfflineCredentialAsync_ExistingIndex_IsReusedWithoutSaving()
+    {
+        using var deviceKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var profile = Profile(Guid.NewGuid());
+        profile.RevocationIndex = EmergencyClaimNames.RevocationIndexOffset + 7;
+        OfflineMintSetup(profile, deviceKey);
+
+        var result = await Service().BuildOfflineCredentialAsync(Guid.NewGuid(), CancellationToken.None);
+
+        Assert.Equal(EmergencyClaimNames.RevocationIndexOffset + 7, IssuerPayload(result.SdJwt).GetProperty("ri").GetInt32());
+        _repository.Verify(r => r.NextRevocationIndexAsync(It.IsAny<CancellationToken>()), Times.Never);
+        _repository.Verify(r => r.TrySaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task BuildOfflineCredentialAsync_IndexTakenByAConcurrentMint_AllocatesAgain()
+    {
+        using var deviceKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var profile = Profile(Guid.NewGuid());
+        OfflineMintSetup(profile, deviceKey);
+        _repository
+            .SetupSequence(r => r.NextRevocationIndexAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(EmergencyClaimNames.RevocationIndexOffset)
+            .ReturnsAsync(EmergencyClaimNames.RevocationIndexOffset + 1);
+        _repository
+            .SetupSequence(r => r.TrySaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false)
+            .ReturnsAsync(true);
+
+        var result = await Service().BuildOfflineCredentialAsync(Guid.NewGuid(), CancellationToken.None);
+
+        Assert.Equal(EmergencyClaimNames.RevocationIndexOffset + 1, IssuerPayload(result.SdJwt).GetProperty("ri").GetInt32());
+        Assert.Equal(EmergencyClaimNames.RevocationIndexOffset + 1, profile.RevocationIndex);
+    }
+
+    [Fact]
+    public async Task BuildOfflineCredentialAsync_EveryAttemptCollides_Throws()
+    {
+        using var deviceKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        OfflineMintSetup(Profile(Guid.NewGuid()), deviceKey);
+        _repository
+            .Setup(r => r.TrySaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Service().BuildOfflineCredentialAsync(Guid.NewGuid(), CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task RegisterDeviceAsync_NewPhone_RetiresTheOldPhonesIndex()
+    {
+        var citizen = new Citizen { Id = Guid.NewGuid(), Names = "T", Surname = "D" };
+        var profile = Profile(citizen.Id);
+        profile.RevocationIndex = EmergencyClaimNames.RevocationIndexOffset + 3;
+
+        _credentials.Setup(c => c.GetCitizenByUserIdAsync(It.IsAny<Guid>())).ReturnsAsync(citizen);
+        _repository
+            .Setup(r => r.GetProfileByUserIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(profile);
+
+        using var newPhone = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        await Service().RegisterDeviceAsync(
+            new RegisterEmergencyDeviceRequestDto
+            {
+                PublicKeySpki = EmergencyBase64Url.Encode(newPhone.ExportSubjectPublicKeyInfo()),
+                Platform = "android",
+            },
+            Guid.NewGuid(), CancellationToken.None);
+
+        _repository.Verify(r => r.AddRetiredRevocationIndexAsync(
+            It.Is<RetiredEmergencyRevocationIndex>(x =>
+                x.RevocationIndex == EmergencyClaimNames.RevocationIndexOffset + 3 &&
+                x.EmergencyProfileId == profile.Id),
+            It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Null(profile.RevocationIndex);
+    }
+
+    [Fact]
+    public async Task RegisterDeviceAsync_NonP256Key_Throws()
+    {
+        var citizen = new Citizen { Id = Guid.NewGuid(), Names = "T", Surname = "D" };
+        _credentials.Setup(c => c.GetCitizenByUserIdAsync(It.IsAny<Guid>())).ReturnsAsync(citizen);
+
+        using var p384 = ECDsa.Create(ECCurve.NamedCurves.nistP384);
+
+        await Assert.ThrowsAsync<InvalidEmergencyCodeException>(() =>
+            Service().RegisterDeviceAsync(
+                new RegisterEmergencyDeviceRequestDto
+                {
+                    PublicKeySpki = EmergencyBase64Url.Encode(p384.ExportSubjectPublicKeyInfo()),
+                },
+                Guid.NewGuid(), CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task SaveProfileAsync_Disabling_RetiresTheIndexSoReEnablingCannotRevive()
+    {
+        var profile = Profile(Guid.NewGuid());
+        profile.RevocationIndex = EmergencyClaimNames.RevocationIndexOffset + 9;
+        _repository
+            .Setup(r => r.GetProfileByUserIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(profile);
+
+        await Service().SaveProfileAsync(
+            new SaveEmergencyProfileRequestDto { IsEnabled = false, ConsentGiven = false },
+            Guid.NewGuid(), CancellationToken.None);
+
+        _repository.Verify(r => r.AddRetiredRevocationIndexAsync(
+            It.Is<RetiredEmergencyRevocationIndex>(x => x.RevocationIndex == EmergencyClaimNames.RevocationIndexOffset + 9),
+            It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Null(profile.RevocationIndex);
+    }
+
+    private RecordOfflineEmergencyAccessRequestDto OfflineAccess(Guid? id = null, string justification = "Unconscious at roadside") => new()
+    {
+        Id = id ?? Guid.NewGuid(),
+        RevocationIndex = EmergencyClaimNames.RevocationIndexOffset + 1,
+        Justification = justification,
+        AccessedAt = DateTimeOffset.UtcNow.AddMinutes(-30).ToUnixTimeSeconds(),
+    };
+
+    private void OfflineAccessSetup(EmergencyProfile profile, Official? official)
+    {
+        _repository
+            .Setup(r => r.GetProfileByRevocationIndexAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(profile);
+        _repository
+            .Setup(r => r.GetOfficialAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(official);
+        _repository
+            .Setup(r => r.TrySaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+    }
+
+    [Fact]
+    public async Task RecordOfflineAccessAsync_RecordsAnOfflineAccessAndNotifies()
+    {
+        var profile = Profile(Guid.NewGuid());
+        OfflineAccessSetup(profile, Responder());
+        var request = OfflineAccess();
+
+        await Service().RecordOfflineAccessAsync(request, _responderUserId, "1.2.3.4", CancellationToken.None);
+
+        _repository.Verify(r => r.AddAccessAsync(
+            It.Is<EmergencyAccess>(a =>
+                a.Id == request.Id &&
+                a.EmergencyProfileId == profile.Id &&
+                a.WasOffline &&
+                a.Justification == "Unconscious at roadside" &&
+                a.ResponderName == "Naledi Khumalo" &&
+                a.AccessedAt == DateTimeOffset.FromUnixTimeSeconds(request.AccessedAt).UtcDateTime),
+            It.IsAny<CancellationToken>()), Times.Once);
+        _notifier.Verify(n => n.NotifyEmergencyAccessAsync(request.Id, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task RecordOfflineAccessAsync_RetriedUpload_IsNotRecordedTwice()
+    {
+        _repository
+            .Setup(r => r.AccessExistsAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        await Service().RecordOfflineAccessAsync(OfflineAccess(), _responderUserId, "1.2.3.4", CancellationToken.None);
+
+        _repository.Verify(r => r.AddAccessAsync(It.IsAny<EmergencyAccess>(), It.IsAny<CancellationToken>()), Times.Never);
+        _notifier.Verify(n => n.NotifyEmergencyAccessAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task RecordOfflineAccessAsync_ConcurrentRetryStoredItFirst_DoesNotNotifyAgain()
+    {
+        OfflineAccessSetup(Profile(Guid.NewGuid()), Responder());
+        _repository
+            .Setup(r => r.TrySaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        await Service().RecordOfflineAccessAsync(OfflineAccess(), _responderUserId, "1.2.3.4", CancellationToken.None);
+
+        _notifier.Verify(n => n.NotifyEmergencyAccessAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task RecordOfflineAccessAsync_UnknownIndex_Throws()
+    {
+        _repository
+            .Setup(r => r.GetProfileByRevocationIndexAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((EmergencyProfile?)null);
+
+        await Assert.ThrowsAsync<EmergencyProfileNotFoundException>(() =>
+            Service().RecordOfflineAccessAsync(OfflineAccess(), _responderUserId, "1.2.3.4", CancellationToken.None));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("too short")]
+    public async Task RecordOfflineAccessAsync_WithoutAProperReason_Throws(string justification)
+    {
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            Service().RecordOfflineAccessAsync(OfflineAccess(justification: justification), _responderUserId, "1.2.3.4", CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task RecordOfflineAccessAsync_TimestampFarInTheFuture_Throws()
+    {
+        var request = OfflineAccess() with { AccessedAt = DateTimeOffset.UtcNow.AddDays(3).ToUnixTimeSeconds() };
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            Service().RecordOfflineAccessAsync(request, _responderUserId, "1.2.3.4", CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task RecordOfflineAccessAsync_OfficialOutsideHealthcareAndPolice_IsStillRecordedAndFlagged()
+    {
+        OfflineAccessSetup(Profile(Guid.NewGuid()), Responder(InstitutionType.HomeAffairs));
+
+        await Service().RecordOfflineAccessAsync(OfflineAccess(), _responderUserId, "1.2.3.4", CancellationToken.None);
+
+        _repository.Verify(r => r.AddAccessAsync(It.IsAny<EmergencyAccess>(), It.IsAny<CancellationToken>()), Times.Once);
+        _audit.Verify(a => a.AddAuditLogAsync(It.Is<AuditLog>(l =>
+            l.EventType == AuditEventType.EmergencyProfileAccessed &&
+            l.Details!.Contains("outside healthcare and law enforcement"))), Times.Once);
     }
 }
