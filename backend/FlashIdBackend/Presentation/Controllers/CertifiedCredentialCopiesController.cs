@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Application.Features.CertifiedCredentialCopies.DTOs;
-using Domain.Entities;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.RateLimiting;
 
 namespace Presentation.Controllers;
@@ -15,13 +13,16 @@ namespace Presentation.Controllers;
 public class CertifiedCredentialCopiesController : ControllerBase
 {
     private readonly ICertifiedCredentialCopyService _certifiedCopyService;
+    private readonly ILogger<CertifiedCredentialCopiesController> _logger;
 
     private const long MaxPdfFileSize = 10 * 1024 * 1024;
 
-    public CertifiedCredentialCopiesController(ICertifiedCredentialCopyService certifiedCopyService)
+    public CertifiedCredentialCopiesController(ICertifiedCredentialCopyService certifiedCopyService, ILogger<CertifiedCredentialCopiesController> logger)
     {
         _certifiedCopyService = certifiedCopyService;
+        _logger = logger;
     }
+
 
     [Authorize(Roles = "Citizen")]
     [HttpPost("credentials/{credentialId:guid}")]
@@ -73,9 +74,12 @@ public class CertifiedCredentialCopiesController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
+            _logger.LogError(ex, "Failed to generate certified copy for credential {CredentialId}.",
+            credentialId);
+
             return StatusCode(StatusCodes.Status500InternalServerError, new
             {
-                message = ex.Message
+                message = "An unexpected error occured."
             });
         }
     }
