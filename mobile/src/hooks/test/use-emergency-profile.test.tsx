@@ -118,7 +118,7 @@ describe('useEmergencyProfile', () => {
         profile: PROFILE,
       })
     })
-    expect(result.current.lockScreenOutOfDate).toBe(true)
+    await waitFor(() => expect(result.current.lockScreenOutOfDate).toBe(true))
   })
 
   it('Should report a failed save', async () => {
