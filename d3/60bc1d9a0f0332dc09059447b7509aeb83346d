@@ -1,0 +1,20 @@
+web/src/components/pages/verify-certified-copy/verify-certified-copy.tsx
+  h_293a8616118f65 9
+  h_293a8616118f65 10-11
+web/src/components/pages/verify-certified-copy/test/verify-certified-copy-page.test.tsx
+  h_293a8616118f65 4-11,27,33,35-38,40-46,48,51-52,54-55,57-60,62,64,66-67
+  h_293a8616118f65 29,68
+web/src/components/pages/verify-certified-copy/types.ts
+  h_293a8616118f65 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d360bc1d9a0f0332dc09059447b7509aeb83346d",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
