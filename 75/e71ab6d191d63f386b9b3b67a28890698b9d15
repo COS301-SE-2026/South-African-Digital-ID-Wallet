@@ -1,0 +1,36 @@
+web/src/services/qr-service/qr-field-definitions.ts
+  h_99fca60b892ff4 17
+backend/FlashIdBackend/Application/Common/Services/DisclosedFieldValueResolver.cs
+  h_99fca60b892ff4 47,52,58-59
+  h_99fca60b892ff4 60
+backend/FlashIdBackend/tests/DisclosedFieldValueResolverTests.cs
+  h_99fca60b892ff4 104,163-172
+  h_99fca60b892ff4 173-174
+backend/FlashIdBackend/tests/SdJwtClaimNamesTests.cs
+  h_99fca60b892ff4 19
+mobile/src/services/qr-service/qr-field-definitions.ts
+  h_99fca60b892ff4 17
+backend/FlashIdBackend/Application/Common/Services/QrFieldDefinitions.cs
+  h_99fca60b892ff4 12
+backend/FlashIdBackend/Application/Common/Services/SdJwtClaimNames.cs
+  h_99fca60b892ff4 40
+mobile/src/lib/offline/test/offline-presentation.test.ts
+  h_99fca60b892ff4 60
+mobile/src/lib/offline/claim-labels.ts
+  h_99fca60b892ff4 16
+docs/demo4/offline-verification/wire-format.md
+  h_99fca60b892ff4 63
+web/src/services/qr-service/test/qr-service.test.ts
+  h_99fca60b892ff4 43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "75e71ab6d191d63f386b9b3b67a28890698b9d15",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

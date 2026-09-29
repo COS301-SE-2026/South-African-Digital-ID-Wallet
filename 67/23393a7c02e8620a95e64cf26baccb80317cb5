@@ -1,0 +1,20 @@
+mobile/src/hooks/test/use-sign-out.test.tsx
+  h_712d174fc3f309 7,40,80-98
+mobile/src/hooks/use-sign-out.ts
+  h_712d174fc3f309 7,13,19,21
+mobile/src/stores/security-result-store.ts
+  h_712d174fc3f309 6,12
+mobile/src/stores/test/security-result-store.test.ts
+  h_712d174fc3f309 15,31-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "6723393a7c02e8620a95e64cf26baccb80317cb5",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

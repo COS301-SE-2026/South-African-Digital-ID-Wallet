@@ -1,0 +1,21 @@
+web/src/app/(auth)/forgot-password/page.tsx
+  h_99fca60b892ff4 1-5
+web/src/components/pages/forgot-password/forgot-password-page.tsx
+  h_99fca60b892ff4 1-33
+web/src/components/organisms/forgot-password-form/test/forgot-password-form.test.tsx
+  h_99fca60b892ff4 1-161
+  h_99fca60b892ff4 162-165
+web/src/components/organisms/forgot-password-form/forgot-password-form.tsx
+  h_99fca60b892ff4 1-170
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "17bec78ebafca3abc0bb2c3dfbf4c809ae643335",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

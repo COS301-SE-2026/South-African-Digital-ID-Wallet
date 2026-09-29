@@ -1,0 +1,79 @@
+mobile/src/app/citizen/security/[alertId]/secured.tsx
+  s_d71219784be482::t_12d4e920c23f9c 6-15
+mobile/src/components/molecules/field-toggle-row/field-toggle-row.tsx
+  s_d71219784be482::t_a518ec7c8d70ca 10,21-28
+mobile/src/components/molecules/field-toggle-row/types.ts
+  s_d71219784be482::t_579abd0330f310 2
+mobile/src/components/molecules/index.ts
+  s_d71219784be482::t_7ed646978856ae 20-21
+mobile/src/components/molecules/security-detail-row/security-detail-row.tsx
+  s_d71219784be482::t_18a73f219ddb4a 5,9,25
+mobile/src/components/molecules/security-detail-row/types.ts
+  s_d71219784be482::t_c517d4f2e2df43 3-4,6
+mobile/src/components/organisms/index.ts
+  s_d71219784be482::t_3a55f22cee8ddc 38-39
+mobile/src/components/organisms/login-form/login-form.tsx
+  s_d71219784be482::t_3a6945e264c8f9 13,35,71-76
+mobile/src/components/organisms/password-form/password-form.tsx
+  s_d71219784be482::t_a6ad99403257ab 35
+mobile/src/components/organisms/security-activity-list/security-activity-list.tsx
+  s_d71219784be482::t_dbee92e32531bb 3,7,11,15-19,46-47
+mobile/src/components/organisms/security-activity-list/types.ts
+  s_d71219784be482::t_6cbb7b1d574978 4,8
+mobile/src/components/organisms/security-alert-banner/security-alert-banner.tsx
+  s_d71219784be482::t_c2c91ab250bd65 1-2,5-6,8-26,29,35,38,43-46,50,52-57,67
+mobile/src/components/organisms/security-alert-banner/types.ts
+  s_d71219784be482::t_5387c556e3b3ff 1-4,6,12
+mobile/src/components/organisms/travel-route-card/travel-route-card.tsx
+  s_d71219784be482::t_a611139078aa2e 1,3,5,7-76,80,83-138,140-141
+mobile/src/components/organisms/travel-route-card/types.ts
+  s_d71219784be482::t_4044d13424b0f3 1-21,23-24,26-27
+mobile/src/components/pages/index.ts
+  s_d71219784be482::t_a646acb18d8d69 16-18
+mobile/src/components/pages/profile/profile-page.tsx
+  s_d71219784be482::t_7a725324b603e5 10,73-86,89
+mobile/src/components/pages/secure-account/secure-account-page.tsx
+  s_d71219784be482::t_7a7e2bed017f28 36-47
+mobile/src/components/pages/security-confirmation/security-confirmation-page.tsx
+  s_d71219784be482::t_69faedd342d2e4 16,21-22,45-55,76-81,91-96
+mobile/src/components/pages/security-confirmation/types.ts
+  s_d71219784be482::t_7a5ac1ba766fcb 3
+mobile/src/components/pages/security-event/security-event-page.tsx
+  s_d71219784be482::t_63f27ea34a5b63 3,6,8,11-21,25-44,63,80-81,92-104,111,115,118-120,122,137-142,145-162
+mobile/src/components/pages/security-overview/security-overview-page.tsx
+  s_d71219784be482::t_b40b6b8af41598 6-7,18,48-62,64,68,81
+mobile/src/hooks/use-security.ts
+  s_d71219784be482::t_93de53c5967085 3,9,13-14,16,18-21,28-42,52,81-82,87-89,94,100-109,116-138
+mobile/src/services/login-service/types.ts
+  s_d71219784be482::t_d9dc728ed9ecda 2,17
+mobile/src/services/security-service/index.ts
+  s_d71219784be482::t_937365a0016d8b 12,16,18,21-22,24-28
+mobile/src/services/security-service/mock-security-service.ts
+  s_d71219784be482::t_ce8f94270d17cc 9,170-181,183-186,192,206,209-211,220-233
+mobile/src/services/security-service/security-dto.ts
+  s_d71219784be482::t_5e45b59ed55058 5,15,24,28-29,31,33,42-52,70-118,143,167-169,177-198
+mobile/src/services/security-service/security-service.ts
+  s_d71219784be482::t_feab8545c8cd90 5,12-13,36-48,50,54,56
+mobile/src/services/security-service/security-urls.ts
+  s_d71219784be482::t_d5027c03950a59 3-5,9-10,12-13
+mobile/src/services/security-service/test/security-dto.test.ts
+  s_d71219784be482::t_6ede6c2f8b7bb0 3-4,7,10,43-66,107-118,127-146
+mobile/src/services/security-service/types.ts
+  s_d71219784be482::t_46a6c25cce3e10 3,90-102,120-142,144,148,153-160,164,174,180-184
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "05b8ddc9b68789c7c9f1f10865a78609c4a5f35a",
+  "prompts": {},
+  "sessions": {
+    "s_d71219784be482": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6d308e11-e9a8-4be8-afa9-9b02513cda14",
+        "model": "unknown"
+      },
+      "human_author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

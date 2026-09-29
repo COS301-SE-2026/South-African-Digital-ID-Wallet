@@ -1,0 +1,16 @@
+mobile/src/hooks/test/use-emergency-profile.test.tsx
+  h_712d174fc3f309 121
+mobile/src/hooks/test/use-security.test.tsx
+  h_712d174fc3f309 1,55-59,187,264,326
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "40dece4fe304bf5d324441c5af42c4cd5b766396",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

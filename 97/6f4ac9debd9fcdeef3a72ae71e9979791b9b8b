@@ -1,0 +1,14 @@
+web/src/services/qr-service/test/qr-api-service.test.ts
+  h_0aff3b71f739b1 1-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "976f4ac9debd9fcdeef3a72ae71e9979791b9b8b",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

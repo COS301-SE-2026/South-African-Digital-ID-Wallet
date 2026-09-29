@@ -1,0 +1,14 @@
+web/src/services/institution-service/test/institution-api-service.test.ts
+  h_0aff3b71f739b1 1-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "3502f7af2fead68c036faeb7005df10b0b972ec8",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+backend/FlashIdBackend/tests/PasswordResetServiceTests.cs
+  h_99fca60b892ff4 1-196
+backend/FlashIdBackend/Application/Features/Auth/DTOs/PasswordResetDtos.cs
+  h_99fca60b892ff4 1-14
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IPasswordResetService.cs
+  h_99fca60b892ff4 1-9
+backend/FlashIdBackend/Application/Common/Services/PasswordResetService.cs
+  h_99fca60b892ff4 1-102
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_99fca60b892ff4 52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "dd94c4924faddda912f61482ca0c579beddec204",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
