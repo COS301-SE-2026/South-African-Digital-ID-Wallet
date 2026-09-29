@@ -27,7 +27,7 @@ import type { LoginFormProps } from './types'
 
 const INITIAL_VALUES: LoginFormData = { email: '', password: '' }
 
-export const LoginForm = ({ onRegister }: LoginFormProps) => {
+export const LoginForm = ({ onForgotPassword, onRegister }: LoginFormProps) => {
   const router = useRouter()
   const signIn = useAuthStore((state) => state.signIn)
   const isBiometricEnabled = useAuthStore((state) => state.isBiometricEnabled)
@@ -162,6 +162,16 @@ export const LoginForm = ({ onRegister }: LoginFormProps) => {
           </Text>
         ) : null}
         <Button label="Log In" testID="login-submit" type="submit" />
+        <Pressable
+          accessibilityRole="link"
+          hitSlop={6}
+          onPress={onForgotPassword}
+          testID="forgot-password-link"
+        >
+          <Text variant="sub-sm" className="text-center text-primary-green">
+            Forgot password?
+          </Text>
+        </Pressable>
         <View className="flex-row items-center justify-center pt-2">
           <Text variant="sub-sm">Don&apos;t have an account? </Text>
           <Pressable

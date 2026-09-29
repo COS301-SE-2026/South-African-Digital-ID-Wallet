@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Onboarding.Dtos;
+using Application.Common.Validation;
 
 namespace Infrastructure.Gateways.GovernmentRegistry;
 
@@ -63,7 +64,7 @@ public class GovernmentRegistryGateway : IGovernmentRegistryGateway
     {
         ArgumentException.ThrowIfNullOrEmpty(saId, nameof(saId));
         var clean = saId.Trim();
-        if (!Regex.IsMatch(clean, @"^\d{13}$", RegexOptions.None, TimeSpan.FromMilliseconds(600)))
+        if (!SaIdValidator.IsValid(clean))
             throw new ArgumentException("Invalid South African ID number");
         return clean;
     }

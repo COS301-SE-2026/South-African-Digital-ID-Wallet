@@ -13,7 +13,7 @@ export const CLAIM_LABELS: Readonly<
     citizenship_status: 'Citizenship status',
     gender: 'Gender',
     country_of_birth: 'Country of birth',
-    card_issue_date_and_number: 'Card issue date and number',
+    card_issue_date_and_number: 'Card issue date',
   },
   'urn:flashid:drivers-license:1': {
     portrait: 'Photo',

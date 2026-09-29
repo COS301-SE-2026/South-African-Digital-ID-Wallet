@@ -43,6 +43,7 @@ public enum AuditEventType
     OfflinePackageMintFailed,
     OfflineCredentialVerified,
     OfflineVerificationRejected,
+    PasswordReset,
     EmergencyConsentRecorded,
     EmergencyProfileUpdated,
     EmergencyDeviceRegistered,

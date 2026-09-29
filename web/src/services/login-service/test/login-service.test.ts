@@ -152,3 +152,33 @@ describe('loginService.getUser', () => {
     expect(getMock).toHaveBeenCalledWith('/api/auth/user/1')
   })
 })
+
+describe('loginService.forgotPassword', () => {
+  it('Should post the email to the forgot password endpoint', async () => {
+    postMock.mockResolvedValue({ data: { message: 'sent' } })
+
+    await expect(
+      loginService.forgotPassword('thabo@flashid.co.za')
+    ).resolves.toBeUndefined()
+
+    expect(postMock).toHaveBeenCalledWith('/api/auth/forgot-password', {
+      email: 'thabo@flashid.co.za',
+    })
+  })
+})
+
+describe('loginService.resetPassword', () => {
+  it('Should post the code and both passwords to the reset endpoint', async () => {
+    postMock.mockResolvedValue({ data: { message: 'updated' } })
+    const request = {
+      email: 'thabo@flashid.co.za',
+      otp: '123456',
+      newPassword: 'BrandNewPwd456!',
+      confirmPassword: 'BrandNewPwd456!',
+    }
+
+    await expect(loginService.resetPassword(request)).resolves.toBeUndefined()
+
+    expect(postMock).toHaveBeenCalledWith('/api/auth/reset-password', request)
+  })
+})

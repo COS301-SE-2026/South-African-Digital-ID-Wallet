@@ -156,4 +156,10 @@ describe('<LoginForm/>', () => {
     expect(useAuthStore.getState().token).toBeNull()
     expect(mockReplace).not.toHaveBeenCalled()
   })
+  it('Should delegate the forgot password action to its props', async () => {
+    const onForgotPassword = jest.fn()
+    await render(<LoginForm onForgotPassword={onForgotPassword} />)
+    await fireEvent.press(screen.getByTestId('forgot-password-link'))
+    expect(onForgotPassword).toHaveBeenCalledTimes(1)
+  })
 })

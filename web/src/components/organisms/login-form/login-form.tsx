@@ -264,9 +264,12 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
           </button>
 
           <div className="space-y-1 text-center text-base text-primary-green">
-            <a href="#" className="block hover:text-deep-green hover:underline">
+            <Link
+              href="/forgot-password"
+              className="block hover:text-deep-green hover:underline"
+            >
               Forgot password?
-            </a>
+            </Link>
 
             <p>
               Don&apos;t have an account?{' '}

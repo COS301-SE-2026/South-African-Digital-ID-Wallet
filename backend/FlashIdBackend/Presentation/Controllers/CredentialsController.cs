@@ -138,6 +138,7 @@ public class CredentialsController : ControllerBase
     }
 
     [HttpPost("resolve")]
+    [EnableRateLimiting("resolve-credential")]
     public async Task<IActionResult> Resolve([FromBody] ResolveCredentialRequestDto req)
     {
         try

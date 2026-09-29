@@ -6,6 +6,7 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Verification.Dtos;
 using Domain.Entities;
 using Domain.Enums;
+using Application.Common.Validation;
 
 namespace Application.Common.Services;
 
@@ -110,8 +111,7 @@ public class CitizenVerificationService : ICitizenVerificationService
             throw new ArgumentException("Activation token is required");
         }
 
-        if (string.IsNullOrWhiteSpace(request.SaId) || !Regex.IsMatch(request.SaId.Trim(), @"^\d{13}$",
-                RegexOptions.None, TimeSpan.FromMilliseconds(500)))
+        if (!SaIdValidator.IsValid(request.SaId))
         {
             throw new ArgumentException("A valid 13-digit South African ID number is required.");
         }

@@ -57,7 +57,7 @@ describe('createOfflinePresentation', () => {
     })
 
     expect(() =>
-      createOfflinePresentation(identity, ['Card issue date and number'])
+      createOfflinePresentation(identity, ['Card issue date'])
     ).not.toThrow()
   })
 

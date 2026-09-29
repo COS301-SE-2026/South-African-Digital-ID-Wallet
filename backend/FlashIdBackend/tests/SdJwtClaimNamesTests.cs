@@ -16,7 +16,7 @@ public class SdJwtClaimNamesTests
         ["Citizenship status"] = "citizenship_status",
         ["Gender"] = "gender",
         ["Country of birth"] = "country_of_birth",
-        ["Card issue date and number"] = "card_issue_date_and_number",
+        ["Card issue date"] = "card_issue_date_and_number",
         ["Signature"] = "signature_image",
     };
 

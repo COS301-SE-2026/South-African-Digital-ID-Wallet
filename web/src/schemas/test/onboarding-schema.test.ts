@@ -1,7 +1,7 @@
 import { onboardingSchema, retrivalSchema } from '@/schemas/onboarding-schema'
 
 describe('retrivalSchema', () => {
-  const valid = { idNumber: '9001015800086', idConsent: true as const }
+  const valid = { idNumber: '8001015009087', idConsent: true as const }
 
   it('Should accept a 13-digit id that is valid with consent', () => {
     expect(retrivalSchema.safeParse(valid).success).toBe(true)
@@ -9,19 +9,22 @@ describe('retrivalSchema', () => {
 
   it('Should trim the surrounding whitespace before validating', () => {
     expect(
-      retrivalSchema.safeParse({ ...valid, idNumber: '  9001015800086  ' })
+      retrivalSchema.safeParse({ ...valid, idNumber: '  8001015009087  ' })
         .success
     ).toBe(true)
   })
 
-  it.each(['900101580008', '90010158000866', '90010158000a6', ''])(
-    'should reject wrong id numbers',
-    (idNumber) => {
-      expect(retrivalSchema.safeParse({ ...valid, idNumber }).success).toBe(
-        false
-      )
-    }
-  )
+  it.each([
+    '900101580008',
+    '90010158000866',
+    '90010158000a6',
+    '',
+    '9001015800086',
+    '8013015009087',
+    '8001015009287',
+  ])('should reject wrong id numbers', (idNumber) => {
+    expect(retrivalSchema.safeParse({ ...valid, idNumber }).success).toBe(false)
+  })
 
   it('Should require consent', () => {
     expect(

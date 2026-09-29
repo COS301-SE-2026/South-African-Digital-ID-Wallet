@@ -51,6 +51,7 @@ public static class DependencyInjection
             sp.GetService<Microsoft.Extensions.Configuration.IConfiguration>()));
         services.AddScoped<IFraudDetectionService, FraudDetectionService>();
         services.AddScoped<IOfflinePackageService, OfflinePackageService>();
+        services.AddScoped<IPasswordResetService, PasswordResetService>();
         return services;
     }
 }
