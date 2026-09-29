@@ -2,6 +2,7 @@ import { p256 } from '@noble/curves/nist.js'
 import { sha256 } from '@noble/hashes/sha2.js'
 import { base64urlnopad } from '@scure/base'
 import { CLAIM_LABELS } from './claim-labels'
+import { EMERGENCY_VCT } from './emergency-claims'
 
 export type VerificationFailureCode =
   | 'MALFORMED'
@@ -19,6 +20,7 @@ export type VerificationFailureCode =
   | 'SD_HASH_MISMATCH'
   | 'STALE_PRESENTATION'
   | 'STALE_TRUST_DATA'
+  | 'EMERGENCY_CODE'
 
 export type PublicJwk = {
   kty: string
@@ -41,11 +43,18 @@ export type TrustData = {
   revocationRetrievedAt: number | null
 }
 
+export type ClaimSet = {
+  vct: string
+  allowedClaims: readonly string[]
+  mandatoryClaims: readonly string[]
+}
+
 export type VerifyOptions = {
   /** Unix seconds. Injected so tests and the cross-stack fixture can pin the clock. */
   now: number
   /** Require key binding even without cnf. A credential that has cnf always requires it. */
   requireKeyBinding?: boolean
+  claimSet?: ClaimSet
 }
 
 export type VerificationResult =
@@ -347,15 +356,32 @@ const readDisclosure = (
 }
 
 // Step 7.
+const allowedClaimsFor = (
+  vct: string,
+  claimSet: ClaimSet | undefined
+): readonly string[] | undefined =>
+  claimSet
+    ? vct === claimSet.vct
+      ? claimSet.allowedClaims
+      : undefined
+    : ALLOWED_CLAIMS[vct]
+
 const collectDisclosures = (
-  parsed: ParsedPresentation
+  parsed: ParsedPresentation,
+  claimSet: ClaimSet | undefined
 ): { vct: string; claims: Record<string, string> } | Failure => {
   const vct = parsed.payload.vct
-  const allowedClaims =
-    typeof vct === 'string' ? ALLOWED_CLAIMS[vct] : undefined
 
-  if (typeof vct !== 'string' || !allowedClaims) {
+  if (typeof vct !== 'string') {
     return failure('MALFORMED')
+  }
+
+  const allowedClaims = allowedClaimsFor(vct, claimSet)
+
+  if (!allowedClaims) {
+    return failure(
+      !claimSet && vct === EMERGENCY_VCT ? 'EMERGENCY_CODE' : 'MALFORMED'
+    )
   }
 
   const sdDigests = new Set(
@@ -388,9 +414,12 @@ const collectDisclosures = (
 // Step 8.
 const checkMandatory = (
   vct: string,
-  claims: Record<string, string>
+  claims: Record<string, string>,
+  claimSet: ClaimSet | undefined
 ): VerificationFailureCode | undefined =>
-  (MANDATORY_CLAIMS[vct] ?? []).every((claimName) => claimName in claims)
+  (claimSet ? claimSet.mandatoryClaims : (MANDATORY_CLAIMS[vct] ?? [])).every(
+    (claimName) => claimName in claims
+  )
     ? undefined
     : 'MISSING_MANDATORY_CLAIM'
 
@@ -520,13 +549,13 @@ export const verifyPresentation = (
     return fail(statusFailure)
   }
 
-  const disclosed = collectDisclosures(parsed)
+  const disclosed = collectDisclosures(parsed, options.claimSet)
   if (isFailure(disclosed)) {
     return fail(disclosed.failure)
   }
 
   const bindingFailure =
-    checkMandatory(disclosed.vct, disclosed.claims) ??
+    checkMandatory(disclosed.vct, disclosed.claims, options.claimSet) ??
     checkKeyBinding(parsed, options)
   if (bindingFailure) {
     return fail(bindingFailure)

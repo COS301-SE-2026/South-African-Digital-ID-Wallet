@@ -11,6 +11,8 @@ module.exports = {
   preset: 'jest-expo',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
+    '^@/\\.\\./modules/flashid-emergency$':
+      '<rootDir>/modules/flashid-emergency/__mocks__/index.ts',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   transformIgnorePatterns: allowEsmPackages,

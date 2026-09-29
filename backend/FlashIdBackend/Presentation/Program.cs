@@ -30,8 +30,7 @@ if (!builder.Environment.IsEnvironment("Testing"))
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 
-builder.Services.AddInfrastructure();
-
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
 builder.Services.AddControllers()
@@ -183,6 +182,8 @@ builder.Services.AddRateLimiter(options =>
     AddUserPartitionedPolicy(options, "email-change-confirm", permitLimit: 5, window: TimeSpan.FromMinutes(1));
     AddUserPartitionedPolicy(options, "issue-credential", permitLimit: 5, window: TimeSpan.FromMinutes(1));
     AddUserPartitionedPolicy(options, "citizen-status-lookup", permitLimit: 20, window: TimeSpan.FromMinutes(1));
+    AddUserPartitionedPolicy(options, "emergency-resolve", permitLimit: 10, window: TimeSpan.FromMinutes(1));
+    AddUserPartitionedPolicy(options, "emergency-offline-access", permitLimit: 20, window: TimeSpan.FromMinutes(1));
 
     options.RejectionStatusCode = 429;
 });
@@ -231,6 +232,7 @@ app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);
 app.UseRateLimiter();
+app.UseMiddleware<Presentation.Middleware.CsrfProtectionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

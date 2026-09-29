@@ -7,6 +7,7 @@ import {
 } from '@/lib/offline/qr-frame-accumulator'
 import {
   verifyPresentation,
+  type ClaimSet,
   type TrustData,
   type VerificationResult,
 } from '@/lib/offline/verify'
@@ -29,12 +30,14 @@ export const useOfflineScan = (
   trust: TrustData | null,
   isTrustLoading = false,
   // Told about each result once, for example to queue it for the audit log.
-  onResult?: (result: VerificationResult) => void
+  onResult?: (result: VerificationResult) => void,
+  claimSet?: ClaimSet
 ) => {
   // useState's lazy initialiser builds the accumulator on the first render only, never again.
   const [accumulator] = useState(() => new PayloadFrameAccumulator())
   const [progress, setProgress] = useState<OfflineScanProgress | null>(null)
   const [result, setResult] = useState<VerificationResult | null>(null)
+  const [presentation, setPresentation] = useState<string | null>(null)
   // A ref, not state: it only decides what to do with the next frame and never changes what is shown.
   const keyBindingWait = useRef<KeyBindingWait | null>(null)
 
@@ -84,26 +87,28 @@ export const useOfflineScan = (
       keyBindingWait.current = null
       setProgress(null)
 
+      const scanned = `${snapshot.presentation}${snapshot.keyBindingJwt ?? ''}`
       const verification: VerificationResult = trust
-        ? verifyPresentation(
-            `${snapshot.presentation}${snapshot.keyBindingJwt ?? ''}`,
-            trust,
-            { now: Math.floor(now / 1000) }
-          )
+        ? verifyPresentation(scanned, trust, {
+            now: Math.floor(now / 1000),
+            claimSet,
+          })
         : { ok: false, code: 'STALE_TRUST_DATA', warnings: [] }
 
+      setPresentation(scanned)
       setResult(verification)
       onResult?.(verification)
     },
-    [accumulator, isTrustLoading, onResult, result, trust]
+    [accumulator, claimSet, isTrustLoading, onResult, result, trust]
   )
 
   const reset = useCallback(() => {
     accumulator.reset()
     keyBindingWait.current = null
     setProgress(null)
+    setPresentation(null)
     setResult(null)
   }, [accumulator])
 
-  return { addFrame, progress, reset, result }
+  return { addFrame, presentation, progress, reset, result }
 }
