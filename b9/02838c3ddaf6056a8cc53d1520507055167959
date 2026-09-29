@@ -1,0 +1,20 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/ICertifiedCredentialCopyService.cs
+  h_0aff3b71f739b1 19-21
+backend/FlashIdBackend/Presentation/Controllers/CertifiedCredentialCopiesController.cs
+  h_0aff3b71f739b1 104-106,117-133,135-136,139-144,146-155,157-171,176-177,198-199
+  h_0aff3b71f739b1 134,137-138,145
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/ICertifiedCredentialCopyRepository.cs
+  h_0aff3b71f739b1 7
+  h_0aff3b71f739b1 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b902838c3ddaf6056a8cc53d1520507055167959",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

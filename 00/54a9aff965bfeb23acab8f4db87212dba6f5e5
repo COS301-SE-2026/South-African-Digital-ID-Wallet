@@ -1,0 +1,16 @@
+web/src/components/organisms/public-certified-copy-frame/test/public-certified-copy-frame.test.tsx
+  h_293a8616118f65 5-12
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/ICertifiedCredentialCopyRepository.cs
+  h_293a8616118f65 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0054a9aff965bfeb23acab8f4db87212dba6f5e5",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+web/src/components/molecules/authentic-result/authentic-result.tsx
+  h_0aff3b71f739b1 67,82
+  h_0aff3b71f739b1 1,55-58,80-81,83-86,95
+web/src/app/verify-certified-copy/[verificationToken]/page.tsx
+  h_0aff3b71f739b1 1-18
+backend/FlashIdBackend/Infrastructure/Repositories/CertifiedCredentialCopyRepository.cs
+  h_0aff3b71f739b1 44-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1ab72c5632b99a7b23c0f98990db1e999f7926bd",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IUpdatePasswordRepository.cs
+  h_712d174fc3f309 11-12,14
+backend/FlashIdBackend/Application/Common/Services/UpdatePasswordService.cs
+  h_712d174fc3f309 41-43,49
+backend/FlashIdBackend/Infrastructure/Repositories/UpdatePasswordRepository.cs
+  h_712d174fc3f309 29-38,43
+backend/FlashIdBackend/tests/UpdatePasswordServiceTests.cs
+  h_712d174fc3f309 12-14,21-22,31-38,74,97,111,114,127,130,148-161
+mobile/jest.config.js
+  h_712d174fc3f309 3-7,16
+mobile/package.json
+  h_712d174fc3f309 19,48-49,56,60
+pnpm-lock.yaml
+  h_712d174fc3f309 51-53,138-143,157-159,169-171,2912-2914,2939-2941,3008-3013,3204,3209,3896-3899,7570-7573,7977-7979,11428-11431,11454-11455,11530-11538,12602-12605,17326-17329,17802-17803
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ee971078e160d2cc1a015f54782c07623642137a",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

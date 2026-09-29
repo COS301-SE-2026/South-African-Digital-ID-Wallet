@@ -1,0 +1,19 @@
+web/src/components/organisms/public-certified-copy-frame/public-certified-copy-frame.tsx
+  h_0aff3b71f739b1 1-4,10-13,15,24-36,39-40,42-45,50-51,53
+  h_0aff3b71f739b1 41,46-48,52
+web/src/components/organisms/invalid-certified-copy/invalid-certified-copy.tsx
+  h_0aff3b71f739b1 13,16-18,24,31,36-37,39,46,53
+web/src/components/organisms/valid-certified-copy/valid-certified-copy.tsx
+  h_0aff3b71f739b1 15,21,35,51,54-56,62,69,75,78,83,89-90,94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "703a3bd7d0d575c809dbcc02625dc38d0e840ccc",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
