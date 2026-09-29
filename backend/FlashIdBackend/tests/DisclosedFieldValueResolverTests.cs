@@ -1,0 +1,234 @@
+using Application.Common.Services;
+using Domain.Entities;
+using Domain.Enums;
+using Application.Common.Interfaces.ProviderInterfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
+
+namespace tests;
+
+public class DisclosedFieldValueResolverTests
+{
+    private const string GenderField = "Gender";
+
+    private sealed class FakePhotoStorageProvider : IPhotoStorageProvider
+    {
+        public Task<string> GenerateReadSasUrlAsync(string blobName, TimeSpan ttl) => Task.FromResult($"https://fake-blob-sas.local/{blobName}");
+        public Task<Stream?> OpenReadAsync(string blobName, CancellationToken cancellationToken) => Task.FromResult<Stream?>(null);
+    }
+
+    private sealed class ThrowingPhotoStorageProvider : IPhotoStorageProvider
+    {
+        public Task<string> GenerateReadSasUrlAsync(string blobName, TimeSpan ttl) => throw new InvalidOperationException("Storage must not be touched.");
+        public Task<Stream?> OpenReadAsync(string blobName, CancellationToken cancellationToken) => throw new InvalidOperationException("Storage must not be touched.");
+    }
+
+    private static DisclosedFieldValueResolver CreateResolver() => new(new FakePhotoStorageProvider());
+
+    private static Credential IdentityDocumentCredential()
+    {
+        var citizen = new Citizen
+        {
+            Id = Guid.NewGuid(),
+            SaId = "9001015800083",
+            Names = "Thandiwe",
+            Surname = "Mokoena",
+            DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            Gender = Gender.Female,
+        };
+
+        var cred = new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Citizen = citizen,
+            IssueDate = new DateTime(2021, 3, 15, 0, 0, 0, DateTimeKind.Utc),
+        };
+
+        cred.IdentityDocument = new IdentityDocument
+        {
+            Id = Guid.NewGuid(),
+            CredentialId = cred.Id,
+            Credential = cred,
+            Citizenship = "Citizen",
+            CountryOfBirth = "South Africa",
+            Nationality = "South African",
+            PhotoPath = "id-photo.jpg",
+        };
+
+        return cred;
+    }
+
+    private static Credential DriversLicenseCredential()
+    {
+        var citizen = new Citizen
+        {
+            Id = Guid.NewGuid(),
+            SaId = "9001015800083",
+            Names = "Thandiwe",
+            Surname = "Mokoena",
+            DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+        };
+
+        var cred = new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Citizen = citizen,
+            IssueDate = new DateTime(2021, 3, 15, 0, 0, 0, DateTimeKind.Utc),
+        };
+
+        cred.DriversLicense = new DriversLicense
+        {
+            Id = Guid.NewGuid(),
+            CredentialId = cred.Id,
+            Credential = cred,
+            LicenseNumber = "4589161234567",
+            LicenseCode = LicenseCode.C,
+            Restrictions = "01",
+            ExpiryDate = new DateTime(2030, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            PhotoPath = "license-photo.jpg",
+            CountryOfIssue = "South Africa",
+        };
+
+        return cred;
+    }
+
+    [Theory]
+    [InlineData("Identity number", "9001015800083")]
+    [InlineData("Full surname", "Mokoena")]
+    [InlineData("Full forenames", "Thandiwe")]
+    [InlineData("Date of birth", "1990-01-01")]
+    [InlineData("Citizenship status", "Citizen")]
+    [InlineData("Photograph", "https://fake-blob-sas.local/id-photo.jpg")]
+    [InlineData("Country of birth", "South Africa")]
+    [InlineData("Card issue date", "2021-03-15")]
+    public async Task Resolve_IdentityDocumentFields_ReturnsExpectedValue(string field, string expected)
+    {
+        var cred = IdentityDocumentCredential();
+        var res = await CreateResolver().ResolveAsync(cred, new[] { field });
+        Assert.Equal(expected, res[field]);
+    }
+
+    [Fact]
+    public async Task Resolve_Gender_ReturnsCitizenGender()
+    {
+        var cred = IdentityDocumentCredential();
+        var res = await CreateResolver().ResolveAsync(cred, new[] { GenderField });
+        Assert.Equal("Female", res[GenderField]);
+    }
+
+    [Theory]
+    [InlineData("SA ID number", "9001015800083")]
+    [InlineData("Full name", "Thandiwe Mokoena")]
+    [InlineData("License number", "4589161234567")]
+    [InlineData("License code", "C")]
+    [InlineData("Expiry date", "2030-01-01")]
+    [InlineData("Photo", "https://fake-blob-sas.local/license-photo.jpg")]
+    [InlineData("Country of issue", "South Africa")]
+    [InlineData("Vehicle restrictions", "01")]
+    public async Task Resolve_DriversLicenseFields_ReturnsExpectedValue(string field, string expected)
+    {
+        var cred = DriversLicenseCredential();
+        var res = await CreateResolver().ResolveAsync(cred, new[] { field });
+        Assert.Equal(expected, res[field]);
+    }
+
+    [Fact]
+    public async Task Resolve_MultiplFields_ReturnsAllRequestedValues()
+    {
+        var cred = IdentityDocumentCredential();
+        var res = await CreateResolver().ResolveAsync(cred, new[] { "Identity number", "Full surname", GenderField });
+        Assert.Equal("Female", res[GenderField]);
+        Assert.Equal("Mokoena", res["Full surname"]);
+        Assert.Equal("9001015800083", res["Identity number"]);
+        Assert.Equal(3, res.Count);
+    }
+
+    [Fact]
+    public async Task Resolve_UnknownField_ThrowsInvalidOperationException()
+    {
+        var cred = IdentityDocumentCredential();
+        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateResolver().ResolveAsync(cred, new[] { "This is not a real field" }));
+    }
+
+    [Theory]
+    [InlineData("Signature")]
+    public async Task Resolve_NotYetImplementedFields_ReturnsEmptyStringe(string field)
+    {
+        var cred = IdentityDocumentCredential();
+        var res = await CreateResolver().ResolveAsync(cred, new[] { field });
+        Assert.Equal(string.Empty, res[field]);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task Resolve_VehicleRestrictionsWhenThereAreNone_ReturnsNone(string? restrictions)
+    {
+        var cred = DriversLicenseCredential();
+        cred.DriversLicense!.Restrictions = restrictions;
+        var res = await CreateResolver().ResolveAsync(cred, new[] { "Vehicle restrictions" });
+        Assert.Equal("None", res["Vehicle restrictions"]);
+    }
+
+    [Theory]
+    [InlineData("Identity number", "9001015800083")]
+    [InlineData("Full surname", "Mokoena")]
+    [InlineData("Date of birth", "1990-01-01")]
+    [InlineData("Citizenship status", "Citizen")]
+    [InlineData("Country of birth", "South Africa")]
+    public void Describe_TextField_ReturnsTextKindWithTheValue(string field, string expected)
+    {
+        var source = CreateResolver().Describe(IdentityDocumentCredential(), field);
+
+        Assert.Equal(DisclosedFieldKind.Text, source.Kind);
+        Assert.Equal(expected, source.Value);
+    }
+
+    [Fact]
+    public void Describe_Photograph_ReturnsPhotoKindWithTheBlobName()
+    {
+        var source = CreateResolver().Describe(IdentityDocumentCredential(), "Photograph");
+
+        Assert.Equal(DisclosedFieldKind.Photo, source.Kind);
+        Assert.Equal("id-photo.jpg", source.Value);
+    }
+
+    [Fact]
+    public void Describe_DriversLicensePhoto_ReturnsPhotoKindWithTheBlobName()
+    {
+        var source = CreateResolver().Describe(DriversLicenseCredential(), "Photo");
+
+        Assert.Equal(DisclosedFieldKind.Photo, source.Kind);
+        Assert.Equal("license-photo.jpg", source.Value);
+    }
+
+    [Fact]
+    public void Describe_PhotographWithNoStoredPhoto_ReturnsPhotoKindWithEmptyValue()
+    {
+        var cred = IdentityDocumentCredential();
+        cred.IdentityDocument!.PhotoPath = null;
+
+        var source = CreateResolver().Describe(cred, "Photograph");
+
+        Assert.Equal(DisclosedFieldKind.Photo, source.Kind);
+        Assert.Equal(string.Empty, source.Value);
+    }
+
+    [Fact]
+    public void Describe_AnyField_DoesNotTouchPhotoStorage()
+    {
+        var resolver = new DisclosedFieldValueResolver(new ThrowingPhotoStorageProvider());
+        var cred = IdentityDocumentCredential();
+
+        Assert.Equal(DisclosedFieldKind.Photo, resolver.Describe(cred, "Photograph").Kind);
+        Assert.Equal(DisclosedFieldKind.Text, resolver.Describe(cred, "Full surname").Kind);
+    }
+
+    [Fact]
+    public void Describe_UnknownField_ThrowsInvalidOperationException()
+    {
+        Assert.Throws<InvalidOperationException>(() => CreateResolver().Describe(IdentityDocumentCredential(), "This is not a real field"));
+    }
+}

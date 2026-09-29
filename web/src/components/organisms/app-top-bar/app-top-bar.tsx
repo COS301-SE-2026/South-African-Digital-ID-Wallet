@@ -1,4 +1,4 @@
-import { Bell, ChevronDown } from 'lucide-react'
+import { Bell, ChevronDown, Menu } from 'lucide-react'
 import type { AppTopBarProps } from '@/types/app-top-bar'
 
 export const AppTopBar = ({
@@ -7,16 +7,30 @@ export const AppTopBar = ({
   user,
   showNotifications = true,
   notificationCount = 0,
+  onMenuClick,
 }: Readonly<AppTopBarProps>) => {
   return (
     <header className="flex items-center justify-between px-5 py-5">
-      <div>
-        <h1 className="text-2xl font-extrabold tracking-tight text-deep-green">
-          {title}
-        </h1>
-        <p className="mt-1 text-sm font-medium text-muted-text">
-          {description}
-        </p>
+      <div className="flex items-center gap-3">
+        {onMenuClick && (
+          <button
+            type="button"
+            onClick={onMenuClick}
+            className="rounded-full p-2 text-primary-green transition hover:bg-primary-green/10 lg:hidden"
+            aria-label="Open navigation menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        )}
+
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-deep-green">
+            {title}
+          </h1>
+          <p className="mt-1 text-sm font-medium text-muted-text">
+            {description}
+          </p>
+        </div>
       </div>
 
       <div className=" flex items-center gap-4">

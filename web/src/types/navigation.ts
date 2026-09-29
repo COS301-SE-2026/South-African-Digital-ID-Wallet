@@ -10,6 +10,7 @@ export type SidebarIconName =
   | 'shield'
   | 'onboard'
   | 'institutions'
+  | 'idCard'
 
 export type SidebarNavItem = {
   label: string
@@ -25,5 +26,4 @@ export type SidebarNavSection = {
 export type SidebarUser = {
   name: string
   initials: string
-  idLabel: string
 }

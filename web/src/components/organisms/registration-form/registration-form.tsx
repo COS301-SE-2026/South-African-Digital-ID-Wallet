@@ -5,13 +5,13 @@ import Link from 'next/link'
 import { User, CircleUserRound, LockKeyhole, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Text } from '@/components/atoms'
-import { TextField } from '@/components/molecules'
+import { getSafeReturnTo, TextField } from '@/components/molecules'
 import type { RegistrationFormProps } from '@/types/registration-form.types'
 
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import { useMutation } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { registerService } from '@/services/citizen-register-service'
 
 const RequirementList = ({
@@ -107,13 +107,26 @@ export const RegistrationForm = ({
 
   const router = useRouter()
 
+  const searchParams = useSearchParams()
+  const returnTo = searchParams.get('returnTo')
+  const safeReturnTo = getSafeReturnTo(returnTo, '')
+
+  const loginHref = safeReturnTo
+    ? `/login?returnTo=${encodeURIComponent(safeReturnTo)}`
+    : `/login`
+
   const registerMutation = useMutation({
     mutationFn: registerService.register,
     onSuccess: () => {
       toast.success(
         'Account created successfully. Please check your email to verify your account.'
       )
-      router.push(`/verify-email?email=${encodeURIComponent(email)}`)
+
+      const verifyEmailHref = safeReturnTo
+        ? `/verify-email?email=${encodeURIComponent(email)}&returnTo=${encodeURIComponent(safeReturnTo)}`
+        : `/verify-email?email=${encodeURIComponent(email)}`
+
+      router.push(verifyEmailHref)
     },
     onError: (err) => {
       const message =
@@ -238,7 +251,7 @@ export const RegistrationForm = ({
         <Text variant="sub-sm" className="text-center">
           Already have an account?{' '}
           <Link
-            href="/"
+            href={loginHref}
             className="font-semibold text-primary-green hover:underline"
           >
             Log in

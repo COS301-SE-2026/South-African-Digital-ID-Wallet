@@ -38,7 +38,7 @@ public class IdentityDocumentConfiguration : IEntityTypeConfiguration<IdentityDo
             .IsRequired()
             .HasColumnType("datetime2")
             .HasDefaultValueSql("GETUTCDATE()")
-            .ValueGeneratedOnAddOrUpdate();
+            .ValueGeneratedOnAdd();
 
         builder.Property(i => i.PhotoPath)
             .IsRequired()

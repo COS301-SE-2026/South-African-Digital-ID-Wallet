@@ -51,9 +51,19 @@ pre-commit:
       glob: "mobile/**/*.{ts,tsx,js,jsx}"
       root: "mobile"
       run: pnpm type-check
-    mobile-build:
-      glob: "mobile/**/*.{ts,tsx,js,jsx}"
-      root: "mobile"
+    government-registry-format:
+      glob: "government-registry/GovernmentRegistry/**/*.cs"
+      root: "government-registry"
+      run: pnpm format
+      stage_fixed: true
+    government-registry-lint:
+      glob: "government-registry/GovernmentRegistry/**/*.cs"
+      root: "government-registry"
+      run: pnpm lint
+      stage_fixed: true
+    government-registry-build:
+      glob: "government-registry/GovernmentRegistry/**/*.cs"
+      root: "government-registry"
       run: pnpm build
       skip:
       - merge

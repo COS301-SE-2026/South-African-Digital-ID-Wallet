@@ -9,7 +9,7 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
-    
+
     public DbSet<CitizenRecord> CitizenRecords { get; set; }
     public DbSet<Credential> Credentials { get; set; }
     public DbSet<IdentityDocument> IdentityDocuments { get; set; }

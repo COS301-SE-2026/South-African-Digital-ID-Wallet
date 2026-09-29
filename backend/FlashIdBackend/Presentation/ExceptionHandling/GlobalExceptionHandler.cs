@@ -1,6 +1,11 @@
 using Application.Features.Onboarding.Exceptions;
+using Application.Features.Verification.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Diagnostics;
+using Application.Features.Citizens.Exceptions;
+using Application.Features.Credentials.Exceptions;
+using Application.Features.GovAdminAuditLog.Exceptions;
+using Application.Features.Emergency.Exceptions;
 
 namespace Presentation.ExceptionHandling;
 
@@ -26,12 +31,47 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
                 (StatusCodes.Status422UnprocessableEntity, "Invalid SA phone number format",
                     exception.Message),
 
+            CitizenUnderageException =>
+                (StatusCodes.Status422UnprocessableEntity, "Citizen too young",
+                    exception.Message),
+
+            InvalidAuditActionException =>
+        (StatusCodes.Status400BadRequest, "Invalid audit action",
+            exception.Message),
+
             DuplicateEmailRegisteredException =>
                 (StatusCodes.Status409Conflict, "Email already registered",
                     exception.Message),
 
+            Application.Features.Citizens.Exceptions.CitizenNotFoundException or
+            Application.Features.Credentials.Exceptions.CitizenNotFoundException =>
+                (StatusCodes.Status404NotFound, "Citizen not found",
+                    exception.Message),
+
+            CitizenNotOnboardedException =>
+                (StatusCodes.Status409Conflict, "Citizen not activated",
+                    exception.Message),
+
+            CredentialAlreadyIssuedException =>
+                (StatusCodes.Status409Conflict, "Credential already issued",
+                    exception.Message),
+
+            GovernmentRegistryRecordNotFoundException =>
+                (StatusCodes.Status404NotFound, "Government registry record not found",
+                    exception.Message),
+
+            GovernmentRegistryDataInvalidException =>
+                (StatusCodes.Status502BadGateway, "Government registry record invalid data",
+                    exception.Message),
+
             EmailDeliveryException => (StatusCodes.Status503ServiceUnavailable, "Required value missing",
                     exception.Message),
+
+            VerificationExpiredException => (StatusCodes.Status410Gone, "Verification session expired", exception.Message),
+
+            VerificationNotFoundException => (StatusCodes.Status404NotFound, "Verification session not found", exception.Message),
+
+            InvalidVerificationState => (StatusCodes.Status409Conflict, "Verification cannot continue", exception.Message),
 
             ArgumentNullException => (StatusCodes.Status400BadRequest, "Invalid request",
                 exception.Message),
@@ -41,6 +81,22 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
 
             ArgumentException => (StatusCodes.Status400BadRequest, "Invalid request.",
                 exception.Message),
+
+            InvalidEmergencyCodeException =>
+                (StatusCodes.Status400BadRequest, "Invalid emergency code",
+                    exception.Message),
+
+            EmergencyProfileNotFoundException =>
+                (StatusCodes.Status404NotFound, "Emergency profile not found",
+                    exception.Message),
+
+            EmergencyDeviceNotRegisteredException =>
+                (StatusCodes.Status409Conflict, "Emergency device not registered",
+                    exception.Message),
+
+            EmergencyConsentRequiredException =>
+                (StatusCodes.Status400BadRequest, "Consent required",
+                    exception.Message),
 
             _ => (StatusCodes.Status500InternalServerError, "Internal server error",
                     environment.IsDevelopment() ? exception.Message : "An unexpected server error occurred.")

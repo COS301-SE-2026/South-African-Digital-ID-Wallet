@@ -1,8 +1,10 @@
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5118'
-
 const loginUrls = {
-  login: (): string => `${apiUrl}/api/auth/login`,
-  getUser: (id: number): string => `${apiUrl}/api/auth/user/${id}`,
+  login: (): string => '/api/auth/login',
+  getUser: (id: number): string => `/api/auth/user/${id}`,
+  verifyDevice: (): string => '/api/auth/verify-device',
+  resendVerificationOtp: (): string => '/api/auth/resend-device-verification',
+  forgotPassword: (): string => '/api/auth/forgot-password',
+  resetPassword: (): string => '/api/auth/reset-password',
 }
 
 export default loginUrls

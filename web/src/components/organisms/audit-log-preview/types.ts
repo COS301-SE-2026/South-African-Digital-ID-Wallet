@@ -1,4 +1,8 @@
 export type AuditLogPreviewProps = {
-  recordName?: string | null
   accountCreated: boolean
+  action?: string
+  className?: string
+  emptyMessage?: string
+  recordName?: string | null
+  status?: string
 }

@@ -30,7 +30,7 @@ public class BiometricsConfiguration : IEntityTypeConfiguration<Biometrics>
             .IsRequired()
             .HasColumnType("datetime2")
             .HasDefaultValueSql("GETUTCDATE()")
-            .ValueGeneratedOnAddOrUpdate();
+            .ValueGeneratedOnAdd();
 
         builder.Property(b => b.CredentialId)
             .IsRequired();

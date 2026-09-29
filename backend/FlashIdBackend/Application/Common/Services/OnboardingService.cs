@@ -10,6 +10,7 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.Extensions.Configuration;
+using Application.Common.Validation;
 
 namespace Application.Common.Services;
 
@@ -37,13 +38,16 @@ public class OnboardingService : IOnboardingService
         if (cleanSaId is null)
             throw new ArgumentException("Invalid South African ID Number.");
 
-        if (!Regex.IsMatch(cleanSaId, @"^\d{13}$", RegexOptions.None, TimeSpan.FromMilliseconds(600)))
+        if (!SaIdValidator.IsValid(cleanSaId))
             throw new ArgumentException("Invalid South African ID number");
 
         var citizenRecord = await _governmentRegistryGateway.GetCitizenBySaIdAsync(cleanSaId);
 
         if (citizenRecord is null)
             throw new IdentityRecordNotFoundException();
+
+        if (AgeInYears(citizenRecord.DateOfBirth) < MinimumOnboardingAge)
+            throw new CitizenUnderageException(MinimumOnboardingAge);
 
         return new VerifiedCitizenRecordResponse
         {
@@ -54,11 +58,23 @@ public class OnboardingService : IOnboardingService
         };
     }
 
+    private const int MinimumOnboardingAge = 16;
+
+    private static int AgeInYears(DateTime dateOfBirth)
+    {
+        var today = SastClock.TodayUtcMidnight(DateTime.UtcNow);
+        var age = today.Year - dateOfBirth.Year;
+        // Birthday not reached yet this year
+        if (dateOfBirth.Date > today.AddYears(-age))
+            age--;
+        return age;
+    }
+
     private static string NormalizeSaPhoneNumber(string phoneNumber)
     {
         var normalized = phoneNumber.Trim().Replace(" ", "").Replace("-", "");
 
-        if (normalized.StartsWith("0"))
+        if (normalized.StartsWith('0'))
             normalized = $"+27{normalized[1..]}";
 
         return normalized;
@@ -66,6 +82,11 @@ public class OnboardingService : IOnboardingService
 
     public async Task<OnboardCitizenResponse> OnboardCitizenAsync(OnboardCitizenRequest request, Guid officialId, string ipAddress)
     {
+        // Onboarding previously skipped format validation entirely
+        if (!SaIdValidator.IsValid(request.SaId))
+            throw new ArgumentException("Invalid South African ID number");
+        var saId = request.SaId.Trim();
+
         if (!request.ConsentGiven)
             throw new CitizenConsentRequiredException();
 
@@ -77,10 +98,13 @@ public class OnboardingService : IOnboardingService
             ? null
             : NormalizeSaPhoneNumber(request.PhoneNumber);
 
-        var citizenRecord = await _governmentRegistryGateway.GetCitizenBySaIdAsync(request.SaId);
+        var citizenRecord = await _governmentRegistryGateway.GetCitizenBySaIdAsync(saId);
 
         if (citizenRecord is null)
             throw new IdentityRecordNotFoundException();
+
+        if (AgeInYears(citizenRecord.DateOfBirth) < MinimumOnboardingAge)
+            throw new CitizenUnderageException(MinimumOnboardingAge);
 
         if (email is null)
             throw new ArgumentException("Email is required.");
@@ -94,15 +118,7 @@ public class OnboardingService : IOnboardingService
                 , TimeSpan.FromMilliseconds(600)))
             throw new ArgumentException("Invalid email address format.", nameof(email));
 
-        if (email is not null)
-        {
-            var existingUser = await _onboardingRepository.GetUserByEmailAsync(email);
-
-            if (existingUser is not null)
-                throw new DuplicateEmailRegisteredException();
-        }
-
-        var existingCitizen = await _onboardingRepository.GetCitizenBySaIdAsync(request.SaId);
+        var existingCitizen = await _onboardingRepository.GetCitizenBySaIdAsync(saId);
 
         if (existingCitizen is not null)
             throw new DuplicateIdRegisteredException();
@@ -151,6 +167,7 @@ public class OnboardingService : IOnboardingService
             ActorId = officialId,
             IpAddress = ipAddress,
             CreatedAt = now,
+            CitizenId = citizen.Id,
         };
 
         var onboardAudit = new AuditLog
@@ -160,7 +177,8 @@ public class OnboardingService : IOnboardingService
             Details = $"Citizen, {citizenRecord.SaId}, has been onboarded into FlashID system with a pending account by Home Affairs Official, {officialId}.",
             ActorId = officialId,
             IpAddress = ipAddress,
-            CreatedAt = now
+            CreatedAt = now,
+            CitizenId = citizen.Id,
         };
 
         await _onboardingRepository.AddAuditLogAsync(consentAudit);
@@ -170,9 +188,9 @@ public class OnboardingService : IOnboardingService
         await _onboardingRepository.SaveChangesAsync();
 
         var activationLink = BuildActivationLink(rawToken);
-        var message = $"Please find attached your activation link : {activationLink}";
+        var message = BuildEmailMessage(activationLink, citizen.Names);
 
-        await _emailSenderProvider.SendEmailAsync(email, "FlashID", message);
+        await _emailSenderProvider.SendEmailAsync(email, "Your FlashID Activation Link", message);
 
         return new OnboardCitizenResponse
         {
@@ -223,9 +241,159 @@ public class OnboardingService : IOnboardingService
 
         var baseUrl = frontendUrl.TrimEnd('/');
 
-        var encodedToken = Uri.EscapeDataString(rawToken);
+        var token = Uri.EscapeDataString(rawToken);
 
-        return $"{baseUrl}/activate?encodedToken={encodedToken}";
+        return $"{baseUrl}/citizen/verify-identity?token={token}";
+    }
+
+    private static string BuildEmailMessage(string activationLink, string name)
+    {
+        return
+            $$"""
+             <div style="background-color:#f7f4ea; padding:32px 16px; font-family:Arial, Helvetica, sans-serif;">
+             
+                 <table role="presentation"
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        style="max-width:480px; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e5e7eb;">
+                     <tr>
+                         <td style="padding:0;">
+                             <table role="presentation"
+                                    width="100%"
+                                    cellpadding="0"
+                                    cellspacing="0">
+                                 <tr>
+                                     <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+             
+                                     <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+             
+                                     <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+             
+                                     <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+                                 </tr>
+                             </table>
+                         </td>
+                     </tr>
+             
+                     
+                     <tr>
+                         <td style="padding:28px 32px 0 32px;">
+                             <span style="font-size:22px; font-weight:700; color:#053b2c; letter-spacing:0.5px;">
+                                 FlashID
+                             </span>
+             
+                             <div style="margin-top:4px; color:#6b7280; font-size:12px; letter-spacing:0.4px;">
+                                 Prove yourself in a flash.
+                             </div>
+                         </td>
+                     </tr>
+             
+                     
+                     <tr>
+                         <td style="padding:24px 32px 0 32px; color:#111827; font-size:15px; line-height:1.6;">
+                             Hi there {{name}},
+                             <br /><br />
+             
+                             Welcome to <strong>FlashID</strong>. Your identity has been
+                             successfully onboarded and your pending FlashID profile is ready.
+             
+                             <br /><br />
+             
+                             Use the button below to continue the activation process and securely
+                             link your digital credentials.
+                         </td>
+                     </tr>
+             
+                     
+                     <tr>
+                         <td align="center" style="padding:28px 32px 28px 32px;">
+                             <a href="{{activationLink}}"
+                                target="_blank"
+                                style="display:inline-block; background-color:#007a4d; color:#ffffff; text-decoration:none; font-size:15px; font-weight:700; padding:14px 32px; border-radius:10px;">
+                                 Activate my FlashID
+                             </a>
+                         </td>
+                     </tr>
+             
+                     
+                     <tr>
+                         <td style="padding:0 32px 24px 32px; color:#6b7280; font-size:13px; line-height:1.6;">
+                             If the button does not work, copy and paste this link into your browser:
+             
+                             <br /><br />
+             
+                             <a href="{{activationLink}}"
+                                style="color:#002395; text-decoration:underline; word-break:break-all;">
+                                 {{activationLink}}
+                             </a>
+                         </td>
+                     </tr>
+             
+                     
+                     <tr>
+                         <td style="padding:0 32px 24px 32px; color:#6b7280; font-size:13px; line-height:1.6;">
+                             This activation link is valid for 48 hours.
+             
+                             <br /><br />
+             
+                             For your security, do not share or forward this activation link.
+                             If you did not request a FlashID profile, you can safely ignore this email.
+                         </td>
+                     </tr>
+             
+                     
+                     <tr>
+                         <td style="padding:0 32px 28px 32px; color:#111827; font-size:14px; line-height:1.6;">
+                             Stay secure,<br />
+                             <strong>The FlashID Team</strong>
+                         </td>
+                     </tr>
+             
+                     
+                     <tr>
+                         <td style="padding:0;">
+                             <table role="presentation"
+                                    width="100%"
+                                    cellpadding="0"
+                                    cellspacing="0">
+                                 <tr>
+                                     <td style="background-color:#002395; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+             
+                                     <td style="background-color:#de3831; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+             
+                                     <td style="background-color:#ffb81c; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+             
+                                     <td style="background-color:#007a4d; width:25%; height:6px; font-size:0; line-height:0;">
+                                         &nbsp;
+                                     </td>
+                                 </tr>
+                             </table>
+                         </td>
+                     </tr>
+                 </table>
+             
+                 <p style="text-align:center; color:#9ca3af; font-size:12px; line-height:1.5; margin:16px auto 0 auto; max-width:480px;">
+                     &copy; {{DateTime.UtcNow.Year}} FlashID |
+                     South African Digital ID Wallet.<br />
+                     All rights reserved.
+                 </p>
+             </div>
+             """;
     }
 
 }

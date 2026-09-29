@@ -4,5 +4,7 @@ public enum IdentityDocumentStatus
 {
     PermanentResident,
     Citizen,
+    Refugee,
+    Naturalised,
 }
 

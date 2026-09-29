@@ -5,4 +5,5 @@ export type ProblemDetails = {
   message?: string
   instance?: string
   traceId?: string
+  error?: string
 }

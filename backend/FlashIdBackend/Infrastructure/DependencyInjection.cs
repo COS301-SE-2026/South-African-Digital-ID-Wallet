@@ -3,20 +3,29 @@ using System.Text;
 using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
-using Domain.Entities;
+using Infrastructure.Gateways.GovernmentRegistry;
 using Infrastructure.Providers;
 using Infrastructure.Repositories;
-using Infrastructure.Services.GovernmentRegistry;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Azure.Core;
+using Azure.Identity;
+using Azure.Storage.Blobs;
+using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Common.Services;
+using Microsoft.Azure.Cosmos;
+using User = Domain.Entities.User;
+using Infrastructure.Repositories.Decorators;
+using Infrastructure.BackgroundJobs;
 
 namespace Infrastructure;
 
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(
-        this IServiceCollection services)
+        this IServiceCollection services, IConfiguration rootConfiguration)
     {
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         services.AddScoped<IPasswordHashingProvider, PasswordHashingProvider>();
@@ -26,20 +35,79 @@ public static class DependencyInjection
         services.AddScoped<IOnboardingRepository, OnboardingRepository>();
 
         services.AddScoped<ICitizenRepository, CitizenRepository>();
+        services.AddScoped<ICredentialRepository, CredentialRepository>();
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
+        services.AddScoped<ISigningKeyRepository, SigningKeyRepository>();
+        services.AddScoped<IKeyRotationRepository, KeyRotationRepository>();
+        services.AddScoped<ITrustedDeviceRepository, TrustedDeviceRepository>();
+        services.AddScoped<IActivityOverviewRepository, ActivityOverviewRepository>();
+        services.AddScoped<IDashboardAccountCardRepository, DashboardAccountCardRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddSingleton<IDeviceTokenProvider, DeviceTokenProvider>();
+        services.AddSingleton<TokenCredential, DefaultAzureCredential>();
+        services.AddScoped<IQrSigningProvider>(sp =>
+        {
+            var config = sp.GetRequiredService<IConfiguration>();
+            var vaultUri = config["AzureKeyVault:VaultUri"];
 
+            if (string.IsNullOrWhiteSpace(vaultUri))
+            {
+                var env = sp.GetRequiredService<IHostEnvironment>();
+                if (env.IsDevelopment() || env.IsEnvironment("Testing"))
+                {
+                    return ActivatorUtilities.CreateInstance<StubQrSigningProvider>(sp);
+                }
+
+                throw new InvalidOperationException("AzureKeyVault:VaultUri is not configured.");
+            }
+
+            return ActivatorUtilities.CreateInstance<AzureKeyVaultQrSigningProvider>(sp);
+        });
+        var vaultUriConfigured = !string.IsNullOrWhiteSpace(rootConfiguration["AzureKeyVault:VaultUri"]);
+        if (vaultUriConfigured)
+        {
+            services.AddSingleton<IQrSigningKeyVaultInspector, AzureQrSigningKeyVaultInspector>();
+            services.AddScoped<IKeyRotationService, KeyRotationService>();
+        }
+        services.AddScoped<IQrSignatureVerifier, QrSignatureVerifier>();
         services.AddTransient<IEmailSenderProvider, EmailSenderProvider>();
 
+        services.AddScoped<ICredentialRepository, CredentialRepository>();
+        services.AddSingleton(n =>
+        {
+            var configuration = n.GetRequiredService<IConfiguration>();
+            var connectionString = configuration["Cosmos:ConnectionString"] ?? throw new InvalidOperationException("Cosmos:ConnectionString is not configured.");
+            return new CosmosClient(connectionString, new CosmosClientOptions
+            {
+                SerializerOptions = new CosmosSerializationOptions
+                { PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase },
+            });
+        });
+        services.AddScoped<IQrDisclosureTokenRepository, CosmosQrDisclosureTokenRepository>();
+        services.AddSingleton(n =>
+        {
+            var configuration = n.GetRequiredService<IConfiguration>();
+            var connectionString = configuration["BlobStorage:ConnectionString"] ?? throw new InvalidOperationException("BlobStorage:ConnectionString not configured.");
+            return new BlobServiceClient(connectionString);
+        });
+        services.AddSingleton<IPhotoStorageProvider, AzureBlobPhotoStorageProvider>();
+        services.AddScoped<IDisclosedFieldsValueResolver, DisclosedFieldValueResolver>();
+
+        services.AddScoped<IOfficialRepository, OfficialRepository>();
+        services.AddScoped<IOfficialActivityRepository, OfficialActivityRepository>();
+
+        services.AddScoped<IManageUserAccountRepository, ManageUserAccountRepository>();
+        services.AddScoped<IUpdatePasswordRepository, UpdatePasswordRepository>();
+        services.AddScoped<IDeleteAccountRepository, DeleteAccountRepository>();
 
         services.AddHttpClient<IGovernmentRegistryGateway, GovernmentRegistryGateway>((serviceProvider, client) =>
-            {
-                var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-                client.BaseAddress = new Uri(configuration["GovernmentRegistry:BaseUrl"]!);
-
-                client.DefaultRequestHeaders.Add(
-                    "X-API-KEY",
-                    configuration["GovernmentRegistry:ApiKeyGov"]);
-            });
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            client.BaseAddress = new Uri(configuration["GovernmentRegistry:BaseUrl"]!);
+            client.DefaultRequestHeaders.Add(
+                "X-API-KEY",
+                configuration["GovernmentRegistry:ApiKeyGov"]);
+        });
 
         services.AddHttpClient<ISmsProvider, SmsPortalProvider>((serviceProvider, client) =>
         {
@@ -47,27 +115,67 @@ public static class DependencyInjection
             var baseUrl = configuration["SmsPortalProvider:BaseUrl"];
             var apiKey = configuration["SmsPortalProvider:ApiKey"];
             var apiSecret = configuration["SmsPortalProvider:ApiSecret"];
-
             if (string.IsNullOrWhiteSpace(baseUrl) ||
-                                                      string.IsNullOrWhiteSpace(apiKey) ||
-                                                      string.IsNullOrWhiteSpace(apiSecret))
+                string.IsNullOrWhiteSpace(apiKey) ||
+                string.IsNullOrWhiteSpace(apiSecret))
             {
                 throw new InvalidOperationException("SMSPortal configuration is missing.");
             }
-
             var apiCredential = Convert.ToBase64String(
-                Encoding.UTF8.GetBytes($"{apiKey}:{apiSecret}")
-                );
-
+                Encoding.UTF8.GetBytes($"{apiKey}:{apiSecret}"));
             client.BaseAddress = new Uri(baseUrl);
-
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", apiCredential);
-
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         });
 
         services.AddScoped<ISmsProvider, AzureCommunicationSmsProvider>();
+        services.AddScoped<IVerificationRepository, VerificationRepository>();
+        services.AddScoped<ICredentialsActivationRepository, CredentialsActivationRepository>();
 
+        services.AddHttpClient<IIpGeolocationProvider, IpGeolocationProvider>((serviceProvider, client) =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["IpGeolocation:BaseUrl"];
+
+            if (string.IsNullOrWhiteSpace(baseUrl))
+            {
+                throw new InvalidOperationException("IpGeolocation BaseUrl configuration is missing.");
+            }
+
+            client.BaseAddress = new Uri(baseUrl);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        });
+
+        services.AddScoped<CredentialExpiryRepository>();
+        services.AddScoped<ICredentialExpiryRepository>(sp => new RetryingCredentialExpiryRepositoryDecorator(sp.GetRequiredService<CredentialExpiryRepository>()));
+        services.AddHostedService<CredentialExpiryBackgroundService>();
+        if (vaultUriConfigured)
+        {
+            services.AddHostedService<KeyRotationBackgroundService>();
+        }
+        services.AddScoped<CredentialUpdateRepository>();
+        services.AddScoped<ICredentialUpdateRepository>(sp => new RetryingCredentialUpdateRepositoryDecorator(sp.GetRequiredService<CredentialUpdateRepository>()));
+        services.AddHostedService<CredentialUpdateBackgroundService>();
+
+        services.AddScoped<IGovAdminAuditLogRepository, GovAdminAuditLogRepository>();
+        services.AddSingleton<IFaceLivenessServiceProvider, AzureFaceLivenessServiceProvider>();
+        services.AddScoped<IPhysicalIdentityVerificationRepository, PhysicalIdentityVerificationRepository>();
+
+        services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
+        services.AddScoped<IFraudDetectionRepository, FraudDetectionRepository>();
+
+        services.AddScoped<IEmergencyRepository, EmergencyRepository>();
+        services.AddSingleton<EmergencyNotificationQueue>();
+        services.AddSingleton<IEmergencyNotificationQueue>(sp => sp.GetRequiredService<EmergencyNotificationQueue>());
+        services.AddHostedService<EmergencyNotificationBackgroundService>();
+        services.AddSingleton<IFieldCryptoProvider, AesFieldCryptoProvider>();
+
+        services.AddSingleton<ICredentialSigningProvider, LocalEs256SigningProvider>();
+
+        services.AddSingleton(PortraitProcessingLimits.Default);
+        services.AddSingleton<IPortraitProcessor, ImageSharpPortraitProcessor>();
+
+        services.AddScoped<IOfflinePackageRepository, OfflinePackageRepository>();
         return services;
     }
 }

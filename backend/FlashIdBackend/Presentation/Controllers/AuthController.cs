@@ -4,6 +4,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Application.Features.Auth.Exceptions;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.DataProtection;
+using Application.Features.FraudDetection.DTOs;
+using Presentation.Security;
+using Application.Features.Citizens.Exceptions;
 
 namespace Presentation.Controllers;
 
@@ -15,14 +20,20 @@ public class AuthController : ControllerBase
     private readonly ILogger<AuthController> _logger;
     private readonly IHostEnvironment _environment;
 
+    private const string DeviceCookieName = "flashid_device";
+    private const string DeviceHeaderName = "X-Device-Token";
+    private readonly IDataProtector _deviceVerificationProtector;
+
     public AuthController(
         IAuthService authService,
         ILogger<AuthController> logger,
-        IHostEnvironment environment)
+        IHostEnvironment environment,
+        IDataProtectionProvider dataProtectionProvider)
     {
         _authService = authService;
         _logger = logger;
         _environment = environment;
+        _deviceVerificationProtector = dataProtectionProvider.CreateProtector("FlashID.DeviceVerification");
     }
 
     [Authorize]
@@ -47,28 +58,54 @@ public class AuthController : ControllerBase
         }
     }
 
-    // Login is anonymous — no [Authorize] needed because the user does not have a token yet.
+    // Login is anonymous - no [Authorize] needed because the user does not have a token yet.
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
+    [EnableRateLimiting("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request, [FromHeader(Name = "X-Client")] string? client, [FromServices] IFraudDetectionService fraudDetectionService, CancellationToken cancellationToken)
     {
         try
         {
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            var result = await _authService.LoginAsync(request, ipAddress);
+            var deviceToken = ReadDeviceToken();
+            var result = await _authService.LoginAsync(request, deviceToken, ipAddress, cancellationToken);
+
+
+            if (result.RequiresDeviceVerification && result.DeviceVerificationId.HasValue)
+            {
+                var protectedVerificationId = _deviceVerificationProtector.Protect(result.DeviceVerificationId.Value.ToString());
+                Response.Cookies.Append("flashid_device_verification", protectedVerificationId,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = !_environment.IsDevelopment(),
+                    SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
+                    Path = "/api/auth",
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(10),
+                    IsEssential = true
+                });
+
+                result.Token = string.Empty;
+                return Ok(result);
+            }
+
+            if (string.IsNullOrWhiteSpace(result.Token))
+            {
+                _logger.LogError("Login completed without an access token for {Email}", request.Email);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { error = "The login could not be completed." });
+            }
+
+            result.SecurityAlert = await RecordSecurityEventAsync(fraudDetectionService, result.UserId,
+                Domain.Enums.SecurityEventType.Login, deviceToken, cancellationToken);
 
             // The token is set in an HttpOnly cookie so JavaScript cannot read it.
             // Secure = true in production forces HTTPS; in development HTTP is allowed.
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = !_environment.IsDevelopment(),
-                SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
-                Path = "/",
-                Expires = result.ExpiresAt,
-            };
+            AuthCookies.AppendAccessToken(Response, _environment, result.Token, result.ExpiresAt);
 
-            Response.Cookies.Append("access_token", result.Token, cookieOptions);
-            result.Token = string.Empty;
+            var isNativeClient = IsNativeClient(client);
+            if (!isNativeClient)
+            {
+                result.Token = null;
+            }
 
             return Ok(result);
         }
@@ -91,7 +128,193 @@ public class AuthController : ControllerBase
         }
     }
 
-    // [Authorize] — must be authenticated (any role) to log out.
+    [HttpPost("verify-device")]
+    [EnableRateLimiting("verify-device")]
+    public async Task<IActionResult> VerifyDevice([FromBody] VerifyDeviceRequestDto request,
+        [FromHeader(Name = "X-Client")] string? client,
+        [FromServices] IFraudDetectionService fraudDetectionService,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var deviceToken = ReadDeviceToken();
+
+            var result = await _authService.VerifyDeviceAsync(request, deviceToken, ipAddress, cancellationToken);
+
+            if (string.IsNullOrWhiteSpace(result.Token))
+            {
+                _logger.LogError("Device verification completed without an access token.");
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { error = "The login could not be completed." });
+            }
+
+            result.SecurityAlert = await RecordSecurityEventAsync(fraudDetectionService, result.UserId,
+                Domain.Enums.SecurityEventType.DeviceVerified, result.DeviceToken ?? deviceToken, cancellationToken);
+
+            AuthCookies.AppendAccessToken(Response, _environment, result.Token, result.ExpiresAt);
+
+            if (!string.IsNullOrWhiteSpace(result.DeviceToken))
+            {
+                var deviceCookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = !_environment.IsDevelopment(),
+                    SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
+                    Path = "/",
+                    Expires = DateTimeOffset.UtcNow.AddMonths(4),
+                    IsEssential = true
+                };
+
+                Response.Cookies.Append("flashid_device", result.DeviceToken, deviceCookieOptions);
+            }
+
+            var isNativeClient = IsNativeClient(client);
+            if (!isNativeClient)
+            {
+                result.Token = null;
+                result.DeviceToken = null;
+            }
+            Response.Cookies.Delete(
+    "flashid_device_verification",
+    new CookieOptions
+    {
+        Path = "/api/auth",
+        Secure = !_environment.IsDevelopment(),
+        SameSite = _environment.IsDevelopment()
+            ? SameSiteMode.Lax
+            : SameSiteMode.None
+    });
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError(ex, "Unexpected error during device verification.");
+            if (_environment.IsDevelopment())
+            {
+                return StatusCode(500, new { error = ex.Message, detail = ex.ToString() });
+            }
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    [HttpPost("resend-device-verification")]
+    [EnableRateLimiting("resend-device-verification")]
+    public async Task<IActionResult> ResendDeviceVerification(
+        [FromBody] ResendDeviceVerificationRequestDto request, CancellationToken cancellationToken
+    )
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(request.DeviceVerificationId))
+            {
+                return BadRequest(
+                    new { error = "Device verification ID is required." });
+            }
+
+            if (!Guid.TryParse(request.DeviceVerificationId, out var deviceVerificationId))
+            {
+                return BadRequest(new
+                {
+                    error = "Invalid device verification ID."
+                });
+            }
+
+            if (!Request.Cookies.TryGetValue(
+        "flashid_device_verification",
+        out var verificationCookie))
+            {
+                return Unauthorized(new
+                {
+                    error = "Device verification session is missing."
+                });
+            }
+
+            Guid cookieVerificationId;
+
+            try
+            {
+                var unprotectedValue =
+                    _deviceVerificationProtector.Unprotect(
+                        verificationCookie);
+
+                if (!Guid.TryParse(
+                        unprotectedValue,
+                        out cookieVerificationId))
+                {
+                    return Unauthorized(new
+                    {
+                        error = "Invalid device verification session."
+                    });
+                }
+            }
+            catch
+            {
+                return Unauthorized(new
+                {
+                    error = "Invalid device verification session."
+                });
+            }
+
+            if (cookieVerificationId != deviceVerificationId)
+            {
+                return Unauthorized(new
+                {
+                    error =
+                        "Device verification session does not match this request."
+                });
+            }
+
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            await _authService.ResendDeviceVerificationOtpAsync(deviceVerificationId, ipAddress, cancellationToken);
+            return Ok(new { message = "Verification code has been resent to your email." });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error during device verification OTP resend.");
+            if (_environment.IsDevelopment())
+                return StatusCode(500, new { error = ex.Message, detail = ex.ToString() });
+            return StatusCode(500, new { error = "An unexpected error occurred." });
+        }
+    }
+
+    // Anonymous: the user cannot sign in, which is why they are here.
+    [HttpPost("forgot-password")]
+    [EnableRateLimiting("password-reset")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto request, [FromServices] IPasswordResetService passwordResetService)
+    {
+        await passwordResetService.RequestResetAsync(request);
+        // Same reply whether or not the account exists, so the endpoint cannot reveal who is registered.
+        return Ok(new { message = "If an account exists for that email, a reset code has been sent." });
+    }
+
+    [HttpPost("reset-password")]
+    [EnableRateLimiting("password-reset")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request, [FromServices] IPasswordResetService passwordResetService)
+    {
+        try
+        {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            await passwordResetService.ResetPasswordAsync(request, ipAddress);
+            return Ok(new { message = "Password updated. You can now log in." });
+        }
+        // The four errors the user can fix themselves become a 400 with a readable message.
+        catch (Exception ex) when (ex is InvalidOtpException or OtpExpiredException or TooManyOtpAttemptsException or InvalidCitizenRegistrationRequestException)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    // [Authorize] - must be authenticated (any role) to log out.
     [Authorize]
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
@@ -105,12 +328,7 @@ public class AuthController : ControllerBase
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
             var result = await _authService.LogoutAsync(userId, ipAddress);
 
-            Response.Cookies.Delete("access_token", new CookieOptions
-            {
-                Path = "/",
-                Secure = !_environment.IsDevelopment(),
-                SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
-            });
+            AuthCookies.DeleteAll(Response, _environment);
 
             return Ok(result);
         }
@@ -119,5 +337,40 @@ public class AuthController : ControllerBase
             _logger.LogError(ex, "Unexpected error during logout");
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
+    }
+    private async Task<SecurityAlertNoticeDto?> RecordSecurityEventAsync(IFraudDetectionService fraudDetectionService,
+        Guid userId, Domain.Enums.SecurityEventType eventType, string? deviceToken, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var context = SecurityEventContextFactory.Create(HttpContext, userId, eventType, deviceToken);
+            var assessment = await fraudDetectionService.RecordSecurityEventAsync(context, cancellationToken);
+            return assessment.Notice;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogError(ex, "Fraud check failed for user {UserId}. Continuing the sign-in without it.", userId);
+            return null;
+        }
+    }
+
+    private string? ReadDeviceToken()
+    {
+        if (Request.Headers.TryGetValue(DeviceHeaderName, out var header)
+            && !string.IsNullOrWhiteSpace(header))
+        {
+            return header.ToString();
+        }
+
+        Request.Cookies.TryGetValue(DeviceCookieName, out var cookie);
+        return cookie;
+    }
+    private bool IsNativeClient(string? client)
+    {
+        if (!string.Equals(client, "mobile", StringComparison.Ordinal))
+        {
+            return false;
+        }
+        return !Request.Headers.ContainsKey("Origin") && !Request.Headers.ContainsKey("Sec-Fetch-Site");
     }
 }

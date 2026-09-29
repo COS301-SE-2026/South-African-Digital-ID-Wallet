@@ -9,11 +9,11 @@ public abstract class Credential
     public string Signature { get; set; } = string.Empty;
 
     public string IssuedBy { get; set; } = string.Empty;
-    
+
     public DateOnly IssueDate { get; set; }
-    
+
     public Guid CitizenId { get; set; }
-    
+
     public CitizenRecord Citizen { get; set; } = null!;
-    
+
 }

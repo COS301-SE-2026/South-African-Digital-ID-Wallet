@@ -32,7 +32,7 @@ public class OfficialConfiguration : IEntityTypeConfiguration<Official>
             .IsRequired()
             .HasColumnType("datetime2")
             .HasDefaultValueSql("GETUTCDATE()")
-            .ValueGeneratedOnAddOrUpdate();
+            .ValueGeneratedOnAdd();
 
         builder.Property(o => o.UserId)
             .IsRequired();

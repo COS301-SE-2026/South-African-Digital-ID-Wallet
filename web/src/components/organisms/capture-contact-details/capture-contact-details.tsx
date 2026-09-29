@@ -1,12 +1,11 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ClipboardCheck, ShieldAlert } from 'lucide-react'
+import { ClipboardCheck, ShieldAlert, UserRoundPlus } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import type { CaptureContactDetailsProps } from './types'
-import { UserRoundPlus } from 'lucide-react'
 
 import toast from 'react-hot-toast'
 

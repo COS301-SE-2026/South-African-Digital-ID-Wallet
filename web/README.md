@@ -684,3 +684,24 @@ The current frontend foundation includes:
 - dark mode token support
 
 Future work will connect the layout to authentication, session management, and role-based portal selection.
+
+## E2E tests (Playwright)
+
+**Prerequisties:** Node 20 (`nvm use 20`), .NET 10 SDK and SQL Server reachable at `localhost:1433`.
+
+### Getting SQL Server running
+
+- **Windows** - use your local SQL Server instance. Make sure that IP is enabled on port 1433. Docker Desktop also work if you want to use it. -**macOS / Linux** - SQL Server has no native build; use the provided container:
+
+```bash
+  docker compose -f ../backend/FlashIdBackend/docker-compose.yml up -d
+```
+
+### Running the tests
+
+```bash
+pnpm --filter ./backend start
+cp e2e/.env.e2e.example e2e/.env.e2e
+pnpm exec playwright install --with-deps chromium firefox
+pnpm test:e2e
+```

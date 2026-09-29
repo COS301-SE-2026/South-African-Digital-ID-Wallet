@@ -37,7 +37,7 @@ public class InstitutionConfiguration : IEntityTypeConfiguration<Institution>
             .IsRequired()
             .HasColumnType("datetime2")
             .HasDefaultValueSql("GETUTCDATE()")
-            .ValueGeneratedOnAddOrUpdate();
+            .ValueGeneratedOnAdd();
 
         builder.Property(i => i.RegisteredById)
             .IsRequired();

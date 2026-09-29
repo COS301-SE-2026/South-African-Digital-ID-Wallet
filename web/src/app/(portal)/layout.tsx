@@ -1,9 +1,16 @@
 import { AppShell } from '@/components/templates/app-shell/app-shell'
+import { UserProvider } from '@/context/user-context'
+import { SessionTimeoutWatcher } from '@/components/utility/session-timeout-watcher'
 
 export default function PortalLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return <AppShell>{children}</AppShell>
+  return (
+    <UserProvider>
+      <SessionTimeoutWatcher />
+      <AppShell>{children}</AppShell>
+    </UserProvider>
+  )
 }

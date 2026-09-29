@@ -17,18 +17,25 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    
-    if (!await context.CitizenRecords.AnyAsync())
+
+
+    if (!app.Environment.IsEnvironment("Testing"))
     {
-        Console.WriteLine("[SEED] Database is empty, seeding sample data...");
-        await DbSeeder.SeedAsync(context);
-        Console.WriteLine("[SEED] Database seeded successfully!");
+        await context.Database.MigrateAsync();
+
+        if (/*app.Environment.IsDevelopment() && */!await context.CitizenRecords.AnyAsync())
+        {
+            Console.WriteLine("[SEED] Database is empty, seeding sample data...");
+            await DbSeeder.SeedAsync(context);
+            Console.WriteLine("[SEED] Database seeded successfully!");
+        }
     }
 }
 
@@ -45,12 +52,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.MapHealthChecks("/health");
+app.UseMiddleware<ApiKeyMiddleware>();
+app.MapControllers();
 app.UseMiddleware<ApiKeyMiddleware>();
 app.MapControllers();
 
 
-app.Run();
-
-
-
-
+await app.RunAsync();

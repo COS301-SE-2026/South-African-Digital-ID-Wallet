@@ -33,7 +33,7 @@ public class UserPreferencesConfiguration : IEntityTypeConfiguration<UserPrefere
             .IsRequired()
             .HasColumnType("datetime2")
             .HasDefaultValueSql("GETUTCDATE()")
-            .ValueGeneratedOnAddOrUpdate();
+            .ValueGeneratedOnAdd();
 
         builder.Property(up => up.UserId)
             .IsRequired();

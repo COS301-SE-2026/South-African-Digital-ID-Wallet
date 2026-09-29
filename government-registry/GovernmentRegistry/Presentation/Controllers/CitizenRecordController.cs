@@ -5,7 +5,7 @@ namespace Presentation.Controllers;
 
 [ApiController]
 [Route("api/citizens")]
-public class CitizenRecordController:ControllerBase
+public class CitizenRecordController : ControllerBase
 {
     private readonly ICitizenRecordService _citizenRecordService;
 
@@ -18,12 +18,12 @@ public class CitizenRecordController:ControllerBase
     public async Task<IActionResult> GetCitizenById(string saId)
     {
         var citizenRecord = await _citizenRecordService.GetCitizenRecord(saId);
-        
-        if(citizenRecord is null)
-            return NotFound(new {message = "Citizen record not found"});
-        
+
+        if (citizenRecord is null)
+            return NotFound(new { message = "Citizen record not found" });
+
         return Ok(citizenRecord);
     }
-    
-    
+
+
 }

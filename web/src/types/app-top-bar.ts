@@ -10,4 +10,5 @@ export type AppTopBarProps = {
   user: TopBarUser
   showNotifications?: boolean
   notificationCount?: number
+  onMenuClick?: () => void
 }

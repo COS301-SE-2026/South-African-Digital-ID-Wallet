@@ -15,4 +15,3 @@
     "lint": "dotnet format --verify-no-changes FlashIdBackend/"
   }
 }
-

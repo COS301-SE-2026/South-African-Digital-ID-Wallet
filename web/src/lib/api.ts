@@ -1,14 +1,30 @@
 import axios from 'axios'
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5118'
-
 const api = axios.create({
-  baseURL: apiBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },
   // Send cookies (httpOnly) with requests for authentication
   withCredentials: true,
+})
+function getCsrfToken(): string | null {
+  if (typeof document === 'undefined') return null
+  const match = /(?:^|;\s*)csrf_token=([^;]+)/.exec(document.cookie)
+  return match ? decodeURIComponent(match[1]) : null
+}
+
+const CSRF_METHODS = new Set(['post', 'put', 'patch', 'delete'])
+
+api.interceptors.request.use((config) => {
+  const method = config.method?.toLowerCase()
+  if (method && CSRF_METHODS.has(method)) {
+    const token = getCsrfToken()
+    if (token) {
+      config.headers = config.headers ?? {}
+      config.headers['X-CSRF-Token'] = token
+    }
+  }
+  return config
 })
 
 // Guard to ensure multiple simultaneous 401 failures only trigger one redirect

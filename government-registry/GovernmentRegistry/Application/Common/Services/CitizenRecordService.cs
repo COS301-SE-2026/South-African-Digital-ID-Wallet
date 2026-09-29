@@ -17,7 +17,7 @@ public class CitizenRecordService : ICitizenRecordService
     public async Task<CitizenRecordResponseDto> GetCitizenRecord(string saId)
     {
         var citizenRecord = await _repository.GetCitizenRecord(saId);
-        
+
         if (citizenRecord is null)
             return null;
 

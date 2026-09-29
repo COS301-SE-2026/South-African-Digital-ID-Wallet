@@ -15,9 +15,58 @@ export const pageHeaders: Record<string, PageHeader> = {
       'Verify a citizen, capture consent, and create a pending FlashID account.',
   },
 
+  '/officials/issue-drivers-license': {
+    title: "Issue Driver's Licence",
+    description:
+      "Look up a citizen, capture consent, and issue their driver's licence credential.",
+  },
+
+  '/officials/verifications': {
+    title: 'Verifications',
+    description: 'Scan secure QR Code to verify identitities and credentials.',
+  },
+
   '/citizen': {
     title: 'Citizen Dashboard',
     description: 'View and manage your digital identity wallet.',
+  },
+
+  '/citizen/citizen-dashboard': {
+    title: 'Citizen Dashboard',
+    description: 'View and manage your digital identity wallet.',
+  },
+
+  '/citizen/verifications': {
+    title: 'Verifications',
+    description: 'Scan secure QR Code to verify identitities and credentials.',
+  },
+
+  '/citizen/qr': {
+    title: 'Share QR codes',
+    description:
+      'Generate secure QR codes to share selected identity information.',
+  },
+
+  '/citizen/my-credentials': {
+    title: 'My Credentials',
+    description: 'View and manage your issued digital credentials. ',
+  },
+
+  '/citizen/verify-identity': {
+    title: 'Verify Identity',
+    description:
+      'Confirm your identity and link your citizen record to your FlashID account.',
+  },
+
+  '/citizen/activate-credentials': {
+    title: 'Activate Credentials',
+    description:
+      'Select the verified credentials you want to add to your FlashID wallet.',
+  },
+
+  '/citizen/manage-user-account': {
+    title: 'Manage Account',
+    description: 'Manage your profile, security settings, and trusted devices.',
   },
 
   '/gov-admin': {

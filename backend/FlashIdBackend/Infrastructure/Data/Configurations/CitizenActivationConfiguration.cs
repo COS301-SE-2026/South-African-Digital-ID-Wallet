@@ -56,7 +56,7 @@ public class CitizenActivationConfiguration : IEntityTypeConfiguration<CitizenAc
             .IsRequired()
             .HasColumnType(dateFormat)
             .HasDefaultValueSql("GETUTCDATE()")
-            .ValueGeneratedOnAddOrUpdate();
+            .ValueGeneratedOnAdd();
 
         builder.HasIndex(a => a.TokenHash)
             .IsUnique();

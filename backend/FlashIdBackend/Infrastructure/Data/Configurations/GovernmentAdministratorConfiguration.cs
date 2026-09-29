@@ -32,7 +32,7 @@ public class GovernmentAdministratorConfiguration : IEntityTypeConfiguration<Gov
             .IsRequired()
             .HasColumnType("datetime2")
             .HasDefaultValueSql("GETUTCDATE()")
-            .ValueGeneratedOnAddOrUpdate();
+            .ValueGeneratedOnAdd();
 
         builder.Property(g => g.UserId)
             .IsRequired();

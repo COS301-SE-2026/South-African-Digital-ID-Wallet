@@ -62,7 +62,7 @@ public class CitizenConfiguration : IEntityTypeConfiguration<Citizen>
             .IsRequired()
             .HasColumnType(dateFormat)
             .HasDefaultValueSql("GETUTCDATE()")
-            .ValueGeneratedOnAddOrUpdate();
+            .ValueGeneratedOnAdd();
 
         builder.HasOne(c => c.User)
             .WithMany()

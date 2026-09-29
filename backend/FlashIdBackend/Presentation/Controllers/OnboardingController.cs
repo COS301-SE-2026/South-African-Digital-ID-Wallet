@@ -3,8 +3,8 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Onboarding.Exceptions;
-using Application.Common.Interfaces.GatewayInterfaces;
 using Application.Features.Onboarding.Dtos;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Presentation.Controllers;
 
@@ -22,6 +22,7 @@ public class OnboardingController : ControllerBase
     }
 
     [HttpGet("verify/{idNumber}")]
+    [EnableRateLimiting("onboarding-verify")]
     public async Task<IActionResult> VerifyCitizenIdentity(string idNumber)
     {
         try

@@ -1,28 +1,36 @@
 import type { SidebarNavSection } from '@/types/navigation'
 
-{
-  /*TODO: Unstub hrefs */
-}
-
 export const citizenNavSections: SidebarNavSection[] = [
   {
     title: 'Citizen Portal',
     items: [
-      { label: 'Dashboard', href: '/citizen', icon: 'dashboard' },
+      {
+        label: 'Dashboard',
+        href: '/citizen/citizen-dashboard',
+        icon: 'dashboard',
+      },
       {
         label: 'My Credentials',
-        href: '/under-construction',
+        href: '/citizen/my-credentials',
         icon: 'credentials',
       },
-      { label: 'Share QR Code', href: '/under-construction', icon: 'qr' },
       {
-        label: 'Notifications',
-        href: '/under-construction',
-        icon: 'notifications',
+        label: 'Verifications',
+        href: '/citizen/verifications',
+        icon: 'users',
+      },
+      {
+        label: 'Verify My Identity',
+        href: '/citizen/verify-identity',
+        icon: 'shield',
+      },
+      {
+        label: 'Activate Credentials',
+        href: '/citizen/activate-credentials',
+        icon: 'idCard',
       },
     ],
   },
-
   {
     title: 'Security',
     items: [
@@ -32,22 +40,23 @@ export const citizenNavSections: SidebarNavSection[] = [
         icon: 'history',
       },
       {
-        label: 'Privacy Settings',
-        href: '/under-construction',
+        label: 'Manage Account',
+        href: '/citizen/manage-user-account',
         icon: 'settings',
       },
     ],
   },
 ]
 
-{
-  /* TODO: add government and officials nav bar items */
-}
 export const governmentAdminNavSections: SidebarNavSection[] = [
   {
     title: 'Government Admin',
     items: [
-      { label: 'Dashboard', href: '/gov-admin', icon: 'dashboard' },
+      {
+        label: 'Dashboard',
+        href: '/gov-admin/gov-admin-dashboard',
+        icon: 'dashboard',
+      },
       {
         label: 'Upload Institution',
         href: '/gov-admin/upload-institution',
@@ -59,9 +68,9 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
         icon: 'institutions',
       },
       {
-        label: 'Notifications',
-        href: '/under-construction',
-        icon: 'notifications',
+        label: 'Manage Credentials',
+        href: '/gov-admin/manage-credentials',
+        icon: 'institutions',
       },
     ],
   },
@@ -69,7 +78,7 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
   {
     title: 'Security',
     items: [
-      { label: 'Audit Logs', href: '/under-construction', icon: 'history' },
+      { label: 'Audit Logs', href: '/gov-admin/audit-log', icon: 'history' },
       { label: 'Settings', href: '/under-construction', icon: 'settings' },
     ],
   },
@@ -79,16 +88,25 @@ export const officialsNavSections: SidebarNavSection[] = [
   {
     title: 'Officials',
     items: [
-      { label: 'Dashboard', href: '/officials', icon: 'dashboard' },
+      {
+        label: 'Dashboard',
+        href: '/officials/officials-dashboard',
+        icon: 'dashboard',
+      },
       {
         label: 'Onboard Citizen',
         href: '/officials/onboard-citizen',
         icon: 'onboard',
       },
       {
-        label: 'Notifications',
-        href: '/under-construction',
-        icon: 'notifications',
+        label: "Issue Driver's Licence",
+        href: '/officials/issue-drivers-license',
+        icon: 'credentials',
+      },
+      {
+        label: 'Verifications',
+        href: '/officials/verifications',
+        icon: 'users',
       },
     ],
   },
@@ -103,7 +121,7 @@ export const officialsNavSections: SidebarNavSection[] = [
       },
       {
         label: 'Privacy Settings',
-        href: '/under-construction',
+        href: '/privacy-settings',
         icon: 'settings',
       },
     ],
@@ -133,11 +151,6 @@ export const manageUserAccountNavSections: SidebarNavSection[] = [
         label: 'Verification History',
         href: '/verification-history',
         icon: 'history',
-      },
-      {
-        label: 'Privacy Settings',
-        href: '/privacy-settings',
-        icon: 'settings',
       },
       {
         label: 'Security & Recovery',

@@ -20,4 +20,16 @@ node_modules/
 .DS_Store
 
 *.swp
+bin/
+obj/
 *.swo
+
+# Test coverage output
+coverage/
+CoverageReport/
+*.cobertura.xml
+
+__azurite*
+Azurite*
+
+backend.log

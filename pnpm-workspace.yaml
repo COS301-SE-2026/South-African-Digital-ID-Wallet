@@ -2,9 +2,9 @@ packages:
   - 'web'
   - 'mobile'
   - 'backend'
+  - 'government-registry'
 
 onlyBuiltDependencies:
-  - cypress
   - lefthook
   - sharp
   - unrs-resolver

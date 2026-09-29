@@ -1,0 +1,256 @@
+using Application.Common.Interfaces.GatewayInterfaces;
+using Application.Common.Interfaces.ProviderInterfaces;
+using Application.Common.Interfaces.RepositoryInterfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Common.Services;
+using Azure.Storage.Blobs;
+using Domain.Entities;
+using Infrastructure;
+using Infrastructure.BackgroundJobs;
+using Infrastructure.Repositories;
+using Infrastructure.Providers;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Presentation.Controllers;
+using Microsoft.AspNetCore.Mvc;
+using Infrastructure.Data;
+using Application;
+using Microsoft.ApplicationInsights.Extensibility;
+
+namespace tests;
+
+public class DependencyInjectionTests
+{
+    private static IConfiguration CreateConfiguration(string? vaultUri = null)
+    {
+        var data = new Dictionary<string, string?>();
+        if (vaultUri != null)
+        {
+            data["AzureKeyVault:VaultUri"] = vaultUri;
+            data["QrSigning:KeyName"] = "some-key";
+        }
+
+        return new ConfigurationBuilder().AddInMemoryCollection(data).Build();
+    }
+
+    [Fact]
+    public void AddInfrastructure_ReturnsSameServiceCollectionInstance()
+    {
+        var services = new ServiceCollection();
+        var result = services.AddInfrastructure(CreateConfiguration());
+
+        Assert.Same(services, result);
+    }
+
+    public static IEnumerable<object[]> ExpectedRegistrations()
+    {
+        yield return new object[] { typeof(IPasswordHasher<User>), typeof(PasswordHasher<User>), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IPasswordHashingProvider), typeof(PasswordHashingProvider), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IJwtTokenProvider), typeof(JwtTokenProvider), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IAuthRepository), typeof(AuthRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IOnboardingRepository), typeof(OnboardingRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(ICitizenRepository), typeof(CitizenRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(ICredentialRepository), typeof(CredentialRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IInstitutionRepository), typeof(InstitutionRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(ITrustedDeviceRepository), typeof(TrustedDeviceRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IActivityOverviewRepository), typeof(ActivityOverviewRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IDashboardAccountCardRepository), typeof(DashboardAccountCardRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(INotificationRepository), typeof(NotificationRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IEmailSenderProvider), typeof(EmailSenderProvider), ServiceLifetime.Transient };
+        yield return new object[] { typeof(IKeyRotationRepository), typeof(KeyRotationRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IQrDisclosureTokenRepository), typeof(CosmosQrDisclosureTokenRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IPhotoStorageProvider), typeof(AzureBlobPhotoStorageProvider), ServiceLifetime.Singleton };
+        yield return new object[] { typeof(IDisclosedFieldsValueResolver), typeof(DisclosedFieldValueResolver), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IOfficialRepository), typeof(OfficialRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IVerificationRepository), typeof(VerificationRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(ICredentialsActivationRepository), typeof(CredentialsActivationRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(ICredentialSigningProvider), typeof(LocalEs256SigningProvider), ServiceLifetime.Singleton };
+        yield return new object[] { typeof(IEmergencyRepository), typeof(EmergencyRepository), ServiceLifetime.Scoped };
+        yield return new object[] { typeof(IFieldCryptoProvider), typeof(AesFieldCryptoProvider), ServiceLifetime.Singleton };
+        yield return new object[] { typeof(IPortraitProcessor), typeof(ImageSharpPortraitProcessor), ServiceLifetime.Singleton };
+        yield return new object[] { typeof(IOfflinePackageRepository), typeof(OfflinePackageRepository), ServiceLifetime.Scoped };
+    }
+
+    [Theory]
+    [MemberData(nameof(ExpectedRegistrations))]
+    public void AddInfrastructure_RegistersExpectedServiceWithLifetime(Type serviceType, Type implementationType, ServiceLifetime lifetime)
+    {
+        var services = new ServiceCollection();
+        services.AddInfrastructure(CreateConfiguration());
+
+        Assert.Contains(services, sd =>
+            sd.ServiceType == serviceType &&
+            sd.ImplementationType == implementationType &&
+            sd.Lifetime == lifetime
+        );
+    }
+
+    [Fact]
+    public void AddInfrastructure_RegistersBlobServiceClient()
+    {
+        var services = new ServiceCollection();
+        services.AddInfrastructure(CreateConfiguration());
+
+        Assert.Contains(services, sd =>
+            sd.ServiceType == typeof(BlobServiceClient) &&
+            sd.Lifetime == ServiceLifetime.Singleton &&
+            sd.ImplementationFactory != null
+        );
+    }
+
+    [Fact]
+    public void AddInfrastructure_RegistersTypedHttpClient_ForGovernmentRegistryGateway()
+    {
+        var services = new ServiceCollection();
+        services.AddInfrastructure(CreateConfiguration());
+
+        Assert.Contains(services, sd => sd.ServiceType == typeof(IGovernmentRegistryGateway));
+    }
+
+    private sealed class FakeHostEnvironment : IHostEnvironment
+    {
+        public string EnvironmentName { get; set; } = "Development";
+        public string ApplicationName { get; set; } = "tests";
+        public string ContentRootPath { get; set; } = AppContext.BaseDirectory;
+        public Microsoft.Extensions.FileProviders.IFileProvider ContentRootFileProvider { get; set; } = null!;
+    }
+
+    [Fact]
+    public void AddInfrastructure_QrSigningProvider_UsesStub_WhenVaultUriNotConfigured()
+    {
+        var services = new ServiceCollection();
+        var config = CreateConfiguration();
+        services.AddSingleton(config);
+        services.AddSingleton<IHostEnvironment>(new FakeHostEnvironment());
+        services.AddDbContext<AppDbContext>(o => o.UseSqlite("DataSource=:memory:"));
+        services.AddInfrastructure(config);
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var qrSigningProvider = scope.ServiceProvider.GetRequiredService<IQrSigningProvider>();
+
+        Assert.IsType<StubQrSigningProvider>(qrSigningProvider);
+    }
+
+    [Fact]
+    public void AddInfrastructure_QrSigningProvider_UsesAzureKeyVault_WhenVaultUriConfigured()
+    {
+        var services = new ServiceCollection();
+        var config = CreateConfiguration("https://example.vault.azure.net/");
+        services.AddSingleton(config);
+        services.AddDbContext<AppDbContext>(o => o.UseSqlite("DataSource=:memory:"));
+        services.AddInfrastructure(config);
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var qrSigningProvider = scope.ServiceProvider.GetRequiredService<IQrSigningProvider>();
+
+        Assert.IsType<AzureKeyVaultQrSigningProvider>(qrSigningProvider);
+    }
+
+    [Fact]
+    public void AddInfrastructure_DoesNotRegisterKeyVaultInspectorOrRotationJob_WhenVaultUriNotConfigured()
+    {
+        var services = new ServiceCollection();
+        services.AddInfrastructure(CreateConfiguration());
+
+        Assert.DoesNotContain(services, sd => sd.ServiceType == typeof(IQrSigningKeyVaultInspector));
+        Assert.DoesNotContain(services, sd => sd.ServiceType == typeof(IKeyRotationService));
+        Assert.DoesNotContain(services, sd =>
+            sd.ServiceType == typeof(IHostedService) &&
+            sd.ImplementationType == typeof(KeyRotationBackgroundService));
+    }
+
+    [Fact]
+    public void AddInfrastructure_RegistersKeyVaultInspectorAndRotationJob_WhenVaultUriConfigured()
+    {
+        var services = new ServiceCollection();
+        services.AddInfrastructure(CreateConfiguration("https://example.vault.azure.net/"));
+
+        Assert.Contains(services, sd =>
+            sd.ServiceType == typeof(IQrSigningKeyVaultInspector) &&
+            sd.ImplementationType == typeof(AzureQrSigningKeyVaultInspector) &&
+            sd.Lifetime == ServiceLifetime.Singleton);
+        Assert.Contains(services, sd =>
+            sd.ServiceType == typeof(IKeyRotationService) &&
+            sd.ImplementationType == typeof(KeyRotationService) &&
+            sd.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, sd =>
+            sd.ServiceType == typeof(IHostedService) &&
+            sd.ImplementationType == typeof(KeyRotationBackgroundService));
+    }
+
+    [Fact]
+    public void AddApplicationAndInfrastructure_RegistersEveryControllerConstructorDependency()
+    {
+        var services = new ServiceCollection();
+        services.AddApplication();
+        services.AddInfrastructure(CreateConfiguration());
+
+        var applicationAssembly = typeof(IAdminDashboardService).Assembly;
+        var registered = services.Select(sd => sd.ServiceType).ToHashSet();
+
+        var controllerTypes = typeof(AdminDashboardController).Assembly
+            .GetTypes()
+            .Where(t => t.IsClass && !t.IsAbstract && typeof(ControllerBase).IsAssignableFrom(t))
+            .ToList();
+
+        Assert.NotEmpty(controllerTypes);
+
+        var missing = controllerTypes
+            .SelectMany(cont => cont
+                .GetConstructors()
+                .SelectMany(ctor => ctor.GetParameters())
+                .Where(p => p.ParameterType.Assembly == applicationAssembly)
+                .Where(p => !registered.Contains(p.ParameterType))
+                .Select(p => $"{cont.Name} -> {p.ParameterType.Name}"))
+            .Distinct()
+            .ToList();
+
+        Assert.Empty(missing);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("https://example.vault.azure.net/")]
+    public void AddApplicationAndInfrastructure_EveryRegisteredServiceHasItsApplicationDependenciesRegistered(string? vaultUri)
+    {
+        var services = new ServiceCollection();
+        services.AddApplication();
+        services.AddInfrastructure(CreateConfiguration(vaultUri));
+
+        var applicationAssembly = typeof(IAdminDashboardService).Assembly;
+        var registered = services.Select(sd => sd.ServiceType).ToHashSet();
+
+        var missing = services
+            .Where(sd => sd.ImplementationType != null)
+            .SelectMany(sd => sd.ImplementationType!
+                .GetConstructors()
+                .OrderByDescending(c => c.GetParameters().Length)
+                .Take(1)
+                .SelectMany(c => c.GetParameters())
+                .Where(p => p.ParameterType.Assembly == applicationAssembly)
+                .Where(p => !registered.Contains(p.ParameterType))
+                .Select(p => $"{sd.ImplementationType!.Name} -> {p.ParameterType.Name}"))
+            .Distinct()
+            .ToList();
+
+        Assert.Empty(missing);
+    }
+
+    [Fact]
+    public void AddInfrastructure_RunsEmergencyNotificationsOnABackgroundQueue()
+    {
+        var services = new ServiceCollection();
+        services.AddInfrastructure(CreateConfiguration());
+
+        Assert.Contains(services, sd =>
+            sd.ServiceType == typeof(IEmergencyNotificationQueue) && sd.Lifetime == ServiceLifetime.Singleton);
+        Assert.Contains(services, sd =>
+            sd.ServiceType == typeof(IHostedService) &&
+            sd.ImplementationType == typeof(EmergencyNotificationBackgroundService));
+    }
+}

@@ -14,6 +14,8 @@ public class DriversLicense : BaseEntity
 
     public string PhotoPath { get; set; } = string.Empty;
 
+    public string CountryOfIssue { get; set; } = "South Africa";
+
 
     // Navigation property back to Credential
     public Guid CredentialId { get; set; }
