@@ -1,12 +1,13 @@
 import { ShieldAlert } from 'lucide-react-native'
 import { Pressable, View } from 'react-native'
 import { Text } from '@/components/atoms'
-import { useSecurityOverview } from '@/hooks'
 import { colors } from '@/theme/colors'
 import type { SecurityAlertCardProps } from './types'
 
-export const SecurityAlertCard = ({ onPress }: SecurityAlertCardProps) => {
-  const { alert } = useSecurityOverview()
+export const SecurityAlertCard = ({
+  alert,
+  onPress,
+}: SecurityAlertCardProps) => {
   if (!alert) {
     return null
   }

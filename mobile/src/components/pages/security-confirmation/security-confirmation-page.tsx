@@ -13,13 +13,11 @@ const FALLBACK_TITLE = 'Your account is secured'
 
 export const SecurityConfirmationPage = ({
   alertId,
-  isPasswordUpdated = false,
 }: SecurityConfirmationPageProps) => {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const result = useSecureAccountResult(alertId)
-  const needsNewPassword =
-    (result?.requiresPasswordChange ?? false) && !isPasswordUpdated
+  const needsNewPassword = result?.requiresPasswordChange ?? false
 
   return (
     <View
@@ -42,17 +40,6 @@ export const SecurityConfirmationPage = ({
           {result?.title ?? FALLBACK_TITLE}
         </Text>
         {result ? <Text className="text-center">{result.message}</Text> : null}
-        {isPasswordUpdated ? (
-          <View
-            className="w-full flex-row items-center gap-3 rounded-2xl border border-primary-green/30 bg-primary-green/10 p-4"
-            testID="password-updated-notice"
-          >
-            <CircleCheck color={colors.primaryGreen} size={20} />
-            <Text variant="sub-sm" className="flex-1 text-text-primary">
-              Your password has been updated. Use it the next time you sign in.
-            </Text>
-          </View>
-        ) : null}
         {result && result.nextSteps.length > 0 ? (
           <Card className="mt-4 w-full gap-3 bg-cream-background">
             <Text className="font-bold text-text-primary">

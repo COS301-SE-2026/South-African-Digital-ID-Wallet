@@ -73,6 +73,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     ])
     setDeviceToken(storedDeviceToken)
 
+    // A stored session is only ever resumed behind a biometric check.
+    // Without one there is nothing guarding it, so discard it.
     if (!session || hasExpired(session.expiresAt) || !isBiometricEnabled) {
       await clearSession()
       await offlineService.clearOfflineData().catch(() => {})

@@ -9,16 +9,14 @@ import {
   RecentActivityList,
   SecurityAlertCard,
 } from '@/components/organisms'
-
+import { CitizenDashboardScreen } from '@/components/templates'
+import { citizenQuickActions } from '@/config'
 import {
   usePrefetchOfflinePackages,
   useRecentActivity,
   useSecurityOverview,
   useWalletCredentials,
 } from '@/hooks'
-
-import { CitizenDashboardScreen } from '@/components/templates'
-import { citizenQuickActions } from '@/config'
 import { useAuthStore } from '@/stores/auth-store'
 import { colors } from '@/theme/colors'
 
@@ -68,6 +66,7 @@ export const CitizenHomePage = () => {
     >
       <IdentityStatusPanel onPress={() => router.push('/citizen/wallet')} />
       <SecurityAlertCard
+        alert={security.alert}
         onPress={(alertId) =>
           router.push({
             params: { alertId },

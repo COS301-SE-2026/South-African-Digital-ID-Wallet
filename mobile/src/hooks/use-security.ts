@@ -14,6 +14,7 @@ import type {
   UpdateSecuritySettingsRequest,
 } from '@/services/security-service'
 import { useAuthStore } from '@/stores/auth-store'
+import { useSecurityResultStore } from '@/stores/security-result-store'
 
 const service: SecurityService =
   process.env.EXPO_PUBLIC_SECURITY_MOCK === 'true'
@@ -24,7 +25,6 @@ export const securityKeys = {
   activity: ['security', 'activity'] as const,
   alert: (alertId: string) => ['security', 'alert', alertId] as const,
   overview: ['security', 'overview'] as const,
-  result: (alertId: string) => ['security', 'result', alertId] as const,
   settings: ['security', 'settings'] as const,
 }
 
@@ -77,9 +77,9 @@ export const useSecurityAlert = (alertId: string) => {
 }
 
 export const useSecureAccount = (alertId: string) => {
-  const queryClient = useQueryClient()
   const refreshSecurity = useRefreshSecurity()
   const replaceToken = useAuthStore((state) => state.replaceToken)
+  const saveResult = useSecurityResultStore((state) => state.save)
   const { isPending, mutateAsync } = useMutation({
     mutationFn: (request: SecureAccountRequest) =>
       service.secureAccount(alertId, request),
@@ -87,10 +87,11 @@ export const useSecureAccount = (alertId: string) => {
       if (result.token && result.expiresAt) {
         replaceToken(result.token, result.expiresAt)
       }
-      queryClient.setQueryData<SecureAccountResponse>(
-        securityKeys.result(alertId),
-        { ...result, expiresAt: undefined, token: undefined }
-      )
+      saveResult(alertId, {
+        ...result,
+        expiresAt: undefined,
+        token: undefined,
+      })
       refreshSecurity(alertId)
     },
   })
@@ -110,9 +111,7 @@ export const useDismissAlert = (alertId: string) => {
 export const useSecureAccountResult = (
   alertId: string
 ): SecureAccountResponse | null =>
-  useQueryClient().getQueryData<SecureAccountResponse>(
-    securityKeys.result(alertId)
-  ) ?? null
+  useSecurityResultStore((state) => state.results[alertId] ?? null)
 
 export const useSecuritySettings = () => {
   const { data, isError, isPending } = useQuery({

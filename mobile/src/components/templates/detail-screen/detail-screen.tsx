@@ -14,7 +14,11 @@ import {
   TextInput,
   View,
 } from 'react-native'
-import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
+import type {
+  LayoutChangeEvent,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+} from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { Text } from '@/components/atoms'
@@ -56,11 +60,23 @@ export const DetailScreen = ({
 }: DetailScreenProps) => {
   const insets = useSafeAreaInsets()
   const keyboardHeight = useKeyboardHeight()
+  const [screenHeight, setScreenHeight] = useState(0)
+  const [fullScreenHeight, setFullScreenHeight] = useState(0)
   const innerScrollRef = useRef<ScrollView>(null)
   const viewportRef = useRef<View>(null)
   const scrollOffset = useRef(0)
 
   useImperativeHandle(scrollRef, () => innerScrollRef.current as ScrollView, [])
+
+  const resizedBy = Math.max(0, fullScreenHeight - screenHeight)
+  const keyboardPadding =
+    keyboardHeight > 0 ? Math.max(0, keyboardHeight - resizedBy) : 0
+
+  const handleScreenLayout = useCallback((event: LayoutChangeEvent) => {
+    const { height } = event.nativeEvent.layout
+    setScreenHeight(height)
+    setFullScreenHeight((previous) => Math.max(previous, height))
+  }, [])
 
   const revealFocusedField = useCallback(() => {
     const input = TextInput.State.currentlyFocusedInput()
@@ -105,7 +121,8 @@ export const DetailScreen = ({
   return (
     <View
       className="flex-1 bg-clean-white"
-      style={{ paddingBottom: keyboardHeight, paddingTop: insets.top }}
+      onLayout={handleScreenLayout}
+      style={{ paddingBottom: keyboardPadding, paddingTop: insets.top }}
       testID={testID}
     >
       <View className="flex-row items-center px-3 py-2">

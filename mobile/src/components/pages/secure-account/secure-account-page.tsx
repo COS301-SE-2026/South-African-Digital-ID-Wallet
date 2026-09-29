@@ -17,7 +17,7 @@ import type { SecureAccountPageProps } from './types'
 
 export const SecureAccountPage = ({ alertId }: SecureAccountPageProps) => {
   const router = useRouter()
-  const { alert, isPending } = useSecurityAlert(alertId)
+  const { alert, isError, isPending } = useSecurityAlert(alertId)
   const { isSecuring, secureAccount } = useSecureAccount(alertId)
   const [chosen, setChosen] = useState<SecureAccountAction | null>(null)
   const [password, setPassword] = useState('')
@@ -58,6 +58,24 @@ export const SecureAccountPage = ({ alertId }: SecureAccountPageProps) => {
       >
         <ActivityIndicator color={colors.primaryGreen} size="large" />
       </View>
+    )
+  }
+
+  if (isError || !alert) {
+    return (
+      <DetailScreen
+        onBack={() => router.back()}
+        testID="secure-account"
+        title="Secure your account"
+      >
+        <Text
+          variant="sub-sm"
+          className="text-danger-red"
+          testID="secure-account-error"
+        >
+          We could not load this security event.
+        </Text>
+      </DetailScreen>
     )
   }
 

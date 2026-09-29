@@ -19,6 +19,7 @@ import type {
   SecurityActivityResponse,
   SecuritySettingsResponse,
 } from '@/services/security-service'
+import { useSecurityResultStore } from '@/stores/security-result-store'
 import {
   createQueryWrapper,
   createTestQueryClient,
@@ -108,7 +109,10 @@ const SECURED: SecureAccountResponse = {
 }
 
 describe('use-security', () => {
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => {
+    jest.clearAllMocks()
+    useSecurityResultStore.setState({ results: {} })
+  })
 
   describe('useSecurityOverview', () => {
     it('Should expose the open alert, its count and the recent activity', async () => {
@@ -182,11 +186,10 @@ describe('use-security', () => {
   })
 
   describe('useSecureAccount', () => {
-    it('Should swap in the new token and cache the result without it', async () => {
+    it('Should swap in the new token and keep the result without it', async () => {
       secureAccount.mockResolvedValue(SECURED)
-      const queryClient = createCachingQueryClient()
       const { result } = await renderHook(() => useSecureAccount(ALERT_ID), {
-        wrapper: createQueryWrapper(queryClient),
+        wrapper: createQueryWrapper(),
       })
 
       await act(async () => {
@@ -204,12 +207,10 @@ describe('use-security', () => {
         'rotated-jwt-token',
         '2026-10-28T00:00:00Z'
       )
-      const cached = queryClient.getQueryData<SecureAccountResponse>(
-        securityKeys.result(ALERT_ID)
-      )
-      expect(cached?.title).toBe('Your account is secured')
-      expect(cached?.token).toBeUndefined()
-      expect(cached?.expiresAt).toBeUndefined()
+      const saved = useSecurityResultStore.getState().results[ALERT_ID]
+      expect(saved?.title).toBe('Your account is secured')
+      expect(saved?.token).toBeUndefined()
+      expect(saved?.expiresAt).toBeUndefined()
     })
 
     it('Should keep the current token when the backend sends none', async () => {
@@ -260,20 +261,17 @@ describe('use-security', () => {
   })
 
   describe('useSecureAccountResult', () => {
-    it('Should read the cached result without a request', async () => {
-      const queryClient = createCachingQueryClient()
-      queryClient.setQueryData(securityKeys.result(ALERT_ID), SECURED)
-      const { result } = await renderHook(
-        () => useSecureAccountResult(ALERT_ID),
-        { wrapper: createQueryWrapper(queryClient) }
+    it('Should read the saved result without a request', async () => {
+      useSecurityResultStore.getState().save(ALERT_ID, SECURED)
+      const { result } = await renderHook(() =>
+        useSecureAccountResult(ALERT_ID)
       )
       expect(result.current?.title).toBe('Your account is secured')
     })
 
-    it('Should return null when nothing was cached', async () => {
-      const { result } = await renderHook(
-        () => useSecureAccountResult(ALERT_ID),
-        { wrapper: createQueryWrapper() }
+    it('Should return null when nothing was saved', async () => {
+      const { result } = await renderHook(() =>
+        useSecureAccountResult(ALERT_ID)
       )
       expect(result.current).toBeNull()
     })
