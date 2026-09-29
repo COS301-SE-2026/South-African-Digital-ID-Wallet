@@ -1,0 +1,85 @@
+web/src/config/navigation/navigation.ts
+  h_712d174fc3f309 68
+web/src/config/page-headers/page-headers.ts
+  h_712d174fc3f309 88-93
+  h_712d174fc3f309 87,94-97
+web/src/components/atoms/account-info-row/account-info-row.tsx
+  h_712d174fc3f309 10,12-15
+web/src/components/atoms/modal/index.ts
+  h_712d174fc3f309 2
+web/src/components/atoms/modal/modal-styles.ts
+  h_712d174fc3f309 1-10
+web/src/components/atoms/modal/modal.tsx
+  h_712d174fc3f309 5-9,41-44,46,51-54
+web/src/components/molecules/account-termination-modal/account-termination-modal.tsx
+  h_712d174fc3f309 4-11,23-24,26-27,29,31,34,36,50,58
+web/src/components/molecules/change-password-modal/change-password-modal.tsx
+  h_712d174fc3f309 4-11,24-28,30,32,35,37
+web/src/components/molecules/credential-detail-card/credential-detial-card.tsx
+  h_712d174fc3f309 4,7-10,140,143-144,146,148,153,155,157,161
+web/src/components/molecules/dashboard-modal/dashboard-modal.tsx
+  h_712d174fc3f309 3-8,26-29,33,35,41,43,47
+web/src/components/molecules/delete-account-card/delete-account-card.tsx
+  h_712d174fc3f309 7-11,49,62-66,72-73,76,99
+web/src/components/molecules/manage-user-trusted-devices/manage-user-trusted-devices.tsx
+  h_712d174fc3f309 76,78,91,113,115-116,120-123,132,136,165,167-168,197
+web/src/components/molecules/table-pagination/table-pagination.tsx
+  h_712d174fc3f309 31
+web/src/components/molecules/update-email-modal/update-email-modal.tsx
+  h_712d174fc3f309 7,14-19,176-179,181,186,188
+web/src/components/molecules/update-password-modal/update-password-modal.tsx
+  h_712d174fc3f309 5,11-16,77-80,82,87,89
+web/src/components/molecules/verification-success-modal/verification-success-modal.tsx
+  h_712d174fc3f309 7-11,62,68-69,73,75,80
+web/src/components/organisms/activate-credentials-form/activate-credentials-form.tsx
+  h_712d174fc3f309 70-76,81
+web/src/components/organisms/audit-log-table/audit-log-table.tsx
+  h_712d174fc3f309 29,84,87,96,105,114,123,145,160,165,181,186
+web/src/components/organisms/consent-to-verify/consent-to-verify.tsx
+  h_712d174fc3f309 47,49-117
+web/src/components/organisms/credential-details-modal/credential-details-modal.tsx
+  h_712d174fc3f309 96-97,116,144
+web/src/components/organisms/gov-admin-audit-log-table/gov-admin-audit-log-details-panel.tsx
+  h_712d174fc3f309 14-19,25,70
+web/src/components/organisms/gov-admin-audit-log-table/gov-admin-audit-log-table.tsx
+  h_712d174fc3f309 7-12,59-109,111-112,121-123,142-189
+web/src/components/organisms/liveness-camera-dialog/liveness-camera-dialog.tsx
+  h_712d174fc3f309 4,18-77,125-126,150-152,177-189,196,204-205,207-211,213-215,219-220,222-241
+web/src/components/organisms/manage-user-account/manage-user-account.tsx
+  h_712d174fc3f309 18-20,22-23,26
+web/src/components/organisms/ready-to-verify/ready-to-verify.tsx
+  h_712d174fc3f309 56,58-62,64-72,74-83,85-91,93-97,99-103,105-120
+web/src/components/organisms/register-institution-form/register-institution-form.tsx
+  h_712d174fc3f309 3-4,14-40,45,78-92,94-105,108-110,113-118,120-121,124-130,132-159,161-173,176,181,190-265
+web/src/components/organisms/revoke-credentials-modal/revoke-credentials-modal.tsx
+  h_712d174fc3f309 44-49
+web/src/components/organisms/search-results-table/search-results-table.tsx
+  h_712d174fc3f309 35,45,55,65,75,85,105,109,119,129,139,149,152,165
+web/src/components/organisms/verification-ready-dialog/verification-ready-dialog.tsx
+  h_712d174fc3f309 42
+web/src/components/organisms/verification-required/verification-required.tsx
+  h_712d174fc3f309 21
+web/src/components/organisms/verification-success/verification-success.tsx
+  h_712d174fc3f309 24
+web/src/components/pages/gov-admin/audit-log-page.tsx
+  h_712d174fc3f309 79-103
+web/src/components/pages/gov-admin/view-institutions-page.tsx
+  h_712d174fc3f309 5,10-27,37-44,46-66,68-75,77-85,87-92,94-174,176-177
+web/src/components/pages/register-institution-page/register-institution-page.tsx
+  h_712d174fc3f309 1-2,4-32,36-83,85-86
+web/src/components/templates/otp-modal/otp-modal.tsx
+  h_712d174fc3f309 131,145-148
+web/src/components/ui/dialog.tsx
+  h_712d174fc3f309 42,64,74,132
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c4be5f8599e01631297db297284a9883761eeac9",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
