@@ -1,0 +1,14 @@
+web/src/services/fraud-detection-service/mapper.cs
+  h_0aff3b71f739b1 1-129
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4d305b1cea3c85bd967c480f314466ac1789fe3c",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

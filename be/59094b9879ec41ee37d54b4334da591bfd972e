@@ -1,0 +1,17 @@
+web/src/components/organisms/valid-certified-copy/valid-certified-copy.tsx
+  h_293a8616118f65 35
+  h_293a8616118f65 36
+web/src/components/organisms/valid-certified-copy/types.ts
+  h_293a8616118f65 3-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "be59094b9879ec41ee37d54b4334da591bfd972e",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

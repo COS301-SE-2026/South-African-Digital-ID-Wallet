@@ -1,0 +1,14 @@
+mobile/src/hooks/test/use-certified-copy.test.tsx
+  h_293a8616118f65 47-53,68-71,85-88,99-102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "adbd4ec950e898037265c6573408a8c344e5cb8c",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
