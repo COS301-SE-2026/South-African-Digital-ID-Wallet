@@ -1,0 +1,14 @@
+web/src/app/globals.css
+  h_293a8616118f65 110-130
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "af332ca75d2c837e6f4b04ed2bf5e17cb3cf388d",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

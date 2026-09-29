@@ -1,0 +1,30 @@
+backend/FlashIdBackend/Presentation/Controllers/CitizensController.cs
+  h_99fca60b892ff4 57
+backend/FlashIdBackend/Presentation/Controllers/OfficialsController.cs
+  h_99fca60b892ff4 8,50
+backend/FlashIdBackend/Presentation/Controllers/ManageUserAccountController.cs
+  h_99fca60b892ff4 132
+backend/FlashIdBackend/Presentation/Controllers/AuthController.cs
+  h_99fca60b892ff4 60,62,131
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_99fca60b892ff4 141
+backend/FlashIdBackend/Presentation/Controllers/OnboardingController.cs
+  h_99fca60b892ff4 7,25
+backend/FlashIdBackend/Presentation/Controllers/VerificationController.cs
+  h_99fca60b892ff4 7,25
+backend/FlashIdBackend/Presentation/Program.cs
+  h_99fca60b892ff4 139-145,148,150-153,160-161,163-166,168-171,173-202,249-250
+backend/FlashIdBackend/Presentation/Controllers/UpdatePasswordController.cs
+  h_99fca60b892ff4 5,22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "89a75918345c0bd33fb8b11368071da18ebc4b89",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
