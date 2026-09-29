@@ -84,7 +84,7 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
             DocumentHash = documentHash,
 
             GeneratedAt = generatedAt,
-            ExpiresAt = null,
+            ExpiresAt = generatedAt.AddDays(90),
             RevokedAt = null,
 
             Status = CertifiedCopyStatus.Active

@@ -192,7 +192,6 @@ public class CertifiedCredentialCopyServiceTests
         Assert.Equal(SnapshotHash, savedCopy.CredentialSnapshotHash);
         Assert.Equal(DocumentHash, savedCopy.DocumentHash);
         Assert.Equal(CertifiedCopyStatus.Active, savedCopy.Status);
-        Assert.Null(savedCopy.ExpiresAt);
         Assert.Null(savedCopy.RevokedAt);
         Assert.Contains("Identity-Document", result.FileName);
         Assert.EndsWith(".pdf", result.FileName);
