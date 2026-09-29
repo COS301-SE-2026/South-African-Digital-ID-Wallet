@@ -18,6 +18,7 @@ import {
 export const UpdatePasswordModal: FC<UpdatePasswordModalProps> = ({
   open,
   onCloseAction,
+  onSuccess,
 }) => {
   const [currentPass, setCurrentPass] = useState('')
   const [newPass, setNewPass] = useState('')
@@ -59,6 +60,7 @@ export const UpdatePasswordModal: FC<UpdatePasswordModalProps> = ({
       setNewPass('')
       setConfirmPass('')
 
+      onSuccess?.()
       onCloseAction()
     } catch (error) {
       const message = axios.isAxiosError(error)
