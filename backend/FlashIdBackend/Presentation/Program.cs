@@ -17,6 +17,7 @@ using Microsoft.Azure.Cosmos;
 using Presentation.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpOverrides;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,8 @@ if (!builder.Environment.IsEnvironment("Testing"))
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
+QuestPDF.Settings.License = LicenseType.Community;
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -48,7 +51,8 @@ builder.Services.AddCors(options =>
             .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials();
+            .AllowCredentials()
+            .WithExposedHeaders("Content-Disposition");
     });
 });
 builder.Services.AddEndpointsApiExplorer();
@@ -180,6 +184,7 @@ builder.Services.AddRateLimiter(options =>
     AddIpPartitionedPolicy(options, "login", permitLimit: 10, window: oneMinute);
     AddIpPartitionedPolicy(options, "verify-device", permitLimit: 5, window: oneMinute);
     AddIpPartitionedPolicy(options, "password-reset", permitLimit: 5, window: oneMinute);
+    AddIpPartitionedPolicy(options, "certified-copy-verify", permitLimit: 10, window: oneMinute);
 
     // Signed-in endpoints.
     AddUserPartitionedPolicy(options, "resend-device-verification", permitLimit: 3, window: oneMinute);
@@ -252,7 +257,6 @@ app.UseAuthentication();
 app.UseRateLimiter();
 app.UseMiddleware<Presentation.Middleware.CsrfProtectionMiddleware>();
 app.UseAuthorization();
-app.MapControllers();
 
 app.MapHealthChecks("/health", new HealthCheckOptions { Predicate = check => !check.Tags.Contains("readiness") });
 

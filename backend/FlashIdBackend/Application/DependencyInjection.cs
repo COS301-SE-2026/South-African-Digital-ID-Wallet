@@ -52,6 +52,9 @@ public static class DependencyInjection
         services.AddScoped<IFraudDetectionService, FraudDetectionService>();
         services.AddScoped<IOfflinePackageService, OfflinePackageService>();
         services.AddScoped<IPasswordResetService, PasswordResetService>();
+        services.AddSingleton<CertifiedCredentialSnapshotMapper>();
+        services.AddScoped<ICertifiedCredentialCopyService, CertifiedCredentialCopyService>();
+
         return services;
     }
 }
