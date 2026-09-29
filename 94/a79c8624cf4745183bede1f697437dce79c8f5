@@ -1,0 +1,14 @@
+docs/demo4/SAS-v4.md
+  h_293a8616118f65 34,1402-1575
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "94a79c8624cf4745183bede1f697437dce79c8f5",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
