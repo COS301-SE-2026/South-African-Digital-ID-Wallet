@@ -9,6 +9,11 @@ export const pageHeaders: Record<string, PageHeader> = {
     description: 'View and manage official FlashID tasks.',
   },
 
+  '/officials/officials-dashboard': {
+    title: 'Officials Dashboard',
+    description: 'View and manage official FlashID tasks.',
+  },
+
   '/officials/onboard-citizen': {
     title: 'Onboard Citizen',
     description:
