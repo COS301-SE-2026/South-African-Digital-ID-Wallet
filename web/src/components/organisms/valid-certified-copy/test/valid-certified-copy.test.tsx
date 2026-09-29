@@ -9,7 +9,12 @@ jest.mock('@/components/organisms/public-certified-copy-frame', () => ({
 }))
 describe('ValidCertifiedCopy', () => {
   it('renders the valid certified-copy state', () => {
-    render(<ValidCertifiedCopy />)
+    render(
+      <ValidCertifiedCopy
+        citizenName="Thabo Mokoena"
+        maskedId="8000 ••••••• 111"
+      />
+    )
     expect(
       screen.getByRole('heading', { name: 'Certified Copy Valid' })
     ).toBeInTheDocument()
@@ -20,13 +25,7 @@ describe('ValidCertifiedCopy', () => {
       )
     ).toBeInTheDocument()
   })
-  it('renders the default citizen details', () => {
-    render(<ValidCertifiedCopy />)
-    expect(screen.getByText('Kayla Patel')).toBeInTheDocument()
-    expect(screen.getByText('9000 ••••••• 000')).toBeInTheDocument()
-    expect(screen.getByText('Citizen name')).toBeInTheDocument()
-    expect(screen.getByText('ID number')).toBeInTheDocument()
-  })
+
   it('renders custom citizen details', () => {
     render(
       <ValidCertifiedCopy
@@ -38,7 +37,12 @@ describe('ValidCertifiedCopy', () => {
     expect(screen.getByText('8000 ••••••• 111')).toBeInTheDocument()
   })
   it('renders the verification explanation', () => {
-    render(<ValidCertifiedCopy />)
+    render(
+      <ValidCertifiedCopy
+        citizenName="Thabo Mokoena"
+        maskedId="8000 ••••••• 111"
+      />
+    )
     expect(
       screen.getByText(
         'This verification confirms the certification record and current status of the source credential.'

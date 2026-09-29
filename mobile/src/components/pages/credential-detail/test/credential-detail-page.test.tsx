@@ -137,7 +137,9 @@ describe('<CredentialDetailPage/>', () => {
     await waitFor(() => expect(openMock).toHaveBeenCalledWith(FILE))
     expect(postMock).toHaveBeenCalledWith(
       '/api/certified-copies/credentials/dl-1',
-      undefined,
+      {
+        credentialType: 'DriversLicense',
+      },
       expect.objectContaining({ responseType: 'arraybuffer' })
     )
     const [bytes, fileName] = saveMock.mock.calls[0]

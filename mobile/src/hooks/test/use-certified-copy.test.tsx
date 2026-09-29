@@ -53,7 +53,7 @@ describe('useCertifiedCopy', () => {
       )
     })
     await waitFor(() => expect(onSuccess).toHaveBeenCalled())
-    expect(generateMock).toHaveBeenCalledWith('c-1')
+    expect(generateMock).toHaveBeenCalledWith('c-1', 'IdentityDocument')
     expect(saveMock).toHaveBeenCalledWith(BYTES, 'copy.pdf')
     expect(openMock).toHaveBeenCalledWith(FILE)
     expect(onSuccess.mock.calls[0][0]).toBe(FILE.uri)

@@ -75,7 +75,7 @@ describe('certifiedCopyService', () => {
     expect(postMock).toHaveBeenCalledWith(
       '/api/certified-copies/credentials/a%2Fb%20c%3F',
       {
-        credentialType: 'Driverslicense',
+        credentialType: 'DriversLicense',
       },
       expect.any(Object)
     )
