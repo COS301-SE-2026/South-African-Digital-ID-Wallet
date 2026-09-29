@@ -10,9 +10,5 @@ export default async function PublicVerifyCertifiedCopyRoute({
   params,
 }: VerifyCertifiedCopyRouteProps) {
   const { verificationToken } = await params
-  return (
-    <VerifyCertifiedCopyPage
-      verificationToken={verificationToken}
-    />
-  )
+  return <VerifyCertifiedCopyPage verificationToken={verificationToken} />
 }

@@ -55,11 +55,7 @@ export function CertifiedCopyGenerated({
               Preview your document before choosing an action.
             </Text>
             <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
-              <a
-                href={pdfUrl}
-                download={fileName}
-                className="block w-full"
-              >
+              <a href={pdfUrl} download={fileName} className="block w-full">
                 <Button
                   type="button"
                   variant="primary"

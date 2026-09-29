@@ -11,12 +11,13 @@ type VerificationState = 'progress' | 'authentic' | 'failed' | null
 const MAX_PDF_FILE_SIZE = 10 * 1024 * 1024
 export const VerifyCertifiedCopyPage: FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [verificationState, setVerificationState] = useState<VerificationState>(null)
+  const [verificationState, setVerificationState] =
+    useState<VerificationState>(null)
   const [cameraOpen, setCameraOpen] = useState(false)
   const [currentStep, setCurrentStep] = useState(3)
   const [selectedDocument, setSelectedDocument] = useState<File | null>(null)
   const [verificationError, setVerificationError] = useState<string | null>(
-    null,
+    null
   )
   useEffect(() => {
     if (verificationState !== 'progress') {
@@ -33,9 +34,7 @@ export const VerifyCertifiedCopyPage: FC = () => {
       window.clearTimeout(fifthStepTimer)
     }
   }, [verificationState])
-  const runDocumentVerification = async (
-    document: File,
-  ): Promise<void> => {
+  const runDocumentVerification = async (document: File): Promise<void> => {
     setVerificationError(null)
     setCurrentStep(3)
     setVerificationState('progress')
@@ -47,7 +46,7 @@ export const VerifyCertifiedCopyPage: FC = () => {
       setCurrentStep(5)
       setVerificationState('failed')
       setVerificationError(
-        'The verification service could not be reached. Please try again.',
+        'The verification service could not be reached. Please try again.'
       )
     }
   }
@@ -55,7 +54,9 @@ export const VerifyCertifiedCopyPage: FC = () => {
     if (!file) {
       return
     }
-    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
+    const isPdf =
+      file.type === 'application/pdf' ||
+      file.name.toLowerCase().endsWith('.pdf')
     if (!isPdf) {
       setVerificationError('Only PDF files are accepted.')
       return
@@ -92,25 +93,22 @@ export const VerifyCertifiedCopyPage: FC = () => {
   const handleQrScan = (rawText: string) => {
     const value = rawText.trim()
     if (!value) {
-      setVerificationError(
-        'The QR code did not contain a verification link.',
-      )
+      setVerificationError('The QR code did not contain a verification link.')
       return
     }
-    const publicUrl = /^https?:\/\//i.test(value)
-      ? value
-      : `http://${value}`
+    const publicUrl = /^https?:\/\//i.test(value) ? value : `http://${value}`
     try {
       const url = new URL(publicUrl)
-      const hasVerificationPath =
-        /\/verify-certified-copy\/[^/]+\/?$/i.test(url.pathname)
+      const hasVerificationPath = /\/verify-certified-copy\/[^/]+\/?$/i.test(
+        url.pathname
+      )
       if (!hasVerificationPath) {
         throw new Error('Invalid verification path')
       }
       window.location.assign(url.toString())
     } catch {
       setVerificationError(
-        'This QR code does not contain a valid certified-copy verification link.',
+        'This QR code does not contain a valid certified-copy verification link.'
       )
     }
   }
@@ -128,11 +126,7 @@ export const VerifyCertifiedCopyPage: FC = () => {
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-green/10 text-primary-green">
                 <FileText className="h-7 w-7" />
               </div>
-              <Text
-                as="h2"
-                variant="h4"
-                className="mt-4 text-text-primary"
-              >
+              <Text as="h2" variant="h4" className="mt-4 text-text-primary">
                 Upload Certified Copy PDF
               </Text>
               <Text variant="sub-sm" className="mt-2">
@@ -171,9 +165,7 @@ export const VerifyCertifiedCopyPage: FC = () => {
             </div>
             <div className="my-5 flex items-center gap-3">
               <div className="h-px flex-1 bg-border-grey" />
-              <Text variant="caption">
-                Alternatively, scan the QR code
-              </Text>
+              <Text variant="caption">Alternatively, scan the QR code</Text>
               <div className="h-px flex-1 bg-border-grey" />
             </div>
             <Button
@@ -192,11 +184,7 @@ export const VerifyCertifiedCopyPage: FC = () => {
                 >
                   Scan QR Code
                 </Text>
-                <Text
-                  as="span"
-                  variant="caption"
-                  className="mt-1"
-                >
+                <Text as="span" variant="caption" className="mt-1">
                   Open the public certified-copy verification page
                 </Text>
               </span>
@@ -242,18 +230,20 @@ export const VerifyCertifiedCopyPage: FC = () => {
       <Modal
         isOpen={verificationState !== null}
         onClose={closeVerificationModal}
-        className="h-fit min-h-0 max-h-[90vh] !w-full !max-w-xl overflow-y-auto p-5 sm:!w-full sm:!max-w-xl sm:p-8"
+        className="h-fit min-h-0 max-h-[90vh] !w-full !max-w-xl overflow-y-auto !bg-transparent !p-0 sm:!w-full sm:!max-w-xl"
       >
-        <div className="flex w-full items-center justify-center">
-          {verificationState && (
-            <CertifiedCopyVerification
-              state={verificationState}
-              currentStep={currentStep}
-              onViewCredentialDetails={closeVerificationModal}
-              onVerifyAnotherDocument={resetVerification}
-              onContactSupport={() => undefined}
-            />
-          )}
+        <div className="rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+          <div className="rounded-[24px] bg-clean-white p-5 sm:p-8">
+            {verificationState && (
+              <CertifiedCopyVerification
+                state={verificationState}
+                currentStep={currentStep}
+                onViewCredentialDetails={closeVerificationModal}
+                onVerifyAnotherDocument={resetVerification}
+                onContactSupport={() => undefined}
+              />
+            )}
+          </div>
         </div>
       </Modal>
     </main>

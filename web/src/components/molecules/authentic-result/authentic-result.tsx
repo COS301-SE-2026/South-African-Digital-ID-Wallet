@@ -23,23 +23,7 @@ export function AuthenticResult({
           </div>
         </div>
       </div>
-      <div className="mt-5 space-y-4 rounded-2xl border border-border-grey bg-clean-white p-5">
-        <VerificationCheck
-          title="Certification record"
-          status="Valid"
-          description="Found in FlashID"
-        />
-        <VerificationCheck
-          title="Document integrity"
-          status="Valid"
-          description="Exact match to the original PDF"
-        />
-        <VerificationCheck
-          title="Source credential"
-          status="Active"
-          description="Credential is current and valid"
-        />
-      </div>
+
       <div className="mt-5 rounded-2xl border border-border-grey bg-clean-white p-5">
         <div className="flex items-start gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-green/10 text-primary-green">
@@ -52,10 +36,7 @@ export function AuthenticResult({
             <div className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
               <DetailRow label="Issued to" value="Verified citizen" />
               <DetailRow label="ID Number" value="••••••••••••" />
-              <DetailRow
-                label="Generated"
-                value="16 May 2025 · 10:24"
-              />
+              <DetailRow label="Generated" value="16 May 2025 · 10:24" />
               <DetailRow
                 label="Certification ID"
                 value="FC-8F42A91C-37D-4E2F"
@@ -77,13 +58,7 @@ export function AuthenticResult({
     </div>
   )
 }
-function DetailRow({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) {
+function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <Text variant="caption">{label}</Text>

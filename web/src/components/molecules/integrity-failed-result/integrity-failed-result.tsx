@@ -25,24 +25,7 @@ export function IntegrityFailedResult({
           </div>
         </div>
       </div>
-      <div className="mt-5 space-y-4 rounded-2xl border border-border-grey bg-clean-white p-5">
-        <VerificationCheck
-          title="Certification record"
-          status="Found"
-          description="A valid certified record exists"
-        />
-        <VerificationCheck
-          title="Document integrity"
-          status="Failed"
-          description="The PDF has been modified or corrupted"
-          failed
-        />
-        <VerificationCheck
-          title="Source credential"
-          status="Active"
-          description="The credential is still valid"
-        />
-      </div>
+
       <div className="mt-5 flex items-start gap-3 rounded-xl border border-accent-gold/40 bg-accent-gold/10 p-4">
         <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-accent-gold" />
         <Text variant="caption" className="text-deep-green">

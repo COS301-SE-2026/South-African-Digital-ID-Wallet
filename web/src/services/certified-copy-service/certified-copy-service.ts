@@ -14,7 +14,7 @@ const getFileName = (contentDisposition?: string): string => {
 }
 const generate = async (
   credentialId: string,
-  request: GenerateCertifiedCopyRequest,
+  request: GenerateCertifiedCopyRequest
 ): Promise<CertifiedCopyDocument> => {
   const response: AxiosResponse<Blob> = await api.post(
     certifiedCopyUrls.generate(credentialId),
@@ -24,7 +24,7 @@ const generate = async (
         Accept: 'application/pdf',
       },
       responseType: 'blob',
-    },
+    }
   )
   return {
     blob: response.data,
@@ -32,39 +32,31 @@ const generate = async (
   }
 }
 const verify = async (
-  verificationToken: string,
+  verificationToken: string
 ): Promise<VerifyCertifiedCopyResponse> => {
   const response = await api.get<VerifyCertifiedCopyResponse>(
-    certifiedCopyUrls.verify(verificationToken),
+    certifiedCopyUrls.verify(verificationToken)
   )
   return response.data
 }
 const verifyDocument = async (
-  document: File,
+  document: File
 ): Promise<VerifyCertifiedCopyDocumentResponse> => {
   const formData = new FormData()
   formData.append('document', document, document.name)
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? ''
-  const response = await fetch(
-    `${apiUrl}${certifiedCopyUrls.verifyDocument()}`,
+  const response = await api.post<VerifyCertifiedCopyDocumentResponse>(
+    certifiedCopyUrls.verifyDocument(),
+    formData,
     {
-      method: 'POST',
-      body: formData,
-      credentials: 'include',
       headers: {
-        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
       },
-    },
+    }
   )
-  if (!response.ok) {
-    const errorBody = await response.text()
-    throw new Error(
-      errorBody ||
-        `Document verification failed with status ${response.status}`,
-    )
-  }
-  return (await response.json()) as VerifyCertifiedCopyDocumentResponse
+
+  return response.data
 }
+
 const certifiedCopyService = {
   generate,
   verify,

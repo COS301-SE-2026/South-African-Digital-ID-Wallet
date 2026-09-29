@@ -8,27 +8,26 @@ export async function VerifyCertifiedCopyPage({
   searchParams,
 }: Readonly<VerifyCertifiedCopyPageProps>) {
   if (verificationToken) {
+    let result = null
     try {
-      const result = await certifiedCopyService.verify(verificationToken)
-      if (!result.isValid) {
-        return <InvalidCertifiedCopy />
-      }
-      return (
-        <ValidCertifiedCopy
-          citizenName={result.fullName}
-          maskedId={result.idNumber}
-        />
-      )
-    } catch {
+      result = await certifiedCopyService.verify(verificationToken)
+    } catch {}
+
+    if (!result?.isValid) {
       return <InvalidCertifiedCopy />
     }
+    return (
+      <ValidCertifiedCopy
+        citizenName={result.fullName}
+        maskedId={result.idNumber}
+      />
+    )
   }
+
   const params = searchParams ? await searchParams : {}
   const status = params.status?.toLowerCase()
   const isInvalid =
-    status === 'invalid' ||
-    status === 'failed' ||
-    status === 'fail'
+    status === 'invalid' || status === 'failed' || status === 'fail'
 
   if (isInvalid) {
     return <InvalidCertifiedCopy />

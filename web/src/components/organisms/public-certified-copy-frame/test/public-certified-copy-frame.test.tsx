@@ -13,7 +13,7 @@ describe('PublicCertifiedCopyFrame', () => {
     render(
       <PublicCertifiedCopyFrame>
         <div>Certified copy content</div>
-      </PublicCertifiedCopyFrame>,
+      </PublicCertifiedCopyFrame>
     )
     expect(screen.getByText('Certified copy content')).toBeInTheDocument()
   })
@@ -21,7 +21,7 @@ describe('PublicCertifiedCopyFrame', () => {
     render(
       <PublicCertifiedCopyFrame>
         <div>Content</div>
-      </PublicCertifiedCopyFrame>,
+      </PublicCertifiedCopyFrame>
     )
     expect(screen.getByText('Powered by FlashID')).toBeInTheDocument()
     expect(screen.getByText('Prove yourself in a flash.')).toBeInTheDocument()
@@ -30,7 +30,7 @@ describe('PublicCertifiedCopyFrame', () => {
     render(
       <PublicCertifiedCopyFrame>
         <div>Content</div>
-      </PublicCertifiedCopyFrame>,
+      </PublicCertifiedCopyFrame>
     )
     expect(screen.getByRole('main')).toBeInTheDocument()
   })

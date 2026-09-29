@@ -18,9 +18,7 @@ jest.mock('@/components/organisms/valid-certified-copy', () => ({
 }))
 jest.mock('@/components/organisms/invalid-certified-copy', () => ({
   InvalidCertifiedCopy: (_props: Record<string, never>) => (
-    <div data-testid="invalid-certified-copy">
-      Invalid certified copy
-    </div>
+    <div data-testid="invalid-certified-copy">Invalid certified copy</div>
   ),
 }))
 describe('VerifyCertifiedCopyPage', () => {
@@ -45,10 +43,8 @@ describe('VerifyCertifiedCopyPage', () => {
         searchParams: Promise.resolve({ status }),
       })
       render(page)
-      expect(
-        screen.getByTestId('invalid-certified-copy'),
-      ).toBeInTheDocument()
-    },
+      expect(screen.getByTestId('invalid-certified-copy')).toBeInTheDocument()
+    }
   )
   it('passes name and ID values to the valid state', async () => {
     const page = await VerifyCertifiedCopyPage({

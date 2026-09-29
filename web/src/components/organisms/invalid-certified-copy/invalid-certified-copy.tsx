@@ -4,7 +4,7 @@ import { PublicCertifiedCopyFrame } from '@/components/organisms/public-certifie
 import type { InvalidCertifiedCopyProps } from './types'
 
 export function InvalidCertifiedCopy(
-  _props: Readonly<InvalidCertifiedCopyProps>,
+  _props: Readonly<InvalidCertifiedCopyProps>
 ) {
   return (
     <PublicCertifiedCopyFrame>
@@ -40,11 +40,7 @@ export function InvalidCertifiedCopy(
             strokeWidth={2.5}
           />
           <div>
-            <Text
-              as="p"
-              variant="sub-md"
-              className="font-bold text-[#b8242a]"
-            >
+            <Text as="p" variant="sub-md" className="font-bold text-[#b8242a]">
               This certified copy is not valid.
             </Text>
             <Text
