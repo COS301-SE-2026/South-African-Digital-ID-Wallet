@@ -1,0 +1,15 @@
+web/src/components/pages/officials/verify-certified-copy-page.tsx
+  h_293a8616118f65 221-229
+  h_293a8616118f65 235-236,238
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "492ec791c8c17c2a7d76ba0c4a08b5f6176ab4c2",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
