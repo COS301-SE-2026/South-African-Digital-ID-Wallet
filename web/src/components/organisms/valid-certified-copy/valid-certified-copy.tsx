@@ -32,8 +32,8 @@ function DetailRow({ icon, label, value, isLast }: Readonly<DetailRowProps>) {
   )
 }
 export function ValidCertifiedCopy({
-  citizenName = 'Kayla Patel',
-  maskedId = '9000 ••••••• 000',
+  citizenName,
+  maskedId,
 }: Readonly<ValidCertifiedCopyProps>) {
   return (
     <PublicCertifiedCopyFrame>
