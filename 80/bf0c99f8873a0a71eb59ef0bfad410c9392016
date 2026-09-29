@@ -1,0 +1,22 @@
+web/src/services/login-service/test/login-urls.test.ts
+  h_99fca60b892ff4 15-19
+web/src/services/login-service/test/login-service.test.ts
+  h_99fca60b892ff4 155-184
+web/src/services/login-service/login-service.ts
+  h_99fca60b892ff4 7,43-50,57-58
+web/src/services/login-service/types.ts
+  h_99fca60b892ff4 26-32
+web/src/services/login-service/login-urls.ts
+  h_99fca60b892ff4 6-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "80bf0c99f8873a0a71eb59ef0bfad410c9392016",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
