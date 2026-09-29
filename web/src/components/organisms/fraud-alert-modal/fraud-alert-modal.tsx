@@ -13,7 +13,8 @@ export function FraudAlertModal({
   onChangePassword,
   onReviewActivity,
   onReviewTrustedDevices,
-  onUnavailableAction,
+  onLogoutOtherDevices,
+  onDismiss,
 }: FraudAlertModalProps) {
   if (layer === 'summary') {
     return (
@@ -25,7 +26,6 @@ export function FraudAlertModal({
       >
         <div className="space-y-6">
           <FraudAlertSummary alert={alert} />
-
           <FraudAlertDetails
             alert={alert}
             onOpenGuidance={onOpenGuidance}
@@ -34,7 +34,6 @@ export function FraudAlertModal({
       </DashboardModal>
     )
   }
-
   return (
     <DashboardModal
       open
@@ -47,7 +46,8 @@ export function FraudAlertModal({
         onChangePassword={onChangePassword}
         onReviewActivity={onReviewActivity}
         onReviewTrustedDevices={onReviewTrustedDevices}
-        onUnavailableAction={onUnavailableAction}
+        onLogoutOtherDevices={onLogoutOtherDevices}
+        onDismiss={onDismiss}
       />
     </DashboardModal>
   )

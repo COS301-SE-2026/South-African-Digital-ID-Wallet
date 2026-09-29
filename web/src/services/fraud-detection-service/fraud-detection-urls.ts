@@ -7,9 +7,10 @@ const fraudDetectionUrls = {
     status
       ? `/api/security/alerts?status=${encodeURIComponent(status)}`
       : '/api/security/alerts',
-  alertDetails: (alertId: string): string => `/api/security/alerts/${alertId}`,
-  secureAccount: (alertId: string): string => `/api/security/alerts/${alertId}/secure`,
-  dismissAlert: (alertId: string): string => `/api/security/alerts/${alertId}/dismiss`,
+  alertDetails: (alertId: string): string => `/api/security/alerts/${encodeURIComponent(alertId)}`,
+
+  secureAccount: (alertId: string): string => `/api/security/alerts/${encodeURIComponent(alertId)}/secure`,
+  dismissAlert: (alertId: string): string => `/api/security/alerts/${encodeURIComponent(alertId)}/dismiss`,
   settings: (): string => '/api/security/settings',
 }
 export default fraudDetectionUrls

@@ -82,11 +82,26 @@ describe('FraudAlertFlow', () => {
         name: /review security event/i,
       })
     )
-    fireEvent.click(screen.getByLabelText('Close'))
+    fireEvent.click(screen.getByRole('button', {
+      name: 'Close dialog',
+    }))
     expect(
       screen.queryByRole('heading', {
         name: /suspicious login activity/i,
       })
     ).not.toBeInTheDocument()
   })
+  it('renders the correct risk level', () => {
+  render(
+    <FraudAlertFlow
+      alert={{
+        ...alert,
+        severity: 'medium',
+      }}
+    />
+  )
+  expect(screen.getByText('Medium risk')).toBeInTheDocument()
+  expect(screen.queryByText('High risk')).not.toBeInTheDocument()
+})
+
 })

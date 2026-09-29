@@ -36,6 +36,7 @@ const mockDevices = [
 ]
 describe('TrustedDevices', () => {
   beforeEach(() => {
+    jest.clearAllMocks()
     mockedApi.get.mockResolvedValue({ data: mockDevices })
   })
   it('renders the trusted devices heading', async () => {
@@ -51,12 +52,18 @@ describe('TrustedDevices', () => {
     expect(
       await screen.findByText(/iphone 16 pro max/i)
     ).toBeInTheDocument()
-    expect(screen.getByText(/brave web portal/i)).toBeInTheDocument()
-    expect(screen.getByText(/ipad pro/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/brave web portal/i)
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(/ipad pro/i)
+    ).toBeInTheDocument()
   })
   it('renders the device status labels', async () => {
     render(<TrustedDevices />)
-    expect(await screen.findByText('Active')).toBeInTheDocument()
+    expect(
+      await screen.findByText('Active')
+    ).toBeInTheDocument()
     expect(screen.getAllByText('Known')).toHaveLength(2)
   })
   it('opens the manage devices modal', async () => {
@@ -71,7 +78,11 @@ describe('TrustedDevices', () => {
         name: /trusted devices/i,
       })
     ).toHaveLength(2)
-    expect(screen.getByLabelText('Close')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', {
+        name: 'Close dialog',
+      })
+    ).toBeInTheDocument()
   })
   it('renders an unlink button for each non-active device in the modal', async () => {
     const user = userEvent.setup()
@@ -93,7 +104,11 @@ describe('TrustedDevices', () => {
       name: /manage/i,
     })
     await user.click(manageButton)
-    await user.click(screen.getByLabelText('Close'))
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Close dialog',
+      })
+    )
     await waitFor(() => {
       expect(
         screen.getAllByRole('heading', {
