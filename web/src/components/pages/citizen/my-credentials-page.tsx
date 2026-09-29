@@ -1,4 +1,5 @@
 'use client'
+import { toast } from 'react-hot-toast'
 import { FC, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
@@ -64,6 +65,7 @@ export const MyCredentialsPage: FC = () => {
     } catch (error) {
       console.error('Failed to generate certified copy', error)
       setCopyModal(null)
+      toast.error('Could not generate certified copy. Please try again.')
     }
   }
   const closeCopyModal = () => {
