@@ -1,0 +1,24 @@
+web/src/components/molecules/authentic-result/types.ts
+  h_293a8616118f65 1-2,4
+web/src/components/molecules/certified-copy-verification/types.ts
+  h_293a8616118f65 1-2,7
+web/src/components/pages/officials/verify-certified-copy-page.tsx
+  h_293a8616118f65 9,17-18,42,47,51,84,89,254-255,258-259
+  h_293a8616118f65 260-261,266
+web/src/components/molecules/authentic-result/authentic-result.tsx
+  h_293a8616118f65 5-35,37,58,63,66,68-69,72,74,77,79,84
+  h_293a8616118f65 70-71,73,75-76,78,80-81
+web/src/components/molecules/certified-copy-verification/certified-copy-verification.tsx
+  h_293a8616118f65 8,10,17,20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b05236c0ae7b4213d58669f52702c7bc67c0a352",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
