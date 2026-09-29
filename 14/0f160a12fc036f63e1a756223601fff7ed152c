@@ -1,0 +1,424 @@
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_293a8616118f65 54
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IUpdatePasswordRepository.cs
+  h_293a8616118f65 11-12,14
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IPasswordResetService.cs
+  h_293a8616118f65 1-9
+backend/FlashIdBackend/Application/Common/Mapping/CredentialMapper.cs
+  h_293a8616118f65 14
+backend/FlashIdBackend/Application/Common/Services/CitizenService.cs
+  h_293a8616118f65 10,82-83
+backend/FlashIdBackend/Application/Common/Services/CitizenVerificationService.cs
+  h_293a8616118f65 9,114
+backend/FlashIdBackend/Application/Common/Services/CredentialService.cs
+  h_293a8616118f65 3,18-19,21,27,74-78,181-202
+backend/FlashIdBackend/Application/Common/Services/DisclosedFieldValueResolver.cs
+  h_293a8616118f65 10,41,48,51,53-54,59-61
+backend/FlashIdBackend/Application/Common/Services/IssueCredentialService.cs
+  h_293a8616118f65 13,34
+backend/FlashIdBackend/Application/Common/Services/OfflinePackageService.cs
+  h_293a8616118f65 242
+backend/FlashIdBackend/Application/Common/Services/OnboardingService.cs
+  h_293a8616118f65 13,41,49-51,61-72,85-89,101,106-108,121
+backend/FlashIdBackend/Application/Common/Services/PasswordResetService.cs
+  h_293a8616118f65 1-110
+backend/FlashIdBackend/Application/Common/Services/PhysicalIdentityVerificationService.cs
+  h_293a8616118f65 10,99
+backend/FlashIdBackend/Application/Common/Services/QrFieldDefinitions.cs
+  h_293a8616118f65 12
+backend/FlashIdBackend/Application/Common/Services/SdJwtClaimNames.cs
+  h_293a8616118f65 40
+backend/FlashIdBackend/Application/Common/Services/UpdatePasswordService.cs
+  h_293a8616118f65 41-43,49
+backend/FlashIdBackend/Application/Common/Validation/CitizenRegistrationValidator.cs
+  h_293a8616118f65 19-25,28,32,36,40,44,48
+backend/FlashIdBackend/Application/Common/Validation/SaIdValidator.cs
+  h_293a8616118f65 1-41
+backend/FlashIdBackend/Application/Features/Auth/DTOs/PasswordResetDtos.cs
+  h_293a8616118f65 1-14
+backend/FlashIdBackend/Application/Features/Credentials/DTOs/CredentialResponseDto.cs
+  h_293a8616118f65 51
+backend/FlashIdBackend/Application/Features/Onboarding/Exceptions/OnboardingExceptions.cs
+  h_293a8616118f65 41-46
+backend/FlashIdBackend/Domain/Enums/AuditEventType.cs
+  h_293a8616118f65 46
+backend/FlashIdBackend/Infrastructure/Gateways/GovernmentRegistry/GovernmentRegistryGateway.cs
+  h_293a8616118f65 7,67
+backend/FlashIdBackend/Infrastructure/Repositories/UpdatePasswordRepository.cs
+  h_293a8616118f65 29-38,43
+backend/FlashIdBackend/Presentation/Controllers/AuthController.cs
+  h_293a8616118f65 11,61,63,132,290-317
+backend/FlashIdBackend/Presentation/Controllers/CitizensController.cs
+  h_293a8616118f65 57
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_293a8616118f65 141
+backend/FlashIdBackend/Presentation/Controllers/ManageUserAccountController.cs
+  h_293a8616118f65 132
+backend/FlashIdBackend/Presentation/Controllers/OfficialsController.cs
+  h_293a8616118f65 8,50
+backend/FlashIdBackend/Presentation/Controllers/OnboardingController.cs
+  h_293a8616118f65 7,25
+backend/FlashIdBackend/Presentation/Controllers/UpdatePasswordController.cs
+  h_293a8616118f65 5,22
+backend/FlashIdBackend/Presentation/Controllers/VerificationController.cs
+  h_293a8616118f65 7,25
+backend/FlashIdBackend/Presentation/ExceptionHandling/GlobalExceptionHandler.cs
+  h_293a8616118f65 34-37
+backend/FlashIdBackend/Presentation/Program.cs
+  h_293a8616118f65 141-147,150,152-155,162-163,165-168,170-173,175-207,253-254
+backend/FlashIdBackend/tests/AuthControllerIntegrationTests.cs
+  h_293a8616118f65 32-35,634-701
+backend/FlashIdBackend/tests/CitizenVerificationSeviceTests.cs
+  h_293a8616118f65 13,149,209
+backend/FlashIdBackend/tests/CredentialControllerIntegrationTests.cs
+  h_293a8616118f65 290,337,380,405,416,430,441,455,475
+backend/FlashIdBackend/tests/CredentialServiceIntegrationTests.cs
+  h_293a8616118f65 11-12,40-41
+backend/FlashIdBackend/tests/CredentialServiceTests.cs
+  h_293a8616118f65 10-11,26,32-33,324-394
+backend/FlashIdBackend/tests/DisclosedFieldValueResolverTests.cs
+  h_293a8616118f65 104,163-174
+backend/FlashIdBackend/tests/IssueCredentialServiceTests.cs
+  h_293a8616118f65 22
+backend/FlashIdBackend/tests/OnboardingServiceTests.cs
+  h_293a8616118f65 18,307-353
+backend/FlashIdBackend/tests/PasswordResetServiceTests.cs
+  h_293a8616118f65 1-222
+backend/FlashIdBackend/tests/PhysicalIdentityVerificationServiceTests.cs
+  h_293a8616118f65 16-17
+backend/FlashIdBackend/tests/SaIdValidatorTests.cs
+  h_293a8616118f65 1-33
+backend/FlashIdBackend/tests/SdJwtClaimNamesTests.cs
+  h_293a8616118f65 19
+backend/FlashIdBackend/tests/UpdatePasswordServiceTests.cs
+  h_293a8616118f65 12-14,21-22,31-38,74,97,111,114,127,130,148-161
+docs/demo4/offline-verification/wire-format.md
+  h_293a8616118f65 63
+government-registry/GovernmentRegistry/Infrastructure/Data/DbSeeder.cs
+  h_293a8616118f65 4,21-30,32-41,81,98
+mobile/.env.example
+  h_293a8616118f65 1-2
+mobile/jest.config.js
+  h_293a8616118f65 3-7,16
+mobile/package.json
+  h_293a8616118f65 19,50-51,58,62
+mobile/src/app/(auth)/forgot-password.tsx
+  h_293a8616118f65 1-5
+mobile/src/app/citizen/security/[alertId]/dismiss.tsx
+  h_293a8616118f65 1-8
+mobile/src/app/citizen/security/[alertId]/index.tsx
+  h_293a8616118f65 1-8
+mobile/src/app/citizen/security/[alertId]/new-password.tsx
+  h_293a8616118f65 1-8
+mobile/src/app/citizen/security/[alertId]/secure.tsx
+  h_293a8616118f65 1-8
+mobile/src/app/citizen/security/[alertId]/secured.tsx
+  h_293a8616118f65 1-8
+mobile/src/app/citizen/security/_layout.tsx
+  h_293a8616118f65 1-7
+mobile/src/app/citizen/security/index.tsx
+  h_293a8616118f65 1-5
+mobile/src/app/citizen/security/notice.tsx
+  h_293a8616118f65 1-5
+mobile/src/components/molecules/field-toggle-row/field-toggle-row.tsx
+  h_293a8616118f65 10,21-28
+mobile/src/components/molecules/field-toggle-row/test/field-toggle-row.test.tsx
+  h_293a8616118f65 30-42
+mobile/src/components/molecules/field-toggle-row/types.ts
+  h_293a8616118f65 2
+mobile/src/components/molecules/index.ts
+  h_293a8616118f65 18-21
+mobile/src/components/molecules/secure-action-option/index.ts
+  h_293a8616118f65 1-2
+mobile/src/components/molecules/secure-action-option/secure-action-option.tsx
+  h_293a8616118f65 1-51
+mobile/src/components/molecules/secure-action-option/test/secure-action-option.test.tsx
+  h_293a8616118f65 1-50
+mobile/src/components/molecules/secure-action-option/types.ts
+  h_293a8616118f65 1-11
+mobile/src/components/molecules/security-activity-row/index.ts
+  h_293a8616118f65 1-2
+mobile/src/components/molecules/security-activity-row/security-activity-row.tsx
+  h_293a8616118f65 1-49
+mobile/src/components/molecules/security-activity-row/test/security-activity-row.test.tsx
+  h_293a8616118f65 1-76
+mobile/src/components/molecules/security-activity-row/types.ts
+  h_293a8616118f65 1-16
+mobile/src/components/molecules/security-detail-row/index.ts
+  h_293a8616118f65 1-2
+mobile/src/components/molecules/security-detail-row/security-detail-row.tsx
+  h_293a8616118f65 1-27
+mobile/src/components/molecules/security-detail-row/test/security-detail-row.test.tsx
+  h_293a8616118f65 1-44
+mobile/src/components/molecules/security-detail-row/types.ts
+  h_293a8616118f65 1-12
+mobile/src/components/molecules/status-badge/index.ts
+  h_293a8616118f65 1-2
+mobile/src/components/molecules/status-badge/status-badge.tsx
+  h_293a8616118f65 1-35
+mobile/src/components/molecules/status-badge/test/status-badge.test.tsx
+  h_293a8616118f65 1-16
+mobile/src/components/molecules/status-badge/types.ts
+  h_293a8616118f65 1-7
+mobile/src/components/organisms/forgot-password-form/forgot-password-form.tsx
+  h_293a8616118f65 1-237
+mobile/src/components/organisms/forgot-password-form/index.ts
+  h_293a8616118f65 1-2
+mobile/src/components/organisms/forgot-password-form/test/forgot-password-form.test.tsx
+  h_293a8616118f65 1-143
+mobile/src/components/organisms/forgot-password-form/types.ts
+  h_293a8616118f65 1-4
+mobile/src/components/organisms/index.ts
+  h_293a8616118f65 36-42
+mobile/src/components/organisms/login-form/login-form.tsx
+  h_293a8616118f65 13,30,35,71-76,165-174
+mobile/src/components/organisms/login-form/test/login-form.test.tsx
+  h_293a8616118f65 159-164
+mobile/src/components/organisms/login-form/types.ts
+  h_293a8616118f65 2
+mobile/src/components/organisms/password-form/password-form.tsx
+  h_293a8616118f65 35
+mobile/src/components/organisms/security-activity-list/index.ts
+  h_293a8616118f65 1-2
+mobile/src/components/organisms/security-activity-list/security-activity-list.tsx
+  h_293a8616118f65 1-60
+mobile/src/components/organisms/security-activity-list/test/security-activity-list.test.tsx
+  h_293a8616118f65 1-99
+mobile/src/components/organisms/security-activity-list/types.ts
+  h_293a8616118f65 1-10
+mobile/src/components/organisms/security-alert-banner/index.ts
+  h_293a8616118f65 1-2
+mobile/src/components/organisms/security-alert-banner/security-alert-banner.tsx
+  h_293a8616118f65 1-70
+mobile/src/components/organisms/security-alert-banner/test/security-alert-banner.test.tsx
+  h_293a8616118f65 1-43
+mobile/src/components/organisms/security-alert-banner/types.ts
+  h_293a8616118f65 1-13
+mobile/src/components/organisms/security-alert-card/index.ts
+  h_293a8616118f65 1-2
+mobile/src/components/organisms/security-alert-card/security-alert-card.tsx
+  h_293a8616118f65 1-46
+mobile/src/components/organisms/security-alert-card/types.ts
+  h_293a8616118f65 1-6
+mobile/src/components/organisms/security-settings-panel/index.ts
+  h_293a8616118f65 1-2
+mobile/src/components/organisms/security-settings-panel/security-settings-panel.tsx
+  h_293a8616118f65 1-202
+mobile/src/components/organisms/security-settings-panel/test/security-settings-panel.test.tsx
+  h_293a8616118f65 1-179
+mobile/src/components/organisms/security-settings-panel/types.ts
+  h_293a8616118f65 1-3
+mobile/src/components/organisms/security-status-card/index.ts
+  h_293a8616118f65 1-2
+mobile/src/components/organisms/security-status-card/security-status-card.tsx
+  h_293a8616118f65 1-66
+mobile/src/components/organisms/security-status-card/test/security-status-card.test.tsx
+  h_293a8616118f65 1-46
+mobile/src/components/organisms/security-status-card/types.ts
+  h_293a8616118f65 1-7
+mobile/src/components/organisms/travel-route-card/index.ts
+  h_293a8616118f65 1-2
+mobile/src/components/organisms/travel-route-card/test/travel-route-card.test.tsx
+  h_293a8616118f65 1-79
+mobile/src/components/organisms/travel-route-card/travel-map.tsx
+  h_293a8616118f65 1-138
+mobile/src/components/organisms/travel-route-card/travel-route-card.tsx
+  h_293a8616118f65 1-141
+mobile/src/components/organisms/travel-route-card/types.ts
+  h_293a8616118f65 1-28
+mobile/src/components/pages/citizen-home/citizen-home-page.tsx
+  h_293a8616118f65 10,17,38-39,42-46,48,68-76
+mobile/src/components/pages/dismiss-alert/dismiss-alert-page.tsx
+  h_293a8616118f65 1-143
+mobile/src/components/pages/dismiss-alert/index.ts
+  h_293a8616118f65 1
+mobile/src/components/pages/dismiss-alert/types.ts
+  h_293a8616118f65 1-3
+mobile/src/components/pages/forgot-password/forgot-password-page.tsx
+  h_293a8616118f65 1-22
+mobile/src/components/pages/forgot-password/index.ts
+  h_293a8616118f65 1
+mobile/src/components/pages/index.ts
+  h_293a8616118f65 12-18,21
+mobile/src/components/pages/login/login-page.tsx
+  h_293a8616118f65 11-14
+mobile/src/components/pages/profile/profile-page.tsx
+  h_293a8616118f65 11,74-87
+mobile/src/components/pages/secure-account/index.ts
+  h_293a8616118f65 1
+mobile/src/components/pages/secure-account/secure-account-page.tsx
+  h_293a8616118f65 1-152
+mobile/src/components/pages/secure-account/types.ts
+  h_293a8616118f65 1-3
+mobile/src/components/pages/security-confirmation/index.ts
+  h_293a8616118f65 1
+mobile/src/components/pages/security-confirmation/security-confirmation-page.tsx
+  h_293a8616118f65 1-87
+mobile/src/components/pages/security-confirmation/types.ts
+  h_293a8616118f65 1-3
+mobile/src/components/pages/security-event/index.ts
+  h_293a8616118f65 1
+mobile/src/components/pages/security-event/security-event-page.tsx
+  h_293a8616118f65 1-165
+mobile/src/components/pages/security-event/types.ts
+  h_293a8616118f65 1-3
+mobile/src/components/pages/security-new-password/index.ts
+  h_293a8616118f65 1
+mobile/src/components/pages/security-new-password/security-new-password-page.tsx
+  h_293a8616118f65 1-49
+mobile/src/components/pages/security-new-password/types.ts
+  h_293a8616118f65 1-3
+mobile/src/components/pages/security-notice/index.ts
+  h_293a8616118f65 1
+mobile/src/components/pages/security-notice/security-notice-page.tsx
+  h_293a8616118f65 1-128
+mobile/src/components/pages/security-overview/index.ts
+  h_293a8616118f65 1
+mobile/src/components/pages/security-overview/security-overview-page.tsx
+  h_293a8616118f65 1-84
+mobile/src/components/templates/detail-screen/detail-screen.tsx
+  h_293a8616118f65 1-7,9-21,29-52,62-120,124-125,147-150,152-162
+mobile/src/config/index.ts
+  h_293a8616118f65 3
+mobile/src/config/web/index.ts
+  h_293a8616118f65 1
+mobile/src/config/web/test/web-url.test.ts
+  h_293a8616118f65 1-13
+mobile/src/config/web/web-url.ts
+  h_293a8616118f65 1-7
+mobile/src/hooks/index.ts
+  h_293a8616118f65 22
+mobile/src/hooks/test/use-emergency-profile.test.tsx
+  h_293a8616118f65 121
+mobile/src/hooks/test/use-security.test.tsx
+  h_293a8616118f65 1-343
+mobile/src/hooks/test/use-sign-out.test.tsx
+  h_293a8616118f65 7,40,80-98
+mobile/src/hooks/use-security.ts
+  h_293a8616118f65 1-137
+mobile/src/hooks/use-sign-out.ts
+  h_293a8616118f65 7,13,19,21
+mobile/src/lib/offline/claim-labels.ts
+  h_293a8616118f65 16
+mobile/src/lib/offline/test/offline-presentation.test.ts
+  h_293a8616118f65 60
+mobile/src/services/index.ts
+  h_293a8616118f65 10
+mobile/src/services/login-service/index.ts
+  h_293a8616118f65 3,5,7-9,13
+mobile/src/services/login-service/login-errors.ts
+  h_293a8616118f65 19-33
+mobile/src/services/login-service/login-service.ts
+  h_293a8616118f65 10,29-47
+mobile/src/services/login-service/login-urls.ts
+  h_293a8616118f65 5-6
+mobile/src/services/login-service/schema.ts
+  h_293a8616118f65 3-14,16,23,26-47,52-53
+mobile/src/services/login-service/types.ts
+  h_293a8616118f65 2,17,24-30
+mobile/src/services/qr-service/qr-field-definitions.ts
+  h_293a8616118f65 17
+mobile/src/services/security-service/index.ts
+  h_293a8616118f65 1-29
+mobile/src/services/security-service/mock-security-service.ts
+  h_293a8616118f65 1-236
+mobile/src/services/security-service/security-dto.ts
+  h_293a8616118f65 1-198
+mobile/src/services/security-service/security-errors.ts
+  h_293a8616118f65 1-41
+mobile/src/services/security-service/security-service.ts
+  h_293a8616118f65 1-59
+mobile/src/services/security-service/security-urls.ts
+  h_293a8616118f65 1-16
+mobile/src/services/security-service/test/mock-security-service.test.ts
+  h_293a8616118f65 1-102
+mobile/src/services/security-service/test/security-dto.extra.test.ts
+  h_293a8616118f65 1-105
+mobile/src/services/security-service/test/security-dto.test.ts
+  h_293a8616118f65 1-147
+mobile/src/services/security-service/test/security-errors.test.ts
+  h_293a8616118f65 1-67
+mobile/src/services/security-service/test/security-service.test.ts
+  h_293a8616118f65 1-98
+mobile/src/services/security-service/types.ts
+  h_293a8616118f65 1-184
+mobile/src/stores/auth-store.ts
+  h_293a8616118f65 28,50,56-63
+mobile/src/stores/security-notice-store.ts
+  h_293a8616118f65 1-15
+mobile/src/stores/security-result-store.ts
+  h_293a8616118f65 1-16
+mobile/src/stores/test/auth-store.replace-token.test.ts
+  h_293a8616118f65 1-84
+mobile/src/stores/test/security-notice-store.test.ts
+  h_293a8616118f65 1-34
+mobile/src/stores/test/security-result-store.test.ts
+  h_293a8616118f65 1-37
+pnpm-lock.yaml
+  h_293a8616118f65 51-53,144-149,163-165,175-177,2948-2950,2975-2977,3044-3049,3240,3245,3932-3935,7618-7621,8025-8027,11521-11524,11547-11548,11623-11631,12695-12698,17435-17438,17911-17912
+web/src/app/(auth)/forgot-password/page.tsx
+  h_293a8616118f65 1-5
+web/src/components/molecules/help-menu-section/help-menu-section.tsx
+  h_293a8616118f65 81
+web/src/components/organisms/credential-details-modal/credential-details-modal.tsx
+  h_293a8616118f65 14-22,149-161
+web/src/components/organisms/credential-details-modal/test/credential-details-modal.test.tsx
+  h_293a8616118f65 12,14-17,48,86-87,92-103
+web/src/components/organisms/credential-details-modal/types.ts
+  h_293a8616118f65 14
+web/src/components/organisms/forgot-password-form/forgot-password-form.tsx
+  h_293a8616118f65 1-176
+web/src/components/organisms/forgot-password-form/test/forgot-password-form.test.tsx
+  h_293a8616118f65 1-186
+web/src/components/organisms/login-form/login-form.tsx
+  h_293a8616118f65 267-270,272
+web/src/components/organisms/physical-identity-form/physical-identity-form.tsx
+  h_293a8616118f65 9,76
+web/src/components/organisms/physical-identity-form/test/physical-identity-form.test.tsx
+  h_293a8616118f65 31-32,39-40,44,62-66
+web/src/components/organisms/verify-identity-card/verify-identity-card.tsx
+  h_293a8616118f65 15,171
+web/src/components/pages/activation/verify-citizen-page.tsx
+  h_293a8616118f65 26,158
+web/src/components/pages/forgot-password/forgot-password-page.tsx
+  h_293a8616118f65 1-33
+web/src/schemas/index.ts
+  h_293a8616118f65 3
+web/src/schemas/issue-credential-schema.ts
+  h_293a8616118f65 2,5-6,14
+web/src/schemas/onboarding-schema.ts
+  h_293a8616118f65 2,5-6
+web/src/schemas/sa-id.ts
+  h_293a8616118f65 1-34
+web/src/schemas/test/onboarding-schema.test.ts
+  h_293a8616118f65 4,12,17-27
+web/src/services/credential-service/credential-mapper.ts
+  h_293a8616118f65 36
+web/src/services/credential-service/types.ts
+  h_293a8616118f65 39
+web/src/services/login-service/login-service.ts
+  h_293a8616118f65 7,43-50,57-58
+web/src/services/login-service/login-urls.ts
+  h_293a8616118f65 6-7
+web/src/services/login-service/test/login-service.test.ts
+  h_293a8616118f65 155-184
+web/src/services/login-service/test/login-urls.test.ts
+  h_293a8616118f65 15-19
+web/src/services/login-service/types.ts
+  h_293a8616118f65 26-32
+web/src/services/qr-service/qr-field-definitions.ts
+  h_293a8616118f65 17
+web/src/services/qr-service/test/qr-service.test.ts
+  h_293a8616118f65 43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "140f160a12fc036f63e1a756223601fff7ed152c",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
