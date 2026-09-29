@@ -135,8 +135,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddHealthChecks()
     .AddCheck<CredentialSigningKeyHealthCheck>("credential-signing-key", tags: ["readiness"]);
 
-// Integration tests hit the same endpoints many times a minute, so limits are off in Testing.
-var rateLimitsEnabled = !builder.Environment.IsEnvironment("Testing");
+// on everywhere except Testing, unless a test turns it back on through config
+var rateLimitsEnabled = builder.Configuration.GetValue("RateLimiting:Enabled", !builder.Environment.IsEnvironment("Testing"));
 
 static string IpPartitionKey(HttpContext httpContext) =>
     httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
