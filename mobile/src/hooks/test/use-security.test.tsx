@@ -1,3 +1,4 @@
+import { QueryClient } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react-native'
 
 import {
@@ -50,6 +51,11 @@ const secureAccount = securityService.secureAccount as jest.Mock
 const dismissAlert = securityService.dismissAlert as jest.Mock
 const getSettings = securityService.getSettings as jest.Mock
 const updateSettings = securityService.updateSettings as jest.Mock
+
+const createCachingQueryClient = () =>
+  new QueryClient({
+    defaultOptions: { queries: { gcTime: Infinity, retry: false } },
+  })
 
 const ALERT_ID = 'alert-1'
 
@@ -178,7 +184,7 @@ describe('use-security', () => {
   describe('useSecureAccount', () => {
     it('Should swap in the new token and cache the result without it', async () => {
       secureAccount.mockResolvedValue(SECURED)
-      const queryClient = createTestQueryClient()
+      const queryClient = createCachingQueryClient()
       const { result } = await renderHook(() => useSecureAccount(ALERT_ID), {
         wrapper: createQueryWrapper(queryClient),
       })
@@ -255,7 +261,7 @@ describe('use-security', () => {
 
   describe('useSecureAccountResult', () => {
     it('Should read the cached result without a request', async () => {
-      const queryClient = createTestQueryClient()
+      const queryClient = createCachingQueryClient()
       queryClient.setQueryData(securityKeys.result(ALERT_ID), SECURED)
       const { result } = await renderHook(
         () => useSecureAccountResult(ALERT_ID),
@@ -317,7 +323,7 @@ describe('use-security', () => {
     it('Should store the updated settings in the cache', async () => {
       const updated = { ...SETTINGS, impossibleTravelDetectionEnabled: false }
       updateSettings.mockResolvedValue(updated)
-      const queryClient = createTestQueryClient()
+      const queryClient = createCachingQueryClient()
       const { result } = await renderHook(() => useUpdateSecuritySettings(), {
         wrapper: createQueryWrapper(queryClient),
       })
