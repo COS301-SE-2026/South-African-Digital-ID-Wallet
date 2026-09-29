@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import {
   ArrowRight,
   History,
@@ -6,6 +9,7 @@ import {
 } from 'lucide-react'
 import { Text } from '@/components/atoms/text'
 import { Button } from '@/components/ui/button'
+import { TextField } from '@/components/molecules/text-field/text-field'
 import type {
   FraudAlertGuidanceProps,
   SecurityActionProps,
@@ -47,14 +51,40 @@ function SecurityAction({
     </Button>
   )
 }
-
+type PasswordAction = 'logout' | 'dismiss' | null
 export function FraudAlertGuidance({
   actionMessage,
   onChangePassword,
   onReviewActivity,
   onReviewTrustedDevices,
-  onUnavailableAction,
+  onLogoutOtherDevices,
+  onDismiss,
 }: FraudAlertGuidanceProps) {
+  const [passwordAction, setPasswordAction] = useState<PasswordAction>(null)
+  const [password, setPassword] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const closePasswordPrompt = () => {
+    setPasswordAction(null)
+    setPassword('')
+    setSubmitting(false)
+  }
+  const handlePasswordSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault()
+    if (!password.trim()) {
+      return
+    }
+    setSubmitting(true)
+    const succeeded =
+      passwordAction === 'logout'
+        ? await onLogoutOtherDevices(password)
+        : await onDismiss(password)
+    setSubmitting(false)
+    if (succeeded) {
+      closePasswordPrompt()
+    }
+  }
   return (
     <div className="space-y-5">
       <div className="flex items-start gap-3">
@@ -69,12 +99,9 @@ export function FraudAlertGuidance({
           >
             We detected unusual activity on your account.
           </Text>
-          <Text
-            as="p"
-            variant="sub-sm"
-            className="mt-1"
-          >
-            Here are some steps you can take to help protect your account.
+          <Text as="p" variant="sub-sm" className="mt-1">
+            Here are some steps you can take to help protect your
+            account.
           </Text>
         </div>
       </div>
@@ -83,11 +110,7 @@ export function FraudAlertGuidance({
           role="status"
           className="rounded-2xl border border-accent-gold/30 bg-accent-gold/10 p-4"
         >
-          <Text
-            as="p"
-            variant="sub-sm"
-            className="text-text-primary"
-          >
+          <Text as="p" variant="sub-sm" className="text-text-primary">
             {actionMessage}
           </Text>
         </div>
@@ -120,27 +143,76 @@ export function FraudAlertGuidance({
         >
           Need more help?
         </Text>
-        <Text
-          as="p"
-          variant="sub-sm"
-          className="mt-1"
-        >
-          If you are still unsure or notice anything suspicious, contact the
-          support team.
+        <Text as="p" variant="sub-sm" className="mt-1">
+          If you are still unsure or notice anything suspicious,
+          contact the support team.
         </Text>
       </div>
       <Button
         type="button"
         variant="destructive"
         className="w-full"
-        onClick={() =>
-          onUnavailableAction(
-            'Logging out from all other devices is not available in this frontend demo yet.'
-          )
-        }
+        onClick={() => setPasswordAction('logout')}
       >
         Log out from all other devices
       </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        className="w-full"
+        onClick={() => setPasswordAction('dismiss')}
+      >
+        Dismiss security alert
+      </Button>
+      {passwordAction && (
+        <div className="rounded-2xl border border-border-grey p-4">
+          <Text
+            as="p"
+            variant="sub-sm"
+            className="font-bold text-deep-green"
+          >
+            {passwordAction === 'logout'
+              ? 'Confirm logout from other devices'
+              : 'Confirm dismissing this alert'}
+          </Text>
+          <Text as="p" variant="caption" className="mt-1">
+            Enter your current password to continue.
+          </Text>
+          <form
+            className="mt-4 space-y-4"
+            onSubmit={handlePasswordSubmit}
+          >
+            <TextField
+              label="Current password"
+              type="password"
+              value={password}
+              autoComplete="current-password"
+              onChange={(event) => setPassword(event.target.value)}
+            />
+            <div className="flex gap-3">
+              <Button
+                type="submit"
+                variant={
+                  passwordAction === 'logout'
+                    ? 'destructive'
+                    : 'default'
+                }
+                disabled={submitting || !password.trim()}
+              >
+                {submitting ? 'Processing...' : 'Confirm'}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={closePasswordPrompt}
+                disabled={submitting}
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   )
 }
