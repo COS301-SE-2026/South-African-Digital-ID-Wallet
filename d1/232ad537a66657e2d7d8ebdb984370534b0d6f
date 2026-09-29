@@ -1,0 +1,27 @@
+web/src/components/organisms/forgot-password-form/forgot-password-form.tsx
+  h_712d174fc3f309 60,62-67,138,166
+  h_712d174fc3f309 61
+backend/FlashIdBackend/tests/PasswordResetServiceTests.cs
+  h_712d174fc3f309 120-144
+  h_712d174fc3f309 119
+backend/FlashIdBackend/Application/Common/Services/PasswordResetService.cs
+  h_712d174fc3f309 17,37-38,94-97
+  h_712d174fc3f309 98
+backend/FlashIdBackend/tests/SaIdValidatorTests.cs
+  h_712d174fc3f309 1-33
+backend/FlashIdBackend/Application/Common/Services/DisclosedFieldValueResolver.cs
+  h_712d174fc3f309 10,41,48,51,54
+web/src/components/organisms/forgot-password-form/test/forgot-password-form.test.tsx
+  h_712d174fc3f309 165-185
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d1232ad537a66657e2d7d8ebdb984370534b0d6f",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
