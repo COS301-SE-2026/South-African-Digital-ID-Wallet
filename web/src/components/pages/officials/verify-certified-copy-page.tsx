@@ -218,19 +218,25 @@ export const VerifyCertifiedCopyPage: FC = () => {
         </div>
       </div>
       {cameraOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 sm:p-6">
-          <div className="relative w-full max-w-3xl [&_.aspect-square]:!aspect-[4/3]">
+        <div
+          className="fixed inset-0 z-50 flex items-center 
+                justify-center bg-black/50 p-4 sm:p-6"
+        >
+          <div className="relative w-full max-w-xl">
+            <div className="pt-12 [&_.aspect-square]:!aspect-[4/3]">
+              <QrCameraScanner onScan={handleQrScan} />
+            </div>
+
             <Button
               type="button"
               variant="text"
-              LeftIcon={ArrowLeft}
               onClick={closeCameraModal}
               aria-label="Back to verification options"
-              className="!absolute left-6 top-6 z-20 !h-auto !w-auto !px-3 !py-2"
+              className="!absolute left-6 top-16 z-20 !h-10 !w-10 !min-w-0 
+                !rounded-full !p-0 text-deep-green hover:bg-primary-green/10"
             >
-              Back
+              <ArrowLeft className="h-6 w-6" />
             </Button>
-            <QrCameraScanner onScan={handleQrScan} />
           </div>
         </div>
       )}
