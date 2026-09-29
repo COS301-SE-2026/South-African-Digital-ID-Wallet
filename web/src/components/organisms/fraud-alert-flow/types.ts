@@ -1,8 +1,7 @@
 export type SecurityAlertLayer = 'summary' | 'guidance'
-
 export type SecurityAlert = {
   id: string
-  severity: 'high' | 'medium'
+  severity: 'high' | 'medium' | 'low'
   title: string
   summary: string
   detailsDescription: string
@@ -25,7 +24,7 @@ export type SecurityAlert = {
     locationAccuracy: string
   }
 }
-
 export type FraudAlertFlowProps = {
   alert: SecurityAlert
+  onResolved?: () => void | Promise<void>
 }

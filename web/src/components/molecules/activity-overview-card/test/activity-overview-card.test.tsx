@@ -5,7 +5,6 @@ import api from '@/lib/api'
 
 jest.mock('@/lib/api')
 const mockedApi = api as jest.Mocked<typeof api>
-
 const mockActivity = [
   {
     id: '1',
@@ -34,7 +33,9 @@ describe('ActivityOverviewCard', () => {
     mockedApi.get.mockReturnValue(new Promise(() => {}))
     render(<ActivityOverviewCard />)
     expect(
-      screen.getByRole('heading', { name: /activity overview/i })
+      screen.getByRole('heading', {
+        name: /activity overview/i,
+      })
     ).toBeInTheDocument()
     expect(screen.getByText(/loading activity/i)).toBeInTheDocument()
   })
@@ -42,7 +43,9 @@ describe('ActivityOverviewCard', () => {
     mockedApi.get.mockResolvedValue({ data: mockActivity })
     render(<ActivityOverviewCard />)
     expect(
-      await screen.findByRole('heading', { name: /activity overview/i })
+      await screen.findByRole('heading', {
+        name: /activity overview/i,
+      })
     ).toBeInTheDocument()
   })
   it('renders all recent activity items', async () => {
@@ -58,11 +61,12 @@ describe('ActivityOverviewCard', () => {
       screen.getByText(/biometric login successful/i)
     ).toBeInTheDocument()
   })
-  it('renders the View all button', async () => {
-    mockedApi.get.mockResolvedValue({ data: mockActivity })
+  it('renders the View all button', async () => { mockedApi.get.mockResolvedValue({ data: mockActivity })
     render(<ActivityOverviewCard />)
     expect(
-      await screen.findByRole('button', { name: /view all/i })
+      await screen.findByRole('button', {
+        name: /view all/i,
+      })
     ).toBeInTheDocument()
   })
   it('opens the activity history modal when View all is clicked', async () => {
@@ -74,9 +78,15 @@ describe('ActivityOverviewCard', () => {
     })
     await user.click(viewAllButton)
     expect(
-      screen.getByRole('heading', { name: /activity history/i })
+      screen.getByRole('heading', {
+        name: /activity history/i,
+      })
     ).toBeInTheDocument()
-    expect(screen.getByLabelText('Close')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', {
+        name: 'Close dialog',
+      })
+    ).toBeInTheDocument()
   })
   it('shows all activity items inside the activity history modal', async () => {
     mockedApi.get.mockResolvedValue({ data: mockActivity })
@@ -87,7 +97,9 @@ describe('ActivityOverviewCard', () => {
     })
     await user.click(viewAllButton)
     expect(
-      screen.getByRole('heading', { name: /activity history/i })
+      screen.getByRole('heading', {
+        name: /activity history/i,
+      })
     ).toBeInTheDocument()
     expect(
       screen.getAllByText(/credential verified by bank official/i)
@@ -108,9 +120,17 @@ describe('ActivityOverviewCard', () => {
     })
     await user.click(viewAllButton)
     expect(
-      screen.getByRole('heading', { name: /activity history/i })
+      screen.getByRole('heading', {
+        name: /activity history/i,
+      })
     ).toBeInTheDocument()
-    await user.click(screen.getByLabelText('Close'))
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Close dialog',
+      })
+    )
+
     await waitFor(() => {
       expect(
         screen.queryByRole('heading', {
@@ -135,9 +155,14 @@ describe('ActivityOverviewCard', () => {
     })
     await user.click(viewAllButton)
     expect(
-      screen.getByRole('heading', { name: /activity history/i })
+      screen.getByRole('heading', {
+        name: /activity history/i,
+      })
     ).toBeInTheDocument()
-    expect(screen.getAllByText(/no activity found/i)).toHaveLength(2)
+
+    expect(
+      screen.getAllByText(/no activity found/i)
+    ).toHaveLength(2)
   })
   it('handles an API error without crashing', async () => {
     mockedApi.get.mockRejectedValue(new Error('API error'))
@@ -146,7 +171,9 @@ describe('ActivityOverviewCard', () => {
       .mockImplementation(() => {})
     render(<ActivityOverviewCard />)
     await waitFor(() => {
-      expect(screen.getByText(/no activity found/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/no activity found/i)
+      ).toBeInTheDocument()
     })
     consoleErrorSpy.mockRestore()
   })

@@ -11,6 +11,7 @@ import { UpdatePasswordModalProps } from './types'
 export const UpdatePasswordModal: FC<UpdatePasswordModalProps> = ({
   open,
   onCloseAction,
+  onSuccess,
 }) => {
   const [currentPass, setCurrentPass] = useState('')
   const [newPass, setNewPass] = useState('')
@@ -52,11 +53,12 @@ export const UpdatePasswordModal: FC<UpdatePasswordModalProps> = ({
       setNewPass('')
       setConfirmPass('')
 
+      onSuccess?.()
       onCloseAction()
     } catch (error) {
       const message = axios.isAxiosError(error)
         ? ((error.response?.data as { message?: string; error?: string })
-            ?.message ??
+          ?.message ??
           (error.response?.data as { message?: string; error?: string })?.error)
         : undefined
 
