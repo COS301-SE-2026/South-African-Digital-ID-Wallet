@@ -43,4 +43,5 @@ public enum AuditEventType
     OfflinePackageMintFailed,
     OfflineCredentialVerified,
     OfflineVerificationRejected,
+    PasswordReset,
 }
