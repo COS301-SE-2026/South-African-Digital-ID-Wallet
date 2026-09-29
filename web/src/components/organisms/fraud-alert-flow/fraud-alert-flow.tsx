@@ -5,12 +5,22 @@ import { Text } from '@/components/atoms/text'
 import { Button } from '@/components/ui/button'
 import { UpdatePasswordModal } from '@/components/molecules/update-password-modal'
 import { FraudAlertModal } from '../fraud-alert-modal'
+import { fraudDetectionService } from '@/services/fraud-detection-service'
 import type {
   FraudAlertFlowProps,
   SecurityAlertLayer,
 } from './types'
 
-export function FraudAlertFlow({ alert }: FraudAlertFlowProps) {
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message) {
+    return error.message
+  }
+  return 'We could not complete that security action. Please try again.'
+}
+export function FraudAlertFlow({
+  alert,
+  onResolved,
+}: FraudAlertFlowProps) {
   const [layer, setLayer] = useState<SecurityAlertLayer | null>(null)
   const [passwordOpen, setPasswordOpen] = useState(false)
   const [actionMessage, setActionMessage] = useState('')
@@ -27,7 +37,42 @@ export function FraudAlertFlow({ alert }: FraudAlertFlowProps) {
       })
     }, 0)
   }
-
+  const handleLogoutOtherDevices = async (
+    password: string
+  ): Promise<boolean> => {
+    try {
+      const result = await fraudDetectionService.secureAccount(
+        alert.id,
+        {
+          action: 'LogOutOtherDevices',
+          password,
+        }
+      )
+      setActionMessage(
+        result.message || 'All other devices have been logged out.'
+      )
+      await onResolved?.()
+      return true
+    } catch (error) {
+      setActionMessage(getErrorMessage(error))
+      return false
+    }
+  }
+  const handleDismiss = async (
+    password: string
+  ): Promise<boolean> => {
+    try {
+      await fraudDetectionService.dismissAlert(alert.id, {
+        password,
+      })
+      setActionMessage('The security alert has been dismissed.')
+      await onResolved?.()
+      return true
+    } catch (error) {
+      setActionMessage(getErrorMessage(error))
+      return false
+    }
+  }
   return (
     <>
       <section
@@ -37,7 +82,7 @@ export function FraudAlertFlow({ alert }: FraudAlertFlowProps) {
         <div className="rounded-[24px] bg-card p-5 sm:p-6">
           <div className="flex items-start gap-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-danger-red text-clean-white">
-              <AlertTriangle className="hidden h-5 w-5 shrink-0 sm:block" />
+              <AlertTriangle className="h-5 w-5 shrink-0" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
@@ -51,16 +96,22 @@ export function FraudAlertFlow({ alert }: FraudAlertFlowProps) {
                 <Text
                   as="span"
                   variant="caption"
-                  className="rounded-full bg-danger-red/10 px-2.5 py-1 font-bold uppercase tracking-wide text-danger-red"
+                  className={`rounded-full px-2.5 py-1 font-bold uppercase tracking-wide ${
+                    alert.severity === 'high'
+                      ? 'bg-danger-red/10 text-danger-red'
+                      : alert.severity === 'medium'
+                        ? 'bg-accent-gold/20 text-deep-green'
+                        : 'bg-primary-green/10 text-deep-green'
+                  }`}
                 >
-                  High risk
+                  {alert.severity === 'high'
+                    ? 'High risk'
+                    : alert.severity === 'medium'
+                      ? 'Medium risk'
+                      : 'Low risk'}
                 </Text>
               </div>
-              <Text
-                as="p"
-                variant="sub-sm"
-                className="mt-2"
-              >
+              <Text as="p" variant="sub-sm" className="mt-2">
                 {alert.summary}
               </Text>
               <Button
@@ -100,14 +151,16 @@ export function FraudAlertFlow({ alert }: FraudAlertFlowProps) {
           onReviewTrustedDevices={() => {
             scrollToSection('trusted-devices-overview')
           }}
-          onUnavailableAction={(message) => {
-            setActionMessage(message)
-          }}
+          onLogoutOtherDevices={handleLogoutOtherDevices}
+          onDismiss={handleDismiss}
         />
       )}
       <UpdatePasswordModal
         open={passwordOpen}
         onCloseAction={() => setPasswordOpen(false)}
+        onSuccess={() => {
+          void onResolved?.()
+        }}
       />
     </>
   )
