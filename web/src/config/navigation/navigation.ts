@@ -115,22 +115,6 @@ export const officialsNavSections: SidebarNavSection[] = [
       },
     ],
   },
-
-  {
-    title: 'Security',
-    items: [
-      {
-        label: 'Onboarding History',
-        href: '/under-construction',
-        icon: 'history',
-      },
-      {
-        label: 'Privacy Settings',
-        href: '/privacy-settings',
-        icon: 'settings',
-      },
-    ],
-  },
 ]
 
 export const manageUserAccountNavSections: SidebarNavSection[] = [
