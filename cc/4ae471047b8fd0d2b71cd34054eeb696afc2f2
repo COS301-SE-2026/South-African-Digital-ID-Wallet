@@ -1,0 +1,24 @@
+web/src/services/fraud-detection-service/fraud-detection-urls.ts
+  h_0aff3b71f739b1 10-13
+web/src/components/organisms/fraud-alert-modal/fraud-alert-modal.tsx
+  h_0aff3b71f739b1 16-17,49-50
+web/src/components/pages/citizen/citizen-dashboard-page.tsx
+  h_0aff3b71f739b1 2-3,13,17-18,20,23-24,26-31,36-38,41-43,49-56,60
+  h_0aff3b71f739b1 19,21-22,32-35,58-59,61
+web/src/components/molecules/trusted-devices/test/trusted-devices.test.tsx
+  h_0aff3b71f739b1 39,82-84,108-110
+  h_0aff3b71f739b1 55-60,64-66,81,85,107,111
+web/src/components/organisms/fraud-alert-flow/test/fraud-alert-flow.test.tsx
+  h_0aff3b71f739b1 85-87,94-106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "cc4ae471047b8fd0d2b71cd34054eeb696afc2f2",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

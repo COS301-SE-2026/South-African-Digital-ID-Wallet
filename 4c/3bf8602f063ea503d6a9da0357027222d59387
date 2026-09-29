@@ -1,0 +1,20 @@
+web/playwright-report/data/5edec6203de1471d73e2b1a1bf75b3c70ee4b84a.md
+  h_0aff3b71f739b1 1-174
+web/playwright-report/index.html
+  h_0aff3b71f739b1 1-49
+web/test-results/.last-run.json
+  h_0aff3b71f739b1 1-6
+web/test-results/auth.setup.ts-device-verified-logins-authenticate-as-citizen-setup/error-context.md
+  h_0aff3b71f739b1 1-174
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4c3bf8602f063ea503d6a9da0357027222d59387",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

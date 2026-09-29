@@ -1,0 +1,23 @@
+web/src/components/organisms/fraud-alert-guidance/types.ts
+  h_0aff3b71f739b1 7-8
+web/src/components/organisms/fraud-alert-details/fraud-alert-details.tsx
+  h_0aff3b71f739b1 49-55
+web/src/services/fraud-detection-service/test/mappers.test.ts
+  h_0aff3b71f739b1 1-76
+web/src/components/molecules/dashboard-modal/dashboard-modal.tsx
+  h_0aff3b71f739b1 1-3,16-35,41,43-45,50,62
+  h_0aff3b71f739b1 42,46-47
+web/src/components/organisms/fraud-alert-modal/test/fraud-alert-modal.test.tsx
+  h_0aff3b71f739b1 36-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "030912b30aa3b6241c3a151e9155d796edc78946",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
