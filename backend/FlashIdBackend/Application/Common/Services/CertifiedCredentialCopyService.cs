@@ -253,8 +253,7 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
             IssueDate = snapshot.IssueDate,
 
             FullName = snapshot.FullName,
-            IdNumber = snapshot.IdNumber,
-            DateOfBirth = snapshot.DateOfBirth,
+            IdNumber = MaskIdNumber(snapshot.IdNumber),
 
             Citizenship = snapshot.Citizenship,
             CountryOfBirth = snapshot.CountryOfBirth,
@@ -266,6 +265,14 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
             ExpiryDate = snapshot.ExpiryDate,
             CountryOfIssue = snapshot.CountryOfIssue
         };
+    }
+
+    private static string MaskIdNumber(string idNumber)
+    {
+        if (string.IsNullOrWhiteSpace(idNumber))
+            return string.Empty;
+
+        return idNumber.Length <= 4 ? new string('*', idNumber.Length) : $"{new string('*', idNumber.Length - 4)}{idNumber[^4..]}";
     }
 
     public async Task<VerifyCertifiedCopyDocumentResponseDto> VerifyDocumentAsync(string verificationToken,
