@@ -36,6 +36,7 @@ export type CredentialActivity = {
   devicesUsed: number
 }
 export type CredentialResponse = {
+  photoUrl?: string | null
   id: string
   type: CredentialType
   title: string

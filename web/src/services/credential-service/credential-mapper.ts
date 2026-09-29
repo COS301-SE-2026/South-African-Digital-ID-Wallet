@@ -33,6 +33,7 @@ export const mapCredentialResponseToDetail = (
   status: response.status,
   issuedOn: response.issueDate,
   expiresOn: mapExpiresOn(response),
+  photoUrl: response.photoUrl ?? null,
   citizen: {
     fullName: response.citizen?.fullName ?? '',
     idNumber: response.citizen?.idNumber ?? '',
