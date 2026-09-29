@@ -9,6 +9,7 @@ import {
 import { loginService, type LoginResponse } from '@/services/login-service'
 import { useAuthStore } from '@/stores/auth-store'
 
+import * as Linking from 'expo-linking'
 import { LoginForm } from '../login-form'
 
 const mockReplace = jest.fn()
@@ -20,6 +21,10 @@ jest.mock('expo-router', () => ({
 jest.mock('@/services/login-service/login-service', () => ({
   __esModule: true,
   default: { login: jest.fn(), logout: jest.fn(), verifyDevice: jest.fn() },
+}))
+
+jest.mock('expo-linking', () => ({
+  openURL: jest.fn(),
 }))
 
 jest.mock('expo-local-authentication', () => ({
@@ -155,5 +160,12 @@ describe('<LoginForm/>', () => {
     expect(useAuthStore.getState().isAuthenticated).toBe(false)
     expect(useAuthStore.getState().token).toBeNull()
     expect(mockReplace).not.toHaveBeenCalled()
+  })
+  it('Should open the web reset page from the Forgot password link', async () => {
+    await render(<LoginForm />)
+    await fireEvent.press(screen.getByTestId('forgot-password-link'))
+    expect(Linking.openURL).toHaveBeenCalledWith(
+      expect.stringMatching(/\/forgot-password$/)
+    )
   })
 })

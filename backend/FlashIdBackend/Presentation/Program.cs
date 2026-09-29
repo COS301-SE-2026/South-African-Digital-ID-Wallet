@@ -202,8 +202,6 @@ builder.Services.AddRateLimiter(options =>
         FixedWindowPartition(UserPartitionKey(httpContext), permitLimit: 300, window: oneMinute));
 
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-
-    options.RejectionStatusCode = 429;
 });
 
 var app = builder.Build();
@@ -250,7 +248,6 @@ app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);
 app.UseAuthentication();
-app.UseRateLimiter();
 // move to after authentication so user-partitioned policies can see who is signed in.
 app.UseRateLimiter();
 app.UseMiddleware<Presentation.Middleware.CsrfProtectionMiddleware>();

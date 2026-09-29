@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useRouter } from 'expo-router'
 import * as LocalAuthentication from 'expo-local-authentication'
+import * as Linking from 'expo-linking'
 import { Lock, Mail } from 'lucide-react-native'
 import { Pressable, View, Alert } from 'react-native'
 
 import { Button, Form, Text } from '@/components/atoms'
 import { TextField } from '@/components/molecules'
+import { webUrl } from '@/config'
 import { DeviceVerificationForm } from '@/components/organisms'
 import { describeDevice } from '@/lib/device-info'
 import { normalizeRole, ROLE_HOME } from '@/lib/roles'
@@ -155,6 +157,17 @@ export const LoginForm = ({ onRegister }: LoginFormProps) => {
           </Text>
         ) : null}
         <Button label="Log In" testID="login-submit" type="submit" />
+        <Pressable
+          accessibilityRole="link"
+          hitSlop={6}
+          // Password reset lives on the web portal, so the app opens it in the browser.
+          onPress={() => void Linking.openURL(webUrl('/forgot-password'))}
+          testID="forgot-password-link"
+        >
+          <Text variant="sub-sm" className="text-center text-primary-green">
+            Forgot password?
+          </Text>
+        </Pressable>
         <View className="flex-row items-center justify-center pt-2">
           <Text variant="sub-sm">Don&apos;t have an account? </Text>
           <Pressable
