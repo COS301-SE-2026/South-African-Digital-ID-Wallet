@@ -29,10 +29,10 @@ public class AuthControllerIntegrationTests
     private const string JwtIssuer = "FlashId";
     private const string JwtAudience = "FlashIdWeb";
 
-    private const string TestPassword = "CitizenPwd123!"; // NOSONAR - test-only dummy credential, not a real secret
-    private const string WrongPassword = "InvalidPwd123!"; // NOSONAR - test-only dummy credential, not a real secret
-    private const string DeviceToken = "trusted-device-token"; // NOSONAR - test-only dummy credential, not a real secret
-    private const string CorrectOtp = "123456"; // NOSONAR - test-only dummy credential, not a real secret
+    private const string TestPassword = "CitizenPwd123!"; // NOSONAR - not a real secret
+    private const string WrongPassword = "InvalidPwd123!"; // NOSONAR - not a real secret
+    private const string DeviceToken = "trusted-device-token"; // NOSONAR - not a real secret
+    private const string CorrectOtp = "123456"; // NOSONAR - not a real secret
 
     private const string DeviceVerificationCookie = "flashid_device_verification";
     private const string AccessTokenCookie = "access_token";
@@ -630,5 +630,73 @@ public class AuthControllerIntegrationTests
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(string.Empty, SetCookieValue(response, AccessTokenCookie));
+    }
+
+    [Fact]
+    public async Task ForgotPassword_UnknownEmail_ReturnsTheSameOkMessage()
+    {
+        using var factory = new TestApiFactory();
+        await factory.CreateInitializedContextAsync();
+        var client = factory.CreateApiClient();
+
+        var response = await client.PostAsJsonAsync("/api/auth/forgot-password",
+            new ForgotPasswordRequestDto { Email = "nobody@flashid.test" }, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await ReadBodyAsync(response);
+        Assert.Equal("If an account exists for that email, a reset code has been sent.", body.GetProperty("message").GetString());
+    }
+
+    [Fact]
+    public async Task ResetPassword_WithTheEmailedCode_ChangesThePasswordAndRevokesOldTokens()
+    {
+        using var factory = new TestApiFactory();
+        var user = BuildUser();
+        user.SetOtp(BCrypt.Net.BCrypt.HashPassword(CorrectOtp), 15);
+        await SeedUserAsync(factory, user);
+        var oldToken = GenerateTokenFor(user);
+        var client = factory.CreateApiClient();
+
+        var response = await client.PostAsJsonAsync("/api/auth/reset-password", new ResetPasswordRequestDto
+        {
+            Email = user.Email,
+            Otp = CorrectOtp,
+            NewPassword = "BrandNewPwd456!", // NOSONAR - not a real secret
+            ConfirmPassword = "BrandNewPwd456!", // NOSONAR - not a real secret
+        }, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var db = await factory.CreateInitializedContextAsync();
+        var saved = await db.DomainUsers.AsNoTracking().SingleAsync(u => u.Id == user.Id, TestContext.Current.CancellationToken);
+        Assert.True(BCrypt.Net.BCrypt.Verify("BrandNewPwd456!", saved.PasswordHash)); // NOSONAR - not a real secret
+        Assert.Null(saved.EmailOTPHash);
+        Assert.True(await db.AuditLogs.AnyAsync(a => a.ActorId == user.Id && a.EventType == AuditEventType.PasswordReset, TestContext.Current.CancellationToken));
+
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", oldToken);
+        var me = await client.GetAsync("/api/auth/me", TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.Unauthorized, me.StatusCode);
+    }
+
+    [Fact]
+    public async Task ResetPassword_WithAWrongCode_ReturnsBadRequest()
+    {
+        using var factory = new TestApiFactory();
+        var user = BuildUser();
+        user.SetOtp(BCrypt.Net.BCrypt.HashPassword(CorrectOtp), 15);
+        await SeedUserAsync(factory, user);
+        var client = factory.CreateApiClient();
+
+        var response = await client.PostAsJsonAsync("/api/auth/reset-password", new ResetPasswordRequestDto
+        {
+            Email = user.Email,
+            Otp = "000000",
+            NewPassword = "BrandNewPwd456!", // NOSONAR - not a real secret
+            ConfirmPassword = "BrandNewPwd456!", // NOSONAR - not a real secret
+        }, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await ReadBodyAsync(response);
+        Assert.Equal("The verification code is incorrect", body.GetProperty("error").GetString());
     }
 }

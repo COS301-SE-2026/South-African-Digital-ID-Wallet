@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.DataProtection;
 using Application.Features.FraudDetection.DTOs;
 using Presentation.Security;
+using Application.Features.Citizens.Exceptions;
 
 namespace Presentation.Controllers;
 
@@ -286,7 +287,34 @@ public class AuthController : ControllerBase
         }
     }
 
-    // [Authorize] — must be authenticated (any role) to log out.
+    // Anonymous: the user cannot sign in, which is why they are here.
+    [HttpPost("forgot-password")]
+    [EnableRateLimiting("password-reset")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto request, [FromServices] IPasswordResetService passwordResetService)
+    {
+        await passwordResetService.RequestResetAsync(request);
+        // Same reply whether or not the account exists, so the endpoint cannot reveal who is registered.
+        return Ok(new { message = "If an account exists for that email, a reset code has been sent." });
+    }
+
+    [HttpPost("reset-password")]
+    [EnableRateLimiting("password-reset")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request, [FromServices] IPasswordResetService passwordResetService)
+    {
+        try
+        {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            await passwordResetService.ResetPasswordAsync(request, ipAddress);
+            return Ok(new { message = "Password updated. You can now log in." });
+        }
+        // The four errors the user can fix themselves become a 400 with a readable message.
+        catch (Exception ex) when (ex is InvalidOtpException or OtpExpiredException or TooManyOtpAttemptsException or InvalidCitizenRegistrationRequestException)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    // [Authorize] - must be authenticated (any role) to log out.
     [Authorize]
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()

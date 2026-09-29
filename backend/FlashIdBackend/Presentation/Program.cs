@@ -180,6 +180,7 @@ builder.Services.AddRateLimiter(options =>
     AddIpPartitionedPolicy(options, "verify-email", permitLimit: 5, window: oneMinute);
     AddIpPartitionedPolicy(options, "login", permitLimit: 10, window: oneMinute);
     AddIpPartitionedPolicy(options, "verify-device", permitLimit: 5, window: oneMinute);
+    AddIpPartitionedPolicy(options, "password-reset", permitLimit: 5, window: oneMinute);
 
     // Signed-in endpoints.
     AddUserPartitionedPolicy(options, "resend-device-verification", permitLimit: 3, window: oneMinute);
