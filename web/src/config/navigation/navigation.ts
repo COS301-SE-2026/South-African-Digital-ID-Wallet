@@ -106,12 +106,12 @@ export const officialsNavSections: SidebarNavSection[] = [
       {
         label: 'Verifications',
         href: '/officials/verifications',
-        icon: 'users',
+        icon: 'qr',
       },
       {
         label: 'Verify Documents',
         href: '/officials/verify-document',
-        icon: 'users',
+        icon: 'fileUser',
       },
     ],
   },
