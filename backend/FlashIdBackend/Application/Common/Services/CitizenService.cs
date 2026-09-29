@@ -7,6 +7,7 @@ using Application.Features.Citizens.DTOs;
 using Application.Features.Citizens.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
+using System.Security.Cryptography;
 
 namespace Application.Common.Services;
 
@@ -78,7 +79,8 @@ public class CitizenService : ICitizenService
         return response;
     }
 
-    private static string GenerateOtp() => Random.Shared.Next(100000, 1000000).ToString();
+    // Cryptographically secure because this code proves ownership of the email address.
+    private static string GenerateOtp() => RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
 
     private Task SendOtpEmailAsync(string toEmail, string otp) => _emailSenderProvider.SendEmailAsync(
         toEmail,
