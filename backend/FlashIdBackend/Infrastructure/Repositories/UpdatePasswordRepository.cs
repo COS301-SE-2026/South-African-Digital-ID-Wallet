@@ -26,6 +26,16 @@ public class UpdatePasswordRepository : IUpdatePasswordRepository
         return Task.CompletedTask;
     }
 
+    public async Task<int> RemoveTrustedDevicesAsync(Guid userId)
+    {
+        var devices = await _context.TrustedDevices
+            .Where(d => d.UserId == userId)
+            .ToListAsync();
+
+        _context.TrustedDevices.RemoveRange(devices);
+        return devices.Count;
+    }
+
     public async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();

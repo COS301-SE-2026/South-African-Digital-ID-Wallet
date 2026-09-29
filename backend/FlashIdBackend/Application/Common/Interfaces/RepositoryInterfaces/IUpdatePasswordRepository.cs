@@ -8,5 +8,7 @@ public interface IUpdatePasswordRepository
 
     Task UpdateUserAsync(User user);
 
+    Task<int> RemoveTrustedDevicesAsync(Guid userId);
+
     Task SaveChangesAsync();
 }
