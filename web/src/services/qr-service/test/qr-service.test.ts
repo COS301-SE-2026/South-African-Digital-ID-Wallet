@@ -40,7 +40,7 @@ describe('OPTIONAL_FIELDS', () => {
       'Gender',
       'Country of birth',
       'Signature',
-      'Card issue date and number',
+      'Card issue date',
     ])
   })
 

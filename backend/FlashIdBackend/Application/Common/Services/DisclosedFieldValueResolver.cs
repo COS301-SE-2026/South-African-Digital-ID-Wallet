@@ -44,16 +44,19 @@ public class DisclosedFieldValueResolver : IDisclosedFieldsValueResolver
             "Photograph" => DisclosedFieldSource.Photo(credential.IdentityDocument?.PhotoPath),
             "Photo" => DisclosedFieldSource.Photo(credential.DriversLicense?.PhotoPath),
             "Signature" => DisclosedFieldSource.Photo(credential.Signature),
-            "Card issue date and number" => DisclosedFieldSource.Text(string.Empty),
+            "Card issue date" => DisclosedFieldSource.Text(credential.IssueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
             "License number" => DisclosedFieldSource.Text(credential.DriversLicense?.LicenseNumber),
             "License code" => DisclosedFieldSource.Text(credential.DriversLicense?.LicenseCode.ToString()),
             "Expiry date" => DisclosedFieldSource.Text(credential.DriversLicense?.ExpiryDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
             "Country of issue" => DisclosedFieldSource.Text(credential.DriversLicense?.CountryOfIssue),
-            "Vehicle restrictions" => DisclosedFieldSource.Text(credential.DriversLicense?.Restrictions),
+            "Vehicle restrictions" => DisclosedFieldSource.Text(OrNone(credential.DriversLicense?.Restrictions)),
             "Date of issue" => DisclosedFieldSource.Text(credential.IssueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
             _ => throw new InvalidOperationException($"No resolver defined for this disclosed field: '{field}'."),
         };
     }
+
+    // An empty value means the licence has no restrictions.
+    private static string OrNone(string? value) => string.IsNullOrWhiteSpace(value) ? "None" : value;
 
     private async Task<string> ResolveFieldAsync(Credential cred, string field)
     {
