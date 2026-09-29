@@ -1,0 +1,38 @@
+mobile/src/app/citizen/security/[alertId]/secured.tsx
+  h_712d174fc3f309 6-7
+mobile/src/components/organisms/security-alert-card/security-alert-card.tsx
+  h_712d174fc3f309 7-10
+mobile/src/components/organisms/security-alert-card/types.ts
+  h_712d174fc3f309 1-2,4
+mobile/src/components/pages/citizen-home/citizen-home-page.tsx
+  h_712d174fc3f309 12-13,69
+mobile/src/components/pages/secure-account/secure-account-page.tsx
+  h_712d174fc3f309 20,64-81
+mobile/src/components/pages/security-confirmation/security-confirmation-page.tsx
+  h_712d174fc3f309 20
+mobile/src/components/templates/detail-screen/detail-screen.tsx
+  h_712d174fc3f309 17-21,63-64,71-80,124-125
+mobile/src/components/templates/detail-screen/types.ts
+  h_712d174fc3f309 8
+mobile/src/hooks/test/use-security.test.tsx
+  h_712d174fc3f309 22,112-115,189,192,210-213,264-267,272-274
+mobile/src/hooks/use-security.ts
+  h_712d174fc3f309 17,82,90-94,114
+mobile/src/stores/auth-store.ts
+  h_712d174fc3f309 76-77
+mobile/src/stores/security-result-store.ts
+  h_712d174fc3f309 1-14
+mobile/src/stores/test/security-result-store.test.ts
+  h_712d174fc3f309 1-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4172b11de122ed365d25b70b5d80b65bdfc9271d",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
