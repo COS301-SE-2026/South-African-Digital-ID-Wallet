@@ -251,10 +251,13 @@ export const VerifyCertifiedCopyPage: FC = () => {
       <Modal
         isOpen={verificationState !== null}
         onClose={closeVerificationModal}
-        className="h-fit min-h-0 !max-w-xl !overflow-visible !bg-transparent 
-        !p-0 sm:!w-full sm:!w-[calc(100vw-3rem)]"
+        className="!m-0 !h-auto !min-h-0 !w-[calc(100vw-3rem)] !max-w-xl 
+        !overflow-visible !bg-transparent !p-0 sm:!w-[calc(100vw-4rem)]"
       >
-        <div className="rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+        <div
+          className="rounded-[26px] 
+              bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]"
+        >
           <div
             className="max-h-[calc(100dvh-2rem)] overflow-y-auto 
           rounded-[calc(1.5rem-2px)] bg-clean-white p-4 sm:max-h-[90vh] sm:p-8"
