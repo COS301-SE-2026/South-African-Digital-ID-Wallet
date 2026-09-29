@@ -173,7 +173,10 @@ export const VerifyCertifiedCopyPage: FC = () => {
               variant="custom"
               LeftIcon={QrCode}
               onClick={openCameraModal}
-              className="!w-full !justify-start rounded-xl border border-deep-green bg-clean-white px-5 py-4 text-left text-deep-green transition-colors hover:bg-primary-green/5"
+              className="!flex !h-auto !w-full items-center !justify-start gap-4
+               rounded-xl border border-deep-green bg-clean-white px-5 py-4 
+               text-left text-deep-green 
+               transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-green/5 hover:shadow-sm"
               iconClassName="h-7 w-7 text-primary-green"
             >
               <span className="flex flex-col items-start">
@@ -184,7 +187,11 @@ export const VerifyCertifiedCopyPage: FC = () => {
                 >
                   Scan QR Code
                 </Text>
-                <Text as="span" variant="caption" className="mt-1">
+                <Text
+                  as="span"
+                  variant="caption"
+                  className="mt-1 block whitespace-normal leading-5 text-muted-text text-left"
+                >
                   Open the public certified-copy verification page
                 </Text>
               </span>
