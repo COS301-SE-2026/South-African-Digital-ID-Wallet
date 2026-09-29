@@ -44,7 +44,13 @@ describe('useCertifiedCopy', () => {
       wrapper: createQueryWrapper(),
     })
     await act(async () => {
-      result.current.generate('c-1', { onSuccess })
+      result.current.generate(
+        {
+          credentialId: 'c-1',
+          credentialType: 'IdentityDocument',
+        },
+        { onSuccess }
+      )
     })
     await waitFor(() => expect(onSuccess).toHaveBeenCalled())
     expect(generateMock).toHaveBeenCalledWith('c-1')
@@ -59,7 +65,10 @@ describe('useCertifiedCopy', () => {
       wrapper: createQueryWrapper(),
     })
     await act(async () => {
-      result.current.generate('c-1')
+      result.current.generate({
+        credentialId: 'c-1',
+        credentialType: 'IdentityDocument',
+      })
     })
     await waitFor(() => expect(result.current.error).toBeInstanceOf(Error))
     expect(saveMock).not.toHaveBeenCalled()
@@ -73,7 +82,10 @@ describe('useCertifiedCopy', () => {
       wrapper: createQueryWrapper(),
     })
     await act(async () => {
-      result.current.generate('c-1')
+      result.current.generate({
+        credentialId: 'c-1',
+        credentialType: 'IdentityDocument',
+      })
     })
     await waitFor(() => expect(result.current.error?.message).toBe('no viewer'))
   })
@@ -84,7 +96,10 @@ describe('useCertifiedCopy', () => {
       wrapper: createQueryWrapper(),
     })
     await act(async () => {
-      result.current.generate('c-1')
+      result.current.generate({
+        credentialId: 'c-1',
+        credentialType: 'IdentityDocument',
+      })
     })
     await waitFor(() => expect(result.current.error).toBeInstanceOf(Error))
     await act(async () => {
