@@ -30,8 +30,7 @@ if (!builder.Environment.IsEnvironment("Testing"))
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 
-builder.Services.AddInfrastructure();
-
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
 builder.Services.AddControllers()
@@ -195,12 +194,16 @@ builder.Services.AddRateLimiter(options =>
     AddUserPartitionedPolicy(options, "onboarding-verify", permitLimit: 20, window: oneMinute);
     AddUserPartitionedPolicy(options, "verify-badge", permitLimit: 20, window: oneMinute);
     AddUserPartitionedPolicy(options, "resolve-credential", permitLimit: 30, window: oneMinute);
+    AddUserPartitionedPolicy(options, "emergency-resolve", permitLimit: 10, window: oneMinute);
+    AddUserPartitionedPolicy(options, "emergency-offline-access", permitLimit: 20, window: oneMinute);
 
     // Backstop for every request, including endpoints without a named policy.
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
         FixedWindowPartition(UserPartitionKey(httpContext), permitLimit: 300, window: oneMinute));
 
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.RejectionStatusCode = 429;
 });
 
 var app = builder.Build();
@@ -247,8 +250,10 @@ app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);
 app.UseAuthentication();
+app.UseRateLimiter();
 // move to after authentication so user-partitioned policies can see who is signed in.
 app.UseRateLimiter();
+app.UseMiddleware<Presentation.Middleware.CsrfProtectionMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 

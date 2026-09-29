@@ -3,6 +3,7 @@ import Constants from 'expo-constants'
 import { useRouter } from 'expo-router'
 import {
   Bell,
+  HeartPulse,
   HelpCircle,
   Info,
   LogOut,
@@ -75,9 +76,15 @@ export const ProfilePage = () => {
         name: 'devices',
         onPress: () => setOpenSheet('devices'),
       })
+      rows.push({
+        Icon: HeartPulse,
+        label: 'Emergency Profile',
+        name: 'emergency',
+        onPress: () => router.push('/citizen/emergency'),
+      })
     }
     return rows
-  }, [isCitizen])
+  }, [isCitizen, router])
 
   const preferenceRows = useMemo<SettingsRowConfig[]>(
     () =>

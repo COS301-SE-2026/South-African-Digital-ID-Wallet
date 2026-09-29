@@ -21,6 +21,7 @@ export const OfflineVerificationSync = () => {
       void offlineService.syncOfflineVerifications(verifierId).catch(() => {
         // Still queued; the next trigger tries again.
       })
+      void offlineService.syncEmergencyAccesses(verifierId).catch(() => {})
     }
 
     sync()
