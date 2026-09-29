@@ -5,18 +5,19 @@ import type { CertifiedCopyVerificationModalProps } from './types'
 
 export function CertifiedCopyVerification({
   state,
+  result,
   currentStep,
-  onViewCredentialDetails,
+
   onVerifyAnotherDocument,
   onContactSupport,
 }: Readonly<CertifiedCopyVerificationModalProps>) {
   if (state === 'progress') {
     return <CertifiedCopyVerificationProgress currentStep={currentStep} />
   }
-  if (state === 'authentic') {
+  if (state === 'authentic' && result) {
     return (
       <AuthenticResult
-        onViewCredentialDetails={onViewCredentialDetails}
+        result={result}
         onVerifyAnotherDocument={onVerifyAnotherDocument}
       />
     )

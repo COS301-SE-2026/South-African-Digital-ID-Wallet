@@ -1,4 +1,6 @@
+import type { VerifyCertifiedCopyDocumentResponse } from '@/services/certified-copy-service/types'
+
 export type AuthenticResultProps = {
-  onViewCredentialDetails: () => void
+  result: VerifyCertifiedCopyDocumentResponse
   onVerifyAnotherDocument: () => void
 }

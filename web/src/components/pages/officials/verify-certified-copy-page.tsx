@@ -6,6 +6,7 @@ import { Button, Modal, Text } from '@/components/atoms'
 import { CertifiedCopyVerification } from '@/components/molecules'
 import { QrCameraScanner } from '@/components/organisms/qr-camera-scanner'
 import certifiedCopyService from '@/services/certified-copy-service/certified-copy-service'
+import type { VerifyCertifiedCopyDocumentResponse } from '@/services/certified-copy-service/types'
 
 type VerificationState = 'progress' | 'authentic' | 'failed' | null
 const MAX_PDF_FILE_SIZE = 10 * 1024 * 1024
@@ -13,6 +14,8 @@ export const VerifyCertifiedCopyPage: FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [verificationState, setVerificationState] =
     useState<VerificationState>(null)
+  const [verificationResult, setVerificationResult] =
+    useState<VerifyCertifiedCopyDocumentResponse | null>(null)
   const [cameraOpen, setCameraOpen] = useState(false)
   const [currentStep, setCurrentStep] = useState(3)
   const [selectedDocument, setSelectedDocument] = useState<File | null>(null)
@@ -36,13 +39,16 @@ export const VerifyCertifiedCopyPage: FC = () => {
   }, [verificationState])
   const runDocumentVerification = async (document: File): Promise<void> => {
     setVerificationError(null)
+    setVerificationResult(null)
     setCurrentStep(3)
     setVerificationState('progress')
     try {
       const result = await certifiedCopyService.verifyDocument(document)
+      setVerificationResult(result)
       setCurrentStep(5)
       setVerificationState(result.isValid ? 'authentic' : 'failed')
     } catch {
+      setVerificationResult(null)
       setCurrentStep(5)
       setVerificationState('failed')
       setVerificationError(
@@ -75,10 +81,12 @@ export const VerifyCertifiedCopyPage: FC = () => {
   }
   const closeVerificationModal = () => {
     setVerificationState(null)
+    setVerificationResult(null)
     setCurrentStep(3)
   }
   const resetVerification = () => {
     setVerificationState(null)
+    setVerificationResult(null)
     setCurrentStep(3)
     setSelectedDocument(null)
     setVerificationError(null)
@@ -243,14 +251,19 @@ export const VerifyCertifiedCopyPage: FC = () => {
       <Modal
         isOpen={verificationState !== null}
         onClose={closeVerificationModal}
-        className="h-fit min-h-0 max-h-[90vh] !w-full !max-w-xl overflow-y-auto !bg-transparent !p-0 sm:!w-full sm:!max-w-xl"
+        className="h-fit min-h-0 !max-w-xl !overflow-visible !bg-transparent 
+        !p-0 sm:!w-full sm:!w-[calc(100vw-3rem)]"
       >
         <div className="rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
-          <div className="rounded-[24px] bg-clean-white p-5 sm:p-8">
+          <div
+            className="max-h-[calc(100dvh-2rem)] overflow-y-auto 
+          rounded-[calc(1.5rem-2px)] bg-clean-white p-4 sm:max-h-[90vh] sm:p-8"
+          >
             {verificationState && (
               <CertifiedCopyVerification
                 state={verificationState}
                 currentStep={currentStep}
+                result={verificationResult}
                 onViewCredentialDetails={closeVerificationModal}
                 onVerifyAnotherDocument={resetVerification}
                 onContactSupport={() => undefined}
