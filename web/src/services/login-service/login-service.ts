@@ -4,6 +4,7 @@ import { loginDto, verifyDeviceDto } from './login-dto'
 import type {
   LoginFormValues,
   LoginResponse,
+  ResetPasswordRequest,
   VerifyDeviceRequest,
 } from './types'
 
@@ -39,12 +40,22 @@ const resendDeviceVerificationOtp = async (
   return response.data
 }
 
+const forgotPassword = async (email: string): Promise<void> => {
+  await api.post(loginUrls.forgotPassword(), { email })
+}
+
+const resetPassword = async (request: ResetPasswordRequest): Promise<void> => {
+  await api.post(loginUrls.resetPassword(), request)
+}
+
 const loginService = {
   login,
   getUser,
   logout,
   verifyDevice,
   resendDeviceVerificationOtp,
+  forgotPassword,
+  resetPassword,
 }
 
 export default loginService
