@@ -1,6 +1,5 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { Text } from '@/components/atoms/text'
 import { GovAdminAuditLogTable } from '@/components/organisms/gov-admin-audit-log-table'
 import { GovAdminAuditLogDetailsPanel } from '@/components/organisms/gov-admin-audit-log-table/gov-admin-audit-log-details-panel'
 import type { GovAdminAuditLogRow } from '@/components/organisms/gov-admin-audit-log-table/types'
@@ -77,32 +76,31 @@ export default function AuditLogPage() {
   }
 
   return (
-    <div className="flex h-full w-full flex-col gap-4 p-6">
-      <Text
-        as="h1"
-        variant="sub-sm"
-        className="text-2xl font-bold text-deep-green"
-      >
-        Audit Log
-      </Text>
-      {error ? (
-        <p className="text-sm text-red-600" role="alert">
-          {error}
-        </p>
-      ) : (
-        <GovAdminAuditLogTable
-          rows={rows}
-          search={search}
-          onSearchChange={handleSearchChange}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalResults={totalResults}
-          resultsPerPage={RESULTS_PER_PAGE}
-          onPageChange={setCurrentPage}
-          onViewDetails={handleViewDetails}
-          isLoading={isLoading}
-        />
-      )}
+    <div className="flex min-h-full overflow-x-hidden bg-[#f6f2ea]">
+      <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">
+        <div className="relative flex min-h-[560px] flex-1 flex-col rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px] *:flex-1">
+          {error ? (
+            <div className="flex items-center justify-center rounded-[24px] bg-card p-6">
+              <p className="text-sm text-national-red" role="alert">
+                {error}
+              </p>
+            </div>
+          ) : (
+            <GovAdminAuditLogTable
+              rows={rows}
+              search={search}
+              onSearchChange={handleSearchChange}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalResults={totalResults}
+              resultsPerPage={RESULTS_PER_PAGE}
+              onPageChange={setCurrentPage}
+              onViewDetails={handleViewDetails}
+              isLoading={isLoading}
+            />
+          )}
+        </div>
+      </main>
       <GovAdminAuditLogDetailsPanel
         row={selectedRow}
         isOpen={isPanelOpen}

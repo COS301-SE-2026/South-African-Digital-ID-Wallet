@@ -4,6 +4,12 @@ import { Text } from '@/components/atoms/text'
 import { TablePagination } from '@/components/molecules/table-pagination'
 import type { GovAdminAuditLogTableProps } from './types'
 
+const formatDate = (value: string) =>
+  new Date(value).toLocaleString('en-GB', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  })
+
 export const GovAdminAuditLogTable = ({
   rows,
   search,
@@ -50,18 +56,60 @@ export const GovAdminAuditLogTable = ({
         </div>
       ) : (
         <>
-          <Text
-            as="p"
-            variant="sub-sm"
-            className="mt-4 shrink-0 !text-xs text-muted-text"
-          >
-            Showing {(currentPage - 1) * resultsPerPage + 1} to{' '}
-            {Math.min(currentPage * resultsPerPage, totalResults)} of{' '}
-            {totalResults} results
-          </Text>
+          <ul className="mt-4 min-h-0 flex-1 space-y-3 overflow-y-auto md:hidden">
+            {rows.map((row) => (
+              <li
+                key={row.id}
+                className="rounded-2xl border border-black/10 bg-card p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className={`break-words text-sm font-bold [overflow-wrap:anywhere] ${
+                        row.outcome === 'Success'
+                          ? 'text-text-primary'
+                          : 'text-national-red'
+                      }`}
+                    >
+                      {row.action}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-text">
+                      {formatDate(row.createdAt)}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onViewDetails(row)}
+                    className="shrink-0 text-muted-text transition hover:text-deep-green"
+                    aria-label={`View details for ${row.action}`}
+                    data-cy={`view-gov-audit-details-mobile-${row.id}`}
+                  >
+                    <Eye className="h-6 w-6" />
+                  </button>
+                </div>
+                <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
+                  <dt className="font-bold uppercase tracking-wide text-muted-text">
+                    User
+                  </dt>
+                  <dd
+                    className="truncate font-semibold text-text-primary"
+                    title={row.userName ?? undefined}
+                  >
+                    {row.userName ?? 'Unknown'}
+                  </dd>
+                  <dt className="font-bold uppercase tracking-wide text-muted-text">
+                    Role
+                  </dt>
+                  <dd className="truncate font-semibold text-text-primary">
+                    {row.role ?? 'Unknown'}
+                  </dd>
+                </dl>
+              </li>
+            ))}
+          </ul>
 
-          <div className="mt-3 min-h-0 flex-1 overflow-auto pr-1">
-            <table className="w-full min-w-[720px] table-fixed border-collapse">
+          <div className="mt-4 hidden min-h-0 flex-1 overflow-auto pr-1 md:block">
+            <table className="w-full table-fixed border-collapse">
               <thead className="sticky top-0 z-10 bg-card">
                 <tr className="border-b border-black/10">
                   {['Time', 'Action', 'User', 'Role', 'Details'].map(
@@ -70,9 +118,9 @@ export const GovAdminAuditLogTable = ({
                         key={label}
                         className={`px-4 py-3 text-left ${
                           [
-                            'w-[15%]',
-                            'w-[20%]',
-                            'w-[20%]',
+                            'w-[18%]',
+                            'w-[27%]',
+                            'w-[25%]',
                             'w-[20%]',
                             'w-[10%]',
                           ][i]
@@ -91,64 +139,54 @@ export const GovAdminAuditLogTable = ({
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row, index) => {
-                  const date = new Date(row.createdAt)
-                  return (
-                    <tr
-                      key={row.id}
-                      className={`border-b border-black/10 align-top ${
-                        index % 2 === 0 ? 'bg-card' : 'bg-black/[0.02]'
-                      }`}
-                    >
-                      <td className="whitespace-nowrap px-4 py-3">
-                        {date.toLocaleString('en-GB', {
-                          dateStyle: 'short',
-                          timeStyle: 'short',
-                        })}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`!text-xs font-bold leading-4 ${
-                            row.outcome === 'Success'
-                              ? 'text-text-primary'
-                              : 'text-national-red'
-                          }`}
-                        >
-                          {row.action}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {row.userName ? (
-                          <div className="flex items-center gap-2">
-                            <span className="truncate !text-xs font-semibold text-text-primary">
-                              {row.userName}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="!text-xs font-semibold text-text-primary">
-                            - Unknown
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="truncate !text-xs font-semibold text-text-primary">
-                          {row.role ?? 'Unknown'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          type="button"
-                          onClick={() => onViewDetails(row)}
-                          className="text-muted-text transition hover:text-deep-green"
-                          aria-label={`View details for ${row.action}`}
-                          data-cy={`view-gov-audit-details-${row.id}`}
-                        >
-                          <Eye className="h-6 w-6" />
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })}
+                {rows.map((row, index) => (
+                  <tr
+                    key={row.id}
+                    className={`border-b border-black/10 align-middle ${
+                      index % 2 === 0 ? 'bg-card' : 'bg-black/[0.02]'
+                    }`}
+                  >
+                    <td className="whitespace-nowrap px-4 py-3 text-xs text-text-primary">
+                      {formatDate(row.createdAt)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        title={row.action}
+                        className={`block break-words text-xs font-bold leading-4 [overflow-wrap:anywhere] ${
+                          row.outcome === 'Success'
+                            ? 'text-text-primary'
+                            : 'text-national-red'
+                        }`}
+                      >
+                        {row.action}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        title={row.userName ?? undefined}
+                        className="block truncate text-xs font-semibold text-text-primary"
+                      >
+                        {row.userName ?? '- Unknown'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="block truncate text-xs font-semibold text-text-primary">
+                        {row.role ?? 'Unknown'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        type="button"
+                        onClick={() => onViewDetails(row)}
+                        className="text-muted-text transition hover:text-deep-green"
+                        aria-label={`View details for ${row.action}`}
+                        data-cy={`view-gov-audit-details-${row.id}`}
+                      >
+                        <Eye className="h-6 w-6" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

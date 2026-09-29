@@ -11,14 +11,18 @@ function DetailRow({
 }: Readonly<{ label: string; value: React.ReactNode }>) {
   if (value === undefined || value === null || value === '') return null
   return (
-    <div className="flex items-center justify-between py-2">
-      <Text as="span" variant="sub-sm" className="!text-xs text-muted-text">
+    <div className="flex items-start justify-between gap-4 py-2">
+      <Text
+        as="span"
+        variant="sub-sm"
+        className="shrink-0 !text-xs text-muted-text"
+      >
         {label}
       </Text>
       <Text
         as="span"
         variant="sub-sm"
-        className="!text-xs font-semibold text-deep-green"
+        className="min-w-0 text-right !text-xs font-semibold text-deep-green [overflow-wrap:anywhere]"
       >
         {value}
       </Text>
@@ -63,7 +67,7 @@ export const GovAdminAuditLogDetailsPanel = ({
         <Text
           as="h2"
           variant="sub-sm"
-          className="mb-4 text-xl font-bold text-deep-green"
+          className="mb-4 text-xl font-extrabold text-deep-green"
         >
           Audit Log Details
         </Text>

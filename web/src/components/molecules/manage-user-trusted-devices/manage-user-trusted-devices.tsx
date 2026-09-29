@@ -73,9 +73,9 @@ export function ManageUserTrustedDevices() {
     <>
       <div className="h-full rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
         <div className="flex h-full flex-col rounded-[24px] bg-card p-6">
-          <div className="mb-5 flex items-start justify-between">
+          <div className="mb-5 flex flex-col items-start gap-2 sm:flex-row sm:justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-foreground">
+              <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
                 Trusted Devices
               </h2>
 
@@ -88,7 +88,7 @@ export function ManageUserTrustedDevices() {
               variant="link"
               size="sm"
               onClick={() => setShowDevices(true)}
-              className="text-green-700 hover:text-green-800"
+              className="h-auto p-0 text-green-700 hover:text-green-800 sm:h-8 sm:px-3"
             >
               Manage devices
             </Button>
@@ -110,15 +110,17 @@ export function ManageUserTrustedDevices() {
                     return (
                       <div
                         key={device.id}
-                        className="flex items-center justify-between rounded-2xl border p-4"
+                        className="flex items-center justify-between gap-3 rounded-2xl border p-4"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="rounded-xl bg-muted p-3">
+                        <div className="flex min-w-0 items-center gap-4">
+                          <div className="shrink-0 rounded-xl bg-muted p-3">
                             <Icon className="h-6 w-6" />
                           </div>
 
-                          <div>
-                            <h3 className="font-semibold">{device.name}</h3>
+                          <div className="min-w-0">
+                            <h3 className="truncate font-semibold">
+                              {device.name}
+                            </h3>
 
                             <p className="mt-1 text-sm text-muted-text">
                               {device.meta}
@@ -127,11 +129,11 @@ export function ManageUserTrustedDevices() {
                         </div>
 
                         {device.status === 'Active' ? (
-                          <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                          <span className="shrink-0 rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
                             Active
                           </span>
                         ) : (
-                          <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
+                          <span className="shrink-0 rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
                             Known
                           </span>
                         )}
@@ -160,10 +162,10 @@ export function ManageUserTrustedDevices() {
               return (
                 <div
                   key={device.id}
-                  className="flex items-center justify-between rounded-2xl border p-5"
+                  className="flex flex-col gap-4 rounded-2xl border p-5 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="rounded-2xl bg-muted p-4">
+                  <div className="flex min-w-0 items-center gap-4">
+                    <div className="shrink-0 rounded-2xl bg-muted p-4">
                       <Icon className="h-7 w-7 text-green-700" />
                     </div>
 
@@ -192,7 +194,7 @@ export function ManageUserTrustedDevices() {
                       variant="destructive"
                       size="lg"
                       onClick={() => unlinkDevice(device.id)}
-                      className="rounded-xl"
+                      className="w-full rounded-xl sm:w-auto"
                     >
                       <Unplug className="mr-2 h-4 w-4" />
                       Unlink Device

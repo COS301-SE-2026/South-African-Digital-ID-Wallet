@@ -2,11 +2,18 @@
 
 import { FC, useState, FormEvent } from 'react'
 import { toast } from 'react-hot-toast'
+import { X } from 'lucide-react'
 import axios from 'axios'
 import api from '@/lib/api'
 import { Text, Button } from '@/components/atoms'
 import { TextField } from '@/components/molecules'
 import { UpdatePasswordModalProps } from './types'
+import {
+  modalCloseButtonClassName,
+  modalOverlayClassName,
+  modalPanelClassName,
+  modalTitleClassName,
+} from '@/components/atoms/modal/modal-styles'
 
 export const UpdatePasswordModal: FC<UpdatePasswordModalProps> = ({
   open,
@@ -67,25 +74,19 @@ export const UpdatePasswordModal: FC<UpdatePasswordModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={onCloseAction}
-        aria-hidden
-      />
-      <div className="relative mx-auto w-[min(560px,95%)]">
-        <div className="bg-card rounded-3xl border p-6">
+    <div className={modalOverlayClassName}>
+      <div className="absolute inset-0" onClick={onCloseAction} aria-hidden />
+      <div className="relative w-full max-w-[560px]">
+        <div className={`${modalPanelClassName} p-6 sm:p-8`}>
           <div className="flex items-start justify-between gap-4">
-            <Text as="h2" variant="h3">
-              Update Password
-            </Text>
+            <h2 className={modalTitleClassName}>Update Password</h2>
             <button
               type="button"
               aria-label="Close"
               onClick={onCloseAction}
-              className="text-muted-text"
+              className={modalCloseButtonClassName}
             >
-              ✕
+              <X className="h-5 w-5" />
             </button>
           </div>
 

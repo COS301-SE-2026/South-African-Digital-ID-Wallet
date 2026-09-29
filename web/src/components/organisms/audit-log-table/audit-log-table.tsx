@@ -26,7 +26,7 @@ export const AuditLogTable = ({
 
   return (
     <div className="flex h-full w-full flex-col rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
-      <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-[24px] bg-card p-6">
+      <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-[24px] bg-card p-4 sm:p-6">
         <div className="flex shrink-0 items-center justify-between">
           <Text
             as="h2"
@@ -81,10 +81,10 @@ export const AuditLogTable = ({
         ) : (
           <>
             <div className="mt-4 min-h-0 flex-1 overflow-auto pr-1">
-              <table className="w-full min-w-[520px] table-fixed border-collapse">
+              <table className="w-full table-fixed border-collapse md:min-w-[520px]">
                 <thead className="sticky top-0 z-10 bg-card">
                   <tr className="border-b border-black/10">
-                    <th className="w-[16%] px-4 py-3 text-left">
+                    <th className="w-[30%] px-2 py-3 text-left sm:px-4 md:w-[16%]">
                       <Text
                         as="span"
                         variant="caption"
@@ -93,7 +93,7 @@ export const AuditLogTable = ({
                         Date &amp; Time
                       </Text>
                     </th>
-                    <th className="w-[20%] px-4 py-3 text-left">
+                    <th className="w-[35%] px-2 py-3 text-left sm:px-4 md:w-[20%]">
                       <Text
                         as="span"
                         variant="caption"
@@ -102,7 +102,7 @@ export const AuditLogTable = ({
                         Action
                       </Text>
                     </th>
-                    <th className="w-[30%] px-4 py-3 text-left">
+                    <th className="w-[35%] px-2 py-3 text-left sm:px-4 md:w-[30%]">
                       <Text
                         as="span"
                         variant="caption"
@@ -111,7 +111,7 @@ export const AuditLogTable = ({
                         Citizen / Details
                       </Text>
                     </th>
-                    <th className="w-[19%] px-4 py-3 text-left">
+                    <th className="hidden w-[19%] px-4 py-3 text-left md:table-cell">
                       <Text
                         as="span"
                         variant="caption"
@@ -120,7 +120,7 @@ export const AuditLogTable = ({
                         Performed By
                       </Text>
                     </th>
-                    <th className="w-[15%] px-4 py-3 text-left">
+                    <th className="hidden w-[15%] px-4 py-3 text-left md:table-cell">
                       <Text
                         as="span"
                         variant="caption"
@@ -142,7 +142,7 @@ export const AuditLogTable = ({
                           index % 2 === 0 ? 'bg-card' : 'bg-black/[0.02]'
                         }`}
                       >
-                        <td className="whitespace-nowrap px-4 py-3">
+                        <td className="px-2 py-3 sm:px-4">
                           <div className="!text-xs font-medium text-text-primary">
                             {date.toLocaleDateString('en-GB', {
                               day: 'numeric',
@@ -157,12 +157,12 @@ export const AuditLogTable = ({
                             })}
                           </div>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-2 py-3 sm:px-4">
                           <div className="!text-xs font-semibold leading-4 text-text-primary">
                             {humanizeAction(row.action)}
                           </div>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-2 py-3 sm:px-4">
                           {row.citizenName ? (
                             <>
                               <div className="truncate !text-xs font-semibold text-text-primary">
@@ -178,12 +178,12 @@ export const AuditLogTable = ({
                             <span className="!text-xs text-muted-text">-</span>
                           )}
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="hidden px-4 py-3 md:table-cell">
                           <div className="truncate !text-xs text-text-primary">
                             {row.performedBy}
                           </div>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="hidden px-4 py-3 md:table-cell">
                           <span
                             className={`inline-flex whitespace-nowrap rounded-full px-2.5 py-1 !text-[11px] font-medium ${
                               row.outcome === 'Success'

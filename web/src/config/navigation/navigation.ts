@@ -35,11 +35,6 @@ export const citizenNavSections: SidebarNavSection[] = [
     title: 'Security',
     items: [
       {
-        label: 'Verification History',
-        href: '/under-construction',
-        icon: 'history',
-      },
-      {
         label: 'Manage Account',
         href: '/citizen/manage-user-account',
         icon: 'settings',
@@ -70,7 +65,7 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
       {
         label: 'Manage Credentials',
         href: '/gov-admin/manage-credentials',
-        icon: 'institutions',
+        icon: 'users',
       },
     ],
   },
@@ -79,7 +74,6 @@ export const governmentAdminNavSections: SidebarNavSection[] = [
     title: 'Security',
     items: [
       { label: 'Audit Logs', href: '/gov-admin/audit-log', icon: 'history' },
-      { label: 'Settings', href: '/under-construction', icon: 'settings' },
     ],
   },
 ]

@@ -4,6 +4,11 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
 import { Button } from '@/components/ui/button'
 import api from '@/lib/api'
+import {
+  modalOverlayClassName,
+  modalPanelClassName,
+  modalTitleClassName,
+} from '@/components/atoms/modal/modal-styles'
 
 export const DeleteAccountCard = () => {
   const router = useRouter()
@@ -41,7 +46,7 @@ export const DeleteAccountCard = () => {
   return (
     <>
       <div className="rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
-        <div className="flex items-center justify-between rounded-[24px] bg-card px-5 py-4">
+        <div className="flex flex-col gap-4 rounded-[24px] bg-card px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-3xl">
             <h2 className="text-base font-semibold text-destructive">
               Delete Account
@@ -54,17 +59,21 @@ export const DeleteAccountCard = () => {
             </p>
           </div>
 
-          <Button variant="destructive" onClick={() => setOpen(true)}>
+          <Button
+            variant="destructive"
+            className="w-full shrink-0 sm:w-auto"
+            onClick={() => setOpen(true)}
+          >
             Delete Account
           </Button>
         </div>
       </div>
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-md rounded-3xl bg-card p-6 shadow-xl">
+        <div className={modalOverlayClassName}>
+          <div className={`${modalPanelClassName} max-w-md p-6 sm:p-8`}>
             {!confirmDelete ? (
               <>
-                <h2 className="text-2xl font-bold">Delete Account</h2>
+                <h2 className={modalTitleClassName}>Delete Account</h2>
 
                 <p className="mt-3 text-sm leading-6 text-muted-text">
                   Are you sure you want to permanently delete your FlashID
@@ -87,7 +96,7 @@ export const DeleteAccountCard = () => {
               </>
             ) : (
               <>
-                <h2 className="text-2xl font-bold">Final Confirmation</h2>
+                <h2 className={modalTitleClassName}>Final Confirmation</h2>
 
                 <p className="mt-3 text-sm text-muted-text">
                   To confirm that you understand this action is permanent,

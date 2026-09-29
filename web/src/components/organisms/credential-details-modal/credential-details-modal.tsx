@@ -93,8 +93,8 @@ export function CredentialDetailsModal({
             <span>{selected.label}</span>
           </Text>
 
-          <div className="mt-2 grid grid-cols-2 items-center gap-6">
-            <div className="mt-6 flex flex-wrap gap-2">
+          <div className="mt-2 grid grid-cols-1 items-center gap-4 lg:grid-cols-2 lg:gap-6">
+            <div className="mt-4 flex flex-wrap gap-2 lg:mt-6">
               {credentials.map((credential) => (
                 <button
                   key={credential.id}
@@ -113,7 +113,7 @@ export function CredentialDetailsModal({
               ))}
             </div>
 
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-wrap gap-3 lg:justify-end">
               <Button
                 variant="custom"
                 onClick={handleReinstate}
@@ -141,7 +141,7 @@ export function CredentialDetailsModal({
               </Button>
             </div>
           </div>
-          <div className="mt-6 grid grid-cols-[0.8fr_1.2fr] gap-6">
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[0.8fr_1.2fr]">
             <div className="relative rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
               <div className="h-full rounded-[24px] bg-clean-white p-6">
                 <div className="flex justify-center">

@@ -4,6 +4,11 @@ import { FC, useEffect } from 'react'
 import { Check, ChevronRight, User, IdCard, Car } from 'lucide-react'
 
 import { Button, Text } from '@/components/atoms'
+import {
+  modalOverlayClassName,
+  modalPanelClassName,
+  modalTitleClassName,
+} from '@/components/atoms/modal/modal-styles'
 
 import {
   VerificationSuccessModalProps,
@@ -54,29 +59,25 @@ export const VerificationSuccessModal: FC<VerificationSuccessModalProps> = ({
   }
 
   return (
-    <div
-      className="absolute inset-0 z-50 flex items-center justify-center p-4"
-      role="dialog"
-      aria-modal="true"
-    >
+    <div className={modalOverlayClassName} role="dialog" aria-modal="true">
       <div
         className="absolute inset-0 animate-in fade-in-0 duration-300"
         onClick={onDismissAction}
         aria-hidden
       />
-      <div className="relative w-[min(560px,95%)] animate-in fade-in-0 zoom-in-95 duration-300">
-        <div className="rounded-3xl bg-card p-8 text-center shadow-2xl shadow-deep-green/10">
+      <div className="relative w-full max-w-[560px] animate-in fade-in-0 zoom-in-95 duration-300">
+        <div className={`${modalPanelClassName} p-6 text-center sm:p-8`}>
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary-green">
             <Check className="h-10 w-10 text-clean-white" strokeWidth={3} />
           </div>
-          <Text as="h2" variant="h2" className="text-text-primary">
+          <h2 className={modalTitleClassName}>
             Citizen verified successfully!
-          </Text>
+          </h2>
           <Text variant="sub-sm" className="mx-auto mt-3 max-w-[38ch]">
             Your identity has been verified and your FlashID account is now
             linked to your citizen record.
           </Text>
-          <div className="mt-6 grid grid-cols-1 gap-4 rounded-2xl bg-secondary p-5 text-left sm:grid-cols-2">
+          <div className="mt-6 grid grid-cols-1 gap-4 rounded-2xl bg-black/[0.03] p-5 text-left sm:grid-cols-2">
             <div className="flex items-center gap-3">
               <User className="h-5 w-5 shrink-0 text-primary-green" />
               <div>

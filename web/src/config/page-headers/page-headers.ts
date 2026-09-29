@@ -84,6 +84,17 @@ export const pageHeaders: Record<string, PageHeader> = {
     description:
       'Browse and search all registered institutions on the FlashID platform.',
   },
+
+  '/gov-admin/manage-credentials': {
+    title: 'Manage Credentials',
+    description:
+      'View and manage all credentials issued on the FlashID platform.',
+  },
+
+  '/gov-admin/audit-log': {
+    title: 'Audit Log',
+    description: 'Review platform activity and security events across FlashID.',
+  },
 }
 
 export const defaultPageHeader: PageHeader = {

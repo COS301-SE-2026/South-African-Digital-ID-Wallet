@@ -41,7 +41,12 @@ export const RevokeCredentialModal = ({
         <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full border-2 border-national-red bg-national-red/10">
           <AlertTriangle className="h-8 w-8 text-national-red" />
         </div>
-        <Text as="h2" variant="h3" dataCy="revoke-credential-title">
+        <Text
+          as="h2"
+          variant="h3"
+          dataCy="revoke-credential-title"
+          className="!text-xl font-extrabold text-deep-green"
+        >
           Revoke Credential
         </Text>
         <div className="mt-6 w-full space-y-4 rounded-xl border border-national-red bg-national-red/5 p-5">

@@ -32,7 +32,7 @@ export const SearchResultsTable = ({
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-deep-green">
-                <th className="px-6 py-4 text-left first:rounded-tl-[22px]">
+                <th className="hidden px-3 py-3 text-left sm:px-6 sm:py-4 md:table-cell md:rounded-tl-[22px]">
                   <Text
                     as="span"
                     variant="caption"
@@ -42,7 +42,7 @@ export const SearchResultsTable = ({
                   </Text>
                 </th>
 
-                <th className="px-6 py-4 text-left">
+                <th className="rounded-tl-[22px] px-3 py-3 text-left sm:px-6 sm:py-4 md:rounded-tl-none">
                   <Text
                     as="span"
                     variant="caption"
@@ -52,7 +52,7 @@ export const SearchResultsTable = ({
                   </Text>
                 </th>
 
-                <th className="px-6 py-4 text-left">
+                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left">
                   <Text
                     as="span"
                     variant="caption"
@@ -62,7 +62,7 @@ export const SearchResultsTable = ({
                   </Text>
                 </th>
 
-                <th className="px-6 py-4 text-left">
+                <th className="hidden md:table-cell px-3 py-3 sm:px-6 sm:py-4 text-left">
                   <Text
                     as="span"
                     variant="caption"
@@ -72,7 +72,7 @@ export const SearchResultsTable = ({
                   </Text>
                 </th>
 
-                <th className="px-6 py-4 text-left">
+                <th className="hidden md:table-cell px-3 py-3 sm:px-6 sm:py-4 text-left">
                   <Text
                     as="span"
                     variant="caption"
@@ -82,7 +82,7 @@ export const SearchResultsTable = ({
                   </Text>
                 </th>
 
-                <th className="px-6 py-4 text-left last:rounded-tr-[22px]">
+                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left last:rounded-tr-[22px]">
                   <Text
                     as="span"
                     variant="caption"
@@ -102,11 +102,11 @@ export const SearchResultsTable = ({
                     index % 2 === 0 ? 'bg-card' : 'bg-deep-green/[0.035]'
                   }
                 >
-                  <td className="px-6 py-4">
+                  <td className="hidden md:table-cell px-3 py-3 sm:px-6 sm:py-4">
                     <Avatar initials={row.initials} />
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="px-3 py-3 sm:px-6 sm:py-4">
                     <Text
                       as="span"
                       variant="sub-sm"
@@ -116,7 +116,7 @@ export const SearchResultsTable = ({
                     </Text>
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="px-3 py-3 sm:px-6 sm:py-4">
                     <Text
                       as="span"
                       variant="sub-sm"
@@ -126,7 +126,7 @@ export const SearchResultsTable = ({
                     </Text>
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="hidden md:table-cell px-3 py-3 sm:px-6 sm:py-4">
                     <Text
                       as="span"
                       variant="sub-sm"
@@ -136,7 +136,7 @@ export const SearchResultsTable = ({
                     </Text>
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="hidden md:table-cell px-3 py-3 sm:px-6 sm:py-4">
                     <Text
                       as="span"
                       variant="sub-sm"
@@ -146,10 +146,10 @@ export const SearchResultsTable = ({
                     </Text>
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="px-3 py-3 sm:px-6 sm:py-4">
                     <Button
                       variant="secondary"
-                      className="!h-auto !w-auto px-3 py-1.5 text-sm"
+                      className="!h-auto !w-auto whitespace-nowrap px-3 py-1.5 text-sm"
                       onClick={() => onViewCredentials(row)}
                       dataCy={`view-credentials-${row.id}`}
                     >
@@ -162,7 +162,7 @@ export const SearchResultsTable = ({
           </table>
         </div>
 
-        <div className="border-t border-deep-green/10 bg-card px-6 py-4">
+        <div className="border-t border-deep-green/10 bg-card px-4 py-4 sm:px-6">
           <TablePagination
             currentPage={currentPage}
             totalPages={totalPages}

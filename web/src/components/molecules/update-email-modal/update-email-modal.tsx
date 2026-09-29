@@ -4,12 +4,19 @@ import axios from 'axios'
 import { useState, useEffect, FC, SubmitEvent } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
+import { X } from 'lucide-react'
 
 import { Text, Button } from '@/components/atoms'
 import { TextField } from '@/components/molecules'
 import { manageUserAccountService } from '@/services/manage-user-account-service'
 
 import { UpdateEmailModalProps, Step } from './types'
+import {
+  modalCloseButtonClassName,
+  modalOverlayClassName,
+  modalPanelClassName,
+  modalTitleClassName,
+} from '@/components/atoms/modal/modal-styles'
 import { useUser } from '@/context/user-context'
 
 const getErrorMessage = (error: unknown, fallback: string): string => {
@@ -166,25 +173,19 @@ export const UpdateEmailModal: FC<UpdateEmailModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={handleClose}
-        aria-hidden
-      />
-      <div className="relative w-[min(560px,95%)] mx-auto">
-        <div className="bg-card rounded-3xl border p-6">
+    <div className={modalOverlayClassName}>
+      <div className="absolute inset-0" onClick={handleClose} aria-hidden />
+      <div className="relative w-full max-w-[560px]">
+        <div className={`${modalPanelClassName} p-6 sm:p-8`}>
           <div className="flex items-start justify-between gap-4">
-            <Text as="h2" variant="h3">
-              Update Email
-            </Text>
+            <h2 className={modalTitleClassName}>Update Email</h2>
             <button
               type="button"
               aria-label="Close"
               onClick={handleClose}
-              className="text-muted-text"
+              className={modalCloseButtonClassName}
             >
-              x
+              <X className="h-5 w-5" />
             </button>
           </div>
 
