@@ -1,0 +1,18 @@
+government-registry/GovernmentRegistry/Infrastructure/Data/DbSeeder.cs
+  h_99fca60b892ff4 4,81,98
+backend/FlashIdBackend/Application/Common/Services/OfflinePackageService.cs
+  h_99fca60b892ff4 242
+backend/FlashIdBackend/Application/Common/Services/CitizenService.cs
+  h_99fca60b892ff4 10,82-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9cfc4faef791597fa0c74bf45280c6fb6cebc1b7",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

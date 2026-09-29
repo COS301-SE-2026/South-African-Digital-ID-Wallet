@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Application/Common/Validation/CitizenRegistrationValidator.cs
+  h_99fca60b892ff4 19-25,28,32,36,40,44,48
+backend/FlashIdBackend/Domain/Enums/AuditEventType.cs
+  h_99fca60b892ff4 46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "663fd96a09171e22a5c3093eabaea49851240c05",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
