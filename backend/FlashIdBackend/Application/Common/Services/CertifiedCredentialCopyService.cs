@@ -221,7 +221,23 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
             };
         }
 
-        var snapshot = ResolveCertifiedSnapshot(certifiedCopy);
+        CertifiedCredentialSnapshot snapshot;
+
+        try
+        {
+            snapshot = ResolveCertifiedSnapshot(certifiedCopy);
+        }
+        catch (InvalidOperationException)
+        {
+            return new VerifyCertifiedCopyResponseDto
+            {
+                IsValid = false,
+                Status = "SnapshotMismatch",
+                CertificationId = certifiedCopy.Id,
+                GeneratedAt = certifiedCopy.GeneratedAt,
+                ExpiresAt = certifiedCopy.ExpiresAt
+            };
+        }
 
         return new VerifyCertifiedCopyResponseDto
         {
@@ -337,7 +353,25 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
             };
         }
 
-        var snapshot = ResolveCertifiedSnapshot(certifiedCopy);
+        CertifiedCredentialSnapshot snapshot;
+
+        try
+        {
+            snapshot = ResolveCertifiedSnapshot(certifiedCopy);
+        }
+        catch (InvalidOperationException)
+        {
+            return new VerifyCertifiedCopyDocumentResponseDto
+            {
+                IsValid = false,
+                DocumentIntegrityValid = true,
+                Status = "SnapshotMismatch",
+                CertificationId = certifiedCopy.Id,
+                GeneratedAt = certifiedCopy.GeneratedAt,
+                ExpiresAt = certifiedCopy.ExpiresAt,
+                Message = "The current credential data does not match the snapshot recorded when this certified copy was generated."
+            };
+        }
 
         return new VerifyCertifiedCopyDocumentResponseDto
         {
@@ -441,7 +475,25 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
                     "The document is authentic, but the underlying credential is no longer active."
             };
         }
-        var snapshot = ResolveCertifiedSnapshot(certifiedCopy);
+        CertifiedCredentialSnapshot snapshot;
+
+        try
+        {
+            snapshot = ResolveCertifiedSnapshot(certifiedCopy);
+        }
+        catch (InvalidOperationException)
+        {
+            return new VerifyCertifiedCopyDocumentResponseDto
+            {
+                IsValid = false,
+                DocumentIntegrityValid = true,
+                Status = "SnapshotMismatch",
+                CertificationId = certifiedCopy.Id,
+                GeneratedAt = certifiedCopy.GeneratedAt,
+                ExpiresAt = certifiedCopy.ExpiresAt,
+                Message = "The current credential data does not match the snapshot recorded when this certified copy was generated."
+            };
+        }
         return new VerifyCertifiedCopyDocumentResponseDto
         {
             IsValid = true,
