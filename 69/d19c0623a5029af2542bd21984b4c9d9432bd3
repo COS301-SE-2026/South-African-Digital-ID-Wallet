@@ -1,0 +1,17 @@
+web/src/app/globals.css
+  h_293a8616118f65 112,116,125
+web/src/components/molecules/quick-action-card/quick-action-card.tsx
+  h_293a8616118f65 48-49,54-55,58-59,61,66-67,74-75,83
+  h_293a8616118f65 50-53,56-57,60,62-65,68-73,76-82,85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "69d19c0623a5029af2542bd21984b4c9d9432bd3",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
