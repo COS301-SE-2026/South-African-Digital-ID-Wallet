@@ -6,17 +6,16 @@ import type {
   SecureAccountResponse,
   SecurityActivityResponse,
   SecurityService,
+  SecuritySettingsResponse,
 } from './types'
 
 export const MOCK_ALERT_ID = '3f2a6c1e-7b4d-4e0a-9c55-2d8e1f0b7a91'
 
 const MOCK_DELAY_MS = 400
 
-// A short pause keeps loading states visible during development
 const later = <T>(value: T): Promise<T> =>
   new Promise((resolve) => setTimeout(() => resolve(value), MOCK_DELAY_MS))
 
-// Wording copied from FraudDetectionService.cs so the screens show real text
 const summary: FraudAlertSummaryResponse = {
   detectedAt: '2026-05-14T14:22:00Z',
   eventType: 'Login',
@@ -166,15 +165,31 @@ const RESULTS: Record<
   },
 }
 
-// Kept in memory so securing the alert hides it everywhere, like the real API
 let alertStatus: FraudAlertStatus = 'Open'
 
+let settings: SecuritySettingsResponse = {
+  deviceVerificationEnabled: true,
+  enhancedVerificationEnabled: false,
+  impossibleTravelDetectionEnabled: true,
+  qrGenerationRestricted: true,
+  qrRestrictedUntil: null,
+  trustedDeviceCount: 2,
+}
+
+const getSettings = () =>
+  later({ ...settings, qrGenerationRestricted: alertStatus === 'Open' })
+
 const mockSecurityService: SecurityService = {
+  dismissAlert: () => {
+    alertStatus = 'Dismissed'
+    return later<void>(undefined)
+  },
   getActivity: () => later(activity),
   getAlert: () =>
     later({
       ...details,
       availableActions: alertStatus === 'Open' ? details.availableActions : [],
+      resolvedAt: alertStatus === 'Open' ? null : new Date().toISOString(),
       status: alertStatus,
     }),
   getOverview: () => {
@@ -188,8 +203,12 @@ const mockSecurityService: SecurityService = {
       recentActivity: activity.slice(0, 3),
     })
   },
+  getSettings,
   secureAccount: (alertId, { action }) => {
     alertStatus = 'Secured'
+    if (action === 'AddExtraVerification') {
+      settings = { ...settings, enhancedVerificationEnabled: true }
+    }
     return later({
       action,
       alertId,
@@ -197,6 +216,20 @@ const mockSecurityService: SecurityService = {
       title: 'Your account is secured',
       ...RESULTS[action],
     })
+  },
+  updateSettings: ({
+    enhancedVerificationEnabled,
+    impossibleTravelDetectionEnabled,
+  }) => {
+    settings = {
+      ...settings,
+      enhancedVerificationEnabled:
+        enhancedVerificationEnabled ?? settings.enhancedVerificationEnabled,
+      impossibleTravelDetectionEnabled:
+        impossibleTravelDetectionEnabled ??
+        settings.impossibleTravelDetectionEnabled,
+    }
+    return getSettings()
   },
 }
 

@@ -2,9 +2,11 @@ import { View } from 'react-native'
 import { Text } from '@/components/atoms'
 import { colors } from '@/theme/colors'
 
+import { StatusBadge } from '../status-badge'
 import type { SecurityDetailRowProps } from './types'
 
 export const SecurityDetailRow = ({
+  badge,
   hint,
   Icon,
   label,
@@ -20,5 +22,6 @@ export const SecurityDetailRow = ({
       <Text variant="sub-sm">{value}</Text>
       {hint ? <Text variant="caption">{hint}</Text> : null}
     </View>
+    {badge ? <StatusBadge label={badge.label} tone={badge.tone} /> : null}
   </View>
 )

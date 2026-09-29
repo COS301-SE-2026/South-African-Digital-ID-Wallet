@@ -1,23 +1,45 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+  mockSecurityService,
   securityService,
   toOpenAlert,
   toSecurityActivityEntries,
 } from '@/services/security-service'
 import type {
+  DismissAlertRequest,
   SecureAccountRequest,
   SecureAccountResponse,
   SecurityService,
+  SecuritySettingsResponse,
+  UpdateSecuritySettingsRequest,
 } from '@/services/security-service'
+import { useAuthStore } from '@/stores/auth-store'
 
-// INTEGRATION: swap to securityService (same interface) to use the real API
-const service: SecurityService = securityService
+const service: SecurityService =
+  process.env.EXPO_PUBLIC_SECURITY_MOCK === 'true'
+    ? mockSecurityService
+    : securityService
 
 export const securityKeys = {
   activity: ['security', 'activity'] as const,
   alert: (alertId: string) => ['security', 'alert', alertId] as const,
   overview: ['security', 'overview'] as const,
   result: (alertId: string) => ['security', 'result', alertId] as const,
+  settings: ['security', 'settings'] as const,
+}
+
+const useRefreshSecurity = () => {
+  const queryClient = useQueryClient()
+  return (alertId: string) => {
+    for (const queryKey of [
+      securityKeys.overview,
+      securityKeys.activity,
+      securityKeys.alert(alertId),
+      securityKeys.settings,
+    ]) {
+      void queryClient.invalidateQueries({ queryKey })
+    }
+  }
 }
 
 export const useSecurityOverview = () => {
@@ -27,6 +49,7 @@ export const useSecurityOverview = () => {
     staleTime: 30_000,
   })
   return {
+    activeAlertCount: data?.activeAlertCount ?? 0,
     alert: toOpenAlert(data),
     isError,
     isPending,
@@ -55,30 +78,61 @@ export const useSecurityAlert = (alertId: string) => {
 
 export const useSecureAccount = (alertId: string) => {
   const queryClient = useQueryClient()
+  const refreshSecurity = useRefreshSecurity()
+  const replaceToken = useAuthStore((state) => state.replaceToken)
   const { isPending, mutateAsync } = useMutation({
     mutationFn: (request: SecureAccountRequest) =>
       service.secureAccount(alertId, request),
     onSuccess: (result) => {
-      // INTEGRATION: store result.token here first, because the backend has just invalidated the old one
-      // The token is stripped so it never sits in the query cache
+      if (result.token && result.expiresAt) {
+        replaceToken(result.token, result.expiresAt)
+      }
       queryClient.setQueryData<SecureAccountResponse>(
         securityKeys.result(alertId),
         { ...result, expiresAt: undefined, token: undefined }
       )
-      void queryClient.invalidateQueries({ queryKey: securityKeys.overview })
-      void queryClient.invalidateQueries({ queryKey: securityKeys.activity })
-      void queryClient.invalidateQueries({
-        queryKey: securityKeys.alert(alertId),
-      })
+      refreshSecurity(alertId)
     },
   })
   return { isSecuring: isPending, secureAccount: mutateAsync }
 }
 
-// Written by useSecureAccount just before navigating, so no request is needed
+export const useDismissAlert = (alertId: string) => {
+  const refreshSecurity = useRefreshSecurity()
+  const { isPending, mutateAsync } = useMutation({
+    mutationFn: (request: DismissAlertRequest) =>
+      service.dismissAlert(alertId, request),
+    onSuccess: () => refreshSecurity(alertId),
+  })
+  return { dismissAlert: mutateAsync, isDismissing: isPending }
+}
+
 export const useSecureAccountResult = (
   alertId: string
 ): SecureAccountResponse | null =>
   useQueryClient().getQueryData<SecureAccountResponse>(
     securityKeys.result(alertId)
   ) ?? null
+
+export const useSecuritySettings = () => {
+  const { data, isError, isPending } = useQuery({
+    queryFn: service.getSettings,
+    queryKey: securityKeys.settings,
+  })
+  return { isError, isPending, settings: data ?? null }
+}
+
+export const useUpdateSecuritySettings = () => {
+  const queryClient = useQueryClient()
+  const { isPending, mutateAsync } = useMutation({
+    mutationFn: (request: UpdateSecuritySettingsRequest) =>
+      service.updateSettings(request),
+    onSuccess: (settings) => {
+      queryClient.setQueryData<SecuritySettingsResponse>(
+        securityKeys.settings,
+        settings
+      )
+    },
+  })
+  return { isUpdating: isPending, updateSettings: mutateAsync }
+}

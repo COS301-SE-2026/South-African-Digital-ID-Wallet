@@ -1,4 +1,5 @@
 export type FieldToggleRowProps = {
+  description?: string
   isLocked?: boolean
   isOn: boolean
   label: string

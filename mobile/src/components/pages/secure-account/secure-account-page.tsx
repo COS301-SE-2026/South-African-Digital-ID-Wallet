@@ -24,7 +24,6 @@ export const SecureAccountPage = ({ alertId }: SecureAccountPageProps) => {
   const [error, setError] = useState<string>()
 
   const options = alert?.availableActions ?? []
-  // Until the user taps an option, the backend's recommended action is selected, as in the design
   const selected =
     chosen ?? options.find((option) => option.isRecommended)?.action ?? null
 
@@ -34,12 +33,18 @@ export const SecureAccountPage = ({ alertId }: SecureAccountPageProps) => {
     }
     setError(undefined)
     try {
-      await secureAccount({ action: selected, password })
-      // Replace, so going back from the confirmation cannot reopen this form
-      router.replace({
-        params: { alertId },
-        pathname: '/citizen/security/[alertId]/secured',
-      })
+      const result = await secureAccount({ action: selected, password })
+      if (result.requiresPasswordChange) {
+        router.replace({
+          params: { alertId },
+          pathname: '/citizen/security/[alertId]/new-password',
+        })
+      } else {
+        router.replace({
+          params: { alertId },
+          pathname: '/citizen/security/[alertId]/secured',
+        })
+      }
     } catch (caught) {
       setError(resolveSecureAccountError(caught))
     }
@@ -108,7 +113,6 @@ export const SecureAccountPage = ({ alertId }: SecureAccountPageProps) => {
               />
             ))}
           </View>
-          {/* The backend re-checks the password before securing (step-up verification) */}
           <TextField
             autoCapitalize="none"
             autoComplete="current-password"

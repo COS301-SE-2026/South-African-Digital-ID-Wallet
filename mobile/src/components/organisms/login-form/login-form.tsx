@@ -10,6 +10,7 @@ import { DeviceVerificationForm } from '@/components/organisms'
 import { describeDevice } from '@/lib/device-info'
 import { normalizeRole, ROLE_HOME } from '@/lib/roles'
 import { useAuthStore } from '@/stores/auth-store'
+import { useSecurityNoticeStore } from '@/stores/security-notice-store'
 import {
   getBiometricPrompted,
   setBiometricPrompted,
@@ -31,6 +32,7 @@ export const LoginForm = ({ onRegister }: LoginFormProps) => {
   const signIn = useAuthStore((state) => state.signIn)
   const isBiometricEnabled = useAuthStore((state) => state.isBiometricEnabled)
   const setBiometricEnabled = useAuthStore((state) => state.setBiometricEnabled)
+  const showSecurityNotice = useSecurityNoticeStore((state) => state.show)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [pending, setPending] = useState<{
     deviceVerificationId: string
@@ -66,7 +68,12 @@ export const LoginForm = ({ onRegister }: LoginFormProps) => {
   const completeSignIn = (session: LoginResponse) => {
     signIn(session)
     const role = normalizeRole(session.role)
-    router.replace(role ? ROLE_HOME[role] : '/unsupported-role')
+    if (role === 'citizen' && session.securityAlert) {
+      showSecurityNotice(session.securityAlert)
+      router.replace('/citizen/security/notice')
+    } else {
+      router.replace(role ? ROLE_HOME[role] : '/unsupported-role')
+    }
     void offerBiometricUnlock()
   }
 

@@ -9,12 +9,21 @@ export {
 } from './security-urls'
 export {
   formatDistance,
+  formatElapsed,
   formatSecurityTime,
   SECURE_ACTION_ICONS,
   toEventDetails,
+  toNoticeDetails,
   toOpenAlert,
+  toRiskBadge,
   toRouteLabel,
   toSecurityActivityEntries,
+  toTravelPointCaption,
+  toTravelStats,
 } from './security-dto'
-export { resolveSecureAccountError } from './security-errors'
+export {
+  resolveDismissAlertError,
+  resolveSecureAccountError,
+  resolveSettingsError,
+} from './security-errors'
 export * from './types'

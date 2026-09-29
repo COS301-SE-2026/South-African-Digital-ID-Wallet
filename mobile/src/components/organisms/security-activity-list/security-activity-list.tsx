@@ -1,16 +1,22 @@
 import { View } from 'react-native'
 import { Card, Divider, Skeleton, Text } from '@/components/atoms'
-import { ActivityRow, SectionHeader } from '@/components/molecules'
+import { SectionHeader, SecurityActivityRow } from '@/components/molecules'
 import type { SecurityActivityListProps } from './types'
 
 export const SecurityActivityList = ({
+  actionLabel,
   entries,
   isError,
   isPending,
+  onActionPress,
   title,
 }: SecurityActivityListProps) => (
   <View className="gap-3" testID="security-activity-list">
-    <SectionHeader title={title} />
+    <SectionHeader
+      actionLabel={actionLabel}
+      onActionPress={onActionPress}
+      title={title}
+    />
     <Card className="py-1">
       {isPending ? (
         <View className="gap-4 py-3" testID="security-activity-loading">
@@ -37,7 +43,8 @@ export const SecurityActivityList = ({
         entries.map((entry, index) => (
           <View key={entry.id}>
             {index > 0 ? <Divider /> : null}
-            <ActivityRow
+            <SecurityActivityRow
+              badge={entry.badge}
               description={entry.description}
               Icon={entry.Icon}
               testID={`security-activity-${entry.id}`}

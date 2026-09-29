@@ -9,16 +9,17 @@ import { colors } from '@/theme/colors'
 
 import type { SecurityConfirmationPageProps } from './types'
 
-// Used when the screen is opened without a result, for example after an app restart
 const FALLBACK_TITLE = 'Your account is secured'
 
 export const SecurityConfirmationPage = ({
   alertId,
+  isPasswordUpdated = false,
 }: SecurityConfirmationPageProps) => {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const result = useSecureAccountResult(alertId)
-  const needsNewPassword = result?.requiresPasswordChange ?? false
+  const needsNewPassword =
+    (result?.requiresPasswordChange ?? false) && !isPasswordUpdated
 
   return (
     <View
@@ -41,6 +42,17 @@ export const SecurityConfirmationPage = ({
           {result?.title ?? FALLBACK_TITLE}
         </Text>
         {result ? <Text className="text-center">{result.message}</Text> : null}
+        {isPasswordUpdated ? (
+          <View
+            className="w-full flex-row items-center gap-3 rounded-2xl border border-primary-green/30 bg-primary-green/10 p-4"
+            testID="password-updated-notice"
+          >
+            <CircleCheck color={colors.primaryGreen} size={20} />
+            <Text variant="sub-sm" className="flex-1 text-text-primary">
+              Your password has been updated. Use it the next time you sign in.
+            </Text>
+          </View>
+        ) : null}
         {result && result.nextSteps.length > 0 ? (
           <Card className="mt-4 w-full gap-3 bg-cream-background">
             <Text className="font-bold text-text-primary">
@@ -61,7 +73,12 @@ export const SecurityConfirmationPage = ({
         {needsNewPassword ? (
           <Button
             label="Create a new password"
-            onPress={() => router.replace('/citizen/profile')}
+            onPress={() =>
+              router.replace({
+                params: { alertId },
+                pathname: '/citizen/security/[alertId]/new-password',
+              })
+            }
             testID="create-new-password-button"
           />
         ) : null}
@@ -70,6 +87,12 @@ export const SecurityConfirmationPage = ({
           onPress={() => router.replace('/citizen/home')}
           testID="back-to-dashboard-button"
           variant={needsNewPassword ? 'secondary' : 'primary'}
+        />
+        <Button
+          label="Review security activity"
+          onPress={() => router.dismissTo('/citizen/security')}
+          testID="review-security-activity-button"
+          variant="text"
         />
       </View>
     </View>

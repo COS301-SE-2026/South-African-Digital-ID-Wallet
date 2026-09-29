@@ -1,15 +1,13 @@
 import { useCallback, useState } from 'react'
 import { useRouter } from 'expo-router'
-import { Text } from '@/components/atoms'
 import { SegmentedTabs } from '@/components/molecules'
 import {
   SecurityActivityList,
-  SecurityAlertBanner,
+  SecuritySettingsPanel,
+  SecurityStatusCard,
 } from '@/components/organisms'
 import { DetailScreen } from '@/components/templates'
 import { useSecurityActivity, useSecurityOverview } from '@/hooks'
-import { formatSecurityTime, toRouteLabel } from '@/services/security-service'
-import type { SecurityOverviewPageProps } from './types'
 
 const TABS = [
   { label: 'Overview', name: 'overview' },
@@ -17,17 +15,13 @@ const TABS = [
   { label: 'Settings', name: 'settings' },
 ]
 
-export const SecurityOverviewPage = ({
-  settingsContent,
-}: SecurityOverviewPageProps) => {
+export const SecurityOverviewPage = () => {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('overview')
   const overview = useSecurityOverview()
-  // The full history is only fetched once the Activity tab is opened
   const activity = useSecurityActivity(activeTab === 'activity')
   const alert = overview.alert
 
-  // A deep link has nothing to go back to, so fall back to home
   const handleBack = useCallback(() => {
     if (router.canGoBack()) {
       router.back()
@@ -51,27 +45,27 @@ export const SecurityOverviewPage = ({
       />
       {activeTab === 'overview' ? (
         <>
-          {alert ? (
-            <SecurityAlertBanner
-              footer={[
-                formatSecurityTime(alert.detectedAt),
-                toRouteLabel(alert),
-              ]}
-              message={alert.message}
-              onPress={() =>
-                router.push({
-                  params: { alertId: alert.id },
-                  pathname: '/citizen/security/[alertId]',
-                })
-              }
-              testID="security-latest-alert"
-              title={alert.title}
-            />
-          ) : null}
+          <SecurityStatusCard
+            activeAlertCount={overview.activeAlertCount}
+            alertTitle={alert?.title}
+            isPending={overview.isPending}
+            onPress={
+              alert
+                ? () =>
+                    router.push({
+                      params: { alertId: alert.id },
+                      pathname: '/citizen/security/[alertId]',
+                    })
+                : undefined
+            }
+            testID="security-status"
+          />
           <SecurityActivityList
+            actionLabel="See all"
             entries={overview.recentActivity}
             isError={overview.isError}
             isPending={overview.isPending}
+            onActionPress={() => setActiveTab('activity')}
             title="Recent security activity"
           />
         </>
@@ -84,13 +78,7 @@ export const SecurityOverviewPage = ({
           title="All security activity"
         />
       ) : null}
-      {activeTab === 'settings'
-        ? (settingsContent ?? (
-            <Text variant="sub-sm" testID="security-settings-placeholder">
-              Security settings will appear here.
-            </Text>
-          ))
-        : null}
+      {activeTab === 'settings' ? <SecuritySettingsPanel /> : null}
     </DetailScreen>
   )
 }

@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react-native'
 import type { IconTileTone } from '@/components/atoms'
+import type { StatusBadgeTone } from '@/components/molecules'
 
 export type SecurityEventType = 'Login' | 'DeviceVerified' | 'QrGenerated'
 
@@ -86,6 +87,19 @@ export type SecurityOverviewResponse = {
   recentActivity: SecurityActivityResponse[]
 }
 
+export type SecurityAlertNotice = {
+  alertId: string
+  deviceDescription: string
+  location: string
+  message: string
+  occurredAt: string
+  qrGenerationRestricted: boolean
+  qrRestrictedUntil: string | null
+  riskLevel: FraudRiskLevel
+  riskScore: number
+  title: string
+}
+
 export type SecureAccountRequest = {
   action: SecureAccountAction
   password: string
@@ -103,17 +117,51 @@ export type SecureAccountResponse = {
   token?: string
 }
 
+export type DismissAlertRequest = {
+  password: string
+}
+
+export type SecuritySettingsResponse = {
+  deviceVerificationEnabled: boolean
+  enhancedVerificationEnabled: boolean
+  impossibleTravelDetectionEnabled: boolean
+  qrGenerationRestricted: boolean
+  qrRestrictedUntil: string | null
+  trustedDeviceCount: number
+}
+
+export type SecuritySettingKey =
+  | 'enhancedVerificationEnabled'
+  | 'impossibleTravelDetectionEnabled'
+
+export type UpdateSecuritySettingsRequest = Partial<
+  Record<SecuritySettingKey, boolean>
+> & {
+  password?: string
+}
+
 export type SecurityService = {
+  dismissAlert: (alertId: string, request: DismissAlertRequest) => Promise<void>
   getActivity: (limit?: number) => Promise<SecurityActivityResponse[]>
   getAlert: (alertId: string) => Promise<FraudAlertDetailsResponse>
   getOverview: () => Promise<SecurityOverviewResponse>
+  getSettings: () => Promise<SecuritySettingsResponse>
   secureAccount: (
     alertId: string,
     request: SecureAccountRequest
   ) => Promise<SecureAccountResponse>
+  updateSettings: (
+    request: UpdateSecuritySettingsRequest
+  ) => Promise<SecuritySettingsResponse>
+}
+
+export type SecurityBadge = {
+  label: string
+  tone: StatusBadgeTone
 }
 
 export type SecurityActivityEntry = {
+  badge: SecurityBadge | null
   description: string
   Icon: LucideIcon
   id: string
@@ -123,8 +171,14 @@ export type SecurityActivityEntry = {
 }
 
 export type SecurityDetail = {
+  badge?: SecurityBadge
   hint?: string
   Icon: LucideIcon
+  label: string
+  value: string
+}
+
+export type SecurityStat = {
   label: string
   value: string
 }

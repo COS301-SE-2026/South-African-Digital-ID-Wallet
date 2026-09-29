@@ -7,7 +7,6 @@ import type { SecurityAlertCardProps } from './types'
 
 export const SecurityAlertCard = ({ onPress }: SecurityAlertCardProps) => {
   const { alert } = useSecurityOverview()
-  // The card is an extra on the dashboard, so loading, errors and no alert all render nothing
   if (!alert) {
     return null
   }

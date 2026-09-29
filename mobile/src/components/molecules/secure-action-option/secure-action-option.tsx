@@ -37,7 +37,6 @@ export const SecureActionOption = ({
         </View>
       ) : null}
     </View>
-    {/* Border width stays fixed so the row does not shift when selected */}
     <View
       className={cn(
         'h-5 w-5 items-center justify-center rounded-full border-2',

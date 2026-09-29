@@ -1,9 +1,8 @@
 import { isAxiosError } from 'axios'
 
-// Matches StepUpVerificationFailedException.ErrorCode on the backend
 const STEP_UP_FAILED = 'STEP_UP_FAILED'
 
-export const resolveSecureAccountError = (error: unknown): string => {
+const resolveSecurityError = (error: unknown, fallback: string): string => {
   if (isAxiosError(error)) {
     const status = error.response?.status
     const code = (error.response?.data as { code?: string } | undefined)?.code
@@ -20,5 +19,23 @@ export const resolveSecureAccountError = (error: unknown): string => {
       return 'Could not reach the server. Check your connection.'
     }
   }
-  return 'Could not secure your account. Please try again.'
+  return fallback
 }
+
+export const resolveSecureAccountError = (error: unknown): string =>
+  resolveSecurityError(
+    error,
+    'Could not secure your account. Please try again.'
+  )
+
+export const resolveDismissAlertError = (error: unknown): string =>
+  resolveSecurityError(
+    error,
+    'Could not confirm this activity. Please try again.'
+  )
+
+export const resolveSettingsError = (error: unknown): string =>
+  resolveSecurityError(
+    error,
+    'Could not update your security settings. Please try again.'
+  )
