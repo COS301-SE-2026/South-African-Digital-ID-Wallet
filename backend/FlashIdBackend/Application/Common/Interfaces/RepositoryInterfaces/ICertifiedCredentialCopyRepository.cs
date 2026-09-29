@@ -1,5 +1,6 @@
 using Domain.Entities;
 namespace Application.Common.Interfaces.RepositoryInterfaces;
+
 public interface ICertifiedCredentialCopyRepository
 {
     Task<CertifiedCredentialCopy?> GetByIdAsync(Guid id);

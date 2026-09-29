@@ -2,6 +2,14 @@ import type { ImgHTMLAttributes, ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
 import { PublicCertifiedCopyFrame } from '../public-certified-copy-frame'
 
+const mockPush = jest.fn()
+
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+}))
+
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: ImgHTMLAttributes<HTMLImageElement>) => (
