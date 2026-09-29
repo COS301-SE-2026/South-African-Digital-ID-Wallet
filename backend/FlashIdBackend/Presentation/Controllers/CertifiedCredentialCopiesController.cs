@@ -6,6 +6,7 @@ using System.Security.Claims;
 using Application.Features.CertifiedCredentialCopies.DTOs;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Presentation.Controllers;
 
@@ -80,6 +81,7 @@ public class CertifiedCredentialCopiesController : ControllerBase
     }
 
     [AllowAnonymous]
+    [EnableRateLimiting("certified-copy-verify")]
     [HttpGet("verify/{verificationToken}")]
     public async Task<IActionResult> VerifyCertifiedCopy(string verificationToken)
     {
@@ -99,6 +101,7 @@ public class CertifiedCredentialCopiesController : ControllerBase
     }
 
     [AllowAnonymous]
+    [EnableRateLimiting("certified-copy-verify")]
     [HttpPost("verify-document/{verificationToken}")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> VerifyCertifiedCopyDocument(
@@ -155,6 +158,7 @@ public class CertifiedCredentialCopiesController : ControllerBase
     }
 
     [AllowAnonymous]
+    [EnableRateLimiting("certified-copy-verify")]
     [HttpPost("verify-document")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> VerifyCertifiedCopyDocumentWithoutToken(
