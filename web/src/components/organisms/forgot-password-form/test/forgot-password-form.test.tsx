@@ -162,4 +162,25 @@ describe('ForgotPasswordForm', () => {
     expect(screen.getByLabelText(/email/i)).toBeEnabled()
     expect(screen.queryByLabelText(/reset code/i)).not.toBeInTheDocument()
   })
+
+  it('clears the old code and passwords when the email is changed', async () => {
+    const user = userEvent.setup()
+    render(<ForgotPasswordForm />, { wrapper: createWrapper() })
+
+    await requestCode(user)
+    await user.type(screen.getByLabelText(/reset code/i), '123456')
+    await user.type(screen.getByLabelText(/^new password/i), PASSWORD)
+    await user.type(screen.getByLabelText(/confirm new password/i), PASSWORD)
+    await user.click(
+      screen.getByRole('button', { name: /use a different email/i })
+    )
+
+    expect(screen.getByLabelText(/email/i)).toHaveValue(EMAIL)
+    await user.click(screen.getByRole('button', { name: /send reset code/i }))
+    await screen.findByLabelText(/reset code/i)
+
+    expect(screen.getByLabelText(/reset code/i)).toHaveValue('')
+    expect(screen.getByLabelText(/^new password/i)).toHaveValue('')
+    expect(screen.getByLabelText(/confirm new password/i)).toHaveValue('')
+  })
 })

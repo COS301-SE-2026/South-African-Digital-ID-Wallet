@@ -7,6 +7,7 @@ namespace Application.Common.Services;
 
 public class DisclosedFieldValueResolver : IDisclosedFieldsValueResolver
 {
+    private const string IsoDate = "yyyy-MM-dd";
     private static readonly TimeSpan PhotoSasTtl = TimeSpan.FromMinutes(5);
     private readonly IPhotoStorageProvider _photoStorageProvider;
 
@@ -37,20 +38,20 @@ public class DisclosedFieldValueResolver : IDisclosedFieldsValueResolver
             "Full surname" => DisclosedFieldSource.Text(credential.Citizen.Surname),
             "Full forenames" => DisclosedFieldSource.Text(credential.Citizen.Names),
             "Full name" => DisclosedFieldSource.Text($"{credential.Citizen.Names} {credential.Citizen.Surname}"),
-            "Date of birth" => DisclosedFieldSource.Text(credential.Citizen.DateOfBirth.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
+            "Date of birth" => DisclosedFieldSource.Text(credential.Citizen.DateOfBirth.ToString(IsoDate, CultureInfo.InvariantCulture)),
             "Gender" => DisclosedFieldSource.Text(credential.Citizen.Gender.ToString()),
             "Citizenship status" => DisclosedFieldSource.Text(credential.IdentityDocument?.Citizenship),
             "Country of birth" => DisclosedFieldSource.Text(credential.IdentityDocument?.CountryOfBirth),
             "Photograph" => DisclosedFieldSource.Photo(credential.IdentityDocument?.PhotoPath),
             "Photo" => DisclosedFieldSource.Photo(credential.DriversLicense?.PhotoPath),
             "Signature" => DisclosedFieldSource.Photo(credential.Signature),
-            "Card issue date" => DisclosedFieldSource.Text(credential.IssueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
+            "Card issue date" => DisclosedFieldSource.Text(credential.IssueDate.ToString(IsoDate, CultureInfo.InvariantCulture)),
             "License number" => DisclosedFieldSource.Text(credential.DriversLicense?.LicenseNumber),
             "License code" => DisclosedFieldSource.Text(credential.DriversLicense?.LicenseCode.ToString()),
-            "Expiry date" => DisclosedFieldSource.Text(credential.DriversLicense?.ExpiryDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
+            "Expiry date" => DisclosedFieldSource.Text(credential.DriversLicense?.ExpiryDate.ToString(IsoDate, CultureInfo.InvariantCulture)),
             "Country of issue" => DisclosedFieldSource.Text(credential.DriversLicense?.CountryOfIssue),
             "Vehicle restrictions" => DisclosedFieldSource.Text(OrNone(credential.DriversLicense?.Restrictions)),
-            "Date of issue" => DisclosedFieldSource.Text(credential.IssueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)),
+            "Date of issue" => DisclosedFieldSource.Text(credential.IssueDate.ToString(IsoDate, CultureInfo.InvariantCulture)),
             _ => throw new InvalidOperationException($"No resolver defined for this disclosed field: '{field}'."),
         };
     }

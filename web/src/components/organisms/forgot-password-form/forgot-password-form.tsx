@@ -57,6 +57,14 @@ export const ForgotPasswordForm = () => {
   })
 
   const isBusy = requestMutation.isPending || resetMutation.isPending
+  const SubmitIcon = step === 'request' ? Mail : KeyRound
+
+  const useDifferentEmail = () => {
+    setStep('request')
+    setCode('')
+    setNewPassword('')
+    setConfirmPassword('')
+  }
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -126,10 +134,8 @@ export const ForgotPasswordForm = () => {
       <Button type="submit" className="w-full gap-2" disabled={isBusy}>
         {isBusy ? (
           <Loader2 className="h-5 w-5 animate-spin" />
-        ) : step === 'request' ? (
-          <Mail className="h-5 w-5" />
         ) : (
-          <KeyRound className="h-5 w-5" />
+          <SubmitIcon className="h-5 w-5" />
         )}
         {step === 'request' ? 'Send reset code' : 'Update password'}
       </Button>
@@ -157,7 +163,7 @@ export const ForgotPasswordForm = () => {
           Wrong email?{' '}
           <button
             type="button"
-            onClick={() => setStep('request')}
+            onClick={useDifferentEmail}
             disabled={isBusy}
             className="font-semibold text-primary-green hover:underline"
           >

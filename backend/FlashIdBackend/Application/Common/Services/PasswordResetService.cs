@@ -14,6 +14,7 @@ public class PasswordResetService : IPasswordResetService
 {
     private const int OtpExpiryMinutes = 15;
     private const int MaxOtpAttempts = 5;
+    private static readonly TimeSpan RequestCooldown = TimeSpan.FromSeconds(60);
 
     private readonly IAuthRepository _authRepository;
     private readonly IPasswordHashingProvider _passwordHashingProvider;
@@ -32,6 +33,8 @@ public class PasswordResetService : IPasswordResetService
 
         // Return silently for unknown emails so this endpoint cannot be used to discover accounts.
         if (user is null || user.IsDeleted) return;
+
+        if (WasCodeSentRecently(user)) return;
 
         // Cryptographically secure, unlike Random, because this code grants account access.
         var otp = RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
@@ -87,6 +90,11 @@ public class PasswordResetService : IPasswordResetService
         await _authRepository.UpdateUserAsync(user);
         await _authRepository.SaveChangesAsync();
     }
+
+    // A reset code expires OtpExpiryMinutes after it is sent, so the expiry tells us when it went out.
+    private static bool WasCodeSentRecently(User user) =>
+        user.EmailOTPExpiresAt is { } expiresAt &&
+        DateTime.UtcNow < expiresAt.AddMinutes(-OtpExpiryMinutes).Add(RequestCooldown);
 
     private static string BuildEmail(string otp) =>
         $"""

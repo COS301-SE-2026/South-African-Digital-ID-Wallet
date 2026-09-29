@@ -117,6 +117,32 @@ public class PasswordResetServiceTests
     }
 
     [Fact]
+    public async Task RequestResetAsync_RepeatWithinCooldown_KeepsTheFirstCodeAndSendsOneEmail()
+    {
+        var user = new User { Email = Email };
+        _repository.UserToReturn = user;
+
+        await _service.RequestResetAsync(new ForgotPasswordRequestDto { Email = Email });
+        var firstHash = user.EmailOTPHash;
+        await _service.RequestResetAsync(new ForgotPasswordRequestDto { Email = Email });
+
+        Assert.Single(_emailSender.Sent);
+        Assert.Equal(firstHash, user.EmailOTPHash);
+        Assert.Equal(1, _repository.Saves);
+    }
+
+    [Fact]
+    public async Task RequestResetAsync_AfterCooldown_SendsANewCode()
+    {
+        var user = UserWithOtp(expiryMinutes: 13);
+
+        await _service.RequestResetAsync(new ForgotPasswordRequestDto { Email = Email });
+
+        Assert.Single(_emailSender.Sent);
+        Assert.NotEqual($"hashed-{Otp}", user.EmailOTPHash);
+    }
+
+    [Fact]
     public async Task ResetPasswordAsync_ValidCode_ChangesPasswordAndRevokesSessions()
     {
         var user = UserWithOtp();
