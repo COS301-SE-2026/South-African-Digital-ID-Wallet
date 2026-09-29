@@ -40,13 +40,19 @@ function DetailRow({
     </div>
   )
 }
-
 export function FraudAlertDetails({
   alert,
   onOpenGuidance,
 }: FraudAlertDetailsProps) {
   return (
     <div className="space-y-5">
+      <Text
+        as="p"
+        variant="sub-sm"
+        className="rounded-2xl bg-danger-red/5 p-4 text-text-primary"
+      >
+        {alert.detailsDescription}
+      </Text>
       <section>
         <Text
           as="h3"

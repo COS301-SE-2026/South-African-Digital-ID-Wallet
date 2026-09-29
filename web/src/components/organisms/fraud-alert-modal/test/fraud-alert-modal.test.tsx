@@ -33,7 +33,8 @@ const callbacks = {
   onChangePassword: jest.fn(),
   onReviewActivity: jest.fn(),
   onReviewTrustedDevices: jest.fn(),
-  onUnavailableAction: jest.fn(),
+  onLogoutOtherDevices: jest.fn().mockResolvedValue(true),
+  onDismiss: jest.fn().mockResolvedValue(true),
 }
 describe('FraudAlertModal', () => {
   beforeEach(() => {

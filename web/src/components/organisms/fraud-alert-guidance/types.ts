@@ -1,13 +1,12 @@
 import type { LucideIcon } from 'lucide-react'
-
 export type FraudAlertGuidanceProps = {
   actionMessage?: string
   onChangePassword: () => void
   onReviewActivity: () => void
   onReviewTrustedDevices: () => void
-  onUnavailableAction: (message: string) => void
+  onLogoutOtherDevices: (password: string) => Promise<boolean>
+  onDismiss: (password: string) => Promise<boolean>
 }
-
 export type SecurityActionProps = {
   icon: LucideIcon
   title: string
