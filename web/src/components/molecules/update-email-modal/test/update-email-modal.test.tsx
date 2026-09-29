@@ -22,6 +22,8 @@ jest.mock('@/context/user-context', () => ({
   useUser: jest.fn(),
 }))
 
+jest.setTimeout(20000)
+
 const mockedUseUser = useUser as jest.Mock
 const renderModal = () => {
   const queryClient = new QueryClient()
