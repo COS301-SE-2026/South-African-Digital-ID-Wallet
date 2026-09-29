@@ -12,6 +12,7 @@ import {
   InputOTPSlot,
 } from '@/components/ui/input-otp'
 import { ProgressStepper } from '@/components/molecules'
+import { isValidSaId } from '@/schemas'
 
 import type { VerifyIdentityCardProps } from './types'
 
@@ -167,7 +168,7 @@ export function VerifyIdentityCard({
             disabled={
               isSubmitting ||
               !activationCode.trim() ||
-              saId.length !== 13 ||
+              !isValidSaId(saId) ||
               pin.length !== 6
             }
           >

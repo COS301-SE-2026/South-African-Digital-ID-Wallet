@@ -9,10 +9,12 @@ jest.mock('next/image', () => ({
   __esModule: true,
   default: ({
     fill: _fill,
+    unoptimized: _unoptimized,
     ...props
-  }: { fill?: boolean } & ImgHTMLAttributes<HTMLImageElement>) => (
-    <img {...props} />
-  ),
+  }: {
+    fill?: boolean
+    unoptimized?: boolean
+  } & ImgHTMLAttributes<HTMLImageElement>) => <img {...props} />,
 }))
 jest.mock('@/components/atoms/modal', () => ({
   Modal: ({ children, isOpen }: { children?: ReactNode; isOpen: boolean }) =>
@@ -43,6 +45,7 @@ const credential = (
   status,
   issuedOn: '2026-01-01',
   expiresOn: '2027-01-01',
+  photoUrl: null,
   citizen: {
     fullName: 'John Doe',
     idNumber: '9001015009087',
@@ -80,10 +83,23 @@ describe('CredentialDetailsModal', () => {
   it('renders and switches credentials', async () => {
     const user = userEvent.setup()
     render(<CredentialDetailsModal {...createProps()} />)
-    expect(screen.getByAltText('John Doe profile')).toBeInTheDocument()
+    expect(screen.getByText('JD')).toBeInTheDocument()
+    expect(screen.queryByAltText('John Doe profile')).not.toBeInTheDocument()
     expect(screen.getByText('REF-1')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Credential 2' }))
     expect(screen.getByText('REF-2')).toBeInTheDocument()
+  })
+  it('shows the citizen photo when a photo URL is available', () => {
+    const props = createProps()
+    props.credentials = [
+      { ...credential('1'), photoUrl: 'https://fake-blob-sas.local/photo.png' },
+    ]
+    render(<CredentialDetailsModal {...props} />)
+    expect(screen.getByAltText('John Doe profile')).toHaveAttribute(
+      'src',
+      'https://fake-blob-sas.local/photo.png'
+    )
+    expect(screen.queryByText('JD')).not.toBeInTheDocument()
   })
   it('revokes a credential', async () => {
     const user = userEvent.setup()

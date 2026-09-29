@@ -14,7 +14,7 @@ export const OPTIONAL_FIELDS: Record<QrCredentialType, string[]> = {
     'Gender',
     'Country of birth',
     'Signature',
-    'Card issue date and number',
+    'Card issue date',
   ],
   driversLicense: [
     'Full name',

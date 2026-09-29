@@ -8,6 +8,7 @@ import {
   Info,
   LogOut,
   Shield,
+  ShieldCheck,
   Smartphone,
   User,
 } from 'lucide-react-native'
@@ -70,12 +71,20 @@ export const ProfilePage = () => {
       },
     ]
     if (isCitizen) {
-      rows.push({
-        Icon: Smartphone,
-        label: 'Linked Devices',
-        name: 'devices',
-        onPress: () => setOpenSheet('devices'),
-      })
+      rows.push(
+        {
+          Icon: ShieldCheck,
+          label: 'Security Centre',
+          name: 'security-centre',
+          onPress: () => router.push('/citizen/security'),
+        },
+        {
+          Icon: Smartphone,
+          label: 'Linked Devices',
+          name: 'devices',
+          onPress: () => setOpenSheet('devices'),
+        }
+      )
       rows.push({
         Icon: HeartPulse,
         label: 'Emergency Profile',

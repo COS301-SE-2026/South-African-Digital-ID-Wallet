@@ -23,6 +23,7 @@ import {
   verificationService,
   type IdentityVerificationStatus,
 } from '@/services/verification-service'
+import { isValidSaId } from '@/schemas'
 
 const FLOW_STEPS = ['Choose Method', 'Verify Identity', 'Complete']
 
@@ -154,7 +155,7 @@ export const VerifyCitizenPage = ({ token = '' }: VerifyCitizenPageProps) => {
   const handlePhysicalIdContinue = () => {
     clearError()
 
-    if (physicalSaId.length !== 13) {
+    if (!isValidSaId(physicalSaId)) {
       setErrorMessage('Please enter a valid 13-digit South African ID number.')
 
       return

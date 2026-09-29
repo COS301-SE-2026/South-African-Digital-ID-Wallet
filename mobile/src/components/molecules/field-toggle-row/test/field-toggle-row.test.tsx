@@ -27,4 +27,17 @@ describe('<FieldToggleRow/>', () => {
     await render(<FieldToggleRow isLocked isOn label="Photo" testID="row" />)
     expect(screen.getByTestId('row-switch').props.disabled).toBe(true)
   })
+  it('Should show the description when given', async () => {
+    await render(
+      <FieldToggleRow
+        description="Flags sign-ins from unlikely places."
+        isOn
+        label="Impossible travel detection"
+        testID="row"
+      />
+    )
+    expect(
+      screen.getByText('Flags sign-ins from unlikely places.')
+    ).toBeTruthy()
+  })
 })

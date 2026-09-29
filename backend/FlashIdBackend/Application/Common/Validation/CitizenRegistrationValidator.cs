@@ -16,26 +16,32 @@ public static class CitizenRegistrationValidator
         if (!EmailValidator.IsValid(request.Email))
             throw new InvalidCitizenRegistrationRequestException("Invalid email address");
 
-        if (string.IsNullOrWhiteSpace(request.Password))
+        ValidatePassword(request.Password);
+    }
+
+    // Shared by registration and password reset so the password rules cannot drift apart.
+    public static void ValidatePassword(string password)
+    {
+        if (string.IsNullOrWhiteSpace(password))
             throw new InvalidCitizenRegistrationRequestException("Password is required.");
 
-        if (request.Password.Length < 10)
+        if (password.Length < 10)
             throw new InvalidCitizenRegistrationRequestException(
                 "Password must be at least 10 characters.");
 
-        if (!request.Password.Any(char.IsUpper))
+        if (!password.Any(char.IsUpper))
             throw new InvalidCitizenRegistrationRequestException(
                 "Password must contain at least one uppercase letter.");
 
-        if (!request.Password.Any(char.IsLower))
+        if (!password.Any(char.IsLower))
             throw new InvalidCitizenRegistrationRequestException(
                 "Password must contain at least one lowercase letter.");
 
-        if (!request.Password.Any(char.IsDigit))
+        if (!password.Any(char.IsDigit))
             throw new InvalidCitizenRegistrationRequestException(
                 "Password must contain at least one digit.");
 
-        if (!request.Password.Any(c => AllowedSpecialChars.Contains(c)))
+        if (!password.Any(c => AllowedSpecialChars.Contains(c)))
             throw new InvalidCitizenRegistrationRequestException(
                 "Password must contain at least one special character (!@#$%^&*_-+=.<>?~).");
     }

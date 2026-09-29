@@ -129,6 +129,7 @@ public class ManageUserAccountController : ControllerBase
     }
 
     [HttpPost("email/confirm")]
+    [EnableRateLimiting("email-change-confirm")]
     [ProducesResponseType(typeof(ManageUserAccountDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

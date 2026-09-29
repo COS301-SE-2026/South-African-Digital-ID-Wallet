@@ -60,7 +60,7 @@ see Q-2.
 | Citizenship status | `citizenship_status` | no | yes |
 | Gender | `gender` | no | yes |
 | Country of birth | `country_of_birth` | no | yes |
-| Card issue date and number | `card_issue_date_and_number` | no | yes |
+| Card issue date | `card_issue_date_and_number` | no | yes |
 | Signature | `signature_image` | no | no (D-011) |
 
 **Driver's licence**

@@ -39,3 +39,8 @@ public class DuplicateEmailRegisteredException : Exception
     {
     }
 }
+
+public class CitizenUnderageException : Exception
+{
+    public CitizenUnderageException(int minimumAge) : base($"Citizen must be at least {minimumAge} years old to be onboarded onto FlashID.") { }
+}

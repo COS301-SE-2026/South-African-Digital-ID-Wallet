@@ -9,7 +9,7 @@ public static class QrFieldDefinitions
 
     public static readonly IReadOnlyList<string> IdentityDocumentOptionalFields = new List<string>
     {
-        "Identity number", "Full surname", "Full forenames","Citizenship status","Gender", "Country of birth", "Signature", "Card issue date and number",
+        "Identity number", "Full surname", "Full forenames","Citizenship status","Gender", "Country of birth", "Signature", "Card issue date",
     };
 
     public static readonly IReadOnlyList<string> DriversLicenseMandatoryFields = new List<string>

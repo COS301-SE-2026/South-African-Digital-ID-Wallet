@@ -9,21 +9,31 @@ namespace tests;
 public class UpdatePasswordServiceTests
 {
 
-    private const string CurrentPassword = "CurrentPwd123!"; //  NOSONAR - not a real secret
-    private const string NewPassword = "BrandNewPwd456!"; //  NOSONAR - not a real secret
-    private const string WrongPassword = "InvalidPwd123!"; //  NOSONAR - not a real secret
+    private const string CurrentPassword = "CurrentPwd123!";
+    private const string NewPassword = "BrandNewPwd456!";
+    private const string WrongPassword = "InvalidPwd123!";
 
     private sealed class FakeUpdatePasswordRepository : IUpdatePasswordRepository
     {
         public User? UserToReturn;
         public int Updates;
         public int Saves;
+        public int TrustedDeviceCount = 2;
+        public int DeviceRemovals;
 
         public Task<User?> GetUserByIdAsync(Guid userId) => Task.FromResult(UserToReturn);
         public Task UpdateUserAsync(User user)
         {
             Updates++;
             return Task.CompletedTask;
+        }
+
+        public Task<int> RemoveTrustedDevicesAsync(Guid userId)
+        {
+            DeviceRemovals++;
+            var removed = TrustedDeviceCount;
+            TrustedDeviceCount = 0;
+            return Task.FromResult(removed);
         }
 
         public Task SaveChangesAsync()
@@ -61,6 +71,7 @@ public class UpdatePasswordServiceTests
         Id = Guid.NewGuid(),
         Email = "citizen@flashid.test",
         PasswordHash = $"hashed-{CurrentPassword}",
+        TokenVersion = 3,
     };
 
     private static UpdatePasswordDto CreateDto(
@@ -83,6 +94,7 @@ public class UpdatePasswordServiceTests
         Assert.False(result);
         Assert.Equal(0, c.Repo.Updates);
         Assert.Equal(0, c.Repo.Saves);
+        Assert.Equal(0, c.Repo.DeviceRemovals);
     }
 
     [Fact]
@@ -96,8 +108,10 @@ public class UpdatePasswordServiceTests
 
         Assert.False(result);
         Assert.Equal($"hashed-{CurrentPassword}", user.PasswordHash);
+        Assert.Equal(3, user.TokenVersion);
         Assert.Equal(0, c.Repo.Updates);
         Assert.Equal(0, c.Repo.Saves);
+        Assert.Equal(0, c.Repo.DeviceRemovals);
     }
 
     [Fact]
@@ -110,8 +124,10 @@ public class UpdatePasswordServiceTests
 
         Assert.False(result);
         Assert.Equal($"hashed-{CurrentPassword}", user.PasswordHash);
+        Assert.Equal(3, user.TokenVersion);
         Assert.Equal(0, c.Repo.Updates);
         Assert.Equal(0, c.Repo.Saves);
+        Assert.Equal(0, c.Repo.DeviceRemovals);
     }
 
     [Fact]
@@ -127,6 +143,20 @@ public class UpdatePasswordServiceTests
         Assert.Equal($"hashed-{NewPassword}", user.PasswordHash);
         Assert.Equal(1, c.Repo.Updates);
         Assert.Equal(1, c.Repo.Saves);
+    }
+
+    [Fact]
+    public async Task UpdatePasswordAsync_ValidRequest_RevokesEverySessionAndForgetsTrustedDevices()
+    {
+        var user = CreateUser();
+        var c = Setup(user);
+
+        var result = await c.Service.UpdatePasswordAsync(user.Id, CreateDto());
+
+        Assert.True(result);
+        Assert.Equal(4, user.TokenVersion);
+        Assert.Equal(1, c.Repo.DeviceRemovals);
+        Assert.Equal(0, c.Repo.TrustedDeviceCount);
     }
 
     [Fact]

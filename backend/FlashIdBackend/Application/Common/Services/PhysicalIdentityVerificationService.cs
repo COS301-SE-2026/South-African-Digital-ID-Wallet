@@ -7,6 +7,7 @@ using Application.Features.Verification.Dtos;
 using Application.Features.Verification.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
+using Application.Common.Validation;
 
 namespace Application.Common.Services;
 
@@ -95,7 +96,7 @@ public class PhysicalIdentityVerificationService : IPhysicalIdentityVerification
 
         var cleanSaId = saId?.Trim();
 
-        if (string.IsNullOrWhiteSpace(cleanSaId) || cleanSaId.Length != 13 || !cleanSaId.All(char.IsDigit))
+        if (!SaIdValidator.IsValid(cleanSaId))
         {
             throw new InvalidVerificationState("A valid 13-digit South African ID number is required.");
         }

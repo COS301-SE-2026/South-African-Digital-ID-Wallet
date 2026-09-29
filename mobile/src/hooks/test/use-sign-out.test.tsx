@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router'
 import { createQueryWrapper } from '@/test/utils/render-with-providers'
 import loginService from '@/services/login-service/login-service'
 import { useAuthStore } from '@/stores/auth-store'
+import { useSecurityResultStore } from '@/stores/security-result-store'
 
 import { useSignOut } from '../use-sign-out'
 
@@ -36,6 +37,7 @@ describe('useSignOut', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     useAuthStore.setState(initial, true)
+    useSecurityResultStore.getState().clear()
     ;(useRouter as jest.Mock).mockReturnValue({
       replace,
       push: jest.fn(),
@@ -74,5 +76,24 @@ describe('useSignOut', () => {
     })
     expect(useAuthStore.getState().isAuthenticated).toBe(false)
     expect(replace).toHaveBeenCalledWith('/login')
+  })
+
+  it('Should forget any security results from the previous user', async () => {
+    useSecurityResultStore.getState().save('alert-1', {
+      action: 'LogOutOtherDevices',
+      alertId: 'alert-1',
+      devicesRemoved: 1,
+      message: "We've logged you out of other devices.",
+      nextSteps: [],
+      requiresPasswordChange: false,
+      title: 'Your account is secured',
+    })
+    const { result } = await renderHook(() => useSignOut(), {
+      wrapper: createQueryWrapper(),
+    })
+    await act(async () => {
+      await result.current()
+    })
+    expect(useSecurityResultStore.getState().results).toEqual({})
   })
 })

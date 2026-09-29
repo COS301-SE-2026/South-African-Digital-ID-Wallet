@@ -28,18 +28,20 @@ describe('PhysicalIdentityForm', () => {
   it('sanitizes the ID number and handles continue and back actions', async () => {
     const user = userEvent.setup()
     const props = createProps({
-      saId: '1234567890123',
+      // Must be a real SA ID, otherwise Continue stays disabled
+      saId: '8001015009087',
     })
     render(<PhysicalIdentityForm {...props} />)
     fireEvent.change(
       screen.getByPlaceholderText('Enter your 13-digit ID number'),
       {
         target: {
-          value: '123abc4567890123',
+          // Letters are stripped by the onChange handler
+          value: '800abc1015009087',
         },
       }
     )
-    expect(props.onSaIdChange).toHaveBeenCalledWith('1234567890123')
+    expect(props.onSaIdChange).toHaveBeenCalledWith('8001015009087')
     await user.click(screen.getByRole('button', { name: 'Continue' }))
     await user.click(screen.getByRole('button', { name: 'Back' }))
     expect(props.onContinue).toHaveBeenCalled()
@@ -56,5 +58,10 @@ describe('PhysicalIdentityForm', () => {
     )
     expect(screen.getByRole('button', { name: 'Preparing...' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled()
+  })
+  it('keeps Continue disabled for a 13-digit number that is not a real SA ID', () => {
+    // Right length, wrong check digit
+    render(<PhysicalIdentityForm {...createProps({ saId: '1234567890123' })} />)
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
   })
 })
