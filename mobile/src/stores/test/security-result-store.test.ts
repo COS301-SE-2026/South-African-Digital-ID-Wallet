@@ -12,7 +12,7 @@ const RESULT: SecureAccountResponse = {
 }
 
 describe('useSecurityResultStore', () => {
-  beforeEach(() => useSecurityResultStore.setState({ results: {} }))
+  beforeEach(() => useSecurityResultStore.getState().clear())
 
   it('Should start with no results', () => {
     expect(useSecurityResultStore.getState().results).toEqual({})
@@ -27,5 +27,11 @@ describe('useSecurityResultStore', () => {
     const { results } = useSecurityResultStore.getState()
     expect(results['alert-1']).toEqual(RESULT)
     expect(results['alert-2']?.alertId).toBe('alert-2')
+  })
+
+  it('Should forget every result once cleared', () => {
+    useSecurityResultStore.getState().save('alert-1', RESULT)
+    useSecurityResultStore.getState().clear()
+    expect(useSecurityResultStore.getState().results).toEqual({})
   })
 })
