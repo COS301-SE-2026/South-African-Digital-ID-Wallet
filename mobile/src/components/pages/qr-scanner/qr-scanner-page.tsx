@@ -80,14 +80,21 @@ export const QrScannerPage = () => {
         setErrorMessage('Scanning official badges is not available yet.')
         return
       }
+      if (parsed.type === 'emergency') {
+        setErrorMessage(
+          'This is an emergency code. Only emergency responders can open it.'
+        )
+        return
+      }
 
-      // Online codes are resolved by the server, so without signal the verifier is told what to asj for instead.
+      // Online codes are resolved by the server, so without signal the verifier is told what to ask for instead.
       if (isOffline) {
         setErrorMessage(
           'No connection. Ask the citizen to show their offline code.'
         )
         return
       }
+
       resolve(parsed.token, {
         onError: (error) => setErrorMessage(resolveScanError(error)),
       })

@@ -239,7 +239,7 @@ public sealed class OfflinePackageService : IOfflinePackageService
             // Another mint claimed this index and nothing was written. Release it and try again.
             credential.RevocationIndex = null;
 
-            await Task.Delay(Random.Shared.Next(MinRetryDelayMs, MaxRetryDelayMs), cancellationToken);
+            await Task.Delay(Random.Shared.Next(MinRetryDelayMs, MaxRetryDelayMs), cancellationToken); // NOSONAR: retry jitter only, not security sensitive
         }
 
         throw new OfflinePackageUnavailableException("a revocation index could not be allocated");

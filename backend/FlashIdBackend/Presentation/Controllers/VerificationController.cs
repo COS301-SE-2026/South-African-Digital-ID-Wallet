@@ -4,6 +4,7 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Verification.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Presentation.Controllers;
 
@@ -21,6 +22,7 @@ public class VerificationController : ControllerBase
     }
 
     [HttpPost("activate-token")]
+    [EnableRateLimiting("activate-token")]
     public async Task<IActionResult> VerifyCitizenActivation([FromBody] VerificationRequestDto request, CancellationToken cancellationToken)
     {
         var userIdvalue = User.FindFirstValue(ClaimTypes.NameIdentifier);

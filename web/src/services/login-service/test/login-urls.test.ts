@@ -12,4 +12,9 @@ describe('loginUrls', () => {
   it('Should interpolate the user id', () => {
     expect(loginUrls.getUser(42)).toBe('/api/auth/user/42')
   })
+
+  it('Should expose the password reset endpoints', () => {
+    expect(loginUrls.forgotPassword()).toBe('/api/auth/forgot-password')
+    expect(loginUrls.resetPassword()).toBe('/api/auth/reset-password')
+  })
 })

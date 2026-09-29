@@ -25,6 +25,7 @@ type AuthState = {
   isLocked: boolean
   isRestoring: boolean
   lock: () => void
+  replaceToken: (token: string, expiresAt: string) => void
   restore: () => Promise<void>
   setBiometricEnabled: (isEnabled: boolean) => Promise<void>
   signIn: (session: LoginResponse) => void
@@ -46,12 +47,20 @@ const SIGNED_OUT = {
   user: null,
 } as const
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   ...SIGNED_OUT,
   isBiometricEnabled: false,
   isRestoring: true,
   lock: () => set({ isLocked: true }),
   unlock: () => set({ isLocked: false }),
+  replaceToken: (token, expiresAt) => {
+    const { user } = get()
+    setAuthToken(token)
+    if (user) {
+      void saveSession({ expiresAt, token, user }).catch(() => {})
+    }
+    set({ expiresAt, token })
+  },
   setBiometricEnabled: async (isEnabled) => {
     await setBiometricPreference(isEnabled).catch(() => {})
     set({ isBiometricEnabled: isEnabled })

@@ -1,0 +1,26 @@
+{
+  "version": "1.1",
+  "note": "Verifiers must pin their clock to verifyAtUnix: the Key Binding JWT is only fresh for 30 seconds after it. Regenerate with FLASHID_UPDATE_FIXTURE=1.",
+  "generatedAt": "2026-09-27T17:25:58.0948620\u002B00:00",
+  "verifyAtUnix": 1790529958,
+  "issuerKeys": [
+    {
+      "kty": "EC",
+      "crv": "P-256",
+      "kid": "test-key-1",
+      "x": "lQCw9EQIBfSni8RZ82yXfNtSNIDAs7Jamrnz-DO1RJE",
+      "y": "myZFaqw5gNC8CHfaWnIurFfn73l0IDvmnZLO3nuOm9I"
+    }
+  ],
+  "presentation": "eyJhbGciOiJFUzI1NiIsInR5cCI6ImRjK3NkLWp3dCIsImtpZCI6InRlc3Qta2V5LTEifQ.eyJpc3MiOiJ1cm46Zmxhc2hpZDppc3N1ZXIiLCJ2Y3QiOiJ1cm46Zmxhc2hpZDplbWVyZ2VuY3ktcHJvZmlsZToxIiwiaWF0IjoxNzkwNTI5OTU4LCJleHAiOjE3OTMxMjE5NTgsInJpIjoxMDAwMDAwMDQyLCJfc2RfYWxnIjoic2hhLTI1NiIsIl9zZCI6WyIxQnM2Y2x4WmFrd0o5SzMwV0ZMUDMxMVJxUXZzQ3JKekRfOW9SN2F6V3Y4IiwiRkhCS1p3ZjlxYmlKeV9TVUVzalE3OUhqMHF0dVdjWlRxMFVveW5VVDNINCIsIlBzS3BBRThtUGZzSHJSdE82eUozc2tsYUxJdEVkMXZCOXRGeWFraHdmRkkiLCJWcWVxWWExdF9qREhuQUpfR2tIQ1hmNUo5NHhuelMtN25lSFhlZVRra0xNIl0sImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJNVUZ6aGU2Q1Y1VTRMcUZsM1plRWpBeThRaEZXSUx6MEllb3ZGNDdhSnRnIiwieSI6IkhOa0gyQWRVSEhRc1dCcktWYUtEYk1OSW1sRDQ3OVVVQzNLZmloQXdBcXcifX19.rrU8V8wi_kfoZfhRsYRUXCynJ09q-Cg1qLK1K53-g_X9at-0KFcKFW33zVD3Wq4bWb4gEhTPT0N-8E1-H65ZfA~WyJHVTA1eWRTbmFRbFIwbHZKY0NnNlhnIiwiZnVsbF9uYW1lIiwiVGhhbmRpd2UgRGxhbWluaSJd~WyIyVzRScW1TdE5ZZERLOVpiOGRma1JnIiwiYmxvb2RfdHlwZSIsIk8gbmVnYXRpdmUiXQ~WyJ4cGJjNko0dGJGejQ1N1E5c21nTWZnIiwiYWxsZXJnaWVzIiwiUGVuaWNpbGxpbiJd~WyJ5cUNfQWNZMmFyczJHREZBY1J6V19nIiwibWVkaWNhbF91cGRhdGVkX29uIiwiMjAyNi0wOS0wMSJd~eyJhbGciOiJFUzI1NiIsInR5cCI6ImtiXHUwMDJCand0In0.eyJpYXQiOjE3OTA1Mjk5NTgsInNkX2hhc2giOiJaSXhKR1hrUk4yaG5oQ1Y0aHE0eGV3UDg0VXhreDNHNk45UWtnYlJDYldnIn0.VZJy8ipKaThMMx9B63VQ9XVnrLfgy_A6jFZ30Y32sl-k3IQaLeUUmxxtBI3UZWELzpMwu3g8RG83h3mFyn1tcw",
+  "expected": {
+    "vct": "urn:flashid:emergency-profile:1",
+    "revocationIndex": 1000000042,
+    "claims": {
+      "full_name": "Thandiwe Dlamini",
+      "blood_type": "O negative",
+      "allergies": "Penicillin",
+      "medical_updated_on": "2026-09-01"
+    }
+  }
+}

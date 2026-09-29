@@ -1,9 +1,13 @@
 export {
   deviceVerificationSchema,
+  forgotPasswordSchema,
   loginSchema,
-  type LoginFormData,
+  resetPasswordSchema,
   type DeviceVerificationFormData,
+  type ForgotPasswordFormData,
+  type LoginFormData,
+  type ResetPasswordFormData,
 } from './schema'
 export { default as loginService } from './login-service'
 export * from './types'
-export { resolveLoginError } from './login-errors'
+export { resolveLoginError, resolvePasswordResetError } from './login-errors'

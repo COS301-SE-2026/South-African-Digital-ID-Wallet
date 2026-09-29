@@ -11,5 +11,6 @@ public partial class CredentialMapper
     [MapperIgnoreTarget(nameof(CredentialResponseDto.Title))]
     [MapperIgnoreTarget(nameof(CredentialResponseDto.Citizen))]
     [MapperIgnoreTarget(nameof(CredentialResponseDto.Activity))]
+    [MapperIgnoreTarget(nameof(CredentialResponseDto.PhotoUrl))]
     public partial CredentialResponseDto CredentialToResponseDto(Credential credential);
 }

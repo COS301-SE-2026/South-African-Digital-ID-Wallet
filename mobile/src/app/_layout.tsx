@@ -11,6 +11,7 @@ import { ActivityIndicator, View } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import {
   BiometricLockOverlay,
+  EmergencyLockScreenRefresh,
   OfflineVerificationSync,
   PrivacyScreenOverlay,
   SessionLockWatcher,
@@ -49,6 +50,7 @@ export default function RootLayout() {
             <Stack screenOptions={{ headerShown: false }} />
             <SessionLockWatcher />
             <OfflineVerificationSync />
+            <EmergencyLockScreenRefresh />
             <PrivacyScreenOverlay />
             <BiometricLockOverlay />
           </>

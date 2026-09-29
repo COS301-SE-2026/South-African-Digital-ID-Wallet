@@ -1,4 +1,5 @@
 import { DeviceDescription } from '@/lib/device-info'
+import type { SecurityAlertNotice } from '@/services/security-service'
 import type { LoginFormData } from './schema'
 
 export type LoginFormValues = LoginFormData
@@ -13,9 +14,17 @@ export type LoginResponse = {
   requiresDeviceVerification?: boolean
   deviceVerificationId?: string | null
   deviceToken?: string | null
+  securityAlert?: SecurityAlertNotice | null
 }
 
 export type VerifyDeviceRequest = {
   deviceVerificationId: string
   otp: string
 } & DeviceDescription
+
+export type ResetPasswordRequest = {
+  email: string
+  otp: string
+  newPassword: string
+  confirmPassword: string
+}

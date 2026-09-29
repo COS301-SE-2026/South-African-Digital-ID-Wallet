@@ -101,6 +101,7 @@ public class DisclosedFieldValueResolverTests
     [InlineData("Citizenship status", "Citizen")]
     [InlineData("Photograph", "https://fake-blob-sas.local/id-photo.jpg")]
     [InlineData("Country of birth", "South Africa")]
+    [InlineData("Card issue date", "2021-03-15")]
     public async Task Resolve_IdentityDocumentFields_ReturnsExpectedValue(string field, string expected)
     {
         var cred = IdentityDocumentCredential();
@@ -152,12 +153,23 @@ public class DisclosedFieldValueResolverTests
 
     [Theory]
     [InlineData("Signature")]
-    [InlineData("Card issue date and number")]
     public async Task Resolve_NotYetImplementedFields_ReturnsEmptyStringe(string field)
     {
         var cred = IdentityDocumentCredential();
         var res = await CreateResolver().ResolveAsync(cred, new[] { field });
         Assert.Equal(string.Empty, res[field]);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task Resolve_VehicleRestrictionsWhenThereAreNone_ReturnsNone(string? restrictions)
+    {
+        var cred = DriversLicenseCredential();
+        cred.DriversLicense!.Restrictions = restrictions;
+        var res = await CreateResolver().ResolveAsync(cred, new[] { "Vehicle restrictions" });
+        Assert.Equal("None", res["Vehicle restrictions"]);
     }
 
     [Theory]

@@ -7,6 +7,7 @@ import { colors } from '@/theme/colors'
 import type { FieldToggleRowProps } from './types'
 
 export const FieldToggleRow = ({
+  description,
   isLocked = false,
   isOn,
   label,
@@ -17,9 +18,14 @@ export const FieldToggleRow = ({
     className="flex-row items-center justify-between rounded-2xl border border-border-grey bg-clean-white px-4 py-3"
     testID={testID}
   >
-    <View className="flex-1 flex-row items-center gap-2 pr-3">
-      <Text className="text-base font-semibold text-text-primary">{label}</Text>
-      {isLocked ? <Lock size={13} color={colors.textMuted} /> : null}
+    <View className="flex-1 gap-0.5 pr-3">
+      <View className="flex-row items-center gap-2">
+        <Text className="text-base font-semibold text-text-primary">
+          {label}
+        </Text>
+        {isLocked ? <Lock size={13} color={colors.textMuted} /> : null}
+      </View>
+      {description ? <Text variant="caption">{description}</Text> : null}
     </View>
     <Switch
       disabled={isLocked}

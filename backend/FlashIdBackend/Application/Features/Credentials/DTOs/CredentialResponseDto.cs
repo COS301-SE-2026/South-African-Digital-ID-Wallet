@@ -48,4 +48,5 @@ public class CredentialResponseDto
     public DriversLicenseDetailDto? DriversLicense { get; set; }
     public CredentialCitizenDto? Citizen { get; set; }
     public CredentialActivityDto? Activity { get; set; }
+    public string? PhotoUrl { get; set; }
 }

@@ -2,6 +2,7 @@ using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.UpdatePassword.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Presentation.Controllers;
 
@@ -18,6 +19,7 @@ public class UpdatePasswordController : ControllerBase
     }
 
     [HttpPut]
+    [EnableRateLimiting("update-password")]
     public async Task<IActionResult> UpdatePassword(
         [FromBody] UpdatePasswordDto dto)
     {

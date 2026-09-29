@@ -20,6 +20,8 @@ public static class DependencyInjection
         services.AddScoped<IActivityOverviewService, ActivityOverviewService>();
         services.AddScoped<ITrustedDeviceService, TrustedDeviceService>();
         services.AddScoped<IOfficialBadgeService, OfficialBadgeService>();
+        services.AddScoped<IEmergencyService, EmergencyService>();
+        services.AddScoped<IEmergencyNotifier, EmergencyNotifier>();
         services.AddSingleton<CitizenMapper>();
         services.AddSingleton<CredentialMapper>();
         services.AddSingleton<InstitutionMapper>();
@@ -49,6 +51,7 @@ public static class DependencyInjection
             sp.GetService<Microsoft.Extensions.Configuration.IConfiguration>()));
         services.AddScoped<IFraudDetectionService, FraudDetectionService>();
         services.AddScoped<IOfflinePackageService, OfflinePackageService>();
+        services.AddScoped<IPasswordResetService, PasswordResetService>();
         return services;
     }
 }

@@ -78,7 +78,7 @@ const FAQS = [
   {
     question: 'What should I do if I forget my password?',
     answer:
-      'Use the "Forgot Password" option on the login page to receive a secure password reset link sent to your registered email address.',
+      'Use the "Forgot password?" link on the login page. We email a 6-digit code to your registered address. Enter it with your new password to reset it.',
   },
   {
     question: 'Does FlashID replace my physical ID?',

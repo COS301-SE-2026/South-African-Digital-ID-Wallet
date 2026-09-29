@@ -4,7 +4,7 @@
 
 Cross-Site Request Forgery is when a malicious site gets a logged-in user's browser to fire off a request to our API using their existing session, without them knowing about it.
 
-The reason this works:browsers attach cookies based on the target domain, not based on where the request came from. So if `access_token` lives in a cookie, any page the user has open in another tab, including a dodgy one, can trigger a request to us and the browser will still send that cookie along.
+The reason this works: browsers attach cookies based on the target domain, not based on where the request came from. So if `access_token` lives in a cookie, any page the user has open in another tab, including a dodgy one, can trigger a request to us and the browser will still send that cookie along.
 
 ### Why we were actually exposed
 
@@ -53,7 +53,8 @@ That's the "double submit" part: the same value has to show up twice, once as a 
 Runs on every request, but only checks anything when all of these hold:
 
 - The method is POST, PUT, PATCH or DELETE. GETs don't change state.
-- There is an `access_token` cookie. No cookie means no browser session to hijack; this is also why mobile is unaffected.
+- There is an `access_token` cookie. No cookie means no browser session to hijack.
+- There is no `Authorization: Bearer` header. The mobile app sends its token in that header, and a browser never adds one by itself, so a forged cross-site request cannot carry it. Mobile still receives the auth cookies at login and React Native sends them back automatically, so without this rule every mobile POST, PUT and DELETE was rejected.
 - The path is not one of the anonymous auth endpoints: `/api/auth/login`, `/api/auth/verify-device`, `/api/auth/resend-device-verification`. A user with an expired session still has a stale `access_token` cookie, and we don't want that to block them from logging in again. These endpoints don't act on an existing session, so there is nothing to forge.
 
 When it does check, there are two outcomes:
@@ -84,7 +85,7 @@ A request interceptor on the shared axios instance reads `csrf_token` from `docu
 
 ## What this doesn't fix
 
-- Mobile isn't affected either way. Mobile never gets `access_token` as a cookie; it comes back in the JSON body and is sent as an `Authorization` header. No cookie means the middleware skips the request, which is fine because a header can't be attached by another site.
+- Mobile is not checked. Login sets the auth cookies for mobile too, and React Native resends them, but mobile also sends `Authorization: Bearer`, which skips the check. That is safe because another site cannot attach that header.
 - This is not an XSS fix. If someone can run JS on our own origin, they can read `csrf_token` directly and this protection is worthless. That's a separate problem, and it's exactly why `access_token` stays `HttpOnly`.
 
 ## Testing
@@ -100,6 +101,7 @@ A request interceptor on the shared axios instance reads `csrf_token` from `docu
 5. GET with `access_token` and no CSRF token: not checked.
 6. POST with no `access_token` cookie: not checked.
 7. POST to each of the three anonymous auth endpoints with a stale `access_token` and no CSRF token: not blocked (one theory, three cases).
+8. POST from the mobile app: a valid `Authorization: Bearer` token plus the cookies React Native keeps, and no `X-CSRF-Token`: not blocked.
 
 ### Auth controller tests
 

@@ -639,6 +639,8 @@ describe('offlineService', () => {
       trust: null,
       savedAt: 1_790_010_000,
       pendingVerifications: [queuedScan],
+      pendingEmergencyAccesses: [],
+      rejectedEmergencyAccesses: [],
     })
   })
 
@@ -649,5 +651,142 @@ describe('offlineService', () => {
 
     expect(clearOfflineCacheMock).toHaveBeenCalled()
     expect(writeOfflineCacheMock).not.toHaveBeenCalled()
+  })
+
+  const queuedAccess = {
+    id: 'access-1',
+    responderId: 'official-1',
+    revocationIndex: 1_000_000_042,
+    justification: 'Unconscious at roadside',
+    accessedAt: 1_790_000_000,
+    presentation: 'issuer.jwt.sig~disclosure~kb.jwt.sig',
+  }
+
+  const { responderId: _responderId, ...uploadAccess } = queuedAccess
+
+  it('Should keep queued emergency accesses when trust data is refreshed', async () => {
+    readOfflineCacheMock.mockResolvedValue({
+      ...existingCache,
+      pendingEmergencyAccesses: [queuedAccess],
+    })
+    getMock.mockResolvedValue({ data: issuerKeysResponse })
+
+    await offlineService.refreshTrustData()
+
+    expect(writeOfflineCacheMock).toHaveBeenCalledWith(
+      expect.objectContaining({ pendingEmergencyAccesses: [queuedAccess] })
+    )
+  })
+
+  it('Should keep queued emergency accesses when an ordinary scan is queued', async () => {
+    readOfflineCacheMock.mockResolvedValue({
+      ...existingCache,
+      pendingEmergencyAccesses: [queuedAccess],
+    })
+
+    await offlineService.queueOfflineVerification(queuedScan)
+
+    expect(writeOfflineCacheMock).toHaveBeenCalledWith(
+      expect.objectContaining({ pendingEmergencyAccesses: [queuedAccess] })
+    )
+  })
+
+  it('Should queue an emergency access in the encrypted cache without touching the rest', async () => {
+    readOfflineCacheMock.mockResolvedValue({
+      ...existingCache,
+      pendingVerifications: [queuedScan],
+    })
+
+    await offlineService.queueEmergencyAccess(queuedAccess)
+
+    expect(writeOfflineCacheMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        packages: existingCache.packages,
+        trust: existingCache.trust,
+        pendingVerifications: [queuedScan],
+        pendingEmergencyAccesses: [queuedAccess],
+      })
+    )
+  })
+
+  it("Should upload this responder's emergency accesses and keep anyone else's", async () => {
+    const someoneElses = {
+      ...queuedAccess,
+      id: 'access-2',
+      responderId: 'official-2',
+    }
+    readOfflineCacheMock.mockResolvedValue({
+      ...existingCache,
+      pendingEmergencyAccesses: [queuedAccess, someoneElses],
+    })
+    postMock.mockResolvedValue({ data: undefined })
+
+    await expect(
+      offlineService.syncEmergencyAccesses('official-1')
+    ).resolves.toBe(1)
+
+    expect(postMock).toHaveBeenCalledWith(
+      '/api/emergency/offline-accesses',
+      uploadAccess
+    )
+    expect(writeOfflineCacheMock).toHaveBeenCalledWith(
+      expect.objectContaining({ pendingEmergencyAccesses: [someoneElses] })
+    )
+  })
+
+  it('Should keep an emergency access queued when the upload fails', async () => {
+    readOfflineCacheMock.mockResolvedValue({
+      ...existingCache,
+      pendingEmergencyAccesses: [queuedAccess],
+    })
+    postMock.mockRejectedValue(new Error('no signal'))
+
+    await expect(
+      offlineService.syncEmergencyAccesses('official-1')
+    ).rejects.toThrow('no signal')
+
+    expect(writeOfflineCacheMock).not.toHaveBeenCalled()
+  })
+
+  it.each([400, 403, 404])(
+    'Should move an emergency access the backend refuses to the rejected list (%i)',
+    async (status) => {
+      readOfflineCacheMock.mockResolvedValue({
+        ...existingCache,
+        pendingEmergencyAccesses: [queuedAccess],
+      })
+      postMock.mockRejectedValue(
+        Object.assign(new Error('rejected'), {
+          isAxiosError: true,
+          response: { status },
+        })
+      )
+
+      await expect(
+        offlineService.syncEmergencyAccesses('official-1')
+      ).resolves.toBe(1)
+
+      expect(writeOfflineCacheMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pendingEmergencyAccesses: [],
+          rejectedEmergencyAccesses: [
+            { ...queuedAccess, rejectedAt: expect.any(Number), status },
+          ],
+        })
+      )
+    }
+  )
+
+  it('Should keep queued emergency accesses when a session ends', async () => {
+    readOfflineCacheMock.mockResolvedValue({
+      ...existingCache,
+      pendingEmergencyAccesses: [queuedAccess],
+    })
+
+    await offlineService.clearOfflineData()
+
+    expect(writeOfflineCacheMock).toHaveBeenCalledWith(
+      expect.objectContaining({ pendingEmergencyAccesses: [queuedAccess] })
+    )
   })
 })

@@ -33,6 +33,11 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<SecurityEvent> SecurityEvents => Set<SecurityEvent>();
     public DbSet<FraudAlert> FraudAlerts => Set<FraudAlert>();
     public DbSet<UserSecurityProfile> UserSecurityProfiles => Set<UserSecurityProfile>();
+    public DbSet<EmergencyProfile> EmergencyProfiles => Set<EmergencyProfile>();
+    public DbSet<EmergencyContact> EmergencyContacts => Set<EmergencyContact>();
+    public DbSet<EmergencyDevice> EmergencyDevices => Set<EmergencyDevice>();
+    public DbSet<EmergencyAccess> EmergencyAccesses => Set<EmergencyAccess>();
+    public DbSet<RetiredEmergencyRevocationIndex> RetiredEmergencyRevocationIndexes => Set<RetiredEmergencyRevocationIndex>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
