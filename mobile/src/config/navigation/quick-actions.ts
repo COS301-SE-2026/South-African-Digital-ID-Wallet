@@ -7,6 +7,7 @@ import {
   History,
   ScrollText,
   ScanLine,
+  ShieldAlert,
   UserCog,
 } from 'lucide-react-native'
 import type { LucideIcon } from 'lucide-react-native'
@@ -53,6 +54,13 @@ export const citizenQuickActions: QuickAction[] = [
 ]
 
 export const officialQuickActions: QuickAction[] = [
+  {
+    href: '/official/emergency',
+    Icon: ShieldAlert,
+    label: 'Emergency',
+    name: 'emergency-scan',
+    tone: 'gold',
+  },
   {
     href: '/official/verify',
     Icon: ScanLine,

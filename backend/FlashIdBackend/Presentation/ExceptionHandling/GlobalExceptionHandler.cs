@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Application.Features.Citizens.Exceptions;
 using Application.Features.Credentials.Exceptions;
 using Application.Features.GovAdminAuditLog.Exceptions;
+using Application.Features.Emergency.Exceptions;
 
 namespace Presentation.ExceptionHandling;
 
@@ -76,6 +77,22 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
 
             ArgumentException => (StatusCodes.Status400BadRequest, "Invalid request.",
                 exception.Message),
+
+            InvalidEmergencyCodeException =>
+                (StatusCodes.Status400BadRequest, "Invalid emergency code",
+                    exception.Message),
+
+            EmergencyProfileNotFoundException =>
+                (StatusCodes.Status404NotFound, "Emergency profile not found",
+                    exception.Message),
+
+            EmergencyDeviceNotRegisteredException =>
+                (StatusCodes.Status409Conflict, "Emergency device not registered",
+                    exception.Message),
+
+            EmergencyConsentRequiredException =>
+                (StatusCodes.Status400BadRequest, "Consent required",
+                    exception.Message),
 
             _ => (StatusCodes.Status500InternalServerError, "Internal server error",
                     environment.IsDevelopment() ? exception.Message : "An unexpected server error occurred.")
