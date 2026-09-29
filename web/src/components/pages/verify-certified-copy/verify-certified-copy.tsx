@@ -5,14 +5,11 @@ import type { VerifyCertifiedCopyPageProps } from './types'
 
 export async function VerifyCertifiedCopyPage({
   verificationToken,
-  searchParams,
 }: Readonly<VerifyCertifiedCopyPageProps>) {
+  const result = await certifiedCopyService
+    .verify(verificationToken)
+    .catch(() => null)
   if (verificationToken) {
-    let result = null
-    try {
-      result = await certifiedCopyService.verify(verificationToken)
-    } catch {}
-
     if (!result?.isValid) {
       return <InvalidCertifiedCopy />
     }
@@ -23,19 +20,4 @@ export async function VerifyCertifiedCopyPage({
       />
     )
   }
-
-  const params = searchParams ? await searchParams : {}
-  const status = params.status?.toLowerCase()
-  const isInvalid =
-    status === 'invalid' || status === 'failed' || status === 'fail'
-
-  if (isInvalid) {
-    return <InvalidCertifiedCopy />
-  }
-  return (
-    <ValidCertifiedCopy
-      citizenName={params.name || 'Kayla Patel'}
-      maskedId={params.id || '9000 ••••••• 000'}
-    />
-  )
 }

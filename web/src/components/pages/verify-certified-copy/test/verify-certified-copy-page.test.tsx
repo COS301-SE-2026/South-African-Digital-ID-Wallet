@@ -1,6 +1,14 @@
 import type { ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
 import { VerifyCertifiedCopyPage } from '../verify-certified-copy'
+import certifiedCopyService from '@/services/certified-copy-service/certified-copy-service'
+
+jest.mock('@/services/certified-copy-service/certified-copy-service', () => ({
+  __esModule: true,
+  default: {
+    verify: jest.fn(),
+  },
+}))
 
 jest.mock('@/components/organisms/valid-certified-copy', () => ({
   ValidCertifiedCopy: ({
@@ -16,46 +24,47 @@ jest.mock('@/components/organisms/valid-certified-copy', () => ({
     </div>
   ),
 }))
+
 jest.mock('@/components/organisms/invalid-certified-copy', () => ({
-  InvalidCertifiedCopy: (_props: Record<string, never>) => (
+  InvalidCertifiedCopy: () => (
     <div data-testid="invalid-certified-copy">Invalid certified copy</div>
   ),
 }))
+
 describe('VerifyCertifiedCopyPage', () => {
-  it('renders the valid state when no status is supplied', async () => {
-    const page = await VerifyCertifiedCopyPage({
-      searchParams: Promise.resolve({}),
-    })
-    render(page)
-    expect(screen.getByTestId('valid-certified-copy')).toBeInTheDocument()
+  const mockVerify = certifiedCopyService.verify as jest.Mock
+
+  beforeEach(() => {
+    jest.clearAllMocks()
   })
-  it('renders the valid state for a valid status', async () => {
+
+  it('renders the valid state when the backend verifies the token', async () => {
+    mockVerify.mockResolvedValue({
+      isValid: true,
+      fullName: 'Thabo Mokoena',
+      idNumber: '8000 ••••••• 111',
+    })
     const page = await VerifyCertifiedCopyPage({
-      searchParams: Promise.resolve({ status: 'valid' }),
+      verificationToken: 'valid-token',
     })
     render(page)
+
+    expect(mockVerify).toHaveBeenCalledWith('valid-token')
     expect(screen.getByTestId('valid-certified-copy')).toBeInTheDocument()
-  })
-  it.each(['invalid', 'failed', 'fail', 'INVALID'])(
-    'renders the invalid state for status "%s"',
-    async (status) => {
-      const page = await VerifyCertifiedCopyPage({
-        searchParams: Promise.resolve({ status }),
-      })
-      render(page)
-      expect(screen.getByTestId('invalid-certified-copy')).toBeInTheDocument()
-    }
-  )
-  it('passes name and ID values to the valid state', async () => {
-    const page = await VerifyCertifiedCopyPage({
-      searchParams: Promise.resolve({
-        status: 'valid',
-        name: 'Thabo Mokoena',
-        id: '8000 ••••••• 111',
-      }),
-    })
-    render(page)
     expect(screen.getByText('Thabo Mokoena')).toBeInTheDocument()
     expect(screen.getByText('8000 ••••••• 111')).toBeInTheDocument()
+  })
+
+  it('renders the invalid state when verification fails', async () => {
+    mockVerify.mockRejectedValue(new Error('Verification failed'))
+
+    const page = await VerifyCertifiedCopyPage({
+      verificationToken: 'failed-token',
+    })
+
+    render(page)
+
+    expect(mockVerify).toHaveBeenCalledWith('failed-token')
+    expect(screen.getByTestId('invalid-certified-copy')).toBeInTheDocument()
   })
 })
