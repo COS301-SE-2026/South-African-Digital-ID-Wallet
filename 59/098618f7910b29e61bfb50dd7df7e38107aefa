@@ -1,0 +1,18 @@
+web/src/components/organisms/app-sidebar/app-sidebar.tsx
+  h_293a8616118f65 18,43
+web/src/types/navigation.ts
+  h_293a8616118f65 14
+web/src/config/navigation/navigation.ts
+  h_293a8616118f65 109,114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "59098618f7910b29e61bfb50dd7df7e38107aefa",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
