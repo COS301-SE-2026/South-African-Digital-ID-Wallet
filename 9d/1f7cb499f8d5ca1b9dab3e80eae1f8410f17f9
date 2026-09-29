@@ -1,0 +1,20 @@
+web/src/services/certified-copy-service/certified-copy-service.ts
+  h_0aff3b71f739b1 7-8,11-12,17,24,27,34-66,69-71
+  h_0aff3b71f739b1 23,25,67-68,72-73
+web/src/components/pages/officials/verify-certified-copy-page.tsx
+  h_0aff3b71f739b1 5,8,11,17-19,27,30,36-39,42-51,59-60,63-64,66-69,73,79-84,93-97,99-112,114-115,154,156-157,159,162,166-170,175,179,181-182,184-185,187,189,196,198,200,203-221,228,230-231,234,237,253
+  h_0aff3b71f739b1 14,20,35,52,58,65,98,113,131-135,174,176,195,197,199,261
+web/src/components/pages/verify-certified-copy/verify-certified-copy.tsx
+  h_0aff3b71f739b1 3,7,10-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9d1f7cb499f8d5ca1b9dab3e80eae1f8410f17f9",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}

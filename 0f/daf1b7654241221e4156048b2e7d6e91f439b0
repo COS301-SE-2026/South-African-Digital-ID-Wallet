@@ -1,0 +1,70 @@
+web/src/components/pages/verify-certified-copy/verify-certified-copy.tsx
+  h_293a8616118f65 11,14-16
+  h_293a8616118f65 13,19-24,26,30,41
+web/src/services/certified-copy-service/certified-copy-service.ts
+  h_293a8616118f65 47-49,52,56-57,59
+  h_293a8616118f65 17,27,35,38,43,54,65
+web/src/components/molecules/authentic-result/authentic-result.tsx
+  h_293a8616118f65 26,61
+  h_293a8616118f65 39,70
+web/src/components/pages/officials/verify-certified-copy-page.tsx
+  h_293a8616118f65 233,235-236,246
+  h_293a8616118f65 14-15,20,37,49,57-59,96,99,102-104,111,129,168,187,237-245,251
+web/src/components/molecules/integrity-failed-result/integrity-failed-result.tsx
+  h_293a8616118f65 28
+web/src/app/verify-certified-copy/[verificationToken]/page.tsx
+  h_293a8616118f65 13-14
+web/src/app/verify-certified-copy/page.tsx
+  h_293a8616118f65 14
+web/src/components/molecules/certified-copy-generated/certified-copy-generated.tsx
+  h_293a8616118f65 58,92
+web/src/components/molecules/certified-copy-verification-progress/test/certified-copy-verification-progress.test.tsx
+  h_293a8616118f65 8,11,18,21,23,25,30,40-41,47-48,51
+web/src/components/molecules/certified-copy-verification/test/certified-copy-verification.test.tsx
+  h_293a8616118f65 23-24,39,58,64,70-72,76-92,96,98-102,104-108,110,114
+web/src/components/organisms/invalid-certified-copy/index.ts
+  h_293a8616118f65 2
+web/src/components/organisms/invalid-certified-copy/invalid-certified-copy.tsx
+  h_293a8616118f65 7,43,59
+web/src/components/organisms/invalid-certified-copy/test/invalid-certified-copy.test.tsx
+  h_293a8616118f65 6-8,14,18-19,25,29-30,33
+web/src/components/organisms/invalid-certified-copy/types.ts
+  h_293a8616118f65 1
+web/src/components/organisms/public-certified-copy-frame/index.ts
+  h_293a8616118f65 2
+web/src/components/organisms/public-certified-copy-frame/public-certified-copy-frame.tsx
+  h_293a8616118f65 58
+web/src/components/organisms/public-certified-copy-frame/test/public-certified-copy-frame.test.tsx
+  h_293a8616118f65 16,24,33,37
+web/src/components/organisms/public-certified-copy-frame/types.ts
+  h_293a8616118f65 4
+web/src/components/organisms/valid-certified-copy/index.ts
+  h_293a8616118f65 2
+web/src/components/organisms/valid-certified-copy/test/valid-certified-copy.test.tsx
+  h_293a8616118f65 6-8,14,19-20,35,44-45,48
+web/src/components/organisms/valid-certified-copy/types.ts
+  h_293a8616118f65 11
+web/src/components/organisms/valid-certified-copy/valid-certified-copy.tsx
+  h_293a8616118f65 6,20,62,81,89
+web/src/components/pages/verify-certified-copy/index.ts
+  h_293a8616118f65 2
+web/src/components/pages/verify-certified-copy/test/verify-certified-copy-page.test.tsx
+  h_293a8616118f65 21,46-47,61
+web/src/components/pages/verify-certified-copy/types.ts
+  h_293a8616118f65 9
+web/src/services/certified-copy-service/certified-copy-urls.ts
+  h_293a8616118f65 6,8
+web/src/services/certified-copy-service/types.ts
+  h_293a8616118f65 41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0fdaf1b7654241221e4156048b2e7d6e91f439b0",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
