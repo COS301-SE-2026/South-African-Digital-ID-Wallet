@@ -19,3 +19,10 @@ export type VerifyDeviceRequest = {
   deviceVerificationId: string
   otp: string
 } & DeviceDescription
+
+export type ResetPasswordRequest = {
+  email: string
+  otp: string
+  newPassword: string
+  confirmPassword: string
+}
