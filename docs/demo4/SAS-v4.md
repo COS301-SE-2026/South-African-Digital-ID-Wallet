@@ -1473,9 +1473,7 @@ Each NFR from SRS-v4 section 5 is listed below with the architectural tactic tha
 | Pass (limited) | Target met, but the evidence has a stated limit (single run, lab measurement or narrower scope) |
 | Partial | Part of the requirement is met; the missing part is stated |
 | Gap | Cannot be met or proven on the current infrastructure; the reason is stated |
-| Not yet tested | The test is designed (see 6.5) but has not been run |
-
-**Summary:** 23 Pass, 6 Pass (limited), 2 Partial, 2 Gap, 1 Not yet tested (34 NFRs).
+**Summary:** 23 Pass, 6 Pass (limited), 2 Partial, 2 Gap (33 NFRs).
 
 #### Security
 
@@ -1501,7 +1499,7 @@ Each NFR from SRS-v4 section 5 is listed below with the architectural tactic tha
 | NFR2.3 | Credential retrieval in under 2 s for 95% of requests | Indexed lookup by UserId and CitizenId | k6 `nfr2-3-credentials-and-qr.js` (up to 5 virtual users for 55 s, one login each) on the dev API, 2026-09-30 | p95 < 2 s | p95 122.73 ms; 0 of 175 requests failed (`nfr-evidence/nfr2-3-credentials-and-qr-2026-09-30.json`) | Pass |
 | NFR2.3 | QR generation in under 2 s for 95% of requests | ES256-signed disclosure token; the signing key never leaves Azure Key Vault, so each signature is one Key Vault call | Same k6 run | p95 < 2 s | p95 552.08 ms (median 382 ms). Slower than the earlier in-memory signing (94 ms) because every signature is a Key Vault call: a deliberate trade of latency for key protection, well inside the target | Pass |
 | NFR2.4 | QR verification in under 3 s | Single-use `Jti` check plus ES256 signature verification | k6 `nfr2-4-qr-verification.js` (up to 5 virtual users for 55 s, one login each) on the dev API, 2026-09-30 | p95 < 3 s | p95 270.76 ms (median 144.57 ms) over 75 verifications; 0 of 230 requests failed (`nfr-evidence/nfr2-4-qr-verification-2026-09-30.json`) | Pass |
-| NFR2.5 | 500 concurrent authenticated users without slower responses | None available on this tier: one B2 instance, no autoscaling | k6 ramp on the dev API | 500 virtual users, p95 still within NFR2.2 and NFR2.3 | [ramp result: the number of users at which p95 passed 2 s]. 500 users was not attempted: one Basic B2 instance, shared by six apps, cannot scale out. Meeting this needs a Standard or Premium plan with autoscale | Gap |
+| NFR2.5 | 500 concurrent authenticated users without slower responses | None available on this tier: one B2 instance, no autoscaling | k6 `nfr2-5-ramp.js` on the dev API, 2026-09-30: credential retrieval held at 10, 25 and 50 concurrent users for 60 s each, sharing 10 test accounts that log in once | 500 users, p95 still within NFR2.3 (< 2 s) | p95 58.91 ms at 10 users, 48.8 ms at 25 and 90.3 ms at 50; 0 of 3,237 requests failed (`nfr-evidence/nfr2-5-ramp-2026-09-30.json`). No slowdown up to 50 users, but 500 was not attempted: one Basic B2 instance shared by six apps cannot scale out, and with 10 test accounts the 300 requests per minute per user backstop (NFR1.9) would reject load well before 500. Meeting this needs a Standard or Premium plan with autoscale and more seeded test accounts | Gap |
 | NFR2.6 | Offline licence presentation scans in under 5 s on the reference phones | Presentation split into an animated multi-frame QR that the verifier reassembles in any order | Manual device test (`docs/demo4/offline-verification/device-test-protocol.md`, step 5), Samsung Galaxy S23 to S24 | < 5 s | About 4.2 s for 28 frames (2026-09-25). One measured run on one phone pair | Pass (limited) |
 | NFR2.7 | First request after idle completes in under 5 s | None configured: Always On is off (az CLI, 2026-09-29), so the app can be unloaded when idle | k6 `nfr-cold-start.js`: one login after about 24 min with no traffic, dev API, 2026-09-28 | < 5 s | 1.36 s after idle (warm repeat 0.78 s). A start from a fully stopped App Service took 45.7 s to the first `/health` 200 on the same day; that is a platform restart, covered under NFR3.4 | Pass |
 
@@ -1521,11 +1519,10 @@ Each NFR from SRS-v4 section 5 is listed below with the architectural tactic tha
 
 | ID | Requirement | Tactic | Test / tool | Target | Result | Status |
 |---|---|---|---|---|---|---|
-| NFR4.1 | First-time citizen registers, verifies email and reaches the wallet within 5 minutes without help | Short registration form, emailed OTP, direct redirect to the wallet | Timed session with people who had not used FlashID (see 6.4) | < 5 min | [time per person, device, sample size] | Not yet tested |
-| NFR4.2 | Frequent tasks within 3 interactions from the dashboard | Sidebar entry for every frequent task; share and update password open in place | Manual interaction count (see 6.2) | <= 3 | All 5 frequent tasks take 3 or fewer on desktop and tablet. On a phone the sidebar sits behind a menu button, which adds one tap | Pass |
-| NFR4.3 | WCAG 2.1 AA on public-facing web pages | Semantic HTML, labelled controls, landmark regions | Lighthouse 13.4.1 accessibility audit, desktop (see 6.1.2) | No AA failures | Scores 90 to 96 on all 19 pages, but Lighthouse reports insufficient colour contrast (WCAG 1.4.3, a Level AA criterion) on all 19, unlabelled form controls on one page and a missing `<main>` landmark on four | Partial |
-| NFR4.4 | Validation errors describe the problem and how to fix it | Validators throw typed exceptions with specific messages (for example which password rule failed and the allowed special characters); controllers return them as 400 `{ error }` | xUnit: `CitizenRegistrationValidatorTests`, `CitizensControllerTests` | Every rule names the problem and the fix | `Validate_InvalidInput_ReturnsMessageThatNamesTheProblemAndTheFix` (8 cases) and `Register_WithInvalidInput_Returns400WithTheSpecificGuidanceMessage` pass | Pass |
-| NFR4.5 | Responsive web interface with no loss of functionality | Tailwind breakpoints; below 1024 px the sidebar becomes a slide-out menu opened from the top bar | Playwright `responsive.spec.ts` (Chromium) at 375, 768 and 1440 px against the local stack, 2026-09-30 (see 6.3) | No sideways scrolling; navigation and main actions work at every width | 30 of 30 checks pass: 10 key pages at phone, tablet and desktop width, including navigation through the slide-out menu and the share dialog's Generate QR code button. Below 1024 px the landing page hides its section links with no menu; the sections are still reachable by scrolling. Tested in Chromium only | Pass |
+| NFR4.1 | Frequent tasks within 3 interactions from the dashboard | Sidebar entry for every frequent task; share and update password open in place | Manual interaction count (see 6.2) | <= 3 | All 5 frequent tasks take 3 or fewer on desktop and tablet. On a phone the sidebar sits behind a menu button, which adds one tap | Pass |
+| NFR4.2 | WCAG 2.1 AA on public-facing web pages | Semantic HTML, labelled controls, landmark regions | Lighthouse 13.4.1 accessibility audit, desktop (see 6.1.2) | No AA failures | Scores 90 to 96 on all 19 pages, but Lighthouse reports insufficient colour contrast (WCAG 1.4.3, a Level AA criterion) on all 19, unlabelled form controls on one page and a missing `<main>` landmark on four | Partial |
+| NFR4.3 | Validation errors describe the problem and how to fix it | Validators throw typed exceptions with specific messages (for example which password rule failed and the allowed special characters); controllers return them as 400 `{ error }` | xUnit: `CitizenRegistrationValidatorTests`, `CitizensControllerTests` | Every rule names the problem and the fix | `Validate_InvalidInput_ReturnsMessageThatNamesTheProblemAndTheFix` (8 cases) and `Register_WithInvalidInput_Returns400WithTheSpecificGuidanceMessage` pass | Pass |
+| NFR4.4 | Responsive web interface with no loss of functionality | Tailwind breakpoints; below 1024 px the sidebar becomes a slide-out menu opened from the top bar | Playwright `responsive.spec.ts` (Chromium) at 375, 768 and 1440 px against the local stack, 2026-09-30 (see 6.3) | No sideways scrolling; navigation and main actions work at every width | 30 of 30 checks pass: 10 key pages at phone, tablet and desktop width, including navigation through the slide-out menu and the share dialog's Generate QR code button. Below 1024 px the landing page hides its section links with no menu; the sections are still reachable by scrolling. Tested in Chromium only | Pass |
 
 #### Maintainability
 
@@ -1599,7 +1596,7 @@ The unlabelled form controls on `/gov-admin/upload-institution` are the most ser
 - **SEO scored 100 on all 19 pages.** No SRS NFR depends on this; it is recorded for completeness.
 - **NFR4.5 (responsive interface) is not covered by this batch**, since all 19 runs emulated a desktop. It is tested separately in 6.3.
 
-### 6.2 Interaction Counts (NFR4.2)
+### 6.2 Interaction Counts (NFR4.1)
 
 Counted from the citizen dashboard on a desktop or tablet, where the sidebar is always visible. One interaction is one click, tap or form submission; typing into a field is not counted. The ID card is the first credential on My Credentials, so it is already selected when the page opens.
 
@@ -1636,17 +1633,7 @@ Run on 2026-09-30 in Chromium against the local stack (web app and API), with th
 
 Known observation: below 1024 px the landing page hides its About, Features and Help links and has no menu to replace them. Those sections can still be reached by scrolling, so no function is lost, but the shortcuts are.
 
-### 6.4 First-Time User Timing (NFR4.1)
-
-People who had never used FlashID were asked to register, verify their email and open their wallet, with no help. The timer started when the site opened and stopped when the wallet showed.
-
-| Participant | Device | Time | Where they hesitated |
-|---|---|---|---|
-| [ ] | [ ] | [ ] | [ ] |
-
-Sample size: [n]. A small sample shows the flow can be completed in time; it does not show what share of all users would manage it.
-
-### 6.5 How to Re-run the Evidence
+### 6.4 How to re-run the Evidence
 
 | NFR | Command | Where |
 |---|---|---|

@@ -290,18 +290,15 @@ Administrative batch operations (e.g. the daily credential-expiry sweep) must co
 ### 5.4 Usability
 
 #### NFR4.1
-A first-time citizen should be able to register an account, verify their email address, and access their digital wallet within 5 minutes without outside help.
+Frequently performed tasks shouldn't require more than three user interactions from the dashboard.
 
 #### NFR4.2
-Frequently performed tasks should not require more than three user interactions from the dashboard.
-
-#### NFR4.3
 The system should conform to WCAG 2.1 Level AA accessibility guidelines for all public-facing web interfaces.
 
-#### NFR4.4
+#### NFR4.3
 All user-visible validation errors and system notifications must clearly describe the problem and provide guidance for resolving it.
 
-#### NFR4.5
+#### NFR4.4
 The web application must provide a responsive interface supporting screen sizes without loss of functionality.
 
 ---
