@@ -296,8 +296,6 @@ The system shall display a pre-generation preview to the citizen showing exactly
 ##### R3.4.4:
 The system shall allow citizens to save preferred disclosure settings per credential type and per verifier type (hospital, police, Home Affairs, DLTC).
 
-##### R3.4.5:
-The system shall provide a "select all" action allowing citizens to quickly disclose all optional fields when the credential is being presented to an official, such as a police officer, who is legally entitled to view the complete record under the National Road Traffic Act.
 ---
 
 #### R3.5: Additional Disclosure Request Flow
