@@ -149,4 +149,22 @@ public class CitizenRegistrationValidatorTests
         Assert.Throws<InvalidCitizenRegistrationRequestException>(
             () => CitizenRegistrationValidator.Validate(req));
     }
+    [Theory]
+    [InlineData("", "P@ssword123", "Email is required.")]
+    [InlineData("invalid-email", "P@ssword123", "Enter a valid email address, for example name@example.com.")]
+    [InlineData("citizen@example.com", "", "Password is required.")]
+    [InlineData("citizen@example.com", "Sh0rt!", "Password must be at least 10 characters.")]
+    [InlineData("citizen@example.com", "p@ssword123", "Password must contain at least one uppercase letter.")]
+    [InlineData("citizen@example.com", "P@SSWORD123", "Password must contain at least one lowercase letter.")]
+    [InlineData("citizen@example.com", "P@sswordabc", "Password must contain at least one digit.")]
+    [InlineData("citizen@example.com", "Password123", "Password must contain at least one special character (!@#$%^&*_-+=.<>?~).")]
+    public void Validate_InvalidInput_ReturnsMessageThatNamesTheProblemAndTheFix(string email, string password, string expectedMessage)
+    {
+        var request = new RegisterCitizenRequestDto { Email = email, Password = password };
+
+        var ex = Assert.Throws<InvalidCitizenRegistrationRequestException>(
+            () => CitizenRegistrationValidator.Validate(request));
+
+        Assert.Equal(expectedMessage, ex.Message);
+    }
 }

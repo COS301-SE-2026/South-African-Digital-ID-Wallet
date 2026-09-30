@@ -1,7 +1,7 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
-const BASE_URL =  __ENV.BASE_URL || 'https://api-flashid-dev.azurewebsites.net';
+const BASE_URL =  __ENV.BASE_URL || 'https://api-flashid-dev-bjgng2dxd6hrgbca.southafricanorth-01.azurewebsites.net';
 
 const MANDATORY_FIELDS =  {
   'Identity Document': ['Date of birth', 'Photograph'],
@@ -26,21 +26,20 @@ export const options =  {
   },
 };
 
+let token = null;
+
 export default function main() {
   const i =  (__VU - 1) % 10;
-  const loginRes =  http.post(
-    `${BASE_URL}/api/auth/login`,
-    JSON.stringify({ email: `nfr-citizen-${String(i).padStart(2, '0')}@flashid.local`, password: 'password123' }),
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Client': 'mobile',
-        'X-Device-Token': `nfr-k6-device-${String(i).padStart(2, '0')}`,
-      },
-    }
-  );
-  const token =  loginRes.json('token');
-  if (!token) { sleep(2); return; }
+  if (!token) {
+    const loginRes = http.post(
+      `${BASE_URL}/api/auth/login`,
+      JSON.stringify({ email: `nfr-citizen-${String(i).padStart(2, '0')}@flashid.local`, password: 'password123' }),
+      { headers: { 'Content-Type': 'application/json', 'X-Client': 'mobile', 'X-Device-Token': `nfr-k6-device-${String(i).padStart(2, '0')}` } }
+    );
+    token = loginRes.json('token');
+    if (!token) { sleep(2); return; }
+  }
+  
   const auth =  { Authorization: `Bearer ${token}` };
 
   const credRes =  http.get(`${BASE_URL}/api/credentials/mine`, { headers: auth });

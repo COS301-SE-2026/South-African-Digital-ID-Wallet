@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -452,5 +453,39 @@ public class AuthControllerTests
         var response = await client.GetAsync("/api/auth/me", TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Login_WhenAnUnexpectedErrorOccurs_ReturnsFriendlyErrorWithinTwoSecondsAndKeepsServing()
+    {
+        const string internalDetail = "Simulated internal failure: sql-internal-host-42 refused the connection";
+        var authService = new StubAuthService { LoginException = new InvalidOperationException(internalDetail) };
+        await using var factory = new TestApiFactory(authService);
+        await factory.CreateInitializedContextAsync();
+        var client = factory.CreateClient();
+        var ct = TestContext.Current.CancellationToken;
+
+        await client.GetAsync("/api/auth/me", ct);
+
+        var stopwatch = Stopwatch.StartNew();
+        var response = await client.PostAsJsonAsync(
+            "/api/auth/login",
+            new { email = "citizen@flashid.local", password = "Password123!" }, // NOSONAR - test data
+            ct);
+        stopwatch.Stop();
+
+        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        Assert.True(
+            stopwatch.Elapsed < TimeSpan.FromSeconds(2),
+            $"Error response took {stopwatch.ElapsedMilliseconds} ms, NFR3.2 requires under 2000 ms");
+
+        var body = await response.Content.ReadAsStringAsync(ct);
+        Assert.False(string.IsNullOrWhiteSpace(body));
+        Assert.DoesNotContain("sql-internal-host-42", body);
+        Assert.DoesNotContain(nameof(InvalidOperationException), body);
+        Assert.DoesNotContain("   at ", body);
+
+        var followUp = await client.GetAsync("/api/auth/me", ct);
+        Assert.Equal(HttpStatusCode.Unauthorized, followUp.StatusCode);
     }
 }

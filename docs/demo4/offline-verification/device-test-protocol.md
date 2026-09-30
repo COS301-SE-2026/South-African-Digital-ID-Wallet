@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Steps 1 to 5 run; steps 6 and 7 pending |
+| Status | Steps 1 to 7 run; steps 6 and 7 passed on 2026-09-27 |
 | Owner | Nathan Chisadza |
 | Devices | Samsung Galaxy S23 (citizen), Samsung Galaxy S24 (verifier) |
 | Build | Expo Go for SDK 56, dev API on Azure (South Africa North) |
