@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { isAxiosError } from 'axios'
 import { useRouter } from 'expo-router'
 import { Platform, View } from 'react-native'
 
@@ -116,6 +117,15 @@ export const validateDraft = (draft: Draft): string | null => {
   return null
 }
 
+export const getLockScreenSetupError = (error: unknown): string => {
+  if (isAxiosError(error)) {
+    return error.response
+      ? 'This phone could not be set up. Please try again in a few minutes.'
+      : 'This phone could not be set up. Check your connection and try again.'
+  }
+  return 'This phone could not be set up because its secure storage could not be used. Try again, and reinstall FlashID if it keeps happening.'
+}
+
 export const LockScreenSection = ({ isEnabled }: { isEnabled: boolean }) => {
   const { isChecking, isConfigured } = useEmergencyDeviceStatus()
   const { error, isRegistering, register } = useRegisterEmergencyDevice()
@@ -167,7 +177,7 @@ export const LockScreenSection = ({ isEnabled }: { isEnabled: boolean }) => {
       ) : null}
       {error ? (
         <Text variant="caption" className="text-danger-red">
-          This phone could not be set up. Check your connection and try again.
+          {getLockScreenSetupError(error)}
         </Text>
       ) : null}
     </View>
