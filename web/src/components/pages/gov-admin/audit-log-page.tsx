@@ -76,7 +76,7 @@ export default function AuditLogPage() {
   }
 
   return (
-    <div className="flex min-h-full overflow-x-hidden bg-[#f6f2ea]">
+    <div className="flex min-h-full overflow-x-hidden bg-cream-background">
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">
         <div className="relative flex min-h-[560px] flex-1 flex-col rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px] *:flex-1">
           {error ? (

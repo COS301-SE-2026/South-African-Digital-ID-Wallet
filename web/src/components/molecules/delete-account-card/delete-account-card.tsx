@@ -4,11 +4,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
 import { Button } from '@/components/ui/button'
 import api from '@/lib/api'
-import {
-  modalOverlayClassName,
-  modalPanelClassName,
-  modalTitleClassName,
-} from '@/components/atoms/modal/modal-styles'
+import { Modal, modalTitleClassName } from '@/components/atoms/modal'
 
 export const DeleteAccountCard = () => {
   const router = useRouter()
@@ -21,6 +17,12 @@ export const DeleteAccountCard = () => {
     setOpen(false)
     setConfirmDelete(false)
     setConfirmationText('')
+  }
+
+  const handleCloseModal = () => {
+    if (!loading) {
+      closeModal()
+    }
   }
 
   const handleDeleteAccount = async () => {
@@ -68,79 +70,76 @@ export const DeleteAccountCard = () => {
           </Button>
         </div>
       </div>
-      {open && (
-        <div className={modalOverlayClassName}>
-          <div className={`${modalPanelClassName} max-w-md p-6 sm:p-8`}>
-            {!confirmDelete ? (
-              <>
-                <h2 className={modalTitleClassName}>Delete Account</h2>
+      <Modal
+        isOpen={open}
+        onClose={handleCloseModal}
+        className="max-w-md p-6 sm:p-8"
+      >
+        {!confirmDelete ? (
+          <>
+            <h2 className={`${modalTitleClassName} pr-10`}>Delete Account</h2>
 
-                <p className="mt-3 text-sm leading-6 text-muted-text">
-                  Are you sure you want to permanently delete your FlashID
-                  account? This action cannot be undone and all of your account
-                  information and credentials will be permanently removed.
-                </p>
+            <p className="mt-3 text-sm leading-6 text-muted-text">
+              Are you sure you want to permanently delete your FlashID account?
+              This action cannot be undone and all of your account information
+              and credentials will be permanently removed.
+            </p>
 
-                <div className="mt-8 flex justify-end gap-3">
-                  <Button variant="outline" onClick={closeModal}>
-                    No
-                  </Button>
+            <div className="mt-8 flex justify-end gap-3">
+              <Button variant="outline" onClick={closeModal}>
+                No
+              </Button>
 
-                  <Button
-                    variant="destructive"
-                    onClick={() => setConfirmDelete(true)}
-                  >
-                    Yes
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <>
-                <h2 className={modalTitleClassName}>Final Confirmation</h2>
+              <Button
+                variant="destructive"
+                onClick={() => setConfirmDelete(true)}
+              >
+                Yes
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2 className={`${modalTitleClassName} pr-10`}>
+              Final Confirmation
+            </h2>
 
-                <p className="mt-3 text-sm text-muted-text">
-                  To confirm that you understand this action is permanent,
-                  please type the word{' '}
-                  <span className="font-semibold">DELETE</span> below.
-                </p>
+            <p className="mt-3 text-sm text-muted-text">
+              To confirm that you understand this action is permanent, please
+              type the word <span className="font-semibold">DELETE</span> below.
+            </p>
 
-                <label
-                  htmlFor="delete-confirmation"
-                  className="mt-6 block text-sm font-medium"
-                >
-                  Type &quot;DELETE&quot;
-                </label>
+            <label
+              htmlFor="delete-confirmation"
+              className="mt-6 block text-sm font-medium"
+            >
+              Type &quot;DELETE&quot;
+            </label>
 
-                <input
-                  id="delete-confirmation"
-                  type="text"
-                  value={confirmationText}
-                  onChange={(e) => setConfirmationText(e.target.value)}
-                  className="mt-2 w-full rounded-xl border px-4 py-3 outline-none focus:ring-2 focus:ring-primary"
-                />
+            <input
+              id="delete-confirmation"
+              type="text"
+              value={confirmationText}
+              onChange={(e) => setConfirmationText(e.target.value)}
+              className="mt-2 w-full rounded-xl border px-4 py-3 outline-none focus:ring-2 focus:ring-primary"
+            />
 
-                <div className="mt-8 flex justify-end gap-3">
-                  <Button
-                    variant="outline"
-                    onClick={closeModal}
-                    disabled={loading}
-                  >
-                    Cancel
-                  </Button>
+            <div className="mt-8 flex justify-end gap-3">
+              <Button variant="outline" onClick={closeModal} disabled={loading}>
+                Cancel
+              </Button>
 
-                  <Button
-                    variant="destructive"
-                    disabled={confirmationText !== 'DELETE' || loading}
-                    onClick={handleDeleteAccount}
-                  >
-                    {loading ? 'Deleting...' : 'Permanently Delete'}
-                  </Button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+              <Button
+                variant="destructive"
+                disabled={confirmationText !== 'DELETE' || loading}
+                onClick={handleDeleteAccount}
+              >
+                {loading ? 'Deleting...' : 'Permanently Delete'}
+              </Button>
+            </div>
+          </>
+        )}
+      </Modal>
     </>
   )
 }

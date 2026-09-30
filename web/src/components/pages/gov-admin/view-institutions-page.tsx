@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Building2, IdCard, Landmark, UploadCloud } from 'lucide-react'
 import {
   institutionService,
+  formatInstitutionType,
   GetInstitutionResponse,
 } from '@/services/institution-service'
 import { Text } from '@/components/atoms/text'
@@ -22,9 +23,6 @@ const QUICK_ACTIONS = [
     href: '/gov-admin/upload-institution',
   },
 ]
-
-const formatInstitutionType = (type: string) =>
-  type.replace(/([a-z])([A-Z])/g, '$1 $2')
 
 export const ViewInstitutionsPage = () => {
   const [search, setSearch] = useState('')
@@ -48,25 +46,22 @@ export const ViewInstitutionsPage = () => {
       icon: Building2,
       label: 'Total Institutions',
       value: institutions.length,
-      href: '/gov-admin/view-institutions',
     },
     {
       icon: Landmark,
       label: 'Home Affairs',
       value: institutions.filter((i) => i.type === 'HomeAffairs').length,
-      href: '/gov-admin/view-institutions',
     },
     {
       icon: IdCard,
       label: 'Licensing Departments',
       value: institutions.filter((i) => i.type === 'LicensingDepartment')
         .length,
-      href: '/gov-admin/view-institutions',
     },
   ]
 
   return (
-    <div className="flex min-h-full overflow-x-hidden bg-[#f6f2ea]">
+    <div className="flex min-h-full overflow-x-hidden bg-cream-background">
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">
         <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-6">
           <div className="flex min-w-0 flex-col gap-4 lg:col-span-4">

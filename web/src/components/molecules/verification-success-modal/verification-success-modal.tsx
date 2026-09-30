@@ -4,11 +4,7 @@ import { FC, useEffect } from 'react'
 import { Check, ChevronRight, User, IdCard, Car } from 'lucide-react'
 
 import { Button, Text } from '@/components/atoms'
-import {
-  modalOverlayClassName,
-  modalPanelClassName,
-  modalTitleClassName,
-} from '@/components/atoms/modal/modal-styles'
+import { Modal, modalTitleClassName } from '@/components/atoms/modal'
 
 import {
   VerificationSuccessModalProps,
@@ -54,75 +50,59 @@ export const VerificationSuccessModal: FC<VerificationSuccessModalProps> = ({
     }
   }, [open])
 
-  if (!open) {
-    return null
-  }
-
   return (
-    <div className={modalOverlayClassName} role="dialog" aria-modal="true">
-      <div
-        className="absolute inset-0 animate-in fade-in-0 duration-300"
-        onClick={onDismissAction}
-        aria-hidden
-      />
-      <div className="relative w-full max-w-[560px] animate-in fade-in-0 zoom-in-95 duration-300">
-        <div className={`${modalPanelClassName} p-6 text-center sm:p-8`}>
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary-green">
-            <Check className="h-10 w-10 text-clean-white" strokeWidth={3} />
+    <Modal
+      isOpen={open}
+      onClose={onDismissAction}
+      dataCy="verification-success-modal"
+      className="max-w-[560px] p-6 text-center animate-in fade-in-0 zoom-in-95 duration-300 sm:p-8"
+    >
+      <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary-green">
+        <Check className="h-10 w-10 text-clean-white" strokeWidth={3} />
+      </div>
+      <h2 className={modalTitleClassName}>Citizen verified successfully!</h2>
+      <Text variant="sub-sm" className="mx-auto mt-3 max-w-[38ch]">
+        Your identity has been verified and your FlashID account is now linked
+        to your citizen record.
+      </Text>
+      <div className="mt-6 grid grid-cols-1 gap-4 rounded-2xl bg-black/[0.03] p-5 text-left sm:grid-cols-2">
+        <div className="flex items-center gap-3">
+          <User className="h-5 w-5 shrink-0 text-primary-green" />
+          <div>
+            <Text variant="caption">Full Name</Text>
+            <Text variant="sub-sm" className="font-semibold text-text-primary">
+              {fullName}
+            </Text>
           </div>
-          <h2 className={modalTitleClassName}>
-            Citizen verified successfully!
-          </h2>
-          <Text variant="sub-sm" className="mx-auto mt-3 max-w-[38ch]">
-            Your identity has been verified and your FlashID account is now
-            linked to your citizen record.
-          </Text>
-          <div className="mt-6 grid grid-cols-1 gap-4 rounded-2xl bg-black/[0.03] p-5 text-left sm:grid-cols-2">
-            <div className="flex items-center gap-3">
-              <User className="h-5 w-5 shrink-0 text-primary-green" />
-              <div>
-                <Text variant="caption">Full Name</Text>
-                <Text
-                  variant="sub-sm"
-                  className="font-semibold text-text-primary"
-                >
-                  {fullName}
-                </Text>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <CredentialIcon className="h-5 w-5 shrink-0 text-primary-green" />
-              <div>
-                <Text variant="caption">{credentialLabel}</Text>
-                <Text
-                  variant="sub-sm"
-                  className="font-semibold text-text-primary"
-                >
-                  {credentialValue}
-                </Text>
-              </div>
-            </div>
-          </div>
-          <div className="mt-6 flex flex-col gap-3">
-            <Button
-              variant="primary"
-              className="w-full lg:w-full"
-              RightIcon={ChevronRight}
-              onClick={onContinueAction}
-            >
-              Continue to activate credentials
-            </Button>
-
-            <Button
-              variant="secondary"
-              className="w-full lg:w-full"
-              onClick={onDismissAction}
-            >
-              Do this later
-            </Button>
+        </div>
+        <div className="flex items-center gap-3">
+          <CredentialIcon className="h-5 w-5 shrink-0 text-primary-green" />
+          <div>
+            <Text variant="caption">{credentialLabel}</Text>
+            <Text variant="sub-sm" className="font-semibold text-text-primary">
+              {credentialValue}
+            </Text>
           </div>
         </div>
       </div>
-    </div>
+      <div className="mt-6 flex flex-col gap-3">
+        <Button
+          variant="primary"
+          className="w-full lg:w-full"
+          RightIcon={ChevronRight}
+          onClick={onContinueAction}
+        >
+          Continue to activate credentials
+        </Button>
+
+        <Button
+          variant="secondary"
+          className="w-full lg:w-full"
+          onClick={onDismissAction}
+        >
+          Do this later
+        </Button>
+      </div>
+    </Modal>
   )
 }

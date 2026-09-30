@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode, type SyntheticEvent, useState } from 'react'
+import { type ReactNode, type SyntheticEvent, useEffect, useState } from 'react'
 import { Check, CheckCircle2, Copy, Landmark } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
@@ -10,9 +10,7 @@ import {
   institutionService,
   RegisterInstitutionResponse,
 } from '@/services/institution-service'
-
-const formatInstitutionType = (type: string) =>
-  type.replace(/([a-z])([A-Z])/g, '$1 $2')
+import { formatInstitutionType } from '@/services/institution-service/institution-model'
 
 function FormSection({
   title,
@@ -43,6 +41,14 @@ export const RegisterInstitutionForm = () => {
   const [registeredInstitution, setRegisteredInstitution] =
     useState<RegisterInstitutionResponse | null>(null)
   const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    if (!copied) {
+      return
+    }
+    const timeout = setTimeout(() => setCopied(false), 2000)
+    return () => clearTimeout(timeout)
+  }, [copied])
 
   const { mutate: doRegister, isPending } = useMutation({
     mutationFn: (formData: {
@@ -139,7 +145,7 @@ export const RegisterInstitutionForm = () => {
               <Text
                 as="span"
                 variant="sub-sm"
-                className="truncate !text-sm font-bold text-text-primary"
+                className="min-w-0 text-right !text-sm font-bold text-text-primary [overflow-wrap:anywhere]"
               >
                 {value}
               </Text>

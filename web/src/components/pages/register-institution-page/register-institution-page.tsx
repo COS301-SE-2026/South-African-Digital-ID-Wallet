@@ -33,7 +33,7 @@ const GUIDELINES = [
 
 export const RegisterInstitutionPage = () => {
   return (
-    <div className="flex min-h-full overflow-x-hidden bg-[#f6f2ea]">
+    <div className="flex min-h-full overflow-x-hidden bg-cream-background">
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-start lg:gap-6">
           <section className="min-w-0 lg:col-span-8">

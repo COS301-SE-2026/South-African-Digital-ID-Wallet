@@ -8,7 +8,7 @@ import {
   modalOverlayClassName,
   modalPanelClassName,
   modalTitleClassName,
-} from '@/components/atoms/modal/modal-styles'
+} from '@/components/atoms/modal'
 import type { DashboardModalProps } from './types'
 
 export function DashboardModal({

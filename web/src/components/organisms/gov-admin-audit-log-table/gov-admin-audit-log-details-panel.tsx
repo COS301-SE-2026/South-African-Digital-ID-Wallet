@@ -63,7 +63,7 @@ export const GovAdminAuditLogDetailsPanel = ({
       dataCy="audit-log-details-modal"
       className="!max-w-lg"
     >
-      <div className="flex max-h-[95vh] flex-col overflow-y-auto p-6">
+      <div className="flex flex-col p-6">
         <Text
           as="h2"
           variant="sub-sm"

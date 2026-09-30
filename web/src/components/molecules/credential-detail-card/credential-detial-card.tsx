@@ -7,7 +7,7 @@ import { FieldSelectionForm, QrDisplay } from '@/components/organisms'
 import {
   modalCloseButtonClassName,
   modalTitleClassName,
-} from '@/components/atoms/modal/modal-styles'
+} from '@/components/atoms/modal'
 import { MANDATORY_FIELDS } from '@/services/qr-service/qr-field-definitions'
 import type { QrDisclosureSelection } from '@/services/qr-service'
 import { type CredentialDetailCardProps } from './types'

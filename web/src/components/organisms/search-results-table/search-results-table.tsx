@@ -52,7 +52,7 @@ export const SearchResultsTable = ({
                   </Text>
                 </th>
 
-                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left">
+                <th className="px-3 py-3 text-left sm:px-6 sm:py-4">
                   <Text
                     as="span"
                     variant="caption"
@@ -62,7 +62,7 @@ export const SearchResultsTable = ({
                   </Text>
                 </th>
 
-                <th className="hidden md:table-cell px-3 py-3 sm:px-6 sm:py-4 text-left">
+                <th className="hidden px-3 py-3 text-left sm:px-6 sm:py-4 md:table-cell">
                   <Text
                     as="span"
                     variant="caption"
@@ -72,7 +72,7 @@ export const SearchResultsTable = ({
                   </Text>
                 </th>
 
-                <th className="hidden md:table-cell px-3 py-3 sm:px-6 sm:py-4 text-left">
+                <th className="hidden px-3 py-3 text-left sm:px-6 sm:py-4 md:table-cell">
                   <Text
                     as="span"
                     variant="caption"
@@ -82,7 +82,7 @@ export const SearchResultsTable = ({
                   </Text>
                 </th>
 
-                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left last:rounded-tr-[22px]">
+                <th className="px-3 py-3 text-left last:rounded-tr-[22px] sm:px-6 sm:py-4">
                   <Text
                     as="span"
                     variant="caption"
@@ -102,7 +102,7 @@ export const SearchResultsTable = ({
                     index % 2 === 0 ? 'bg-card' : 'bg-deep-green/[0.035]'
                   }
                 >
-                  <td className="hidden md:table-cell px-3 py-3 sm:px-6 sm:py-4">
+                  <td className="hidden px-3 py-3 sm:px-6 sm:py-4 md:table-cell">
                     <Avatar initials={row.initials} />
                   </td>
 
@@ -126,7 +126,7 @@ export const SearchResultsTable = ({
                     </Text>
                   </td>
 
-                  <td className="hidden md:table-cell px-3 py-3 sm:px-6 sm:py-4">
+                  <td className="hidden px-3 py-3 sm:px-6 sm:py-4 md:table-cell">
                     <Text
                       as="span"
                       variant="sub-sm"
@@ -136,7 +136,7 @@ export const SearchResultsTable = ({
                     </Text>
                   </td>
 
-                  <td className="hidden md:table-cell px-3 py-3 sm:px-6 sm:py-4">
+                  <td className="hidden px-3 py-3 sm:px-6 sm:py-4 md:table-cell">
                     <Text
                       as="span"
                       variant="sub-sm"

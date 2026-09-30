@@ -161,6 +161,15 @@ export const AuditLogTable = ({
                           <div className="!text-xs font-semibold leading-4 text-text-primary">
                             {humanizeAction(row.action)}
                           </div>
+                          <span
+                            className={`mt-1 inline-flex whitespace-nowrap rounded-full px-2 py-0.5 !text-[10px] font-medium md:hidden ${
+                              row.outcome === 'Success'
+                                ? 'bg-primary-green/10 text-primary-green'
+                                : 'bg-national-red/10 text-national-red'
+                            }`}
+                          >
+                            {row.outcome}
+                          </span>
                         </td>
                         <td className="px-2 py-3 sm:px-4">
                           {row.citizenName ? (

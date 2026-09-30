@@ -73,6 +73,11 @@ export const GovAdminAuditLogTable = ({
                     >
                       {row.action}
                     </p>
+                    {row.outcome !== 'Success' && (
+                      <span className="mt-1 inline-flex rounded-full bg-national-red/10 px-2 py-0.5 text-[11px] font-semibold text-national-red">
+                        Failed
+                      </span>
+                    )}
                     <p className="mt-1 text-xs text-muted-text">
                       {formatDate(row.createdAt)}
                     </p>
@@ -80,7 +85,7 @@ export const GovAdminAuditLogTable = ({
                   <button
                     type="button"
                     onClick={() => onViewDetails(row)}
-                    className="shrink-0 text-muted-text transition hover:text-deep-green"
+                    className="-m-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-text transition hover:bg-black/5 hover:text-deep-green"
                     aria-label={`View details for ${row.action}`}
                     data-cy={`view-gov-audit-details-mobile-${row.id}`}
                   >
@@ -160,13 +165,18 @@ export const GovAdminAuditLogTable = ({
                       >
                         {row.action}
                       </span>
+                      {row.outcome !== 'Success' && (
+                        <span className="mt-1 inline-flex rounded-full bg-national-red/10 px-2 py-0.5 text-[10px] font-semibold text-national-red">
+                          Failed
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <span
                         title={row.userName ?? undefined}
                         className="block truncate text-xs font-semibold text-text-primary"
                       >
-                        {row.userName ?? '- Unknown'}
+                        {row.userName ?? 'Unknown'}
                       </span>
                     </td>
                     <td className="px-4 py-3">
@@ -178,7 +188,7 @@ export const GovAdminAuditLogTable = ({
                       <button
                         type="button"
                         onClick={() => onViewDetails(row)}
-                        className="text-muted-text transition hover:text-deep-green"
+                        className="-m-2 flex h-10 w-10 items-center justify-center rounded-full text-muted-text transition hover:bg-black/5 hover:text-deep-green"
                         aria-label={`View details for ${row.action}`}
                         data-cy={`view-gov-audit-details-${row.id}`}
                       >
