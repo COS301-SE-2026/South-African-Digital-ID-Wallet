@@ -15,11 +15,10 @@ export const useBiometricUnlock = () => {
 
   const unlock = useCallback(async (prompt: string): Promise<UnlockStatus> => {
     setStatus('checking')
-    const [hasHardware, isEnrolled] = await Promise.all([
-      LocalAuthentication.hasHardwareAsync(),
-      LocalAuthentication.isEnrolledAsync(),
-    ])
-    if (!hasHardware || !isEnrolled) {
+    // SECRET means a PIN, pattern or password; the prompt falls back to it
+    // on phones whose biometrics apps cannot use.
+    const level = await LocalAuthentication.getEnrolledLevelAsync()
+    if (level === LocalAuthentication.SecurityLevel.NONE) {
       setStatus('unavailable')
       return 'unavailable'
     }

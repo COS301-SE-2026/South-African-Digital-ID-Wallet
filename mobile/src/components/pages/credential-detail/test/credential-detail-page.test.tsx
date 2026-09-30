@@ -33,6 +33,8 @@ jest.mock('expo-router', () => ({
   useRouter: jest.fn(),
 }))
 jest.mock('expo-local-authentication', () => ({
+  getEnrolledLevelAsync: jest.fn(),
+  SecurityLevel: { NONE: 0, SECRET: 1, BIOMETRIC_WEAK: 2, BIOMETRIC_STRONG: 3 },
   authenticateAsync: jest.fn(),
   hasHardwareAsync: jest.fn(),
   isEnrolledAsync: jest.fn(),
@@ -44,6 +46,7 @@ const saveMock = savePdf as jest.Mock
 const openMock = openPdf as jest.Mock
 const hasHardware = LocalAuthentication.hasHardwareAsync as jest.Mock
 const isEnrolled = LocalAuthentication.isEnrolledAsync as jest.Mock
+const enrolledLevel = LocalAuthentication.getEnrolledLevelAsync as jest.Mock
 const authenticate = LocalAuthentication.authenticateAsync as jest.Mock
 const back = jest.fn()
 const push = jest.fn()
@@ -94,6 +97,7 @@ describe('<CredentialDetailPage/>', () => {
     ;(useRouter as jest.Mock).mockReturnValue({ back, push })
     hasHardware.mockResolvedValue(true)
     isEnrolled.mockResolvedValue(true)
+    enrolledLevel.mockResolvedValue(2)
     saveMock.mockReturnValue(FILE)
     openMock.mockResolvedValue(undefined)
     postMock.mockResolvedValue({

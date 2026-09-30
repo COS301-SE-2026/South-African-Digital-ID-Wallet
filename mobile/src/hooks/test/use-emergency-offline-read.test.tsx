@@ -22,6 +22,8 @@ jest.mock('expo-crypto', () => ({
 }))
 
 jest.mock('expo-local-authentication', () => ({
+  getEnrolledLevelAsync: jest.fn(),
+  SecurityLevel: { NONE: 0, SECRET: 1, BIOMETRIC_WEAK: 2, BIOMETRIC_STRONG: 3 },
   authenticateAsync: jest.fn(),
   hasHardwareAsync: jest.fn(),
   isEnrolledAsync: jest.fn(),
@@ -75,6 +77,7 @@ const framesFor = (presentation: string): readonly string[] => {
 
 const hasHardware = LocalAuthentication.hasHardwareAsync as jest.Mock
 const isEnrolled = LocalAuthentication.isEnrolledAsync as jest.Mock
+const enrolledLevel = LocalAuthentication.getEnrolledLevelAsync as jest.Mock
 const authenticate = LocalAuthentication.authenticateAsync as jest.Mock
 const trustMock = useVerifierTrust as jest.Mock
 const queueMock = offlineService.queueEmergencyAccess as jest.Mock
@@ -98,6 +101,7 @@ describe('useEmergencyOfflineRead', () => {
     jest.clearAllMocks()
     hasHardware.mockResolvedValue(true)
     isEnrolled.mockResolvedValue(true)
+    enrolledLevel.mockResolvedValue(2)
     authenticate.mockResolvedValue({ success: true })
     queueMock.mockResolvedValue(undefined)
     useAuthStore.setState({
@@ -165,7 +169,7 @@ describe('useEmergencyOfflineRead', () => {
   })
 
   it('Should show nothing when the phone has no biometrics', async () => {
-    isEnrolled.mockResolvedValue(false)
+    enrolledLevel.mockResolvedValue(0)
     const { result } = await readAll(emergency)
 
     await act(async () => {
@@ -173,7 +177,7 @@ describe('useEmergencyOfflineRead', () => {
     })
 
     expect(result.current.accessedAt).toBeNull()
-    expect(result.current.gateError).toContain('no enrolled biometrics')
+    expect(result.current.gateError).toContain('screen lock')
   })
 
   it('Should show nothing if the access cannot be recorded on the phone', async () => {

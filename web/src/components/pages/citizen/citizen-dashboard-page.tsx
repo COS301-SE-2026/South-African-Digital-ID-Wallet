@@ -12,35 +12,54 @@ import type { SecurityAlert } from '@/components/organisms/fraud-alert-flow'
 import { fraudDetectionService } from '@/services/fraud-detection-service'
 import { mapFraudAlertToSecurityAlert } from '@/services/fraud-detection-service/mappers'
 
+type SecurityAlertResult = {
+  alert: SecurityAlert | null
+  error: string | null
+}
+
+const fetchSecurityAlert = async (): Promise<SecurityAlertResult> => {
+  try {
+    const overview = await fraudDetectionService.getOverview()
+    if (!overview.hasActiveAlert || !overview.latestAlert) {
+      return { alert: null, error: null }
+    }
+    const alertDetails = await fraudDetectionService.getAlertDetails(
+      overview.latestAlert.id
+    )
+    return { alert: mapFraudAlertToSecurityAlert(alertDetails), error: null }
+  } catch (error) {
+    console.error('Unable to load the security alert from the backend.', error)
+    return {
+      alert: null,
+      error:
+        'We could not check your latest security activity. Please refresh the page and try again.',
+    }
+  }
+}
+
 export default function CitizenDashboardPage() {
   const [securityAlert, setSecurityAlert] = useState<SecurityAlert | null>(null)
-  const [securityAlertError, setSecurityAlertError] = useState<string | null>(null)
-  const reloadSecurityAlert = useCallback(async () => {
-    try {
-      setSecurityAlertError(null)
-      const overview = await fraudDetectionService.getOverview()
-      if (!overview.hasActiveAlert || !overview.latestAlert) {
-        setSecurityAlert(null)
-        return
-      }
-      const alertDetails =
-        await fraudDetectionService.getAlertDetails(
-          overview.latestAlert.id
-        )
-      setSecurityAlert(mapFraudAlertToSecurityAlert(alertDetails))
-    } catch (error) {
-      console.error(
-        'Unable to load the security alert from the backend.',
-        error
-      )
-      setSecurityAlertError(
-        'We could not check your latest security activity. Please refresh the page and try again.'
-      )
-    }
+  const [securityAlertError, setSecurityAlertError] = useState<string | null>(
+    null
+  )
+  const applySecurityAlert = useCallback((result: SecurityAlertResult) => {
+    setSecurityAlert(result.alert)
+    setSecurityAlertError(result.error)
   }, [])
+  const reloadSecurityAlert = useCallback(async () => {
+    applySecurityAlert(await fetchSecurityAlert())
+  }, [applySecurityAlert])
   useEffect(() => {
-    void reloadSecurityAlert()
-  }, [reloadSecurityAlert])
+    let ignore = false
+    fetchSecurityAlert().then((result) => {
+      if (!ignore) {
+        applySecurityAlert(result)
+      }
+    })
+    return () => {
+      ignore = true
+    }
+  }, [applySecurityAlert])
   return (
     <div className="flex min-h-full overflow-x-hidden bg-[#f6f2ea]">
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">

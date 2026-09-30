@@ -30,9 +30,7 @@ const alert: SecurityAlert = {
 describe('FraudAlertSummary', () => {
   it('renders the alert title and summary', () => {
     render(<FraudAlertSummary alert={alert} />)
-    expect(
-      screen.getByText('Suspicious login activity')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Suspicious login activity')).toBeInTheDocument()
     expect(
       screen.getByText('A suspicious login was detected on your account.')
     ).toBeInTheDocument()

@@ -1,8 +1,4 @@
-import {
-  fireEvent,
-  render,
-  screen,
-} from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { FraudAlertGuidance } from '../fraud-alert-guidance'
 
 describe('FraudAlertGuidance', () => {
@@ -78,15 +74,11 @@ describe('FraudAlertGuidance', () => {
     fireEvent.change(screen.getByLabelText(/current password/i), {
       target: { value: 'Password123!' },
     })
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Confirm' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
     await screen.findByRole('button', {
       name: /log out from all other devices/i,
     })
-    expect(props.onLogoutOtherDevices).toHaveBeenCalledWith(
-      'Password123!'
-    )
+    expect(props.onLogoutOtherDevices).toHaveBeenCalledWith('Password123!')
   })
   it('submits the dismiss action with a password', async () => {
     render(<FraudAlertGuidance {...props} />)
@@ -98,15 +90,11 @@ describe('FraudAlertGuidance', () => {
     fireEvent.change(screen.getByLabelText(/current password/i), {
       target: { value: 'Password123!' },
     })
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Confirm' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
     await screen.findByRole('button', {
       name: /dismiss security alert/i,
     })
-    expect(props.onDismiss).toHaveBeenCalledWith(
-      'Password123!'
-    )
+    expect(props.onDismiss).toHaveBeenCalledWith('Password123!')
   })
   it('shows an action message when provided', () => {
     render(

@@ -38,6 +38,8 @@ jest.mock('@/components/organisms', () => {
   }
 })
 jest.mock('expo-local-authentication', () => ({
+  getEnrolledLevelAsync: jest.fn(),
+  SecurityLevel: { NONE: 0, SECRET: 1, BIOMETRIC_WEAK: 2, BIOMETRIC_STRONG: 3 },
   authenticateAsync: jest.fn(),
   hasHardwareAsync: jest.fn(),
   isEnrolledAsync: jest.fn(),
@@ -46,6 +48,7 @@ jest.mock('expo-local-authentication', () => ({
 const getMock = api.get as jest.Mock
 const hasHardware = LocalAuthentication.hasHardwareAsync as jest.Mock
 const isEnrolled = LocalAuthentication.isEnrolledAsync as jest.Mock
+const enrolledLevel = LocalAuthentication.getEnrolledLevelAsync as jest.Mock
 const authenticate = LocalAuthentication.authenticateAsync as jest.Mock
 const push = jest.fn()
 
@@ -86,6 +89,7 @@ describe('<CitizenWalletPage/>', () => {
     ;(useRouter as jest.Mock).mockReturnValue({ back: jest.fn(), push })
     hasHardware.mockResolvedValue(true)
     isEnrolled.mockResolvedValue(true)
+    enrolledLevel.mockResolvedValue(2)
     getMock.mockResolvedValue({ data: CREDENTIALS })
   })
 
@@ -152,7 +156,7 @@ describe('<CitizenWalletPage/>', () => {
 
   it('Should ask the user to set up a device lock when none exists', async () => {
     const alert = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn())
-    isEnrolled.mockResolvedValue(false)
+    enrolledLevel.mockResolvedValue(0)
     await renderWithProviders(<CitizenWalletPage />)
     await fireEvent.press(await screen.findByTestId('credential-card-id-1'))
     await waitFor(() =>
@@ -185,7 +189,7 @@ describe('<CitizenWalletPage/>', () => {
       resolvePrompt({ success: true })
       await Promise.all(taps)
     })
-    expect(hasHardware).toHaveBeenCalledTimes(1)
+    expect(enrolledLevel).toHaveBeenCalledTimes(1)
     expect(authenticate).toHaveBeenCalledTimes(1)
     expect(push).toHaveBeenCalledTimes(1)
     expect(push).toHaveBeenCalledWith({
@@ -214,7 +218,7 @@ describe('<CitizenWalletPage/>', () => {
 
   it('Should allow another tap after the device lock alert', async () => {
     const alert = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn())
-    isEnrolled.mockResolvedValue(false)
+    enrolledLevel.mockResolvedValue(0)
     await renderWithProviders(<CitizenWalletPage />)
     await fireEvent.press(await screen.findByTestId('credential-card-id-1'))
     await waitFor(() => expect(alert).toHaveBeenCalledTimes(1))

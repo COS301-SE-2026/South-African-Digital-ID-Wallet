@@ -20,6 +20,8 @@ const fileName = 'FlashID-Certified-Copy.pdf'
 const renderComponent = (onBack = jest.fn()) =>
   render(
     <CertifiedCopyGenerated
+      credential={credential}
+      generatedAt={generatedAt}
       pdfUrl={pdfUrl}
       fileName={fileName}
       onBack={onBack}

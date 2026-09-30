@@ -43,9 +43,7 @@ describe('qrService', () => {
     ]
     mockedApi.get.mockResolvedValue({ data })
     const result = await qrService.getMine()
-    expect(mockedApi.get).toHaveBeenCalledWith(
-      '/api/credentials/mine'
-    )
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/credentials/mine')
     expect(result).toEqual(data)
   })
   it('propagates QR generation errors', async () => {

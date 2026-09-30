@@ -34,15 +34,12 @@ describe('institutionService', () => {
     }
     mockedApi.post.mockResolvedValue({ data })
     const result = await institutionService.register(formData)
-    expect(mockedApi.post).toHaveBeenCalledWith(
-      '/api/institutions/register',
-      {
-        name: 'Home Affairs Johannesburg',
-        type: 0,
-        verificationNumber: 'HA-001',
-        adminId: 'admin-123',
-      }
-    )
+    expect(mockedApi.post).toHaveBeenCalledWith('/api/institutions/register', {
+      name: 'Home Affairs Johannesburg',
+      type: 0,
+      verificationNumber: 'HA-001',
+      adminId: 'admin-123',
+    })
     expect(result).toEqual(data)
   })
   it('gets all institutions', async () => {

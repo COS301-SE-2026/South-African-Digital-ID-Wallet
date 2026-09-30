@@ -49,9 +49,7 @@ describe('fraudDetectionService', () => {
     const data: SecurityActivityItemResponse[] = []
     mockedApi.get.mockResolvedValue({ data })
     await fraudDetectionService.getActivity(5)
-    expect(mockedApi.get).toHaveBeenCalledWith(
-      '/api/security/activity?limit=5'
-    )
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/security/activity?limit=5')
     expect(data).toEqual([])
   })
   it('gets alerts without a status filter', async () => {
@@ -77,9 +75,7 @@ describe('fraudDetectionService', () => {
     }
     mockedApi.get.mockResolvedValue({ data })
     const result = await fraudDetectionService.getAlertDetails('alert-123')
-    expect(mockedApi.get).toHaveBeenCalledWith(
-      '/api/security/alerts/alert-123'
-    )
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/security/alerts/alert-123')
     expect(result).toEqual(data)
   })
   it('secures an account', async () => {

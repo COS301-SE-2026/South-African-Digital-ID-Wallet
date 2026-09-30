@@ -20,15 +20,11 @@ const getOverview = (): Promise<SecurityOverviewResponse> => {
     .get(url)
     .then((res: AxiosResponse<SecurityOverviewResponse>) => res.data)
 }
-const getActivity = (
-  limit = 20
-): Promise<SecurityActivityItemResponse[]> => {
+const getActivity = (limit = 20): Promise<SecurityActivityItemResponse[]> => {
   const url = fraudDetectionUrls.activity(limit)
   return api
     .get(url)
-    .then(
-      (res: AxiosResponse<SecurityActivityItemResponse[]>) => res.data
-    )
+    .then((res: AxiosResponse<SecurityActivityItemResponse[]>) => res.data)
 }
 const getAlerts = (
   status?: FraudAlertStatus
@@ -36,9 +32,7 @@ const getAlerts = (
   const url = fraudDetectionUrls.alerts(status)
   return api
     .get(url)
-    .then(
-      (res: AxiosResponse<FraudAlertSummaryResponse[]>) => res.data
-    )
+    .then((res: AxiosResponse<FraudAlertSummaryResponse[]>) => res.data)
 }
 const getAlertDetails = (
   alertId: string
@@ -55,9 +49,7 @@ const secureAccount = (
   const url = fraudDetectionUrls.secureAccount(alertId)
   return api
     .post(url, request)
-    .then(
-      (res: AxiosResponse<SecureAccountResultResponse>) => res.data
-    )
+    .then((res: AxiosResponse<SecureAccountResultResponse>) => res.data)
 }
 const dismissAlert = (
   alertId: string,

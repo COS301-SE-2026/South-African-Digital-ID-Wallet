@@ -68,14 +68,21 @@ for (const viewport of VIEWPORTS) {
       // logged out, otherwise /login redirects to the dashboard
       test.use({ storageState: { cookies: [], origins: [] } })
 
-      test('landing keeps login and register reachable', async ({ page }) => {
+      test('landing keeps sign in and create account reachable', async ({
+        page,
+      }) => {
         await page.goto('/')
         const header = page.getByRole('banner')
+        const menuButton = header.getByRole('button', {
+          name: 'Open navigation menu',
+        })
+        // below lg the auth links live inside the hamburger menu, so open it first
+        if (await menuButton.isVisible()) await menuButton.click()
         await expect(
-          header.getByRole('link', { name: 'Login' })
+          header.getByRole('link', { name: 'Sign in' })
         ).toBeInViewport()
         await expect(
-          header.getByRole('link', { name: /Register/ })
+          header.getByRole('link', { name: /Create account/ })
         ).toBeInViewport()
         expect(await sidewaysOverflow(page)).toBeLessThanOrEqual(0)
       })

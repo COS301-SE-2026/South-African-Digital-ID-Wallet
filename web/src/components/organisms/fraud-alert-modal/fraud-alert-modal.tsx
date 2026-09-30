@@ -26,10 +26,7 @@ export function FraudAlertModal({
       >
         <div className="space-y-6">
           <FraudAlertSummary alert={alert} />
-          <FraudAlertDetails
-            alert={alert}
-            onOpenGuidance={onOpenGuidance}
-          />
+          <FraudAlertDetails alert={alert} onOpenGuidance={onOpenGuidance} />
         </div>
       </DashboardModal>
     )

@@ -49,21 +49,13 @@ describe('TrustedDevices', () => {
   })
   it('renders the list of trusted devices', async () => {
     render(<TrustedDevices />)
-    expect(
-      await screen.findByText(/iphone 16 pro max/i)
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText(/brave web portal/i)
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText(/ipad pro/i)
-    ).toBeInTheDocument()
+    expect(await screen.findByText(/iphone 16 pro max/i)).toBeInTheDocument()
+    expect(screen.getByText(/brave web portal/i)).toBeInTheDocument()
+    expect(screen.getByText(/ipad pro/i)).toBeInTheDocument()
   })
   it('renders the device status labels', async () => {
     render(<TrustedDevices />)
-    expect(
-      await screen.findByText('Active')
-    ).toBeInTheDocument()
+    expect(await screen.findByText('Active')).toBeInTheDocument()
     expect(screen.getAllByText('Known')).toHaveLength(2)
   })
   it('opens the manage devices modal', async () => {

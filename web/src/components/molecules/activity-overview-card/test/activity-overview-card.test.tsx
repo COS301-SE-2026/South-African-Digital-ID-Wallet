@@ -57,11 +57,10 @@ describe('ActivityOverviewCard', () => {
     expect(
       screen.getByText(/driver's licence credential issued/i)
     ).toBeInTheDocument()
-    expect(
-      screen.getByText(/biometric login successful/i)
-    ).toBeInTheDocument()
+    expect(screen.getByText(/biometric login successful/i)).toBeInTheDocument()
   })
-  it('renders the View all button', async () => { mockedApi.get.mockResolvedValue({ data: mockActivity })
+  it('renders the View all button', async () => {
+    mockedApi.get.mockResolvedValue({ data: mockActivity })
     render(<ActivityOverviewCard />)
     expect(
       await screen.findByRole('button', {
@@ -107,9 +106,7 @@ describe('ActivityOverviewCard', () => {
     expect(
       screen.getAllByText(/driver's licence credential issued/i)
     ).toHaveLength(2)
-    expect(
-      screen.getAllByText(/biometric login successful/i)
-    ).toHaveLength(2)
+    expect(screen.getAllByText(/biometric login successful/i)).toHaveLength(2)
   })
   it('closes the activity history modal when Close is clicked', async () => {
     mockedApi.get.mockResolvedValue({ data: mockActivity })
@@ -142,9 +139,7 @@ describe('ActivityOverviewCard', () => {
   it('shows a message when there is no activity', async () => {
     mockedApi.get.mockResolvedValue({ data: [] })
     render(<ActivityOverviewCard />)
-    expect(
-      await screen.findByText(/no activity found/i)
-    ).toBeInTheDocument()
+    expect(await screen.findByText(/no activity found/i)).toBeInTheDocument()
   })
   it('shows no activity in the modal when there is no activity', async () => {
     mockedApi.get.mockResolvedValue({ data: [] })
@@ -160,9 +155,7 @@ describe('ActivityOverviewCard', () => {
       })
     ).toBeInTheDocument()
 
-    expect(
-      screen.getAllByText(/no activity found/i)
-    ).toHaveLength(2)
+    expect(screen.getAllByText(/no activity found/i)).toHaveLength(2)
   })
   it('handles an API error without crashing', async () => {
     mockedApi.get.mockRejectedValue(new Error('API error'))
@@ -171,9 +164,7 @@ describe('ActivityOverviewCard', () => {
       .mockImplementation(() => {})
     render(<ActivityOverviewCard />)
     await waitFor(() => {
-      expect(
-        screen.getByText(/no activity found/i)
-      ).toBeInTheDocument()
+      expect(screen.getByText(/no activity found/i)).toBeInTheDocument()
     })
     consoleErrorSpy.mockRestore()
   })

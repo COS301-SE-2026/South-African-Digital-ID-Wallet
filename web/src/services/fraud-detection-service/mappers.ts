@@ -14,10 +14,7 @@ export function formatDate(value: string): string {
   }).format(date)
   return `${formattedDate} • ${formattedTime}`
 }
-export function formatNumber(
-  value: number | null,
-  suffix: string
-): string {
+export function formatNumber(value: number | null, suffix: string): string {
   if (value === null || Number.isNaN(value)) {
     return 'Unavailable'
   }
@@ -39,11 +36,7 @@ export function formatElapsedTime(minutes: number | null): string {
     parts.push(`${hours} hour${hours === 1 ? '' : 's'}`)
   }
   if (remainingMinutes > 0 && parts.length < 2) {
-    parts.push(
-      `${remainingMinutes} minute${
-        remainingMinutes === 1 ? '' : 's'
-      }`
-    )
+    parts.push(`${remainingMinutes} minute${remainingMinutes === 1 ? '' : 's'}`)
   }
   if (parts.length === 0) {
     return 'Less than 1 minute'
@@ -69,8 +62,7 @@ export function mapFraudAlertToSecurityAlert(
 ): SecurityAlert {
   const suspiciousLocation = details.suspiciousLocation
   const previousLocation = details.previousLocation
-  const suspiciousLocationLabel =
-    getLocationLabel(suspiciousLocation)
+  const suspiciousLocationLabel = getLocationLabel(suspiciousLocation)
   const previousLocationLabel = previousLocation
     ? getLocationLabel(previousLocation)
     : 'No previous location available'
@@ -92,8 +84,7 @@ export function mapFraudAlertToSecurityAlert(
   return {
     id: details.id,
     severity,
-    title:
-      details.title || `${details.riskLevel} risk security event`,
+    title: details.title || `${details.riskLevel} risk security event`,
     summary:
       details.message ||
       'We detected suspicious login activity on your account. Please review the details and secure your account.',
@@ -112,13 +103,8 @@ export function mapFraudAlertToSecurityAlert(
     },
     travel: {
       distance: formatNumber(details.distanceKm, 'km'),
-      impliedSpeed: formatNumber(
-        details.impliedSpeedKmh,
-        'km/h'
-      ),
-      timeBetweenLogins: formatElapsedTime(
-        details.elapsedMinutes
-      ),
+      impliedSpeed: formatNumber(details.impliedSpeedKmh, 'km/h'),
+      timeBetweenLogins: formatElapsedTime(details.elapsedMinutes),
     },
     device: {
       name: details.deviceDescription || 'Unknown device',

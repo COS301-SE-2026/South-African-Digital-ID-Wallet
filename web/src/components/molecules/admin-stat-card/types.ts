@@ -4,7 +4,7 @@ export interface AdminStatItem {
   icon: LucideIcon
   label: string
   value: number
-  href: string
+  href?: string
 }
 
 export interface AdminStatCardProps {

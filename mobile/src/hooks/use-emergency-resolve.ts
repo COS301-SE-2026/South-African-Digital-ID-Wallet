@@ -33,7 +33,7 @@ export const useEmergencyResolve = () => {
       }
       if (gate === 'unavailable') {
         setGateError(
-          'This device has no enrolled biometrics. Emergency scanning requires one.'
+          'Set a screen lock (PIN, pattern or password) on this phone to use emergency scanning.'
         )
         return null
       }

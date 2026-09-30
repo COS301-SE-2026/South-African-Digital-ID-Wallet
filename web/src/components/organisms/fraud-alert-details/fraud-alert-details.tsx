@@ -8,16 +8,9 @@ import {
 } from 'lucide-react'
 import { Text } from '@/components/atoms/text'
 import { Button } from '@/components/ui/button'
-import type {
-  DetailRowProps,
-  FraudAlertDetailsProps,
-} from './types'
+import type { DetailRowProps, FraudAlertDetailsProps } from './types'
 
-function DetailRow({
-  icon: Icon,
-  label,
-  value,
-}: DetailRowProps) {
+function DetailRow({ icon: Icon, label, value }: DetailRowProps) {
   return (
     <div className="flex items-start gap-3">
       <Icon className="mt-0.5 h-5 w-5 shrink-0 text-primary-green" />
@@ -54,11 +47,7 @@ export function FraudAlertDetails({
         {alert.detailsDescription}
       </Text>
       <section>
-        <Text
-          as="h3"
-          variant="h4"
-          className="mb-3 text-base text-deep-green"
-        >
+        <Text as="h3" variant="h4" className="mb-3 text-base text-deep-green">
           Login information
         </Text>
         <div className="space-y-4 rounded-2xl border border-border-grey p-4">
@@ -75,11 +64,7 @@ export function FraudAlertDetails({
         </div>
       </section>
       <section>
-        <Text
-          as="h3"
-          variant="h4"
-          className="mb-3 text-base text-deep-green"
-        >
+        <Text as="h3" variant="h4" className="mb-3 text-base text-deep-green">
           Travel details
         </Text>
         <div className="space-y-4 rounded-2xl border border-border-grey p-4">
@@ -101,11 +86,7 @@ export function FraudAlertDetails({
         </div>
       </section>
       <section>
-        <Text
-          as="h3"
-          variant="h4"
-          className="mb-3 text-base text-deep-green"
-        >
+        <Text as="h3" variant="h4" className="mb-3 text-base text-deep-green">
           Device and network
         </Text>
         <div className="space-y-4 rounded-2xl border border-border-grey p-4">
@@ -126,11 +107,7 @@ export function FraudAlertDetails({
           />
         </div>
       </section>
-      <Button
-        type="button"
-        className="w-full"
-        onClick={onOpenGuidance}
-      >
+      <Button type="button" className="w-full" onClick={onOpenGuidance}>
         How to keep your account secure
       </Button>
     </div>

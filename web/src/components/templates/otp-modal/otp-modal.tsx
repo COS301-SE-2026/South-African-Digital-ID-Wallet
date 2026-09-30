@@ -128,7 +128,7 @@ export function OtpModal({
           </p>
         </div>
 
-        <div className="flex justify-center gap-3">
+        <div className="flex justify-center gap-2 sm:gap-3">
           {otp.map((digit, index) => (
             <input
               key={index}
@@ -142,8 +142,10 @@ export function OtpModal({
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               className="
-                h-14
-                w-12
+                h-12
+                w-10
+                sm:h-14
+                sm:w-12
                 rounded-lg
                 border
                 border-border-grey

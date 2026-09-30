@@ -35,9 +35,8 @@ describe('issueCredentialService', () => {
       surname: 'Mokoena',
     }
     mockedApi.get.mockResolvedValue({ data })
-    const result = await issueCredentialService.getCitizenStatus(
-      '9001015009087'
-    )
+    const result =
+      await issueCredentialService.getCitizenStatus('9001015009087')
     expect(mockedApi.get).toHaveBeenCalledWith(
       '/api/credentials/citizens/9001015009087/status'
     )
@@ -70,14 +69,11 @@ describe('issueCredentialService', () => {
     }
     mockedApi.post.mockResolvedValue({ data })
     const result = await issueCredentialService.issueCredential(formValues)
-    expect(mockedApi.post).toHaveBeenCalledWith(
-      '/api/credentials/issue',
-      {
-        consentGiven: true,
-        credentialType: 'IdentityDocument',
-        saId: '9001015009087',
-      }
-    )
+    expect(mockedApi.post).toHaveBeenCalledWith('/api/credentials/issue', {
+      consentGiven: true,
+      credentialType: 'IdentityDocument',
+      saId: '9001015009087',
+    })
     expect(result).toEqual({
       ...data,
       issueDate: '2026-09-29',
