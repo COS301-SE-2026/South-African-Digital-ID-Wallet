@@ -20,6 +20,8 @@ public static class DependencyInjection
         services.AddScoped<IActivityOverviewService, ActivityOverviewService>();
         services.AddScoped<ITrustedDeviceService, TrustedDeviceService>();
         services.AddScoped<IOfficialBadgeService, OfficialBadgeService>();
+        services.AddScoped<IEmergencyService, EmergencyService>();
+        services.AddScoped<IEmergencyNotifier, EmergencyNotifier>();
         services.AddSingleton<CitizenMapper>();
         services.AddSingleton<CredentialMapper>();
         services.AddSingleton<InstitutionMapper>();
@@ -45,7 +47,14 @@ public static class DependencyInjection
         services.AddScoped<IAdminDashboardService, AdminDashboardService>();
         services.AddSingleton(TimeProvider.System);
         services.AddScoped<ISdJwtCredentialFactory, SdJwtCredentialFactory>();
+        services.AddSingleton(sp => Application.Features.FraudDetection.FraudDetectionOptions.FromConfiguration(
+            sp.GetService<Microsoft.Extensions.Configuration.IConfiguration>()));
+        services.AddScoped<IFraudDetectionService, FraudDetectionService>();
         services.AddScoped<IOfflinePackageService, OfflinePackageService>();
+        services.AddScoped<IPasswordResetService, PasswordResetService>();
+        services.AddSingleton<CertifiedCredentialSnapshotMapper>();
+        services.AddScoped<ICertifiedCredentialCopyService, CertifiedCredentialCopyService>();
+
         return services;
     }
 }

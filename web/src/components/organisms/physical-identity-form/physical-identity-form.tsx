@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { isValidSaId } from '@/schemas'
 
 type PhysicalIdentityFormProps = {
   saId: string
@@ -72,7 +73,7 @@ export function PhysicalIdentityForm({
         <Button
           type="button"
           className="w-full"
-          disabled={isSubmitting || saId.length !== 13}
+          disabled={isSubmitting || !isValidSaId(saId)}
           onClick={onContinue}
         >
           {isSubmitting ? 'Preparing...' : 'Continue'}

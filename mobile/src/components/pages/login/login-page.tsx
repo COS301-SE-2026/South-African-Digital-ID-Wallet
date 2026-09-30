@@ -8,7 +8,10 @@ export const LoginPage = () => {
 
   return (
     <AuthScreen subtitle="Log in to your account" title="Welcome back">
-      <LoginForm onRegister={() => router.push('/register')} />
+      <LoginForm
+        onForgotPassword={() => router.push('/forgot-password')}
+        onRegister={() => router.push('/register')}
+      />
     </AuthScreen>
   )
 }

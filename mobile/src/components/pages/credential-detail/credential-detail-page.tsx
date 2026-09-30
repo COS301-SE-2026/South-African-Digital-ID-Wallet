@@ -1,12 +1,17 @@
-import { useCallback, useEffect } from 'react'
-import { useRouter } from 'expo-router'
-import { QrCode } from 'lucide-react-native'
-import { ActivityIndicator, View } from 'react-native'
+import { useCallback } from 'react'
+import { useFocusEffect, useRouter } from 'expo-router'
+import { FileBadge, QrCode } from 'lucide-react-native'
+import { ActivityIndicator, Alert, View } from 'react-native'
 
 import { Button, Text } from '@/components/atoms'
 import { CredentialDetailCard } from '@/components/organisms'
 import { DetailScreen } from '@/components/templates'
-import { useBiometricUnlock, useWalletCredential } from '@/hooks'
+import {
+  useBiometricUnlock,
+  useCertifiedCopy,
+  useWalletCredential,
+} from '@/hooks'
+import { resolveCertifiedCopyError } from '@/services/certified-copy-service'
 import { useAuthStore } from '@/stores/auth-store'
 import {
   isUnlockValid,
@@ -24,23 +29,57 @@ export const CredentialDetailPage = ({ id }: CredentialDetailPageProps) => {
   const unlockedAt = useCredentialUnlockStore((state) => state.unlockedAt)
   const unlockedId = useCredentialUnlockStore((state) => state.unlockedId)
   const { status, unlock } = useBiometricUnlock()
+  const { generate: generateCertifiedCopy, isGenerating } = useCertifiedCopy()
 
   const isUnlocked = isUnlockValid(id, unlockedId, unlockedAt)
-
-  useEffect(() => {
-    if (isUnlocked || status !== 'idle' || !credential) {
-      return
-    }
-    void unlock(`Unlock ${credential.title}`).then((result) => {
-      if (result === 'unlocked') {
-        grantUnlock(credential.id)
+  // only the screen on top prompts.
+  useFocusEffect(
+    useCallback(() => {
+      if (isUnlocked || status !== 'idle' || !credential) {
         return
       }
-      router.back()
-    })
-  }, [credential, grantUnlock, isUnlocked, router, status, unlock])
+      void unlock(`Unlock ${credential.title}`).then((result) => {
+        if (result === 'unlocked') {
+          grantUnlock(credential.id)
+          return
+        }
+        router.back()
+      })
+    }, [credential, grantUnlock, isUnlocked, router, status, unlock])
+  )
 
   const handleBack = useCallback(() => router.back(), [router])
+
+  const handleCertifiedCopy = useCallback(() => {
+    if (!credential) {
+      return
+    }
+
+    if (
+      credential.type !== 'IdentityDocument' &&
+      credential.type !== 'DriversLicense'
+    ) {
+      Alert.alert(
+        'Certified copy unavailable',
+        'This credential type does not support certified copies.'
+      )
+      return
+    }
+
+    generateCertifiedCopy(
+      {
+        credentialId: credential.id,
+        credentialType: credential.type,
+      },
+      {
+        onError: (error) =>
+          Alert.alert(
+            'Certified copy failed',
+            resolveCertifiedCopyError(error)
+          ),
+      }
+    )
+  }, [credential, generateCertifiedCopy])
 
   const holderName = [user?.names, user?.surname].filter(Boolean).join(' ')
 
@@ -75,10 +114,19 @@ export const CredentialDetailPage = ({ id }: CredentialDetailPageProps) => {
         onPress={() =>
           router.push({
             params: { credentialId: credential.id },
-            pathname: '/citizen/present',
+            pathname: '/citizen/wallet/present',
           })
         }
         testID="share-identity-button"
+      />
+      <Button
+        disabled={credential.status !== 'Active'}
+        isLoading={isGenerating}
+        label="Generate Certified Copy"
+        LeftIcon={FileBadge}
+        onPress={handleCertifiedCopy}
+        testID="certified-copy-button"
+        variant="secondary"
       />
     </DetailScreen>
   )

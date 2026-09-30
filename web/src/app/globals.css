@@ -107,6 +107,25 @@
   --sidebar-ring: #ffb81c;
 }
 
+.flashid-gradient-border {
+  position: relative;
+  border-radius: 1.3rem;
+  padding: 2px;
+  background: linear-gradient(
+    90deg,
+    black,
+    var(--national-red),
+    var(--primary-green)
+  );
+}
+
+.flashid-gradient-border-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 1.3rem;
+  background: white;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

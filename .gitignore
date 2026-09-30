@@ -20,7 +20,7 @@ node_modules/
 .DS_Store
 
 *.swp
-*.swobin/
+bin/
 obj/
 *.swo
 
@@ -31,3 +31,5 @@ CoverageReport/
 
 __azurite*
 Azurite*
+
+backend.log

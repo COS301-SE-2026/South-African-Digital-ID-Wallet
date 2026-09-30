@@ -1,6 +1,7 @@
 using System.Reflection.Metadata;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.RepositoryInterfaces;
+using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Services;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Exceptions;
@@ -30,8 +31,21 @@ public class QrServiceTests
 
     private sealed class FakeQrSigningProvider : IQrSigningProvider
     {
-        public string Sign(string payload) => "fake-signature";
-        public bool Verify(string payload, string signature) => true;
+        private static readonly EcPublicJwk FakeJwk = new("EC", "P-256", "fake-kid", "fake-x", "fake-y");
+        private static readonly QrSigningKey FakeKey = new("fake-kid", "ES256", FakeJwk);
+
+        public Task<QrSigningKey> GetActiveKeyAsync(CancellationToken cancellationToken) => Task.FromResult(FakeKey);
+
+        public Task<byte[]> SignAsync(string keyId, byte[] signingInput, CancellationToken cancellationToken) =>
+            Task.FromResult(System.Text.Encoding.UTF8.GetBytes("fake-signature"));
+    }
+
+    private sealed class FakeQrSignatureVerifier : IQrSignatureVerifier
+    {
+        public bool ShouldVerify { get; set; } = true;
+
+        public Task<bool> VerifyAsync(string kid, string alg, byte[] signingInput, byte[] signature, CancellationToken cancellationToken) =>
+            Task.FromResult(ShouldVerify);
     }
 
     private sealed class FakeQrDisclosureTokenRepository : IQrDisclosureTokenRepository
@@ -115,11 +129,11 @@ public class QrServiceTests
             CredentialsToReturn = credentialsToReturn ?? new List<Credential>(),
         };
         var fakeSigningProvider = new FakeQrSigningProvider();
+        var fakeSignatureVerifier = new FakeQrSignatureVerifier();
         var fakeQrDisclosureTokenRepo = new FakeQrDisclosureTokenRepository();
         var fakeInstitutionRepo = new FakeInstitutionRepository();
         var disclosedFieldValueResolver = new DisclosedFieldValueResolver(new FakePhotoStorageProvider());
-        var service = new QrService(fakeRepo, fakeSigningProvider, fakeQrDisclosureTokenRepo, fakeInstitutionRepo, disclosedFieldValueResolver);
-
+        var service = new QrService(fakeRepo, fakeSigningProvider, fakeSignatureVerifier, fakeQrDisclosureTokenRepo, fakeInstitutionRepo, disclosedFieldValueResolver);
         return (service, fakeQrDisclosureTokenRepo);
     }
 

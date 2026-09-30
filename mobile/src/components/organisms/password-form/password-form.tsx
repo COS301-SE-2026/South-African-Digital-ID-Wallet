@@ -32,7 +32,7 @@ export const PasswordForm = ({
       await updatePassword(values)
       Alert.alert(
         'Password updated',
-        'Please sign in again with your new password.',
+        "You've been signed out on all your devices. Sign in again with your new password and verify this device with the code we email you.",
         [{ onPress: () => void signOut(), text: 'OK' }],
         { onDismiss: () => void signOut() }
       )

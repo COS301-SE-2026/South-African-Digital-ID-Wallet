@@ -1,12 +1,9 @@
 import { z } from 'zod'
+import { saIdSchema } from './sa-id'
 
 export const retrivalSchema = z.object({
-  idNumber: z
-    .string()
-    .trim()
-    .regex(/^\d{13}$/, {
-      error: 'Enter a valid 13 digit South African ID number.',
-    }),
+  // Full SA ID check (date, citizenship digit, Luhn), not just "13 digits"
+  idNumber: saIdSchema,
 
   idConsent: z.literal(true, {
     error: 'Citizen consent is required before retreiving ID record.',

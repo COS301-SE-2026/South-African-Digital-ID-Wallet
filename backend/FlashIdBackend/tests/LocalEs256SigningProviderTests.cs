@@ -17,8 +17,31 @@ public class LocalEs256SigningProviderTests
     // Each test generates a fresh key at runtime, so no private key is ever committed.
     private static string NewPrivateKey(ECCurve curve)
     {
-        using var key = ECDsa.Create(curve);
-        return Convert.ToBase64String(key.ExportPkcs8PrivateKey());
+        try
+        {
+            using var key = ECDsa.Create(curve);
+            return Convert.ToBase64String(key.ExportPkcs8PrivateKey());
+        }
+        catch (PlatformNotSupportedException)
+        {
+            Assert.Skip($"Curve {curve.Oid.FriendlyName ?? curve.Oid.Value} is not supported by this platform's crypto provider.");
+            throw;
+        }
+    }
+
+    // macOS CoreCrypto only implements the NIST curves, so secp256k1 and brainpool
+    // cannot be generated there at all. Skip rather than fail on those platforms.
+    private static string NewPrivateKeyOrSkip(ECCurve curve)
+    {
+        try
+        {
+            return NewPrivateKey(curve);
+        }
+        catch (PlatformNotSupportedException)
+        {
+            Assert.Skip("Curve not supported by this platform's crypto backend.");
+            throw;
+        }
     }
 
     private static IConfiguration CreateConfiguration(string? kid, string? privateKey)

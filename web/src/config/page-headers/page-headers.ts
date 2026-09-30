@@ -9,6 +9,11 @@ export const pageHeaders: Record<string, PageHeader> = {
     description: 'View and manage official FlashID tasks.',
   },
 
+  '/officials/officials-dashboard': {
+    title: 'Officials Dashboard',
+    description: 'View and manage official FlashID tasks.',
+  },
+
   '/officials/onboard-citizen': {
     title: 'Onboard Citizen',
     description:
@@ -83,6 +88,11 @@ export const pageHeaders: Record<string, PageHeader> = {
     title: 'View Institutions',
     description:
       'Browse and search all registered institutions on the FlashID platform.',
+  },
+  '/officials/verify-document': {
+    title: 'Verify a Certified Copy',
+    description:
+      'Upload a certified copy PDF to verify its authenticity and integrity.',
   },
 }
 

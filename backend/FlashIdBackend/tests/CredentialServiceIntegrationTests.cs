@@ -8,6 +8,8 @@ using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Moq;
+using Application.Common.Interfaces.ProviderInterfaces;
 
 namespace tests;
 
@@ -35,7 +37,8 @@ public class CredentialServiceIntegrationTests
             new CredentialRepository(context),
             new NotificationRepository(context),
             new InstitutionRepository(context),
-            new CredentialMapper()
+            new CredentialMapper(),
+            Mock.Of<IPhotoStorageProvider>()
         );
     }
 

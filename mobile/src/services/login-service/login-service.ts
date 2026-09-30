@@ -7,6 +7,7 @@ import loginUrls from './login-urls'
 import type {
   LoginFormValues,
   LoginResponse,
+  ResetPasswordRequest,
   VerifyDeviceRequest,
 } from './types'
 
@@ -25,6 +26,24 @@ const verifyDevice = (request: VerifyDeviceRequest) =>
 
 const logout = () => api.post(loginUrls.logout()).then((res) => res.data)
 
-const loginService = { login, logout, verifyDevice }
+const forgotPassword = async (email: string): Promise<void> => {
+  await api.post(loginUrls.forgotPassword(), { email: email.trim() })
+}
+
+const resetPassword = async (request: ResetPasswordRequest): Promise<void> => {
+  await api.post(loginUrls.resetPassword(), {
+    ...request,
+    email: request.email.trim(),
+    otp: request.otp.trim(),
+  })
+}
+
+const loginService = {
+  login,
+  logout,
+  verifyDevice,
+  forgotPassword,
+  resetPassword,
+}
 
 export default loginService

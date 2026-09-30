@@ -15,6 +15,7 @@ import {
   Landmark,
   LogOut,
   IdCard,
+  FileUser,
 } from 'lucide-react'
 import { useState } from 'react'
 import Image from 'next/image'
@@ -39,6 +40,7 @@ const sidebarIcons: Record<SidebarIconName, React.ElementType> = {
   onboard: UserRoundPen,
   institutions: Landmark,
   idCard: IdCard,
+  fileUser: FileUser,
 }
 
 export const AppSidebar = ({

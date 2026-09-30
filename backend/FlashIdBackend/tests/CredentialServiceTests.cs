@@ -7,6 +7,8 @@ using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Exceptions;
+using Moq;
+using Application.Common.Interfaces.ProviderInterfaces;
 
 namespace tests;
 
@@ -21,13 +23,14 @@ public class CredentialServiceTests
         return new AppDbContext(options);
     }
 
-    private static CredentialService CreateService(AppDbContext context)
+    private static CredentialService CreateService(AppDbContext context, IPhotoStorageProvider? photoStorage = null)
     {
         return new CredentialService(
             new CredentialRepository(context),
             new NotificationRepository(context),
             new InstitutionRepository(context),
-            new CredentialMapper()
+            new CredentialMapper(),
+            photoStorage ?? Mock.Of<IPhotoStorageProvider>()
         );
     }
 
@@ -316,6 +319,77 @@ public class CredentialServiceTests
 
         Assert.Single(result);
         Assert.Equal("IdentityDocument", result[0].Type);
+    }
+
+    [Fact]
+    public async Task GetCredentialsForCitizenAsync_CredentialWithPhoto_ReturnsPhotoUrl()
+    {
+        using var context = CreateContext();
+        var citizen = SeedCitizen(context, "Sipho", "Nkosi", "9001015800086");
+        context.Credentials.Add(new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Status = CredentialStatus.Active,
+            Signature = "sig",
+            IssuedBy = "Department of Home Affairs",
+            IssueDate = DateTime.UtcNow,
+            IdentityDocument = new IdentityDocument
+            {
+                Id = Guid.NewGuid(),
+                Nationality = "South African",
+                Citizenship = "South African",
+                CountryOfBirth = "South Africa",
+                Status = IdentityDocumentStatus.Citizen,
+                PhotoPath = "mock-photos-raven.png",
+            },
+        });
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var photoStorage = new Mock<IPhotoStorageProvider>();
+        photoStorage
+            .Setup(p => p.GenerateReadSasUrlAsync("mock-photos-raven.png", It.IsAny<TimeSpan>()))
+            .ReturnsAsync("https://fake-blob-sas.local/mock-photos-raven.png");
+        var service = CreateService(context, photoStorage.Object);
+
+        var result = (await service.GetCredentialsForCitizenAsync(citizen.Id)).ToList();
+
+        var dto = Assert.Single(result);
+        Assert.Equal("https://fake-blob-sas.local/mock-photos-raven.png", dto.PhotoUrl);
+    }
+
+    [Fact]
+    public async Task GetCredentialsForCitizenAsync_CredentialWithoutPhoto_ReturnsNullPhotoUrl()
+    {
+        using var context = CreateContext();
+        var citizen = SeedCitizen(context, "Sipho", "Nkosi", "9001015800086");
+        context.Credentials.Add(new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Status = CredentialStatus.Active,
+            Signature = "sig",
+            IssuedBy = "Department of Home Affairs",
+            IssueDate = DateTime.UtcNow,
+            IdentityDocument = new IdentityDocument
+            {
+                Id = Guid.NewGuid(),
+                Nationality = "South African",
+                Citizenship = "South African",
+                CountryOfBirth = "South Africa",
+                Status = IdentityDocumentStatus.Citizen,
+            },
+        });
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var photoStorage = new Mock<IPhotoStorageProvider>();
+        var service = CreateService(context, photoStorage.Object);
+
+        var result = (await service.GetCredentialsForCitizenAsync(citizen.Id)).ToList();
+
+        var dto = Assert.Single(result);
+        Assert.Null(dto.PhotoUrl);
+        photoStorage.Verify(p => p.GenerateReadSasUrlAsync(It.IsAny<string>(), It.IsAny<TimeSpan>()), Times.Never);
     }
 
     [Fact]

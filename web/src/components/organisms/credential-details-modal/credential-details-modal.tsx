@@ -11,6 +11,15 @@ import type { StatusPillIntent } from '@/components/atoms/status-pill'
 import type { CredentialDetailsModalProps, CredentialStatus } from './types'
 import Image from 'next/image'
 
+const getInitials = (fullName: string): string =>
+  fullName
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase())
+    .slice(0, 2)
+    .join('')
+
 const CREDENTIAL_STATUS_PILL_INTENTS: Record<
   CredentialStatus,
   StatusPillIntent
@@ -137,12 +146,19 @@ export function CredentialDetailsModal({
               <div className="h-full rounded-[24px] bg-clean-white p-6">
                 <div className="flex justify-center">
                   <div className="relative h-48 w-48 overflow-hidden rounded-xl border-2 border-primary-green">
-                    <Image
-                      src="/images/mock-citizen.jpg"
-                      alt={`${selected.citizen.fullName} profile`}
-                      fill
-                      className="object-cover"
-                    />
+                    {selected.photoUrl ? (
+                      <Image
+                        src={selected.photoUrl}
+                        alt={`${selected.citizen.fullName} profile`}
+                        fill
+                        unoptimized
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-primary-green/10 text-5xl font-semibold text-primary-green">
+                        {getInitials(selected.citizen.fullName)}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="mt-6">

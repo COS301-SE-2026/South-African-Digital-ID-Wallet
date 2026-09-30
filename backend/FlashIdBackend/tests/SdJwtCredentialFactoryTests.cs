@@ -5,6 +5,7 @@ using System.Text.Json.Nodes;
 using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Common.Services;
+using Application.Features.Credentials.Exceptions;
 using Microsoft.AspNetCore.Http;
 
 namespace tests;
@@ -327,16 +328,16 @@ public class SdJwtCredentialFactoryTests
     }
 
     [Fact]
-    public async Task CreateAsync_DeviceKeyWithShortCoordinates_ThrowsArgumentException()
+    public async Task CreateAsync_DeviceKeyWithShortCoordinates_ThrowsInvalidDeviceKeyException()
     {
         using var signingProvider = new TestSigningProvider();
         var request = new SdJwtCredentialRequestBuilder().WithDeviceKey(new EcPublicJwk("EC", "P-256", "device-1", "eA", "eQ")).Build();
 
-        await Assert.ThrowsAsync<ArgumentException>(() => CreateFactory(signingProvider).CreateAsync(request, TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<InvalidDeviceKeyException>(() => CreateFactory(signingProvider).CreateAsync(request, TestContext.Current.CancellationToken));
     }
 
     [Fact]
-    public async Task CreateAsync_DeviceKeyOffTheCurve_ThrowsArgumentException()
+    public async Task CreateAsync_DeviceKeyOffTheCurve_ThrowsInvalidDeviceKeyException()
     {
         using var signingProvider = new TestSigningProvider();
         var valid = CreateDeviceKey();
@@ -347,18 +348,18 @@ public class SdJwtCredentialFactoryTests
             .WithDeviceKey(valid with { Y = Base64Url.EncodeToString(tampered) })
             .Build();
 
-        await Assert.ThrowsAsync<ArgumentException>(() => CreateFactory(signingProvider).CreateAsync(request, TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<InvalidDeviceKeyException>(() => CreateFactory(signingProvider).CreateAsync(request, TestContext.Current.CancellationToken));
     }
 
     [Fact]
-    public async Task CreateAsync_DeviceKeyOnTheWrongCurve_ThrowsArgumentException()
+    public async Task CreateAsync_DeviceKeyOnTheWrongCurve_ThrowsInvalidDeviceKeyException()
     {
         using var signingProvider = new TestSigningProvider();
         var valid = CreateDeviceKey();
 
         var request = new SdJwtCredentialRequestBuilder().WithDeviceKey(valid with { Crv = "P-384" }).Build();
 
-        await Assert.ThrowsAsync<ArgumentException>(() => CreateFactory(signingProvider).CreateAsync(request, TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<InvalidDeviceKeyException>(() => CreateFactory(signingProvider).CreateAsync(request, TestContext.Current.CancellationToken));
     }
 
     [Fact]

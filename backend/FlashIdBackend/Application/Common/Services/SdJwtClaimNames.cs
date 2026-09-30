@@ -37,7 +37,7 @@ public static class SdJwtClaimNames
         ["Citizenship status"] = CitizenshipStatus,
         ["Gender"] = Gender,
         ["Country of birth"] = CountryOfBirth,
-        ["Card issue date and number"] = CardIssueDateAndNumber,
+        ["Card issue date"] = CardIssueDateAndNumber,
         ["Signature"] = SignatureImage,
     }.ToFrozenDictionary();
 

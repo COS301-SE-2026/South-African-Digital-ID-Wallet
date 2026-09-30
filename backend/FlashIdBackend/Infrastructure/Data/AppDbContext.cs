@@ -29,13 +29,21 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<DeviceVerification> DeviceVerifications => Set<DeviceVerification>();
     public DbSet<JobRun> JobRuns => Set<JobRun>();
     public DbSet<PhysicalIdentityVerification> PhysicalIdentityVerifications => Set<PhysicalIdentityVerification>();
+    public DbSet<SigningKey> SigningKeys => Set<SigningKey>();
+    public DbSet<SecurityEvent> SecurityEvents => Set<SecurityEvent>();
+    public DbSet<FraudAlert> FraudAlerts => Set<FraudAlert>();
+    public DbSet<UserSecurityProfile> UserSecurityProfiles => Set<UserSecurityProfile>();
+    public DbSet<EmergencyProfile> EmergencyProfiles => Set<EmergencyProfile>();
+    public DbSet<EmergencyContact> EmergencyContacts => Set<EmergencyContact>();
+    public DbSet<EmergencyDevice> EmergencyDevices => Set<EmergencyDevice>();
+    public DbSet<EmergencyAccess> EmergencyAccesses => Set<EmergencyAccess>();
+    public DbSet<RetiredEmergencyRevocationIndex> RetiredEmergencyRevocationIndexes => Set<RetiredEmergencyRevocationIndex>();
 
+    public DbSet<CertifiedCredentialCopy> CertifiedCredentialCopies => Set<CertifiedCredentialCopy>();
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        //this lets IdentityDbContext set up its own tables
         base.OnModelCreating(builder);
 
-        //scan the Infrastructure assembly and automatically find every class that implements IEntityTypeConfiguration<T>
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

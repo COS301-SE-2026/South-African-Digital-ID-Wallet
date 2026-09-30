@@ -33,7 +33,7 @@ const FAQS = [
   {
     question: 'Can I use FlashID offline?',
     answer:
-      'Some credentials can be viewed offline, but internet access is required when verifying credentials or receiving new ones from issuing authorities.',
+      'Yes. Once your phone has been online once, you can show an offline QR code for your credentials with no signal, and officials can verify it on their phone without a connection. Offline codes work only from your own phone.',
   },
   {
     question: 'Which credentials can I store?',
@@ -78,7 +78,7 @@ const FAQS = [
   {
     question: 'What should I do if I forget my password?',
     answer:
-      'Use the "Forgot Password" option on the login page to receive a secure password reset link sent to your registered email address.',
+      'Use the "Forgot password?" link on the login page. We email a 6-digit code to your registered address. Enter it with your new password to reset it.',
   },
   {
     question: 'Does FlashID replace my physical ID?',

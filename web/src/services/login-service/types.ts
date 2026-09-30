@@ -23,3 +23,10 @@ export type VerifyDeviceRequest = {
   browser: string
   rememberMe?: boolean
 }
+
+export type ResetPasswordRequest = {
+  email: string
+  otp: string
+  newPassword: string
+  confirmPassword: string
+}

@@ -11,6 +11,7 @@ export interface CredentialDetail {
   status: CredentialStatus
   issuedOn: string
   expiresOn: string
+  photoUrl: string | null
   citizen: {
     fullName: string
     idNumber: string

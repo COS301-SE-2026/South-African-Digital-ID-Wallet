@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Http;
 using Application.Features.Auth.Exceptions;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.DataProtection;
+using Application.Features.FraudDetection.DTOs;
+using Presentation.Security;
+using Application.Features.Citizens.Exceptions;
 
 namespace Presentation.Controllers;
 
@@ -55,9 +58,10 @@ public class AuthController : ControllerBase
         }
     }
 
-    // Login is anonymous — no [Authorize] needed because the user does not have a token yet.
+    // Login is anonymous - no [Authorize] needed because the user does not have a token yet.
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequestDto request, [FromHeader(Name = "X-Client")] string? client, CancellationToken cancellationToken)
+    [EnableRateLimiting("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request, [FromHeader(Name = "X-Client")] string? client, [FromServices] IFraudDetectionService fraudDetectionService, CancellationToken cancellationToken)
     {
         try
         {
@@ -90,19 +94,12 @@ public class AuthController : ControllerBase
                 return StatusCode(StatusCodes.Status500InternalServerError, new { error = "The login could not be completed." });
             }
 
+            result.SecurityAlert = await RecordSecurityEventAsync(fraudDetectionService, result.UserId,
+                Domain.Enums.SecurityEventType.Login, deviceToken, cancellationToken);
+
             // The token is set in an HttpOnly cookie so JavaScript cannot read it.
             // Secure = true in production forces HTTPS; in development HTTP is allowed.
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = !_environment.IsDevelopment(),
-                SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
-                Path = "/",
-                Expires = result.ExpiresAt,
-                IsEssential = true
-            };
-
-            Response.Cookies.Append("access_token", result.Token, cookieOptions);
+            AuthCookies.AppendAccessToken(Response, _environment, result.Token, result.ExpiresAt);
 
             var isNativeClient = IsNativeClient(client);
             if (!isNativeClient)
@@ -132,8 +129,10 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("verify-device")]
+    [EnableRateLimiting("verify-device")]
     public async Task<IActionResult> VerifyDevice([FromBody] VerifyDeviceRequestDto request,
         [FromHeader(Name = "X-Client")] string? client,
+        [FromServices] IFraudDetectionService fraudDetectionService,
         CancellationToken cancellationToken)
     {
         try
@@ -150,16 +149,10 @@ public class AuthController : ControllerBase
                     new { error = "The login could not be completed." });
             }
 
-            var accessTokenOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = !_environment.IsDevelopment(),
-                SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
-                Path = "/",
-                Expires = result.ExpiresAt,
-                IsEssential = true
-            };
-            Response.Cookies.Append("access_token", result.Token, accessTokenOptions);
+            result.SecurityAlert = await RecordSecurityEventAsync(fraudDetectionService, result.UserId,
+                Domain.Enums.SecurityEventType.DeviceVerified, result.DeviceToken ?? deviceToken, cancellationToken);
+
+            AuthCookies.AppendAccessToken(Response, _environment, result.Token, result.ExpiresAt);
 
             if (!string.IsNullOrWhiteSpace(result.DeviceToken))
             {
@@ -294,7 +287,34 @@ public class AuthController : ControllerBase
         }
     }
 
-    // [Authorize] — must be authenticated (any role) to log out.
+    // Anonymous: the user cannot sign in, which is why they are here.
+    [HttpPost("forgot-password")]
+    [EnableRateLimiting("password-reset")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto request, [FromServices] IPasswordResetService passwordResetService)
+    {
+        await passwordResetService.RequestResetAsync(request);
+        // Same reply whether or not the account exists, so the endpoint cannot reveal who is registered.
+        return Ok(new { message = "If an account exists for that email, a reset code has been sent." });
+    }
+
+    [HttpPost("reset-password")]
+    [EnableRateLimiting("password-reset")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request, [FromServices] IPasswordResetService passwordResetService)
+    {
+        try
+        {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            await passwordResetService.ResetPasswordAsync(request, ipAddress);
+            return Ok(new { message = "Password updated. You can now log in." });
+        }
+        // The four errors the user can fix themselves become a 400 with a readable message.
+        catch (Exception ex) when (ex is InvalidOtpException or OtpExpiredException or TooManyOtpAttemptsException or InvalidCitizenRegistrationRequestException)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    // [Authorize] - must be authenticated (any role) to log out.
     [Authorize]
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
@@ -308,12 +328,7 @@ public class AuthController : ControllerBase
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
             var result = await _authService.LogoutAsync(userId, ipAddress);
 
-            Response.Cookies.Delete("access_token", new CookieOptions
-            {
-                Path = "/",
-                Secure = !_environment.IsDevelopment(),
-                SameSite = _environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
-            });
+            AuthCookies.DeleteAll(Response, _environment);
 
             return Ok(result);
         }
@@ -323,6 +338,22 @@ public class AuthController : ControllerBase
             return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
+    private async Task<SecurityAlertNoticeDto?> RecordSecurityEventAsync(IFraudDetectionService fraudDetectionService,
+        Guid userId, Domain.Enums.SecurityEventType eventType, string? deviceToken, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var context = SecurityEventContextFactory.Create(HttpContext, userId, eventType, deviceToken);
+            var assessment = await fraudDetectionService.RecordSecurityEventAsync(context, cancellationToken);
+            return assessment.Notice;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogError(ex, "Fraud check failed for user {UserId}. Continuing the sign-in without it.", userId);
+            return null;
+        }
+    }
+
     private string? ReadDeviceToken()
     {
         if (Request.Headers.TryGetValue(DeviceHeaderName, out var header)

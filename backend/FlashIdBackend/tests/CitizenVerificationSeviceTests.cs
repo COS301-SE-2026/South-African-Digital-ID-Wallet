@@ -10,7 +10,7 @@ public class CitizenVerificationServiceTests
 {
     private const string RawToken = "activation-token";
     private const string ValidPin = "123456";
-    private const string ValidSaId = "9001015800086";
+    private const string ValidSaId = "9001015801086";
     private const string TestIpAddress = "196.25.1.10";
 
     private static string Sha256Hex(string raw) => Convert.ToHexString(
@@ -146,7 +146,7 @@ public class CitizenVerificationServiceTests
     [Fact]
     public async Task SaIdMismatch_RecordsFailedAttempt()
     {
-        var c = Setup(citizenSaId: "8001015800087");
+        var c = Setup(citizenSaId: "8001015801087");
         await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid()));
         Assert.Equal(1, c.Activation.AttemptCount);
         Assert.Equal(1, c.Repo.Saves);
@@ -206,7 +206,7 @@ public class CitizenVerificationServiceTests
     [Fact]
     public async Task UserAlreadyLinkedToAnotherCitizen_Throws()
     {
-        var c = Setup(citizenForUser: new Citizen { Id = Guid.NewGuid(), SaId = "8001015800087" });
+        var c = Setup(citizenForUser: new Citizen { Id = Guid.NewGuid(), SaId = "8001015801087" });
         var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid()));
         Assert.Contains("linked to another citizen", ex.Message);
     }

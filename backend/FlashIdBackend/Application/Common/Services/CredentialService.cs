@@ -1,5 +1,6 @@
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
+using Application.Common.Interfaces.ProviderInterfaces;
 using Application.Common.Mapping;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Exceptions;
@@ -14,13 +15,16 @@ public class CredentialService : ICredentialService
     private readonly INotificationRepository _notificationRepository;
     private readonly IInstitutionRepository _institutionRepository;
     private readonly CredentialMapper _mapper;
+    private readonly IPhotoStorageProvider _photoStorage;
+    private static readonly TimeSpan AdminPhotoUrlLifetime = TimeSpan.FromMinutes(15);
 
-    public CredentialService(ICredentialRepository credentialRepository, INotificationRepository notificationRepository, IInstitutionRepository institutionRepository, CredentialMapper mapper)
+    public CredentialService(ICredentialRepository credentialRepository, INotificationRepository notificationRepository, IInstitutionRepository institutionRepository, CredentialMapper mapper, IPhotoStorageProvider photoStorage)
     {
         _credentialRepository = credentialRepository;
         _notificationRepository = notificationRepository;
         _institutionRepository = institutionRepository;
         _mapper = mapper;
+        _photoStorage = photoStorage;
     }
 
     public async Task<IEnumerable<CredentialResponseDto>> GetMyCredentialsAsync(Guid userId)
@@ -66,6 +70,11 @@ public class CredentialService : ICredentialService
 
         var credentials = await _credentialRepository.GetCredentialsByCitizenIdAsync(citizen.Id);
         var dtos = credentials.Select(c => MapToDto(c, citizen)).ToList();
+
+        foreach (var (dto, credential) in dtos.Zip(credentials))
+        {
+            dto.PhotoUrl = await GetPhotoUrlAsync(credential);
+        }
 
         foreach (var dto in dtos)
         {
@@ -168,6 +177,28 @@ public class CredentialService : ICredentialService
             Status = credential.Status,
             UpdatedAt = DateTime.UtcNow,
         };
+    }
+    private async Task<string?> GetPhotoUrlAsync(Credential credential)
+    {
+        var photoPath = credential.IdentityDocument?.PhotoPath;
+        if (string.IsNullOrWhiteSpace(photoPath))
+        {
+            photoPath = credential.DriversLicense?.PhotoPath;
+        }
+
+        if (string.IsNullOrWhiteSpace(photoPath))
+        {
+            return null;
+        }
+
+        try
+        {
+            return await _photoStorage.GenerateReadSasUrlAsync(photoPath, AdminPhotoUrlLifetime);
+        }
+        catch (InvalidOperationException)
+        {
+            return null;
+        }
     }
     private CredentialResponseDto MapToDto(Credential credential, Citizen citizen)
     {

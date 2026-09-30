@@ -31,6 +31,7 @@
     - [Officials](#officials)
     - [Trusted Devices](#trusted-devices)
     - [Government Registry Service](#government-registry-service)
+    - [Certified Copies](#certified-copies)
 5. [Deployment](#5-deployment)
     - [5.1 Live System](#51-live-system)
     - [5.2 Environment Parity](#52-environment-parity)
@@ -39,6 +40,7 @@
     - [5.5 Rollback Strategy](#55-rollback-strategy)
     - [5.6 Deployment Diagram](#56-deployment-diagram)
     - [5.7 CI/CD Pipeline Diagram](#57-cicd-pipeline-diagram)
+6. [Non-Functional Requirement (NFR) Testing](#6-non-functional-requirement-nfr-testing)
 
 ## 1. Introduction
 
@@ -50,7 +52,7 @@ FlashID is composed of four subsystems: Next.js for web portal for citizens, adm
 
 The full architectural requirements, including architectural patterns, design patterns, constraints and mapping can be found in:
 
- **[architecture-v2.md](../demo3/architecture-v3.md)**
+ **[architecture-v2.md](../demo4/architecture-v4.md)**
 
 ### Architectural Diagram
 ![Architectural Diagram](../images/_architecture_diagram_final.drawio.svg)
@@ -771,6 +773,13 @@ Returns the citizen's offline credential package, minting it if none is stored o
 **Path parameters:**
 - `credentialId` - the credential to prepare for offline presentation.
 
+**Request body:** required (D-022).
+```json
+{ "deviceKey": { "kty": "EC", "crv": "P-256", "x": "qdHQBxh_no3hO8faJ-QU9bguirYPb6hDoEZTq3rWbkg", "y": "dDlHz1bvfdVFBt-vfyZVnxmCxuS3-MPduE49uAt9znU" } }
+```
+
+The public half of the key the wallet created on the phone. It is embedded in the credential as `cnf`, and a change of key re-mints the package.
+
 **Response 200:**
 ```json
 {
@@ -787,7 +796,7 @@ Returns the citizen's offline credential package, minting it if none is stored o
 
 `disclosures` is keyed by claim name so the wallet can offer the citizen a choice without decoding each disclosure first. Every value is the base64url of `[salt, claim_name, claim_value]`.
 
-**Response 400:** the credential is not active.
+**Response 400:** the credential is not active, or the device key is missing or not a valid P-256 public key.
 
 **Response 403:** the credential belongs to another citizen.
 
@@ -828,6 +837,46 @@ officials (D-001).
 `status` is `active` for the key signing now, or `retired` for a key whose private half is disabled but whose existing signatures must still verify for up to 45 days (D-008).
 
 ---
+
+#### GET /api/credentials/revocation-list
+
+Returns the signed list of revocation indexes that must no longer verify offline, for a verifier to cache before going offline (D-025). The list follows wire-format section 13.
+
+**Authentication:** Required, any role.
+
+**Response 200:**
+```json
+{
+    "revocationList": "eyJhbGciOiJFUzI1NiIsInR5cCI6InJldm9jYXRpb24tbGlzdCtqd3QiLCJraWQiOiJmbGFzaGlkLWNyZWQtZGV2LTIwMjYtMDkifQ.eyJpc3MiOiJ1cm46Zmxhc2hpZDppc3N1ZXIiLCJpYXQiOjE3OTAwMDAwMDAsIm5leHRfdXBkYXRlIjoxNzkwMDg2NDAwLCJyZXZva2VkIjpbN119.signature",
+    "retrievedAt": "2026-09-26T10:00:00+02:00"
+}
+```
+
+The payload holds `iss`, `iat`, `next_update` (24 hours later) and `revoked`, the revocation index of every credential that is not `Active`. The verifier stores the list only if its signature verifies against the cached issuer keys.
+
+#### POST /api/credentials/offline-verifications
+
+Records scans a verifier's phone made while offline, once it has signal again (D-026). Each entry's `id` is generated on the phone and becomes the audit row's id, so a retried upload is recorded once.
+
+**Authentication:** Required, any role. Every row records the caller as the actor.
+
+**Request body:**
+```json
+{
+    "entries": [
+        { "id": "3f0e8a52-4c1d-4b8e-9d2a-6f1b7c9e0a11", "revocationIndex": 7, "result": "VERIFIED", "verifiedAt": 1790000000 }
+    ]
+}
+```
+
+`revocationIndex` is sent only when `result` is `VERIFIED`; failed scans are recorded against the verifier and never linked to a citizen. `verifiedAt` is Unix seconds by the phone's clock.
+
+**Response 200:**
+```json
+{ "recorded": 1, "duplicates": 0 }
+```
+
+**Response 400:** more than 100 entries, a missing id, an unknown result or a time out of range.
 
 #### Physical Identity Account Linking Rules
 
@@ -1350,6 +1399,180 @@ Return gov-held driver license record for citizen.
 **Response 200:** Driver's license data
 **Response 404:** Not found
 
+### Certified Copies
+
+#### POST /api/certified-copies/credentials/{credentialId}
+
+Generates a certified PDF copy of one of the authenticated citizen's active credentials.
+
+The `credentialId` identifies the parent FlashID credential record. The requested credential type determines whether the Identity Document or Driver's Licence representation is included in the certified copy.
+
+**Authentication:** Required for Citizen
+
+**Path Parameter:**
+
+- `credentialId` - UUID of the credential belonging to the authenticated citizen.
+
+**Request Body:**
+
+```json
+{
+    "credentialType": "IdentityDocument"
+}
+```
+
+**Credential Types:**
+
+| Value | Description |
+|---|---|
+| `IdentityDocument` | South African identity document |
+| `DriversLicense` | South African driver's licence |
+
+**Response 200:**
+
+Content-Type:
+
+```text
+application/pdf
+```
+
+The response body contains the generated certified-copy PDF as binary data.
+
+The response includes a `Content-Disposition` header containing the generated PDF filename.
+
+**Response 400:** Invalid request or unsupported credential type
+
+**Response 401:** User is not authenticated
+
+**Response 403:** Credential does not belong to the authenticated citizen or the caller is not a Citizen
+
+**Response 404:** Credential not found
+
+**Response 409:** Credential is not in a state that permits certified-copy generation
+
+**Response 500:** Certified copy could not be generated
+
+---
+
+#### GET /api/certified-copies/verify/{verificationToken}
+
+Publicly verifies a FlashID certified copy using the verification token contained in its QR verification URL.
+
+The raw verification token is never stored by FlashID. The supplied token is SHA-256 hashed and matched against the stored verification-token hash.
+
+**Authentication:** None
+
+**Path Parameter:**
+
+- `verificationToken` - opaque cryptographically secure token embedded in the certified copy verification URL.
+
+**Response 200 — Valid Certified Copy:**
+
+```json
+{
+    "isValid": true,
+    "status": "Active",
+    "certificationId": "00000000-0000-0000-0000-000000000000",
+    "generatedAt": "2026-09-29T01:00:00Z",
+    "expiresAt": null,
+    "credentialType": "IdentityDocument",
+    "issuedBy": "string",
+    "issueDate": "2026-01-01T00:00:00Z",
+    "fullName": "string",
+    "idNumber": "string",
+    "dateOfBirth": "2000-01-01T00:00:00Z",
+    "citizenship": "string",
+    "countryOfBirth": "string",
+    "nationality": "string",
+    "licenseNumber": null,
+    "licenseCode": null,
+    "restrictions": null,
+    "expiryDate": null,
+    "countryOfIssue": "South Africa"
+}
+```
+
+Fields that do not apply to the selected credential type may be `null`.
+
+**Response 200 — Invalid Certified Copy:**
+
+```json
+{
+    "isValid": false,
+    "status": "Invalid"
+}
+```
+
+**Response 400:** Verification token is missing or malformed
+
+**Response 404:** Verification token does not resolve to a FlashID certified copy
+
+**Response 500:** Verification could not be completed
+
+---
+
+#### POST /api/certified-copies/verify-document
+
+Verifies whether an uploaded PDF exactly matches a certified copy previously generated by FlashID.
+
+The uploaded document is hashed using SHA-256. FlashID searches for a certified-copy record containing the same stored document hash.
+
+This endpoint verifies the exact PDF bytes and therefore detects modifications or re-saving of the original generated document.
+
+**Authentication:** None
+
+**Content-Type:**
+
+```text
+multipart/form-data
+```
+
+**Form Data:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `document` | PDF file | Yes | Certified-copy PDF to verify |
+
+**Response 200 — Verified Document:**
+
+```json
+{
+    "isValid": true,
+    "documentIntegrityValid": true,
+    "status": "Active",
+    "certificationId": "00000000-0000-0000-0000-000000000000",
+    "credentialType": "IdentityDocument",
+    "fullName": "string",
+    "idNumber": "string",
+    "generatedAt": "2026-09-29T01:00:00Z",
+    "expiresAt": null,
+    "message": "Certified copy verified successfully."
+}
+```
+
+**Response 200 — Document Could Not Be Verified:**
+
+```json
+{
+    "isValid": false,
+    "documentIntegrityValid": false,
+    "status": "Invalid",
+    "certificationId": null,
+    "credentialType": null,
+    "fullName": null,
+    "idNumber": null,
+    "generatedAt": null,
+    "expiresAt": null,
+    "message": "The document could not be verified."
+}
+```
+
+**Response 400:** No document supplied, file is empty, file exceeds the permitted size, or uploaded file is not a PDF
+
+**Response 500:** Document verification could not be completed
+
+---
+
 ## 5. Deployment
 
 ### 5.1 Live System
@@ -1410,3 +1633,106 @@ Database schema changes are a known exception: both APIs apply Entity Framework 
 ### 5.7 CI/CD Pipeline Diagram
 
 ![CI/CD Pipeline Diagram](../images/CICDdiagram.svg)
+
+## 6. Non-Functional Requirement (NFR) Testing
+
+Every quantified NFR from the SRS is mapped below to the architectural tactic claimed to satisfy it and the test that verifies that claim. Where a target could not be honestly validated on the current infrastructure (Azure App Service Free/Basic tier 1), that is stated explicitly rather than reported as a pass.
+
+| ID | Quantified requirement | Tactic in SAS | Test / tool | Target /  actual |
+|---|---|---|---|---|
+| NFR1.1 | All protected resources require a valid JWT | JWT bearer authentication with role-based authorisation policies on controllers | xUnit integration (`CredentialControllerIntegrationTests`) | 401 unauthenticated, 403 wrong role / **pass**, 6 tests including `ExpiryCheck_Unauthenticated_ReturnsUnauthorized` and `IssueCredential_AsCitizen_ReturnsForbidden` |
+| NFR1.4 | OTP required on administrative authentication | Device verification with emailed OTP, attempt-capped and time-expiring, skipped only for an already-trusted device | xUnit (`AuthServiceTests`) | OTP enforced on every untrusted device / **pass**, 12 tests covering missing, invalid, expired, already-verified and max-attempt OTP paths |
+| NFR1.7 | Account locked for 30 minutes after 5 consecutive failed logins | Failed-attempt counter and `LockoutUntil` on the user, checked before the password is verified | xUnit (`AuthServiceTests`, `AuthControllerIntegrationTests`) | Locked on 5th failure, rejected while locked / **pass**, `LoginAsync_FifthConsecutiveFailure_LocksTheAccountForThirtyMinutes`, `LoginAsync_LockedOutAccount_ThrowsBeforeCheckingThePassword`, `Login_WithALockedAccount_ReturnsUnauthorized` |
+| NFR1.8 | QR disclosure token usable exactly once | Single-use `Jti` claim marked through `TryMarkUsedAsync` in Cosmos DB, plus Ed25519 signature verification | xUnit integration (`QrServiceIntegrationTests`) | Second redemption rejected / **pass**, `ResolveAlreadyUsed_TokenAlreadyUsed_ThrowsInvalidDisclosureTokenException` |
+| NFR1.9 | Rate limiting on abuse-prone endpoints | ASP.NET Core rate limiting middleware, per-user partitioned policies | k6 | 429 past configured limit /  429 confirmed on request #4 |
+| NFR1.10 | POPIA erasure on account-deletion request | Cascading removal of citizen, credential, audit and user records in a defined order | xUnit (`DeleteAccountServiceTests`) | All personal data removed or irrecoverable / **pass**, 5 tests including deletion ordering and audit-log removal |
+| NFR2.1 | Dashboard interactive <2s for 95% of requests | Next.js code-split routing, static asset optimisation | Lighthouse 13.4.1 (desktop, single run per page) | <2000 ms / worst case across all 19 pages: FCP 0.5 s, LCP 1.2 s, TBT 10 ms. Lab measurement, one sample per page, not a 95th-percentile field measurement |
+| NFR2.2 | Auth ops <2s for 95% of requests | JWT bearer auth, BCrypt password hashing, trusted-device check to skip OTP round-trip | k6 | <2000 ms / 1.62 s |
+| NFR2.3 | Credential retrieval <2s for 95% of requests | Indexed lookup via UserId/ CitizenId | k6 | <2000 ms /  508 ms |
+| NFR2.3 | QR generation <2s for 95% of requests | Ed25519-signed disclosure token generation | k6 | <2000 ms /  94 ms |
+| NFR2.4 | QR verification <3s | Single-use Jti claim (`TryMarkUsedAsync`) + Ed25519 signature verification | k6 | <3000 ms /  435.55 ms |
+| NFR2.5 | 500 concurrent authenticated users, no degradation | - | k6 | 500 VUs /  **not attainable on current Basic tier** - requires Standard/Premium plan with autoscaling |
+| NFR2.7 | Cold-start latency <5s after idle | None - Free/ Basic tier has no "Always On"/ warm-up strategy configured | k6 | <5000 ms / 667 ms |
+| NFR3.5 | Credential and account data remain consistent | EF Core transactional writes, keyset pagination, idempotent background sweeps | xUnit integration (repository test suites) | No hard target / **pass**, consistency is exercised indirectly by `CredentialExpiryRepositoryIntegrationTests` and `CredentialUpdateRepositoryIntegrationTests` |
+| NFR3.7 | Expiry-check batch completes within bounded time at current volume | Idempotent daily sweep, single-flight 409 guard | k6 | documented, no hard target / 366 ms at ~150 citizens |
+| NFR4.2 | Frequent tasks within 3 interactions from the dashboard | Dashboard entry points to each frequent task | Manual interaction count (see 6.2) | <=3 / 4 of 5 tasks pass, update password takes 4 - **partial** |
+| NFR4.3 | WCAG 2.1 AA on public-facing web interfaces | Semantic HTML | Lighthouse 13.4.1 Accessibility audit (desktop) | 90 / 90 to 96 across 19 pages, **pass** |
+| NFR5.1 | Modular Clean Architecture | Domain / Application / Infrastructure / Presentation separation, dependencies inverted through interfaces registered at composition root | xUnit (`DependencyInjectionTests`) | Every Application interface resolves to its Infrastructure implementation at the expected lifetime / **pass** |
+| NFR5.2 | CI passes build/lint/tests on main | GitHub Actions quality gates | Actions history | https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/33838886255 |
+| NFR5.3 | >=80% unit test coverage on critical logic | - | Codecov | >=80% / 63% - **fail**, 17pts short |
+| NFR5.4 | Deploy within 30 min of merge to main | GitHub Actions -> Azure Web Apps deploy | Actions run duration | <30 min / 5m36s (api-flashid), 5m35s (gov-registry), 2m8s (web) - **pass** |
+
+### 6.1 Lighthouse Audit Detail (supports NFR2.1, NFR4.3)
+
+All runs used Lighthouse 13.4.1, emulated desktop, custom throttling, single page session,
+initial page load, one run per page. Raw reports are in `docs/lighthouse-nf-testing/`.
+
+**Production** (`flashid.co.za`)
+
+| Page | Perf | A11y | BP | SEO | FCP | LCP | TBT | CLS | SI |
+|---|---|---|---|---|---|---|---|---|---|
+| Landing (`/`) | 99 | 96 | 100 | 100 | 0.4 s | 0.9 s | 0 ms | 0.004 | 0.4 s |
+| Officials Dashboard (`/officials/officials-dashboard`) | 97 | 96 | 96 | 100 | 0.4 s | 0.9 s | 0 ms | 0.082 | 0.8 s |
+| Onboard Citizen (`/officials/onboard-citizen`) | 99 | 96 | 96 | 100 | 0.4 s | 1.0 s | 10 ms | 0 | 0.7 s |
+| Issue Driver's Licence (`/officials/issue-drivers-license`) | 99 | 96 | 96 | 100 | 0.4 s | 1.0 s | 0 ms | 0 | 0.4 s |
+| Officials Verifications (`/officials/verifications`) | 100 | 93 | 96 | 100 | 0.4 s | 0.8 s | 0 ms | 0.001 | 0.6 s |
+| Citizen Dashboard (`/citizen/citizen-dashboard`) | 99 | 96 | 96 | 100 | 0.4 s | 0.9 s | 0 ms | 0.022 | 0.4 s |
+| View ID Credential (`/citizen/my-credentials`) | 98 | 95 | 96 | 100 | 0.5 s | 1.1 s | 0 ms | 0 | 0.5 s |
+| View Licence Credential (`/citizen/my-credentials`) | 99 | 95 | 96 | 100 | 0.4 s | 1.0 s | 0 ms | 0 | 0.4 s |
+| Share ID Credential (`/citizen/my-credentials`)* | 97 | 95 | 96 | 100 | 0.5 s | 1.2 s | 0 ms | 0 | 0.8 s |
+| Share Licence Credential (`/citizen/my-credentials`)* | 99 | 95 | 96 | 100 | 0.4 s | 1.0 s | 0 ms | 0 | 0.4 s |
+| Citizen Verifications (`/citizen/verifications`) | 96 | 93 | 96 | 100 | 0.5 s | 1.0 s | 0 ms | 0 ms | 0.5 s |
+| Verify Identity (`/citizen/verify-identity`) | 99 | 96 | 96 | 100 | 0.4 s | 0.9 s | 0 ms | 0 | 0.4 s |
+| Activate Credentials (`/citizen/activate-credentials`) | 99 | 94 | 100 | 100 | 0.4 s | 1.0 s | 0 ms | 0 | 0.4 s |
+| Manage Account (`/citizen/manage-user-account`) | 97 | 96 | 100 | 100 | 0.5 s | 1.2 s | 0 ms | 0 | 0.5 s |
+| Gov Admin Dashboard (`/gov-admin/gov-admin-dashboard`) | 97 | 96 | 96 | 100 | 0.5 s | 1.2 s | 0 ms | 0 | 1.1 s |
+| Upload Institution (`/gov-admin/upload-institution`) | 98 | 90 | 100 | 100 | 0.5 s | 1.1 s | 0 ms | 0 | 0.7 s |
+| View Institutions (`/gov-admin/view-institutions`) | 99 | 96 | 100 | 100 | 0.5 s | 1.0 s | 0 ms | 0 | 0.5 s |
+| Manage Credentials (`/gov-admin/manage-credentials`) | 99 | 96 | 96 | 100 | 0.4 s | 0.9 s | 0 ms | 0 | 0.6 s |
+| Audit Log (`/gov-admin/audit-log`) | 99 | 94 | 96 | 100 | 0.4 s | 0.9 s | 0 ms | 0 | 0.4 s |
+
+\* Lighthouse navigation mode audits the initial page load only, so these two runs measure `/citizen/my-credentials` loading, not the share dialog or QR generation. QR generation latency is covered by k6 under NFR2.3.
+
+#### 6.1.1 Performance findings (NFR2.1)
+
+Across all 19 pages: FCP 0.4 s to 0.5 s, LCP 0.8 s to 1.2 s, TBT 0 ms to 10 ms, CLS 0 to 0.082. Every page is inside the 2 s NFR2.1 budget with roughly a 40% margin on the slowest LCP, and TBT at or near zero means no page blocks the main thread long enough to delay interaction.
+
+The limits of this evidence are stated rather than glossed over:
+
+- Lighthouse reports one simulated lab run per page. NFR2.1 is written as a 95th-percentile claim over real requests, which requires field data (Core Web Vitals / RUM) that the project does not collect. These results are consistent with the target, but do not on their own prove the percentile.
+- The three highest Speed Index values (`/gov-admin/gov-admin-dashboard` at 1.1 s, `/citizen/my-credentials` (Share ID run) at 0.8 s, `/officials/officials-dashboard` at 0.8 s) are the data-heavy screens, which is the expected shape.
+- `/officials/officials-dashboard` records the highest CLS in the set (0.082). This is inside Google's 0.1 "good" threshold but is the layout-shift outlier, consistent with its live activity feed.
+
+Recurring optimisation opportunities flagged on nearly every page, none of which currently threaten the NFR2.1 target: HTTP/2 or HTTP/3 not in use (est. 270 ms to 570 ms), render-blocking requests (est. 130 ms to 240 ms), legacy JavaScript transpilation (est. 13 KiB), and unused JavaScript (est. 44 KiB to 203 KiB).
+
+#### 6.1.2 Accessibility findings (NFR4.3)
+
+NFR4.3 is **met**. All scores range from 90 to 96. Remaining issues keeping scores below 100:
+
+| Failure | WCAG criterion | Affected pages |
+|---|---|---|
+| Background and foreground colours lack sufficient contrast | 1.4.3 Contrast (Minimum) | All 19 |
+| Form elements do not have associated labels | 1.3.1, 4.1.2 | `/gov-admin/upload-institution` |
+| Document does not have a `<main>` landmark | 1.3.1 (bypass blocks) | `/officials/verifications`, `/citizen/verifications`, `/citizen/activate-credentials`, `/gov-admin/audit-log` |
+
+The unlabelled form controls on `/gov-admin/upload-institution` are the most severe of the three, since a screen reader user cannot determine what each input expects. That page holds the lowest accessibility score in the set at 90.
+
+#### 6.1.3 Other findings
+
+- **Images with incorrect aspect ratio** on 12 of 19 pages, a rendering-quality issue under Best Practices.
+- **Security headers are unverified.** On every page, CSP, HSTS, COOP, X-Frame-Options and Trusted Types appear under Trust and Safety without a pass. Lighthouse confirms these pages are served over HTTPS, which supports but does not prove NFR1.2, since Lighthouse does not report the negotiated TLS version. Adding these headers would strengthen the NFR1.2 position.
+- **SEO scored 100 on all 19 pages.** No SRS NFR depends on this; it is recorded for completeness.
+- **NFR4.5 (responsive interface) is not evidenced by this batch.** All 19 runs used emulated desktop. A mobile-emulation pass would be needed to speak to that requirement.
+
+### 6.2 Interaction Counts (NFR4.2)
+
+Counted from the citizen dashboard as the starting point. One interaction is one click,
+tap or form submission. Typing into an already-focused field is not counted.
+
+| Frequent task | Path | Interactions | Within 3 |
+|---|---|---|---|
+| View ID credential | Dashboard > My Credentials > National ID Card | 2 | Yes |
+| Share ID credential via QR | Dashboard > My Credentials > Share | 2 | Yes |
+| View verification history | Dashboard > Verifications | 1 | Yes |
+| Activate a credential | Dashboard > Activate Credentials > select > Activate | 3 | Yes |
+| Update password | Dashboard > Manage Account > Update Password | 3 | Yes |

@@ -19,7 +19,7 @@ namespace tests;
 
 public class IssueCredentialServiceTests
 {
-    private const string KnownSaId = "9001015800086";
+    private const string KnownSaId = "9001015801086";
     private const string TestIpAddress = "196.25.1.10";
 
     private sealed class FakeGovernmentRegistryGateway : IGovernmentRegistryGateway

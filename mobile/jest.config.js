@@ -1,9 +1,19 @@
+const { transformIgnorePatterns } = require('jest-expo/jest-preset')
+
+const allowEsmPackages = transformIgnorePatterns.map((pattern) =>
+  pattern.replace(
+    '(?!(.pnpm|',
+    '(?!(.pnpm|@noble|@scure|d3-[^/]+|internmap|topojson-client|'
+  )
+)
+
 module.exports = {
   preset: 'jest-expo',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
+  transformIgnorePatterns: allowEsmPackages,
   testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
