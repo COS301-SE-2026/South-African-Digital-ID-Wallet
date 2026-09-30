@@ -18,7 +18,7 @@ export const VerificationRequired = ({
         <Text
           as="h1"
           variant="h3"
-          className="mt-4 !text-2xl font-extrabold text-text-primary"
+          className="mt-4 !text-xl font-extrabold text-deep-green"
         >
           Identity Verification Required
         </Text>

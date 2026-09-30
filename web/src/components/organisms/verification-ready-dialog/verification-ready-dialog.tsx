@@ -39,9 +39,7 @@ const VerificationReadyDialog = ({
           <ProgressStepper steps={LIVENESS_STEPS} currentStep={3} />
         </div>
         <DialogHeader className="text-center sm:text-center">
-          <DialogTitle className="text-2xl font-semibold">
-            Ready to verify
-          </DialogTitle>
+          <DialogTitle>Ready to verify</DialogTitle>
 
           <DialogDescription>
             We&apos;ll guide you through a few quick steps.

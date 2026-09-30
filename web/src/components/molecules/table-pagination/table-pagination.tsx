@@ -28,7 +28,7 @@ export const TablePagination = ({
   const showTrailingEllipsis = (pagesToShow.at(-1) ?? 0) < totalPages
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-between">
       <Text as="span" variant="sub-sm" className="text-muted-text">
         Showing {start} to {end} of {totalResults} results
       </Text>

@@ -2,6 +2,8 @@
 
 import * as React from 'react'
 
+import { Modal, modalTitleClassName } from '@/components/atoms/modal'
+
 import type { AccountTerminationModalProps } from './types'
 
 export const AccountTerminationModal = ({
@@ -12,48 +14,37 @@ export const AccountTerminationModal = ({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onCloseAction} />
+    <Modal
+      isOpen={open}
+      onClose={onCloseAction}
+      className="max-w-[560px] p-6 sm:p-8"
+    >
+      <h2 className={`${modalTitleClassName} pr-10`}>Terminate Account</h2>
 
-      <div className="relative w-[min(560px,95%)] mx-auto">
-        <div className="bg-card rounded-3xl border p-6">
-          <div className="flex items-start justify-between gap-4">
-            <h2 className="text-2xl font-bold">Terminate Account</h2>
-            <button
-              aria-label="Close"
-              onClick={onCloseAction}
-              className="text-muted-text"
-            >
-              ✕
-            </button>
-          </div>
+      <p className="text-sm text-muted-text mt-3">
+        Terminating your account will permanently delete your data and revoke
+        access to your Flash ID wallet. This action cannot be undone. If you are
+        sure, confirm below.
+      </p>
 
-          <p className="text-sm text-muted-text mt-3">
-            Terminating your account will permanently delete your data and
-            revoke access to your Flash ID wallet. This action cannot be undone.
-            If you are sure, confirm below.
-          </p>
+      <div className="mt-6 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onConfirmAction}
+          className="rounded-xl bg-destructive px-4 py-2 text-sm font-semibold text-clean-white"
+        >
+          Yes, terminate account
+        </button>
 
-          <div className="mt-6 flex items-center gap-3">
-            <button
-              type="button"
-              onClick={onConfirmAction}
-              className="bg-destructive px-4 py-2 rounded-2xl text-clean-white font-semibold"
-            >
-              Yes, terminate account
-            </button>
-
-            <button
-              type="button"
-              onClick={onCloseAction}
-              className="px-4 py-2 rounded-2xl border text-muted-text"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={onCloseAction}
+          className="rounded-xl border border-black/10 px-4 py-2 text-sm font-semibold text-deep-green hover:bg-black/5"
+        >
+          Cancel
+        </button>
       </div>
-    </div>
+    </Modal>
   )
 }
 

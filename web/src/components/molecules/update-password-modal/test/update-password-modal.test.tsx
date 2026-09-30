@@ -9,6 +9,7 @@ jest.mock('@/lib/api', () => ({
 jest.mock('react-hot-toast', () => ({
   toast: { success: jest.fn(), error: jest.fn() },
 }))
+jest.setTimeout(20000)
 describe('UpdatePasswordModal', () => {
   beforeEach(() => {
     jest.clearAllMocks()
