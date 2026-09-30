@@ -16,7 +16,7 @@ FlashId makes use of an N-Tier architectural pattern. The presentation tier make
 
 ### 1.1 Security
 
-- All API endpoints require JWT authentication except public registration and login endpoints
+- All API endpoints require JWT authentication except public ones: registration and login, citizen registration and email verification, new-device verification, forgot password, reset password, certified copy verification, and the offline issuer keys and revocation list.
 - JWT tokens are issued by the backend, transmitted via HttpOnly cookies, and validated on every request
 - All passwords are hashed using BCrypt before storage and plaintext passwords are never persisted
 - All data transmitted between client and server uses HTTPS/TLS encryption
@@ -24,18 +24,21 @@ FlashId makes use of an N-Tier architectural pattern. The presentation tier make
 - QR verification payloads are cryptographically signed using Ed25519 to prevent tampering
 - QR replay-guard tokens are stored in Azure Cosmos DB with a native per item TTL (Time To Live), so a scanned or expired QR cannot be reused and the ledger cleans itself up automatically
 - Citizen photos are stored in a private Azure Blob Storage container. A short-lived, time limited signed URL is generated only at the moment a QR is scanned, never persisted or embedded in the QR itself
-- Qr replay-guard documents in Cosmos DB reference credentials via a keyed HMAC hash rather than the raw credential ID, so read access to that store alone cannot be correlated back to a specific citizen's recond in Azure SQL.
+- Qr replay-guard documents in Cosmos DB reference credentials via a keyed HMAC hash rather than the raw credential ID, so read access to that store alone cannot be correlated back to a specific citizen's record in Azure SQL.
 - The system enforces account lockout after repeated failed login attempts
 - Rate limiting is applied to registration endpoints: 5 requests per minute per client to prevent brute-force attacks (HTTP 429 on breach)
 - Role-based access control prevents unauthorized access to restricted endpoints
 - The system maintains immutable audit logs for all critical operations
+- Sign-ins from an unrecognised device require a one-time code sent by email before a session is issued.
+- Fraud detection flags suspicious activity, such as impossible travel between sign-in locations, and can temporarily block QR generation.
+- Physical identity verification uses Azure Face liveness detection with a face match against the registry portrait.
 
 ### 1.2 Performance
 
 - API endpoints shall respond within 500ms under normal load
 - The system shall support at least 100 concurrent users during the prototype phase
 - Database queries are optimized using indexed foreign keys on frequently queried fields
-- React Query is used on the frontend to cache server state and minimize redundant API calls
+- React Query is used on the web portal and mobile app to cache server state and minimize redundant API calls
 
 ### 1.3 Reliability
 
@@ -48,7 +51,7 @@ FlashId makes use of an N-Tier architectural pattern. The presentation tier make
 
 - The Clean Architecture pattern allows individual layers to be scaled or replaced independently
 - Azure SQL is used for relational data with the ability to scale tier as load increases
-- Cosmos DB is used for high-volume unstructured data such as audit logs
+- Cosmos DB is used for small, high-churn, disposable data: the QR disclosure token replay-guard ledger and the one-time claims for emergency codes. Native TTL auto-expiry removes the need for a manual cleanup job.
 - The backend API is stateless and supports horizontal scaling
 - Cosmos DB is used for the QR disclosure token replay-guard ledger. A small, high churn, disposable dataset well suited to NoSQL, with native TTL auto-expiry removing the need for a manual cleanup job
 
@@ -81,16 +84,16 @@ Application (Use Cases, DTOs, Validators, Interfaces)
 ↓
 Domain (Entities, Enums, Business Rules)
 ↑
-Infrastructure (EF Core, SQL Server, Service Implementations)
+Infrastructure (EF Core, SQL Server, Cosmos DB, Azure service providers)
 
 | Layer | Project | Responsibility |
 |---|---|---|
 | Domain | `Domain.csproj` | Core entities, enums, value objects, and business rules |
 | Application | `Application.csproj` | Use case interfaces, DTOs, validators, and typed exceptions |
-| Infrastructure | `Infrastructure.csproj` | EF Core DbContext, migrations, service implementations |
+| Infrastructure | `Infrastructure.csproj` | EF Core DbContext, migrations, repositories, background jobs, and provider for Azure Key Vault, Blob Storage, FaceAPI and email service |
 | Presentation | `Presentation.csproj` | ASP.NET Core controllers, middleware, JWT config, rate limiting |
 
-Dependencies point inward only — Presentation depends on Application, Application depends on Domain. Infrastructure implements Application interfaces. Business logic is never coupled to framework or database concerns.
+Dependencies point inward only: Presentation depends on Application, Application depends on Domain. Infrastructure implements Application interfaces. Business logic is never coupled to framework or database concerns.
 
 ### 2.2 Repository Pattern
 
@@ -121,15 +124,15 @@ The frontend follows atomic design with five component levels:
 | Templates | AppShell |
 | Pages | ViewInstitutionsPage, OnboardCitizenPage, CitizenRegistrationPage |
 
-This ensures reusability, consistency, and separation of UI concerns across the three portals (Citizen, Official, Government Admin).
+This ensures reusability, consistency, and separation of UI concerns across the three portals (Citizen, Official, Government Admin). The mobile app follows the same atomic structure.
 
 ### 2.5 Context-Based State Management
 
-Global application state such as authenticated user data is managed using React Context. The `UserContext` provides user identity, role, and session information to all components without prop drilling. User state is persisted to `localStorage` so sessions survive page refreshes.
+Global application state such as authenticated user data is managed using React Context. The `UserContext` provides user identity, role, and session information to all components without prop drilling. User state is persisted to `localStorage` so sessions survive page refreshes. The mobile app manages global state with Zustard stores, and keeps the session token in the device's secure storage.
 
 ### 2.6 Server State Management
 
-React Query (`@tanstack/react-query`) manages all server state on the frontend. Components subscribe to query keys and automatically re-render when data changes. Mutations trigger optimistic updates and toast notifications on success or failure.
+React Query (`@tanstack/react-query`) manages all server state on the frontend. Components subscribe to query keys and automatically re-render when data changes. Mutations show toast notification on success or failure.
 
 ---
 
@@ -140,21 +143,23 @@ All services and repositories are registered through ASP.NET Core's built-in DI 
 
 ### 3.2 Data Transfer Object (DTO)
 DTOs decouple internal domain entities from API request and response shapes. Separate request and response DTOs are defined for each use case, preventing over-posting and controlling data exposure.
-RegisterInstitutionRequestDto  →  InstitutionService  →  RegisterInstitutionResponseDto
+RegisterInstitutionRequestDto  ->  InstitutionService  ->  RegisterInstitutionResponseDto
 
 ### 3.3 Validator Pattern
 Input validation is centralized in static validator classes in the Application layer:
-- `InstitutionValidator` — validates institution registration requests
-- `CitizenRegistrationValidator` — validates citizen registration requests
+- `InstitutionValidator` - validates institution registration requests
+- `CitizenRegistrationValidator` - validates citizen registration requests
+- `SaIdValidator` - validates the format and checksum of 13-digit SA ID numbers
+- `EmailValidator` - validates email addresses
 
 Validators throw typed domain exceptions that are caught and mapped to HTTP error responses by the controller layer.
 
 ### 3.4 Service Pattern
 Business logic is encapsulated in service classes implementing interfaces defined in the Application layer:
-- `IInstitutionService` → `InstitutionService`
-- `ICitizenService` → `CitizenService`
-- `IAuthService` → `AuthService`
-- `IOnboardingService` → `OnboardingService`
+- `IInstitutionService` -> `InstitutionService`
+- `ICitizenService` -> `CitizenService`
+- `IAuthService` -> `AuthService`
+- `IOnboardingService` -> `OnboardingService`
 
 Controllers delegate all business operations to services, keeping controllers thin and focused on HTTP concerns only.
 
@@ -164,14 +169,14 @@ The frontend uses React Query to manage server state reactively. Components subs
 ### 3.6 Factory Pattern (API Key Generation)
 Institution API keys are generated using a static factory method `GenerateApiKey()` inside `InstitutionService`. This centralizes key generation logic and ensures a consistent `flashid_live_{hex}` format across the system.
 
-### 3.7 Mock Service Pattern
-During the prototype phase, external government registry integrations are simulated using mock service implementations (e.g., `MockGovernmentRegistryService`). These implement the same interfaces as real services and can be swapped out when real integrations become available, following the Strategy pattern.
+### 3.7 Gateway Pattern (Government Registry)
+The government registry is simulated by a separate mock Government Registry API with its own database. The backend calls it over HTTP through GovernmentRegistryGateway, which implements IGovernmentRegistryGateway and authenticates with an API key. Services depend only on the interface, so the mock can be replaced by a real government integration without changing business logic.
 
 ### 3.8 Keyed Hash Reference Pattern
 The Cosmos backed QR replay-guard ledger never stores a credential's raw identifier. It stores `HMAC-SHA256(credentialId, serverSecretKey)` instead, computed with a secret that only the backend holds. This lets the system still query "all active tokens for this credential" without the data store itself ever holding a directly-joinable identifier back to Azure SQL.
 
 ### 3.9 Decorator Pattern (Retry Resilience)
-The credential expiry background job separates persistence from resilience: `CredentialExpiryRepository` implements plain EF Core persistence, and `RetryingCredentialExpiryRepositoryDecorator` wraps it behind the same `ICredentialsExpiryRepository` interface to add retry-with-backoff around `SaveChangesAsync` for transient database failures. The service layer and DI container are unaware retry is happening. Resilience is composed on top of persistence rather than baked into it.
+The credential expiry background job separates persistence from resilience: `CredentialExpiryRepository` implements plain EF Core persistence, and `RetryingCredentialExpiryRepositoryDecorator` and `RetryingCredentialUpdateRepositoryDecorator` wrap them behind the same interfaces to add retry-with-backoff around `SaveChangesAsync` for transient database failures. The service layer and DI container are unaware retry is happening. Resilience is composed on top of persistence rather than baked into it.
 
 ### 3.10 Template Method Pattern (Scheduled Jobs)
 `DailyScheduledBackgroundService` defines the fixed algorithm for a once-daily scheduled job:
@@ -179,10 +184,11 @@ The credential expiry background job separates persistence from resilience: `Cre
 - Wait until the next SAST midnight
 - Execute
 - Repeat
-All while leaving the 2 variant steps (`HasCompletedTodayAsync`, `RunOnceAsync`) abstract. `CredentialExpiryBackgroundService` is the first concrete subclass; any future daily job can extend the same base class without reimplementing the scheduling and catch-up logic.
+All while leaving the 2 variant steps (`HasCompletedTodayAsync`, `RunOnceAsync`) abstract. `CredentialExpiryBackgroundService` is the first concrete subclass; any future daily job can extend the same base class without reimplementing the scheduling and catch-up logic. CredentialExpiryBackgroundService, CredentialUpdateBackgroundService and KeyRotationBackgroundService all extend this base class, so each daily job reuses the scheduling and catch-up logic."
 
 ### 3.11 Strategy Pattern (Credential Signing)
-`ICredentialSigningProvider` hides where the credential signing key lives. `LocalEs256SigningProvider` signs with a development key today; a Key Vault provider can replace it through dependency injection alone, as R9.1.3 requires. The rest of the system asks the provider for the active key and a signature and never sees the private key.
+`ICredentialSigningProvider` hides where the credential signing key lives. `LocalEs256SigningProvider` signs with a development key today; a Key Vault provider can replace it through dependency injection alone, as R9.1.3 requires. The rest of the system asks the provider for the active key and a signature and never sees the private key. 
+- QR signing uses the same approach: IQrSigningProvider is implemented by AzureKeyVaultQrSigningProvider in deployed environments and by StubQrSigningProvider when no vault is configured.
 
 ### 3.12 Factory Pattern (Offline Credentials)
 `SdJwtCredentialFactory` builds a signed SD-JWT credential from a request: it salts and hashes each claim, shuffles the digests, adds the device key as `cnf`, and signs the result. The variation between an identity document and a driver's licence is in the data, not in the construction steps, so a single factory method fits better than a GoF Builder, which was considered and rejected.
@@ -203,6 +209,10 @@ TanStack Query needs to know whether the phone is online, and NetInfo reports it
 - **Chain of Responsibility for the 12 verification steps:** the steps run in a fixed order defined by the wire format, and each is a small pure function returning a result code. A chain of handler objects would add indirection without allowing any reordering the standard permits.
 - **GoF Builder for credentials:** see 3.12.
 
+### 3.18 Producer-Consumer (Emergency Notifications)
+- When an emergency profile is accessed, `EmergencyService` places a message on `IEmergencyNotificationQueue` and returns immediately. 
+- `EmergencyNotificationBackgroundService` consumes the queue and emails the citizen and their emergency contacts, so a slow email provider never delays the responder's result.
+
 ---
 
 ## 4. Architectural Constraints
@@ -213,7 +223,7 @@ TanStack Query needs to know whether the phone is online, and NetInfo reports it
 | Backend Framework | Must use ASP.NET Core (.NET 10) |
 | Web Frontend | Must use Next.js 16 with React 19 |
 | Mobile Application | Must use React Native with Expo |
-| Authentication | Must use JWT tokens issued by the backend, transmitted via HttpOnly cookies |
+| Authentication | Must use JWT tokens issued by the backend, sent in HttpOnly cookies on the web and as Bearer tokens from mobile |
 | Government Integrations | No live government API integrations permitted during prototype phase — mock services only |
 | Data Protection | POPIA compliance must be considered in all citizen data handling decisions |
 | CI/CD | Must use GitHub Actions for pipeline automation |
