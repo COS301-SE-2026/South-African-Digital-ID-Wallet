@@ -1473,6 +1473,7 @@ Each NFR from SRS-v4 section 5 is listed below with the architectural tactic tha
 | Pass (limited) | Target met, but the evidence has a stated limit (single run, lab measurement or narrower scope) |
 | Partial | Part of the requirement is met; the missing part is stated |
 | Gap | Cannot be met or proven on the current infrastructure; the reason is stated |
+
 **Summary:** 23 Pass, 6 Pass (limited), 2 Partial, 2 Gap (33 NFRs).
 
 #### Security
