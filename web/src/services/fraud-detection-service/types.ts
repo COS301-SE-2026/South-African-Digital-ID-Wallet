@@ -1,9 +1,6 @@
 export type FraudRiskLevel = 'Low' | 'Medium' | 'High'
 export type FraudAlertStatus = 'Open' | 'Secured' | 'Dismissed'
-export type SecurityEventType =
-  | 'Login'
-  | 'DeviceVerified'
-  | 'QrGenerated'
+export type SecurityEventType = 'Login' | 'DeviceVerified' | 'QrGenerated'
 export type SecureAccountAction =
   | 'LogOutOtherDevices'
   | 'ResetPassword'

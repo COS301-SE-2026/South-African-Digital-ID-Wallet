@@ -6,10 +6,7 @@ import { Button } from '@/components/ui/button'
 import { UpdatePasswordModal } from '@/components/molecules/update-password-modal'
 import { FraudAlertModal } from '../fraud-alert-modal'
 import { fraudDetectionService } from '@/services/fraud-detection-service'
-import type {
-  FraudAlertFlowProps,
-  SecurityAlertLayer,
-} from './types'
+import type { FraudAlertFlowProps, SecurityAlertLayer } from './types'
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message) {
@@ -17,10 +14,7 @@ function getErrorMessage(error: unknown): string {
   }
   return 'We could not complete that security action. Please try again.'
 }
-export function FraudAlertFlow({
-  alert,
-  onResolved,
-}: FraudAlertFlowProps) {
+export function FraudAlertFlow({ alert, onResolved }: FraudAlertFlowProps) {
   const [layer, setLayer] = useState<SecurityAlertLayer | null>(null)
   const [passwordOpen, setPasswordOpen] = useState(false)
   const [actionMessage, setActionMessage] = useState('')
@@ -41,13 +35,10 @@ export function FraudAlertFlow({
     password: string
   ): Promise<boolean> => {
     try {
-      const result = await fraudDetectionService.secureAccount(
-        alert.id,
-        {
-          action: 'LogOutOtherDevices',
-          password,
-        }
-      )
+      const result = await fraudDetectionService.secureAccount(alert.id, {
+        action: 'LogOutOtherDevices',
+        password,
+      })
       setActionMessage(
         result.message || 'All other devices have been logged out.'
       )
@@ -58,9 +49,7 @@ export function FraudAlertFlow({
       return false
     }
   }
-  const handleDismiss = async (
-    password: string
-  ): Promise<boolean> => {
+  const handleDismiss = async (password: string): Promise<boolean> => {
     try {
       await fraudDetectionService.dismissAlert(alert.id, {
         password,
@@ -86,11 +75,7 @@ export function FraudAlertFlow({
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <Text
-                  as="h2"
-                  variant="h4"
-                  className="text-danger-red"
-                >
+                <Text as="h2" variant="h4" className="text-danger-red">
                   Suspicious activity detected
                 </Text>
                 <Text

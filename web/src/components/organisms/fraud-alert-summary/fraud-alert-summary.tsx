@@ -10,18 +10,10 @@ export function FraudAlertSummary({ alert }: FraudAlertSummaryProps) {
           <ShieldAlert className="h-5 w-5" />
         </div>
         <div>
-          <Text
-            as="p"
-            variant="sub-sm"
-            className="font-bold text-danger-red"
-          >
+          <Text as="p" variant="sub-sm" className="font-bold text-danger-red">
             {alert.title}
           </Text>
-          <Text
-            as="p"
-            variant="sub-sm"
-            className="mt-1 text-text-primary"
-          >
+          <Text as="p" variant="sub-sm" className="mt-1 text-text-primary">
             {alert.summary}
           </Text>
         </div>

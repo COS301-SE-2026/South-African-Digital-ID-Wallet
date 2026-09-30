@@ -2,8 +2,13 @@
 
 import { useEffect, useId } from 'react'
 import { X } from 'lucide-react'
-import { Text } from '@/components/atoms/text'
 import { Button } from '@/components/ui/button'
+import {
+  modalCloseButtonClassName,
+  modalOverlayClassName,
+  modalPanelClassName,
+  modalTitleClassName,
+} from '@/components/atoms/modal'
 import type { DashboardModalProps } from './types'
 
 export function DashboardModal({
@@ -38,42 +43,35 @@ export function DashboardModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+    <div className={modalOverlayClassName}>
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="w-full max-w-3xl rounded-3xl border bg-card shadow-2xl"
+        className={`${modalPanelClassName} max-w-3xl`}
       >
-        <div className="flex items-center justify-between border-b p-6">
-          <Text
-            id={titleId}
-            as="h2"
-            variant="h3"
-            className="text-text-primary"
-          >
+        <div className="flex items-center justify-between gap-4 border-b border-black/10 px-6 py-5">
+          <h2 id={titleId} className={modalTitleClassName}>
             {title}
-          </Text>
+          </h2>
           <Button
             type="button"
             variant="ghost"
             size="icon-sm"
             onClick={onClose}
             aria-label="Close dialog"
-            className="rounded-xl p-2"
+            className={modalCloseButtonClassName}
           >
             <X className="h-5 w-5" />
           </Button>
         </div>
-        <div className="max-h-[500px] overflow-y-auto p-6">
-          {children}
-        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto p-6">{children}</div>
         {showBottomClose && (
-          <div className="flex justify-end border-t p-6">
+          <div className="flex justify-end border-t border-black/10 px-6 py-4">
             <Button
               type="button"
               onClick={onClose}
-              className="rounded-xl px-5 py-2 font-semibold"
+              className="rounded-xl bg-deep-green px-5 py-2 text-sm font-semibold text-clean-white hover:bg-primary-green"
             >
               Close
             </Button>

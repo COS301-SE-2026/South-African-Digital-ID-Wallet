@@ -252,7 +252,7 @@ export const VerifyCertifiedCopyPage: FC = () => {
         isOpen={verificationState !== null}
         onClose={closeVerificationModal}
         className="!m-0 !h-auto !min-h-0 !w-[calc(100vw-3rem)] !max-w-xl 
-        !overflow-visible !bg-transparent !p-0 sm:!w-[calc(100vw-4rem)]"
+        !overflow-visible !border-0 !bg-transparent !p-0 !shadow-none sm:!w-[calc(100vw-4rem)]"
       >
         <div
           className="rounded-[26px] 

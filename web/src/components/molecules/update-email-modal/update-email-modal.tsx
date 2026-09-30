@@ -10,6 +10,7 @@ import { TextField } from '@/components/molecules'
 import { manageUserAccountService } from '@/services/manage-user-account-service'
 
 import { UpdateEmailModalProps, Step } from './types'
+import { Modal, modalTitleClassName } from '@/components/atoms/modal'
 import { useUser } from '@/context/user-context'
 
 const getErrorMessage = (error: unknown, fallback: string): string => {
@@ -166,143 +167,123 @@ export const UpdateEmailModal: FC<UpdateEmailModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={handleClose}
-        aria-hidden
-      />
-      <div className="relative w-[min(560px,95%)] mx-auto">
-        <div className="bg-card rounded-3xl border p-6">
-          <div className="flex items-start justify-between gap-4">
-            <Text as="h2" variant="h3">
-              Update Email
-            </Text>
-            <button
-              type="button"
-              aria-label="Close"
-              onClick={handleClose}
-              className="text-muted-text"
+    <Modal
+      isOpen={open}
+      onClose={handleClose}
+      className="max-w-[560px] p-6 sm:p-8"
+    >
+      <h2 className={`${modalTitleClassName} pr-10`}>Update Email</h2>
+
+      {step === 'password' && (
+        <>
+          <Text as="p" variant="sub-sm" className="mt-2">
+            For your security, confirm your password before changing your email
+            address.
+          </Text>
+          <form
+            onSubmit={handlePasswordSubmit}
+            className="mt-5 flex flex-col gap-5"
+          >
+            <TextField
+              label="Current password"
+              type="password"
+              autoComplete="current-password"
+              placeholder=""
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value)
+                setErrorMessage('')
+              }}
+              error={errorMessage}
+            />
+            <Button
+              type="submit"
+              variant="primary"
+              className="w-full lg:w-full"
+              isLoading={verifyPasswordMutation.isPending}
             >
-              x
-            </button>
-          </div>
+              Continue
+            </Button>
+          </form>
+        </>
+      )}
 
-          {step === 'password' && (
-            <>
-              <Text as="p" variant="sub-sm" className="mt-2">
-                For your security, confirm your password before changing your
-                email address.
-              </Text>
-              <form
-                onSubmit={handlePasswordSubmit}
-                className="mt-5 flex flex-col gap-5"
-              >
-                <TextField
-                  label="Current password"
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder=""
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value)
-                    setErrorMessage('')
-                  }}
-                  error={errorMessage}
-                />
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="w-full lg:w-full"
-                  isLoading={verifyPasswordMutation.isPending}
-                >
-                  Continue
-                </Button>
-              </form>
-            </>
-          )}
+      {step === 'email' && (
+        <>
+          <Text as="p" variant="sub-sm" className="mt-2">
+            Enter your new email address. We&apos;ll send a verification code to
+            it.
+          </Text>
+          <form
+            onSubmit={handleEmailSubmit}
+            className="mt-5 flex flex-col gap-5"
+          >
+            <TextField
+              label="New email address"
+              type="email"
+              autoComplete="email"
+              placeholder=""
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                setErrorMessage('')
+              }}
+              error={errorMessage}
+            />
+            <Button
+              type="submit"
+              variant="primary"
+              className="w-full lg:w-full"
+              isLoading={requestChangeMutation.isPending}
+            >
+              Send verification code
+            </Button>
+          </form>
+        </>
+      )}
 
-          {step === 'email' && (
-            <>
-              <Text as="p" variant="sub-sm" className="mt-2">
-                Enter your new email address. We&apos;ll send a verification
-                code to it.
-              </Text>
-              <form
-                onSubmit={handleEmailSubmit}
-                className="mt-5 flex flex-col gap-5"
+      {step === 'otp' && (
+        <>
+          <Text as="p" variant="sub-sm" className="mt-2">
+            Enter the 6-digit code sent to {email} to confirm the change. The
+            code expires in 10 minutes.
+          </Text>
+          <form onSubmit={handleOtpSubmit} className="mt-5 flex flex-col gap-5">
+            <TextField
+              label="Verification code"
+              value={otp}
+              onChange={(e) => {
+                setOTP(e.target.value.replace(/\D/g, '').slice(0, 6))
+                setErrorMessage('')
+              }}
+              placeholder=""
+              inputMode="numeric"
+              maxLength={6}
+              className="text-center text-2xl tracking-[0.5em]"
+              error={errorMessage}
+            />
+            <Button
+              type="submit"
+              variant="primary"
+              className="w-full lg:w-full"
+              isLoading={confirmMutation.isPending}
+            >
+              Confirm &amp; Update Email
+            </Button>
+            <Text variant="sub-sm" className="text-center">
+              Didn&apos;t get a code?{' '}
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={cooldown > 0 || resendMutation.isPending}
+                className="font-semibold text-primary-green hover:underline disabled:cursor-not-allowed disabled:opacity-50 disabled:no-underline"
               >
-                <TextField
-                  label="New email address"
-                  type="email"
-                  autoComplete="email"
-                  placeholder=""
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value)
-                    setErrorMessage('')
-                  }}
-                  error={errorMessage}
-                />
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="w-full lg:w-full"
-                  isLoading={requestChangeMutation.isPending}
-                >
-                  Send verification code
-                </Button>
-              </form>
-            </>
-          )}
-
-          {step === 'otp' && (
-            <>
-              <Text as="p" variant="sub-sm" className="mt-2">
-                Enter the 6-digit code sent to {email} to confirm the change.
-                The code expires in 10 minutes.
-              </Text>
-              <form
-                onSubmit={handleOtpSubmit}
-                className="mt-5 flex flex-col gap-5"
-              >
-                <TextField
-                  label="Verification code"
-                  value={otp}
-                  onChange={(e) => {
-                    setOTP(e.target.value.replace(/\D/g, '').slice(0, 6))
-                    setErrorMessage('')
-                  }}
-                  placeholder=""
-                  inputMode="numeric"
-                  maxLength={6}
-                  className="text-center text-2xl tracking-[0.5em]"
-                  error={errorMessage}
-                />
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="w-full lg:w-full"
-                  isLoading={confirmMutation.isPending}
-                >
-                  Confirm &amp; Update Email
-                </Button>
-                <Text variant="sub-sm" className="text-center">
-                  Didn&apos;t get a code?{' '}
-                  <button
-                    type="button"
-                    onClick={handleResend}
-                    disabled={cooldown > 0 || resendMutation.isPending}
-                    className="font-semibold text-primary-green hover:underline disabled:cursor-not-allowed disabled:opacity-50 disabled:no-underline"
-                  >
-                    {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'}
-                  </button>
-                </Text>
-              </form>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+                {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'}
+              </button>
+            </Text>
+          </form>
+        </>
+      )}
+    </Modal>
   )
 }

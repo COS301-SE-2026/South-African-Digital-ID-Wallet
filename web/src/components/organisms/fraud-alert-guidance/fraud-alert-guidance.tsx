@@ -1,19 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  ArrowRight,
-  History,
-  LockKeyhole,
-  ShieldCheck,
-} from 'lucide-react'
+import { ArrowRight, History, LockKeyhole, ShieldCheck } from 'lucide-react'
 import { Text } from '@/components/atoms/text'
 import { Button } from '@/components/ui/button'
 import { TextField } from '@/components/molecules/text-field/text-field'
-import type {
-  FraudAlertGuidanceProps,
-  SecurityActionProps,
-} from './types'
+import type { FraudAlertGuidanceProps, SecurityActionProps } from './types'
 
 function SecurityAction({
   icon: Icon,
@@ -32,11 +24,7 @@ function SecurityAction({
         <Icon className="h-5 w-5" />
       </div>
       <div className="min-w-0 flex-1">
-        <Text
-          as="p"
-          variant="sub-sm"
-          className="font-bold text-deep-green"
-        >
+        <Text as="p" variant="sub-sm" className="font-bold text-deep-green">
           {title}
         </Text>
         <Text
@@ -92,16 +80,11 @@ export function FraudAlertGuidance({
           <ShieldCheck className="h-5 w-5" />
         </div>
         <div>
-          <Text
-            as="p"
-            variant="sub-sm"
-            className="font-bold text-deep-green"
-          >
+          <Text as="p" variant="sub-sm" className="font-bold text-deep-green">
             We detected unusual activity on your account.
           </Text>
           <Text as="p" variant="sub-sm" className="mt-1">
-            Here are some steps you can take to help protect your
-            account.
+            Here are some steps you can take to help protect your account.
           </Text>
         </div>
       </div>
@@ -136,16 +119,12 @@ export function FraudAlertGuidance({
         />
       </div>
       <div className="rounded-2xl bg-primary-green/10 p-4">
-        <Text
-          as="p"
-          variant="sub-sm"
-          className="font-bold text-deep-green"
-        >
+        <Text as="p" variant="sub-sm" className="font-bold text-deep-green">
           Need more help?
         </Text>
         <Text as="p" variant="sub-sm" className="mt-1">
-          If you are still unsure or notice anything suspicious,
-          contact the support team.
+          If you are still unsure or notice anything suspicious, contact the
+          support team.
         </Text>
       </div>
       <Button
@@ -166,11 +145,7 @@ export function FraudAlertGuidance({
       </Button>
       {passwordAction && (
         <div className="rounded-2xl border border-border-grey p-4">
-          <Text
-            as="p"
-            variant="sub-sm"
-            className="font-bold text-deep-green"
-          >
+          <Text as="p" variant="sub-sm" className="font-bold text-deep-green">
             {passwordAction === 'logout'
               ? 'Confirm logout from other devices'
               : 'Confirm dismissing this alert'}
@@ -178,10 +153,7 @@ export function FraudAlertGuidance({
           <Text as="p" variant="caption" className="mt-1">
             Enter your current password to continue.
           </Text>
-          <form
-            className="mt-4 space-y-4"
-            onSubmit={handlePasswordSubmit}
-          >
+          <form className="mt-4 space-y-4" onSubmit={handlePasswordSubmit}>
             <TextField
               label="Current password"
               type="password"
@@ -193,9 +165,7 @@ export function FraudAlertGuidance({
               <Button
                 type="submit"
                 variant={
-                  passwordAction === 'logout'
-                    ? 'destructive'
-                    : 'default'
+                  passwordAction === 'logout' ? 'destructive' : 'default'
                 }
                 disabled={submitting || !password.trim()}
               >

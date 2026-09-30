@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { CredentialDetailsModal } from '../credential-details-modal'
 import type { CredentialDetail } from '../types'
-import { ImgHTMLAttributes, ReactNode } from 'react'
 
 jest.mock('next/image', () => ({
   __esModule: true,

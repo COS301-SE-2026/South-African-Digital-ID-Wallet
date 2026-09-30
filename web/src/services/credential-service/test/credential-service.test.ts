@@ -60,10 +60,7 @@ describe('credentialService', () => {
       updatedAt: '2026-09-29T10:00:00Z',
     }
     mockedApi.post.mockResolvedValue({ data })
-    const result = await credentialService.reinstate(
-      'credential-1',
-      request
-    )
+    const result = await credentialService.reinstate('credential-1', request)
     expect(mockedApi.post).toHaveBeenCalledWith(
       '/api/credentials/credential-1/reinstate',
       request
@@ -85,11 +82,7 @@ describe('credentialService', () => {
       pageSize: 10,
     }
     mockedApi.get.mockResolvedValue({ data })
-    const result = await credentialService.search(
-      'Thabo Mokoena',
-      1,
-      10
-    )
+    const result = await credentialService.search('Thabo Mokoena', 1, 10)
     expect(mockedApi.get).toHaveBeenCalledWith(
       '/api/credentials/search?query=Thabo%20Mokoena&page=1&pageSize=10'
     )
@@ -107,9 +100,7 @@ describe('credentialService', () => {
       },
     ]
     mockedApi.get.mockResolvedValue({ data })
-    const result = await credentialService.getCredentialsForCitizen(
-      'citizen-1'
-    )
+    const result = await credentialService.getCredentialsForCitizen('citizen-1')
     expect(mockedApi.get).toHaveBeenCalledWith(
       '/api/credentials/citizen/citizen-1'
     )
@@ -121,4 +112,4 @@ describe('credentialService', () => {
       'Credential request failed'
     )
   })
-})  
+})

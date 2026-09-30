@@ -29,9 +29,7 @@ describe('manageUserAccountService', () => {
     }
     mockedApi.get.mockResolvedValue({ data })
     const result = await manageUserAccountService.getMyAccount()
-    expect(mockedApi.get).toHaveBeenCalledWith(
-      '/api/manage-user-account/me'
-    )
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/manage-user-account/me')
     expect(result).toEqual(data)
   })
   it('verifies the current password', async () => {
@@ -39,9 +37,7 @@ describe('manageUserAccountService', () => {
       message: 'Password verified successfully.',
     }
     mockedApi.post.mockResolvedValue({ data })
-    const result = await manageUserAccountService.verifyPassword(
-      'Password123!'
-    )
+    const result = await manageUserAccountService.verifyPassword('Password123!')
     expect(mockedApi.post).toHaveBeenCalledWith(
       '/api/manage-user-account/email/verify-password',
       {
@@ -55,9 +51,8 @@ describe('manageUserAccountService', () => {
       message: 'Verification code sent.',
     }
     mockedApi.post.mockResolvedValue({ data })
-    const result = await manageUserAccountService.requestEmailChange(
-      'new@example.com'
-    )
+    const result =
+      await manageUserAccountService.requestEmailChange('new@example.com')
     expect(mockedApi.post).toHaveBeenCalledWith(
       '/api/manage-user-account/email/request-change',
       {
@@ -89,9 +84,7 @@ describe('manageUserAccountService', () => {
       accountStatus: 'Activated',
     }
     mockedApi.post.mockResolvedValue({ data })
-    const result = await manageUserAccountService.confirmEmailChange(
-      '123456'
-    )
+    const result = await manageUserAccountService.confirmEmailChange('123456')
     expect(mockedApi.post).toHaveBeenCalledWith(
       '/api/manage-user-account/email/confirm',
       {

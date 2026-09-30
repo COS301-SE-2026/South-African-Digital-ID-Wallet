@@ -1,8 +1,4 @@
-import {
-  fireEvent,
-  render,
-  screen,
-} from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { DashboardModal } from '../dashboard-modal'
 
 describe('DashboardModal', () => {
@@ -12,26 +8,16 @@ describe('DashboardModal', () => {
   })
   it('does not render when open is false', () => {
     render(
-      <DashboardModal
-        open={false}
-        title="Test Modal"
-        onClose={onClose}
-      >
+      <DashboardModal open={false} title="Test Modal" onClose={onClose}>
         <p>Modal Content</p>
       </DashboardModal>
     )
     expect(screen.queryByText('Test Modal')).not.toBeInTheDocument()
-    expect(
-      screen.queryByText('Modal Content')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Modal Content')).not.toBeInTheDocument()
   })
   it('renders with dialog accessibility attributes', () => {
     render(
-      <DashboardModal
-        open
-        title="Test Modal"
-        onClose={onClose}
-      >
+      <DashboardModal open title="Test Modal" onClose={onClose}>
         <p>Modal Content</p>
       </DashboardModal>
     )
@@ -43,41 +29,25 @@ describe('DashboardModal', () => {
   })
   it('calls onClose when the footer Close button is clicked', () => {
     render(
-      <DashboardModal
-        open
-        title="Test Modal"
-        onClose={onClose}
-      >
+      <DashboardModal open title="Test Modal" onClose={onClose}>
         <p>Modal Content</p>
       </DashboardModal>
     )
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Close' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
     expect(onClose).toHaveBeenCalledTimes(1)
   })
   it('calls onClose when the close icon is clicked', () => {
     render(
-      <DashboardModal
-        open
-        title="Test Modal"
-        onClose={onClose}
-      >
+      <DashboardModal open title="Test Modal" onClose={onClose}>
         <p>Modal Content</p>
       </DashboardModal>
     )
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Close dialog' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Close dialog' }))
     expect(onClose).toHaveBeenCalledTimes(1)
   })
   it('calls onClose when Escape is pressed', () => {
     render(
-      <DashboardModal
-        open
-        title="Test Modal"
-        onClose={onClose}
-      >
+      <DashboardModal open title="Test Modal" onClose={onClose}>
         <p>Modal Content</p>
       </DashboardModal>
     )

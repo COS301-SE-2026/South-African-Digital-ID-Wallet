@@ -15,15 +15,15 @@ export function ManageUserAccount() {
   const [openPass, setOpenPass] = useState(false)
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      <main className="flex flex-1 flex-col gap-5 overflow-hidden p-5">
-        <div className="grid min-h-0 flex-1 grid-cols-2 gap-5">
+    <div className="flex bg-background lg:h-screen lg:overflow-hidden">
+      <main className="flex flex-1 flex-col gap-4 p-4 sm:gap-5 sm:p-5 lg:overflow-hidden">
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-2">
           <AccountCard />
-          <div className="flex min-h-0 flex-col gap-5">
-            <div className="h-[45%] min-h-[300px]">
+          <div className="flex min-h-0 flex-col gap-4 sm:gap-5">
+            <div className="min-h-[300px] lg:h-[45%]">
               <ManageUserTrustedDevices />
             </div>
-            <div className="grid flex-1 grid-cols-2 gap-5">
+            <div className="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
               <UpdateEmailCard onAction={() => setOpenEmail(true)} />
               <UpdatePasswordCard onAction={() => setOpenPass(true)} />
             </div>

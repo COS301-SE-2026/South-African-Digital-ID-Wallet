@@ -41,13 +41,7 @@ describe('FraudAlertModal', () => {
     jest.clearAllMocks()
   })
   it('renders the summary layer', () => {
-    render(
-      <FraudAlertModal
-        alert={alert}
-        layer="summary"
-        {...callbacks}
-      />
-    )
+    render(<FraudAlertModal alert={alert} layer="summary" {...callbacks} />)
     expect(
       screen.getByRole('heading', {
         name: /suspicious login activity/i,
@@ -76,8 +70,6 @@ describe('FraudAlertModal', () => {
         name: /keep your account secure/i,
       })
     ).toBeInTheDocument()
-    expect(
-      screen.getByText('Review your account.')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Review your account.')).toBeInTheDocument()
   })
 })

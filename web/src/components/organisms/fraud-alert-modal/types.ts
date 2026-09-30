@@ -11,8 +11,6 @@ export type FraudAlertModalProps = {
   onChangePassword: () => void
   onReviewActivity: () => void
   onReviewTrustedDevices: () => void
-  onLogoutOtherDevices: (
-    password: string
-  ) => Promise<boolean>
+  onLogoutOtherDevices: (password: string) => Promise<boolean>
   onDismiss: (password: string) => Promise<boolean>
 }

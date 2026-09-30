@@ -67,13 +67,18 @@ export function ActivateCredentialsForm({
           </Card>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Button variant="secondary" onClick={onBack} disabled={isSubmitting}>
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
+          <Button
+            variant="secondary"
+            className="w-full sm:w-[160px]"
+            onClick={onBack}
+            disabled={isSubmitting}
+          >
             Back
           </Button>
           <Button
             variant="primary"
-            className="flex-1 lg:w-full"
+            className="w-full sm:flex-1 lg:w-full"
             onClick={onSubmit}
             disabled={noneSelected || isSubmitting}
             isLoading={isSubmitting}

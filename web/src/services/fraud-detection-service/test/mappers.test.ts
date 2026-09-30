@@ -46,9 +46,7 @@ describe('fraud alert mappers', () => {
   })
   it('handles a null previous location', () => {
     const result = mapFraudAlertToSecurityAlert(baseDetails)
-    expect(result.previousLogin.location).toBe(
-      'No previous location available'
-    )
+    expect(result.previousLogin.location).toBe('No previous location available')
     expect(result.previousLogin.timestamp).toBe('Unavailable')
   })
   it('handles elapsed minutes less than or equal to zero', () => {

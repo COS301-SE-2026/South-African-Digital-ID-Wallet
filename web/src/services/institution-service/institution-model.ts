@@ -11,3 +11,6 @@ export const institutionModel = (data: RegisterInstitutionResponse) => {
     createdAt: data.createdAt,
   }
 }
+
+export const formatInstitutionType = (type: string) =>
+  type.replace(/([a-z])([A-Z])/g, '$1 $2')
