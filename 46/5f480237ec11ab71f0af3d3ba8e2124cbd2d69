@@ -1,0 +1,15 @@
+docs/demo4/epics-and-user-stories-v4.md
+  h_99fca60b892ff4 53,56-57,60-61,65
+  h_99fca60b892ff4 54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "465f480237ec11ab71f0af3d3ba8e2124cbd2d69",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
