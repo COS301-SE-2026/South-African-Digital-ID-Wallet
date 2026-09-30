@@ -1,0 +1,32 @@
+docs/demo4/SAS-v4.md
+  h_99fca60b892ff4 1515
+  s_57409dd8135b25::t_01f06722186f50 1536
+  s_57409dd8135b25::t_9de38cd406b40f 1478,1512,1528,1535,1537,1621-1622,1626-1635
+  s_57409dd8135b25::t_119ebd1bd98084 1620
+web/e2e/test/responsive.spec.ts
+  s_57409dd8135b25::t_78c3fc41135e5b 110-111
+  s_57409dd8135b25::t_9679a718e31fd1 112-113
+backend/FlashIdBackend/k6/nfr2-5-ramp.js
+  s_57409dd8135b25::t_6b3890a915690e 1-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4a2f0a66c1105d417a1140a0b145aaeb0fe532b7",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_57409dd8135b25": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fd5fab29-012b-4b6b-a4d5-1f81e8937c56",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+docs/demo4/architecture-v4.md
+  h_99fca60b892ff4 27,32-34,41,87,96,127,131,135,146,150-153,159-162,172-173,179,187,190-191,212-215
+  h_99fca60b892ff4 19,54,93,226
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "51ec8e5970d704f15e6c40854742c9e22d4e72ef",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
