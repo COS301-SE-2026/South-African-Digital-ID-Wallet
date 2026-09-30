@@ -1,0 +1,43 @@
+backend/FlashIdBackend/k6/nfr2-3-credentials-and-qr.js
+  h_99fca60b892ff4 30-31,35-41,43
+docs/demo4/SRS-v4.md
+  h_99fca60b892ff4 258
+codecov.yml
+  h_99fca60b892ff4 29-41
+docs/demo4/SAS-v4.md
+  h_99fca60b892ff4 1440,1464-1538,1585,1587-1591,1593,1598,1600,1604,1608-1662
+docs/demo4/offline-verification/device-test-protocol.md
+  h_99fca60b892ff4 5
+backend/FlashIdBackend/k6/nfr2-4-qr-verification.js
+  h_99fca60b892ff4 29-30,33,41-42
+  h_99fca60b892ff4 34-40
+web/src/components/templates/app-shell/app-shell.tsx
+  h_99fca60b892ff4 104
+  h_99fca60b892ff4 105-106
+web/e2e/test/responsive.spec.ts
+  h_99fca60b892ff4 1-105
+  h_99fca60b892ff4 106-158
+backend/FlashIdBackend/k6/nfr2-2-auth.js
+  h_99fca60b892ff4 8-14
+docs/demo4/nfr-evidence/nfr-expiry-batch-timing-2026-09-30.json
+  h_99fca60b892ff4 1-127
+docs/demo4/nfr-evidence/nfr-rate-limit-2026-09-30.json
+  h_99fca60b892ff4 1-116
+docs/demo4/nfr-evidence/nfr2-2-auth-2026-09-30.json
+  h_99fca60b892ff4 1-133
+docs/demo4/nfr-evidence/nfr2-3-credentials-and-qr-2026-09-30.json
+  h_99fca60b892ff4 1-159
+docs/demo4/nfr-evidence/nfr2-4-qr-verification-2026-09-30.json
+  h_99fca60b892ff4 1-141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "60540241fd8ba1a480aeba542f081b8580342c31",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
