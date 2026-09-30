@@ -11,8 +11,8 @@ const mockSignOut = jest.fn()
 
 jest.mock('@/hooks/use-sign-out', () => ({ useSignOut: () => mockSignOut }))
 jest.mock('expo-local-authentication', () => ({
-  hasHardwareAsync: jest.fn(),
-  isEnrolledAsync: jest.fn(),
+  getEnrolledLevelAsync: jest.fn(),
+  SecurityLevel: { NONE: 0, SECRET: 1, BIOMETRIC_WEAK: 2, BIOMETRIC_STRONG: 3 },
 }))
 jest.mock('@/lib/secure-session', () => ({
   clearSession: jest.fn().mockResolvedValue(undefined),
@@ -30,8 +30,7 @@ jest.mock('@/lib/api', () => ({
   setDeviceToken: jest.fn(),
 }))
 
-const hasHardware = LocalAuthentication.hasHardwareAsync as jest.Mock
-const isEnrolled = LocalAuthentication.isEnrolledAsync as jest.Mock
+const enrolledLevel = LocalAuthentication.getEnrolledLevelAsync as jest.Mock
 const initial = useAuthStore.getState()
 
 describe('useBiometricPreference', () => {
@@ -40,27 +39,26 @@ describe('useBiometricPreference', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     useAuthStore.setState(initial, true)
-    hasHardware.mockResolvedValue(true)
-    isEnrolled.mockResolvedValue(true)
+    enrolledLevel.mockResolvedValue(2)
     alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {})
   })
   afterEach(() => alertSpy.mockRestore())
 
-  it('Should report support when hardware is present and enrolled', async () => {
+  it('Should report support when biometrics are enrolled', async () => {
     const { result } = await renderHook(() => useBiometricPreference(), {
       wrapper: createQueryWrapper(),
     })
     await waitFor(() => expect(result.current.isSupported).toBe(true))
   })
-  it('Should report no support without hardware', async () => {
-    hasHardware.mockResolvedValue(false)
+  it('Should report support when only a screen lock is set', async () => {
+    enrolledLevel.mockResolvedValue(1)
     const { result } = await renderHook(() => useBiometricPreference(), {
       wrapper: createQueryWrapper(),
     })
-    await waitFor(() => expect(result.current.isSupported).toBe(false))
+    await waitFor(() => expect(result.current.isSupported).toBe(true))
   })
-  it('Should report no support when nothing is enrolled', async () => {
-    isEnrolled.mockResolvedValue(false)
+  it('Should report no support without a screen lock', async () => {
+    enrolledLevel.mockResolvedValue(0)
     const { result } = await renderHook(() => useBiometricPreference(), {
       wrapper: createQueryWrapper(),
     })

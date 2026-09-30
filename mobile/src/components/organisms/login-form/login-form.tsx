@@ -43,18 +43,17 @@ export const LoginForm = ({ onForgotPassword, onRegister }: LoginFormProps) => {
     if (isBiometricEnabled) {
       return
     }
-    const [hasHardware, isEnrolled] = await Promise.all([
-      LocalAuthentication.hasHardwareAsync(),
-      LocalAuthentication.isEnrolledAsync(),
+    const [level] = await Promise.all([
+      LocalAuthentication.getEnrolledLevelAsync(),
       getBiometricPrompted(),
     ])
-    if (!hasHardware || !isEnrolled) {
+    if (level === LocalAuthentication.SecurityLevel.NONE) {
       return
     }
     await setBiometricPrompted().catch(() => {})
     Alert.alert(
       'Skip the password next time?',
-      'Unlock FlashID with your face or fingerprint when you reopen the app.',
+      'Unlock FlashID with your face, fingerprint or screen lock when you reopen the app.',
       [
         { style: 'cancel', text: 'Not now' },
         {

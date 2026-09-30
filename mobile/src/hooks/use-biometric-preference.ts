@@ -13,11 +13,9 @@ export const useBiometricPreference = () => {
 
   useEffect(() => {
     void (async () => {
-      const [hasHardware, isEnrolled] = await Promise.all([
-        LocalAuthentication.hasHardwareAsync(),
-        LocalAuthentication.isEnrolledAsync(),
-      ])
-      setIsSupported(hasHardware && isEnrolled)
+      // A PIN, pattern or password is enough to guard a saved session.
+      const level = await LocalAuthentication.getEnrolledLevelAsync()
+      setIsSupported(level !== LocalAuthentication.SecurityLevel.NONE)
     })()
   }, [])
 

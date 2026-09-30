@@ -30,7 +30,7 @@ export const SecuritySheet = ({ isVisible, onClose }: SecuritySheetProps) => {
         {isSupported ? (
           <FieldToggleRow
             isOn={isEnabled}
-            label="Unlock with Face ID or fingerprint"
+            label="Unlock with biometrics or screen lock"
             onToggle={(value) => void toggle(value)}
             testID="biometric-unlock-toggle"
           />

@@ -23,8 +23,8 @@ jest.mock('@/services/login-service/login-service', () => ({
 }))
 
 jest.mock('expo-local-authentication', () => ({
-  hasHardwareAsync: jest.fn().mockResolvedValue(false),
-  isEnrolledAsync: jest.fn().mockResolvedValue(false),
+  getEnrolledLevelAsync: jest.fn().mockResolvedValue(0),
+  SecurityLevel: { NONE: 0, SECRET: 1, BIOMETRIC_WEAK: 2, BIOMETRIC_STRONG: 3 },
 }))
 
 jest.mock('@/lib/secure-session', () => ({
