@@ -255,7 +255,7 @@ QR code verification requests must return a verification result within 3 seconds
 The system must support at least 500 concurrent authenticated users without degradation in response times.
 
 #### NFR2.6
-An offline presentation of a driver's licence, including the portrait and key binding, must scan within 5 seconds on the reference phones. Measured: about 4.2 seconds for 28 frames.
+An offline presentation of a driver's licence, including the portrait and key binding, must scan within 5 seconds on the reference phones.
 
 #### NFR2.7
 The first request served after a period of application inactivity (cold start) must complete within 5 seconds.

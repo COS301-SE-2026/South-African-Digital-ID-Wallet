@@ -5,14 +5,13 @@ const BASE_URL = __ENV.BASE_URL || 'https://api-flashid-dev-bjgng2dxd6hrgbca.sou
 
 export const options = {
   scenarios: {
-    auth_latency: {
-      executor: 'ramping-vus',
-      startVUs: 0,
-      stages: [
-        { duration: '15s', target: 5 },
-        { duration: '30s', target: 5 },
-        { duration: '10s', target: 0 },
-      ],
+      auth_latency: {
+      // 8 logins a minute stays under the deployed 10 per minute per IP login limit (NFR1.9)
+      executor: 'constant-arrival-rate',
+      rate: 8,
+      timeUnit: '1m',
+      duration: '3m',
+      preAllocatedVUs: 2,
     },
   },
   thresholds: {

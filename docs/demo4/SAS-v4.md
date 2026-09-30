@@ -1437,7 +1437,7 @@ Application deployment itself (on every push to `dev`/`main`) continues to run a
 
 Secrets and environment-specific configuration are not committed to the Git repository.
 
-In deployed environments, secrets are stored directly as Azure App Service Application Settings, configured outside of source control. `infra/main.bicep` additionally models an Azure Key Vault based secrets architecture (`kv-flashid-dev` / `kv-flashid-prod`, RBAC-authorised, referenced via managed identity) as the target design for secrets management, with `infra/seed-secrets.sh` provided to seed it. This is defined and validated but not yet the live mechanism serving the deployed applications, and represents a documented next step beyond the current project timeline.
+In deployed environments, secrets are Azure App Service application settings, configured outside source control. Most of them are Key Vault references: the setting points at a secret in `kv-flashid-dev` or `kv-flashid-prod`, and the app reads it through its managed identity, so the value never appears in App Service configuration. On the dev API, 11 secrets are served this way, including the JWT signing key and every connection string (checked with the az CLI on 2026-09-29). The QR and credential signing keys are Key Vault keys and never leave the vault. One secret, the email app password, is still a plain application setting and is the next to move.
 
 Local development uses `.NET User Secrets`, local environment variables, and development configuration files excluded from source control. Public configuration templates (`.env.example` files) are included in the repository to document required variable names without real values.
 
@@ -1461,42 +1461,81 @@ Database schema changes are a known exception: both APIs apply Entity Framework 
 
 ## 6. Non-Functional Requirement (NFR) Testing
 
-Every quantified NFR from the SRS is mapped below to the architectural tactic claimed to satisfy it and the test that verifies that claim. Where a target could not be honestly validated on the current infrastructure (Azure App Service Free/Basic tier 1), that is stated explicitly rather than reported as a pass.
+Each NFR from SRS-v4 section 5 is listed below with the architectural tactic that addresses it, how it was tested, the target, the measured result and a status. Where a target cannot be met or proven on the current infrastructure, the row says so and gives the reason instead of reporting a pass.
 
-| ID | Quantified requirement | Tactic in SAS | Test / tool | Target /  actual |
-|---|---|---|---|---|
-| NFR1.1 | All protected resources require a valid JWT | JWT bearer authentication with role-based authorisation policies on controllers | xUnit integration (`CredentialControllerIntegrationTests`) | 401 unauthenticated, 403 wrong role / **pass**, 6 tests including `ExpiryCheck_Unauthenticated_ReturnsUnauthorized` and `IssueCredential_AsCitizen_ReturnsForbidden` |
-| NFR1.2 | Sensitive traffic encrypted with HTTPS, TLS 1.2 or later | `UseHttpsRedirection` redirects any plain-HTTP request to HTTPS; `UseHsts` (outside Development) sends `Strict-Transport-Security` so browsers refuse plain HTTP to the API; TLS is terminated by Azure App Service, with the minimum TLS version set to 1.2 in infrastructure-as-code (`infra/modules/appservice.bicep`; SQL, Cosmos DB and Storage are also pinned to TLS 1.2 in their Bicep modules) | xUnit integration (`HttpsEnforcementTests`); `curl` against the deployed dev API | Plain HTTP redirected, HSTS present / **pass**, `PlainHttpRequest_IsRedirectedToHttps`, `HttpsResponse_IncludesStrictTransportSecurityHeader`. Deployed dev API accepts a TLS 1.2-only connection (`curl --tlsv1.2 --tls-max 1.2`, HTTP 200, 2026-09-28) |
-| NFR1.3 | Passwords never stored in plaintext; BCrypt at work factor >= 12 | `PasswordHashingProvider` hashes every password with BCrypt at work factor 12 (per-password random salt); only the hash is persisted | xUnit (`PasswordHashingProviderTests`) | Work factor >= 12, hash != plaintext / **pass**, 5 tests including `HashPassword_UsesBcryptWorkFactorOfAtLeast12` and `HashPassword_CalledTwiceForSamePassword_ProducesDifferentSaltedHashes` |
-| NFR1.4 | OTP required on administrative authentication | Device verification with emailed OTP, attempt-capped and time-expiring, skipped only for an already-trusted device | xUnit (`AuthServiceTests`) | OTP enforced on every untrusted device / **pass**, 12 tests covering missing, invalid, expired, already-verified and max-attempt OTP paths |
-| NFR1.5 | Sensitive configuration stored in environment variables / GitHub Secrets | Committed `appsettings.json` files hold only blank placeholders for secrets; real values come from Azure App Service settings and GitHub Actions secrets at deploy time; local `appsettings.Development.json` is git-ignored in both backend and government-registry | xUnit (`ConfigurationSecretsTests`) + `git check-ignore` | No secret values in committed config / **pass**, 3 tests: both committed `appsettings.json` files scanned for any Key/ApiKey/Secret/Password/ConnectionString/HmacKey setting with a value (none found), plus the 9 known backend secret keys asserted blank |
-| NFR1.6 | Offline credentials encrypted on the device, bound to the device key, and refused without a fresh device signature | Per-device EC P-256 key held in secure storage (this device only); offline cache written encrypted and discarded if tampered with or if the key is missing (e.g. restored onto another phone); each presentation carries an ES256 key-binding JWT (`iat` + `sd_hash`) signed by the device key, which the verifier checks | Jest (`device-key`, `key-binding`, `offline-cache`, `verify`, `offline-flow`), Mobile CI run [#122](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/36317467804); device protocol step 5 | Encrypted, device-bound, stale or foreign signature refused / **pass**, 35 tests including `never writes the credential in plaintext`, `discards the cache when the key is gone`, `returns BAD_KEY_BINDING_SIGNATURE when another device signed it`, `returns STALE_PRESENTATION for a replayed key binding JWT`; on real phones a screen recording replayed after 2 minutes was rejected (2026-09-25) |
-| NFR1.7 | Account locked for 30 minutes after 5 consecutive failed logins | Failed-attempt counter and `LockoutUntil` on the user, checked before the password is verified | xUnit (`AuthServiceTests`, `AuthControllerIntegrationTests`) | Locked on 5th failure, rejected while locked / **pass**, `LoginAsync_FifthConsecutiveFailure_LocksTheAccountForThirtyMinutes`, `LoginAsync_LockedOutAccount_ThrowsBeforeCheckingThePassword`, `Login_WithALockedAccount_ReturnsUnauthorized` |
-| NFR1.8 | QR disclosure token usable exactly once | Single-use `Jti` claim marked through `TryMarkUsedAsync` in Cosmos DB, plus ES256 signature verification (signing key held in Azure Key Vault) | xUnit integration (`QrServiceIntegrationTests`) | Second redemption rejected / **pass**, `ResolveAlreadyUsed_TokenAlreadyUsed_ThrowsInvalidDisclosureTokenException` |
-| NFR1.9 | Rate limiting on abuse-prone endpoints | ASP.NET Core rate limiting middleware, per-user partitioned policies | k6 | 429 past configured limit /  429 confirmed on request #4 |
-| NFR1.10 | POPIA erasure on account-deletion request | Cascading removal of citizen, credential, audit and user records in a defined order | xUnit (`DeleteAccountServiceTests`) | All personal data removed or irrecoverable / **pass**, 5 tests including deletion ordering and audit-log removal |
-| NFR2.1 | Dashboard interactive <2s for 95% of requests | Next.js code-split routing, static asset optimisation | Lighthouse 13.4.1 (desktop, single run per page) | <2000 ms / worst case across all 19 pages: FCP 0.5 s, LCP 1.2 s, TBT 10 ms. Lab measurement, one sample per page, not a 95th-percentile field measurement |
-| NFR2.2 | Auth ops <2s for 95% of requests | JWT bearer auth, BCrypt password hashing, trusted-device check to skip OTP round-trip | k6 | <2000 ms / 1.62 s |
-| NFR2.3 | Credential retrieval <2s for 95% of requests | Indexed lookup via UserId/CitizenId | k6 (`nfr2-3-credentials-and-qr.js`, 5 VUs for 55 s against the deployed dev API, 2026-09-28) | <2000 ms / p95 236.62 ms, 0 of 153 requests failed, **pass** |
-| NFR2.3 | QR generation <2s for 95% of requests | ES256-signed disclosure token; the signing key never leaves Azure Key Vault, so each signature is a Key Vault call | k6 (same run) | <2000 ms / p95 1.38 s, **pass**. Slower than the earlier in-memory Ed25519 figure (94 ms) because signing now goes through Key Vault: a deliberate trade of latency for key protection, still within target |
-| NFR2.4 | QR verification <3s | Single-use Jti claim (`TryMarkUsedAsync`) + ES256 signature verification | k6 (`nfr2-4-qr-verification.js`, 5 VUs for 55 s against the deployed dev API, 2026-09-28) | <3000 ms / p95 464.55 ms, 0 of 216 requests failed, **pass** |
-| NFR2.5 | 500 concurrent authenticated users, no degradation | - | k6 | 500 VUs /  **not attainable on current Basic tier** - requires Standard/Premium plan with autoscaling |
-| NFR2.6 | Offline driver's licence presentation (portrait + key binding) scans within 5 s on the reference phones | Presentation split into an animated multi-frame QR that the verifier reassembles in any order | Manual device test (`docs/demo4/offline-verification/device-test-protocol.md`, step 5), Samsung Galaxy S23 to S24 | <5 s / about 4.2 s for 28 frames, **pass** (2026-09-25). Single measured run on one phone pair |
-| NFR2.7 | Cold-start latency <5s after idle | None: the Free/Basic tier has no "Always On" or warm-up configured, so the app can be unloaded when idle | k6 (`nfr-cold-start.js`, one login after ~24 min with no traffic from us on the deployed dev API, 2026-09-28) | <5000 ms / 1.36 s after idle (warm repeat 0.78 s), **pass**. A start from a fully stopped App Service took 45.7 s to the first `/health` 200 (same day), well over target; that is a platform restart rather than an idle wake-up, and is relevant to NFR3.4 |
-| NFR3.1 | 99.9% availability, excluding scheduled maintenance | Managed Azure App Service hosting (platform patching, automatic restart of a failed process); `/health` liveness endpoint that stays up even when a dependency is misconfigured, so a probe or uptime monitor only restarts or alerts on a dead process; `/health/ready` readiness endpoint that returns 503 when the credential signing key cannot load | xUnit integration (`HealthEndpointTests`), unit (`CredentialSigningKeyHealthCheckTests`) | 99.9% / **not measured**. Health endpoints verified, 3 tests: `/health` returns 200 without login even when the signing key is broken; `/health/ready` returns 200 when the key loads and 503 without leaking detail when it cannot. Availability itself needs weeks of uptime monitoring on the deployed API, which has not been done; paid (Basic and above) App Service plans carry a 99.95% Microsoft SLA, Free and Shared plans carry none, and the single-instance deployment has no redundancy |
-| NFR3.2 | Unexpected errors show a user-friendly message within 2 s without crashing | Unhandled exceptions are caught (controller catch blocks and `GlobalExceptionHandler`) and returned as a generic JSON error; outside Development the real exception text and stack trace stay in the server logs, correlated by `traceId` | xUnit (`AuthControllerTests`, `GlobalExceptionHandlerTests`) | Friendly 500 in <2 s, next request still served / **pass**, `Login_WhenAnUnexpectedErrorOccurs_ReturnsFriendlyErrorWithinTwoSecondsAndKeepsServing` plus handler tests for production vs development detail |
-| NFR3.3 | Users continue using the app once connectivity is restored, without reinstalling or recovering data | Offline scans are queued on the device and uploaded automatically when signal returns or the app comes back to the foreground, only while a user is signed in | Jest (`offline-verification-sync`), Mobile CI run [#122](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/36317467804); device protocol step 7 | Queued data syncs with no user action / **pass**, 5 tests including `Should upload once signal returns` and `Should not upload while offline`; on real phones the offline scan appeared as an `OfflineCredentialVerified` audit row after reconnecting (2026-09-27). Evidence covers the offline-verification path; general session resume after reconnecting is not separately tested |
-| NFR3.5 | Credential and account data remain consistent | EF Core transactional writes, keyset pagination, idempotent background sweeps | xUnit integration (repository test suites) | No hard target / **pass**, consistency is exercised indirectly by `CredentialExpiryRepositoryIntegrationTests` and `CredentialUpdateRepositoryIntegrationTests` |
-| NFR3.6 | Credential presentation and verification work with no network on either phone, using data cached while online | Credential package, trusted issuer keys and signed revocation list cached while online; verification runs fully on the verifier's phone; trust data older than 7 days is refused | Jest (`offline-flow`, `verify`), Mobile CI run [#122](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/36317467804); device protocol steps 2, 4, 6 | Verifies with both phones offline / **pass**, 9 end-to-end flow tests (built, split, scanned out of order, reassembled, verified) plus 37 verifier tests; on real phones in aeroplane mode the licence verified with portrait, and a revoked licence was rejected offline (2026-09-24, 2026-09-27) |
-| NFR3.7 | Expiry-check batch completes within bounded time at current volume | Idempotent daily sweep, single-flight 409 guard | k6 | documented, no hard target / 366 ms at ~150 citizens |
-| NFR4.2 | Frequent tasks within 3 interactions from the dashboard | Dashboard entry points to each frequent task | Manual interaction count (see 6.2) | <=3 / 4 of 5 tasks pass, update password takes 4 - **partial** |
-| NFR4.3 | WCAG 2.1 AA on public-facing web interfaces | Semantic HTML | Lighthouse 13.4.1 Accessibility audit (desktop) | 90 / 90 to 96 across 19 pages, **pass** |
-| NFR4.4 | Validation errors describe the problem and how to fix it | Validators throw typed exceptions with specific, actionable messages (e.g. which password rule failed and the allowed special characters); controllers return them as 400 `{ error }` rather than a generic failure | xUnit (`CitizenRegistrationValidatorTests`, `CitizensControllerTests`) | Every citizen-registration rule returns a message naming the problem and the fix, surfaced to the client as 400 / **pass**, `Validate_InvalidInput_ReturnsMessageThatNamesTheProblemAndTheFix` (8 cases) and `Register_WithInvalidInput_Returns400WithTheSpecificGuidanceMessage` |
-| NFR5.1 | Modular Clean Architecture | Domain / Application / Infrastructure / Presentation separation, dependencies inverted through interfaces registered at composition root | xUnit (`DependencyInjectionTests`) | Every Application interface resolves to its Infrastructure implementation at the expected lifetime / **pass** |
-| NFR5.2 | CI passes build/lint/tests on main | GitHub Actions quality gates | Actions history | https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/33838886255 |
-| NFR5.3 | >=80% unit test coverage on critical logic | - | Codecov | >=80% / 63% - **fail**, 17pts short |
-| NFR5.4 | Deploy within 30 min of merge to main | GitHub Actions -> Azure Web Apps deploy | Actions run duration | <30 min / 5m36s (api-flashid), 5m35s (gov-registry), 2m8s (web) - **pass** |
-| NFR5.5 | Architecture supports onboarding additional government departments and institutions | Institutions are data, not code: `InstitutionType` enum + `POST /api/institutions/register` (GovernmentAdministrator only) creates the institution, issues its API key and writes an audit log, with no deployment needed | xUnit integration (`InstitutionsControllerTests`, `InstitutionServiceTests`) | Every institution type onboarded end-to-end through the API / **pass**, `RegisterInstitution_ForEveryInstitutionType_OnboardsThroughTheApiWithoutCodeChanges` (registers, receives API key and reads back each type) and `RegisterInstitution_AsCitizen_ReturnsForbidden` |
+**Infrastructure the results were measured on** (read from Azure with the az CLI on 2026-09-29): one App Service plan, `asp-flashid`, Basic B2 tier with a single instance, shared by all six web apps (web, API and government registry, for both dev and production). Always On is off and no App Service health check path is configured. Performance figures come from the deployed dev API unless the row says otherwise.
+
+**Status key**
+
+| Status | Meaning |
+|---|---|
+| Pass | Target met; the evidence is named in the row |
+| Pass (limited) | Target met, but the evidence has a stated limit (single run, lab measurement or narrower scope) |
+| Partial | Part of the requirement is met; the missing part is stated |
+| Gap | Cannot be met or proven on the current infrastructure; the reason is stated |
+| Not yet tested | The test is designed (see 6.5) but has not been run |
+
+**Summary:** 22 Pass, 5 Pass (limited), 2 Partial, 2 Gap, 3 Not yet tested (34 NFRs).
+
+#### Security
+
+| ID | Requirement | Tactic | Test / tool | Target | Result | Status |
+|---|---|---|---|---|---|---|
+| NFR1.1 | Protected resources require a valid JWT | JWT bearer authentication with role-based authorisation policies on controllers | xUnit integration: `CredentialControllerIntegrationTests` | 401 without a token, 403 for the wrong role | 6 tests pass, including `ExpiryCheck_Unauthenticated_ReturnsUnauthorized` and `IssueCredential_AsCitizen_ReturnsForbidden` | Pass |
+| NFR1.2 | HTTPS with TLS 1.2 or later | `UseHttpsRedirection` sends plain HTTP to HTTPS; `UseHsts` (outside Development) sends `Strict-Transport-Security`; Azure terminates TLS with a 1.2 minimum on every service | xUnit integration: `HttpsEnforcementTests`; az CLI; `curl` | HTTP redirected, HSTS sent, TLS below 1.2 refused | `PlainHttpRequest_IsRedirectedToHttps` and `HttpsResponse_IncludesStrictTransportSecurityHeader` pass. Live Azure config (2026-09-29): HTTPS Only on and minimum TLS 1.2 for the dev API, dev web and production API; minimum TLS 1.2 on SQL (`sql-flashid`), Cosmos DB and both storage accounts. The dev API accepted a TLS 1.2-only connection (`curl --tlsv1.2 --tls-max 1.2`, HTTP 200, 2026-09-28) | Pass |
+| NFR1.3 | Passwords hashed with BCrypt, work factor at least 12 | `PasswordHashingProvider` hashes with BCrypt at work factor 12 with a random salt per password; only the hash is stored | xUnit: `PasswordHashingProviderTests` | Work factor >= 12, hash never equals the password | 5 tests pass, including `HashPassword_UsesBcryptWorkFactorOfAtLeast12` (reads the cost from the stored hash) and `HashPassword_CalledTwiceForSamePassword_ProducesDifferentSaltedHashes` | Pass |
+| NFR1.4 | OTP on administrative authentication | Emailed OTP on every untrusted device, capped attempts and expiry; skipped only for a device already trusted | xUnit: `AuthServiceTests` | OTP required on every untrusted device | 12 tests pass covering missing, invalid, expired, already-used and max-attempt OTPs | Pass |
+| NFR1.5 | Secrets kept in environment variables or GitHub Secrets | Committed `appsettings.json` files hold blank placeholders only; deployed secrets are App Service settings, most of them Key Vault references; CI secrets are GitHub Actions secrets; local `appsettings.Development.json` is git-ignored | xUnit: `ConfigurationSecretsTests`; `git check-ignore`; az CLI | No secret value committed; deployed secrets outside the code | 3 tests pass: both committed `appsettings.json` files contain no value for any Key, ApiKey, Secret, Password, ConnectionString or HmacKey setting, and the 9 known backend secret keys are blank. On the dev API (2026-09-29) 11 secrets, including `Jwt__Key` and every connection string, are Key Vault references. `Email__AppPassword` is a plain App Service setting: still an environment variable, but not yet moved to Key Vault | Pass |
+| NFR1.6 | Offline credentials encrypted, bound to the device key, refused without a fresh device signature | Per-device EC P-256 key in secure storage; offline cache encrypted and discarded if tampered with or if the key is missing; each presentation carries an ES256 key-binding JWT (`iat` + `sd_hash`) that the verifier checks | Jest (`device-key`, `key-binding`, `offline-cache`, `verify`, `offline-flow`), Mobile CI run [#122](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/36317467804); device protocol step 5 | Encrypted at rest; stale or foreign signature refused | 35 tests pass, including `never writes the credential in plaintext`, `discards the cache when the key is gone`, `returns BAD_KEY_BINDING_SIGNATURE when another device signed it` and `returns STALE_PRESENTATION for a replayed key binding JWT`. On real phones a screen recording replayed after 2 minutes was rejected (2026-09-25) | Pass |
+| NFR1.7 | Account locked for 30 minutes after 5 failed logins | Failed-attempt counter and `LockoutUntil` on the user, checked before the password | xUnit: `AuthServiceTests`, `AuthControllerIntegrationTests` | Locked on the 5th failure; rejected while locked | `LoginAsync_FifthConsecutiveFailure_LocksTheAccountForThirtyMinutes`, `LoginAsync_LockedOutAccount_ThrowsBeforeCheckingThePassword` and `Login_WithALockedAccount_ReturnsUnauthorized` pass | Pass |
+| NFR1.8 | QR disclosure token usable exactly once | Single-use `Jti` claim marked through `TryMarkUsedAsync` in Cosmos DB; ES256 signature with the key held in Azure Key Vault | xUnit integration: `QrServiceIntegrationTests` | Second redemption rejected | `ResolveAlreadyUsed_TokenAlreadyUsed_ThrowsInvalidDisclosureTokenException` passes | Pass |
+| NFR1.9 | Rate limits on abuse-prone endpoints (registration, issuance, OTP) | ASP.NET Core rate limiter, one-minute fixed windows. Anonymous endpoints are limited per IP address (register 5, resend OTP 3, verify email 5, login 10, verify device 5, password reset 5). Signed-in endpoints are limited per user (issue credential 5, email change OTP 3, and others). Every request also falls under a 300 per minute backstop | xUnit integration: `RateLimitingTests`; k6 `nfr-rate-limit.js` on the dev API, 2026-09-30 | HTTP 429 once the limit is passed | `AbuseProneEndpoint_PastItsLimit_Returns429` passes for register (6th request), resend OTP (4th) and login (11th). On the deployed dev API the 4th resend-OTP request within a minute returned 429 (`nfr-evidence/ nfr-rate-limit-2026-09-30.json`) | Pass |
+| NFR1.10 | POPIA erasure on account deletion | Cascading removal of citizen, credential, audit and user records in a fixed order | xUnit: `DeleteAccountServiceTests` | All personal data removed | 5 tests pass, including `DeleteAccountAsync_CallsRepositoryMethodsInExpectedOrder` and `DeleteAccountAsync_CitizenExists_AlsoDeletesAuditLogsUserAndSaves` | Pass |
+
+#### Performance
+
+| ID | Requirement | Tactic | Test / tool | Target | Result | Status |
+|---|---|---|---|---|---|---|
+| NFR2.1 | Dashboard interactive in under 2 s for 95% of requests | Next.js code-split routing and static asset optimisation | Lighthouse 13.4.1, desktop, one run per page (see 6.1) | < 2 s | Slowest of 19 pages: LCP 1.2 s, FCP 0.5 s, TBT 10 ms. One lab sample per page, not a 95th percentile over real traffic | Pass (limited) |
+| NFR2.2 | Authentication in under 2 s for 95% of requests | JWT bearer auth; BCrypt hashing; trusted-device check skips the OTP round trip | k6 `nfr2-2-auth.js` on the dev API, 2026-09-30: 8 logins a minute for 3 minutes, which stays under the NFR1.9 login limit of 10 per minute per IP | p95 < 2 s | p95 1.19 s (median 756 ms); 0 of 24 logins failed (`nfr-evidence/nfr2-2-auth-2026-09-30.json`). Measures latency at a steady low rate, not under heavy load | Pass |
+| NFR2.3 | Credential retrieval in under 2 s for 95% of requests | Indexed lookup by UserId and CitizenId | k6 `nfr2-3-credentials-and-qr.js` (up to 5 virtual users for 55 s, one login each) on the dev API, 2026-09-30 | p95 < 2 s | p95 122.73 ms; 0 of 175 requests failed (`nfr-evidence/nfr2-3-credentials-and-qr-2026-09-30.json`) | Pass |
+| NFR2.3 | QR generation in under 2 s for 95% of requests | ES256-signed disclosure token; the signing key never leaves Azure Key Vault, so each signature is one Key Vault call | Same k6 run | p95 < 2 s | p95 552.08 ms (median 382 ms). Slower than the earlier in-memory signing (94 ms) because every signature is a Key Vault call: a deliberate trade of latency for key protection, well inside the target | Pass |
+| NFR2.4 | QR verification in under 3 s | Single-use `Jti` check plus ES256 signature verification | k6 `nfr2-4-qr-verification.js` (up to 5 virtual users for 55 s, one login each) on the dev API, 2026-09-30 | p95 < 3 s | p95 270.76 ms (median 144.57 ms) over 75 verifications; 0 of 230 requests failed (`nfr-evidence/nfr2-4-qr-verification-2026-09-30.json`) | Pass |
+| NFR2.5 | 500 concurrent authenticated users without slower responses | None available on this tier: one B2 instance, no autoscaling | k6 ramp on the dev API | 500 virtual users, p95 still within NFR2.2 and NFR2.3 | [ramp result: the number of users at which p95 passed 2 s]. 500 users was not attempted: one Basic B2 instance, shared by six apps, cannot scale out. Meeting this needs a Standard or Premium plan with autoscale | Gap |
+| NFR2.6 | Offline licence presentation scans in under 5 s on the reference phones | Presentation split into an animated multi-frame QR that the verifier reassembles in any order | Manual device test (`docs/demo4/offline-verification/device-test-protocol.md`, step 5), Samsung Galaxy S23 to S24 | < 5 s | About 4.2 s for 28 frames (2026-09-25). One measured run on one phone pair | Pass (limited) |
+| NFR2.7 | First request after idle completes in under 5 s | None configured: Always On is off (az CLI, 2026-09-29), so the app can be unloaded when idle | k6 `nfr-cold-start.js`: one login after about 24 min with no traffic, dev API, 2026-09-28 | < 5 s | 1.36 s after idle (warm repeat 0.78 s). A start from a fully stopped App Service took 45.7 s to the first `/health` 200 on the same day; that is a platform restart, covered under NFR3.4 | Pass |
+
+#### Reliability and availability
+
+| ID | Requirement | Tactic | Test / tool | Target | Result | Status |
+|---|---|---|---|---|---|---|
+| NFR3.1 | 99.9% availability, excluding scheduled maintenance | Managed App Service hosting; `/health` liveness endpoint that stays up when a dependency is misconfigured; `/health/ready` returns 503 when the signing key cannot load | xUnit integration: `HealthEndpointTests`; unit: `CredentialSigningKeyHealthCheckTests`; Azure Monitor metrics | 99.9% | Not measured over time. 3 health tests pass: `/health` returns 200 without login even when the signing key is broken; `/health/ready` returns 200 when the key loads and 503 without leaking detail when it cannot. [30-day dev API figures: total requests and 5xx responses]. Basic B2 carries Microsoft's 99.95% SLA, but there is one instance, no redundancy and no App Service health check path configured, so a hung process is not detected automatically | Gap |
+| NFR3.2 | Unexpected errors show a friendly message within 2 s without crashing | Controller catch blocks and `GlobalExceptionHandler` return a generic JSON error; outside Development the exception detail stays in the server log, linked by `traceId` | xUnit: `AuthControllerTests`, `GlobalExceptionHandlerTests` | Friendly 500 in < 2 s; next request still served | `Login_WhenAnUnexpectedErrorOccurs_ReturnsFriendlyErrorWithinTwoSecondsAndKeepsServing` passes, plus handler tests for production and development detail | Pass |
+| NFR3.3 | Users carry on once connectivity returns, with no reinstall or data recovery | Offline scans are queued on the device and uploaded when signal returns or the app comes back to the foreground, while a user is signed in | Jest `offline-verification-sync`, Mobile CI run [#122](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/36317467804); device protocol step 7 | Queued data syncs with no user action | 5 tests pass, including `Should upload once signal returns` and `Should not upload while offline`. On real phones the offline scan appeared as an `OfflineCredentialVerified` audit row after reconnecting (2026-09-27). Covers the offline-verification path only | Pass (limited) |
+| NFR3.4 | Recovery from a critical service failure within 5 minutes | App Service restarts the process; EF Core migrations and signing key load on startup; `/health/ready` reports when the API can sign again | Restart of the dev API (`az webapp restart`) while polling `/health/ready` (script in 6.5) | < 5 min to ready | [restart result and date]. Supporting measurement: after a full stop, the first `/health` 200 came 45.7 s after start (2026-09-28) | Not yet tested |
+| NFR3.5 | Credential and account data stay consistent | EF Core transactional writes; a job-run claim table so only one expiry sweep runs per day; failed sweeps are marked failed, not left half done | xUnit: `CredentialExpiryServiceTests`, `CredentialExpiryRepositoryIntegrationTests`, `DeleteAccountServiceTests` | No partial or duplicate writes | `SaveChangesFails_MarksJobRunFailedInsteadOfThrowingPastTheService`, `TryClaimJobRunAsync_SecondClaimForSameDate_Fails` and `DeleteAccountAsync_CallsRepositoryMethodsInExpectedOrder` pass. These cover the expiry sweep and account deletion, not every write path | Pass (limited) |
+| NFR3.6 | Presentation and verification work with no network on either phone | Credential package, trusted issuer keys and signed revocation list cached while online; verification runs on the verifier's phone; trust data older than 7 days is refused | Jest (`offline-flow`, `verify`), Mobile CI run [#122](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/36317467804); device protocol steps 2, 4 and 6 | Verifies with both phones offline | 9 end-to-end flow tests (built, split, scanned out of order, reassembled, verified) and 37 verifier tests pass. On real phones in aeroplane mode the licence verified with its portrait, and a revoked licence was rejected offline (2026-09-24, 2026-09-27) | Pass |
+| NFR3.7 | Batch jobs finish in bounded time and can be safely re-run | Daily expiry sweep with keyset pagination; a per-day claim so a second run returns the first result instead of reprocessing; a failed or stale run can be reclaimed | k6 `nfr-expiry-batch-timing.js` on the dev API, 2026-09-30; xUnit: `CredentialExpiryServiceTests`, `CredentialExpiryRepositoryIntegrationTests` | Bounded time; safe to re-run | 619.5 ms at the dev data volume (`nfr-evidence/nfr-expiry-batch-timing-2026-09-30.json`). `AlreadyCompletedToday_ReturnsExistingResultWithoutReprocessing`, `TryClaimJobRunAsync_ReclaimsRowLeftAsFailed` and `TryClaimJobRunAsync_ReclaimsStaleRunningRow` pass | Pass |
+
+#### Usability
+
+| ID | Requirement | Tactic | Test / tool | Target | Result | Status |
+|---|---|---|---|---|---|---|
+| NFR4.1 | First-time citizen registers, verifies email and reaches the wallet within 5 minutes without help | Short registration form, emailed OTP, direct redirect to the wallet | Timed session with people who had not used FlashID (see 6.4) | < 5 min | [time per person, device, sample size] | Not yet tested |
+| NFR4.2 | Frequent tasks within 3 interactions from the dashboard | Sidebar entry for every frequent task; share and update password open in place | Manual interaction count (see 6.2) | <= 3 | All 5 frequent tasks take 3 or fewer on desktop and tablet. On a phone the sidebar sits behind a menu button, which adds one tap | Pass |
+| NFR4.3 | WCAG 2.1 AA on public-facing web pages | Semantic HTML, labelled controls, landmark regions | Lighthouse 13.4.1 accessibility audit, desktop (see 6.1.2) | No AA failures | Scores 90 to 96 on all 19 pages, but Lighthouse reports insufficient colour contrast (WCAG 1.4.3, a Level AA criterion) on all 19, unlabelled form controls on one page and a missing `<main>` landmark on four | Partial |
+| NFR4.4 | Validation errors describe the problem and how to fix it | Validators throw typed exceptions with specific messages (for example which password rule failed and the allowed special characters); controllers return them as 400 `{ error }` | xUnit: `CitizenRegistrationValidatorTests`, `CitizensControllerTests` | Every rule names the problem and the fix | `Validate_InvalidInput_ReturnsMessageThatNamesTheProblemAndTheFix` (8 cases) and `Register_WithInvalidInput_Returns400WithTheSpecificGuidanceMessage` pass | Pass |
+| NFR4.5 | Responsive web interface with no loss of functionality | Tailwind breakpoints; below 1024 px the sidebar becomes a slide-out menu | Playwright `responsive.spec.ts` at 375, 768 and 1440 px (see 6.3) | No sideways scrolling; navigation and main actions work at every width | [results from 6.3] | Not yet tested |
+
+#### Maintainability
+
+| ID | Requirement | Tactic | Test / tool | Target | Result | Status |
+|---|---|---|---|---|---|---|
+| NFR5.1 | Modular Clean Architecture | Domain, Application, Infrastructure and Presentation layers; dependencies inverted through interfaces registered at the composition root | xUnit: `DependencyInjectionTests` | Every Application interface resolves to its Infrastructure implementation | Passes | Pass |
+| NFR5.2 | Code merged to main passes build, lint, formatting and CI checks | GitHub Actions runs build, lint, format and tests on every pull request; branch protection on `main` | GitHub Actions; branch protection settings (`gh api`, 2026-09-29) | A merge cannot happen with failing checks | CI runs on every pull request ([example run](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/33838886255)) and `main` requires 2 approvals. No status checks are marked as required on `main`, so a pull request with failing CI could still be merged by its reviewers [update after the ruleset check] | Partial |
+| NFR5.3 | At least 80% unit test coverage on critical business logic | Critical logic lives in the backend Application and Domain layers and the mobile offline-verification library, all covered by unit tests | Coverage measured locally (`dotnet test --coverage`, Jest `--coverage`), 2026-09-29; Codecov | >= 80% line coverage on critical logic | Backend Application 96.5%, Domain 87.1%; mobile `src/lib/offline` 97.2%. Across all code in all four projects Codecov reports 63% [link to Codecov critical-logic component once enabled] | Pass (limited) |
+| NFR5.4 | Deploy to production within 30 minutes of merging to main | GitHub Actions deploys to Azure App Service on every push to `main` | GitHub Actions run durations | < 30 min | Production API: last 5 deploys took 2 min 17 s to 8 min 55 s ([latest, 2026-09-23](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/35923611440)). Government registry 5 min 35 s and web 2 min 8 s [add run links] | Pass |
+| NFR5.5 | New departments and institutions can be onboarded | Institutions are data, not code: `POST /api/institutions/register` (GovernmentAdministrator only) creates the institution, issues its API key and writes an audit log, with no deployment | xUnit integration: `InstitutionsControllerTests`, `InstitutionServiceTests` | Every institution type onboarded through the API | `RegisterInstitution_ForEveryInstitutionType_OnboardsThroughTheApiWithoutCodeChanges` and `RegisterInstitution_AsCitizen_ReturnsForbidden` pass | Pass |
 
 ### 6.1 Lighthouse Audit Detail (supports NFR2.1, NFR4.3)
 
@@ -1543,32 +1582,81 @@ Recurring optimisation opportunities flagged on nearly every page, none of which
 
 #### 6.1.2 Accessibility findings (NFR4.3)
 
-NFR4.3 is **met**. All scores range from 90 to 96. Remaining issues keeping scores below 100:
+NFR4.3 is **partially met**. Lighthouse scores range from 90 to 96, but a Lighthouse score is not a WCAG conformance level, and three failures remain. The first is a Level AA criterion, so the pages do not yet conform to WCAG 2.1 AA:
 
-| Failure | WCAG criterion | Affected pages |
-|---|---|---|
-| Background and foreground colours lack sufficient contrast | 1.4.3 Contrast (Minimum) | All 19 |
-| Form elements do not have associated labels | 1.3.1, 4.1.2 | `/gov-admin/upload-institution` |
-| Document does not have a `<main>` landmark | 1.3.1 (bypass blocks) | `/officials/verifications`, `/citizen/verifications`, `/citizen/activate-credentials`, `/gov-admin/audit-log` |
+| Failure | WCAG criterion | Level | Affected pages |
+|---|---|---|---|
+| Background and foreground colours lack sufficient contrast | 1.4.3 Contrast (Minimum) | AA | All 19 |
+| Form elements do not have associated labels | 1.3.1, 4.1.2 | A | `/gov-admin/upload-institution` |
+| Document does not have a `<main>` landmark | 1.3.1 | A | `/officials/verifications`, `/citizen/verifications`, `/citizen/activate-credentials`, `/gov-admin/audit-log` |
 
-The unlabelled form controls on `/gov-admin/upload-institution` are the most severe of the three, since a screen reader user cannot determine what each input expects. That page holds the lowest accessibility score in the set at 90.
+The unlabelled form controls on `/gov-admin/upload-institution` are the most serious for a screen reader user, since they cannot tell what each input expects; that page also has the lowest score (90). The contrast failure affects every page, which points to one or two shared colour tokens rather than page-by-page problems.
 
 #### 6.1.3 Other findings
 
 - **Images with incorrect aspect ratio** on 12 of 19 pages, a rendering-quality issue under Best Practices.
-- **Security headers are unverified.** On every page, CSP, HSTS, COOP, X-Frame-Options and Trusted Types appear under Trust and Safety without a pass. Lighthouse confirms these pages are served over HTTPS, which supports but does not prove NFR1.2, since Lighthouse does not report the negotiated TLS version. Adding these headers would strengthen the NFR1.2 position.
+- **Security headers on the web app are unverified.** On every page, CSP, HSTS, COOP, X-Frame-Options and Trusted Types appear under Trust and Safety without a pass. These runs audit the Next.js web app. The API now sends HSTS (see NFR1.2), but the web app's own headers have not been added.
 - **SEO scored 100 on all 19 pages.** No SRS NFR depends on this; it is recorded for completeness.
-- **NFR4.5 (responsive interface) is not evidenced by this batch.** All 19 runs used emulated desktop. A mobile-emulation pass would be needed to speak to that requirement.
+- **NFR4.5 (responsive interface) is not covered by this batch**, since all 19 runs emulated a desktop. It is tested separately in 6.3.
 
 ### 6.2 Interaction Counts (NFR4.2)
 
-Counted from the citizen dashboard as the starting point. One interaction is one click,
-tap or form submission. Typing into an already-focused field is not counted.
+Counted from the citizen dashboard on a desktop or tablet, where the sidebar is always visible. One interaction is one click, tap or form submission; typing into a field is not counted. The ID card is the first credential on My Credentials, so it is already selected when the page opens.
 
 | Frequent task | Path | Interactions | Within 3 |
 |---|---|---|---|
-| View ID credential | Dashboard > My Credentials > National ID Card | 2 | Yes |
-| Share ID credential via QR | Dashboard > My Credentials > Share | 2 | Yes |
-| View verification history | Dashboard > Verifications | 1 | Yes |
-| Activate a credential | Dashboard > Activate Credentials > select > Activate | 3 | Yes |
-| Update password | Dashboard > Manage Account > Update Password | 3 | Yes |
+| View ID credential | My Credentials | 1 | Yes |
+| Share ID credential via QR | My Credentials > Share Credential > Generate QR code | 3 | Yes |
+| View verification history | Verifications | 1 | Yes |
+| Activate a credential | Activate Credentials > select credential > Activate | 3 | Yes |
+| Update password | Manage Account > Update Password > submit the form | 3 | Yes |
+
+On a phone the sidebar sits behind the menu button, so each path takes one more tap. The driver's licence needs one extra tap to select it before viewing or sharing.
+
+
+
+
+
+### 6.3 Responsive Interface (NFR4.5)
+
+Tested with Playwright (`web/e2e/test/responsive.spec.ts`) at three widths: 375 px (phone), 768 px (tablet) and 1440 px (desktop). At each width the test checks that neither the page nor the portal's content area scrolls sideways, and that the main function of the page still works. For portal pages that means the sidebar link (or, below 1024 px, the menu button and its link) navigates; for the share dialog it means the Generate QR code button can be reached.
+
+The architecture document (`a)
+rchitecture-v4.md` commits to desktop and tablet. Phone results are reported here as well, and any phone problem is marked as outside that commitment rather than left out.
+
+| Page | 375 px | 768 px | 1440 px |
+|---|---|---|---|
+| Landing | [ ] | [ ] | [ ] |
+| Login | [ ] | [ ] | [ ] |
+| Register | [ ] | [ ] | [ ] |
+| Citizen dashboard | [ ] | [ ] | [ ] |
+| My Credentials | [ ] | [ ] | [ ] |
+| Share credential dialog | [ ] | [ ] | [ ] |
+| Citizen verifications | [ ] | [ ] | [ ] |
+| Officials dashboard | [ ] | [ ] | [ ] |
+| Onboard citizen | [ ] | [ ] | [ ] |
+| Gov admin dashboard | [ ] | [ ] | [ ] |
+
+Known observation: below 1024 px the landing page hides its About, Features and Help links and has no menu to replace them. Those sections can still be reached by scrolling, so no function is lost, but the shortcuts are.
+
+### 6.4 First-Time User Timing (NFR4.1)
+
+People who had never used FlashID were asked to register, verify their email and open their wallet, with no help. The timer started when the site opened and stopped when the wallet showed.
+
+| Participant | Device | Time | Where they hesitated |
+|---|---|---|---|
+| [ ] | [ ] | [ ] | [ ] |
+
+Sample size: [n]. A small sample shows the flow can be completed in time; it does not show what share of all users would manage it.
+
+### 6.5 How to Re-run the Evidence
+
+| NFR | Command | Where |
+|---|---|---|
+| All xUnit rows | `dotnet test --solution ./backend/FlashIdBackend/FlashIdBackend.sln` | Repository root |
+| NFR1.6, 3.3, 3.6 | `pnpm test` | `mobile/` |
+| NFR4.5 | `pnpm exec playwright test e2e/test/responsive.spec.ts` (backend running locally) | `web/` |
+| k6 rows | `k6 run --summary-export docs/demo4/nfr-evidence/<script>-<date>.json backend/FlashIdBackend/k6/<script>.js` | Repository root |
+| NFR5.3 | `dotnet test --solution ./backend/FlashIdBackend/FlashIdBackend.sln --coverage --coverage-output-format cobertura` | Repository root |
+
+Saved k6 results are in `docs/demo4/nfr-evidence/`.
