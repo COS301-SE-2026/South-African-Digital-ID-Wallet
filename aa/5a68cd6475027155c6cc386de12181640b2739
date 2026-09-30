@@ -1,0 +1,16 @@
+docs/images/certified-copy.drawio.svg
+  h_99fca60b892ff4 4
+docs/images/emergency-qr.drawio.svg
+  h_99fca60b892ff4 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "aa5a68cd6475027155c6cc386de12181640b2739",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
