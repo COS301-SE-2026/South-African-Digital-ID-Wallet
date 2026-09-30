@@ -43,14 +43,14 @@ Deployment is fully automated via GitHub Actions .See [SAS 5 Deployment](docs/de
 
 ## Demo Videos
 
-- [Demo 1 Video](https://drive.google.com/file/d/1HRZ4kPE6d9CZjKYMcp1lL_AB6-7ywVYP/view?usp=sharing) (Please doownload video due to video size)
+- [Demo 1 Video](https://drive.google.com/file/d/1HRZ4kPE6d9CZjKYMcp1lL_AB6-7ywVYP/view?usp=sharing)
 
 - [Demo 2 Video](https://drive.google.com/file/d/1zvqFxAfxtZlVi4LKnHyqWYL7NjBREaG7/view?usp=sharing)
 
 - [Demo 3 Video](https://drive.google.com/file/d/1fDvILt3r_7-KdpE3DQ4lAmEqNAfbMtk7/view?usp=sharing)
 --[Mobile Video](https://universitypretoria-my.sharepoint.com/:v:/g/personal/u24573699_up_ac_za/IQCfDy_jLr4GQLQG5VqKu8BOAQVXPIE2iC5cbbNoUdkJMK0?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=sBroN4https://universitypretoria-my.sharepoint.com/:v:/g/personal/u24573699_up_ac_za/IQCfDy_jLr4GQLQG5VqKu8BOAQVXPIE2iC5cbbNoUdkJMK0?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=sBroN4)
 
-- [Demo 4 Video](#)
+- [Demo 4 Video](#https://drive.google.com/file/d/1dAoPo8PUMzo2n27K99AgZOxaLuUC8DLU/view?usp=sharing)
 
 ---
 
@@ -106,6 +106,15 @@ t3chtitansgo@gmail.com
 <details>
 <summary><strong>Demo 4 Documentation</strong></summary>
 
+🔗 [SAS](docs/demo4/SAS-v4.md) <br> 
+🔗 [SRS](docs/demo4/SRS-v4.md) <br> 
+🔗 [User Manual](docs/demo4/User%20Help%20Manual.pdf) <br> 
+🔗 [Brand style guide](docs/demo4/FlashID.pdf) <br> 
+🔗 [Testing Policy Document](docs/demo4/TESTING_POLICY.md) <br> 
+🔗 [Coding Standards](docs/demo4/coding_standards.md) <br> 
+🔗 [OpenAPI Spec (FlashID)](docs/demo4/openapi.yaml) <br> 
+🔗 [OpenAPI Spec (Government Registry)](docs/demo4/openapi-government-registry.yaml) <br> 
+🔗 [Deployed Instance](#https://flashid.co.za/) <br>
 
 
 </details>
