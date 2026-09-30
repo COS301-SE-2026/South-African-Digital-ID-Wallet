@@ -1,0 +1,20 @@
+docs/demo4/use-cases-v4.md
+  h_293a8616118f65 363-578
+docs/images/certified-copy.drawio.svg
+  h_293a8616118f65 1-4
+docs/images/emergency-qr.drawio.svg
+  h_293a8616118f65 1-4
+docs/images/fraud-detection.drawio.svg
+  h_293a8616118f65 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a117fb54ea13e4367e9293bca1bd8bf37581fc5a",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
