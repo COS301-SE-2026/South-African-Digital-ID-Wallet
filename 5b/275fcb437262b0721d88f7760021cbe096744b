@@ -1,0 +1,18 @@
+mobile/app.json
+  h_712d174fc3f309 15
+mobile/modules/flashid-emergency/android/src/main/java/expo/modules/flashidemergency/EmergencyStore.kt
+  h_712d174fc3f309 8-9,26-38,52-64,69,75
+mobile/src/components/pages/emergency-profile/emergency-profile-page.tsx
+  h_712d174fc3f309 2,120-128,180
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "5b275fcb437262b0721d88f7760021cbe096744b",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}
