@@ -14,7 +14,7 @@ public static class CitizenRegistrationValidator
             throw new InvalidCitizenRegistrationRequestException("Email is required.");
 
         if (!EmailValidator.IsValid(request.Email))
-            throw new InvalidCitizenRegistrationRequestException("Invalid email address");
+            throw new InvalidCitizenRegistrationRequestException("Enter a valid email address, for example name@example.com.");
 
         ValidatePassword(request.Password);
     }

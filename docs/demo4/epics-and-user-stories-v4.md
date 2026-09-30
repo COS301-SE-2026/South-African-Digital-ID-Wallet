@@ -18,14 +18,16 @@ As a Home Affairs official, I want to retrieve a citizen's verified identity rec
 
 **Acceptance Criteria:**
 - Official can search for a citizen by SA ID number
+- The SA ID number is checked for a valid 13-digit format and checksum before the registry is queried
 - System queries the MockGov registry and returns the identity record if found
-- System displays the citizen's full name, date of birth, and address from the registry
+- System displays the citizen's full name, SA ID number and date of birth from the registry
 - System shows a clear error if the SA ID is not found in the registry
-- Official cannot proceed with onboarding until a Verified record is retrieved
+- System rejects citizens younger than 16
+- Official cannot proceed with onboarding until a verified record is retrieved
 
 **Definition of Done:**
 - Identity retrieval queries MockGov registry and returns authoritative data
-- All onboarding events are written to the audit log
+- Onboarding is written to the audit log
 - Duplicate SA ID numbers are rejected
 
 ---
@@ -34,10 +36,10 @@ As a Home Affairs official, I want to capture a citizen's explicit consent befor
 
 **Acceptance Criteria:**
 - POPIA Section 11 notice is displayed to the official before consent is recorded
-- Official must actively confirm consent — it cannot be pre-checked
-- Consent record includes the official's ID, citizen's SA ID, and a precise timestamp
-- System prevents onboarding from proceeding if consent has not been recorded
-- Consent record is stored permanently and cannot be edited or deleted
+- Official must actively confirm consent, it cannot be pre-checked
+- Consent record includes the official's ID, the citizen, and a precise timestamp
+- System prevents onboarding from proceeding if consent has not been given
+- Consent is recorded as an audit log entry
 
 **Definition of Done:**
 - Explicit POPIA consent is captured and stored with timestamp
@@ -45,155 +47,140 @@ As a Home Affairs official, I want to capture a citizen's explicit consent befor
 
 ---
 #### US-1.3
-As a Home Affairs official, I want to capture a citizen's contact details (phone and/or email) during onboarding, so that the citizen can receive their activation link and future notifications.
+As a Home Affairs official, I want to capture a citizen's contact details during onboarding, so that the citizen can receive their activation link.
 
 **Acceptance Criteria:**
-- Official can enter a phone number and/or email address for the citizen
-- Phone number is validated as a valid South African format
+- Official must enter an email address for the citizen
+- Official can optionally enter a South African mobile number
 - Email is validated against standard email format rules
-- System rejects an email that is already registered to another account
-- Contact details are saved to the citizen record before the activation code is generated
+- Phone number is normalised to +27 format and validated as a South African mobile number
+- Contact details are saved with the activation record before the activation link is sent
 
 **Definition of Done:**
-- Contact details saved and associated with the citizen record
-- Duplicate email addresses are rejected
+- Contact details saved and associated with the citizen's activation record
+- Invalid email or phone formats are rejected
 
 ---
 #### US-1.4
-As a Home Affairs official, I want to send an activation link or OTP to the citizen after onboarding, so that the citizen can securely activate their wallet at their own convenience before the activation code expires.
+As a Home Affairs official, I want the system to send an activation link to the citizen and give me an activation PIN after onboarding, so that the citizen can securely link their identity to their FlashID account.
 
 **Acceptance Criteria:**
-- System generates a unique activation code after contact details are captured
-- Activation code is sent to the citizen's captured phone and/or email
-- Activation code expires after 7 days
-- Official sees a confirmation that the code was successfully dispatched
-- Dispatching the activation code is logged to the audit trail
+- System generates a unique activation link and a 6-digit activation PIN when onboarding succeeds
+- The activation link is emailed to the citizen's captured email address
+- The activation PIN is shown to the official once, to hand to the citizen in person
+- The activation link and PIN expire after 48 hours
+- Only hashes of the activation token and PIN are stored
+- Wrong details lock activation for 5 minutes after 3 failed attempts and for 10 minutes after 5 failed attempts, the activation is revoked after 6 failed attempts
 
 **Definition of Done:**
-- Activation code generation and dispatch works end-to-end
-- Expired codes are rejected on activation attempt
+- Activation link generation and email delivery work end-to-end
+- Expired, used or revoked activations are rejected
 
 ---
 #### US-1.5
-As a citizen, I want to register on FlashID using my physical ID document and a selfie, so that I can activate my digital wallet without visiting a Home Affairs office.
+As a citizen, I want to verify my identity using my SA ID number and a live selfie, so that I can activate my digital wallet without visiting a Home Affairs office.
 
 **Acceptance Criteria:**
-- Citizen can upload or capture an image of their SA ID document
-- Citizen can take a selfie via the app for liveness verification
-- System performs a liveness check 
-- System validates the ID document against the MockGov registry
-- Citizen account is created on successful identity verification
-- Registration is blocked if liveness check fails or ID is not found in the registry
+- A signed-in citizen can choose to verify with their physical ID instead of an activation code
+- Citizen enters their SA ID number, which is checked against the MockGov registry
+- Citizen completes an Azure Face liveness check that also compares their face with the registry portrait
+- The citizen is linked to their FlashID account only if the registry match, liveness check and face match all pass
+- Verification is blocked if the identity is already linked to another account
+- A verification session expires after 15 minutes
 
 **Definition of Done:**
-- Self-registration liveness check integrated 
-- Identity matched against MockGov before account creation
+- Liveness and face match integrated with Azure Face
+- Identity matched against MockGov before the citizen is linked to the account
 
 ---
 #### US-1.6
-As a citizen, I want to provide explicit consent before my identity data is processed during registration by physical ID (photo of back and front of the ID and the citizen's face), so that I understand and agree to how my personal information will be used.
+As a citizen, I want to give explicit consent before my identity data is processed during physical ID verification, so that I understand and agree to how my personal information will be used.
 
 **Acceptance Criteria:**
-- POPIA consent notice is displayed before any identity data is processed
-- Citizen must actively check the consent checkbox — it cannot be pre-checked
-- Consent timestamp is stored with the citizen record
-- Registration cannot proceed without consent being recorded
+- A consent notice is displayed before any biometric processing starts
+- Citizen must actively accept consent before continuing
+- Consent timestamp is stored with the verification session
+- The liveness check cannot start until consent has been recorded
 
 **Definition of Done:**
-- Consent captured and stored with timestamp before any data processing
-- Consent event written to audit log
+- Consent captured and stored with timestamp before any biometric processing
 
 ---
 #### US-1.7
-As a citizen, I want to receive feedback when my identity verification fails during registration, so that I know what went wrong and can take corrective action.
+As a citizen, I want to receive feedback when my identity verification fails, so that I know what went wrong and can take corrective action.
 
 **Acceptance Criteria:**
-- System displays a specific reason for failure (e.g. ID not found, liveness check failed, document unclear)
-- Error message is written in plain language and suggests a corrective action
-- Citizen is offered an option to retry or contact Home Affairs
-- Failed verification attempts are logged to the audit trail
+- System shows a specific reason for failure: identity not found in the registry, liveness failed, face did not match the registry portrait, registry portrait unavailable, or identity already linked to another account
+- Error messages are written in plain language
+- The failure reason is stored on the verification session
+- Citizen can start a new verification attempt
 
 **Definition of Done:**
-- All failure paths return a descriptive, actionable error message
-- Failed attempts are logged
+- All failure paths return a descriptive error message
 
 ---
 #### US-1.8
-As a citizen, I want to set up biometric authentication (fingerprint or face) when activating my wallet, so that I can log in securely without typing a password each time.
+As a citizen, I want to unlock the mobile app with my fingerprint or face, so that I can open my wallet securely without typing my password each time.
 
 **Acceptance Criteria:**
-- Citizen is offered the option to enable fingerprint authentication during activation
-- Citizen is offered the option to enable facial recognition during activation
-- Biometric setup is optional and can be skipped
-- Device hardware-backed biometric is used — biometric data is never sent to the server
-- Biometric can also be set up from account settings after activation
+- After the first successful sign-in on mobile, the citizen is offered biometric unlock
+- Biometric unlock is optional and can be declined
+- The device's own biometrics are used, with the device PIN as a fallback. Biometric data never leaves the device
+- Biometric unlock can be turned on or off from the security settings sheet
+- Viewing credential details and presenting a credential require biometric or device PIN confirmation
 
 **Definition of Done:**
-- Biometric login works on mobile via device hardware-backed authentication
+- Biometric unlock works on mobile using the device's hardware-backed authentication
 
 ---
-#### US-1.9
-As a citizen, I want to provide explicit consent before my identity data is processed during registration with an activation code, so that I understand and agree to how my personal information will be used.
-
-**Acceptance Criteria:**
-- POPIA consent notice is displayed before the activation code flow begins
-- Citizen must actively accept consent before proceeding
-- Consent timestamp is stored with the citizen record
-- Activation cannot proceed without consent being recorded
-
-**Definition of Done:**
-- Consent captured and stored for activation code registration path
-- Consent event written to audit log
-
----
-#### US-1.10
-As a citizen, I want to request a new activation link if mine has expired, so that I am not permanently locked out of activating my account.
-
-**Acceptance Criteria:**
-- Citizen can request a new activation code if the current one has expired
-- Issuing a new code immediately invalidates all previous codes for that account
-- Resend requests are rate-limited to prevent abuse
-- New code is sent to the contact details already on file for the citizen
-
-**Definition of Done:**
-- Resend flow works end-to-end
-- Previous codes invalidated on resend
-
----
-## 3.2.2 Epic 2: Authentication & Role-Based Access Control (RBAC)
+## 3.2.2 Epic 2: Authentication & Role-Based Access Control
 
 ---
 
 #### US-2.1
-As a citizen, I want to log into my account and see the citizen portal, so that I have no access to another user's portal.
+As a user, I want to sign in and see only the portal for my role, so that I cannot access another role's portal.
 
 **Acceptance Criteria:**
-- Citizen can log in using email/username and password
-- JWT is issued with role claim = citizen on successful login
-- Citizen is redirected to the citizen portal after login
-- Citizen cannot access the official or government administrator portal
-- Attempting to access a restricted portal returns an unauthorised error
+- Users sign in with email and password
+- A JWT is issued with a role claim of Citizen, Official or GovernmentAdministrator
+- Users are redirected to their role's portal after sign-in
+- Endpoints for other roles return an unauthorised error
+- The mobile app supports Citizens and Officials, other roles see an unsupported-role screen
+- The account is locked for 30 minutes after 5 failed sign-in attempts
+- Sessions last 8 hours, or 30 days when "remember me" is selected
 
 **Definition of Done:**
-- JWT issued with correct role claims for all three actor types
-- Role-based routing enforced
-- Session expires after configured inactivity period
+- JWT issued with correct role claims for all three roles
+- Role-based routing and endpoint authorisation enforced
 
 ---
 #### US-2.2
-As a citizen, I want to be able to register with a username, ID, and password, so that my account can be uniquely identified.
+As a citizen, I want to create a FlashID account with my email address and a password, so that I have an account to link my identity to.
 
 **Acceptance Criteria:**
-- Citizen can register providing their SA ID number, chosen username, and password
-- SA ID must be exactly 13 digits
-- Username must be at least 8 characters with no spaces
-- Password must meet complexity requirements (min 10 chars, uppercase, lowercase, digit, special character)
-- System rejects registration if the SA ID is already activated
-- System rejects registration if the username is already taken
+- Citizen registers with an email address and password
+- Password must be at least 10 characters and include an uppercase letter, a lowercase letter, a digit and a special character
+- System rejects an email address that is already registered
+- A 6-digit code is emailed to verify the address, it expires after 10 minutes
+- Verification is blocked after 5 wrong codes, and the citizen can request a new code
+- Registration is logged to the audit trail
 
 **Definition of Done:**
-- Registration validates all input fields before creating records
-- Duplicate SA ID numbers and usernames are rejected
+- Registration validates all input before creating the account
+- Email ownership verified by one-time code
+
+---
+#### US-2.3
+As a user, I want to confirm new devices by email when I sign in, so that someone with my password cannot sign in from an unknown device.
+
+**Acceptance Criteria:**
+- Signing in from a device FlashID does not recognise sends a 6-digit code to the user's email
+- The code expires after 10 minutes and the resend option is rate-limited
+- A verified device is added to the user's trusted devices
+- Device verification requests, failures, successes and resends are logged to the audit trail
+
+**Definition of Done:**
+- New-device sign-in requires email verification before a session is issued
 
 ---
 ## 3.2.3 Epic 3: Institution Registration & API Key Management
@@ -201,64 +188,44 @@ As a citizen, I want to be able to register with a username, ID, and password, s
 ---
 
 #### US-3.1
-As a government administrator, I want to register an institution (bank, hospital, police station, insurance agency) with the system, so that verified institutions can integrate with FlashID and perform credential verification.
+As a government administrator, I want to register an institution with the system, so that its officials can be linked to a verified institution.
 
 **Acceptance Criteria:**
-- Admin can select institution type from a predefined list
-- Admin enters institution name and verification number
-- System validates the verification number format for the selected institution type
+- Admin selects the institution type: Home Affairs, Licensing Department, Law Enforcement, Healthcare or Financial Institution
+- Admin enters the institution name (up to 256 characters) and verification number (up to 100 characters)
 - System rejects registration if the verification number already exists
-- A cryptographically secure API key is generated on successful registration
-- API key is displayed exactly once and is never retrievable again
-- Only the SHA-256 hash of the key is stored in the database
+- A random API key is generated on successful registration
+- The API key is displayed exactly once and is never retrievable again
 - Registration is logged to the audit trail with the admin's ID and timestamp
 
 **Definition of Done:**
-- Institution record created with type, verification number, and status
-- API key generated, displayed once, hash stored — never plaintext
+- Institution record created with type, verification number and registering admin
+- API key displayed once and not stored in plaintext
 
 ---
 #### US-3.2
-As a government administrator, I want to view all registered institutions and their status, so that I can manage which institutions are authorised to access the system.
+As a government administrator, I want to view all registered institutions, so that I can see which institutions are part of the system.
 
 **Acceptance Criteria:**
 - Admin can view a list of all registered institutions
-- List displays institution name, type, status, and registration date
-- Admin can filter by institution type and status
+- Each entry shows the institution name, type and verification number
 - Admin can view full institution details
-- Deactivated institutions are visually distinct from active ones
+- An empty state is shown when there are no institutions
 
 **Definition of Done:**
-- Institution list loads with all required fields and filtering works
-
----
-#### US-3.3
-As a government administrator, I want to regenerate an institution's API key, so that I can revoke access if a key is compromised without removing the institution.
-
-**Acceptance Criteria:**
-- Admin can trigger API key regeneration for any institution
-- Previous key is immediately invalidated on regeneration
-- New key is displayed exactly once and is never retrievable again
-- Key regeneration is logged to the audit trail with the admin's ID and timestamp
-- Institution's other details are unchanged by key regeneration
-
-**Definition of Done:**
-- Key regeneration immediately invalidates the previous key
-- Regeneration event logged to audit trail
+- Institution list loads with all required fields
 
 ---
 #### US-3.4
-As a government administrator, I want to view and search for institutions that have been registered by institution name, institution type, institution verification number, or the government admin that registered the institution.
+As a government administrator, I want to search registered institutions, so that I can quickly find a specific institution.
 
 **Acceptance Criteria:**
-- Admin can search by institution name (partial match supported)
-- Admin can filter by institution type
-- Admin can search by verification number (exact match)
-- Admin can filter by the government admin who registered the institution
-- Empty state shown when no results match the search criteria
+- A single search box matches institution name, type or verification number
+- Matching is partial and case-insensitive
+- An empty state is shown when no results match
 
 **Definition of Done:**
-- All four search/filter dimensions work correctly
+- Search filters the list on name, type and verification number
 
 ---
 ## 3.2.4 Epic 4: Digital Credential Issuance
@@ -266,61 +233,58 @@ As a government administrator, I want to view and search for institutions that h
 ---
 
 #### US-4.1
-As an Official, I want to issue a digital National ID credential/Driver's License to a registered citizen, so that the citizen can use their digital credential for secure identity verification.
+As an Official, I want to issue a digital driver's licence to a registered citizen, so that the citizen can use it for secure identity verification.
 
 **Acceptance Criteria:**
-- Official can search for a citizen by SA ID number before issuing
-- Identity fields are sourced from the Government registry.
-- System blocks issuance if an active National ID credential/Driver's License already exists for the citizen
-- Credential is signed with Ed25519 at the point of issuance
-- Citizen wallet is updated immediately after issuance
-- Issuance is logged to the audit trail
+- Official searches for the citizen by SA ID number before issuing
+- Citizen must be Activated before a credential can be issued
+- Official must record the citizen's POPIA consent before issuing
+- Credential fields are sourced from the government registry
+- System blocks issuance if the citizen already has an active credential of the same type
+- The credential appears in the citizen's wallet and the citizen receives an in-app notification
+- Consent and issuance are logged to the audit trail, failed issuance attempts are also logged
 
 **Definition of Done:**
-- Credential created and signed with Ed25519 before being stored
+- Credential created from registry data and stored against the citizen
 - Duplicate active credentials of the same type per citizen are blocked
 
 ---
 #### US-4.2
-As an Official, I want to search for a citizen by SA ID number before issuing a credential, so that I can confirm I am issuing to the correct person.
+As an Official, I want to look up a citizen by SA ID number before issuing a credential, so that I can confirm I am issuing to the correct person.
 
 **Acceptance Criteria:**
-- Search supports full SA ID number
-- Results display citizen name, SA ID, and account activation status
-- Official sees a clear error if no matching citizen is found or the citizen is not activated
-- Official must explicitly confirm the correct citizen before proceeding to issuance
+- Search uses the full SA ID number
+- Results show the citizen's name, SA ID, account status and existing credentials
+- Official sees a clear error if no matching citizen is found
+- Lookups are rate-limited and logged to the audit trail
 
 **Definition of Done:**
 - Search returns accurate results by SA ID
 
 ---
-#### US-4.3
-As a registered institution, I want to submit a credential issuance request via the API after a citizen passes their driving test, so that the citizen's digital driver's licence is automatically issued to their wallet.
+#### US-4.4
+As a citizen, I want to be notified when a new credential is issued to my wallet, so that I am aware of all credentials issued in my name.
 
 **Acceptance Criteria:**
-- Institution authenticates with a valid API key before any request is processed
-- API accepts issuance request with citizen SA ID and required credential fields
-- System validates the institution is authorised to issue the requested credential type
-- Credential is created and signed on a successful request
-- API returns 201 Created with the new credential ID
-- Citizen wallet is updated immediately
+- An in-app notification is created when a credential is issued
+- The notification identifies the credential type that was issued
 
 **Definition of Done:**
-- Institution API key validated before any API-initiated issuance
-- Credential signed and issued correctly via API
+- In-app notification created on every successful issuance
 
 ---
-#### US-4.4
-As a citizen, I want to receive a push notification when a new credential is issued to my wallet, so that I am aware of all credentials issued in my name.
+#### US-4.5
+As a citizen, I want to add my existing ID and driver's licence to my wallet after verifying my identity, so that I do not have to visit an office to get my digital credentials.
 
 **Acceptance Criteria:**
-- Push notification is sent to the citizen's device on credential issuance
-- Notification clearly identifies the credential type that was issued
-- Notification deep-links to the wallet view for that credential
-- Notification is sent regardless of whether issuance was admin-initiated or API-initiated
+- Only a verified citizen can activate credentials
+- Citizen chooses which credential types to add: National ID, driver's licence, or both
+- Credential data is fetched from the government registry
+- Credential types the citizen already holds are skipped
+- The citizen's status changes to Activated once at least one credential is added
 
 **Definition of Done:**
-- Push notification sent to citizen on successful issuance for all issuance paths
+- Selected credentials fetched from the registry and added to the wallet
 
 ---
 ## 3.2.5 Epic 5: Credential Wallet & Viewing
@@ -331,41 +295,41 @@ As a citizen, I want to receive a push notification when a new credential is iss
 As a citizen, I want to view all credentials stored in my digital wallet, so that I can see what digital documents I have and their current status.
 
 **Acceptance Criteria:**
-- Wallet displays all issued credentials with credential type, name, SA ID, issue date, expiry date, and status
-- Status badge is colour-coded: green (Active), amber (Expired), red (Revoked)
-- A helpful empty state is shown when no credentials have been issued
-- The list updates in real time when a new credential is issued
+- Wallet lists all credentials with credential type, issue date, expiry date (where applicable) and status
+- Status is one of Active, Inactive, Investigation, Revoked or Expired, shown as a colour-coded badge
+- An empty state is shown when no credentials have been issued
+- The wallet shows the latest data each time it is opened
 
 **Definition of Done:**
-- Credential list shows all six required fields per credential
-- Status badge correctly reflects current credential status
+- Credential list shows all required fields
+- Status badge reflects the current credential status
 
 ---
 #### US-5.2
 As a citizen, I want to view the full details of an individual credential, so that I can confirm the information on my digital document is correct.
 
 **Acceptance Criteria:**
-- Full detail view requires biometric or PIN re-authentication before opening
-- Detail view shows all credential fields, issuing authority, issue date, and expiry date
+- On mobile, the detail view requires biometric or device PIN confirmation before opening
+- Detail view shows all credential fields, issue date and expiry date
 - Current status is clearly displayed
 - Citizen can navigate back to the credential list
 
 **Definition of Done:**
-- Detail view secured behind biometric or PIN re-authentication
-- All credential fields rendered correctly for National ID and Driver's Licence
+- Mobile detail view secured behind biometric or device PIN confirmation
+- All credential fields rendered correctly for National ID and driver's licence
 
 ---
 #### US-5.3
-As a citizen, I want to access my stored credentials when I have no internet connection, so that I can still present my identity in areas with poor connectivity.
+As a citizen, I want my credentials available on my phone without an internet connection, so that I can still present my identity in areas with poor connectivity.
 
 **Acceptance Criteria:**
-- Credentials are cached in encrypted local storage on the device
-- An offline indicator is shown when the device has no internet connectivity
-- Cached credentials are accessible without internet
-- Cache is updated automatically when the device reconnects
+- Offline copies of active credentials are stored encrypted on the device, with the key held in secure storage
+- Offline copies can be presented without internet (see Epic 13)
+- Offline copies are refreshed when the device is online
+- Offline copies are removed on sign-out
 
 **Definition of Done:**
-- Offline access loads from encrypted local cache with an offline indicator
+- Offline credentials load from the encrypted local cache without internet
 
 ---
 ## 3.2.6 Epic 6: QR Code Generation & Selective Disclosure
@@ -373,84 +337,58 @@ As a citizen, I want to access my stored credentials when I have no internet con
 ---
 
 #### US-6.1
-As a citizen, I want to generate a one-time QR code for a selected credential, so that an official can verify my identity without seeing my raw personal data.
+As a citizen, I want to generate a one-time QR code for a selected credential, so that an official can verify my identity.
 
 **Acceptance Criteria:**
 - Citizen selects a credential to generate a QR code from
-- QR payload is a signed JWT with a credential reference token — zero raw PII
-- QR is displayed with a live expiry countdown timer
-- One-time use is enforced — scanning the same QR twice returns INVALID on the second scan
-- QR cannot be generated from a credential with status Expired or Revoked
+- The QR contains a signed token (ES256) listing the credential reference and the disclosed field names, field values are not in the QR
+- Generating a new QR invalidates any earlier QR for the same credential
+- A QR can only be used once, a second scan is rejected
+- QR cannot be generated for a credential that is not Active
+- QR generation can be blocked by fraud detection (see US-11.9)
 
 **Definition of Done:**
-- QR payload contains only a credential reference token — zero raw PII
-- One-time use enforced
+- QR token signed and one-time use enforced
 
 ---
 #### US-6.2
-As a citizen, I want to see a clear expiry countdown and be notified when my QR code expires, so that I know when to regenerate it during a verification interaction.
+As a citizen, I want to see how long my QR code remains valid, so that I know when to generate a new one.
 
 **Acceptance Criteria:**
-- Countdown timer is visible on the QR screen from the moment of generation
-- A visual warning is shown when less than 60 seconds remain
-- QR is visually replaced with an expired state when the timer reaches zero
-- An expired QR returns INVALID with reason qr_expired on scan
+- The QR is valid for 60 seconds
+- A live countdown is shown from the moment of generation
+- The QR is replaced with an expired state when the countdown reaches zero
+- An expired QR is rejected on scan
 - Citizen can generate a new QR immediately after expiry
 
 **Definition of Done:**
-- QR expires after configurable period with live countdown timer
-- Expired QR visually replaced and returns INVALID on scan
+- QR expires after 60 seconds with a live countdown
+- Expired QR rejected on scan
 
 ---
 #### US-6.3
-As a citizen, I want to choose which fields from my credential are disclosed when I generate a QR code, so that I share only the minimum personal information needed for each verification.
+As a citizen, I want to choose which fields from my credential are disclosed when I generate a QR code, so that I share only the minimum personal information needed.
 
 **Acceptance Criteria:**
-- Citizen can toggle optional credential fields on or off before generating the QR
-- Mandatory minimum fields (e.g. name, ID number) cannot be deselected
-- The QR payload reflects only the fields the citizen has selected to disclose
-- Verifier receives only the disclosed fields when scanning
+- Citizen can toggle optional fields on or off before generating the QR
+- Mandatory fields cannot be deselected: date of birth and photograph for a National ID, photo, expiry date and date of birth for a driver's licence
+- Requests with unknown fields or missing mandatory fields are rejected
+- The verifier receives only the fields the citizen selected
 
 **Definition of Done:**
-- Selective disclosure enforces mandatory minimum fields
+- Selective disclosure enforces mandatory fields on the backend
 
 ---
 #### US-6.4
-As a citizen, I want to see exactly which of my fields will be visible to the verifier before confirming QR generation, so that I can make an informed disclosure decision.
+As a citizen, I want to see exactly which fields will be visible to the verifier before confirming QR generation, so that I can make an informed disclosure decision.
 
 **Acceptance Criteria:**
-- A preview screen is shown before the QR is generated listing every field that will be disclosed
+- On the web portal, a preview step lists every field that will be disclosed
 - Citizen must confirm the preview before the QR is generated
-- A cancel option returns the citizen to the field selection screen
-- Preview accurately reflects the exact fields the verifier will receive
+- A back option returns the citizen to field selection
 
 **Definition of Done:**
-- Pre-generation preview screen lists all fields that will be disclosed
-
----
-#### US-6.5
-As a citizen, I want to save my preferred disclosure settings per credential type, so that I don't have to manually select fields every time I generate a QR code.
-
-**Acceptance Criteria:**
-- Citizen can save the current field selection as default for a given credential type
-- Saved preferences are applied automatically on next QR generation for that credential type
-- Citizen can modify or clear saved preferences at any time
-
-**Definition of Done:**
-- Saved disclosure preferences applied automatically on next QR generation
-
----
-#### US-6.6
-As a citizen, I want to save my preferred disclosure settings per verifier type (hospital, police, home affairs, DLTC), so that I don't have to manually select fields every time I generate a QR code.
-
-**Acceptance Criteria:**
-- Citizen can save different disclosure settings for each verifier type
-- System applies the correct preference when the citizen selects a verifier context
-- Citizen can modify preferences per verifier type independently
-- If no preference is saved for a verifier type, the default credential type preference is used
-
-**Definition of Done:**
-- Per-verifier-type disclosure preferences saved and applied correctly
+- Pre-generation preview lists all fields that will be disclosed
 
 ---
 ## 3.2.7 Epic 7: Cryptographic Security & Key Management
@@ -458,57 +396,43 @@ As a citizen, I want to save my preferred disclosure settings per verifier type 
 ---
 
 #### US-7.1
-As a government administrator, issuing a credential must result in it being signed with Ed25519 at the point of issuance, so that any tampering is mathematically detectable.
+As a citizen, I want my QR tokens signed with a key the application cannot leak, so that a forged or altered token is detected.
 
 **Acceptance Criteria:**
-- Every credential has an Ed25519 signature stored at the point of issuance
-- The signature covers all credential fields
-- Private key is stored in Azure Key Vault 
+- QR tokens are signed with ES256 (ECDSA P-256)
+- The signing key is held in Azure Key Vault and signing is performed by Key Vault
 - The private key is never stored in the application database
-- Signing failure prevents the credential from being saved
+- Each token records the key ID used to sign it
 
 **Definition of Done:**
-- Every credential has an Ed25519 signature stored at issuance
+- Every QR token signed with the Key Vault key
 - Private keys never stored in the database
 
 ---
-#### US-7.2
-As a registered institution, an API key credential must be cryptographically signed on creation, so that the authenticity and integrity of the API key is guaranteed.
-
-**Acceptance Criteria:**
-- API keys are generated as cryptographically signed JWTs
-- Signing is always performed server-side
-- Only the SHA-256 hash of the signed JWT is stored in the database
-- A compromised key can be invalidated by regeneration without affecting the institution record
-
-**Definition of Done:**
-- API keys generated as signed JWTs with hash-only storage
-
----
 #### US-7.3
-As an official, the system must perform a live signature verification on every QR scan, so that I can trust the result is based on the current state of the credential.
+As an official, I want the signature checked on every QR scan, so that I can trust the result reflects the current state of the credential.
 
 **Acceptance Criteria:**
-- Signature verification is performed on every QR scan — results are never cached
-- A credential whose fields have been tampered with fails signature verification
-- Tampered credentials return INVALID with reason tampered
-- Verification result is returned within 2 seconds including the signature check
+- Signature verification runs on every scan, results are never cached
+- A token whose contents have been altered fails verification
+- The credential's current status is checked at scan time
+- A token that has already been used is rejected
 
 **Definition of Done:**
-- Signature verification runs on every QR scan via live backend call
+- Signature, expiry, one-time use and credential status checked on every scan
 
 ---
-#### US-7.4
-As a government administrator, a credential must be re-signed after every update, so that the updated credential carries a fresh, valid signature.
+#### US-7.5
+As a government administrator, I want the QR signing key rotated safely, so that a new key version can be introduced without downtime.
 
 **Acceptance Criteria:**
-- Every credential update triggers a fresh Ed25519 signature
-- The previous version of the credential is archived before the update is applied
-- The new signature is timestamped with the time of the update
-- Update and re-signing fail atomically
+- A daily job checks Azure Key Vault for a new version of the signing key
+- When a new version is found, the previous signing key is marked Retired and the new one Active
+- Each rotation run is recorded as a job run
+- Offline verifiers download the current issuer public keys (see US-13.5)
 
 **Definition of Done:**
-- Credential re-signed after every update; previous version archived for audit
+- Key rotation job runs daily and records its result
 
 ---
 ## 3.2.8 Epic 8: Credential Verification
@@ -516,73 +440,52 @@ As a government administrator, a credential must be re-signed after every update
 ---
 
 #### US-8.1
-As an official, I want to scan a citizen's QR code to verify their credential in real time, so that I can confirm their identity instantly without requiring a physical document.
+As an official, I want to scan a citizen's QR code to verify their credential in real time, so that I can confirm their identity without a physical document.
 
 **Acceptance Criteria:**
-- Official can scan a QR code using the device camera
-- Verification result is returned within 2 seconds of scanning
-- Result clearly shows VALID or INVALID
-- No citizen PII is included in the verification response
-- Every scan attempt is logged to the audit trail regardless of result
+- Official scans the QR code with the mobile app camera
+- Screenshots are blocked on the scanning screen
+- Result clearly shows whether the credential is valid
+- A valid result shows the credential type and only the fields the citizen chose to disclose
+- Scan attempts are rate-limited
 
 **Definition of Done:**
-- Verification result returned within 2 seconds
-- No citizen PII included in verification response
-- Every scan attempt logged
-
----
-#### US-8.2
-As an official, I want to manually enter a credential token when QR scanning is not possible, so that I can still verify credentials if the camera is unavailable.
-
-**Acceptance Criteria:**
-- Official can type or paste a credential token as an alternative to scanning
-- The same verification logic applies to manual entry as to QR scanning
-- Token input is validated for format before the verification request is submitted
-- Manual entry attempts are logged to the audit trail
-
-**Definition of Done:**
-- Manual token entry produces the same verification result as QR scanning
+- Verification result shown with only the disclosed fields
 
 ---
 #### US-8.3
-As an official, I want to see a clear VALID or INVALID result with the reason for failure, so that I can take the correct action and inform the citizen appropriately.
+As an official, I want to see a clear result when a scan fails, so that I can take the correct action and inform the citizen.
 
 **Acceptance Criteria:**
-- VALID result shows a green indicator with credential type and verification timestamp
-- INVALID result shows a red indicator with one of four reasons: revoked, expired, qr_expired, tampered
-- Each failure reason has a plain-language description
-- Attempting to scan the same QR twice returns INVALID with reason already_used
+- A valid result shows a success indicator with the credential type and disclosed fields
+- An invalid online scan shows a failure indicator with a plain-language message, expired, used, altered and inactive tokens are all reported as invalid
+- Offline scans show a specific reason for each failure (see US-13.4)
 
 **Definition of Done:**
-- All four failure reasons produce distinct, actionable messages
+- Every failed scan produces a clear, plain-language message
 
 ---
-#### US-8.4
-As an official, I want to request additional credential fields from a citizen during verification, so that I can access information needed for my specific use case beyond the default disclosure.
+#### US-8.6
+As an official, I want to see my verification history and activity stats, so that I can review the checks I have performed.
 
 **Acceptance Criteria:**
-- Official can select specific additional fields to request after an initial VALID result
-- Request is sent to the citizen in real time via push notification
-- Official's view shows a pending state while awaiting citizen approval
-- Request times out after a configurable period if the citizen does not respond
+- Official can view their history, filtered by search text, action, type and date range, with paging
+- Official's home screen shows their activity stats and recent activity
 
 **Definition of Done:**
-- Additional disclosure request sent to citizen in real time
+- History and stats load for the signed-in official only
 
 ---
-#### US-8.5
-As a citizen, I want to approve or deny an official's request for additional credential information, so that I remain in control of what personal data I share during verification.
+#### US-8.7
+As an official, I want to show a digital badge, so that a citizen can see which institution I represent.
 
 **Acceptance Criteria:**
-- Citizen receives a real-time push notification describing the request
-- Citizen can approve or deny each requested field individually
-- Official receives only the fields the citizen approved
-- A denial returns a not_disclosed indicator to the official for denied fields
-- The disclosure decision is logged to the audit trail
+- Official can display a signed badge QR identifying them and their institution
+- The badge is valid for 60 seconds
+- Badge verification returns the institution name, type and its suggested disclosure fields
 
 **Definition of Done:**
-- Additional disclosure requires citizen real-time approval before any extra fields are shared
-- Disclosure decision logged to audit trail
+- Badge token generated and verifiable by the backend
 
 ---
 ## 3.2.9 Epic 9: Credential Lifecycle Management
@@ -590,91 +493,64 @@ As a citizen, I want to approve or deny an official's request for additional cre
 ---
 
 #### US-9.1
-As a citizen, I want my digital credential to automatically update when my ID details change, so that my digital credential remains accurate and legally valid at all times.
+As a citizen, I want my digital credential to update automatically when my registry details change, so that it stays accurate.
 
 **Acceptance Criteria:**
-- When authoritative source data changes, the credential is updated automatically
-- Updated credential is re-signed with a fresh Ed25519 signature after every change
-- The previous version of the credential is archived before the update is applied
-- Citizen is notified when their credential is updated
+- A daily job compares every citizen's active credentials with the government registry
+- Changed fields are updated in FlashID
+- A government administrator can also trigger the check manually
+- Updates and sync failures are logged to the audit trail
+- Citizen receives an in-app notification when their details are updated
 
 **Definition of Done:**
-- Credential updates trigger re-signing and version archiving
-- Citizen notified on update
-
----
-#### US-9.2
-As a registered institution, I want the system to update the credential via the API when relevant information changes, so that citizen credentials reflect up-to-date, authoritative data.
-
-**Acceptance Criteria:**
-- Institution authenticates with a valid API key before submitting an update
-- Institution can only update credential fields within its authorised scope
-- Update triggers a re-signing of the credential
-- Update is logged to the audit trail
-
-**Definition of Done:**
-- Institution can only update fields within its authorised scope
-- Update triggers re-signing and is logged
+- Daily registry sync updates changed credentials and notifies the citizen
 
 ---
 #### US-9.3
-As a citizen, I want the system to automatically update the status of my driver's license credential to Expired once it reaches its expiry date, so that expired credentials can no longer be used for verification.
+As a citizen, I want my driver's licence credential to change to Expired once it reaches its expiry date, so that expired credentials can no longer be used for verification.
 
 **Acceptance Criteria:**
-- A background job runs daily at 00:00 SAST to check expiry dates on Active driver's license credentials
-- Credentials past their expiry date are set to status Expired
-- Qr verification returns INVALID with reason expired immediately after status update
-- Expiry update is logged as a system event
-- Citizen is notified in-app when their credential expires
-- If the daily run is missed (e.g. the service was down at midnight), the check runs automatically on the next service startup
+- A background job runs daily at 00:00 SAST to check expiry dates on Active driver's licence credentials
+- Credentials past their expiry date are set to Expired
+- QR verification rejects the credential immediately after the status change
+- Expiry is logged to the audit trail
+- Citizen receives an in-app notification when their credential expires
+- If the daily run is missed, the check runs on the next service start-up
+- A government administrator can trigger the check manually
 
 **Definition of Done:**
-- Automatic expiry job runs on schedule (with startup catch-up) and updates all due driver's license credentials
+- Expiry job runs on schedule, with start-up catch-up, and updates all due driver's licence credentials
 - Citizen receives an in-app notification on expiry
 
 ---
-#### US-9.4
-As the government admin, I want the system to send advance expiry warning notifications to citizens before their credential expires, so that citizens can take action before losing access to a valid credential.
-
-**Acceptance Criteria:**
-- A notification is sent to the citizen 30 days before credential expiry
-- A second notification is sent 7 days before credential expiry
-- Notifications are sent to the citizen's registered email and phone number
-- Notifications clearly state the credential type and exact expiry date
-
-**Definition of Done:**
-- Expiry warning notifications sent at 30 days and 7 days before expiry
-
----
 #### US-9.5
-As a government administrator, I want to revoke a citizen's credential due to fraud, forgery, or investigation, so that the compromised credential is immediately invalidated and can no longer be used for verification.
+As a government administrator, I want to revoke a citizen's credential due to fraud, forgery or investigation, so that the credential can no longer be used for verification.
 
 **Acceptance Criteria:**
-- Admin must provide a mandatory revocation reason before revocation is processed
-- Revocation takes effect immediately — QR codes return INVALID on the next scan
-- No grace period or caching delay is permitted after revocation
-- Revocation is logged to the audit trail with the admin's ID, reason, and timestamp
-- Citizen is notified of the revocation
+- Admin must provide a reason before revocation is processed
+- Revocation takes effect immediately. The next QR scan is rejected
+- Revocation is logged to the audit trail with the admin's ID, reason and timestamp
+- Citizen receives an in-app notification
+- Admin can reinstate a revoked credential to Active with a reason, which is also logged and notified
 
 **Definition of Done:**
 - Revocation takes effect immediately
-- Revocation reason mandatory and logged
-- Citizen notified on revocation
+- Revocation and reinstatement reasons are required and logged
 
 ---
 #### US-9.6
-As a government administrator, I want to place a credential Under Investigation as a temporary status, so that I can flag suspicious activity without permanently revoking a credential before an investigation concludes.
+As a government administrator, I want to place a credential under investigation as a temporary status, so that I can stop its use without permanently revoking it.
 
 **Acceptance Criteria:**
-- Admin can set a credential status to Under Investigation
-- A credential with status Under Investigation returns INVALID on QR verification
-- Admin can lift the investigation status and restore to Active, or proceed to full revocation
-- Status change is logged to the audit trail
-- Citizen is notified when their credential is placed under investigation
+- Admin can set a credential's status to Investigation with a reason
+- A credential under investigation is rejected on QR verification
+- Admin can reinstate it to Active or revoke it
+- Status changes are logged to the audit trail
+- Citizen receives an in-app notification
 
 **Definition of Done:**
-- Under Investigation status prevents VALID verification result
-- Admin can transition from Under Investigation to Active or Revoked
+- Investigation status prevents a valid verification result
+- Admin can move a credential from Investigation to Active or Revoked
 
 ---
 ## 3.2.10 Epic 10: Audit Logging & POPIA Compliance
@@ -682,69 +558,74 @@ As a government administrator, I want to place a credential Under Investigation 
 ---
 
 #### US-10.1
-As a government administrator, I want the registering of an institution to be logged to the audit trail, so that there is a traceable record of every institution onboarded into the system.
+As a government administrator, I want the registration of an institution to be logged to the audit trail, so that there is a traceable record of every institution onboarded.
 
 **Acceptance Criteria:**
-- A log entry is created for every institution registration attempt
-- Log entry includes the admin's ID, institution name, institution type, and timestamp
-- Log entry is written atomically with the institution record
-- Log entry cannot be edited or deleted
+- A log entry is created for every institution registration
+- Log entry includes the admin's ID, institution name and timestamp
+- Log entry is saved together with the institution record
+- There is no endpoint to edit or delete audit log entries
 
 **Definition of Done:**
-- Audit log entries are append-only
-- All covered event types produce a log entry with actor ID, role, event type, and timestamp
+- Institution registration always produces an audit log entry
 
 ---
 #### US-10.2
-As a Home Affairs official, I want a citizen's consent to be captured and logged with timestamp and official ID, so that there is a verifiable record of consent for POPIA compliance.
+As a Home Affairs official, I want a citizen's consent to be logged with a timestamp and my official ID, so that there is a verifiable record of consent for POPIA compliance.
 
 **Acceptance Criteria:**
-- A log entry is created when consent is captured for a citizen
-- Log entry includes the official's ID, citizen's SA ID, and a precise timestamp
-- Log entry is immutable
-- Consent log is retained indefinitely, including after account deletion
+- A log entry is created when consent is captured during onboarding and during credential issuance
+- Log entry includes the official's ID, the citizen, and a precise timestamp
+- There is no endpoint to edit audit log entries
 
 **Definition of Done:**
-- Consent events logged immutably with official ID and timestamp
-
----
-#### US-10.3
-As a citizen, changing my password must be logged to the audit trail, so that any security-relevant account changes are traceable.
-
-**Acceptance Criteria:**
-- A log entry is created for every successful password change
-- Log entry includes the citizen's user ID, event type PasswordChanged, and timestamp
-- Log entry does not include the old or new password values
-- Log entry is immutable
-
-**Definition of Done:**
-- Password change events logged without exposing password values
+- Consent events logged with official ID and timestamp
 
 ---
 #### US-10.4
-As the government administrator, I want every verification attempt to be logged regardless of result, so that there is a complete record of all credential verification events.
+As a government administrator, I want verification attempts to be logged, so that there is a record of credential verification events.
 
 **Acceptance Criteria:**
-- A log entry is created for every verification scan, whether VALID or INVALID
-- Log entry includes the official's ID, credential reference, result, failure reason, and timestamp
-- Log entry is written synchronously with the verification response
-- Log entry is immutable
+- A log entry is created for every successful online verification, with the official's ID and credential reference
+- Online tokens that fail signature or format checks are logged as failed verifications
+- Offline verification results are uploaded and logged when the verifier reconnects (see US-13.6)
 
 **Definition of Done:**
-- Every verification attempt logged regardless of result
+- Successful and forged verification attempts logged
 
 ---
 #### US-10.5
-As a government administrator, every revocation must be logged with reason, admin ID, and timestamp, so that there is a fully accountable record of every credential revocation.
+As a government administrator, every revocation must be logged with reason, admin ID and timestamp, so that there is an accountable record of every credential revocation.
 
 **Acceptance Criteria:**
-- A log entry is created for every credential revocation
-- Log entry includes the admin's ID, credential ID, citizen's ID, revocation reason, and timestamp
-- Log entry is written atomically with the revocation
-- Log entry is immutable
+- A log entry is created for every revocation and every change to Investigation
+- Log entry includes the admin's ID, credential ID, new status, reason and timestamp
+- Reinstatements are logged in the same way
 
 **Definition of Done:**
-- All revocation events logged atomically with mandatory reason, admin ID, and timestamp
+- All revocation, investigation and reinstatement events logged with reason, admin ID and timestamp
+
+---
+#### US-10.6
+As a government administrator, I want to search the audit log, so that I can investigate activity across the system.
+
+**Acceptance Criteria:**
+- Admin can view the audit log with paging
+- Admin can filter by search text, action and date range
+
+**Definition of Done:**
+- Audit log viewer returns filtered, paged results to government administrators only
+
+---
+#### US-10.7
+As a government administrator, I want a dashboard of system activity, so that I can monitor how FlashID is being used.
+
+**Acceptance Criteria:**
+- Dashboard shows system status, counts of users, institutions and credentials issued, and a recent activity feed
+- Analytics show verifications, credentials issued, active officials and active institutions over a chosen date range, with daily figures and change since the previous period
+
+**Definition of Done:**
+- Dashboard and analytics load for government administrators only
 
 ---
 ## 3.2.11 Epic 11: Account Management & Device Security
@@ -752,27 +633,28 @@ As a government administrator, every revocation must be logged with reason, admi
 ---
 
 #### US-11.1
-As a citizen, I want to change my password from account settings, so that I can keep my account secure if I believe my credentials have been compromised.
+As a citizen, I want to change my password from account settings, so that I can keep my account secure.
 
 **Acceptance Criteria:**
 - Citizen must enter their current password before a new one is accepted
-- New password must meet complexity requirements (min 10 chars, uppercase, lowercase, digit, special char)
-- All active sessions except the current one are invalidated after the change
-- A confirmation notification is sent to the citizen's registered email and phone
-- Password change is logged to the audit trail
+- New password must be entered twice and both entries must match
+- All sessions are signed out after the change, including the current one
+- All trusted devices are removed, so each device must be verified again at next sign-in
+- Password change requests are rate-limited
 
 **Definition of Done:**
-- Password change validates current password, enforces complexity, invalidates other sessions
+- Password change validates the current password and signs out all sessions
 
 ---
 #### US-11.2
-As a citizen, I want to reset my forgotten password via email or phone, so that I can regain access to my wallet without contacting support.
+As a citizen, I want to reset my forgotten password by email, so that I can regain access to my wallet without contacting support.
 
 **Acceptance Criteria:**
-- Citizen can request a reset using their registered email or phone number
-- Reset link or OTP expires after 15 minutes
-- New password must meet complexity requirements
-- Account is temporarily locked after 3 consecutive failed reset attempts
+- Citizen requests a reset using their registered email address
+- A 6-digit code is emailed and expires after 15 minutes
+- The code is blocked after 5 wrong attempts
+- New password must meet the complexity rules in US-2.2
+- Reset requests are rate-limited
 - Password reset is logged to the audit trail
 
 **Definition of Done:**
@@ -780,83 +662,91 @@ As a citizen, I want to reset my forgotten password via email or phone, so that 
 
 ---
 #### US-11.3
-As a citizen, I want to update my contact details (email and phone number), so that notifications and security alerts are sent to my current contact information.
+As a citizen, I want to update my email address, so that notifications and security codes reach my current inbox.
 
 **Acceptance Criteria:**
-- Citizen must verify ownership of the new email or phone via OTP before the change takes effect
-- Previous contact details remain active until OTP verification succeeds
-- Contact detail change is logged to the audit trail
-- Citizen receives a notification on both the old and new contact details confirming the change
+- Citizen must re-enter their password before requesting the change
+- A 6-digit code is sent to the new email address and expires after 10 minutes
+- The old address stays active until the code is confirmed
+- Resends are limited and rate-limited
+- Email change is logged to the audit trail
 
 **Definition of Done:**
-- Contact detail changes require OTP verification before taking effect
+- Email changes require one-time code verification before taking effect
 
 ---
 #### US-11.4
-As a citizen, I want to delete my FlashID account, so that I can exercise my right to erasure under POPIA if I no longer wish to use the service.
+As a citizen, I want to delete my FlashID account, so that I can exercise my right to erasure under POPIA.
 
 **Acceptance Criteria:**
-- Citizen must confirm account deletion with password authentication
-- Account is soft-deleted — not immediately purged from the database
-- A 90-day POPIA data retention period is enforced before hard deletion
-- Audit log entries are retained indefinitely even after account deletion
-- Citizen receives a confirmation notification
+- A signed-in citizen can delete their account
+- Deletion removes the citizen's account, credentials, trusted devices and notifications
+- Deletion takes effect immediately
 
 **Definition of Done:**
-- Account deletion triggers soft-delete with 90-day POPIA retention period
-- Audit logs retained indefinitely after deletion
+- Account deletion removes all of the citizen's personal data
 
 ---
 #### US-11.5
-As a citizen, I want to view all devices that are currently trusted to access my FlashID wallet, so that I can identify any devices I no longer authorise.
+As a citizen, I want to view all devices that are trusted to access my FlashID account, so that I can identify any devices I no longer recognise.
 
 **Acceptance Criteria:**
-- Citizen can view a list of all trusted devices showing device type, name, and last active date
-- The current device is clearly highlighted in the list
-- List is ordered by most recently active
+- Citizen can view a list of trusted devices with each device's name
+- The current device is clearly marked
 
 **Definition of Done:**
-- Trusted device list shows all required fields and highlights current device
+- Trusted device list shows all trusted devices and marks the current one
 
 ---
 #### US-11.6
-As a citizen, I want to mark a device as lost or stolen to immediately revoke its access to my wallet, so that my credentials cannot be accessed from a compromised device.
+As a citizen, I want to remove a device I no longer trust, so that it must be verified again before it can sign in.
 
 **Acceptance Criteria:**
-- All active sessions on the revoked device are immediately invalidated
-- Device is removed from the trusted devices list
-- Citizen cannot undo a device revocation — the device must re-authenticate from scratch
-- Device revocation is logged to the audit trail
+- Citizen can remove any of their trusted devices
+- A removed device must pass email device verification (US-2.3) at its next sign-in
+- Citizens cannot remove another user's devices
 
 **Definition of Done:**
-- Lost/stolen device revocation immediately invalidates all sessions on that device
+- Removed device no longer appears in the trusted device list
 
 ---
-#### US-11.7
-As a citizen, I want to set up a duress PIN that opens a restricted safe-mode view of my wallet, so that I can protect my real credentials if I am ever forced to unlock the app under coercion.
+#### US-11.9
+As a citizen, I want FlashID to detect suspicious activity on my account, so that I am warned if someone else may be using it.
 
 **Acceptance Criteria:**
-- Duress PIN must be different from the citizen's normal PIN
-- Duress PIN is stored as a hash — never in plaintext
-- Entering the duress PIN opens a safe-mode wallet with only non-sensitive placeholder credentials
-- Real credentials are completely hidden in safe mode
+- Sign-ins and QR generation are checked for suspicious patterns, including impossible travel (sign-ins from locations that would need travel faster than 900 km/h)
+- Medium-risk and high-risk events create a security alert for the citizen
+- A high-risk event blocks QR generation for 30 minutes
+- Detected events and blocked QR attempts are logged to the audit trail
 
 **Definition of Done:**
-- Duress PIN distinct from normal PIN, stored as hash
-- Safe-mode wallet shows only placeholder credentials
+- Suspicious activity creates an alert, and high-risk activity restricts QR generation
 
 ---
-#### US-11.8
-As a citizen, I want the system to silently alert security when my duress PIN is used, so that a possible coercion or fraud event is flagged for investigation without alerting the attacker.
+#### US-11.10
+As a citizen, I want to act on a security alert, so that I can either lock out an attacker or confirm the activity was mine.
 
 **Acceptance Criteria:**
-- Entering the duress PIN creates a silent security alert — no visible indication to the person watching
-- Alert is logged to the audit trail with the citizen's ID, device ID, and timestamp
-- No UI change or error message is shown when the duress PIN is used
-- Security alert is accessible to authorised administrators
+- Citizen can view their security overview, activity and alerts in the mobile app
+- Securing the account requires the citizen's password, signs out all sessions, removes the suspicious device (or all other devices) and lifts the QR restriction
+- Citizen can dismiss an alert that was their own activity, which lifts the QR restriction
+- Securing and dismissing are logged to the audit trail
 
 **Definition of Done:**
-- Duress PIN activation creates a silent security alert with no visible UI indication to attacker
+- Citizen can secure or dismiss an alert and the outcome is logged
+
+---
+#### US-11.11
+As a citizen, I want to control my security settings, so that I can choose how strictly my account is monitored.
+
+**Acceptance Criteria:**
+- Citizen can turn impossible travel detection on or off
+- Citizen can turn enhanced verification on or off
+- Changing settings requires the citizen's password
+- Settings changes are logged to the audit trail
+
+**Definition of Done:**
+- Security settings saved and applied to future fraud checks
 
 ---
 ## 3.2.12 Epic 12: Advanced Features & Certified Documents
@@ -864,47 +754,72 @@ As a citizen, I want the system to silently alert security when my duress PIN is
 ---
 
 #### US-12.1
-As a citizen, I want to generate a digitally certified copy of my credential as a downloadable document, so that I can use it for formal submissions that require a certified copy of my ID or licence.
+As a citizen, I want to generate a certified copy of my credential as a downloadable PDF, so that I can use it for formal submissions that require a certified copy.
 
 **Acceptance Criteria:**
-- Certified copy can only be generated for credentials with status Active
-- Document is generated as a signed PDF with an embedded verification QR code
-- PDF includes all credential fields, issuing authority, generation date, and digital signature
-- The embedded QR code can be scanned to verify the document's authenticity
-- Certified copy generation is logged to the audit trail
+- Certified copy can only be generated for an Active credential
+- The PDF includes the credential fields and an embedded verification QR code
+- A hash of the PDF and a snapshot of the credential are stored for later verification
+- The certified copy is valid for 90 days
 
 **Definition of Done:**
-- Certified copy generated as a signed PDF with embedded verification QR
+- Certified copy generated as a PDF with an embedded verification QR
 - Available only for Active credentials
 
 ---
 #### US-12.2
-As an emergency official (paramedic, firefighter, police), I want to scan a citizen's emergency QR code to retrieve critical identity and medical information, so that I can identify the citizen and provide appropriate emergency care when they cannot speak for themselves.
+As an official, I want to scan a citizen's emergency QR code to retrieve critical medical information, so that I can provide appropriate emergency care when the citizen cannot speak for themselves.
 
 **Acceptance Criteria:**
-- Emergency QR returns only emergency-safe fields to authorised emergency officials
-- Emergency access requires the official to be authenticated as an authorised emergency responder
-- Emergency access is logged immediately with the official's ID, timestamp, and location
-- Citizen's primary contact is notified when emergency access is used
+- Only users with the Official role can resolve an emergency code
+- The emergency code is signed by a key on the citizen's phone, is short-lived and can be used only once
+- The official sees the citizen's chosen medical fields and emergency contacts
+- Each access is logged with the official's ID, institution, timestamp and location (when provided), failed attempts are also logged
+- The citizen and their emergency contacts are emailed when emergency access is used
+- Emergency access also works offline and is uploaded when the official reconnects
 
 **Definition of Done:**
-- Emergency QR returns only emergency-safe fields
-- Emergency access logged immediately
-- Citizen primary contact notified on emergency access
+- Emergency code returns only the citizen's emergency profile
+- Emergency access logged and contacts notified
 
 ---
 #### US-12.3
-As a citizen, I want to configure which information is included in my emergency QR, so that I control what emergency responders can access about me.
+As a citizen, I want to configure what my emergency QR shares, so that I control what emergency responders can see.
 
 **Acceptance Criteria:**
-- Citizen can toggle optional fields in their emergency profile (e.g. blood type, allergies, medical conditions)
-- Mandatory identification fields (name, SA ID, date of birth) cannot be removed from the emergency profile
-- Changes to the emergency profile are saved and reflected in the next emergency QR
-- Citizen can view a preview of what emergency responders will see
+- Citizen must consent before the emergency profile is enabled
+- Citizen registers their phone to sign emergency codes
+- Citizen chooses which medical fields to fill in: severe allergies, chronic medication, implanted devices, medical conditions, blood type, communication needs and medical aid details
+- Citizen can add emergency contacts in priority order
+- Profile changes are logged to the audit trail
 
 **Definition of Done:**
-- Citizen can configure optional emergency fields
-- Mandatory identification fields cannot be removed
+- Citizen can configure the emergency profile and contacts
+- Consent recorded before the profile is enabled
+
+---
+#### US-12.4
+As a person receiving a certified copy, I want to verify it online, so that I know the document is genuine and still valid.
+
+**Acceptance Criteria:**
+- Anyone can scan the QR on the PDF, or open its link, to see the verification result without signing in
+- A PDF can be uploaded to check that it has not been altered
+- The result shows whether the copy is valid, expired, or linked to a credential that is no longer active
+- Verification requests are rate-limited
+
+**Definition of Done:**
+- Public verification page confirms authenticity and status of a certified copy
+
+---
+#### US-12.5
+As a citizen, I want to see when my emergency profile was accessed, so that I know who viewed my medical information.
+
+**Acceptance Criteria:**
+- Citizen can view a list of emergency accesses to their profile
+- Each entry shows who accessed it, their institution, when, the reason they gave, the location (when provided) and whether the access was offline
+
+**Definition of Done:**
+- Emergency access history visible to the citizen
 
 ---
 
@@ -917,7 +832,7 @@ As a citizen, I want to show an offline QR code for my credential when I have no
 
 **Acceptance Criteria:**
 - The share screen offers an offline code whenever an offline package is on the phone
-- The citizen chooses which optional fields to share; mandatory fields are always included
+- The citizen chooses which optional fields to share. Mandatory fields are always included
 - Changing the shared fields while offline produces a new offline code
 - A clear message is shown when no offline package is available yet
 

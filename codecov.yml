@@ -26,3 +26,16 @@ flag_management:
       paths: [web/]
     - name: gov-registry
       paths: [government-registry/]
+
+# NFR5.3: the SRS target is 80% on critical business logic, reported apart from the all-code figure
+component_management:
+  individual_components:
+    - component_id: critical-logic
+      name: Critical business logic (NFR5.3)
+      paths:
+        - backend/FlashIdBackend/Application/**
+        - backend/FlashIdBackend/Domain/**
+        - mobile/src/lib/offline/**
+      statuses:
+        - type: project
+          target: 80%

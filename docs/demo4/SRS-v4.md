@@ -155,7 +155,7 @@ Officials may:
 ---
 ## 3.2 Epics and User Stories
 
-The full epics and user stories, including acceptance criteria and definitions of done for all 13 epics and 55 user stories are documented in:
+The full epics and user stories, including acceptance criteria and definitions of done for all 13 epics and 66 user stories are documented in:
 
  **[Epics and User Stories](../demo4/epics-and-user-stories-v4.md)**
 
@@ -164,7 +164,7 @@ The full epics and user stories, including acceptance criteria and definitions o
 | Epic | Title |
 |---|---|
 | E01 | Identity Onboarding & Citizen Registration |
-| E02 | Authentication & Role-Based Access Control |
+| E02 | Authentication & Role-Based Access Control (RBAC) |
 | E03 | Institution Registration & API Key Management |
 | E04 | Digital Credential Issuance |
 | E05 | Credential Wallet & Viewing |
@@ -255,7 +255,7 @@ QR code verification requests must return a verification result within 3 seconds
 The system must support at least 500 concurrent authenticated users without degradation in response times.
 
 #### NFR2.6
-An offline presentation of a driver's licence, including the portrait and key binding, must scan within 5 seconds on the reference phones. Measured: about 4.2 seconds for 28 frames.
+An offline presentation of a driver's licence, including the portrait and key binding, must scan within 5 seconds on the reference phones.
 
 #### NFR2.7
 The first request served after a period of application inactivity (cold start) must complete within 5 seconds.
@@ -290,18 +290,15 @@ Administrative batch operations (e.g. the daily credential-expiry sweep) must co
 ### 5.4 Usability
 
 #### NFR4.1
-A first-time citizen should be able to register an account, verify their email address, and access their digital wallet within 5 minutes without outside help.
+Frequently performed tasks shouldn't require more than three user interactions from the dashboard.
 
 #### NFR4.2
-Frequently performed tasks should not require more than three user interactions from the dashboard.
-
-#### NFR4.3
 The system should conform to WCAG 2.1 Level AA accessibility guidelines for all public-facing web interfaces.
 
-#### NFR4.4
+#### NFR4.3
 All user-visible validation errors and system notifications must clearly describe the problem and provide guidance for resolving it.
 
-#### NFR4.5
+#### NFR4.4
 The web application must provide a responsive interface supporting screen sizes without loss of functionality.
 
 ---
