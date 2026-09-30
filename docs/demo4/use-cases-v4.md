@@ -360,3 +360,219 @@ The Offline Verification subsystem lets a Citizen present a credential, and an O
 - **Section 11 - Consent:** An offline presentation happens only when the Citizen explicitly chooses to show the offline code.
 
 ---
+
+## 12. Fraud Detection (Impossible Travel)
+
+The Fraud Detection subsystem protects Citizen accounts by checking every login for impossible travel: two logins from places too far apart to have travelled between in the time between them. When a login is flagged, FlashID raises a security alert, restricts QR generation, and guides the Citizen through reviewing the event and securing their account.
+
+![Fraud Detection Use Case Diagram](../images/fraud-detection.drawio.svg)
+
+### Detect Impossible Travel
+
+**TUCBW:** This use case begins when a User successfully logs in and FlashID records the login's approximate location, device and time.
+
+**TUCEW:** This use case ends with the distance, time between logins and implied travel speed compared against the User's previous login, and the login given a risk score and risk level.
+
+### Raise Security Alert
+
+**TUCBW:** This use case begins when a login is assessed as impossible travel and impossible travel detection is enabled for the User.
+
+**TUCEW:** This use case ends with an open fraud alert recorded against the User's account, QR generation temporarily restricted, and the alert shown on the Citizen's dashboard.
+
+### View Security Alert
+
+**TUCBW:** This use case begins when a Citizen with an open fraud alert opens their dashboard.
+
+**TUCEW:** This use case ends with a "Suspicious activity detected" alert displayed, summarising the event and offering the option to review it.
+
+### View Alert Details
+
+**TUCBW:** This use case begins when a Citizen chooses to review a security alert.
+
+**TUCEW:** This use case ends with the new and previous login locations, the distance, time between logins, implied travel speed, device and IP address displayed, along with guidance on how to keep the account secure.
+
+### Secure Account
+
+**TUCBW:** This use case begins when a Citizen chooses to secure their account from an open fraud alert and selects an action: log out other devices, reset password, or add extra verification.
+
+**TUCEW:** This use case ends with the chosen action applied after the Citizen's password is confirmed, the alert marked as secured, and the result and next steps shown to the Citizen.
+
+### Confirm Password
+
+**TUCBW:** This use case begins when a Citizen attempts a sensitive security action (securing the account, dismissing an alert, or changing security settings).
+
+**TUCEW:** This use case ends with the Citizen's password verified so the action can continue, or the action refused if the password is incorrect.
+
+### Dismiss Alert
+
+**TUCBW:** This use case begins when a Citizen recognises the flagged activity as their own and chooses to dismiss the alert.
+
+**TUCEW:** This use case ends with the alert marked as dismissed after the Citizen's password is confirmed, and the alert no longer shown on the dashboard.
+
+### Manage Security Settings
+
+**TUCBW:** This use case begins when a Citizen opens their security settings.
+
+**TUCEW:** This use case ends with the Citizen's choices for impossible travel detection and enhanced verification saved after their password is confirmed.
+
+### View Security Activity
+
+**TUCBW:** This use case begins when a Citizen opens their recent security activity.
+
+**TUCEW:** This use case ends with a list of recent security events displayed, each showing the event type, location, time, device and risk level.
+
+### POPIA Compliance
+
+- **Section 8 — Accountability:** Every alert, dismissal and security action is recorded against the Citizen's account, so each decision is traceable.
+- **Section 10 — Minimality:** Only the location, device and time data needed to assess login risk is processed. Locations are approximate and derived from the login's IP address.
+- **Section 13 — Purpose Specification:** Login location and device data is used only to detect fraud and protect the Citizen's account.
+- **Section 18 — Notification to Data Subject:** Citizens are shown exactly why an alert was raised, including the locations, times and device involved.
+- **Sections 19–22 — Security Safeguards:** Suspicious logins trigger alerts and temporary QR restrictions, and sensitive actions require password confirmation.
+
+---
+
+## 13. Emergency QR Code
+
+The Emergency QR Code subsystem lets a Citizen prepare an emergency profile that authorised Officials, such as paramedics and police, can open in an emergency, even straight from the Citizen's lock screen and without an internet connection. Every access requires a justification, is logged, and is reported to the Citizen and their emergency contacts.
+
+![Emergency QR Code Use Case Diagram](../images/emergency-qr.drawio.svg)
+
+### Manage Emergency Profile
+
+**TUCBW:** This use case begins when a Citizen opens their emergency profile in the FlashID mobile app.
+
+**TUCEW:** This use case ends with the Citizen's emergency information and emergency contacts saved to their profile.
+
+### Register Emergency Device
+
+**TUCBW:** This use case begins when a Citizen chooses to enable the emergency QR code on their phone.
+
+**TUCEW:** This use case ends with the phone registered as the Citizen's emergency device and a signed offline credential downloaded to it.
+
+### Download Offline Credential
+
+**TUCBW:** This use case begins when a Citizen's registered emergency device requests the signed emergency credential while online.
+
+**TUCEW:** This use case ends with the signed offline credential stored securely on the device, ready to be shown as an emergency QR code without an internet connection.
+
+### Show Emergency QR (Lock Screen)
+
+**TUCBW:** This use case begins when the Citizen, or someone assisting them, opens the emergency QR code from the phone's lock screen.
+
+**TUCEW:** This use case ends with the emergency QR code displayed on the lock screen without the phone being unlocked.
+
+### View Emergency Access History
+
+**TUCBW:** This use case begins when a Citizen opens their emergency access history.
+
+**TUCEW:** This use case ends with a list of every time their emergency profile was accessed displayed, including the responder, their institution, the justification given and when it happened.
+
+### Scan Emergency QR
+
+**TUCBW:** This use case begins when an authorised Official scans a Citizen's emergency QR code.
+
+**TUCEW:** This use case ends with the Citizen's emergency profile and photo displayed to the Official after a justification has been provided and the access logged, or the request refused if the code is invalid or already used.
+
+### Provide Justification
+
+**TUCBW:** This use case begins when an Official is asked why they need to open a Citizen's emergency profile.
+
+**TUCEW:** This use case ends with the Official's justification recorded as part of the emergency access.
+
+### Log Emergency Access
+
+**TUCBW:** This use case begins when an emergency profile is opened by an Official, online or through a synced offline scan.
+
+**TUCEW:** This use case ends with an emergency access record saved, capturing the responder, their institution, the justification, the location, whether the scan was offline, and the time.
+
+### Notify Citizen & Emergency Contacts
+
+**TUCBW:** This use case begins when a new emergency access has been logged.
+
+**TUCEW:** This use case ends with an email sent to each of the Citizen's emergency contacts who has an email address and to the Citizen, informing them that the emergency profile was accessed.
+
+### Verify Offline QR
+
+**TUCBW:** This use case begins when an Official scans a Citizen's emergency QR code while the Official's phone has no internet connection.
+
+**TUCEW:** This use case ends with the emergency QR code verified on the Official's phone and the emergency information displayed, with the access queued to be recorded.
+
+### Record Offline Access
+
+**TUCBW:** This use case begins when an Official's phone that verified an emergency QR code offline reconnects to the internet.
+
+**TUCEW:** This use case ends with the offline access sent to FlashID and recorded as an emergency access marked as offline.
+
+### POPIA Compliance
+
+- **Section 8 — Accountability:** Every emergency access is attributed to the Official who performed it and recorded with their justification.
+- **Section 10 — Minimality:** Only the emergency information the Citizen chose to include in their profile is shown to the responder.
+- **Section 11 — Consent:** Citizens choose to create an emergency profile and enable the emergency QR code on their phone.
+- **Section 13 — Purpose Specification:** Emergency information is used only to assist the Citizen in an emergency.
+- **Section 18 — Notification to Data Subject:** The Citizen and their emergency contacts are emailed every time the emergency profile is opened.
+- **Sections 19–22 — Security Safeguards:** Only authorised Officials can open an emergency profile, the offline credential is signed and stored securely on the device, and the Citizen's photo is shared through a short-lived, read-only link.
+- **Section 23 — Access to Personal Information:** Citizens can view a full history of who accessed their emergency profile and why.
+
+---
+
+## 14. Certified Copy
+
+The Certified Copy subsystem lets a Citizen generate a certified PDF copy of an active credential, instead of having a physical document certified in person. Each copy contains a verification QR code, and anyone can confirm a copy is genuine and unaltered by scanning that code or uploading the PDF.
+
+![Certified Copy Use Case Diagram](../images/certified-copy.drawio.svg)
+
+### Generate Certified Copy
+
+**TUCBW:** This use case begins when a Citizen selects one of their Active credentials and chooses to generate a certified copy.
+
+**TUCEW:** This use case ends with a certified PDF copy of the credential generated and downloaded by the Citizen, or the request refused if the credential is not Active or does not belong to the Citizen.
+
+### Embed Verification QR Code
+
+**TUCBW:** This use case begins when a certified copy is being generated.
+
+**TUCEW:** This use case ends with a unique verification link created and printed on the PDF as a QR code.
+
+### Store Document Hash
+
+**TUCBW:** This use case begins when the certified copy PDF has been generated.
+
+**TUCEW:** This use case ends with fingerprints (SHA-256 hashes) of the verification token, the credential details and the finished PDF stored, so the copy can later be verified and any changes detected.
+
+### Verify Certified Copy
+
+**TUCBW:** This use case begins when an Official or Third-Party Verifier chooses to check whether a certified copy is genuine.
+
+**TUCEW:** This use case ends with the verification result displayed: whether the copy is valid, its status, and the credential details it certifies.
+
+### Verify via QR Code
+
+**TUCBW:** This use case begins when an Official or Third-Party Verifier scans the verification QR code printed on a certified copy.
+
+**TUCEW:** This use case ends with the certified copy's status and certified credential details displayed on the public verification page, or the copy reported as invalid if the code does not match a FlashID certified copy.
+
+### Verify by Uploading PDF
+
+**TUCBW:** This use case begins when an Official or Third-Party Verifier uploads a certified copy PDF for verification.
+
+**TUCEW:** This use case ends with the uploaded PDF confirmed as an exact, unaltered FlashID certified copy along with its status, or reported as unverifiable if it was edited or not generated by FlashID.
+
+### Check Copy Status
+
+**TUCBW:** This use case begins when a certified copy has been matched during verification.
+
+**TUCEW:** This use case ends with the copy's status (Active, Expired or Revoked) determined and shown as part of the verification result.
+
+### Check Document Integrity
+
+**TUCBW:** This use case begins when a PDF has been uploaded for verification.
+
+**TUCEW:** This use case ends with the PDF's fingerprint compared against the stored fingerprint, confirming whether the document has been changed in any way.
+
+### POPIA Compliance
+
+- **Section 10 — Minimality:** A certified copy contains only the details of the single credential the Citizen chose.
+- **Section 11 — Consent:** Certified copies are generated only when the Citizen chooses to create one.
+- **Section 13 — Purpose Specification:** Certified copy data is used only to produce and verify the certified copy.
+- **Section 16 — Information Quality:** Copies are generated only from Active credentials, and verification reports whether a copy is still Active, Expired or Revoked.
+- **Sections 19–22 — Security Safeguards:** The verification token is stored only as a hash, and document hashes make any change to a PDF detectable. Uploads are limited to genuine PDF files of up to 10 MB.
