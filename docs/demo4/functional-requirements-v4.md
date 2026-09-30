@@ -13,42 +13,36 @@
 
 ### R1: User Registration and Authentication
 
-The FlashID system shall provide secure authentication and identity onboarding functionality for citizens, government administrators, and verification officials.
+The FlashID system shall provide secure authentication and account registration functionality for citizens, government administrators, and officials.
 
 ---
 
 #### R1.1: Citizen Registration
 
 ##### R1.1.1:
-The system shall allow citizens to register using: South African ID number, mobile number, and email address.
+The system shall allow citizens to register using: email address.
 
 ##### R1.1.2:
-The system shall validate: ID number format (exactly 13 digits), email format, and password complexity requirements.
+The system shall validate: email format, and password complexity requirements.
 
 ##### R1.1.3:
-The system shall prevent duplicate citizen registrations using the same South African ID number.
+The system shall prevent duplicate citizen registrations using the same email address.
 
 ##### R1.1.4:
-The system shall require citizens to verify their mobile number using OTP verification.
+The system shall require citizens to verify their email using OTP verification.
 
 ##### R1.1.5:
 The system shall securely store citizen registration information in the backend database.
-
-##### R1.1.6:
-The system shall support citizen registration via a pre-issued activation code sent by a Home Affairs official, as an alternative to self-registration with a physical ID document.
-
-##### R1.1.7:
-The system shall lock a citizen account after 5 consecutive failed login attempts and notify the account holder.
 
 ---
 
 #### R1.2: Citizen Login
 
 ##### R1.2.1:
-The system shall allow login using: email and password, or mobile number and password.
+The system shall allow login using: email and password.
 
 ##### R1.2.2:
-The system shall support biometric authentication including fingerprint authentication and facial recognition authentication.
+The mobile app shall support biometric authentication including fingerprint authentication and facial recognition authentication.
 
 ##### R1.2.3:
 The system shall issue JWT authentication tokens upon successful login.
@@ -57,7 +51,19 @@ The system shall issue JWT authentication tokens upon successful login.
 The system shall automatically expire inactive user sessions after a configurable timeout period.
 
 ##### R1.2.5:
+The system shall track succesful logins for audit logging, taking note of location and device type.
+
+##### R1.2.6:
+The system shall require users to verify devices that log into their accounts for the first time using an OTP verification code.
+
+##### R1.2.7:
+The system shall allow the device verification code to be resent.
+
+##### R1.2.8:
 The system shall securely log citizens out of all active sessions when requested.
+
+##### R1.2.9:
+The system shall lock a citizen account after 5 consecutive failed login attempts and notify the account holder.
 
 ---
 
@@ -70,9 +76,6 @@ The system shall restrict administrator access to authorized personnel only.
 The system shall support role-based administrator permissions.
 
 ##### R1.3.3:
-The system shall support multi-factor authentication for administrators.
-
-##### R1.3.4:
 The system shall maintain audit logs of all administrator login attempts.
 
 ---
@@ -90,18 +93,12 @@ The system shall associate each verification action with the authenticated offic
 #### R1.5: Government Administrator Registration
 
 ##### R1.5.1:
-The system shall allow existing government administrators to register new government administrator accounts.
-
-##### R1.5.2:
 The system shall assign the role GovernmentAdministrator to all registered government administrator accounts.
 
-##### R1.5.3:
+##### R1.5.2:
 The system shall require a unique government employee ID for every administrator registration.
 
-##### R1.5.4:
-The system shall reject duplicate government employee IDs and duplicate email addresses during administrator registration.
-
-##### R1.5.5:
+##### R1.5.3:
 The system shall hash and securely store all administrator passwords.
 
 ---
@@ -115,7 +112,7 @@ The system shall hash and securely store all administrator passwords.
 #### R2.1: Digital ID Credential Issuance
 
 ##### R2.1.1:
-The system shall allow administrators to issue South African digital identity credentials to registered citizens.
+The system shall allow officials to issue South African digital identity credentials to registered citizens.
 
 ##### R2.1.2:
 The system shall generate a unique credential identifier for every issued credential.
@@ -127,12 +124,9 @@ The system shall cryptographically sign each credential using ES256 at the point
 The system shall associate issued credentials with the correct citizen profile.
 
 ##### R2.1.5:
-The system shall notify citizens when credentials have been successfully issued.
-
-##### R2.1.6:
 The system shall allow registered institutions to submit credential issuance requests via authenticated API calls using a valid institution API key.
 
-##### R2.1.7:
+##### R2.1.6:
 The system shall validate that an institution is authorised to issue the requested credential type before processing an API-based issuance request.
 
 ---
@@ -162,12 +156,9 @@ The system shall allow administrators to place a credential in Under Investigati
 The system shall maintain credential statuses including: Active, Under Investigation, Revoked, Expired.
 
 ##### R2.3.4:
-The system shall notify citizens when credentials are revoked or placed Under Investigation.
-
-##### R2.3.5:
 A credential with status Under Investigation shall return an INVALID result on verification. Administrators may lift the status to Active or proceed to full revocation.
 
-##### R2.3.6:
+##### R2.3.5:
 The system shall send advance expiry warning notifications to citizens at 30 days and 7 days before a credential's expiry date.
 
 ##### R2.3.7:
