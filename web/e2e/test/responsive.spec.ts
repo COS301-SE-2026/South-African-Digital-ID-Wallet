@@ -107,8 +107,10 @@ for (const viewport of VIEWPORTS) {
           page,
         }) => {
           await page.goto(p.path)
-          // measure only after the page's data has rendered
-          await page.waitForLoadState('networkidle')
+          // wait for the top bar title (the dashboard has a second h1); networkidle never settles on the officials pages at desktop width
+          await expect(
+            page.getByRole('banner').getByRole('heading', { level: 1 })
+          ).toBeVisible()
           expect(
             await sidewaysOverflow(page),
             'sideways overflow in px'

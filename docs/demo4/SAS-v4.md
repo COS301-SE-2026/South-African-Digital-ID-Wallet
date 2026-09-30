@@ -1475,7 +1475,7 @@ Each NFR from SRS-v4 section 5 is listed below with the architectural tactic tha
 | Gap | Cannot be met or proven on the current infrastructure; the reason is stated |
 | Not yet tested | The test is designed (see 6.5) but has not been run |
 
-**Summary:** 22 Pass, 5 Pass (limited), 2 Partial, 2 Gap, 3 Not yet tested (34 NFRs).
+**Summary:** 23 Pass, 6 Pass (limited), 2 Partial, 2 Gap, 1 Not yet tested (34 NFRs).
 
 #### Security
 
@@ -1509,10 +1509,10 @@ Each NFR from SRS-v4 section 5 is listed below with the architectural tactic tha
 
 | ID | Requirement | Tactic | Test / tool | Target | Result | Status |
 |---|---|---|---|---|---|---|
-| NFR3.1 | 99.9% availability, excluding scheduled maintenance | Managed App Service hosting; `/health` liveness endpoint that stays up when a dependency is misconfigured; `/health/ready` returns 503 when the signing key cannot load | xUnit integration: `HealthEndpointTests`; unit: `CredentialSigningKeyHealthCheckTests`; Azure Monitor metrics | 99.9% | Not measured over time. 3 health tests pass: `/health` returns 200 without login even when the signing key is broken; `/health/ready` returns 200 when the key loads and 503 without leaking detail when it cannot. [30-day dev API figures: total requests and 5xx responses]. Basic B2 carries Microsoft's 99.95% SLA, but there is one instance, no redundancy and no App Service health check path configured, so a hung process is not detected automatically | Gap |
+| NFR3.1 | 99.9% availability, excluding scheduled maintenance | Managed App Service hosting; `/health` liveness endpoint that stays up when a dependency is misconfigured; `/health/ready` returns 503 when the signing key cannot load | xUnit integration: `HealthEndpointTests`; unit: `CredentialSigningKeyHealthCheckTests`; Azure Monitor request metrics for the dev API over 30 days to 2026-09-30 | 99.9% | Not measured as uptime. 3 health tests pass: `/health` returns 200 without login even when the signing key is broken; `/health/ready` returns 200 when the key loads and 503 without leaking detail when it cannot. Over 30 days the dev API served 4,463 requests, 56 of them 5xx (98.75% without a server error). 47 of the 56 fell on 2026-09-03 and 2026-09-04, the busiest days (Demo 3 preparation and the demo); the other 9 were spread over three days, and 25 days had none, including the 2026-09-30 load tests. The causes cannot be traced because request logs are not kept (no Application Insights); one known source is that login and resend-OTP return 500 for an empty request body. Basic B2 carries Microsoft's 99.95% SLA, but there is one instance, no redundancy and no health check path, so a hung process is not detected automatically | Gap |
 | NFR3.2 | Unexpected errors show a friendly message within 2 s without crashing | Controller catch blocks and `GlobalExceptionHandler` return a generic JSON error; outside Development the exception detail stays in the server log, linked by `traceId` | xUnit: `AuthControllerTests`, `GlobalExceptionHandlerTests` | Friendly 500 in < 2 s; next request still served | `Login_WhenAnUnexpectedErrorOccurs_ReturnsFriendlyErrorWithinTwoSecondsAndKeepsServing` passes, plus handler tests for production and development detail | Pass |
 | NFR3.3 | Users carry on once connectivity returns, with no reinstall or data recovery | Offline scans are queued on the device and uploaded when signal returns or the app comes back to the foreground, while a user is signed in | Jest `offline-verification-sync`, Mobile CI run [#122](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/36317467804); device protocol step 7 | Queued data syncs with no user action | 5 tests pass, including `Should upload once signal returns` and `Should not upload while offline`. On real phones the offline scan appeared as an `OfflineCredentialVerified` audit row after reconnecting (2026-09-27). Covers the offline-verification path only | Pass (limited) |
-| NFR3.4 | Recovery from a critical service failure within 5 minutes | App Service restarts the process; EF Core migrations and signing key load on startup; `/health/ready` reports when the API can sign again | Restart of the dev API (`az webapp restart`) while polling `/health/ready` (script in 6.5) | < 5 min to ready | [restart result and date]. Supporting measurement: after a full stop, the first `/health` 200 came 45.7 s after start (2026-09-28) | Not yet tested |
+| NFR3.4 | Recovery from a critical service failure within 5 minutes | App Service restarts the process on start; EF Core migrations and the signing key load on startup; `/health/ready` only returns 200 once the API can sign credentials again | Dev API stopped (`az webapp stop`, confirmed by HTTP 403), then started (`az webapp start`) while polling `/ health/ ready` every 3 s, 2026-09-30 | < 5 min from start to ready | Ready 57 s after the start command (403 while stopping, no response while starting, then 200). An earlier stop and start (2026-09-28) reached the first `/ health` 200 in 45.7 s. This measures recovery once the app is started; detection is not automated, since no App Service health check path is configured | Pass (limited) |
 | NFR3.5 | Credential and account data stay consistent | EF Core transactional writes; a job-run claim table so only one expiry sweep runs per day; failed sweeps are marked failed, not left half done | xUnit: `CredentialExpiryServiceTests`, `CredentialExpiryRepositoryIntegrationTests`, `DeleteAccountServiceTests` | No partial or duplicate writes | `SaveChangesFails_MarksJobRunFailedInsteadOfThrowingPastTheService`, `TryClaimJobRunAsync_SecondClaimForSameDate_Fails` and `DeleteAccountAsync_CallsRepositoryMethodsInExpectedOrder` pass. These cover the expiry sweep and account deletion, not every write path | Pass (limited) |
 | NFR3.6 | Presentation and verification work with no network on either phone | Credential package, trusted issuer keys and signed revocation list cached while online; verification runs on the verifier's phone; trust data older than 7 days is refused | Jest (`offline-flow`, `verify`), Mobile CI run [#122](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/36317467804); device protocol steps 2, 4 and 6 | Verifies with both phones offline | 9 end-to-end flow tests (built, split, scanned out of order, reassembled, verified) and 37 verifier tests pass. On real phones in aeroplane mode the licence verified with its portrait, and a revoked licence was rejected offline (2026-09-24, 2026-09-27) | Pass |
 | NFR3.7 | Batch jobs finish in bounded time and can be safely re-run | Daily expiry sweep with keyset pagination; a per-day claim so a second run returns the first result instead of reprocessing; a failed or stale run can be reclaimed | k6 `nfr-expiry-batch-timing.js` on the dev API, 2026-09-30; xUnit: `CredentialExpiryServiceTests`, `CredentialExpiryRepositoryIntegrationTests` | Bounded time; safe to re-run | 619.5 ms at the dev data volume (`nfr-evidence/nfr-expiry-batch-timing-2026-09-30.json`). `AlreadyCompletedToday_ReturnsExistingResultWithoutReprocessing`, `TryClaimJobRunAsync_ReclaimsRowLeftAsFailed` and `TryClaimJobRunAsync_ReclaimsStaleRunningRow` pass | Pass |
@@ -1525,16 +1525,16 @@ Each NFR from SRS-v4 section 5 is listed below with the architectural tactic tha
 | NFR4.2 | Frequent tasks within 3 interactions from the dashboard | Sidebar entry for every frequent task; share and update password open in place | Manual interaction count (see 6.2) | <= 3 | All 5 frequent tasks take 3 or fewer on desktop and tablet. On a phone the sidebar sits behind a menu button, which adds one tap | Pass |
 | NFR4.3 | WCAG 2.1 AA on public-facing web pages | Semantic HTML, labelled controls, landmark regions | Lighthouse 13.4.1 accessibility audit, desktop (see 6.1.2) | No AA failures | Scores 90 to 96 on all 19 pages, but Lighthouse reports insufficient colour contrast (WCAG 1.4.3, a Level AA criterion) on all 19, unlabelled form controls on one page and a missing `<main>` landmark on four | Partial |
 | NFR4.4 | Validation errors describe the problem and how to fix it | Validators throw typed exceptions with specific messages (for example which password rule failed and the allowed special characters); controllers return them as 400 `{ error }` | xUnit: `CitizenRegistrationValidatorTests`, `CitizensControllerTests` | Every rule names the problem and the fix | `Validate_InvalidInput_ReturnsMessageThatNamesTheProblemAndTheFix` (8 cases) and `Register_WithInvalidInput_Returns400WithTheSpecificGuidanceMessage` pass | Pass |
-| NFR4.5 | Responsive web interface with no loss of functionality | Tailwind breakpoints; below 1024 px the sidebar becomes a slide-out menu | Playwright `responsive.spec.ts` at 375, 768 and 1440 px (see 6.3) | No sideways scrolling; navigation and main actions work at every width | [results from 6.3] | Not yet tested |
+| NFR4.5 | Responsive web interface with no loss of functionality | Tailwind breakpoints; below 1024 px the sidebar becomes a slide-out menu opened from the top bar | Playwright `responsive.spec.ts` (Chromium) at 375, 768 and 1440 px against the local stack, 2026-09-30 (see 6.3) | No sideways scrolling; navigation and main actions work at every width | 30 of 30 checks pass: 10 key pages at phone, tablet and desktop width, including navigation through the slide-out menu and the share dialog's Generate QR code button. Below 1024 px the landing page hides its section links with no menu; the sections are still reachable by scrolling. Tested in Chromium only | Pass |
 
 #### Maintainability
 
 | ID | Requirement | Tactic | Test / tool | Target | Result | Status |
 |---|---|---|---|---|---|---|
 | NFR5.1 | Modular Clean Architecture | Domain, Application, Infrastructure and Presentation layers; dependencies inverted through interfaces registered at the composition root | xUnit: `DependencyInjectionTests` | Every Application interface resolves to its Infrastructure implementation | Passes | Pass |
-| NFR5.2 | Code merged to main passes build, lint, formatting and CI checks | GitHub Actions runs build, lint, format and tests on every pull request; branch protection on `main` | GitHub Actions; branch protection settings (`gh api`, 2026-09-29) | A merge cannot happen with failing checks | CI runs on every pull request ([example run](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/33838886255)) and `main` requires 2 approvals. No status checks are marked as required on `main`, so a pull request with failing CI could still be merged by its reviewers [update after the ruleset check] | Partial |
-| NFR5.3 | At least 80% unit test coverage on critical business logic | Critical logic lives in the backend Application and Domain layers and the mobile offline-verification library, all covered by unit tests | Coverage measured locally (`dotnet test --coverage`, Jest `--coverage`), 2026-09-29; Codecov | >= 80% line coverage on critical logic | Backend Application 96.5%, Domain 87.1%; mobile `src/lib/offline` 97.2%. Across all code in all four projects Codecov reports 63% [link to Codecov critical-logic component once enabled] | Pass (limited) |
-| NFR5.4 | Deploy to production within 30 minutes of merging to main | GitHub Actions deploys to Azure App Service on every push to `main` | GitHub Actions run durations | < 30 min | Production API: last 5 deploys took 2 min 17 s to 8 min 55 s ([latest, 2026-09-23](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/35923611440)). Government registry 5 min 35 s and web 2 min 8 s [add run links] | Pass |
+| NFR5.2 | Code merged to main passes build, lint, formatting and CI checks | GitHub Actions runs build, lint, format and tests on every pull request; branch protection on `main` | GitHub Actions; branch protection settings (`gh api`, including repository rulesets, 2026-09-29) | A merge cannot happen with failing checks | CI runs on every pull request ([example run](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/33838886255)) and `main` requires 2 approvals. No status checks are marked as required on `main`, so a pull request with failing CI could still be merged by its reviewers | Partial |
+| NFR5.3 | At least 80% unit test coverage on critical business logic | Critical logic lives in the backend Application and Domain layers and the mobile offline-verification library, all covered by unit tests | Coverage measured locally (`dotnet test --coverage`, Jest `--coverage`), 2026-09-29; Codecov | >= 80% line coverage on critical logic | Backend Application 96.5%, Domain 87.1%; mobile `src/lib/offline` 97.2%. Across all code in all four projects Codecov reports 63%. The 80% target on critical logic is now enforced in CI as the Codecov component `critical-logic` (`codecov.yml`), so a pull request that drops it below 80% fails that status | Pass (limited) |
+| NFR5.4 | Deploy to production within 30 minutes of merging to main | GitHub Actions deploys to Azure App Service on every push to `main` | GitHub Actions run durations | < 30 min | All three production deploys on 2026-09-23 finished within 2 min 17 s of starting: API 2 min 17 s ([run](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/35923611440)), government registry 1 min 35 s ([run](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/35923611544)), web 1 min 57 s ([run](https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/actions/runs/35923611577)). The slowest production API deploy in the last five was 8 min 55 s (2026-09-04) | Pass |
 | NFR5.5 | New departments and institutions can be onboarded | Institutions are data, not code: `POST /api/institutions/register` (GovernmentAdministrator only) creates the institution, issues its API key and writes an audit log, with no deployment | xUnit integration: `InstitutionsControllerTests`, `InstitutionServiceTests` | Every institution type onboarded through the API | `RegisterInstitution_ForEveryInstitutionType_OnboardsThroughTheApiWithoutCodeChanges` and `RegisterInstitution_AsCitizen_ReturnsForbidden` pass | Pass |
 
 ### 6.1 Lighthouse Audit Detail (supports NFR2.1, NFR4.3)
@@ -1613,29 +1613,26 @@ Counted from the citizen dashboard on a desktop or tablet, where the sidebar is 
 
 On a phone the sidebar sits behind the menu button, so each path takes one more tap. The driver's licence needs one extra tap to select it before viewing or sharing.
 
-
-
-
-
 ### 6.3 Responsive Interface (NFR4.5)
 
 Tested with Playwright (`web/e2e/test/responsive.spec.ts`) at three widths: 375 px (phone), 768 px (tablet) and 1440 px (desktop). At each width the test checks that neither the page nor the portal's content area scrolls sideways, and that the main function of the page still works. For portal pages that means the sidebar link (or, below 1024 px, the menu button and its link) navigates; for the share dialog it means the Generate QR code button can be reached.
 
-The architecture document (`a)
-rchitecture-v4.md` commits to desktop and tablet. Phone results are reported here as well, and any phone problem is marked as outside that commitment rather than left out.
+The architecture document (`architecture-v4.md`) commits to desktop and tablet. Phone results are reported here as well, and any phone problem is marked as outside that commitment rather than left out.
+
+Run on 2026-09-30 in Chromium against the local stack (web app and API), with the seeded e2e accounts: 30 of 30 checks passed.
 
 | Page | 375 px | 768 px | 1440 px |
 |---|---|---|---|
-| Landing | [ ] | [ ] | [ ] |
-| Login | [ ] | [ ] | [ ] |
-| Register | [ ] | [ ] | [ ] |
-| Citizen dashboard | [ ] | [ ] | [ ] |
-| My Credentials | [ ] | [ ] | [ ] |
-| Share credential dialog | [ ] | [ ] | [ ] |
-| Citizen verifications | [ ] | [ ] | [ ] |
-| Officials dashboard | [ ] | [ ] | [ ] |
-| Onboard citizen | [ ] | [ ] | [ ] |
-| Gov admin dashboard | [ ] | [ ] | [ ] |
+| Landing | Pass | Pass | Pass |
+| Login | Pass | Pass | Pass |
+| Register | Pass | Pass | Pass |
+| Citizen dashboard | Pass | Pass | Pass |
+| My Credentials | Pass | Pass | Pass |
+| Share credential dialog | Pass | Pass | Pass |
+| Citizen verifications | Pass | Pass | Pass |
+| Officials dashboard | Pass | Pass | Pass |
+| Onboard citizen | Pass | Pass | Pass |
+| Gov admin dashboard | Pass | Pass | Pass |
 
 Known observation: below 1024 px the landing page hides its About, Features and Help links and has no menu to replace them. Those sections can still be reached by scrolling, so no function is lost, but the shortcuts are.
 
