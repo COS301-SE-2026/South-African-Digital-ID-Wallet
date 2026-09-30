@@ -1,0 +1,19 @@
+web/e2e/test/responsive.spec.ts
+  h_99fca60b892ff4 71,76-77
+  h_99fca60b892ff4 72-73,78-80,82,85
+web/playwright-report/index.html
+  h_99fca60b892ff4 49
+web/test-results/.last-run.json
+  h_99fca60b892ff4 2-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "8018542d4a9ec22000d97d639fabf4726edb1d41",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
