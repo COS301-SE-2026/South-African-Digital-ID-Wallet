@@ -50,19 +50,19 @@ As a Home Affairs official, I want to capture a citizen's explicit consent befor
 As a Home Affairs official, I want to capture a citizen's contact details during onboarding, so that the citizen can receive their activation link.
 
 **Acceptance Criteria:**
-- Official can enter a phone number and/or email address for the citizen
-- Phone number is validated as a valid South African format
+- Official must enter an email address for the citizen
+- Official can optionally enter a South African mobile number
 - Email is validated against standard email format rules
-- System rejects an email that is already registered to another account
-- Contact details are saved to the citizen record before the activation code is generated
+- Phone number is normalised to +27 format and validated as a South African mobile number
+- Contact details are saved with the activation record before the activation link is sent
 
 **Definition of Done:**
-- Contact details saved and associated with the citizen record
-- Duplicate email addresses are rejected
+- Contact details saved and associated with the citizen's activation record
+- Invalid email or phone formats are rejected
 
 ---
 #### US-1.4
-As a Home Affairs official, I want to send an activation link or OTP to the citizen after onboarding, so that the citizen can securely activate their wallet at their own convenience before the activation code expires.
+As a Home Affairs official, I want the system to send an activation link to the citizen and give me an activation PIN after onboarding, so that the citizen can securely link their identity to their FlashID account.
 
 **Acceptance Criteria:**
 - System generates a unique activation code after contact details are captured
