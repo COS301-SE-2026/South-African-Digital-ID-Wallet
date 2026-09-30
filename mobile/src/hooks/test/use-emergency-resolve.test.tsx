@@ -7,6 +7,8 @@ import { createQueryWrapper } from '@/test/utils/render-with-providers'
 import { useEmergencyResolve } from '../use-emergency-resolve'
 
 jest.mock('expo-local-authentication', () => ({
+  getEnrolledLevelAsync: jest.fn(),
+  SecurityLevel: { NONE: 0, SECRET: 1, BIOMETRIC_WEAK: 2, BIOMETRIC_STRONG: 3 },
   authenticateAsync: jest.fn(),
   hasHardwareAsync: jest.fn(),
   isEnrolledAsync: jest.fn(),
@@ -19,6 +21,7 @@ jest.mock('@/services/emergency-service/emergency-service', () => ({
 
 const hasHardware = LocalAuthentication.hasHardwareAsync as jest.Mock
 const isEnrolled = LocalAuthentication.isEnrolledAsync as jest.Mock
+const enrolledLevel = LocalAuthentication.getEnrolledLevelAsync as jest.Mock
 const authenticate = LocalAuthentication.authenticateAsync as jest.Mock
 const resolveMock = emergencyService.resolve as jest.Mock
 
@@ -46,6 +49,7 @@ describe('useEmergencyResolve', () => {
     jest.clearAllMocks()
     hasHardware.mockResolvedValue(true)
     isEnrolled.mockResolvedValue(true)
+    enrolledLevel.mockResolvedValue(2)
     authenticate.mockResolvedValue({ success: true })
   })
 
@@ -91,7 +95,7 @@ describe('useEmergencyResolve', () => {
   })
 
   it('Should never call the API when no biometrics are enrolled', async () => {
-    isEnrolled.mockResolvedValue(false)
+    enrolledLevel.mockResolvedValue(0)
     const { result } = await renderHook(() => useEmergencyResolve(), {
       wrapper: createQueryWrapper(),
     })
@@ -101,9 +105,7 @@ describe('useEmergencyResolve', () => {
     })
 
     expect(resolveMock).not.toHaveBeenCalled()
-    await waitFor(() =>
-      expect(result.current.error).toContain('enrolled biometrics')
-    )
+    await waitFor(() => expect(result.current.error).toContain('screen lock'))
   })
 
   it('Should surface a server rejection as a friendly message', async () => {
