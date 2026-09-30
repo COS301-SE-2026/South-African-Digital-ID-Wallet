@@ -11,6 +11,7 @@ export type SidebarIconName =
   | 'onboard'
   | 'institutions'
   | 'idCard'
+  | 'fileUser'
 
 export type SidebarNavItem = {
   label: string

@@ -100,23 +100,12 @@ export const officialsNavSections: SidebarNavSection[] = [
       {
         label: 'Verifications',
         href: '/officials/verifications',
-        icon: 'users',
-      },
-    ],
-  },
-
-  {
-    title: 'Security',
-    items: [
-      {
-        label: 'Onboarding History',
-        href: '/under-construction',
-        icon: 'history',
+        icon: 'qr',
       },
       {
-        label: 'Privacy Settings',
-        href: '/privacy-settings',
-        icon: 'settings',
+        label: 'Verify Documents',
+        href: '/officials/verify-document',
+        icon: 'fileUser',
       },
     ],
   },
