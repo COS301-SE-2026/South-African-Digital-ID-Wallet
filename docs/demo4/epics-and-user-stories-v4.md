@@ -18,14 +18,16 @@ As a Home Affairs official, I want to retrieve a citizen's verified identity rec
 
 **Acceptance Criteria:**
 - Official can search for a citizen by SA ID number
+- The SA ID number is checked for a valid 13-digit format and checksum before the registry is queried
 - System queries the MockGov registry and returns the identity record if found
-- System displays the citizen's full name, date of birth, and address from the registry
+- System displays the citizen's full name, SA ID number and date of birth from the registry
 - System shows a clear error if the SA ID is not found in the registry
-- Official cannot proceed with onboarding until a Verified record is retrieved
+- System rejects citizens younger than 16
+- Official cannot proceed with onboarding until a verified record is retrieved
 
 **Definition of Done:**
 - Identity retrieval queries MockGov registry and returns authoritative data
-- All onboarding events are written to the audit log
+- Onboarding is written to the audit log
 - Duplicate SA ID numbers are rejected
 
 ---
@@ -34,10 +36,10 @@ As a Home Affairs official, I want to capture a citizen's explicit consent befor
 
 **Acceptance Criteria:**
 - POPIA Section 11 notice is displayed to the official before consent is recorded
-- Official must actively confirm consent — it cannot be pre-checked
-- Consent record includes the official's ID, citizen's SA ID, and a precise timestamp
-- System prevents onboarding from proceeding if consent has not been recorded
-- Consent record is stored permanently and cannot be edited or deleted
+- Official must actively confirm consent, it cannot be pre-checked
+- Consent record includes the official's ID, the citizen, and a precise timestamp
+- System prevents onboarding from proceeding if consent has not been given
+- Consent is recorded as an audit log entry
 
 **Definition of Done:**
 - Explicit POPIA consent is captured and stored with timestamp
@@ -45,7 +47,7 @@ As a Home Affairs official, I want to capture a citizen's explicit consent befor
 
 ---
 #### US-1.3
-As a Home Affairs official, I want to capture a citizen's contact details (phone and/or email) during onboarding, so that the citizen can receive their activation link and future notifications.
+As a Home Affairs official, I want to capture a citizen's contact details during onboarding, so that the citizen can receive their activation link.
 
 **Acceptance Criteria:**
 - Official can enter a phone number and/or email address for the citizen

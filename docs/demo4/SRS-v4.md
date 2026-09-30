@@ -155,7 +155,7 @@ Officials may:
 ---
 ## 3.2 Epics and User Stories
 
-The full epics and user stories, including acceptance criteria and definitions of done for all 13 epics and 55 user stories are documented in:
+The full epics and user stories, including acceptance criteria and definitions of done for all 13 epics and 66 user stories are documented in:
 
  **[Epics and User Stories](../demo4/epics-and-user-stories-v4.md)**
 
@@ -164,7 +164,7 @@ The full epics and user stories, including acceptance criteria and definitions o
 | Epic | Title |
 |---|---|
 | E01 | Identity Onboarding & Citizen Registration |
-| E02 | Authentication & Role-Based Access Control |
+| E02 | Authentication & Role-Based Access Control (RBAC) |
 | E03 | Institution Registration & API Key Management |
 | E04 | Digital Credential Issuance |
 | E05 | Credential Wallet & Viewing |
