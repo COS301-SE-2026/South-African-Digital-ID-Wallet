@@ -1,0 +1,15 @@
+docs/demo4/functional-requirements-v4.md
+  h_293a8616118f65 16,23,26,29,32,42,45,54-61,65-66,115,161
+  h_293a8616118f65 62,67,98,101,129
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4f78fd3d0340bc079b64b93b7112bc9bfe12470a",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
