@@ -38,7 +38,7 @@ export const ViewInstitutionsPage = () => {
     (i: GetInstitutionResponse) =>
       i.name.toLowerCase().includes(query) ||
       i.verificationNumber.toLowerCase().includes(query) ||
-      i.type.toLowerCase().includes(query)
+      formatInstitutionType(i.type).toLowerCase().includes(query)
   )
 
   const statItems: AdminStatItem[] = [

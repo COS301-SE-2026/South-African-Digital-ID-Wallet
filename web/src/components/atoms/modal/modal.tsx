@@ -38,6 +38,11 @@ export const Modal = ({
       open
       aria-modal="true"
       data-cy={dataCy}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose()
+        }
+      }}
       className={cn(
         modalOverlayClassName,
         'm-0 h-full max-h-none w-full max-w-none border-0'
