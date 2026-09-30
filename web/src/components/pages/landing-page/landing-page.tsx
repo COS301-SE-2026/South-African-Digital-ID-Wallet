@@ -1,384 +1,661 @@
+'use client'
+import { useState } from 'react'
 import { LandingPageNavbar } from '../../organisms/landing-page-navbar/landing-page-navbar'
 import { LandingPageFooter } from '../../organisms/landing-page-footer/landing-page-footer'
 import { Text } from '@/components/atoms'
 import { HelpMenuSection } from '../../molecules/help-menu-section/help-menu-section'
 import {
-  Check,
-  ShieldCheck,
-  Zap,
   ArrowRight,
-  Shield,
-  Lock,
-  QrCode,
-  FileBadge,
-  UserCheck,
+  BadgeCheck,
   Building2,
-  Landmark,
-  FileWarning,
+  Check,
+  FileBadge,
+  Fingerprint,
   KeyRound,
+  Landmark,
+  LockKeyhole,
+  QrCode,
+  Shield,
+  ShieldCheck,
+  Smartphone,
+  UserCheck,
+  Users,
+  Zap,
 } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import citizenDashboardPic from '@/assets/images/citizen-dashboard-pic.jpeg'
 import manageUserAccountPic from '@/assets/images/manage-user-account-pic.jpeg'
 import credentialWalletPic from '@/assets/images/credential-wallet-pic.jpeg'
 import verifyIdentityPic from '@/assets/images/verify-identity-pic.jpeg'
 
-const screens = [
-  { label: 'Citizen Dashboard', src: citizenDashboardPic },
-  { label: 'Manage Account', src: manageUserAccountPic },
-  { label: 'Credential Wallet', src: credentialWalletPic },
-  { label: 'Verify Identity', src: verifyIdentityPic },
-]
-
 const FEATURES = [
   {
     icon: Shield,
-    title: 'Digital Identity Wallet',
-    description: 'Securely store your South African digital credentials.',
+    title: 'Digital identity wallet',
+    description:
+      'Keep supported official credentials organised in one secure place.',
   },
   {
-    icon: Lock,
-    title: 'Selective Disclosure',
-    description: 'Share only the information required for verification.',
+    icon: LockKeyhole,
+    title: 'Selective disclosure',
+    description:
+      'Share only the information needed for a particular verification.',
   },
   {
     icon: QrCode,
-    title: 'Trusted Verification',
-    description: 'QR-based verification backed by digital signatures.',
+    title: 'Trusted verification',
+    description:
+      'Use secure QR-based flows backed by digitally signed credentials.',
   },
   {
     icon: FileBadge,
-    title: 'Government-Issued Credentials',
-    description: 'Receive official documents directly from trusted issuers.',
+    title: 'Verified credentials',
+    description:
+      'Receive credentials from trusted government and institutional issuers.',
   },
   {
     icon: KeyRound,
-    title: 'Account Security',
+    title: 'Account protection',
     description:
-      'Multi-factor authentication, trusted devices and activity monitoring.',
+      'Use multi-factor authentication, trusted devices, and activity monitoring.',
   },
   {
-    icon: ShieldCheck,
-    title: 'Privacy First',
-    description: 'Your information remains under your control.',
+    icon: Fingerprint,
+    title: 'Privacy by design',
+    description: 'Stay in control of what you share and who can verify it.',
   },
 ]
-
 const AUDIENCES = [
   {
     icon: UserCheck,
     tone: 'green' as const,
     title: 'Citizens',
+    description:
+      'Carry your trusted credentials with you and share only what is needed.',
     points: [
       'Store official credentials securely',
       'Share only necessary information',
-      'Access credentials anywhere',
+      'Access your wallet wherever you are',
     ],
   },
   {
     icon: Landmark,
     tone: 'gold' as const,
     title: 'Government',
+    description:
+      'Issue and manage credentials through a more connected digital ecosystem.',
     points: [
       'Issue verified digital credentials',
-      'Reduce document fraud',
-      'Improve service delivery',
+      'Support faster service delivery',
+      'Help reduce document fraud',
     ],
   },
   {
     icon: Building2,
-    tone: 'red' as const,
-    title: 'Institutions & Businesses',
+    tone: 'blue' as const,
+    title: 'Organisations',
+    description:
+      'Verify trusted identity information without relying on repetitive paperwork.',
     points: [
-      'Verify identities instantly',
-      'Trust government-issued credentials',
-      'Reduce onboarding time',
+      'Verify identities more quickly',
+      'Trust digitally signed credentials',
+      'Reduce onboarding friction',
     ],
   },
 ]
-
 const HOW_IT_WORKS = [
-  { actor: 'Government', action: 'issues credential' },
-  { actor: 'Citizen', action: 'stores credential' },
-  { actor: 'Citizen', action: 'shares credential' },
-  { actor: 'Organisation', action: 'verifies credential instantly' },
+  {
+    actor: 'Government or an authorised issuer',
+    action: 'issues a verified credential',
+  },
+  { actor: 'You', action: 'store the credential in your wallet' },
+  { actor: 'You', action: 'choose what information to share' },
+  {
+    actor: 'A trusted organisation',
+    action: 'verifies the credential in seconds',
+  },
 ]
-
 const SECURITY_POINTS = [
   'Government-issued credentials',
   'Digital signatures',
   'Selective disclosure',
-  'End-to-end encrypted communication',
   'Trusted device management',
+  'Protected communication',
 ]
-
-const NAV_LINKS = [
-  { label: 'About', href: '#about' },
-  { label: 'Features and How it works', href: '#features&how-it-works' },
-  { label: 'Preview', href: '#preview' },
-]
-
-const TONE_BORDER = {
-  green: 'border-t-emerald-600',
-  gold: 'border-t-yellow-500',
-  red: 'border-t-red-600',
+const TONE_STYLES = {
+  green: {
+    border: 'border-t-primary-green',
+    icon: 'bg-primary-green/10 text-primary-green',
+  },
+  gold: {
+    border: 'border-t-accent-gold',
+    icon: 'bg-accent-gold/15 text-deep-green',
+  },
+  blue: {
+    border: 'border-t-national-blue',
+    icon: 'bg-national-blue/10 text-national-blue',
+  },
 } as const
-
-const TONE_ICON_BG = {
-  green: 'bg-emerald-50 text-emerald-700',
-  gold: 'bg-yellow-50 text-yellow-600',
-  red: 'bg-red-50 text-red-600',
-} as const
-
 export function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-cream-background">
       <LandingPageNavbar />
       <LandingPageContent />
       <LandingPageFooter />
     </div>
   )
 }
-
 export function LandingPageContent() {
   return (
-    <main className="flex-1">
+    <main>
       <HeroSection />
+      <TrustStrip />
       <ProblemAndAudienceSection />
       <FeaturesAndHowItWorksSection />
-      <HelpMenuSection />
       <PreviewSection />
+      <HelpMenuSection />
     </main>
   )
 }
-
 function HeroSection() {
   return (
-    <section
-      id="home"
-      className="relative w-full overflow-hidden min-h-[calc(100vh-80px)] flex items-center bg-background"
-    >
-      <div className="relative w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-        <div className="mx-auto max-w-3xl space-y-6 text-center sm:space-y-8">
-          <div className="inline-flex items-center gap-3 rounded-full border border-gray-200 bg-white px-5 py-2.5 shadow-sm">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-white">
-              <Check className="h-3.5 w-3.5" strokeWidth={3} />
-            </span>
-            <span className="text-sm sm:text-base font-medium text-gray-900">
-              Secure Identity. Smarter Decisions.
-            </span>
+    <section id="home" className="relative overflow-hidden bg-cream-background">
+      <div className="pointer-events-none absolute -right-32 -top-24 h-80 w-80 rounded-full bg-accent-gold/10 blur-3xl" />
+      <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1.02fr_0.98fr] lg:gap-16 lg:px-10 lg:py-24">
+        <div className="relative z-10">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary-green/20 bg-clean-white px-4 py-2 text-sm font-semibold text-deep-green shadow-sm">
+            <BadgeCheck
+              className="h-4 w-4 text-primary-green"
+              aria-hidden="true"
+            />
+            A secure digital identity wallet for South Africa
           </div>
-
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-[1.1] tracking-tight text-gray-900">
-            Secure Digital Identity for Every{' '}
-            <span className="text-emerald-600">South African</span>
+          <h1 className="max-w-2xl text-4xl font-bold leading-[1.08] tracking-tight text-secure-night sm:text-5xl">
+            Your official identity,
+            <span className="block text-primary-green">
+              ready when you are.
+            </span>
           </h1>
-
-          <div className="mx-auto flex h-1.5 w-56 overflow-hidden rounded-full">
-            <span className="h-full flex-1 bg-emerald-600" />
-            <span className="h-full flex-1 bg-yellow-400" />
-            <span className="h-full flex-1 bg-black" />
-            <span className="h-full flex-1 bg-red-600" />
-            <span className="h-full flex-1 bg-blue-600" />
-          </div>
-
-          <p className="mx-auto max-w-xl text-lg sm:text-xl leading-relaxed text-gray-600">
-            Access, verify and share your official credentials securely with
-            government institutions, employers, universities and businesses.
+          <p className="mt-6 max-w-xl text-lg leading-8 text-muted-text">
+            FlashID helps you securely store, share, and verify supported
+            digital credentials, so identity checks take seconds instead of
+            paperwork.
           </p>
-
-          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Link
               href="/register"
-              className="rounded-full bg-emerald-600 px-8 py-3.5 text-base font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700"
+              className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-primary-green px-6 py-3 text-base font-bold text-clean-white shadow-lg transition hover:bg-deep-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-green focus-visible:ring-offset-2"
             >
-              Get Started
-            </a>
-
-            <a
-              href="#about"
-              className="rounded-full border border-gray-300 px-8 py-3.5 text-base font-semibold text-gray-700 transition-colors hover:border-emerald-600 hover:text-emerald-600"
+              Create your FlashID
+              <ArrowRight
+                className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                aria-hidden="true"
+              />
+            </Link>
+            <Link
+              href="#how-it-works"
+              className="inline-flex min-h-12 items-center justify-center rounded-xl border border-primary-green/30 bg-clean-white px-6 py-3 text-base font-bold text-deep-green transition hover:border-primary-green hover:bg-primary-green/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-green focus-visible:ring-offset-2"
             >
-              Learn More
-            </a>
+              See how it works
+            </Link>
+          </div>
+          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-medium text-muted-text">
+            <span className="inline-flex items-center gap-2">
+              <Check
+                className="h-4 w-4 text-primary-green"
+                aria-hidden="true"
+              />
+              Built around trusted credentials
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <Check
+                className="h-4 w-4 text-primary-green"
+                aria-hidden="true"
+              />
+              Designed for everyday verification
+            </span>
+          </div>
+        </div>
+        <div className="relative">
+          <div className="absolute -inset-5 rounded-[2rem] bg-primary-green/10 blur-2xl" />
+          <div className="relative rounded-[2rem] bg-gradient-to-br from-secure-night via-deep-green to-primary-green p-3 shadow-2xl sm:p-5">
+            <div className="mb-3 flex items-center justify-between px-2 text-clean-white">
+              <div className="flex items-center gap-2 text-sm font-bold">
+                <Smartphone
+                  className="h-4 w-4 text-accent-gold"
+                  aria-hidden="true"
+                />
+                FlashID wallet
+              </div>
+              <span className="rounded-full bg-clean-white/10 px-3 py-1 text-xs text-clean-white/80">
+                Secure preview
+              </span>
+            </div>
+            <div className="relative overflow-hidden rounded-2xl bg-clean-white shadow-xl">
+              <Image
+                src={citizenDashboardPic}
+                alt="FlashID citizen dashboard preview"
+                className="h-auto w-full object-cover"
+                priority
+              />
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-xl border border-clean-white/40 bg-secure-night/90 px-3 py-2 text-xs text-clean-white backdrop-blur-sm">
+                <span className="inline-flex items-center gap-2">
+                  <ShieldCheck
+                    className="h-4 w-4 text-accent-gold"
+                    aria-hidden="true"
+                  />
+                  Credentials protected
+                </span>
+                <span className="text-clean-white/60">FlashID</span>
+              </div>
+            </div>
+          </div>
+          <div className="absolute -bottom-5 -left-3 hidden items-center gap-2 rounded-xl border border-border-grey bg-clean-white px-4 py-3 text-xs font-bold text-deep-green shadow-xl sm:flex">
+            <QrCode className="h-5 w-5 text-primary-green" aria-hidden="true" />
+            Verify in seconds
+          </div>
+          <div className="absolute -right-3 top-16 hidden items-center gap-2 rounded-xl border border-border-grey bg-clean-white px-4 py-3 text-xs font-bold text-deep-green shadow-xl sm:flex">
+            <LockKeyhole
+              className="h-5 w-5 text-accent-gold"
+              aria-hidden="true"
+            />
+            Share selectively
           </div>
         </div>
       </div>
     </section>
   )
 }
-
+function TrustStrip() {
+  const items = [
+    { icon: ShieldCheck, label: 'Secure by design' },
+    { icon: Zap, label: 'Instant verification' },
+    { icon: Fingerprint, label: 'Privacy protected' },
+    { icon: Users, label: 'Built for South Africa' },
+  ]
+  return (
+    <section
+      aria-label="FlashID principles"
+      className="border-y border-border-grey bg-clean-white"
+    >
+      <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-border-grey px-6 sm:grid-cols-4 sm:px-8 lg:px-10">
+        {items.map(({ icon: Icon, label }) => (
+          <div
+            key={label}
+            className="flex min-h-20 items-center justify-center gap-2 px-3 py-4 text-center text-xs font-bold uppercase tracking-wide text-deep-green sm:gap-3 sm:text-sm"
+          >
+            <Icon
+              className="h-5 w-5 flex-shrink-0 text-accent-gold"
+              aria-hidden="true"
+            />
+            <span>{label}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
 function ProblemAndAudienceSection() {
   return (
-    <section id="about" className=" py-12 sm:py-16 bg-background">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center mt-5">
-          <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            Why FlashID?
-          </h2>
-          <p className="mt-4 text-lg leading-relaxed text-gray-600">
-            Today&apos;s identity verification is often slow, repetitive and
-            vulnerable to fraud. FlashID provides a secure digital identity
-            wallet that enables trusted, instant verification while giving
-            citizens full control over their personal information.
+    <section id="about" className="bg-cream-background py-20 sm:py-24">
+      <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-3xl text-center">
+          <Text
+            as="p"
+            variant="label"
+            className="text-sm uppercase tracking-[0.18em]"
+          >
+            Identity, without the friction
+          </Text>
+          <Text as="h2" variant="h2" className="mt-3 text-3xl sm:text-4xl">
+            Make every verification feel simpler.
+          </Text>
+          <p className="mt-5 text-lg leading-8 text-muted-text">
+            Identity checks can be slow, repetitive, and difficult to trust.
+            FlashID brings trusted credentials and controlled sharing into one
+            clear digital experience.
           </p>
         </div>
-
-        <Text as="h2" variant="h2" className="text-center mt-25 text-gray-900">
-          Who is involved?
-        </Text>
-
-        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3 mt-10">
-          {AUDIENCES.map(({ icon: Icon, tone, title, points }) => (
-            <div
-              key={title}
-              className={`rounded-xl border-t-4 bg-white p-6 shadow-sm transition-shadow hover:shadow-md ${TONE_BORDER[tone]}`}
-            >
-              <div
-                className={`mb-3 flex h-11 w-11 items-center justify-center rounded-full ${TONE_ICON_BG[tone]}`}
+        <div className="mt-14 grid gap-5 md:grid-cols-3">
+          {AUDIENCES.map(({ icon: Icon, tone, title, description, points }) => {
+            const styles = TONE_STYLES[tone]
+            return (
+              <article
+                key={title}
+                className={`border border-border-grey border-t-4 ${styles.border} rounded-2xl bg-clean-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg`}
               >
-                <Icon className="h-5 w-5" strokeWidth={2.25} />
-              </div>
-              <Text variant="h3" className="mb-2">
-                {title}
-              </Text>
-              <ul className="space-y-1.5">
-                {points.map((point) => (
-                  <li
-                    key={point}
-                    className="flex items-start gap-2 text-sm text-gray-600"
-                  >
-                    <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600" />
-                    {point}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+                <div
+                  className={`mb-5 flex h-12 w-12 items-center justify-center rounded-xl ${styles.icon}`}
+                >
+                  <Icon
+                    className="h-6 w-6"
+                    strokeWidth={2.1}
+                    aria-hidden="true"
+                  />
+                </div>
+                <Text as="h3" variant="h3" className="text-xl">
+                  {title}
+                </Text>
+                <p className="mt-3 min-h-14 text-sm leading-6 text-muted-text">
+                  {description}
+                </p>
+                <ul className="mt-5 space-y-3 border-t border-border-grey pt-5">
+                  {points.map((point) => (
+                    <li
+                      key={point}
+                      className="flex items-start gap-2 text-sm text-text-primary"
+                    >
+                      <Check
+                        className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-green"
+                        aria-hidden="true"
+                      />
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            )
+          })}
         </div>
       </div>
     </section>
   )
 }
-
 function FeaturesAndHowItWorksSection() {
   return (
-    <section
-      id="features&how-it-works"
-      className="py-12 sm:py-16 bg-background"
-    >
-      <div className="mx-auto px-4 sm:px-6 lg:px-8">
-        <Text variant="h2" as="h2" className="mb-12 text-center sm:text-4xl">
-          Features & How It Works
-        </Text>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl border-2 border-emerald-600 bg-white p-6">
-            <Text variant="h2" as="h2" className="mb-4 text-xl">
-              Features
-            </Text>
-            <ul className="divide-y divide-gray-100">
-              {FEATURES.map(({ icon: Icon, title, description }) => (
-                <li
-                  key={title}
-                  className="flex items-start gap-3 py-3 first:pt-0 last:pb-0"
+    <section id="features" className="bg-clean-white py-20 sm:py-24">
+      <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-3xl text-center">
+          <Text
+            as="p"
+            variant="label"
+            className="text-sm uppercase tracking-[0.18em]"
+          >
+            One wallet, clearer control
+          </Text>
+          <Text as="h2" variant="h2" className="mt-3 text-3xl sm:text-4xl">
+            Everything you need to prove who you are.
+          </Text>
+        </div>
+        <div className="mt-14 grid gap-8 lg:grid-cols-[1.12fr_0.88fr]">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {FEATURES.map(({ icon: Icon, title, description }) => (
+              <article
+                key={title}
+                className="rounded-2xl border border-border-grey bg-cream-background p-5 transition hover:border-primary-green/40 hover:bg-clean-white hover:shadow-md"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-green/10 text-primary-green">
+                  <Icon
+                    className="h-5 w-5"
+                    strokeWidth={2.1}
+                    aria-hidden="true"
+                  />
+                </div>
+                <Text as="h3" variant="h4" className="mt-4 text-lg">
+                  {title}
+                </Text>
+                <p className="mt-2 text-sm leading-6 text-muted-text">
+                  {description}
+                </p>
+              </article>
+            ))}
+          </div>
+          <div
+            id="how-it-works"
+            className="scroll-mt-28 rounded-3xl bg-deep-green p-6 text-clean-white shadow-xl sm:p-8"
+          >
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-accent-gold text-deep-green">
+                <QrCode className="h-6 w-6" aria-hidden="true" />
+              </div>
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.16em] text-accent-gold">
+                  How it works
+                </p>
+                <h3 className="mt-2 text-2xl font-bold tracking-tight">
+                  A simpler path from credential to verification.
+                </h3>
+              </div>
+            </div>
+            <div className="mt-8 space-y-6">
+              {HOW_IT_WORKS.map((step, index) => (
+                <div
+                  key={`${step.actor}-${step.action}`}
+                  className="relative flex gap-4"
                 >
-                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
-                    <Icon className="h-4 w-4" strokeWidth={2.25} />
+                  {index < HOW_IT_WORKS.length - 1 && (
+                    <div className="absolute left-5 top-11 h-[calc(100%+0.25rem)] w-px bg-clean-white/20" />
+                  )}
+                  <div className="relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary-green text-sm font-bold text-clean-white ring-4 ring-deep-green">
+                    {index + 1}
                   </div>
-                  <div>
-                    <Text variant="h4" as="h3">
-                      {title}
-                    </Text>
-                    <p className="mt-0.5 text-xs leading-relaxed text-gray-600">
-                      {description}
+                  <div className="pt-1">
+                    <p className="font-bold text-clean-white">{step.actor}</p>
+                    <p className="mt-1 text-sm leading-6 text-clean-white/70">
+                      {step.action}
                     </p>
                   </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-8 border-t border-clean-white/15 pt-6">
+              <p className="text-sm leading-6 text-clean-white/75">
+                You stay in control of what is shared at every step.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+function PreviewSection() {
+  const [featuredScreen, setFeaturedScreen] = useState({
+    label: 'Citizen dashboard',
+    description: 'Your identity overview at a glance.',
+    src: citizenDashboardPic,
+    accent: 'bg-primary-green',
+    accentText: 'text-primary-green',
+  })
+  const [supportingScreens, setSupportingScreens] = useState([
+    {
+      label: 'Manage your account',
+      description: 'Control your account details and trusted devices.',
+      src: manageUserAccountPic,
+      accent: 'bg-national-blue',
+      accentText: 'text-national-blue',
+    },
+    {
+      label: 'View your credentials',
+      description: 'Keep your supported credentials organised.',
+      src: credentialWalletPic,
+      accent: 'bg-accent-gold',
+      accentText: 'text-deep-green',
+    },
+    {
+      label: 'Verify your identity',
+      description: 'Complete trusted verification when you need it.',
+      src: verifyIdentityPic,
+      accent: 'bg-national-red',
+      accentText: 'text-national-red',
+    },
+  ])
+  const swapPreview = (
+    selectedScreen: (typeof supportingScreens)[number],
+    selectedIndex: number
+  ) => {
+    const previousFeaturedScreen = featuredScreen
+    setFeaturedScreen(selectedScreen)
+    setSupportingScreens((currentScreens) =>
+      currentScreens.map((screen, index) =>
+        index === selectedIndex ? previousFeaturedScreen : screen
+      )
+    )
+  }
+  return (
+    <section id="preview" className="bg-cream-background py-20 sm:py-24">
+      <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-3xl text-center">
+          <Text
+            as="p"
+            variant="label"
+            className="text-sm uppercase tracking-[0.18em] text-primary-green"
+          >
+            A clear experience
+          </Text>
+          <Text as="h2" variant="h2" className="mt-3 text-3xl sm:text-4xl">
+            Designed to make trusted identity feel easy.
+          </Text>
+          <p className="mt-5 text-lg leading-8 text-muted-text">
+            From your dashboard to your credential wallet, FlashID keeps
+            important identity actions visible, understandable, and close at
+            hand.
+          </p>
+        </div>
+        <div className="relative mt-12">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-5 -top-5 hidden h-20 w-20 rounded-tr-3xl border-r-2 border-t-2 border-accent-gold/60 sm:block"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-5 -left-5 hidden h-20 w-20 rounded-bl-3xl border-b-2 border-l-2 border-national-blue/40 sm:block"
+          />
+          <div className="relative rounded-3xl border-2 border-deep-green/20 bg-clean-white p-3 shadow-xl sm:p-5">
+            <div className="mb-4 flex flex-col gap-3 px-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <span
+                  aria-hidden="true"
+                  className={`mt-1.5 h-3 w-3 flex-shrink-0 rounded-full ${featuredScreen.accent} ring-4 ring-cream-background`}
+                />
+                <div>
+                  <p className="text-sm font-bold text-deep-green">
+                    {featuredScreen.label}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-text">
+                    {featuredScreen.description}
+                  </p>
+                </div>
+              </div>
+              <span className="self-start rounded-full bg-cream-background px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-primary-green sm:self-auto">
+                Featured view
+              </span>
+            </div>
+            <div className="relative aspect-[16/9] overflow-hidden rounded-2xl border-2 border-deep-green/15 bg-cream-background">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-3 rounded-xl border border-clean-white/80"
+              />
+              <Image
+                src={featuredScreen.src}
+                alt={`${featuredScreen.label} preview`}
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 1200px"
+                className="object-contain p-3 sm:p-5"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="mt-6 grid gap-5 md:grid-cols-3">
+          {supportingScreens.map((screen, index) => (
+            <button
+              key={screen.label}
+              type="button"
+              onClick={() => swapPreview(screen, index)}
+              aria-label={`Show ${screen.label} in the large preview`}
+              className="group relative overflow-hidden rounded-2xl border-2 border-deep-green/20 bg-clean-white text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:border-deep-green hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-green focus-visible:ring-offset-2"
+            >
+              <div className="relative aspect-[16/9] overflow-hidden bg-cream-background">
+                <Image
+                  src={screen.src}
+                  alt={`${screen.label} preview`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-contain p-3 transition duration-500 group-hover:scale-[1.04] sm:p-4"
+                />
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 bg-gradient-to-br from-clean-white/10 via-transparent to-deep-green/10"
+                />
+                <div
+                  aria-hidden="true"
+                  className={`absolute bottom-3 right-3 h-3 w-3 rounded-full ${screen.accent} opacity-80 shadow-sm ring-4 ring-clean-white/80`}
+                />
+              </div>
+              <div className="border-t border-border-grey p-5">
+                <div className="flex items-center gap-2">
+                  <span
+                    aria-hidden="true"
+                    className={`h-2 w-2 rounded-full ${screen.accent}`}
+                  />
+                  <p
+                    className={`text-[0.68rem] font-bold uppercase tracking-[0.14em] ${screen.accentText}`}
+                  >
+                    Explore view
+                  </p>
+                </div>
+                <h3 className="mt-3 font-bold text-deep-green">
+                  {screen.label}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-muted-text">
+                  {screen.description}
+                </p>
+                <span className="mt-4 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-primary-green transition group-hover:text-deep-green">
+                  View preview
+                  <ArrowRight
+                    className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1"
+                    aria-hidden="true"
+                  />
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+        <div className="mt-8 text-center">
+          <Link
+            href="/register"
+            className="group inline-flex items-center gap-2 font-bold text-primary-green transition hover:text-deep-green"
+          >
+            Explore FlashID
+            <ArrowRight
+              className="h-4 w-4 transition-transform group-hover:translate-x-1"
+              aria-hidden="true"
+            />
+          </Link>
+        </div>
+        <div className="mt-16 rounded-3xl border-2 border-primary-green/30 bg-deep-green p-6 text-clean-white shadow-lg sm:p-8">
+          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+            <div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-gold text-deep-green shadow-sm">
+                <ShieldCheck className="h-6 w-6" aria-hidden="true" />
+              </div>
+              <h3 className="mt-5 text-2xl font-bold">
+                Security that supports confidence.
+              </h3>
+              <p className="mt-3 max-w-md text-sm leading-6 text-clean-white/70">
+                FlashID is designed around verified credentials, controlled
+                sharing, and protection for the devices you trust.
+              </p>
+            </div>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {SECURITY_POINTS.map((point) => (
+                <li
+                  key={point}
+                  // stronger border and fill so pills separate from the card
+                  className="flex items-center gap-3 rounded-xl border border-clean-white/25 bg-clean-white/10 px-4 py-3 text-sm font-medium text-clean-white shadow-sm transition hover:border-accent-gold/60 hover:bg-clean-white/15"
+                >
+                  {/* gold on green is readable; national-blue was nearly invisible */}
+                  <Check
+                    className="h-4 w-4 flex-shrink-0 text-accent-gold"
+                    aria-hidden="true"
+                  />
+                  {point}
                 </li>
               ))}
             </ul>
           </div>
-
-          <div className="flex flex-col gap-6">
-            <div className="rounded-2xl border-2 border-emerald-600 bg-white p-6">
-              <Text variant="h2" as="h2" className="mb-4 text-xl">
-                How FlashID Works
-              </Text>
-              <div>
-                {HOW_IT_WORKS.map((step, i) => (
-                  <div
-                    key={i}
-                    className="relative flex items-start gap-3 pb-5 last:pb-0"
-                  >
-                    {i < HOW_IT_WORKS.length - 1 && (
-                      <div className="absolute left-4 top-8 h-full w-px bg-emerald-200" />
-                    )}
-                    <div className="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white ring-4 ring-white">
-                      {i + 1}
-                    </div>
-                    <div className="pt-1">
-                      <p className="text-sm font-semibold text-gray-900">
-                        {step.actor}
-                      </p>
-                      <p className="text-xs text-gray-600">{step.action}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border-2 border-emerald-600 bg-white p-6">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
-                  <Shield className="h-4 w-4" />
-                </div>
-                <Text variant="h2" as="h2" className="mb-4 text-xl">
-                  Security You Can Trust
-                </Text>
-              </div>
-
-              <ul className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                {SECURITY_POINTS.map((point) => (
-                  <li key={point} className="flex items-center gap-2.5">
-                    <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white">
-                      <Check className="h-3 w-3" strokeWidth={3} />
-                    </span>
-                    <span className="text-sm text-gray-700">{point}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function PreviewSection() {
-  return (
-    <section id="preview" className="py-16 sm:py-24 bg-background">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto mb-12 max-w-2xl text-center">
-          <Text
-            variant="h2"
-            as="h2"
-            className="mb-4 text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900"
-          >
-            Application Preview
-          </Text>
-        </div>
-
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-          {screens.map(({ label, src }) => (
-            <div key={label} className="space-y-3">
-              <div className="relative aspect-video overflow-hidden rounded-2xl border-2 border-emerald-600 bg-white shadow-sm">
-                <Image src={src} alt={label} fill className="object-cover" />
-              </div>
-              <p className="text-center text-sm font-medium text-gray-700">
-                {label}
-              </p>
-            </div>
-          ))}
         </div>
       </div>
     </section>
