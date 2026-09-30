@@ -1,0 +1,280 @@
+web/src/services/index.ts
+  h_712d174fc3f309 7
+web/src/config/page-headers/page-headers.ts
+  h_712d174fc3f309 12-16,92-96
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/ICertifiedCopyCryptographyProvider.cs
+  h_712d174fc3f309 1-18
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/ICertifiedCopyPdfProvider.cs
+  h_712d174fc3f309 1-9
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/ICertifiedCredentialCopyRepository.cs
+  h_712d174fc3f309 1-11
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/ICertifiedCredentialCopyService.cs
+  h_712d174fc3f309 1-22
+backend/FlashIdBackend/Application/Common/Mapping/CertifiedCredentialSnapshotMapper.cs
+  h_712d174fc3f309 1-97
+backend/FlashIdBackend/Application/Common/Services/CertifiedCredentialCopyService.cs
+  h_712d174fc3f309 1-518
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_712d174fc3f309 55-57
+backend/FlashIdBackend/Application/Features/CertifiedCredentialCopies/DTOs/GenerateCertifiedCopyRequestDto.cs
+  h_712d174fc3f309 1-10
+backend/FlashIdBackend/Application/Features/CertifiedCredentialCopies/DTOs/GeneratedCertifiedCopyResultDto.cs
+  h_712d174fc3f309 1-9
+backend/FlashIdBackend/Application/Features/CertifiedCredentialCopies/DTOs/VerifyCertifiedCopyDocumentResponseDto.cs
+  h_712d174fc3f309 1-24
+backend/FlashIdBackend/Application/Features/CertifiedCredentialCopies/DTOs/VerifyCertifiedCopyResponseDto.cs
+  h_712d174fc3f309 1-28
+backend/FlashIdBackend/Application/Features/CertifiedCredentialCopies/Models/CertifiedCredentialSnapshot.cs
+  h_712d174fc3f309 1-24
+backend/FlashIdBackend/Domain/Entities/CertifiedCredentialCopy.cs
+  h_712d174fc3f309 1-18
+backend/FlashIdBackend/Domain/Enums/CertifiedCopyStatus.cs
+  h_712d174fc3f309 1-8
+backend/FlashIdBackend/Infrastructure/Data/AppDbContext.cs
+  h_712d174fc3f309 42
+backend/FlashIdBackend/Infrastructure/Data/Configurations/CertifiedCredentialCopyConfiguration.cs
+  h_712d174fc3f309 1-26
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_712d174fc3f309 179-182
+backend/FlashIdBackend/Infrastructure/Infrastructure.csproj
+  h_712d174fc3f309 29-30
+"backend/FlashIdBackend/Infrastructure/Migrations/20260913200523_Certified Credential Copy Table Added.Designer.cs"
+  h_712d174fc3f309 1-1483
+"backend/FlashIdBackend/Infrastructure/Migrations/20260913200523_Certified Credential Copy Table Added.cs"
+  h_712d174fc3f309 1-63
+"backend/FlashIdBackend/Infrastructure/Migrations/20260921084400_Updated CertifiedCopies Entity to have Document Hash.Designer.cs"
+  h_712d174fc3f309 1-1488
+"backend/FlashIdBackend/Infrastructure/Migrations/20260921084400_Updated CertifiedCopies Entity to have Document Hash.cs"
+  h_712d174fc3f309 1-30
+backend/FlashIdBackend/Infrastructure/Migrations/20260929222705_AddCertifiedCopyDocumentHashIndex.Designer.cs
+  h_712d174fc3f309 1-2113
+backend/FlashIdBackend/Infrastructure/Migrations/20260929222705_AddCertifiedCopyDocumentHashIndex.cs
+  h_712d174fc3f309 1-27
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_712d174fc3f309 119-173,1758-1768
+backend/FlashIdBackend/Infrastructure/Providers/CertifiedCopyCryptographyProvider.cs
+  h_712d174fc3f309 1-137
+backend/FlashIdBackend/Infrastructure/Providers/CertifiedCopyPdfProvider.cs
+  h_712d174fc3f309 1-473
+backend/FlashIdBackend/Infrastructure/Repositories/CertifiedCredentialCopyRepository.cs
+  h_712d174fc3f309 1-57
+backend/FlashIdBackend/Presentation/Controllers/CertifiedCredentialCopiesController.cs
+  h_712d174fc3f309 1-219
+backend/FlashIdBackend/Presentation/Presentation.csproj
+  h_712d174fc3f309 23-28
+backend/FlashIdBackend/Presentation/Program.cs
+  h_712d174fc3f309 20,37-38,54-55,187
+backend/FlashIdBackend/tests/CertifiedCopyCryptographyProviderTests.cs
+  h_712d174fc3f309 1-169
+backend/FlashIdBackend/tests/CertifiedCredentialCopyServiceTests.cs
+  h_712d174fc3f309 1-630
+docs/demo4/SAS-v4.md
+  h_712d174fc3f309 34,1402-1575
+mobile/package.json
+  h_712d174fc3f309 26,32
+mobile/src/components/atoms/skeleton/skeleton.tsx
+  h_712d174fc3f309 7,11
+mobile/src/components/atoms/skeleton/test/skeleton.test.tsx
+  h_712d174fc3f309 1-16
+mobile/src/components/atoms/skeleton/types.ts
+  h_712d174fc3f309 1-2,5
+mobile/src/components/molecules/credential-card/credential-card.tsx
+  h_712d174fc3f309 1,4,7-20,24-25,30-53,55-68,71-102,104-106
+mobile/src/components/molecules/credential-card/test/credential-card.test.tsx
+  h_712d174fc3f309 2-3,5-9,12-14,18-24,26-34,39,43-48,55,62-142
+mobile/src/components/molecules/credential-card/types.ts
+  h_712d174fc3f309 1,5-6,11-18
+mobile/src/components/organisms/credential-list/credential-list.tsx
+  h_712d174fc3f309 1-2,6,8,10-13,15-16,18-41
+mobile/src/components/organisms/credential-list/index.ts
+  h_712d174fc3f309 1
+mobile/src/components/organisms/credential-list/test/credential-list.test.tsx
+  h_712d174fc3f309 2,7-10,12-16,23,26,29-36,38-46,49,51,54-56,59-60,62,64,66-67,70,72,74-76,78-82,84-93,95-100
+mobile/src/components/organisms/credential-list/types.ts
+  h_712d174fc3f309 3
+mobile/src/components/organisms/index.ts
+  h_712d174fc3f309 7
+mobile/src/components/pages/citizen-wallet/citizen-wallet-page.tsx
+  h_712d174fc3f309 1,6-9,15-16,22,26,29-48,56,61-70,86
+mobile/src/components/pages/citizen-wallet/test/citizen-wallet-page.test.tsx
+  h_712d174fc3f309 1-226
+mobile/src/components/pages/credential-detail/credential-detail-page.tsx
+  h_712d174fc3f309 3-4,9-14,32,53-83,122-130
+mobile/src/components/pages/credential-detail/test/credential-detail-page.test.tsx
+  h_712d174fc3f309 1-230
+mobile/src/hooks/index.ts
+  h_712d174fc3f309 7
+mobile/src/hooks/test/use-certified-copy.test.tsx
+  h_712d174fc3f309 1-110
+mobile/src/hooks/use-certified-copy.ts
+  h_712d174fc3f309 1-30
+mobile/src/lib/pdf-file.ts
+  h_712d174fc3f309 1-57
+mobile/src/lib/test/pdf-file.test.ts
+  h_712d174fc3f309 1-198
+mobile/src/services/certified-copy-service/certified-copy-dto.ts
+  h_712d174fc3f309 1-28
+mobile/src/services/certified-copy-service/certified-copy-errors.ts
+  h_712d174fc3f309 1-16
+mobile/src/services/certified-copy-service/certified-copy-service.ts
+  h_712d174fc3f309 1-32
+mobile/src/services/certified-copy-service/certified-copy-urls.ts
+  h_712d174fc3f309 1-6
+mobile/src/services/certified-copy-service/index.ts
+  h_712d174fc3f309 1-8
+mobile/src/services/certified-copy-service/test/certified-copy-dto.test.ts
+  h_712d174fc3f309 1-47
+mobile/src/services/certified-copy-service/test/certified-copy-service.test.ts
+  h_712d174fc3f309 1-118
+mobile/src/services/certified-copy-service/types.ts
+  h_712d174fc3f309 1-10
+mobile/src/services/index.ts
+  h_712d174fc3f309 8
+pnpm-lock.yaml
+  h_712d174fc3f309 72-74,90-92,536-541,572-575,670-675,1073-1075,1082-1084,1187-1194,4536-4540,4624-4630,8282,8298,8301-8303,8331,8345,8376,8401-8409,8421,8441-8442,8535-8539,8829-8831,9077-9095,9117-9118,9346-9355,13057,13114,13164,13546-13549,13657-13668
+web/src/app/(portal)/officials/verify-document/page.tsx
+  h_712d174fc3f309 1-5
+web/src/app/globals.css
+  h_712d174fc3f309 110-128
+web/src/app/verify-certified-copy/[verificationToken]/page.tsx
+  h_712d174fc3f309 1-14
+web/src/components/molecules/authentic-result/authentic-result.tsx
+  h_712d174fc3f309 1-112
+web/src/components/molecules/authentic-result/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/authentic-result/types.ts
+  h_712d174fc3f309 1-6
+web/src/components/molecules/certified-copy-generated/certified-copy-generated.tsx
+  h_712d174fc3f309 1-92
+web/src/components/molecules/certified-copy-generated/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/certified-copy-generated/test/certified-copy-generated.test.tsx
+  h_712d174fc3f309 1-70
+web/src/components/molecules/certified-copy-generated/types.ts
+  h_712d174fc3f309 1-9
+web/src/components/molecules/certified-copy-verification-progress/certified-copy-verification-progress.tsx
+  h_712d174fc3f309 1-98
+web/src/components/molecules/certified-copy-verification-progress/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/certified-copy-verification-progress/test/certified-copy-verification-progress.test.tsx
+  h_712d174fc3f309 1-51
+web/src/components/molecules/certified-copy-verification-progress/types.ts
+  h_712d174fc3f309 1-3
+web/src/components/molecules/certified-copy-verification/certified-copy-verification.tsx
+  h_712d174fc3f309 1-31
+web/src/components/molecules/certified-copy-verification/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/certified-copy-verification/test/certified-copy-verification.test.tsx
+  h_712d174fc3f309 1-159
+web/src/components/molecules/certified-copy-verification/types.ts
+  h_712d174fc3f309 1-12
+web/src/components/molecules/certified-credential-card/certified-credential-card.tsx
+  h_712d174fc3f309 1-109
+web/src/components/molecules/certified-credential-card/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/certified-credential-card/test/certified-credential-card.test.tsx
+  h_712d174fc3f309 1-67
+web/src/components/molecules/certified-credential-card/types.ts
+  h_712d174fc3f309 1-6
+web/src/components/molecules/credential-detail-card/credential-detial-card.tsx
+  h_712d174fc3f309 3,12,16,36-37,55-59,61,92-96,98-103,105,117,129-136
+web/src/components/molecules/credential-detail-card/test/credential-detail-card.test.tsx
+  h_712d174fc3f309 91-97,103,115,122-123,129-144,148,165,190
+web/src/components/molecules/credential-detail-card/types.ts
+  h_712d174fc3f309 1,4
+web/src/components/molecules/gen-copy-progress/gen-copy-progress.tsx
+  h_712d174fc3f309 1-109
+web/src/components/molecules/gen-copy-progress/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/gen-copy-progress/test/gen-copy-progress.test.tsx
+  h_712d174fc3f309 1-43
+web/src/components/molecules/gen-copy-progress/types.ts
+  h_712d174fc3f309 1-3
+web/src/components/molecules/index.ts
+  h_712d174fc3f309 31-34
+web/src/components/molecules/integrity-failed-result/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/integrity-failed-result/integrity-failed-result.tsx
+  h_712d174fc3f309 1-49
+web/src/components/molecules/integrity-failed-result/types.ts
+  h_712d174fc3f309 1-4
+web/src/components/molecules/quick-action-card/quick-action-card.tsx
+  h_712d174fc3f309 48-83,85
+web/src/components/molecules/update-email-modal/test/update-email-modal.test.tsx
+  h_712d174fc3f309 25-26
+web/src/components/molecules/update-password-modal/test/update-password-modal.test.tsx
+  h_712d174fc3f309 12
+web/src/components/molecules/verification-check/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/molecules/verification-check/types.ts
+  h_712d174fc3f309 1-6
+web/src/components/molecules/verification-check/verification-check.tsx
+  h_712d174fc3f309 1-47
+web/src/components/organisms/app-sidebar/app-sidebar.tsx
+  h_712d174fc3f309 18,43
+web/src/components/organisms/credential-details-modal/test/credential-details-modal.test.tsx
+  h_712d174fc3f309 1
+web/src/components/organisms/invalid-certified-copy/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/organisms/invalid-certified-copy/invalid-certified-copy.tsx
+  h_712d174fc3f309 1-59
+web/src/components/organisms/invalid-certified-copy/test/invalid-certified-copy.test.tsx
+  h_712d174fc3f309 1-33
+web/src/components/organisms/invalid-certified-copy/types.ts
+  h_712d174fc3f309 1
+web/src/components/organisms/public-certified-copy-frame/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/organisms/public-certified-copy-frame/public-certified-copy-frame.tsx
+  h_712d174fc3f309 1-58
+web/src/components/organisms/public-certified-copy-frame/test/public-certified-copy-frame.test.tsx
+  h_712d174fc3f309 1-45
+web/src/components/organisms/public-certified-copy-frame/types.ts
+  h_712d174fc3f309 1-4
+web/src/components/organisms/valid-certified-copy/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/organisms/valid-certified-copy/test/valid-certified-copy.test.tsx
+  h_712d174fc3f309 1-52
+web/src/components/organisms/valid-certified-copy/types.ts
+  h_712d174fc3f309 1-11
+web/src/components/organisms/valid-certified-copy/valid-certified-copy.tsx
+  h_712d174fc3f309 1-89
+web/src/components/pages/citizen/my-credentials-page.tsx
+  h_712d174fc3f309 2-3,6-11,15,17,19,24-28,34-80,102,104-108,110-131,135-142,147-158
+web/src/components/pages/officials/verify-certified-copy-page.tsx
+  h_712d174fc3f309 1-280
+web/src/components/pages/verify-certified-copy/index.ts
+  h_712d174fc3f309 1-2
+web/src/components/pages/verify-certified-copy/test/verify-certified-copy-page.test.tsx
+  h_712d174fc3f309 1-70
+web/src/components/pages/verify-certified-copy/types.ts
+  h_712d174fc3f309 1-3
+web/src/components/pages/verify-certified-copy/verify-certified-copy.tsx
+  h_712d174fc3f309 1-23
+web/src/config/navigation/navigation.ts
+  h_712d174fc3f309 103,106-108
+web/src/lib/api.ts
+  h_712d174fc3f309 4
+web/src/services/certified-copy-service/certified-copy-service.ts
+  h_712d174fc3f309 1-65
+web/src/services/certified-copy-service/certified-copy-urls.ts
+  h_712d174fc3f309 1-8
+web/src/services/certified-copy-service/index.ts
+  h_712d174fc3f309 1-2
+web/src/services/certified-copy-service/tests/certified-copy-service.test.ts
+  h_712d174fc3f309 1-130
+web/src/services/certified-copy-service/types.ts
+  h_712d174fc3f309 1-41
+web/src/types/navigation.ts
+  h_712d174fc3f309 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "7a4055991751715088ac5927c9122abe8dee6b12",
+  "prompts": {},
+  "humans": {
+    "h_712d174fc3f309": {
+      "author": "Ryan-Liao-Code <u24573699@tuks.co.za>"
+    }
+  }
+}

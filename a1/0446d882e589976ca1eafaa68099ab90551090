@@ -1,0 +1,20 @@
+backend/FlashIdBackend/Infrastructure/Data/Configurations/CertifiedCredentialCopyConfiguration.cs
+  h_293a8616118f65 21
+backend/FlashIdBackend/Infrastructure/Migrations/20260929222705_AddCertifiedCopyDocumentHashIndex.Designer.cs
+  h_293a8616118f65 1-2113
+backend/FlashIdBackend/Infrastructure/Migrations/20260929222705_AddCertifiedCopyDocumentHashIndex.cs
+  h_293a8616118f65 1-27
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_293a8616118f65 166-167
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a10446d882e589976ca1eafaa68099ab90551090",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+backend/FlashIdBackend/Presentation/Program.cs
+  h_293a8616118f65 186
+backend/FlashIdBackend/Presentation/Controllers/CertifiedCredentialCopiesController.cs
+  h_293a8616118f65 9,84,104,161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "60484a99ab6647839cd87e91681b2845682a20cf",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
