@@ -69,8 +69,6 @@ export const AppTopBar = ({
               </p>
             )}
           </div>
-
-          <ChevronDown className="h-4 w-4 text-muted-text" />
         </button>
       </div>
     </header>

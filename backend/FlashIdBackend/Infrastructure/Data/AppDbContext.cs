@@ -39,6 +39,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<EmergencyAccess> EmergencyAccesses => Set<EmergencyAccess>();
     public DbSet<RetiredEmergencyRevocationIndex> RetiredEmergencyRevocationIndexes => Set<RetiredEmergencyRevocationIndex>();
 
+    public DbSet<CertifiedCredentialCopy> CertifiedCredentialCopies => Set<CertifiedCredentialCopy>();
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
