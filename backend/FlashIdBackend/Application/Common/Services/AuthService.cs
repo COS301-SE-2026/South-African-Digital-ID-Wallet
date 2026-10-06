@@ -29,6 +29,7 @@ public class AuthService : IAuthService
     private readonly IHostEnvironment _environment;
     private readonly IIpGeolocationProvider _ipGeolocationProvider;
     private readonly ILogger<AuthService> _logger;
+    private readonly IRefreshTokenService _refreshTokenService;
 
     public AuthService(
         IAuthRepository authRepository,
@@ -41,7 +42,8 @@ public class AuthService : IAuthService
         IEmailSenderProvider emailSenderProvider,
             IHostEnvironment environment,
         IIpGeolocationProvider ipGeolocationProvider,
-        ILogger<AuthService> logger)
+        ILogger<AuthService> logger,
+        IRefreshTokenService refreshTokenService)
     {
         _authRepository = authRepository;
         _jwtTokenProvider = jwtTokenProvider;
@@ -54,6 +56,7 @@ public class AuthService : IAuthService
         _environment = environment;
         _ipGeolocationProvider = ipGeolocationProvider;
         _logger = logger;
+        _refreshTokenService = refreshTokenService;
 
     }
 
@@ -160,6 +163,7 @@ public class AuthService : IAuthService
         await _authRepository.SaveChangesAsync();
 
         var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user, request.RememberMe);
+        var refreshToken = await _refreshTokenService.IssueAsync(user, request.RememberMe, cancellationToken);
 
         var citizen = await _authRepository.GetCitizenByUserIdAsync(user.Id);
 
@@ -167,6 +171,8 @@ public class AuthService : IAuthService
         {
             Token = token,
             ExpiresAt = expiresAt,
+            RefreshToken = refreshToken.Token,
+            RefreshTokenExpiresAt = refreshToken.ExpiresAt,
             UserId = user.Id,
             Role = user.Role.ToString(),
             Names = citizen?.Names,
@@ -325,11 +331,14 @@ public class AuthService : IAuthService
         await _authRepository.SaveChangesAsync();
 
         var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user, request.RememberMe);
+        var refreshToken = await _refreshTokenService.IssueAsync(user, request.RememberMe, cancellationToken);
 
         return new LoginResponseDto()
         {
             Token = token,
             ExpiresAt = expiresAt,
+            RefreshToken = refreshToken.Token,
+            RefreshTokenExpiresAt = refreshToken.ExpiresAt,
             UserId = user.Id,
             Role = user.Role.ToString(),
 
@@ -552,7 +561,6 @@ public class AuthService : IAuthService
 
         if (user != null)
         {
-            user.TokenVersion++;
             var auditLog = new AuditLog
             {
                 Id = Guid.NewGuid(),

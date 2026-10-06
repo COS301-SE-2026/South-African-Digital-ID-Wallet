@@ -182,6 +182,7 @@ builder.Services.AddRateLimiter(options =>
     AddIpPartitionedPolicy(options, "resend-otp", permitLimit: 3, window: oneMinute);
     AddIpPartitionedPolicy(options, "verify-email", permitLimit: 5, window: oneMinute);
     AddIpPartitionedPolicy(options, "login", permitLimit: 10, window: oneMinute);
+    AddIpPartitionedPolicy(options, "refresh", permitLimit: 60, window: oneMinute);
     AddIpPartitionedPolicy(options, "verify-device", permitLimit: 5, window: oneMinute);
     AddIpPartitionedPolicy(options, "password-reset", permitLimit: 5, window: oneMinute);
     AddIpPartitionedPolicy(options, "certified-copy-verify", permitLimit: 10, window: oneMinute);

@@ -24,7 +24,8 @@ public class JwtTokenProvider : IJwtTokenProvider
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expiresAt = rememberMe ? DateTime.UtcNow.AddDays(30) : DateTime.UtcNow.AddHours(8);
+        var accessTokenMinutes = _configuration.GetValue("Jwt:AccessTokenMinutes", 15);
+        var expiresAt = DateTime.UtcNow.AddMinutes(accessTokenMinutes);
 
         var claims = new[]
         {

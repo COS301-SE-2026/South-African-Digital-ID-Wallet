@@ -201,7 +201,7 @@ public class AuthServiceTests
         var fakeDeviceTokenProvider = new FakeDeviceTokenProvider();
         var mapper = new AuthMapper();
         var fakeIpGeolocationProvider = new IpGeolocationProvider();
-        return new AuthService(fakeAuthRepository, fakeJwtTokenProvider, fakePasswordHasher, null!, mapper, fakeTrustedDeviceRepository, fakeDeviceTokenProvider, fakeEmailSenderProvider, fakeHostEnvironment, fakeIpGeolocationProvider, NullLogger<AuthService>.Instance);
+        return new AuthService(fakeAuthRepository, fakeJwtTokenProvider, fakePasswordHasher, null!, mapper, fakeTrustedDeviceRepository, fakeDeviceTokenProvider, fakeEmailSenderProvider, fakeHostEnvironment, fakeIpGeolocationProvider, NullLogger<AuthService>.Instance, new FakeRefreshTokenService());
     }
 
     [Fact]

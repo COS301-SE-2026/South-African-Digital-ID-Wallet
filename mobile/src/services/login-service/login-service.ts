@@ -24,7 +24,11 @@ const verifyDevice = (request: VerifyDeviceRequest) =>
     .post(loginUrls.verifyDevice(), verifyDeviceDto(request))
     .then((res: AxiosResponse<LoginResponse>) => res.data)
 
-const logout = () => api.post(loginUrls.logout()).then((res) => res.data)
+const logout = (refreshToken?: string | null) =>
+  (refreshToken
+    ? api.post(loginUrls.logout(), { refreshToken })
+    : api.post(loginUrls.logout())
+  ).then((res) => res.data)
 
 const forgotPassword = async (email: string): Promise<void> => {
   await api.post(loginUrls.forgotPassword(), { email: email.trim() })

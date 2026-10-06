@@ -179,3 +179,53 @@ describe('useAuthStore.restore', () => {
     expect(offlineService.clearOfflineData).not.toHaveBeenCalled()
   })
 })
+
+describe('useAuthStore refresh tokens', () => {
+  beforeEach(() => {
+    useAuthStore.setState(pristine, true)
+    jest.clearAllMocks()
+    ;(getBiometricPreference as jest.Mock).mockResolvedValue(true)
+  })
+  it('Should keep the refresh token from sign in', () => {
+    useAuthStore.getState().signIn({
+      ...session,
+      refreshToken: 'refresh-1',
+      refreshTokenExpiresAt: '2099-01-01T00:00:00Z',
+    })
+    expect(useAuthStore.getState()).toMatchObject({
+      refreshToken: 'refresh-1',
+      refreshTokenExpiresAt: '2099-01-01T00:00:00Z',
+    })
+  })
+  it('Should resume a session whose access token expired while the refresh token is live', async () => {
+    ;(loadSession as jest.Mock).mockResolvedValue({
+      expiresAt: '2020-01-01T00:00:00Z',
+      refreshToken: 'refresh-1',
+      refreshTokenExpiresAt: '2099-01-01T00:00:00Z',
+      token: 'expired-jwt',
+      user: session,
+    })
+    await useAuthStore.getState().restore()
+    expect(useAuthStore.getState()).toMatchObject({
+      isAuthenticated: true,
+      refreshToken: 'refresh-1',
+    })
+  })
+  it('Should discard a session whose refresh token expired', async () => {
+    ;(loadSession as jest.Mock).mockResolvedValue({
+      expiresAt: '2099-01-01T00:00:00Z',
+      refreshToken: 'refresh-1',
+      refreshTokenExpiresAt: '2020-01-01T00:00:00Z',
+      token: 'jwt-token',
+      user: session,
+    })
+    await useAuthStore.getState().restore()
+    expect(clearSession).toHaveBeenCalled()
+    expect(useAuthStore.getState().isAuthenticated).toBe(false)
+  })
+  it('Should clear the refresh token on sign out', () => {
+    useAuthStore.getState().signIn({ ...session, refreshToken: 'refresh-1' })
+    useAuthStore.getState().signOut()
+    expect(useAuthStore.getState().refreshToken).toBeNull()
+  })
+})

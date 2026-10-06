@@ -13,7 +13,8 @@ export const useSignOut = () => {
   const clearSecurityResults = useSecurityResultStore((state) => state.clear)
 
   return useCallback(async () => {
-    await loginService.logout().catch(() => {})
+    const { refreshToken } = useAuthStore.getState()
+    await loginService.logout(refreshToken).catch(() => {})
     signOut()
     queryClient.clear()
     clearSecurityResults()

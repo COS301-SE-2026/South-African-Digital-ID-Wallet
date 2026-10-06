@@ -211,7 +211,8 @@ public class AuthServiceDeviceTrustTests
             new FakeEmailSenderProvider(),
             new FakeHostEnvironment(),
             geo,
-            NullLogger<AuthService>.Instance);
+            NullLogger<AuthService>.Instance,
+            new FakeRefreshTokenService());
 
         return new Ctx
         {
