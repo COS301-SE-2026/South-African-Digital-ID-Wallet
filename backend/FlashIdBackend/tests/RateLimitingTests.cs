@@ -98,4 +98,25 @@ public class RateLimitingTests
         Assert.Equal(HttpStatusCode.TooManyRequests, (await RefreshWith("session-a")).StatusCode);
         Assert.NotEqual(HttpStatusCode.TooManyRequests, (await RefreshWith("session-b")).StatusCode);
     }
+
+    [Fact]
+    public async Task Refresh_WithADifferentRandomTokenEachTime_IsStillCappedPerIp()
+    {
+        await using var factory = new TestApiFactory();
+        var client = factory.CreateClient();
+
+        Task<HttpResponseMessage> RefreshWithRandomToken()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh");
+            request.Headers.Add("Cookie", $"refresh_token={Guid.NewGuid():N}");
+            return client.SendAsync(request, TestContext.Current.CancellationToken);
+        }
+
+        for (var i = 0; i < 300; i++)
+        {
+            Assert.NotEqual(HttpStatusCode.TooManyRequests, (await RefreshWithRandomToken()).StatusCode);
+        }
+
+        Assert.Equal(HttpStatusCode.TooManyRequests, (await RefreshWithRandomToken()).StatusCode);
+    }
 }
