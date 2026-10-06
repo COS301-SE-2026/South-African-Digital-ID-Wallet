@@ -138,6 +138,25 @@ describe('token refresh interceptor', () => {
     expect(retry).not.toHaveBeenCalled()
   })
 
+  it('Should keep the session when the retried request is rejected', async () => {
+    signIn()
+    post.mockResolvedValue({
+      data: {
+        expiresAt: '2099-01-01T00:15:00Z',
+        refreshToken: 'refresh-2',
+        refreshTokenExpiresAt: '2099-03-01T00:00:00Z',
+        token: 'fresh-jwt',
+      },
+    })
+    const forbidden = rejectedRefresh(403)
+    retry.mockRejectedValue(forbidden)
+
+    await expect(rejectHandler()(unauthorized())).rejects.toBe(forbidden)
+
+    expect(onSessionExpired).not.toHaveBeenCalled()
+    expect(useAuthStore.getState().isAuthenticated).toBe(true)
+  })
+
   it('Should keep the session when the refresh fails offline', async () => {
     signIn()
     post.mockRejectedValue(new AxiosError('Network Error'))

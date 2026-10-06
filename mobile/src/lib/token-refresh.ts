@@ -75,17 +75,18 @@ export const installTokenRefresh = (onSessionExpired: () => void) => {
         throw error
       }
       config._retried = true
+      let token: string
       try {
-        const token = await refreshSession()
-        config.headers.set('Authorization', `Bearer ${token}`)
-        return await api.request(config)
+        token = await refreshSession()
       } catch (refreshError) {
-        if (refreshError === error || !isSessionRejected(refreshError)) {
+        if (!isSessionRejected(refreshError)) {
           throw refreshError
         }
         onSessionExpired()
         throw error
       }
+      config.headers.set('Authorization', `Bearer ${token}`)
+      return api.request(config)
     }
   )
 }

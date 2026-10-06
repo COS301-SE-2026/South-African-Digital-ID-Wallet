@@ -25,6 +25,19 @@ public class RefreshTokenRepository : IRefreshTokenRepository
             .FirstOrDefaultAsync(t => t.TokenHash == tokenHash, cancellationToken);
     }
 
+    public async Task<bool> TryMarkRotatedAsync(Guid tokenId, Guid replacedByTokenId, DateTime rotatedAt,
+        CancellationToken cancellationToken)
+    {
+        var affected = await _context.RefreshTokens
+            .Where(t => t.Id == tokenId && t.RevokedAt == null)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(t => t.RevokedAt, rotatedAt)
+                .SetProperty(t => t.ReplacedByTokenId, replacedByTokenId)
+                .SetProperty(t => t.UpdatedAt, rotatedAt), cancellationToken);
+
+        return affected == 1;
+    }
+
     public async Task RevokeFamilyAsync(Guid familyId, DateTime revokedAt, CancellationToken cancellationToken)
     {
         var activeTokens = await _context.RefreshTokens
@@ -38,13 +51,13 @@ public class RefreshTokenRepository : IRefreshTokenRepository
         }
     }
 
-    public async Task RemoveStaleAsync(Guid userId, DateTime now, DateTime revokedBefore, CancellationToken cancellationToken)
+    public async Task RemoveExpiredAsync(Guid userId, DateTime now, CancellationToken cancellationToken)
     {
-        var staleTokens = await _context.RefreshTokens
-            .Where(t => t.UserId == userId && (t.ExpiresAt <= now || t.RevokedAt < revokedBefore))
+        var expiredTokens = await _context.RefreshTokens
+            .Where(t => t.UserId == userId && t.ExpiresAt <= now)
             .ToListAsync(cancellationToken);
 
-        _context.RefreshTokens.RemoveRange(staleTokens);
+        _context.RefreshTokens.RemoveRange(expiredTokens);
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken)

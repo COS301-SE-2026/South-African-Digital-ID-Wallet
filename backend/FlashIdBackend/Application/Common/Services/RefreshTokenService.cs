@@ -15,7 +15,6 @@ public class RefreshTokenService : IRefreshTokenService
     private static readonly TimeSpan RememberedLifetime = TimeSpan.FromDays(30);
     private static readonly TimeSpan SessionLifetime = TimeSpan.FromHours(8);
     private static readonly TimeSpan ConcurrentRefreshGrace = TimeSpan.FromSeconds(30);
-    private static readonly TimeSpan RevokedRetention = TimeSpan.FromDays(7);
 
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IAuthRepository _authRepository;
@@ -34,7 +33,7 @@ public class RefreshTokenService : IRefreshTokenService
     public async Task<IssuedRefreshToken> IssueAsync(User user, bool rememberMe, CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;
-        await _refreshTokenRepository.RemoveStaleAsync(user.Id, now, now - RevokedRetention, cancellationToken);
+        await _refreshTokenRepository.RemoveExpiredAsync(user.Id, now, cancellationToken);
         var (_, issued) = await AddTokenAsync(user, Guid.NewGuid(), rememberMe, now, cancellationToken);
         await _refreshTokenRepository.SaveChangesAsync(cancellationToken);
         return issued;
@@ -98,13 +97,16 @@ public class RefreshTokenService : IRefreshTokenService
             throw new UnauthorizedAccessException("Your session has ended. Please sign in again.");
         }
 
-        var (next, issued) = await AddTokenAsync(user, stored.FamilyId, stored.RememberMe, now, cancellationToken);
-        stored.RevokedAt = now;
-        stored.ReplacedByTokenId = next.Id;
-        stored.UpdatedAt = now;
+        var nextTokenId = Guid.NewGuid();
+        if (!await _refreshTokenRepository.TryMarkRotatedAsync(stored.Id, nextTokenId, now, cancellationToken))
+        {
+            throw new RefreshTokenAlreadyRotatedException();
+        }
+
+        var (_, issued) = await AddTokenAsync(user, stored.FamilyId, stored.RememberMe, now, cancellationToken, nextTokenId);
         await _refreshTokenRepository.SaveChangesAsync(cancellationToken);
 
-        var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user, stored.RememberMe);
+        var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user);
         var citizen = await _authRepository.GetCitizenByUserIdAsync(user.Id);
 
         return new LoginResponseDto
@@ -139,12 +141,12 @@ public class RefreshTokenService : IRefreshTokenService
     }
 
     private async Task<(RefreshToken Entity, IssuedRefreshToken Issued)> AddTokenAsync(User user, Guid familyId,
-        bool rememberMe, DateTime now, CancellationToken cancellationToken)
+        bool rememberMe, DateTime now, CancellationToken cancellationToken, Guid? tokenId = null)
     {
         var rawToken = Base64Url.EncodeToString(RandomNumberGenerator.GetBytes(32));
         var entity = new RefreshToken
         {
-            Id = Guid.NewGuid(),
+            Id = tokenId ?? Guid.NewGuid(),
             UserId = user.Id,
             FamilyId = familyId,
             TokenHash = HashToken(rawToken),

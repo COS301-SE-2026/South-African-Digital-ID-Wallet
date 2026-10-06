@@ -8,7 +8,11 @@ const ACCESS_TOKEN_COOKIE = 'access_token'
 const REFRESH_TOKEN_COOKIE = 'refresh_token'
 const FORWARDED_HEADERS = ['user-agent', 'x-forwarded-for', 'x-forwarded-proto']
 
-type RefreshResult = { accessToken: string | null; setCookies: string[] }
+type RefreshResult = {
+  accessToken: string | null
+  rotatedElsewhere: boolean
+  setCookies: string[]
+}
 
 export async function proxy(req: NextRequest) {
   const jwtSecret = process.env.JWT_SECRET
@@ -26,6 +30,10 @@ export async function proxy(req: NextRequest) {
   const refreshed = await refreshSession(req)
   if (!refreshed) {
     return redirectToLogin(req)
+  }
+
+  if (refreshed.rotatedElsewhere) {
+    return NextResponse.next()
   }
 
   const refreshedPayload = refreshed.accessToken
@@ -96,6 +104,7 @@ async function refreshSession(req: NextRequest): Promise<RefreshResult | null> {
       accessToken: response.ok
         ? readCookie(setCookies, ACCESS_TOKEN_COOKIE)
         : null,
+      rotatedElsewhere: response.status === 409,
       setCookies,
     }
   } catch {

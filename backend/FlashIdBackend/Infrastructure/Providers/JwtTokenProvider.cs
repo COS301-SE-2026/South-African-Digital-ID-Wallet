@@ -17,7 +17,7 @@ public class JwtTokenProvider : IJwtTokenProvider
         _configuration = configuration;
     }
 
-    public (string Token, DateTime ExpiresAt) GenerateToken(User user, bool rememberMe = false)
+    public (string Token, DateTime ExpiresAt) GenerateToken(User user)
     {
         var jwtKey = _configuration["Jwt:Key"]
                      ?? throw new InvalidOperationException("JWT signing key is not configured.");

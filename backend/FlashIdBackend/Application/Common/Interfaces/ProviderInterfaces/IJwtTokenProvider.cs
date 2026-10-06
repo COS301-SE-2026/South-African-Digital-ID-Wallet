@@ -4,5 +4,5 @@ namespace Application.Common.Interfaces.ProviderInterfaces;
 
 public interface IJwtTokenProvider
 {
-    (string Token, DateTime ExpiresAt) GenerateToken(User user, bool rememberMe = false);
+    (string Token, DateTime ExpiresAt) GenerateToken(User user);
 }

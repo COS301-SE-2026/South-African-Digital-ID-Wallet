@@ -255,6 +255,18 @@ describe('proxy middleware', () => {
       expect(res.headers.append).toHaveBeenCalledWith('set-cookie', cleared[0])
     })
 
+    it('lets the request through when another request already rotated the session', async () => {
+      fetchMock.mockResolvedValue({
+        ok: false,
+        status: 409,
+        headers: { getSetCookie: () => [] },
+      })
+
+      const res = await proxy(makeRefreshReq('/citizen/dashboard'))
+
+      expect(res.status).toBe(200)
+    })
+
     it('redirects to login when the api cannot be reached', async () => {
       fetchMock.mockRejectedValue(new Error('ECONNREFUSED'))
 

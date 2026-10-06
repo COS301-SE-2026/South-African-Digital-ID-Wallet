@@ -76,4 +76,26 @@ public class RateLimitingTests
 
         Assert.Equal(HttpStatusCode.TooManyRequests, rejected.StatusCode);
     }
+
+    [Fact]
+    public async Task Refresh_IsLimitedPerRefreshTokenRatherThanPerSharedIp()
+    {
+        await using var factory = new TestApiFactory();
+        var client = factory.CreateClient();
+
+        Task<HttpResponseMessage> RefreshWith(string refreshToken)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh");
+            request.Headers.Add("Cookie", $"refresh_token={refreshToken}");
+            return client.SendAsync(request, TestContext.Current.CancellationToken);
+        }
+
+        for (var i = 0; i < 60; i++)
+        {
+            Assert.NotEqual(HttpStatusCode.TooManyRequests, (await RefreshWith("session-a")).StatusCode);
+        }
+
+        Assert.Equal(HttpStatusCode.TooManyRequests, (await RefreshWith("session-a")).StatusCode);
+        Assert.NotEqual(HttpStatusCode.TooManyRequests, (await RefreshWith("session-b")).StatusCode);
+    }
 }

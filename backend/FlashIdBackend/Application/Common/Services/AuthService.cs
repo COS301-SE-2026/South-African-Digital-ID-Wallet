@@ -162,7 +162,7 @@ public class AuthService : IAuthService
         await _authRepository.AddAuditLogAsync(auditLog);
         await _authRepository.SaveChangesAsync();
 
-        var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user, request.RememberMe);
+        var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user);
         var refreshToken = await _refreshTokenService.IssueAsync(user, request.RememberMe, cancellationToken);
 
         var citizen = await _authRepository.GetCitizenByUserIdAsync(user.Id);
@@ -330,7 +330,7 @@ public class AuthService : IAuthService
         await _authRepository.UpdateUserAsync(user);
         await _authRepository.SaveChangesAsync();
 
-        var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user, request.RememberMe);
+        var (token, expiresAt) = _jwtTokenProvider.GenerateToken(user);
         var refreshToken = await _refreshTokenService.IssueAsync(user, request.RememberMe, cancellationToken);
 
         return new LoginResponseDto()

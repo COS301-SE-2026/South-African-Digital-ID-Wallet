@@ -81,6 +81,35 @@ describe('api session refresh', () => {
     expect(window.localStorage.getItem('flashid-user')).toBeNull()
   })
 
+  it.each([
+    ['a server error', { response: { status: 500 } }],
+    ['rate limiting', { response: { status: 429 } }],
+    ['a network failure', new Error('Network Error')],
+  ])(
+    'Should keep the session when the refresh fails with %s',
+    async (_, refreshError) => {
+      const { post, reject, request } = await loadApi()
+      post.mockRejectedValue(refreshError)
+      const error = unauthorized()
+
+      await expect(reject(error)).rejects.toBe(error)
+
+      expect(request).not.toHaveBeenCalled()
+      expect(window.localStorage.getItem('flashid-user')).not.toBeNull()
+    }
+  )
+
+  it('Should keep the session when the retried request fails for another reason', async () => {
+    const { post, reject, request } = await loadApi()
+    post.mockResolvedValue({ data: {} })
+    const forbidden = { response: { status: 403 } }
+    request.mockRejectedValue(forbidden)
+
+    await expect(reject(unauthorized())).rejects.toBe(forbidden)
+
+    expect(window.localStorage.getItem('flashid-user')).not.toBeNull()
+  })
+
   it('Should not refresh a failed login', async () => {
     const { post, reject } = await loadApi()
 

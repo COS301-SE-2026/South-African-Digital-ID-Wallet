@@ -1,4 +1,4 @@
-import { setAuthToken, setDeviceToken } from '@/lib/api'
+import { setAuthToken } from '@/lib/api'
 import type { LoginResponse } from '@/services'
 
 import { useAuthStore } from '../auth-store'

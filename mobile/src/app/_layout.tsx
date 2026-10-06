@@ -19,11 +19,13 @@ import {
 import { installTokenRefresh } from '@/lib/token-refresh'
 import { colors } from '@/theme/colors'
 import { useAuthStore } from '@/stores/auth-store'
+import { useSecurityResultStore } from '@/stores/security-result-store'
 
 const queryClient = new QueryClient()
 installTokenRefresh(() => {
   useAuthStore.getState().signOut()
   queryClient.clear()
+  useSecurityResultStore.getState().clear()
 })
 // TanStack assumes the phone is always online, so offline refetches fail and replace data with errors.
 // Given the real state (same rule as useNetworkStatus), it pauses them and keeps the last data.

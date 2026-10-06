@@ -284,6 +284,26 @@ public class RefreshTokenIntegrationTests
     }
 
     [Fact]
+    public async Task Refresh_ReplayingATokenRotatedLongAgo_StillRevokesTheSessionAfterAnotherLogin()
+    {
+        using var factory = new TestApiFactory();
+        var user = await SeedTrustedUserAsync(factory);
+        var original = (await MobileLoginAsync(factory, user)).GetProperty("refreshToken").GetString()!;
+        var rotated = await (await MobileRefreshAsync(factory, original)).Content.ReadFromJsonAsync<JsonElement>(Ct);
+        var db = await factory.CreateInitializedContextAsync();
+        var used = await db.RefreshTokens.SingleAsync(t => t.RevokedAt != null, Ct);
+        used.RevokedAt = DateTime.UtcNow.AddDays(-10);
+        await db.SaveChangesAsync(Ct);
+        await MobileLoginAsync(factory, user);
+
+        var replayed = await MobileRefreshAsync(factory, original);
+        var afterReplay = await MobileRefreshAsync(factory, rotated.GetProperty("refreshToken").GetString()!);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, replayed.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, afterReplay.StatusCode);
+    }
+
+    [Fact]
     public async Task Refresh_AfterTheTokenVersionChanges_ReturnsUnauthorized()
     {
         using var factory = new TestApiFactory();

@@ -60,6 +60,9 @@ export const refreshSession = () => {
   return refreshInFlight
 }
 
+const responseStatus = (error: unknown) =>
+  (error as { response?: { status?: number } }).response?.status
+
 const canRefresh = (status: number | undefined, config?: RetriableConfig) =>
   status === 401 &&
   typeof window !== 'undefined' &&
@@ -86,16 +89,15 @@ api.interceptors.response.use(
     const config = error.config as RetriableConfig | undefined
     if (config && canRefresh(error.response?.status, config)) {
       config._retried = true
-      try {
-        await refreshSession()
-        return await api.request(config)
-      } catch (refreshError) {
-        const refreshStatus = (
-          refreshError as { response?: { status?: number } }
-        ).response?.status
-        if (refreshStatus === 409) {
-          return api.request(config)
-        }
+      const refreshFailure = await refreshSession().then(
+        () => null,
+        (refreshError: unknown) => ({ status: responseStatus(refreshError) })
+      )
+      if (refreshFailure === null || refreshFailure.status === 409) {
+        return api.request(config)
+      }
+      if (refreshFailure.status !== 401) {
+        return Promise.reject(error)
       }
     }
     if (
