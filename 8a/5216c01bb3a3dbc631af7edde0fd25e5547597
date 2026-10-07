@@ -1,0 +1,32 @@
+web/src/components/molecules/authentic-result/authentic-result.tsx
+  s_04e8275c5282f5::t_58afca1f8bbad6 19
+  s_04e8275c5282f5::t_3bb4395cfae2ae 73,102-110,114-117
+web/src/components/organisms/landing-page-navbar/landing-page-navbar.tsx
+  s_04e8275c5282f5::t_35d91c6ad6db1c 84-85,90,92,105-113,121
+  s_04e8275c5282f5::t_5bbf6b42ca38e3 7-13,72-77,79-83,86-87,115-120,122-128,159-163
+  s_04e8275c5282f5::t_2f7d873887db2b 88-89,93-104,114
+  s_04e8275c5282f5::t_0ddcf97f5645a6 129-158
+backend/FlashIdBackend/Application/Common/Services/CertifiedCredentialCopyService.cs
+  s_04e8275c5282f5::t_6fc6ea8d9dff79 256
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8a5216c01bb3a3dbc631af7edde0fd25e5547597",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_04e8275c5282f5": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "aad132df-7b28-44b6-a0f2-6532b98bf85e",
+        "model": "auto"
+      },
+      "human_author": null
+    }
+  }
+}
