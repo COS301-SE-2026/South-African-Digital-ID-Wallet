@@ -16,9 +16,7 @@ const formatCredentialType = (credentialType?: string | null) => {
 const maskIdNumber = (idNumber?: string | null) => {
   if (!idNumber) return 'Not available'
 
-  const visibleDigits = idNumber.slice(-4)
-
-  return `${'•'.repeat(Math.max(idNumber.length - 4, 0))}${visibleDigits}`
+  return `${'*'.repeat(Math.max(idNumber.length - 2, 0))}${idNumber.slice(-2)}`
 }
 
 const formatDateTime = (date?: string | null) => {
@@ -72,6 +70,7 @@ export function AuthenticResult({
               <DetailRow
                 label="ID Number"
                 value={maskIdNumber(result.idNumber)}
+                valueClassName="font-mono tracking-[0.08em]"
               />
 
               <DetailRow
@@ -100,11 +99,22 @@ export function AuthenticResult({
     </div>
   )
 }
-function DetailRow({ label, value }: { label: string; value: string }) {
+function DetailRow({
+  label,
+  value,
+  valueClassName = '',
+}: {
+  label: string
+  value: string
+  valueClassName?: string
+}) {
   return (
     <div>
       <Text variant="caption">{label}</Text>
-      <Text variant="sub-sm" className="font-semibold text-deep-green">
+      <Text
+        variant="sub-sm"
+        className={`font-semibold text-deep-green ${valueClassName}`}
+      >
         {value}
       </Text>
     </div>
