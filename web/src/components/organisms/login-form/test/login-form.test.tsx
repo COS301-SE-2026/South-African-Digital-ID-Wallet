@@ -82,4 +82,35 @@ describe('LoginForm', () => {
     expect(refresh).toHaveBeenCalled()
     expect(push).toHaveBeenCalled()
   })
+  it('stores the refresh token expiry as the session expiry', async () => {
+    ;(loginService.login as jest.Mock).mockResolvedValue({
+      role: 'citizen',
+      requiresDeviceVerification: false,
+      expiresAt: '2026-01-01T00:15:00Z',
+      refreshTokenExpiresAt: '2026-01-31T00:00:00Z',
+    })
+    renderForm()
+    await fill()
+    expect(window.localStorage.getItem('flashid-session-expires-at')).toBe(
+      '2026-01-31T00:00:00Z'
+    )
+  })
+  it('stores the refresh token expiry after device verification', async () => {
+    ;(loginService.login as jest.Mock).mockResolvedValue({
+      role: 'citizen',
+      requiresDeviceVerification: true,
+      deviceVerificationId: 'dv-1',
+    })
+    ;(loginService.verifyDevice as jest.Mock).mockResolvedValue({
+      role: 'citizen',
+      expiresAt: '2026-01-01T00:15:00Z',
+      refreshTokenExpiresAt: '2026-01-31T00:00:00Z',
+    })
+    renderForm()
+    const user = await fill()
+    await user.click(screen.getByRole('button', { name: 'OTP' }))
+    expect(window.localStorage.getItem('flashid-session-expires-at')).toBe(
+      '2026-01-31T00:00:00Z'
+    )
+  })
 })

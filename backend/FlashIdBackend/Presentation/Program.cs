@@ -145,6 +145,12 @@ var rateLimitsEnabled = builder.Configuration.GetValue("RateLimiting:Enabled", !
 static string IpPartitionKey(HttpContext httpContext) =>
     httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
+static string RefreshPartitionKey(HttpContext httpContext) =>
+    httpContext.Request.Cookies.TryGetValue(Presentation.Security.AuthCookies.RefreshTokenCookieName, out var refreshToken)
+    && !string.IsNullOrEmpty(refreshToken)
+        ? Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken)))
+        : IpPartitionKey(httpContext);
+
 // Falls back to the IP when there is no signed-in user, so anonymous callers still get their own bucket.
 static string UserPartitionKey(HttpContext httpContext) =>
     httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
@@ -182,6 +188,8 @@ builder.Services.AddRateLimiter(options =>
     AddIpPartitionedPolicy(options, "resend-otp", permitLimit: 3, window: oneMinute);
     AddIpPartitionedPolicy(options, "verify-email", permitLimit: 5, window: oneMinute);
     AddIpPartitionedPolicy(options, "login", permitLimit: 10, window: oneMinute);
+    options.AddPolicy("refresh", httpContext =>
+        FixedWindowPartition(RefreshPartitionKey(httpContext), permitLimit: 60, window: oneMinute));
     AddIpPartitionedPolicy(options, "verify-device", permitLimit: 5, window: oneMinute);
     AddIpPartitionedPolicy(options, "password-reset", permitLimit: 5, window: oneMinute);
     AddIpPartitionedPolicy(options, "certified-copy-verify", permitLimit: 10, window: oneMinute);

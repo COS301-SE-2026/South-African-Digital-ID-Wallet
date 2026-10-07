@@ -99,13 +99,7 @@ public class AuthController : ControllerBase
 
             // The token is set in an HttpOnly cookie so JavaScript cannot read it.
             // Secure = true in production forces HTTPS; in development HTTP is allowed.
-            AuthCookies.AppendAccessToken(Response, _environment, result.Token, result.ExpiresAt);
-
-            var isNativeClient = IsNativeClient(client);
-            if (!isNativeClient)
-            {
-                result.Token = null;
-            }
+            AppendSessionCookies(result, IsNativeClient(client));
 
             return Ok(result);
         }
@@ -152,7 +146,8 @@ public class AuthController : ControllerBase
             result.SecurityAlert = await RecordSecurityEventAsync(fraudDetectionService, result.UserId,
                 Domain.Enums.SecurityEventType.DeviceVerified, result.DeviceToken ?? deviceToken, cancellationToken);
 
-            AuthCookies.AppendAccessToken(Response, _environment, result.Token, result.ExpiresAt);
+            var isNativeClient = IsNativeClient(client);
+            AppendSessionCookies(result, isNativeClient);
 
             if (!string.IsNullOrWhiteSpace(result.DeviceToken))
             {
@@ -169,10 +164,8 @@ public class AuthController : ControllerBase
                 Response.Cookies.Append("flashid_device", result.DeviceToken, deviceCookieOptions);
             }
 
-            var isNativeClient = IsNativeClient(client);
             if (!isNativeClient)
             {
-                result.Token = null;
                 result.DeviceToken = null;
             }
             Response.Cookies.Delete(
@@ -314,10 +307,42 @@ public class AuthController : ControllerBase
         }
     }
 
+    [HttpPost("refresh")]
+    [EnableRateLimiting("refresh")]
+    public async Task<IActionResult> Refresh(
+        [FromBody(EmptyBodyBehavior = Microsoft.AspNetCore.Mvc.ModelBinding.EmptyBodyBehavior.Allow)] RefreshTokenRequestDto? request,
+        [FromHeader(Name = "X-Client")] string? client,
+        [FromServices] IRefreshTokenService refreshTokenService,
+        CancellationToken cancellationToken)
+    {
+        var isNativeClient = IsNativeClient(client);
+        try
+        {
+            var result = await refreshTokenService.RefreshAsync(request?.RefreshToken ?? ReadRefreshTokenCookie(), cancellationToken);
+            AppendSessionCookies(result, isNativeClient);
+            return Ok(result);
+        }
+        catch (RefreshTokenAlreadyRotatedException ex)
+        {
+            return Conflict(new { error = ex.Message, code = RefreshTokenAlreadyRotatedException.ErrorCode });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            if (!isNativeClient)
+            {
+                AuthCookies.DeleteAll(Response, _environment);
+            }
+            return Unauthorized(new { error = ex.Message });
+        }
+    }
+
     // [Authorize] - must be authenticated (any role) to log out.
     [Authorize]
     [HttpPost("logout")]
-    public async Task<IActionResult> Logout()
+    public async Task<IActionResult> Logout(
+        [FromBody(EmptyBodyBehavior = Microsoft.AspNetCore.Mvc.ModelBinding.EmptyBodyBehavior.Allow)] RefreshTokenRequestDto? request,
+        [FromServices] IRefreshTokenService refreshTokenService,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -326,6 +351,7 @@ public class AuthController : ControllerBase
 
             var userId = Guid.Parse(userIdClaim);
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            await refreshTokenService.RevokeAsync(userId, request?.RefreshToken ?? ReadRefreshTokenCookie(), cancellationToken);
             var result = await _authService.LogoutAsync(userId, ipAddress);
 
             AuthCookies.DeleteAll(Response, _environment);
@@ -352,6 +378,24 @@ public class AuthController : ControllerBase
             _logger.LogError(ex, "Fraud check failed for user {UserId}. Continuing the sign-in without it.", userId);
             return null;
         }
+    }
+
+    private void AppendSessionCookies(LoginResponseDto result, bool isNativeClient)
+    {
+        AuthCookies.AppendSession(Response, _environment, result.Token!, result.ExpiresAt,
+            isNativeClient ? null : result.RefreshToken, result.RefreshTokenExpiresAt);
+
+        if (!isNativeClient)
+        {
+            result.Token = null;
+            result.RefreshToken = null;
+        }
+    }
+
+    private string? ReadRefreshTokenCookie()
+    {
+        Request.Cookies.TryGetValue(AuthCookies.RefreshTokenCookieName, out var cookie);
+        return cookie;
     }
 
     private string? ReadDeviceToken()

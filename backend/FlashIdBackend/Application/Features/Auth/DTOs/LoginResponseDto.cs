@@ -7,6 +7,12 @@ public class LoginResponseDto
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Token { get; set; } = string.Empty;
     public DateTime? ExpiresAt { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? RefreshToken { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public DateTime? RefreshTokenExpiresAt { get; set; }
     public Guid UserId { get; set; }
     public string Role { get; set; } = string.Empty;
 

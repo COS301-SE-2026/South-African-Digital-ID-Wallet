@@ -6,22 +6,22 @@ namespace Presentation.Security;
 public static class AuthCookies
 {
     public const string AccessTokenCookieName = "access_token";
+    public const string RefreshTokenCookieName = "refresh_token";
     public const string CsrfTokenCookieName = "csrf_token";
 
-    public static void AppendAccessToken(HttpResponse response, IHostEnvironment environment, string token, DateTimeOffset? expires)
+    public static void AppendSession(HttpResponse response, IHostEnvironment environment, string accessToken,
+        DateTimeOffset? accessExpires, string? refreshToken, DateTimeOffset? refreshExpires)
     {
-        response.Cookies.Append(AccessTokenCookieName, token, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = !environment.IsDevelopment(),
-            SameSite = SameSiteMode.Lax,
-            Path = "/",
-            Expires = expires,
-            IsEssential = true,
-        });
+        response.Cookies.Append(AccessTokenCookieName, accessToken, CreateOptions(environment, accessExpires));
 
-        AppendCsrfToken(response, environment, expires);
+        if (!string.IsNullOrWhiteSpace(refreshToken))
+        {
+            response.Cookies.Append(RefreshTokenCookieName, refreshToken, CreateOptions(environment, refreshExpires));
+        }
+
+        AppendCsrfToken(response, environment, refreshExpires ?? accessExpires);
     }
+
     public static void DeleteAll(HttpResponse response, IHostEnvironment environment)
     {
         var options = new CookieOptions
@@ -33,8 +33,19 @@ public static class AuthCookies
         };
 
         response.Cookies.Delete(AccessTokenCookieName, options);
+        response.Cookies.Delete(RefreshTokenCookieName, options);
         response.Cookies.Delete(CsrfTokenCookieName, options);
     }
+
+    private static CookieOptions CreateOptions(IHostEnvironment environment, DateTimeOffset? expires) => new()
+    {
+        HttpOnly = true,
+        Secure = !environment.IsDevelopment(),
+        SameSite = SameSiteMode.Lax,
+        Path = "/",
+        Expires = expires,
+        IsEssential = true,
+    };
 
     private static void AppendCsrfToken(HttpResponse response, IHostEnvironment environment, DateTimeOffset? expires)
     {

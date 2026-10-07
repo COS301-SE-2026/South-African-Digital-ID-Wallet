@@ -11,6 +11,7 @@ export type LoginResponse = {
   role: string
   token: string
   expiresAt: string
+  refreshTokenExpiresAt?: string | null
   requiresDeviceVerification: boolean
   deviceVerificationId?: string | null
 }

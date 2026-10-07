@@ -111,6 +111,8 @@ export type SecureAccountResponse = {
   devicesRemoved: number
   expiresAt?: string
   message: string
+  refreshToken?: string
+  refreshTokenExpiresAt?: string
   nextSteps: string[]
   requiresPasswordChange: boolean
   title: string

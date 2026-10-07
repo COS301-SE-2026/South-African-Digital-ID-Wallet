@@ -110,7 +110,7 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
       if (typeof window !== 'undefined') {
         window.localStorage.setItem(
           'flashid-session-expires-at',
-          data.expiresAt
+          data.refreshTokenExpiresAt ?? data.expiresAt
         )
       }
 
@@ -176,7 +176,10 @@ export const LoginForm = ({ onSubmitAction }: Readonly<LoginFormProps>) => {
     setDeviceVerificationId('')
 
     if (typeof window !== 'undefined') {
-      window.localStorage.setItem('flashid-session-expires-at', data.expiresAt)
+      window.localStorage.setItem(
+        'flashid-session-expires-at',
+        data.refreshTokenExpiresAt ?? data.expiresAt
+      )
     }
 
     await refresh()
