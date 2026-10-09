@@ -2,7 +2,14 @@
 
 import * as React from 'react'
 import Link from 'next/link'
-import { User, CircleUserRound, LockKeyhole, Loader2 } from 'lucide-react'
+import {
+  User,
+  CircleUserRound,
+  LockKeyhole,
+  Loader2,
+  Eye,
+  EyeOff,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Text } from '@/components/atoms'
 import { getSafeReturnTo, TextField } from '@/components/molecules'
@@ -42,6 +49,26 @@ const RequirementList = ({
   )
 }
 
+const PasswordVisibilityToggle = ({
+  visible,
+  onToggle,
+  fieldName,
+}: {
+  visible: boolean
+  onToggle: () => void
+  fieldName: string
+}) => (
+  <button
+    type="button"
+    onClick={onToggle}
+    aria-label={`${visible ? 'Hide' : 'Show'} ${fieldName}`}
+    aria-pressed={visible}
+    className="absolute right-3 top-[54px] -translate-y-1/2 text-muted-foreground transition-colors hover:text-primary-green"
+  >
+    {visible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+  </button>
+)
+
 export const RegistrationForm = ({
   onSubmitAction,
 }: Readonly<RegistrationFormProps>) => {
@@ -50,6 +77,8 @@ export const RegistrationForm = ({
   const [confirmPassword, setConfirmPassword] = React.useState('')
   const [submitted, setSubmitted] = React.useState(false)
   const [dirtyFields, setDirtyFields] = React.useState<Set<string>>(new Set())
+  const [showPassword, setShowPassword] = React.useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false)
 
   const stripSpaces = (value: string) => value.replace(/\s+/g, '')
 
@@ -188,7 +217,7 @@ export const RegistrationForm = ({
           <LockKeyhole className="pointer-events-none absolute left-3 top-[54px] h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           <TextField
             label="Password:"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             value={password}
             onChange={(e) => {
               setPassword(stripSpaces(e.target.value))
@@ -198,7 +227,12 @@ export const RegistrationForm = ({
               if (e.key === ' ') e.preventDefault()
             }}
             placeholder="Enter your password"
-            className="pl-11"
+            className="pl-11 pr-11"
+          />
+          <PasswordVisibilityToggle
+            visible={showPassword}
+            onToggle={() => setShowPassword((prev) => !prev)}
+            fieldName="password"
           />
         </div>
         <RequirementList
@@ -213,7 +247,7 @@ export const RegistrationForm = ({
           <LockKeyhole className="pointer-events-none absolute left-3 top-[54px] h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           <TextField
             label="Verify password:"
-            type="password"
+            type={showConfirmPassword ? 'text' : 'password'}
             value={confirmPassword}
             onChange={(e) => {
               setConfirmPassword(stripSpaces(e.target.value))
@@ -223,7 +257,12 @@ export const RegistrationForm = ({
               if (e.key === ' ') e.preventDefault()
             }}
             placeholder="Re-enter your password"
-            className="pl-11"
+            className="pl-11 pr-11"
+          />
+          <PasswordVisibilityToggle
+            visible={showConfirmPassword}
+            onToggle={() => setShowConfirmPassword((prev) => !prev)}
+            fieldName="verify password"
           />
         </div>
         <RequirementList
