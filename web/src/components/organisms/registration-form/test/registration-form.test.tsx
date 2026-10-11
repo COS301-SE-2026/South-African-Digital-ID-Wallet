@@ -69,7 +69,7 @@ function getPasswordInput() {
 }
 
 function getConfirmPasswordInput() {
-  return screen.getByLabelText(/verify password/i)
+  return screen.getByLabelText('Verify password:')
 }
 
 function getSubmitButton() {
@@ -250,16 +250,12 @@ describe('RegistrationForm — unit tests', () => {
       render(<RegistrationForm />, { wrapper: createWrapper() })
       await user.click(getSubmitButton())
       expect(
-        screen.getByText(
-          'Must conatain at least 1 special character (!@#$%^&*)'
-        )
+        screen.getByText('Must contain at least 1 special character (!@#$%^&*)')
       ).not.toHaveClass('line-through')
       await user.type(getPasswordInput(), '@')
       await user.click(getSubmitButton())
       expect(
-        screen.getByText(
-          'Must conatain at least 1 special character (!@#$%^&*)'
-        )
+        screen.getByText('Must contain at least 1 special character (!@#$%^&*)')
       ).toHaveClass('line-through')
     })
   })
@@ -335,7 +331,7 @@ describe('RegistrationForm — unit tests', () => {
       ).not.toBeInTheDocument()
       expect(
         screen.queryByText(
-          'Must conatain at least 1 special character (!@#$%^&*)'
+          'Must contain at least 1 special character (!@#$%^&*)'
         )
       ).not.toBeInTheDocument()
     })
@@ -368,7 +364,7 @@ describe('RegistrationForm — unit tests', () => {
       ).toBeInTheDocument()
       expect(
         screen.queryByText(
-          'Must conatain at least 1 special character (!@#$%^&*)'
+          'Must contain at least 1 special character (!@#$%^&*)'
         )
       ).toBeInTheDocument()
       expect(
@@ -501,9 +497,7 @@ describe('RegistrationForm — unit tests', () => {
         screen.getByText('Must contain at least 1 lowercase letter (a-z)')
       ).toBeInTheDocument()
       expect(
-        screen.getByText(
-          'Must conatain at least 1 special character (!@#$%^&*)'
-        )
+        screen.getByText('Must contain at least 1 special character (!@#$%^&*)')
       ).toBeInTheDocument()
       expect(
         screen.getByText('Must match the password above')
@@ -640,6 +634,27 @@ describe('RegistrationForm — unit tests', () => {
           'Registration failed. Please try again.'
         )
       })
+    })
+  })
+
+  describe('password visibility toggles', () => {
+    it('reveals and re-hides the password field', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(screen.getByRole('button', { name: 'Show password' }))
+      expect(getPasswordInput()).toHaveAttribute('type', 'text')
+      await user.click(screen.getByRole('button', { name: 'Hide password' }))
+      expect(getPasswordInput()).toHaveAttribute('type', 'password')
+    })
+
+    it('toggles each field on its own', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(
+        screen.getByRole('button', { name: 'Show verify password' })
+      )
+      expect(getConfirmPasswordInput()).toHaveAttribute('type', 'text')
+      expect(getPasswordInput()).toHaveAttribute('type', 'password')
     })
   })
 })

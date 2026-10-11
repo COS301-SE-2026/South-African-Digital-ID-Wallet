@@ -37,6 +37,9 @@ public class PasswordResetServiceTests
             Saves++;
             return Task.CompletedTask;
         }
+
+        public Task<Official?> GetOfficialByUserIdAsync(Guid userId) => Task.FromResult<Official?>(null);
+        public Task<GovernmentAdministrator?> GetGovernmentAdministratorByUserIdAsync(Guid userId) => Task.FromResult<GovernmentAdministrator?>(null);
     }
 
     private sealed class FakePasswordHashingProvider : IPasswordHashingProvider
