@@ -1,0 +1,35 @@
+web/src/components/organisms/registration-form/test/registration-form.test.tsx
+  h_99fca60b892ff4 72,639-655
+  h_99fca60b892ff4 253,258,334,367,500,656-659
+web/src/components/templates/otp-modal/test/otp-modal.test.tsx
+  h_99fca60b892ff4 149-163
+  h_99fca60b892ff4 164-165
+web/src/components/templates/otp-modal/otp-modal.tsx
+  h_99fca60b892ff4 69-95,141-142,170,173,196,205,226
+backend/FlashIdBackend/Infrastructure/Repositories/AuthRepository.cs
+  h_99fca60b892ff4 50-61
+backend/FlashIdBackend/Application/Common/Services/AuthService.cs
+  h_99fca60b892ff4 587,589-613
+backend/FlashIdBackend/tests/AuthServiceTests.cs
+  h_99fca60b892ff4 30-33,289-329
+backend/FlashIdBackend/tests/AuthServiceDeviceTrustTests.cs
+  h_99fca60b892ff4 56-58
+backend/FlashIdBackend/tests/PasswordResetServiceTests.cs
+  h_99fca60b892ff4 40-42
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IAuthRepository.cs
+  h_99fca60b892ff4 13-14
+web/src/components/organisms/registration-form/registration-form.tsx
+  h_99fca60b892ff4 195
+  h_99fca60b892ff4 120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "447569f6b641323b6d8bc09943a809b338435919",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
