@@ -101,7 +101,10 @@ export function AppShell({
           showNotifications={false}
           onMenuClick={() => setMobileNavOpen(true)}
         />
-        <div className="flex-1 overflow-y-auto" data-testid="page-content">
+        <div
+          className="relative flex-1 overflow-y-auto"
+          data-testid="page-content"
+        >
           {children}
         </div>
       </div>
