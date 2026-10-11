@@ -117,7 +117,7 @@ export const RegistrationForm = ({
       met: /[a-z]/.test(password),
     },
     {
-      label: 'Must conatain at least 1 special character (!@#$%^&*)',
+      label: 'Must contain at least 1 special character (!@#$%^&*)',
       met: /[!@#$%^&*_+\-=.<>?~]/.test(password),
     },
   ]
@@ -192,7 +192,7 @@ export const RegistrationForm = ({
       {/* Email */}
       <div>
         <div className="relative">
-          <CircleUserRound className="pointer-events-non absolute left-3 top-[54px] h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <CircleUserRound className="pointer-events-none absolute left-3 top-[54px] h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           <TextField
             label="Email:"
             type="email"

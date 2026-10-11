@@ -146,4 +146,21 @@ describe('OtpModal', () => {
       )
     })
   })
+
+  it('fills every box when a full code is pasted', () => {
+    renderModal()
+    const inputs = screen.getAllByRole('textbox')
+    fireEvent.paste(inputs[2], { clipboardData: { getData: () => '12 34 56' } })
+    expect(inputs.map((i) => (i as HTMLInputElement).value).join('')).toBe(
+      '123456'
+    )
+  })
+
+  it('submits when the form is submitted (Enter key)', async () => {
+    renderModal()
+    const inputs = screen.getAllByRole('textbox')
+    fireEvent.paste(inputs[0], { clipboardData: { getData: () => '123456' } })
+    fireEvent.submit(inputs[0].closest('form')!)
+    await waitFor(() => expect(onSuccess).toHaveBeenCalledWith('123456'))
+  })
 })
