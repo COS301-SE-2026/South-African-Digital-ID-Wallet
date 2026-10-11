@@ -1,0 +1,17 @@
+web/src/components/organisms/activity-card/activity-card.tsx
+  h_99fca60b892ff4 54-55,74
+web/src/components/organisms/audit-log-table/audit-log-table.tsx
+  h_99fca60b892ff4 188-192
+  h_99fca60b892ff4 187
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "548e47473470d8a5290cfee6663d854d77cc5c6e",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
