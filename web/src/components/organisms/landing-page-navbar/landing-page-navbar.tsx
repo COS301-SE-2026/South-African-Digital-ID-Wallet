@@ -17,13 +17,14 @@ const NAV_LINKS = [
   { label: 'Features', href: '/#features' },
   { label: 'How it works', href: '/#how-it-works' },
   { label: 'Preview', href: '/#preview' },
+  { label: 'Mobile app', href: '/#mobile-app' },
   { label: 'Help', href: '/#help' },
 ]
 export function LandingPageNavbar() {
   return (
     <header className="sticky top-0 z-50">
       <div className="border-b border-clean-white/10 bg-deep-green">
-        <div className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-6 px-6 sm:px-8 lg:px-10">
+        <div className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-3 px-6 sm:px-8 lg:px-10">
           <Link
             href="/"
             className="flex items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold focus-visible:ring-offset-2 focus-visible:ring-offset-deep-green"
@@ -33,25 +34,25 @@ export function LandingPageNavbar() {
               alt="FlashID home"
               width={200}
               height={50}
-              className="h-10 w-auto object-contain sm:h-11"
+              className="h-14 w-auto origin-left scale-[1.15] object-contain sm:h-16"
               priority
             />
           </Link>
-          <nav aria-label="Primary navigation" className="hidden lg:block">
+          <nav aria-label="Primary navigation" className="hidden xl:block">
             <ul className="flex items-center gap-1">
               {NAV_LINKS.map((link) => (
                 <li key={link.label}>
-                  <Link
+                  <a
                     href={link.href}
-                    className="rounded-lg px-3 py-2 text-sm font-semibold text-clean-white/80 transition hover:bg-clean-white/10 hover:text-clean-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
+                    className="rounded-lg px-2 py-2 text-sm font-semibold text-clean-white/80 transition hover:bg-clean-white/10 hover:text-clean-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
                   >
                     {link.label}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>
           </nav>
-          <div className="hidden items-center gap-3 lg:flex">
+          <div className="hidden items-center gap-3 xl:flex">
             <Link
               href="/login"
               className="rounded-lg px-4 py-2.5 text-sm font-bold text-clean-white transition hover:bg-clean-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
@@ -74,7 +75,7 @@ export function LandingPageNavbar() {
               <button
                 type="button"
                 aria-label="Open navigation menu"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-clean-white transition hover:bg-clean-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold lg:hidden"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-clean-white transition hover:bg-clean-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold xl:hidden"
               >
                 <Menu className="h-5 w-5" aria-hidden="true" />
               </button>
@@ -99,7 +100,7 @@ export function LandingPageNavbar() {
                       alt="FlashID home"
                       width={180}
                       height={45}
-                      className="h-10 w-auto object-contain"
+                      className="h-14 w-auto object-contain"
                     />
                   </Link>
                   <SheetClose asChild>
@@ -116,12 +117,12 @@ export function LandingPageNavbar() {
                   {NAV_LINKS.map((link) => (
                     <li key={link.label}>
                       <SheetClose asChild>
-                        <Link
+                        <a
                           href={link.href}
                           className="block rounded-2xl border border-transparent px-4 py-3 text-base font-semibold text-clean-white/75 transition hover:border-accent-gold hover:bg-clean-white/10 hover:text-clean-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
                         >
                           {link.label}
-                        </Link>
+                        </a>
                       </SheetClose>
                     </li>
                   ))}

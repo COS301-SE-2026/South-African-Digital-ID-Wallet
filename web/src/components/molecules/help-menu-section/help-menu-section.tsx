@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import landingEffects from '@/components/pages/landing-page/landing-effects.module.css'
 import {
   ChevronDown,
   HelpCircle,
@@ -89,9 +90,9 @@ export function HelpMenuSection() {
   return (
     <section
       id="help"
-      className="scroll-mt-28 bg-cream-background py-20 sm:py-24"
+      className={`${landingEffects.ambientSection} scroll-mt-28 bg-cream-background py-20 sm:py-24`}
     >
-      <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
+      <div className="mx-auto w-full max-w-none px-6 sm:px-8 lg:px-10">
         <div className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:items-start lg:gap-16">
           <div className="lg:sticky lg:top-32">
             <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-green text-clean-white shadow-lg">
@@ -109,7 +110,9 @@ export function HelpMenuSection() {
               variant="h2"
               className="mt-3 max-w-md text-3xl sm:text-4xl"
             >
-              Questions before you get started?
+              <span className="inline-block bg-gradient-to-r from-primary-green to-accent-gold bg-clip-text text-transparent">
+                Questions before you get started?
+              </span>
             </Text>
             <p className="mt-5 max-w-md text-base leading-7 text-muted-text sm:text-lg">
               Find quick answers about your credentials, privacy, devices, and
@@ -161,7 +164,9 @@ export function HelpMenuSection() {
                   Frequently asked questions
                 </p>
                 <h3 className="mt-2 text-2xl font-bold tracking-tight text-deep-green sm:text-3xl">
-                  How can we help?
+                  <span className="inline-block bg-gradient-to-r from-primary-green to-accent-gold bg-clip-text text-transparent">
+                    How can we help?
+                  </span>
                 </h3>
               </div>
               <span className="hidden rounded-full bg-clean-white px-3 py-1.5 text-xs font-bold text-muted-text shadow-sm sm:inline-flex">
