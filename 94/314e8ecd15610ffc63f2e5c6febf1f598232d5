@@ -1,0 +1,122 @@
+backend/FlashIdBackend/Application/Common/Interfaces/ProviderInterfaces/IJwtTokenProvider.cs
+  h_0aff3b71f739b1 7
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IRefreshTokenRepository.cs
+  h_0aff3b71f739b1 1-13
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IRefreshTokenService.cs
+  h_0aff3b71f739b1 1-12
+backend/FlashIdBackend/Application/Common/Services/AuthService.cs
+  h_0aff3b71f739b1 32,45-46,59,165-166,174-175,333-334,340-341
+backend/FlashIdBackend/Application/Common/Services/RefreshTokenService.cs
+  h_0aff3b71f739b1 1-168
+backend/FlashIdBackend/Application/DependencyInjection.cs
+  h_0aff3b71f739b1 17
+backend/FlashIdBackend/Application/Features/Auth/DTOs/IssuedRefreshToken.cs
+  h_0aff3b71f739b1 1-3
+backend/FlashIdBackend/Application/Features/Auth/DTOs/LoginResponseDto.cs
+  h_0aff3b71f739b1 10-15
+backend/FlashIdBackend/Application/Features/Auth/DTOs/RefreshTokenRequestDto.cs
+  h_0aff3b71f739b1 1-6
+backend/FlashIdBackend/Application/Features/Auth/Exceptions/AuthExceptions.cs
+  h_0aff3b71f739b1 7-15
+backend/FlashIdBackend/Application/Features/FraudDetection/DTOs/FraudDetectionDtos.cs
+  h_0aff3b71f739b1 159-164
+backend/FlashIdBackend/Domain/Entities/RefreshToken.cs
+  h_0aff3b71f739b1 1-22
+backend/FlashIdBackend/Infrastructure/Data/AppDbContext.cs
+  h_0aff3b71f739b1 30
+backend/FlashIdBackend/Infrastructure/Data/Configurations/RefreshTokenConfiguration.cs
+  h_0aff3b71f739b1 1-20
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_0aff3b71f739b1 35
+backend/FlashIdBackend/Infrastructure/Migrations/20261006101650_AddRefreshTokens.Designer.cs
+  h_0aff3b71f739b1 1-2174
+backend/FlashIdBackend/Infrastructure/Migrations/20261006101650_AddRefreshTokens.cs
+  h_0aff3b71f739b1 1-65
+backend/FlashIdBackend/Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+  h_0aff3b71f739b1 1129-1178,2021-2031
+backend/FlashIdBackend/Infrastructure/Providers/JwtTokenProvider.cs
+  h_0aff3b71f739b1 20,27-28
+backend/FlashIdBackend/Infrastructure/Repositories/RefreshTokenRepository.cs
+  h_0aff3b71f739b1 1-67
+backend/FlashIdBackend/Presentation/Controllers/AuthController.cs
+  h_0aff3b71f739b1 102,149-150,310-338,342-345,354,383-400
+backend/FlashIdBackend/Presentation/Controllers/SecurityController.cs
+  h_0aff3b71f739b1 79-80,89,92-97,100,103
+backend/FlashIdBackend/Presentation/Middleware/CsrfProtectionMiddleware.cs
+  h_0aff3b71f739b1 21
+backend/FlashIdBackend/Presentation/Program.cs
+  h_0aff3b71f739b1 148-153,191-192
+backend/FlashIdBackend/Presentation/Security/AuthCookies.cs
+  h_0aff3b71f739b1 9,12-13,15-17,19-20,22,24,36,40-49
+backend/FlashIdBackend/Presentation/appsettings.json
+  h_0aff3b71f739b1 8-9
+backend/FlashIdBackend/tests/AuthServiceDeviceTrustTests.cs
+  h_0aff3b71f739b1 118,164,200,213-214,222,463,470
+backend/FlashIdBackend/tests/AuthServiceTests.cs
+  h_0aff3b71f739b1 40-41,191,199,203,209-210,221,224,228,234-235,245-246,249
+backend/FlashIdBackend/tests/BackendIntegrationTests.cs
+  h_0aff3b71f739b1 133
+backend/FlashIdBackend/tests/FakeRefreshTokenService.cs
+  h_0aff3b71f739b1 1-24
+backend/FlashIdBackend/tests/FraudDetectionServiceTests.cs
+  h_0aff3b71f739b1 64
+backend/FlashIdBackend/tests/RateLimitingTests.cs
+  h_0aff3b71f739b1 79-121
+backend/FlashIdBackend/tests/RefreshTokenIntegrationTests.cs
+  h_0aff3b71f739b1 1-359
+backend/FlashIdBackend/tests/RefreshTokenServiceTests.cs
+  h_0aff3b71f739b1 1-154
+mobile/src/app/_layout.tsx
+  h_0aff3b71f739b1 19,22,25-29
+mobile/src/components/utility/session-lock-watcher.tsx
+  h_0aff3b71f739b1 4,12-13,26
+mobile/src/hooks/use-security.ts
+  h_0aff3b71f739b1 88-95,100-101
+mobile/src/hooks/use-sign-out.ts
+  h_0aff3b71f739b1 16-17
+mobile/src/lib/secure-session.ts
+  h_0aff3b71f739b1 8-9
+mobile/src/lib/test/token-refresh.test.ts
+  h_0aff3b71f739b1 1-196
+mobile/src/lib/token-refresh.ts
+  h_0aff3b71f739b1 1-92
+mobile/src/services/login-service/login-service.ts
+  h_0aff3b71f739b1 27-31
+mobile/src/services/login-service/test/login-service.test.ts
+  h_0aff3b71f739b1 53-59
+mobile/src/services/login-service/types.ts
+  h_0aff3b71f739b1 14-15
+mobile/src/services/security-service/types.ts
+  h_0aff3b71f739b1 114-115
+mobile/src/stores/auth-store.ts
+  h_0aff3b71f739b1 21-25,33-39,52-58,64-65,70-84,91,93-95,98,100,114-123,126,141-142,147-157,164-170,176-177
+mobile/src/stores/test/auth-store.replace-token.test.ts
+  h_0aff3b71f739b1 85-115
+mobile/src/stores/test/auth-store.test.ts
+  h_0aff3b71f739b1 1,182-231
+web/src/components/organisms/login-form/login-form.tsx
+  h_0aff3b71f739b1 113,179-182
+web/src/components/organisms/login-form/test/login-form.test.tsx
+  h_0aff3b71f739b1 85-115
+web/src/lib/api.ts
+  h_0aff3b71f739b1 1,31-72,79,88-102
+web/src/lib/test/api-refresh.test.ts
+  h_0aff3b71f739b1 1-130
+web/src/proxy.ts
+  h_0aff3b71f739b1 1,7-15,18-19,21,25-28,30-49,51-52,58-62,64-66,68-72,74-84,86-108,111,115-120
+web/src/services/login-service/types.ts
+  h_0aff3b71f739b1 14
+web/src/test/proxy.test.ts
+  h_0aff3b71f739b1 13,17,42,45-48,177-295
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "94314e8ecd15610ffc63f2e5c6febf1f598232d5",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
