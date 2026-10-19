@@ -1,7 +1,15 @@
 import { ProductShowcase } from './product-showcase'
-import { fireEvent, render, screen } from '@testing-library/react'
+import {
+  fireEvent,
+  render,
+  screen,
+  within,
+  waitFor,
+} from '@testing-library/react'
 import borderStyles from './landing-effects.module.css'
-import { LandingPageContent } from './landing-page'
+import { LandingPageNavbar } from '@/components/organisms/landing-page-navbar/landing-page-navbar'
+import { HelpMenuSection } from '@/components/molecules/help-menu-section/help-menu-section'
+import { LandingPage, LandingPageContent } from './landing-page'
 import { SecuritySection } from './security-section'
 import { MobilePreview } from './mobile-preview'
 import { MobileAppSection } from './mobile-app-section'
@@ -286,5 +294,167 @@ describe('Visible screenshot controls', () => {
       screen.getByRole('button', { name: 'Next product screen' })
     ).toHaveClass('bg-deep-green', 'text-clean-white', '!absolute')
     expect(screen.queryByText('04')).not.toBeInTheDocument()
+  })
+})
+
+describe('Remaining showcase interactions', () => {
+  it('moves backwards with ArrowLeft and ignores unrelated keys', () => {
+    render(<ProductShowcase />)
+    const region = screen.getByRole('region', {
+      name: 'Explore the FlashID web experience',
+    })
+    fireEvent.keyDown(region, { key: 'ArrowLeft' })
+    expect(
+      screen.getByRole('group', { name: '4 of 4: Verification' })
+    ).toBeInTheDocument()
+    fireEvent.keyDown(region, { key: 'Tab' })
+    expect(
+      screen.getByRole('group', { name: '4 of 4: Verification' })
+    ).toBeInTheDocument()
+  })
+
+  it('handles left and right swipes, short gestures, and unpaired touch ends', () => {
+    render(<ProductShowcase />)
+    const touchArea = screen.getByTestId('product-image-stage').parentElement!
+      .parentElement!
+    const slide = () => screen.getByRole('group', { name: /of 4/ })
+    fireEvent.touchEnd(touchArea, { changedTouches: [{ clientX: 40 }] })
+    expect(slide()).toHaveAttribute('aria-label', '1 of 4: Dashboard')
+    fireEvent.touchStart(touchArea, { touches: [{ clientX: 200 }] })
+    fireEvent.touchEnd(touchArea, { changedTouches: [{ clientX: 80 }] })
+    expect(slide()).toHaveAttribute('aria-label', '2 of 4: Your account')
+    fireEvent.touchStart(touchArea, { touches: [{ clientX: 80 }] })
+    fireEvent.touchEnd(touchArea, { changedTouches: [{ clientX: 200 }] })
+    expect(slide()).toHaveAttribute('aria-label', '1 of 4: Dashboard')
+    for (const end of [130, 150, 170]) {
+      fireEvent.touchStart(touchArea, { touches: [{ clientX: 150 }] })
+      fireEvent.touchEnd(touchArea, { changedTouches: [{ clientX: end }] })
+      expect(slide()).toHaveAttribute('aria-label', '1 of 4: Dashboard')
+    }
+    fireEvent.touchEnd(touchArea, { changedTouches: [{ clientX: 0 }] })
+    expect(slide()).toHaveAttribute('aria-label', '1 of 4: Dashboard')
+  })
+
+  it('keeps enlarged screenshots in sync with each selected view', () => {
+    render(<ProductShowcase />)
+    for (const name of ['Your account', 'Credentials', 'Verification']) {
+      fireEvent.click(
+        screen.getByRole('button', { name: `View ${name} screen` })
+      )
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: 'Enlarge current product screenshot',
+        })
+      )
+      expect(screen.getByRole('dialog', { name })).toBeInTheDocument()
+      expect(
+        screen.getByRole('img', { name: `${name} full-size screenshot` })
+      ).toBeInTheDocument()
+      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' })
+    }
+  })
+})
+
+describe('Landing FAQs', () => {
+  it('opens, switches, and closes an answer with accessible relationships', () => {
+    render(<HelpMenuSection />)
+    const first = screen.getByRole('button', {
+      name: /How do I get my digital ID/,
+    })
+    const second = screen.getByRole('button', {
+      name: /Is my information safe/,
+    })
+    expect(first).toHaveAttribute('aria-expanded', 'false')
+    fireEvent.click(first)
+    const answer = screen.getByRole('region', {
+      name: /How do I get my digital ID/,
+    })
+    expect(first).toHaveAttribute('aria-expanded', 'true')
+    expect(first).toHaveAttribute('aria-controls', answer.id)
+    expect(answer).toHaveTextContent('Government-issued credentials are added')
+    fireEvent.click(second)
+    expect(first).toHaveAttribute('aria-expanded', 'false')
+    expect(second).toHaveAttribute('aria-expanded', 'true')
+    expect(
+      screen.queryByRole('region', { name: /How do I get my digital ID/ })
+    ).not.toBeInTheDocument()
+    fireEvent.click(second)
+    expect(second).toHaveAttribute('aria-expanded', 'false')
+    expect(
+      screen.queryByRole('region', { name: /Is my information safe/ })
+    ).not.toBeInTheDocument()
+  })
+
+  it('loads every remaining question in batches and removes the show-more button at the end', () => {
+    render(<HelpMenuSection />)
+    const questions = () =>
+      screen
+        .getAllByRole('button')
+        .filter((button) => button.hasAttribute('aria-expanded'))
+    expect(questions()).toHaveLength(6)
+    fireEvent.click(screen.getByRole('button', { name: 'Show more questions' }))
+    expect(questions()).toHaveLength(11)
+    fireEvent.click(screen.getByRole('button', { name: 'Show more questions' }))
+    expect(questions()).toHaveLength(14)
+    expect(
+      screen.queryByRole('button', { name: 'Show more questions' })
+    ).not.toBeInTheDocument()
+    for (const button of questions()) {
+      fireEvent.click(button)
+      expect(button).toHaveAttribute('aria-expanded', 'true')
+      const answer = document.getElementById(
+        button.getAttribute('aria-controls')!
+      )!
+      expect(answer).toBeInTheDocument()
+      expect(answer.textContent!.length).toBeGreaterThan(20)
+    }
+  })
+})
+
+describe('Full landing page and navigation', () => {
+  it('renders the complete page with navigation, main content, and footer', () => {
+    render(<LandingPage />)
+    expect(screen.getByRole('banner')).toBeInTheDocument()
+    expect(screen.getByRole('main')).toBeInTheDocument()
+    expect(screen.getByRole('contentinfo')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Your official identity,ready when you are.'
+    )
+    expect(
+      within(
+        screen.getByRole('navigation', { name: 'Primary navigation' })
+      ).getByRole('link', { name: 'Mobile app' })
+    ).toHaveAttribute('href', '/#mobile-app')
+  })
+
+  it('opens the mobile menu, exposes all destinations, and closes with its close button', async () => {
+    render(<LandingPageNavbar />)
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Open navigation menu' })
+    )
+    const menu = screen.getByRole('navigation', { name: 'Mobile navigation' })
+    for (const [name, href] of [
+      ['About', '/#about'],
+      ['Features', '/#features'],
+      ['How it works', '/#how-it-works'],
+      ['Preview', '/#preview'],
+      ['Mobile app', '/#mobile-app'],
+      ['Help', '/#help'],
+      ['Sign in', '/login'],
+      ['Create account', '/register'],
+    ]) {
+      expect(within(menu).getByRole('link', { name })).toHaveAttribute(
+        'href',
+        href
+      )
+    }
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Close navigation menu' })
+    )
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('navigation', { name: 'Mobile navigation' })
+      ).not.toBeInTheDocument()
+    )
   })
 })
