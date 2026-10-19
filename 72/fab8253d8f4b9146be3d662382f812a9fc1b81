@@ -1,0 +1,22 @@
+web/src/components/molecules/authentic-result/test/authentic-result.test.tsx
+  h_0aff3b71f739b1 1-81
+web/src/components/molecules/update-email-modal/test/update-email-modal.test.tsx
+  h_0aff3b71f739b1 1,71-228
+web/src/components/organisms/fraud-alert-flow/test/fraud-alert-flow.test.tsx
+  h_0aff3b71f739b1 1,5-10,115-255
+web/src/components/pages/landing-page/landing-page.test.tsx
+  h_0aff3b71f739b1 2-8,10-12,299-460
+web/src/components/pages/landing-page/landing-release-assets.test.tsx
+  h_0aff3b71f739b1 1-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "72fab8253d8f4b9146be3d662382f812a9fc1b81",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
