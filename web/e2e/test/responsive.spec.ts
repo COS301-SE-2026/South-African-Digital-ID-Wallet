@@ -76,13 +76,20 @@ for (const viewport of VIEWPORTS) {
         const menuButton = header.getByRole('button', {
           name: 'Open navigation menu',
         })
-        // below lg the auth links live inside the hamburger menu, so open it first
-        if (await menuButton.isVisible()) await menuButton.click()
+        // Below xl, the auth links live in a sheet portalled outside the header.
+        let navigation = header
+        if (await menuButton.isVisible()) {
+          await menuButton.click()
+          navigation = page.getByRole('navigation', {
+            name: 'Mobile navigation',
+          })
+          await expect(navigation).toBeVisible()
+        }
         await expect(
-          header.getByRole('link', { name: 'Sign in' })
+          navigation.getByRole('link', { name: 'Sign in' })
         ).toBeInViewport()
         await expect(
-          header.getByRole('link', { name: /Create account/ })
+          navigation.getByRole('link', { name: /Create account/ })
         ).toBeInViewport()
         expect(await sidewaysOverflow(page)).toBeLessThanOrEqual(0)
       })
