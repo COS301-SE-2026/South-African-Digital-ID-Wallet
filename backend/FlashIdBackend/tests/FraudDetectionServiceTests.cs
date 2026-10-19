@@ -61,7 +61,7 @@ public class FraudDetectionServiceTests
 
     private sealed class FakeJwtTokenProvider : IJwtTokenProvider
     {
-        public (string Token, DateTime ExpiresAt) GenerateToken(User user, bool rememberMe = false) =>
+        public (string Token, DateTime ExpiresAt) GenerateToken(User user) =>
             ($"jwt-v{user.TokenVersion}", new DateTime(2026, 5, 15, 0, 0, 0, DateTimeKind.Utc));
     }
 

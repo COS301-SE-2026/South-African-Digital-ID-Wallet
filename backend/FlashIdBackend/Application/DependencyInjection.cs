@@ -14,6 +14,7 @@ public static class DependencyInjection
         services.AddScoped<IOnboardingService, OnboardingService>();
         services.AddScoped<IInstitutionService, InstitutionService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IQrService, QrService>();
         services.AddScoped<IDashboardAccountCardService, DashboardAccountCardService>();
         services.AddScoped<INotificationService, NotificationService>();

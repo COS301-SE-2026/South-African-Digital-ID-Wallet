@@ -156,6 +156,12 @@ public class SecureAccountResultDto
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DateTime? ExpiresAt { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? RefreshToken { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public DateTime? RefreshTokenExpiresAt { get; set; }
 }
 
 public class DismissFraudAlertRequestDto

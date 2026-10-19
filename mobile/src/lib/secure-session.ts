@@ -5,6 +5,8 @@ const BIOMETRIC_KEY = 'flashid.biometric-unlock'
 
 export type PersistedSession = {
   expiresAt: string
+  refreshToken?: string
+  refreshTokenExpiresAt?: string
   token: string
   user: { names: string; role: string; surname: string; userId: string }
 }

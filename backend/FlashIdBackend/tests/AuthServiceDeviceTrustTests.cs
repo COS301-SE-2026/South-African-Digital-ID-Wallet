@@ -115,11 +115,8 @@ public class AuthServiceDeviceTrustTests
 
     private sealed class FakeJwtTokenProvider : IJwtTokenProvider
     {
-        public bool? LastRememberMe;
-
-        public (string Token, DateTime ExpiresAt) GenerateToken(User user, bool rememberMe = false)
+        public (string Token, DateTime ExpiresAt) GenerateToken(User user)
         {
-            LastRememberMe = rememberMe;
             return ("fake-token", DateTime.UtcNow.AddHours(8));
         }
     }
@@ -164,6 +161,7 @@ public class AuthServiceDeviceTrustTests
         public FakeTrustedDeviceRepository Devices = null!;
         public FakeDeviceTokenProvider Tokens = null!;
         public FakeJwtTokenProvider Jwt = null!;
+        public FakeRefreshTokenService Refresh = null!;
         public FakeIpGeolocationProvider Geo = null!;
         public AuthService Service = null!;
         public User User = null!;
@@ -199,6 +197,7 @@ public class AuthServiceDeviceTrustTests
         var tokens = new FakeDeviceTokenProvider();
         var jwt = new FakeJwtTokenProvider();
         var geo = new FakeIpGeolocationProvider();
+        var refresh = new FakeRefreshTokenService();
 
         var service = new AuthService(
             auth,
@@ -211,7 +210,8 @@ public class AuthServiceDeviceTrustTests
             new FakeEmailSenderProvider(),
             new FakeHostEnvironment(),
             geo,
-            NullLogger<AuthService>.Instance);
+            NullLogger<AuthService>.Instance,
+            refresh);
 
         return new Ctx
         {
@@ -219,6 +219,7 @@ public class AuthServiceDeviceTrustTests
             Devices = devices,
             Tokens = tokens,
             Jwt = jwt,
+            Refresh = refresh,
             Geo = geo,
             Service = service,
             User = subject,
@@ -459,14 +460,14 @@ public class AuthServiceDeviceTrustTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task VerifyDeviceAsync_PassesRememberMeThroughToTheTokenProvider(bool rememberMe)
+    public async Task VerifyDeviceAsync_PassesRememberMeThroughToTheRefreshToken(bool rememberMe)
     {
         var c = Setup();
 
         await c.Service.VerifyDeviceAsync(
             Request(c.Verification.Id, rememberMe: rememberMe), null, TestIpAddress, TestContext.Current.CancellationToken);
 
-        Assert.Equal(rememberMe, c.Jwt.LastRememberMe);
+        Assert.Equal((c.User.Id, rememberMe), Assert.Single(c.Refresh.Issued));
     }
 
     [Fact]

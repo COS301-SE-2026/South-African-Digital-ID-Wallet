@@ -27,6 +27,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<TrustedDevice> TrustedDevices => Set<TrustedDevice>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<DeviceVerification> DeviceVerifications => Set<DeviceVerification>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<JobRun> JobRuns => Set<JobRun>();
     public DbSet<PhysicalIdentityVerification> PhysicalIdentityVerifications => Set<PhysicalIdentityVerification>();
     public DbSet<SigningKey> SigningKeys => Set<SigningKey>();

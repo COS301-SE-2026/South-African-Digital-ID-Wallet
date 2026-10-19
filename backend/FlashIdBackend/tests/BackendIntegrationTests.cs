@@ -130,7 +130,7 @@ public class BackendIntegrationTests
             citizenService,
             mapper,
             trustedDevicesRepository,
-            deviceTokenProvider, emailSenderProvider, environment, ipGeolocationProvider, NullLogger<AuthService>.Instance);
+            deviceTokenProvider, emailSenderProvider, environment, ipGeolocationProvider, NullLogger<AuthService>.Instance, new RefreshTokenService(new RefreshTokenRepository(context), authRepository, jwtProvider));
     }
 
     private static InstitutionService CreateInstitutionService(AppDbContext context)

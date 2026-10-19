@@ -50,4 +50,11 @@ describe('loginService', () => {
     await loginService.logout()
     expect(postMock).toHaveBeenCalledWith('/api/auth/logout')
   })
+  it('Should send the refresh token so the backend can revoke it', async () => {
+    postMock.mockResolvedValue({ data: null })
+    await loginService.logout('refresh-1')
+    expect(postMock).toHaveBeenCalledWith('/api/auth/logout', {
+      refreshToken: 'refresh-1',
+    })
+  })
 })

@@ -76,7 +76,8 @@ public class SecurityController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> SecureAccount(Guid alertId, [FromBody] SecureAccountRequestDto request,
-        [FromHeader(Name = "X-Client")] string? client, CancellationToken cancellationToken)
+        [FromHeader(Name = "X-Client")] string? client, [FromServices] IRefreshTokenService refreshTokenService,
+        CancellationToken cancellationToken)
     {
         if (!TryGetUserId(out var userId)) return Unauthorized(new { error = InvalidToken });
 
@@ -85,14 +86,21 @@ public class SecurityController : ControllerBase
             var result = await _fraudDetectionService.SecureAccountAsync(
                 userId, alertId, request, SecurityEventContextFactory.ReadDeviceToken(Request), ClientIp(), cancellationToken);
 
+            var isNativeClient = IsNativeClient(client);
             if (!string.IsNullOrWhiteSpace(result.Token))
             {
-                AuthCookies.AppendAccessToken(Response, _environment, result.Token, result.ExpiresAt);
+                Request.Cookies.TryGetValue(AuthCookies.RefreshTokenCookieName, out var currentRefreshToken);
+                var refreshToken = await refreshTokenService.ReissueAsync(userId, currentRefreshToken, isNativeClient, cancellationToken);
+                AuthCookies.AppendSession(Response, _environment, result.Token, result.ExpiresAt,
+                    isNativeClient ? null : refreshToken.Token, refreshToken.ExpiresAt);
+                result.RefreshToken = refreshToken.Token;
+                result.RefreshTokenExpiresAt = refreshToken.ExpiresAt;
             }
 
-            if (!IsNativeClient(client))
+            if (!isNativeClient)
             {
                 result.Token = null;
+                result.RefreshToken = null;
             }
 
             return Ok(result);
