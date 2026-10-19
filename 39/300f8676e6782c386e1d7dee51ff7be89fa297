@@ -1,0 +1,60 @@
+web/src/components/pages/landing-page/landing-assets.ts
+  h_0aff3b71f739b1 1-21
+web/src/components/organisms/landing-page-footer/landing-page-footer.tsx
+  h_0aff3b71f739b1 1-2
+  h_0aff3b71f739b1 3,17,23-29,57,62-63,68-69,74-75,80,103-105,108-109,120
+web/src/components/pages/landing-page/landing-effects.module.css
+  h_0aff3b71f739b1 1-219
+web/src/components/pages/landing-page/landing-page.tsx
+  h_0aff3b71f739b1 2-5,160-161
+  h_0aff3b71f739b1 6-7,138,142,149-152,154,156-157,162-163,183,188,207,212,215-216,218,228-230,244,246-250,252,263,266,290-294,304-306,314,316-331,333,390-394,404-406,414-415,417
+web/public/landing/README.md
+  h_0aff3b71f739b1 1-24
+web/public/landing/mobile-credentials.svg
+  h_0aff3b71f739b1 1
+web/public/landing/mobile-register.svg
+  h_0aff3b71f739b1 1
+web/public/landing/mobile-verify.svg
+  h_0aff3b71f739b1 1
+web/public/landing/mobile-wallet.svg
+  h_0aff3b71f739b1 1
+web/src/components/molecules/help-menu-section/help-menu-section.tsx
+  h_0aff3b71f739b1 4,93,95,113-115,167-169
+web/src/components/organisms/landing-page-navbar/landing-page-navbar.tsx
+  h_0aff3b71f739b1 20,27,37,41,45,47,50,55,78,103,120,125
+web/src/components/pages/landing-page/landing-page.test.tsx
+  h_0aff3b71f739b1 1-290
+web/src/components/pages/landing-page/mobile-app-section.tsx
+  h_0aff3b71f739b1 1-104
+web/src/components/pages/landing-page/mobile-preview/index.ts
+  h_0aff3b71f739b1 1-2
+web/src/components/pages/landing-page/mobile-preview/mobile-preview.tsx
+  h_0aff3b71f739b1 1-100
+web/src/components/pages/landing-page/mobile-preview/phone-frame.tsx
+  h_0aff3b71f739b1 1-36
+web/src/components/pages/landing-page/mobile-preview/types.ts
+  h_0aff3b71f739b1 1-6
+web/src/components/pages/landing-page/principles-section.tsx
+  h_0aff3b71f739b1 1-106
+web/src/components/pages/landing-page/product-showcase/index.ts
+  h_0aff3b71f739b1 1
+web/src/components/pages/landing-page/product-showcase/product-showcase.tsx
+  h_0aff3b71f739b1 1-242
+web/src/components/pages/landing-page/product-showcase/screens.ts
+  h_0aff3b71f739b1 1-54
+web/src/components/pages/landing-page/product-showcase/types.ts
+  h_0aff3b71f739b1 1-11
+web/src/components/pages/landing-page/security-section.tsx
+  h_0aff3b71f739b1 1-126
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "39300f8676e6782c386e1d7dee51ff7be89fa297",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
