@@ -1,0 +1,17 @@
+web/src/components/templates/app-shell/app-shell.tsx
+  h_99fca60b892ff4 104
+  h_99fca60b892ff4 105-107
+web/src/components/pages/officials/officials-dashboard-page.tsx
+  h_99fca60b892ff4 3,93-94,107-112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ce59cd056ae58ac9242693f05521454a6935a37e",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

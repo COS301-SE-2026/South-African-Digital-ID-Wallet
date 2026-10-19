@@ -1,0 +1,25 @@
+web/src/components/organisms/registration-form/registration-form.tsx
+  h_99fca60b892ff4 64,235
+  s_b2917687a6edb4::t_04f15abf484ffb 5-12,52-63,65-71,80-81,220,230-234,250,260-265
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f16736abf67cd43b787e5c694ff7c900f0846063",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_b2917687a6edb4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23839738-64de-4ee3-9563-bc961e701511",
+        "model": "unknown"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
