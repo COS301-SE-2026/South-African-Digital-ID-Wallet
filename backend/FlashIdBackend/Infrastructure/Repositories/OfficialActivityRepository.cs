@@ -24,7 +24,10 @@ public class OfficialActivityRepository : IOfficialActivityRepository
             join credential in _context.Credentials.AsNoTracking() on log.CredentialId equals credential.Id into credentialJoin
             from credential in credentialJoin.DefaultIfEmpty()
                 // Only citizen-facing work: logins and device checks are not "activity" an official needs to see
-            where log.ActorId == userId && AuditEventTypeExtensions.OfficialWorkEvents.Contains(log.EventType)
+                // Consent is skipped here: it always comes with an onboarding, so the card would show every onboarding twice
+            where log.ActorId == userId
+                  && AuditEventTypeExtensions.OfficialWorkEvents.Contains(log.EventType)
+                  && log.EventType != AuditEventType.ConsentRecorded
             orderby log.CreatedAt descending
             select new
             {

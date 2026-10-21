@@ -96,7 +96,7 @@ export const AuditLogTable = ({
         ) : (
           <>
             <div className="mt-4 min-h-0 flex-1 overflow-auto pr-1">
-              <table className="w-full table-fixed border-collapse md:min-w-[520px]">
+              <table className="w-full table-fixed border-collapse break-words md:min-w-[520px]">
                 <thead className="sticky top-0 z-10 bg-card">
                   <tr className="border-b border-black/10">
                     <th className="w-[30%] px-2 py-3 text-left sm:px-4 md:w-[16%]">
@@ -121,7 +121,7 @@ export const AuditLogTable = ({
                       <Text
                         as="span"
                         variant="caption"
-                        className="whitespace-nowrap !text-[11px] font-bold uppercase tracking-wide text-muted-text"
+                        className="!text-[11px] font-bold uppercase tracking-wide text-muted-text md:whitespace-nowrap"
                       >
                         Citizen / Details
                       </Text>
@@ -209,7 +209,10 @@ export const AuditLogTable = ({
                           )}
                         </td>
                         <td className="hidden px-4 py-3 md:table-cell">
-                          <div className="truncate !text-xs text-text-primary">
+                          <div
+                            className="line-clamp-2 !text-xs text-text-primary"
+                            title={row.performedBy}
+                          >
                             {row.performedBy}
                           </div>
                         </td>

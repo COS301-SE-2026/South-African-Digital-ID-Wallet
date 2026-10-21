@@ -27,4 +27,13 @@ public class OfficialAuditSummaryFormatterTests
     [Fact]
     public void OtherEvents_KeepTheirDetails() =>
         Assert.Equal("Citizen onboarded.", OfficialAuditSummaryFormatter.Format(AuditEventType.OnboardCitizen, "Citizen onboarded.", null));
+
+    [Fact]
+    public void AccountEvents_UseShortLabelsInsteadOfTheLogSentence() =>
+        Assert.Equal("New device trusted", OfficialAuditSummaryFormatter.Format(
+            AuditEventType.DeviceVerified, "User someone@flashid.local verified and trusted a new device.", null));
+
+    [Fact]
+    public void ConsentRecorded_IsCitizenWork() =>
+        Assert.Contains(AuditEventType.ConsentRecorded, AuditEventTypeExtensions.OfficialWorkEvents);
 }

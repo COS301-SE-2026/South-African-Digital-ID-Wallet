@@ -22,6 +22,16 @@ public static partial class OfficialAuditSummaryFormatter
             AuditEventType.OfflineCredentialVerified => $"{credential} · offline scan",
             AuditEventType.OfflineVerificationRejected => "Offline scan rejected",
             AuditEventType.CitizenVerificationFailed => "QR verification failed",
+            // Account events: the raw Details repeat the action and the official's email, so use short labels instead
+            AuditEventType.UserLoggedIn => "Signed in",
+            AuditEventType.UserLoggedOut => "Signed out",
+            AuditEventType.FailedLoginAttempt => "Wrong email or password",
+            AuditEventType.DeviceVerificationRequested => "Code emailed to confirm a new device",
+            AuditEventType.DeviceVerificationResent => "Device code resent",
+            AuditEventType.DeviceVerified => "New device trusted",
+            AuditEventType.DeviceVerificationFailed => "Wrong device code entered",
+            AuditEventType.PasswordReset => "Password reset",
+            AuditEventType.ConsentRecorded => "POPIA consent recorded",
             _ => details,
         };
     }
