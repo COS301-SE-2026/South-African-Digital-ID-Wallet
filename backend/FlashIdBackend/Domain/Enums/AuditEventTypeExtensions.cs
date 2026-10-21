@@ -26,6 +26,7 @@ public static class AuditEventTypeExtensions
     {
         AuditEventType.OnboardCitizen,
         AuditEventType.OnboardCitizenFailed,
+        AuditEventType.ConsentRecorded,
         AuditEventType.CredentialIssued,
         AuditEventType.CredentialVerified,
         AuditEventType.CitizenVerificationFailed,
