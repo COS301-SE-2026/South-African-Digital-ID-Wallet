@@ -1,0 +1,54 @@
+README.md
+  h_99fca60b892ff4 41,52,58-61,77-80,89,91-92,109,128-144,179,308-309
+docs/project-day/SAS-v4.md
+  h_99fca60b892ff4 1-1822
+docs/project-day/SRS-v4.md
+  h_99fca60b892ff4 1-349
+docs/project-day/TESTING_POLICY.md
+  h_99fca60b892ff4 1-112
+docs/project-day/architecture-v4.md
+  h_99fca60b892ff4 1-239
+docs/project-day/coding_standards.md
+  h_99fca60b892ff4 1-267
+docs/project-day/epics-and-user-stories-v4.md
+  h_99fca60b892ff4 1-910
+docs/project-day/functional-requirements-v4.md
+  h_99fca60b892ff4 1-594
+docs/project-day/nfr-evidence/nfr-expiry-batch-timing-2026-09-30.json
+  h_99fca60b892ff4 1-127
+docs/project-day/nfr-evidence/nfr-rate-limit-2026-09-30.json
+  h_99fca60b892ff4 1-116
+docs/project-day/nfr-evidence/nfr2-2-auth-2026-09-30.json
+  h_99fca60b892ff4 1-133
+docs/project-day/nfr-evidence/nfr2-3-credentials-and-qr-2026-09-30.json
+  h_99fca60b892ff4 1-159
+docs/project-day/nfr-evidence/nfr2-4-qr-verification-2026-09-30.json
+  h_99fca60b892ff4 1-141
+docs/project-day/nfr-evidence/nfr2-5-ramp-2026-09-30.json
+  h_99fca60b892ff4 1-174
+docs/project-day/offline-verification/decisions.md
+  h_99fca60b892ff4 1-430
+docs/project-day/offline-verification/device-test-protocol.md
+  h_99fca60b892ff4 1-46
+docs/project-day/offline-verification/wire-format.md
+  h_99fca60b892ff4 1-272
+docs/project-day/openapi-government-registry.yaml
+  h_99fca60b892ff4 1-48
+docs/project-day/openapi.yaml
+  h_99fca60b892ff4 1-3236
+docs/project-day/security/csrf-protection.md
+  h_99fca60b892ff4 1-112
+docs/project-day/use-cases-v4.md
+  h_99fca60b892ff4 1-578
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7b824d9c0d49c7345b4f0dc6a4ebb011e8524ba3",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
