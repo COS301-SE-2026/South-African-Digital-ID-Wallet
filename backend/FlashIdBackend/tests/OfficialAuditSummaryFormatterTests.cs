@@ -35,5 +35,5 @@ public class OfficialAuditSummaryFormatterTests
 
     [Fact]
     public void ConsentRecorded_IsCitizenWork() =>
-        Assert.Contains(AuditEventType.ConsentRecorded, AuditEventTypeExtensions.OfficialWorkEvents);
+        Assert.Contains(AuditEventType.ConsentRecorded, (IReadOnlySet<AuditEventType>)AuditEventTypeExtensions.OfficialWorkEvents);
 }

@@ -16,9 +16,7 @@ public static partial class OfficialAuditSummaryFormatter
 
         return eventType switch
         {
-            AuditEventType.CredentialVerified => FieldCountPattern().Match(details) is { Success: true } match
-                ? $"{credential} · {match.Groups[1].Value} {(match.Groups[1].Value == "1" ? "field" : "fields")} disclosed"
-                : $"{credential} verified",
+            AuditEventType.CredentialVerified => DisclosureSummary(credential, details),
             AuditEventType.OfflineCredentialVerified => $"{credential} · offline scan",
             AuditEventType.OfflineVerificationRejected => "Offline scan rejected",
             AuditEventType.CitizenVerificationFailed => "QR verification failed",
@@ -34,5 +32,19 @@ public static partial class OfficialAuditSummaryFormatter
             AuditEventType.ConsentRecorded => "POPIA consent recorded",
             _ => details,
         };
+    }
+
+    // Field count comes from QrService's Details text; without one, just say it was verified
+    private static string DisclosureSummary(string credential, string details)
+    {
+        var match = FieldCountPattern().Match(details);
+        if (!match.Success)
+        {
+            return $"{credential} verified";
+        }
+
+        var count = match.Groups[1].Value;
+        var unit = count == "1" ? "field" : "fields";
+        return $"{credential} · {count} {unit} disclosed";
     }
 }
