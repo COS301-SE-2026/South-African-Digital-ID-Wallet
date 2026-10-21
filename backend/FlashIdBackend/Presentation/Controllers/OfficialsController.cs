@@ -99,6 +99,7 @@ public class OfficialsController : ControllerBase
     /// <param name="type">Filters by outcome: "Success" or "Failed".</param>
     /// <param name="page">1-based page number. Clamped server side to >= 1.</param>
     /// <param name="pageSize">Items per page. Clamped server side to [1, 100], default 7.</param>
+    /// <param name="category">"work" for citizen-facing actions, "security" for account events; omit for everything.</param>
     /// <response code="200">The requested page of institution audit history.</response>
     /// <response code="401">The caller is not authenticated, or the token could not be resolved to a user.</response>
     [HttpGet("history")]
@@ -112,7 +113,8 @@ public class OfficialsController : ControllerBase
         [FromQuery] DateTime? dateTo,
         [FromQuery] string? type,
         [FromQuery] int? page,
-        [FromQuery] int? pageSize
+        [FromQuery] int? pageSize,
+        [FromQuery] string? category
     )
     {
         var userIdClaim = User.FindFirst("userId")?.Value;
@@ -124,7 +126,7 @@ public class OfficialsController : ControllerBase
 
         try
         {
-            var result = await _officialActivityService.GetInstitutionHistoryAsync(userId, search, action, dateFrom, dateTo, type, page, pageSize, ipAddress);
+            var result = await _officialActivityService.GetInstitutionHistoryAsync(userId, search, action, dateFrom, dateTo, type, page, pageSize, ipAddress, category);
             return Ok(result);
         }
         catch (UnauthorizedAccessException uae)

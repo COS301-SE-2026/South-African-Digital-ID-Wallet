@@ -21,6 +21,27 @@ public static class AuditEventTypeExtensions
         AuditEventType.CitizenStatusViewed,
     };
 
+    // An official's citizen-facing work: drives "My recent work" and the "Citizen work" tab
+    public static readonly HashSet<AuditEventType> OfficialWorkEvents = new()
+    {
+        AuditEventType.OnboardCitizen,
+        AuditEventType.OnboardCitizenFailed,
+        AuditEventType.CredentialIssued,
+        AuditEventType.CredentialVerified,
+        AuditEventType.CitizenVerificationFailed,
+        AuditEventType.OfflineCredentialVerified,
+        AuditEventType.OfflineVerificationRejected,
+        AuditEventType.EmergencyProfileAccessed,
+        AuditEventType.EmergencyProfileAccessFailed,
+    };
+
+    // The citizen chose what to reveal, so official-facing views must never show who they are
+    public static readonly HashSet<AuditEventType> SelectiveDisclosureEvents = new()
+    {
+        AuditEventType.CredentialVerified,
+        AuditEventType.OfflineCredentialVerified,
+    };
+
     public static string ToOutcome(this AuditEventType eventType) =>
         ViewEvents.Contains(eventType) ? "Access"
         : FailedEvents.Contains(eventType) ? "Failed"

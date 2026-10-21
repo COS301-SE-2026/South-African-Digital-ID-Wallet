@@ -42,14 +42,15 @@ public class OfficialActivityService : IOfficialActivityService
         string? type,
         int? page,
         int? pageSize,
-        string ipAddress
+        string ipAddress,
+        string? category = null
     )
     {
         var official = await _officialRepository.GetByUserIdAsync(userId) ?? throw new UnauthorizedAccessException("The authenticated official could not be identified.");
         var clampedPage = Math.Max(page ?? 1, 1);
         var clampedPageSize = Math.Clamp(pageSize ?? DefaultPageSize, MinPageSize, MaxPageSize);
         var parsedAction = Enum.TryParse<AuditEventType>(action, ignoreCase: true, out var actionValue) ? actionValue : (AuditEventType?)null;
-        var (items, totalCount) = await _officialActivityRepository.GetInstitutionHistoryAsync(official.InstitutionId, search, parsedAction, dateFrom, dateTo, type, clampedPage, clampedPageSize);
+        var (items, totalCount) = await _officialActivityRepository.GetInstitutionHistoryAsync(official.InstitutionId, search, parsedAction, dateFrom, dateTo, type, clampedPage, clampedPageSize, category);
 
         await _officialActivityRepository.AddAuditLogAsync(new AuditLog
         {
@@ -58,7 +59,7 @@ public class OfficialActivityService : IOfficialActivityService
             ActorId = userId,
             IpAddress = ipAddress,
             CreatedAt = DateTime.UtcNow,
-            Details = $"Viewed institution audit history: search='{search}', action='{action}', dateFrom='{dateFrom:O}', dateTo='{dateTo:O}', type='{type}', page='{clampedPage}', pageSize='{clampedPageSize}'; resultCount={items.Count}",
+            Details = $"Viewed institution audit history: category='{category}', search='{search}', action='{action}', dateFrom='{dateFrom:O}', dateTo='{dateTo:O}', type='{type}', page='{clampedPage}', pageSize='{clampedPageSize}'; resultCount={items.Count}",
         });
 
         await _officialActivityRepository.SaveChangesAsync();

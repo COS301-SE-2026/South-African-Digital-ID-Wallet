@@ -3,9 +3,15 @@ import type {
   AuditLogHistoryResponse,
   AuditLogItem,
   AuditLogOutcome,
+  AuditLogCategory,
 } from '@/services/official-dashboard-service/types'
 
-export type { AuditLogHistoryResponse, AuditLogItem, AuditLogOutcome }
+export type {
+  AuditLogCategory,
+  AuditLogHistoryResponse,
+  AuditLogItem,
+  AuditLogOutcome,
+}
 
 export type AuditLogApiError = {
   error: {
@@ -25,4 +31,6 @@ export type AuditLogTableProps = {
   resultsPerPage: number
   onPageChange: Dispatch<SetStateAction<number>>
   isLoading: boolean
+  category: AuditLogCategory
+  onCategoryChange: (category: AuditLogCategory) => void
 }
