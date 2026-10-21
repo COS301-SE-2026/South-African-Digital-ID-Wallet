@@ -19,6 +19,7 @@ const item = (
   ipAddress: '196.25.1.1',
   outcome: 'Success',
   performedBy: 'officer@flashid.co.za',
+  summary: 'Signed in',
   ...overrides,
 })
 
@@ -52,6 +53,22 @@ describe('toAuditLogEntry', () => {
   })
   it('Should leave the SA id null when absent', () => {
     expect(toAuditLogEntry(item({ citizenSaId: null })).saId).toBeNull()
+  })
+  it('Should show the summary instead of the raw details', () => {
+    const entry = toAuditLogEntry(
+      item({
+        action: 'OfflineCredentialVerified',
+        details:
+          'Offline verification. Result: VERIFIED. Revocation index: 42.',
+        summary: 'Identity Document · offline scan',
+      })
+    )
+    expect(entry.details).toBe('Identity Document · offline scan')
+  })
+  it('Should fall back to the details when there is no summary', () => {
+    expect(toAuditLogEntry(item({ summary: '' })).details).toBe(
+      'Signed in from mobile'
+    )
   })
   it.each(['system', 'unknown', '', '  SYSTEM  '])(
     'Should discard the uninformative ip %s',
