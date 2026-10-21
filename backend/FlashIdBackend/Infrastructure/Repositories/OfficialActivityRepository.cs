@@ -19,6 +19,8 @@ public class OfficialActivityRepository : IOfficialActivityRepository
 
     public async Task<List<MyActivityItemDto>> GetRecentByActorAsync(Guid userId, int limit)
     {
+        // EF Core can translate array.Contains into SQL IN, but not FrozenSet.Contains
+        var workEvents = AuditEventTypeExtensions.OfficialWorkEvents.ToArray();
         var rows = await (
             from log in _context.AuditLogs.AsNoTracking()
             join credential in _context.Credentials.AsNoTracking() on log.CredentialId equals credential.Id into credentialJoin
@@ -26,7 +28,7 @@ public class OfficialActivityRepository : IOfficialActivityRepository
                 // Only citizen-facing work: logins and device checks are not "activity" an official needs to see
                 // Consent is skipped here: it always comes with an onboarding, so the card would show every onboarding twice
             where log.ActorId == userId
-                  && AuditEventTypeExtensions.OfficialWorkEvents.Contains(log.EventType)
+                  && workEvents.Contains(log.EventType)
                   && log.EventType != AuditEventType.ConsentRecorded
             orderby log.CreatedAt descending
             select new
@@ -85,7 +87,9 @@ public class OfficialActivityRepository : IOfficialActivityRepository
         var searchMatchesSuccess = trimmedSearch != null && "success".Contains(trimmedSearch, StringComparison.OrdinalIgnoreCase);
         var searchMatchesAccess = trimmedSearch != null && "access".Contains(trimmedSearch, StringComparison.OrdinalIgnoreCase);
         var failedEvents = AuditEventTypeExtensions.FailedEvents;
-        var hiddenCitizenEvents = AuditEventTypeExtensions.SelectiveDisclosureEvents;
+        // EF Core can translate array.Contains into SQL IN, but not FrozenSet.Contains, so copy the sets into arrays
+        var hiddenCitizenEvents = AuditEventTypeExtensions.SelectiveDisclosureEvents.ToArray();
+        var workEvents = AuditEventTypeExtensions.OfficialWorkEvents.ToArray();
 
         var query =
             from log in _context.AuditLogs.AsNoTracking()
@@ -102,12 +106,12 @@ public class OfficialActivityRepository : IOfficialActivityRepository
         // "work" = citizen-facing actions, "security" = the officials' own account events, anything else = everything
         if (string.Equals(category, "work", StringComparison.OrdinalIgnoreCase))
         {
-            query = query.Where(x => AuditEventTypeExtensions.OfficialWorkEvents.Contains(x.log.EventType));
+            query = query.Where(x => workEvents.Contains(x.log.EventType));
         }
         else if (string.Equals(category, "security", StringComparison.OrdinalIgnoreCase))
         {
             query = query.Where(x =>
-                !AuditEventTypeExtensions.OfficialWorkEvents.Contains(x.log.EventType) &&
+                !workEvents.Contains(x.log.EventType) &&
                 !AuditEventTypeExtensions.ViewEvents.Contains(x.log.EventType));
         }
 

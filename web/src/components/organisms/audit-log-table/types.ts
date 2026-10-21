@@ -1,9 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react'
 import type {
-  AuditLogHistoryResponse,
-  AuditLogItem,
-  AuditLogOutcome,
   AuditLogCategory,
+  AuditLogItem,
 } from '@/services/official-dashboard-service/types'
 
 export type {
@@ -11,7 +9,7 @@ export type {
   AuditLogHistoryResponse,
   AuditLogItem,
   AuditLogOutcome,
-}
+} from '@/services/official-dashboard-service/types'
 
 export type AuditLogApiError = {
   error: {

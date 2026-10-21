@@ -1,4 +1,4 @@
-using Domain.Enums;
+using System.Collections.Frozen;
 
 namespace Domain.Enums;
 
@@ -22,7 +22,7 @@ public static class AuditEventTypeExtensions
     };
 
     // An official's citizen-facing work: drives "My recent work" and the "Citizen work" tab
-    public static readonly HashSet<AuditEventType> OfficialWorkEvents = new()
+    public static readonly FrozenSet<AuditEventType> OfficialWorkEvents = new[]
     {
         AuditEventType.OnboardCitizen,
         AuditEventType.OnboardCitizenFailed,
@@ -34,14 +34,14 @@ public static class AuditEventTypeExtensions
         AuditEventType.OfflineVerificationRejected,
         AuditEventType.EmergencyProfileAccessed,
         AuditEventType.EmergencyProfileAccessFailed,
-    };
+    }.ToFrozenSet();
 
     // The citizen chose what to reveal, so official-facing views must never show who they are
-    public static readonly HashSet<AuditEventType> SelectiveDisclosureEvents = new()
+    public static readonly FrozenSet<AuditEventType> SelectiveDisclosureEvents = new[]
     {
         AuditEventType.CredentialVerified,
         AuditEventType.OfflineCredentialVerified,
-    };
+    }.ToFrozenSet();
 
     public static string ToOutcome(this AuditEventType eventType) =>
         ViewEvents.Contains(eventType) ? "Access"
