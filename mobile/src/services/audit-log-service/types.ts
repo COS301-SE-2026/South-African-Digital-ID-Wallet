@@ -14,6 +14,7 @@ export type AuditLogItemResponse = {
   ipAddress: string | null
   outcome: string
   performedBy: string
+  summary: string
 }
 
 export type AuditLogResponse = {

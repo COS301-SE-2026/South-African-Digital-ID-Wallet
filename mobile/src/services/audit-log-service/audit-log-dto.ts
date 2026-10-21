@@ -39,7 +39,8 @@ export const toAuditLogEntry = (item: AuditLogItemResponse): AuditLogEntry => {
     OUTCOME_PRESENTATION[item.outcome] ?? FALLBACK_PRESENTATION
   return {
     actor: item.performedBy,
-    details: item.details,
+    // Readable, privacy-safe text from the backend; raw details only if an older API sends no summary
+    details: item.summary || item.details,
     id: item.id,
     Icon: presentation.Icon,
     ipAddress: toIpAddress(item.ipAddress),
