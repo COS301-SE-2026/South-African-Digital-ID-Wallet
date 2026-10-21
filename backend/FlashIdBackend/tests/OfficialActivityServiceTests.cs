@@ -72,7 +72,8 @@ public class OfficialActivityServiceTests
             DateTime? dateTo,
             string? type,
             int page,
-            int pageSize)
+            int pageSize,
+            string? category = null)
         {
             LastHistoryQuery = new HistoryQuery
             {
