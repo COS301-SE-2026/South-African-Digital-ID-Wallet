@@ -1,0 +1,19 @@
+mobile/src/services/audit-log-service/test/audit-log-dto.test.ts
+  h_99fca60b892ff4 22,57-60,63-72
+  h_99fca60b892ff4 61-62
+mobile/src/services/audit-log-service/types.ts
+  h_99fca60b892ff4 17
+mobile/src/services/audit-log-service/audit-log-dto.ts
+  h_99fca60b892ff4 42-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4865da012cc52cae861b3028faada3ba6eaade42",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
