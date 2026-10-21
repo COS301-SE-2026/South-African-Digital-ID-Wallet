@@ -18,6 +18,7 @@ public class OfficialActivityServiceTests
         public DateTime? DateFrom;
         public DateTime? DateTo;
         public string? Type;
+        public string? Category;
         public int Page;
         public int PageSize;
     }
@@ -83,6 +84,7 @@ public class OfficialActivityServiceTests
                 DateFrom = dateFrom,
                 DateTo = dateTo,
                 Type = type,
+                Category = category,
                 Page = page,
                 PageSize = pageSize,
             };
@@ -431,5 +433,18 @@ public class OfficialActivityServiceTests
         var result = await c.Service.GetMyStatsAsync(c.UserId);
 
         Assert.False(result.IsCapped);
+    }
+
+    [Fact]
+    public async Task GetInstitutionHistoryAsync_PassesCategoryToRepositoryAndAuditsIt()
+    {
+        var c = Setup();
+
+        await c.Service.GetInstitutionHistoryAsync(
+            c.UserId, null, null, null, null, null, null, null, TestIpAddress, "work");
+
+        Assert.Equal("work", c.ActivityRepo.LastHistoryQuery!.Category);
+        // The POPIA "who viewed the audit log" record must say which tab was viewed
+        Assert.Contains("category='work'", c.ActivityRepo.AuditLogs.Single().Details);
     }
 }
