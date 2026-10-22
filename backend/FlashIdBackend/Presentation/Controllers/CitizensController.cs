@@ -97,7 +97,7 @@ public class CitizensController : ControllerBase
         try
         {
             await _citizenService.ResendOtpAsync(request);
-            return Ok(new { message = "Verificaiton code has been resent." });
+            return Ok(new { message = "Verification code has been resent." });
         }
         catch (EmailAlreadyVerifiedException eave)
         {

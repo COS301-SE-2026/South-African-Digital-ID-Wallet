@@ -110,7 +110,7 @@ public class CertifiedCredentialCopiesController : ControllerBase
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> VerifyCertifiedCopyDocument(
         string verificationToken,
-        IFormFile document)
+        [FromForm(Name = "document")] IFormFile document)
     {
         try
         {
@@ -166,7 +166,7 @@ public class CertifiedCredentialCopiesController : ControllerBase
     [HttpPost("verify-document")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> VerifyCertifiedCopyDocumentWithoutToken(
-        IFormFile document)
+        [FromForm(Name = "document")] IFormFile document)
     {
         try
         {

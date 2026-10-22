@@ -41,7 +41,7 @@ Server=localhost\SQLEXPRESS;Database=FlashIdDb;Trusted_Connection=True;MultipleA
 
 This points the app to your local SQL Server Express instance and lets SSMS / EF Core use the same database name.
 
-On macOS or Linux, start SQL Server and Azurite with `docker compose -f backend/FlashIdBackend/docker-compose.yml up -d` and use `Server=localhost,1433;Database=FlashIdDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True` instead.
+On macOS or Linux, start SQL Server and Azurite with `docker compose -f backend/FlashIdBackend/docker-compose.yml up -d` and use `Server=localhost,1433;Database=FlashIdDb;User Id=sa;Password=<MSSQL_SA_PASSWORD>;TrustServerCertificate=True` instead, replacing `<MSSQL_SA_PASSWORD>` with the `MSSQL_SA_PASSWORD` from `docker-compose.yml`.
 
 The API also reads `Jwt:Key`, `Cosmos:*`, `BlobStorage:*` and the other empty values in `appsettings.json` at startup, so set those as user secrets too. The API applies pending migrations automatically when it starts.
 

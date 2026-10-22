@@ -16,7 +16,7 @@ FlashId makes use of an N-Tier architectural pattern. The presentation tier make
 
 ### 1.1 Security
 
-- All API endpoints require JWT authentication except public ones: registration and login, citizen registration and email verification, new-device verification, forgot password, reset password, certified copy verification, and the offline issuer keys and revocation list.
+- All API endpoints require JWT authentication except public ones: registration and login, citizen registration and email verification, new-device verification, token refresh, forgot password, reset password, certified copy verification, and the offline issuer keys and revocation list.
 - Short-lived (15-minute) JWT access tokens are issued by the backend together with a rotating, single-use refresh token. They are transmitted via HttpOnly cookies on the web and as a Bearer token from mobile, and validated on every request. Reusing an already-rotated refresh token revokes the whole session
 - All passwords are hashed using BCrypt before storage and plaintext passwords are never persisted
 - All data transmitted between client and server uses HTTPS/TLS encryption
@@ -26,7 +26,7 @@ FlashId makes use of an N-Tier architectural pattern. The presentation tier make
 - Citizen photos are stored in a private Azure Blob Storage container. A short-lived, time limited signed URL is generated only at the moment a QR is scanned, never persisted or embedded in the QR itself
 - Qr replay-guard documents in Cosmos DB reference credentials via a keyed HMAC hash rather than the raw credential ID, so read access to that store alone cannot be correlated back to a specific citizen's record in Azure SQL.
 - The system enforces account lockout after repeated failed login attempts
-- Rate limiting (HTTP 429 on breach) is applied per client IP to anonymous endpoints, such as registration (5 per minute), login (10 per minute), OTP resend (3 per minute) and password reset (5 per minute), and per user to sensitive signed-in endpoints, with a global backstop of 300 requests per minute
+- Rate limiting (HTTP 429 on breach) is applied per client IP to anonymous endpoints, such as registration (5 per minute), login (10 per minute), OTP resend (3 per minute), password reset (5 per minute) and token refresh (60 per minute per refresh token), and per user to sensitive signed-in endpoints, with a global backstop of 300 requests per minute
 - Role-based access control prevents unauthorized access to restricted endpoints
 - The system maintains immutable audit logs for all critical operations
 - Sign-ins from an unrecognised device require a one-time code sent by email before a session is issued.

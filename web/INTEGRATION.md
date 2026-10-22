@@ -578,7 +578,7 @@ Only create a new service folder if the feature is genuinely separate.
 
 # Rules of Thumb
 
-- One feature = one folder = five files.
+- One feature = one folder (`*-model.ts` only when needed).
 - Components never import axios or `@/lib/api`.
 - Components never see snake_case fields. That is the DTO and model's job.
 - Query keys must include everything that affects the result.
