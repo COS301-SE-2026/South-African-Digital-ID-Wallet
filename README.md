@@ -56,8 +56,10 @@ Deployment is fully automated via GitHub Actions. See [SAS 5 Deployment](docs/de
   - [Demo 4 Mobile Video](https://drive.google.com/file/d/1lFLun-fpQ__IlzdNswOcz_ZTaL8VzSbG/view?usp=sharing)
 
 - Project Day Videos
-  - [Project Day Video](https://drive.google.com/file/d/1t4lDBn8qNqx0QfUmopVgcpspJw4Qw0Qw/view?usp=drive_link)
-  - [Trailer](https://drive.google.com/file/d/1xT1Q78IFFTJBvw102cBK2hqWuBXaNt8p/view?usp=drive_link)
+  - [Project Day Video (Google Drive)](https://drive.google.com/file/d/1t4lDBn8qNqx0QfUmopVgcpspJw4Qw0Qw/view?usp=drive_link)
+  - [Project Day Video (Youtube)](https://youtu.be/nflAqYkuHsw)
+  - [Trailer (Google Drive)](https://drive.google.com/file/d/1xT1Q78IFFTJBvw102cBK2hqWuBXaNt8p/view?usp=drive_link)
+  - [Trailer (Youtube)](https://youtu.be/Gd-2XxsDdfM)
 
 ---
 
