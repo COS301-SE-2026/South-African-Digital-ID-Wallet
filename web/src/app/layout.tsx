@@ -9,8 +9,19 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://flashid.co.za'),
   title: 'FlashID',
   description: 'South African Digital ID Wallet',
+  openGraph: {
+    title: 'FlashID',
+    description: 'South African Digital ID Wallet',
+    url: '/',
+    siteName: 'FlashID',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 }
 
 export default function RootLayout({
