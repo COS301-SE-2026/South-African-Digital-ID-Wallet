@@ -184,7 +184,12 @@ export const AuditLogTable = ({
                               ) : null}
                             </>
                           ) : (
-                            <span className="!text-xs text-muted-text">-</span>
+                            <span
+                              className="line-clamp-2 !text-xs text-muted-text"
+                              title={row.details}
+                            >
+                              {row.details || '-'}
+                            </span>
                           )}
                         </td>
                         <td className="hidden px-4 py-3 md:table-cell">
