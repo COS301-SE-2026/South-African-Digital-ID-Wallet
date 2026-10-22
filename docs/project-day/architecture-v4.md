@@ -26,7 +26,7 @@ FlashId makes use of an N-Tier architectural pattern. The presentation tier make
 - Citizen photos are stored in a private Azure Blob Storage container. A short-lived, time limited signed URL is generated only at the moment a QR is scanned, never persisted or embedded in the QR itself
 - Qr replay-guard documents in Cosmos DB reference credentials via a keyed HMAC hash rather than the raw credential ID, so read access to that store alone cannot be correlated back to a specific citizen's record in Azure SQL.
 - The system enforces account lockout after repeated failed login attempts
-- Rate limiting (HTTP 429 on breach) is applied per client IP to anonymous endpoints, such as registration (5 per minute), login (10 per minute), OTP resend (3 per minute), password reset (5 per minute), plus token refresh (60 per minute per refresh token, falling back to client IP when no refresh token is sent), and per user to sensitive signed-in endpoints, with a global backstop of 300 requests per minute
+- Rate limiting (HTTP 429 on breach) is applied per client IP to anonymous endpoints, such as registration (5 per minute), login (10 per minute), OTP resend (3 per minute), password reset (5 per minute), plus token refresh (60 per minute per refresh token, falling back to client IP when there is no refresh token cookie, e.g. mobile), and per user to sensitive signed-in endpoints, with a global backstop of 300 requests per minute
 - Role-based access control prevents unauthorized access to restricted endpoints
 - The system maintains immutable audit logs for all critical operations
 - Sign-ins from an unrecognised device require a one-time code sent by email before a session is issued.
