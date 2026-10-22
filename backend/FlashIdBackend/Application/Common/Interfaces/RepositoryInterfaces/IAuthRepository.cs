@@ -10,4 +10,6 @@ public interface IAuthRepository
     Task UpdateUserAsync(User user);
     Task AddAuditLogAsync(AuditLog auditLog);
     Task SaveChangesAsync();
+    Task<Official?> GetOfficialByUserIdAsync(Guid userId);
+    Task<GovernmentAdministrator?> GetGovernmentAdministratorByUserIdAsync(Guid userId);
 }

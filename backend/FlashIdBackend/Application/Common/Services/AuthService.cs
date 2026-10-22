@@ -584,7 +584,32 @@ public class AuthService : IAuthService
         {
             return null;
         }
+
         var citizen = await _authRepository.GetCitizenByUserIdAsync(userId);
-        return _mapper.UserToUserProfileDto(user, citizen);
+        var dto = _mapper.UserToUserProfileDto(user, citizen);
+
+        // Staff accounts have no Citizen row, so their names come from their own table
+        if (citizen == null)
+        {
+            (dto.Names, dto.Surname) = await GetStaffNamesAsync(user);
+        }
+
+        return dto;
+    }
+
+    // Each staff role stores its names in a different table, so look in the one for this role
+    private async Task<(string? Names, string? Surname)> GetStaffNamesAsync(User user)
+    {
+        switch (user.Role)
+        {
+            case UserRole.Official:
+                var official = await _authRepository.GetOfficialByUserIdAsync(user.Id);
+                return (official?.Names, official?.Surname);
+            case UserRole.GovernmentAdministrator:
+                var admin = await _authRepository.GetGovernmentAdministratorByUserIdAsync(user.Id);
+                return (admin?.Names, admin?.Surname);
+            default:
+                return (null, null); // a citizen with no Citizen row yet: the frontend shows the email
+        }
     }
 }
