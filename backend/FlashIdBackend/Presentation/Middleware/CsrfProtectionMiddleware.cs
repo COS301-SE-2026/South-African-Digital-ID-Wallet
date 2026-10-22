@@ -18,6 +18,7 @@ public class CsrfProtectionMiddleware
         "/api/auth/login",
         "/api/auth/verify-device",
         "/api/auth/resend-device-verification",
+        "/api/auth/refresh",
     };
 
     private readonly RequestDelegate _next;

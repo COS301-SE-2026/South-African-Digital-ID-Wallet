@@ -37,13 +37,8 @@ public class AuthServiceTests
 
     private class FakeJwtTokenProvider : IJwtTokenProvider
     {
-        public bool? LastRememberMeValue { get; private set; }
-        public (string Token, DateTime ExpiresAt) GenerateToken(User user, bool rememberMe = false)
-        {
-            LastRememberMeValue = rememberMe;
-            var expiresAt = rememberMe ? DateTime.UtcNow.AddDays(30) : DateTime.UtcNow.AddHours(8);
-            return ("fake-token", expiresAt);
-        }
+        public (string Token, DateTime ExpiresAt) GenerateToken(User user) =>
+            ("fake-token", DateTime.UtcNow.AddMinutes(15));
     }
 
     private class FakeDeviceTokenProvider : IDeviceTokenProvider
@@ -193,7 +188,7 @@ public class AuthServiceTests
         };
     }
 
-    private static AuthService CreateAuthService(FakeAuthRepository fakeAuthRepository, FakeJwtTokenProvider fakeJwtTokenProvider, FakeTrustedDeviceRepository fakeTrustedDeviceRepository)
+    private static AuthService CreateAuthService(FakeAuthRepository fakeAuthRepository, FakeJwtTokenProvider fakeJwtTokenProvider, FakeTrustedDeviceRepository fakeTrustedDeviceRepository, FakeRefreshTokenService? fakeRefreshTokenService = null)
     {
         var fakePasswordHasher = new FakePasswordHashingProvider();
         var fakeHostEnvironment = new FakeHostEnvironment();
@@ -201,17 +196,18 @@ public class AuthServiceTests
         var fakeDeviceTokenProvider = new FakeDeviceTokenProvider();
         var mapper = new AuthMapper();
         var fakeIpGeolocationProvider = new IpGeolocationProvider();
-        return new AuthService(fakeAuthRepository, fakeJwtTokenProvider, fakePasswordHasher, null!, mapper, fakeTrustedDeviceRepository, fakeDeviceTokenProvider, fakeEmailSenderProvider, fakeHostEnvironment, fakeIpGeolocationProvider, NullLogger<AuthService>.Instance);
+        return new AuthService(fakeAuthRepository, fakeJwtTokenProvider, fakePasswordHasher, null!, mapper, fakeTrustedDeviceRepository, fakeDeviceTokenProvider, fakeEmailSenderProvider, fakeHostEnvironment, fakeIpGeolocationProvider, NullLogger<AuthService>.Instance, fakeRefreshTokenService ?? new FakeRefreshTokenService());
     }
 
     [Fact]
-    public async Task LoginAsync_RememberMeTrue_GeneratesLongerExpiry()
+    public async Task LoginAsync_RememberMeTrue_IssuesARememberedRefreshToken()
     {
         var user = ValidUser();
         var fakeRepository = new FakeAuthRepository { UserToReturn = user };
         var fakeJwtProvider = new FakeJwtTokenProvider();
         var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { TrustedDeviceToReturn = ValidTrustedDevice(user.Id) };
-        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+        var fakeRefreshTokenService = new FakeRefreshTokenService();
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository, fakeRefreshTokenService);
 
         var request = new LoginRequestDto
         {
@@ -222,21 +218,21 @@ public class AuthServiceTests
 
         var result = await authService.LoginAsync(request, "trusted-browser-token", "127.0.0.1", CancellationToken.None);
 
-        Assert.True(fakeJwtProvider.LastRememberMeValue);
+        Assert.Equal((user.Id, true), Assert.Single(fakeRefreshTokenService.Issued));
         Assert.False(result.RequiresDeviceVerification);
         Assert.Equal("fake-token", result.Token);
-        Assert.True(result.ExpiresAt > DateTime.UtcNow.AddDays(29));
+        Assert.Equal("fake-refresh-token", result.RefreshToken);
     }
 
     [Fact]
-    public async Task LoginAsync_RememberMeFalse_GeneratesShorterExpiry()
+    public async Task LoginAsync_RememberMeFalse_IssuesASessionRefreshToken()
     {
         var user = ValidUser();
         var fakeRepository = new FakeAuthRepository { UserToReturn = user };
         var fakeJwtProvider = new FakeJwtTokenProvider();
         var fakeTrustedDeviceRepository = new FakeTrustedDeviceRepository { TrustedDeviceToReturn = ValidTrustedDevice(user.Id) };
-
-        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository);
+        var fakeRefreshTokenService = new FakeRefreshTokenService();
+        var authService = CreateAuthService(fakeRepository, fakeJwtProvider, fakeTrustedDeviceRepository, fakeRefreshTokenService);
 
         var request = new LoginRequestDto
         {
@@ -246,13 +242,12 @@ public class AuthServiceTests
         };
 
         var result = await authService.LoginAsync(request, "trusted-browser-token", "127.0.0.1", CancellationToken.None);
-        Assert.Equal(false, fakeJwtProvider.LastRememberMeValue);
+
+        Assert.Equal((user.Id, false), Assert.Single(fakeRefreshTokenService.Issued));
         Assert.False(result.RequiresDeviceVerification);
         Assert.Equal("fake-token", result.Token);
-        Assert.True(result.ExpiresAt < DateTime.UtcNow.AddDays(1));
+        Assert.Equal("fake-refresh-token", result.RefreshToken);
     }
-
-
 
     [Fact]
     public async Task GetCurrentUserAsync_ReturnsMappedUserProfile()

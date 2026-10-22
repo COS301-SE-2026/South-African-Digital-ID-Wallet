@@ -82,3 +82,34 @@ describe('useAuthStore.replaceToken', () => {
     expect(saveSession).not.toHaveBeenCalled()
   })
 })
+
+describe('useAuthStore.replaceToken with refresh credentials', () => {
+  beforeEach(() => {
+    useAuthStore.setState(pristine, true)
+    jest.clearAllMocks()
+  })
+
+  it('Should rotate and persist the refresh token', () => {
+    useAuthStore.getState().signIn({ ...session, refreshToken: 'refresh-1' })
+    useAuthStore.getState().replaceToken(NEW_TOKEN, NEW_EXPIRY, {
+      refreshToken: 'refresh-2',
+      refreshTokenExpiresAt: '2026-10-16T10:00:00Z',
+    })
+
+    expect(useAuthStore.getState().refreshToken).toBe('refresh-2')
+    expect(saveSession).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        refreshToken: 'refresh-2',
+        refreshTokenExpiresAt: '2026-10-16T10:00:00Z',
+        token: NEW_TOKEN,
+      })
+    )
+  })
+
+  it('Should keep the current refresh token when none is given', () => {
+    useAuthStore.getState().signIn({ ...session, refreshToken: 'refresh-1' })
+    useAuthStore.getState().replaceToken(NEW_TOKEN, NEW_EXPIRY)
+
+    expect(useAuthStore.getState().refreshToken).toBe('refresh-1')
+  })
+})

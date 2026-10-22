@@ -85,11 +85,20 @@ export const useSecureAccount = (alertId: string) => {
       service.secureAccount(alertId, request),
     onSuccess: (result) => {
       if (result.token && result.expiresAt) {
-        replaceToken(result.token, result.expiresAt)
+        if (result.refreshToken && result.refreshTokenExpiresAt) {
+          replaceToken(result.token, result.expiresAt, {
+            refreshToken: result.refreshToken,
+            refreshTokenExpiresAt: result.refreshTokenExpiresAt,
+          })
+        } else {
+          replaceToken(result.token, result.expiresAt)
+        }
       }
       saveResult(alertId, {
         ...result,
         expiresAt: undefined,
+        refreshToken: undefined,
+        refreshTokenExpiresAt: undefined,
         token: undefined,
       })
       refreshSecurity(alertId)
