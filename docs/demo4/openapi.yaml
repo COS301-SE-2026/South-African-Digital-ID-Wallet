@@ -43,10 +43,14 @@ paths:
     get:
       tags:
       - AdminDashboard
-      summary: "Returns the admin dashboard landing page summary: system status, headline counts (users,\
-        \ institutions,\r\ncredentials issued), and a system wide recent activity feed. The feed is restricted\
-        \ to an explicit allow\r\nlist of institution/system-level event types so it never surfaces citizen-level\
-        \ data across institution boundaries."
+      summary: 'Returns the admin dashboard landing page summary: system status, headline counts (users,
+        institutions,
+
+        credentials issued), and a system wide recent activity feed. The feed is restricted to an explicit
+        allow
+
+        list of institution/system-level event types so it never surfaces citizen-level data across institution
+        boundaries.'
       responses:
         '200':
           description: The dashboard summary.
@@ -77,8 +81,8 @@ paths:
       tags:
       - AdminDashboard
       summary: "Returns the system-wide analytics for the requested date range: verifications, credentials\
-        \ issued, \r\nactive officials, and active institutions, each with a value, a percentage change\
-        \ against the immediately\r\npreceding period of equal length, and a daily-bucketed series. Computed\
+        \ issued, \nactive officials, and active institutions, each with a value, a percentage change\
+        \ against the immediately\npreceding period of equal length, and a daily-bucketed series. Computed\
         \ live with no pre-aggregation."
       parameters:
       - name: range
@@ -194,10 +198,162 @@ paths:
       responses:
         '200':
           description: OK
+  /api/auth/forgot-password:
+    post:
+      tags:
+      - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequestDto'
+      responses:
+        '200':
+          description: OK
+  /api/auth/reset-password:
+    post:
+      tags:
+      - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequestDto'
+      responses:
+        '200':
+          description: OK
+  /api/auth/refresh:
+    post:
+      tags:
+      - Auth
+      parameters:
+      - name: X-Client
+        in: header
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequestDto'
+      responses:
+        '200':
+          description: OK
   /api/auth/logout:
     post:
       tags:
       - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequestDto'
+      responses:
+        '200':
+          description: OK
+  /api/certified-copies/credentials/{credentialId}:
+    post:
+      tags:
+      - CertifiedCredentialCopies
+      parameters:
+      - name: credentialId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateCertifiedCopyRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/GenerateCertifiedCopyRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/GenerateCertifiedCopyRequestDto'
+      responses:
+        '200':
+          description: OK
+  /api/certified-copies/verify/{verificationToken}:
+    get:
+      tags:
+      - CertifiedCredentialCopies
+      parameters:
+      - name: verificationToken
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /api/certified-copies/verify-document/{verificationToken}:
+    post:
+      tags:
+      - CertifiedCredentialCopies
+      parameters:
+      - name: verificationToken
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                document:
+                  type: string
+                  format: binary
+            encoding:
+              document:
+                style: form
+      responses:
+        '200':
+          description: OK
+  /api/certified-copies/verify-document:
+    post:
+      tags:
+      - CertifiedCredentialCopies
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                document:
+                  type: string
+                  format: binary
+            encoding:
+              document:
+                style: form
       responses:
         '200':
           description: OK
@@ -247,8 +403,6 @@ paths:
               $ref: '#/components/schemas/VerifyEmailRequestDto'
       responses:
         '200':
-          description: OK
-        '201':
           description: The email was verified.
         '400':
           description: The OTP was invalid, expired, already used, or too many attempts were made.
@@ -272,8 +426,6 @@ paths:
               $ref: '#/components/schemas/ResendOtpRequestDto'
       responses:
         '200':
-          description: OK
-        '201':
           description: A new OTP was sent.
         '400':
           description: The email is already verified or the request was invalid.
@@ -338,9 +490,10 @@ paths:
     post:
       tags:
       - Credentials
-      summary: "Manually triggers the daily credential-expiry check. Government Administrator only.\r\n\
-        Idempotent. If today's check already completed or is currently running, returns that result instead\
-        \ of reprocessing."
+      summary: 'Manually triggers the daily credential-expiry check. Government Administrator only.
+
+        Idempotent. If today''s check already completed or is currently running, returns that result instead
+        of reprocessing.'
       responses:
         '200':
           description: The check ran, or had already completed for today.
@@ -834,6 +987,144 @@ paths:
       responses:
         '200':
           description: OK
+  /api/emergency/resolve:
+    post:
+      tags:
+      - Emergency
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveEmergencyRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/ResolveEmergencyRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/ResolveEmergencyRequestDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/EmergencyProfileResponseDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmergencyProfileResponseDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/EmergencyProfileResponseDto'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/emergency/offline-accesses:
+    post:
+      tags:
+      - Emergency
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordOfflineEmergencyAccessRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RecordOfflineEmergencyAccessRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RecordOfflineEmergencyAccessRequestDto'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/emergency/devices:
+    post:
+      tags:
+      - Emergency
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterEmergencyDeviceRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RegisterEmergencyDeviceRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RegisterEmergencyDeviceRequestDto'
+      responses:
+        '200':
+          description: OK
+  /api/emergency/profile:
+    get:
+      tags:
+      - Emergency
+      responses:
+        '200':
+          description: OK
+    put:
+      tags:
+      - Emergency
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveEmergencyProfileRequestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/SaveEmergencyProfileRequestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/SaveEmergencyProfileRequestDto'
+      responses:
+        '200':
+          description: OK
+  /api/emergency/offline-credential:
+    get:
+      tags:
+      - Emergency
+      responses:
+        '200':
+          description: OK
+  /api/emergency/accesses:
+    get:
+      tags:
+      - Emergency
+      responses:
+        '200':
+          description: OK
   /api/admin/audit-log:
     get:
       tags:
@@ -1266,9 +1557,13 @@ paths:
     get:
       tags:
       - Officials
-      summary: "Returns a paginated, filterable audit history for every official at the caller's own instaitution.\r\
-        \nInstitution is always derived server side from the authenticated official. Never accepted as\
-        \ a parameter.\r\nEvery call is itself audit-logged for POPIA accountability."
+      summary: 'Returns a paginated, filterable audit history for every official at the caller''s own
+        instaitution.
+
+        Institution is always derived server side from the authenticated official. Never accepted as a
+        parameter.
+
+        Every call is itself audit-logged for POPIA accountability.'
       parameters:
       - name: search
         in: query
@@ -2109,6 +2404,9 @@ components:
           $ref: '#/components/schemas/CredentialCitizenDto'
         activity:
           $ref: '#/components/schemas/CredentialActivityDto'
+        photoUrl:
+          type: string
+          nullable: true
       additionalProperties: false
     CredentialStatus:
       enum:
@@ -2231,6 +2529,77 @@ components:
           type: string
           format: date-time
       additionalProperties: false
+    EmergencyContactDto:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        relationship:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        priority:
+          type: integer
+          format: int32
+      additionalProperties: false
+    EmergencyIdentityDto:
+      type: object
+      properties:
+        names:
+          type: string
+          nullable: true
+        surname:
+          type: string
+          nullable: true
+        dateOfBirth:
+          type: string
+          format: date-time
+        photoUrl:
+          type: string
+          nullable: true
+      additionalProperties: false
+    EmergencyMedicalFieldDto:
+      type: object
+      properties:
+        key:
+          type: string
+          nullable: true
+        label:
+          type: string
+          nullable: true
+        value:
+          type: string
+          nullable: true
+      additionalProperties: false
+    EmergencyProfileResponseDto:
+      type: object
+      properties:
+        identity:
+          $ref: '#/components/schemas/EmergencyIdentityDto'
+        medical:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmergencyMedicalFieldDto'
+          nullable: true
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmergencyContactDto'
+          nullable: true
+        medicalLastUpdatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        accessedAt:
+          type: string
+          format: date-time
+      additionalProperties: false
     ExistingCredentialSummaryDto:
       type: object
       properties:
@@ -2243,6 +2612,13 @@ components:
         issueDate:
           type: string
           format: date-time
+      additionalProperties: false
+    ForgotPasswordRequestDto:
+      type: object
+      properties:
+        email:
+          type: string
+          nullable: true
       additionalProperties: false
     FraudAlertDetailsDto:
       type: object
@@ -2420,6 +2796,12 @@ components:
         weight:
           type: integer
           format: int32
+      additionalProperties: false
+    GenerateCertifiedCopyRequestDto:
+      type: object
+      properties:
+        credentialType:
+          $ref: '#/components/schemas/CredentialType'
       additionalProperties: false
     GenerateQrRequestDto:
       type: object
@@ -2825,6 +3207,40 @@ components:
           type: string
           nullable: true
       additionalProperties: {}
+    RecordOfflineEmergencyAccessRequestDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        revocationIndex:
+          type: integer
+          format: int32
+        justification:
+          type: string
+          nullable: true
+        accessedAt:
+          type: integer
+          format: int64
+        presentation:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          format: double
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          nullable: true
+      additionalProperties: false
+    RefreshTokenRequestDto:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+          nullable: true
+      additionalProperties: false
     RegisterCitizenRequestDto:
       type: object
       properties:
@@ -2834,6 +3250,21 @@ components:
         password:
           type: string
           nullable: true
+      additionalProperties: false
+    RegisterEmergencyDeviceRequestDto:
+      type: object
+      properties:
+        publicKeySpki:
+          type: string
+          nullable: true
+        platform:
+          type: string
+          nullable: true
+        deviceLabel:
+          type: string
+          nullable: true
+        isStrongBoxBacked:
+          type: boolean
       additionalProperties: false
     RegisterInstitutionRequestDto:
       type: object
@@ -2878,12 +3309,48 @@ components:
           type: string
           nullable: true
       additionalProperties: false
+    ResetPasswordRequestDto:
+      type: object
+      properties:
+        email:
+          type: string
+          nullable: true
+        otp:
+          type: string
+          nullable: true
+        newPassword:
+          type: string
+          nullable: true
+        confirmPassword:
+          type: string
+          nullable: true
+      additionalProperties: false
     ResolveCredentialRequestDto:
       type: object
       properties:
         token:
           type: string
           nullable: true
+      additionalProperties: false
+    ResolveEmergencyRequestDto:
+      type: object
+      properties:
+        code:
+          type: string
+          nullable: true
+        justification:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          format: double
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          nullable: true
+        wasOffline:
+          type: boolean
       additionalProperties: false
     RevocationListResponseDto:
       type: object
@@ -2902,6 +3369,29 @@ components:
           $ref: '#/components/schemas/CredentialStatus'
         reason:
           type: string
+          nullable: true
+      additionalProperties: false
+    SaveEmergencyProfileRequestDto:
+      type: object
+      properties:
+        isEnabled:
+          type: boolean
+        consentGiven:
+          type: boolean
+        fields:
+          type: object
+          additionalProperties:
+            type: string
+          nullable: true
+        offlineFields:
+          type: array
+          items:
+            type: string
+          nullable: true
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmergencyContactDto'
           nullable: true
       additionalProperties: false
     SecureAccountAction:
@@ -2947,6 +3437,13 @@ components:
           type: string
           nullable: true
         expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        refreshToken:
+          type: string
+          nullable: true
+        refreshTokenExpiresAt:
           type: string
           format: date-time
           nullable: true
@@ -3220,10 +3717,12 @@ tags:
 - name: ActivityOverview
 - name: AdminDashboard
 - name: Auth
+- name: CertifiedCredentialCopies
 - name: Citizens
 - name: Credentials
 - name: DashboardAccountCard
 - name: DeleteAccount
+- name: Emergency
 - name: GovAdminAuditLog
 - name: Institutions
 - name: ManageUserAccount

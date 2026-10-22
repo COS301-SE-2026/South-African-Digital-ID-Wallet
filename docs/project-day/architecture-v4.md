@@ -16,17 +16,17 @@ FlashId makes use of an N-Tier architectural pattern. The presentation tier make
 
 ### 1.1 Security
 
-- All API endpoints require JWT authentication except public ones: registration and login, citizen registration and email verification, new-device verification, forgot password, reset password, certified copy verification, and the offline issuer keys and revocation list.
-- JWT tokens are issued by the backend, transmitted via HttpOnly cookies, and validated on every request
+- All API endpoints require JWT authentication except public ones: registration and login, citizen registration and email verification, new-device verification, token refresh, forgot password, reset password, certified copy verification, and the offline issuer keys and revocation list.
+- Short-lived (15-minute) JWT access tokens are issued by the backend together with a rotating, single-use refresh token. They are transmitted via HttpOnly cookies on the web and as a Bearer token from mobile, and validated on every request. Reusing an already-rotated refresh token revokes the whole session
 - All passwords are hashed using BCrypt before storage and plaintext passwords are never persisted
 - All data transmitted between client and server uses HTTPS/TLS encryption
 - Sensitive citizen data is encrypted at rest in Azure SQL
-- QR verification payloads are cryptographically signed using Ed25519 to prevent tampering
+- QR verification payloads are cryptographically signed using ES256 (ECDSA P-256) with a key held in Azure Key Vault to prevent tampering
 - QR replay-guard tokens are stored in Azure Cosmos DB with a native per item TTL (Time To Live), so a scanned or expired QR cannot be reused and the ledger cleans itself up automatically
 - Citizen photos are stored in a private Azure Blob Storage container. A short-lived, time limited signed URL is generated only at the moment a QR is scanned, never persisted or embedded in the QR itself
 - Qr replay-guard documents in Cosmos DB reference credentials via a keyed HMAC hash rather than the raw credential ID, so read access to that store alone cannot be correlated back to a specific citizen's record in Azure SQL.
 - The system enforces account lockout after repeated failed login attempts
-- Rate limiting is applied to registration endpoints: 5 requests per minute per client to prevent brute-force attacks (HTTP 429 on breach)
+- Rate limiting (HTTP 429 on breach) is applied per client IP to anonymous endpoints, such as registration (5 per minute), login (10 per minute), OTP resend (3 per minute), password reset (5 per minute), plus token refresh (60 per minute per refresh token, falling back to client IP when there is no refresh token cookie, e.g. mobile), and per user to sensitive signed-in endpoints, with a global backstop of 300 requests per minute
 - Role-based access control prevents unauthorized access to restricted endpoints
 - The system maintains immutable audit logs for all critical operations
 - Sign-ins from an unrecognised device require a one-time code sent by email before a session is issued.
@@ -53,7 +53,6 @@ FlashId makes use of an N-Tier architectural pattern. The presentation tier make
 - Azure SQL is used for relational data with the ability to scale tier as load increases
 - Cosmos DB is used for small, high-churn, disposable data: the QR disclosure token replay-guard ledger and the one-time claims for emergency codes. Native TTL auto-expiry removes the need for a manual cleanup job.
 - The backend API is stateless and supports horizontal scaling
-- Cosmos DB is used for the QR disclosure token replay-guard ledger. A small, high churn, disposable dataset well suited to NoSQL, with native TTL auto-expiry removing the need for a manual cleanup job
 
 ### 1.5 Maintainability
 
@@ -128,7 +127,7 @@ This ensures reusability, consistency, and separation of UI concerns across the 
 
 ### 2.5 Context-Based State Management
 
-Global application state such as authenticated user data is managed using React Context. The `UserContext` provides user identity, role, and session information to all components without prop drilling. User state is persisted to `localStorage` so sessions survive page refreshes. The mobile app manages global state with Zustard stores, and keeps the session token in the device's secure storage.
+Global application state such as authenticated user data is managed using React Context. The `UserContext` provides user identity, role, and session information to all components without prop drilling. User state is persisted to `localStorage` so sessions survive page refreshes. The mobile app manages global state with Zustand stores, and keeps the access and refresh tokens in the device's secure storage.
 
 ### 2.6 Server State Management
 

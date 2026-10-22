@@ -147,7 +147,7 @@ As a user, I want to sign in and see only the portal for my role, so that I cann
 - Endpoints for other roles return an unauthorised error
 - The mobile app supports Citizens and Officials, other roles see an unsupported-role screen
 - The account is locked for 30 minutes after 5 failed sign-in attempts
-- Sessions last 8 hours, or 30 days when "remember me" is selected
+- Sessions end after 8 hours without activity, or 30 days when "remember me" is selected; the 15-minute access token is renewed silently while the user is active
 
 **Definition of Done:**
 - JWT issued with correct role claims for all three roles

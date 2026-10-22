@@ -16,7 +16,7 @@ These instructions allow an AI agent to validate or provision the FlashID Azure 
 
 | File | Purpose |
 |---|---|
-| `main.bicep` | Orchestrator - calls all 8 modules, wires cross-module dependencies |
+| `main.bicep` | Orchestrator - calls the 9 modules, wires cross-module dependencies |
 | `main.dev.bicepparam` | Parameter values for the dev environment |
 | `main.prod.bicepparam` | Parameter values for the prod environment |
 | `modules/appservice.bicep` | App Service (reusable - called 3 times for api-flashid, api-government-registry, web-flashid) |
@@ -25,6 +25,7 @@ These instructions allow an AI agent to validate or provision the FlashID Azure 
 | `modules/cosmos.bicep` | Cosmos DB account + 2 SQL databases (FlashIDDb, FlashIdQrDb) + 2 containers |
 | `modules/faceapi.bicep` | Cognitive Services Face API |
 | `modules/keyvault.bicep` | Key Vault (RBAC-only, no access policies) |
+| `modules/roleassignment.bicep` | RBAC role assignment for an App Service managed identity (Key Vault Secrets User, Storage Blob Data Contributor, Cognitive Services User) |
 | `modules/sql.bicep` | SQL Server + database loop (serverless Gen5 vCore) |
 | `modules/storage.bicep` | Storage account + blob containers (citizen-photos, images) |
 
@@ -130,8 +131,8 @@ az deployment group what-if --resource-group rg-capstone-techtitans --template-f
 ```
 
 **Prod-specific notes:**
-- Prod has 1 SQL database (`sqldb-flashid-prod`), dev has 2 (`sqldb-flashid-dev`, `sqldb-gov-registry`)
-- Prod uses `Geo` backup redundancy, dev uses `Local`
+- Both parameter files declare 2 SQL databases on the shared `sql-flashid` server: dev has `sqldb-flashid-dev` and `sqldb-gov-registry`, prod has `sqldb-flashid-prod` and `sqldb-gov-registry`. Both list the same `sqldb-gov-registry` entry
+- `sqldb-flashid-prod` uses `Geo` backup redundancy; `sqldb-flashid-dev` and `sqldb-gov-registry` use `Local`
 - The web app at `web-flashid-prod` has a custom domain (`flashid.co.za`) with an SSL certificate - this is managed outside Bicep and will appear as an ignored resource
 
 ## Procedure: Validate both environments
@@ -151,7 +152,7 @@ The orchestrator (`main.bicep`) wires these automatically - no manual interventi
 
 - **No secrets exist in these templates.** Key Vault uses RBAC authorisation. SQL password comes from an environment variable at deploy time.
 - **Never commit** the SQL password, Key Vault secrets, or any connection strings to source control.
-- **Managed identities** (`SystemAssigned`) are enabled on all App Services - these should be granted RBAC roles (Key Vault Secrets User, Storage Blob Data Contributor, etc.) as a post-deploy step.
+- **Managed identities** (`SystemAssigned`) are enabled on all App Services. `main.bicep` grants their RBAC roles through `modules/roleassignment.bicep`: Key Vault Secrets User and Storage Blob Data Contributor for all three apps, and Cognitive Services User for both APIs.
 - **FTP is disabled** on all App Services. SCM (Kudu) credentials are enabled for CI/CD.
 - **TLS 1.2** is the minimum version on all resources that support it.
 
