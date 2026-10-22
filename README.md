@@ -3,7 +3,8 @@
 </p>
 
 <p align="center">
-South African Digital ID Wallet - FlashID, is a secure national-scale digital identity platform that enables citizens to store, manage, and verify official identity credentials digitally. Citizens can securely store cryptographically signed credentials such as national IDs and driver's licences, then present them through QR codes for instant real-time verification.
+South African Digital ID Wallet - FlashID, is a secure national-scale digital identity platform that enables citizens to store, manage, and verify official identity credentials digitally. Citizens can securely store cryptographically signed credentials such as national IDs and driver's licences, then present them through QR codes for instant real-time verification.  <br>
+  <a href="https://flashid.co.za/">flashid.co.za</a> <br>
 </p>
 
 <div align="center">
