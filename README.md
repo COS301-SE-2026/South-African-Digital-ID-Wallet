@@ -251,9 +251,11 @@ t3chtitansgo@gmail.com
 
 Our repository follows a modular monorepo structure where different components are organised into dedicated directories.
 
-- **frontend/** → Next.js web portals for administrators and verifiers.
-- **mobile/** → React Native citizen wallet application.
-- **backend/** → ASP.NET Core APIs and business logic.
+- **web/** → Next.js web portals for citizens, officials and government administrators.
+- **mobile/** → Expo React Native app for citizens and officials.
+- **backend/** → ASP.NET Core FlashID API and business logic.
+- **government-registry/** → Mock government registry API used as the source of identity data.
+- **infra/** → Azure Bicep templates for the dev and prod environments.
 - **docs/** → Project documentation, reports, and assets.
 
 | Branch | Purpose |

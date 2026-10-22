@@ -19,13 +19,13 @@ All dependencies are already installed in the project. No setup steps needed bey
 
 ---
 
-# One-Time Setup
+# One-Time Setup (already done)
 
 ## React Query Provider
 
 React Query needs a `QueryClientProvider` wrapping the app. Because it uses hooks, this must be a client component.
 
-Create `src/app/providers.tsx`:
+It lives in `src/app/providers.tsx`:
 
 ```tsx
 'use client'
@@ -48,7 +48,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Then wrap the app in `src/app/layout.tsx`:
+`src/app/layout.tsx` wraps the app in it:
 
 ```tsx
 import { Providers } from './providers'
@@ -70,13 +70,14 @@ export default function RootLayout({
 
 ## Environment Variables
 
-Add the API URL to `.env.local`:
+Copy `.env.example` to `.env.local`:
 
 ```txt
-NEXT_PUBLIC_API_URL=http://localhost:5118
+API_INTERNAL_URL=http://localhost:5118
+JWT_SECRET=<same value as the backend's Jwt:Key>
 ```
 
-The `NEXT_PUBLIC_` prefix is required so the variable is available in the browser.
+The browser never calls the backend directly. Service URLs are relative (`/api/...`), and `src/app/api/[...path]/route.ts` forwards them to `API_INTERNAL_URL` on the server, so the auth cookies stay on the web app's own origin. `src/proxy.ts` uses `JWT_SECRET` to check the `access_token` cookie before rendering a portal page. Leave `NEXT_PUBLIC_API_URL` unset for normal development.
 
 ---
 
@@ -89,25 +90,16 @@ src/services/
 │   ├── login-urls.ts
 │   ├── login-service.ts
 │   ├── login-dto.ts
-│   ├── login-model.ts
-│   └── types.ts
+│   ├── types.ts
+│   └── test/
 │
-├── user-service/
-│   ├── index.ts
-│   ├── user-urls.ts
-│   ├── user-service.ts
-│   ├── user-dto.ts
-│   ├── user-model.ts
-│   └── types.ts
-│
-└── product-service/
-    ├── index.ts
-    ├── product-urls.ts
-    ├── product-service.ts
-    ├── product-dto.ts
-    ├── product-model.ts
-    └── types.ts
+├── credential-service/
+├── qr-service/
+├── manage-user-account-service/
+└── ...                      one folder per backend feature
 ```
+
+`*-model.ts` is only added when the backend shape needs translating, so most services do not have one.
 
 ---
 
@@ -149,12 +141,13 @@ export type LoginFormValues = {
 }
 
 export type LoginResponse = {
-  token: string
-  expiresAt: string
   userId: string
   role: string
-  names: string
-  surname: string
+  token: string
+  expiresAt: string
+  refreshTokenExpiresAt?: string | null
+  requiresDeviceVerification: boolean
+  deviceVerificationId?: string | null
 }
 ```
 
@@ -167,13 +160,13 @@ Stores every endpoint for the feature in one place.
 Example:
 
 ```ts
-const apiUrl = process.env.NEXT_PUBLIC_API_URL
-
-export default {
-  login: (): string => `${apiUrl}/auth/login`,
-  logout: (): string => `${apiUrl}/auth/logout`,
-  getUser: (id: number): string => `${apiUrl}/auth/user/${id}`,
+const loginUrls = {
+  login: (): string => '/api/auth/login',
+  verifyDevice: (): string => '/api/auth/verify-device',
+  forgotPassword: (): string => '/api/auth/forgot-password',
 }
+
+export default loginUrls
 ```
 
 ### Rules
@@ -235,39 +228,34 @@ export const loginFormModel = (row: LoginBackendRow): LoginFormValues => {
 
 ## `*-service.ts`
 
-Contains the actual HTTP calls. This is the only file that uses axios.
+Contains the actual HTTP calls. This is the only file that makes requests, always through the shared `api` instance from `@/lib/api`.
 
 Example:
 
 ```ts
-import axios, { AxiosResponse } from 'axios'
-
+import api from '@/lib/api'
 import loginUrls from './login-urls'
 import { loginDto } from './login-dto'
-import { LoginFormValues } from './types'
+import type { LoginFormValues, LoginResponse } from './types'
 
-const login = (formData: LoginFormValues) => {
+const login = (formData: LoginFormValues): Promise<LoginResponse> => {
   const url = loginUrls.login()
   const dto = loginDto(formData)
-  return axios.post(url, dto).then((res: AxiosResponse) => res.data)
+  return api.post(url, dto).then((res) => res.data as LoginResponse)
 }
 
-const getUser = (id: number) => {
-  const url = loginUrls.getUser(id)
-  return axios.get(url).then((res: AxiosResponse) => res.data)
-}
-
-export default {
+const loginService = {
   login,
-  getUser,
 }
+
+export default loginService
 ```
 
 Every function does the same three steps:
 
 1. Get the URL.
 2. Run the DTO if sending data.
-3. Call axios and return `res.data`.
+3. Call `api` and return `res.data`.
 
 ---
 
@@ -348,11 +336,11 @@ export function LoginForm() {
 Then import the client component into a route page:
 
 ```tsx
-// src/app/login/page.tsx
-import { LoginForm } from '@/components/pages/login-form'
+// src/app/(auth)/login/page.tsx
+import { LoginPage } from '@/components/pages/login/login-page'
 
-export default function LoginPage() {
-  return <LoginForm />
+export default function Page() {
+  return <LoginPage />
 }
 ```
 
@@ -484,32 +472,38 @@ const { mutate } = useMutation({
 
 # Axios Basics
 
-Axios is the HTTP client. Four methods cover almost everything:
+Axios is the HTTP client, used through the shared instance in `src/lib/api.ts`. Four methods cover almost everything:
 
 ```ts
-axios.get(url) // read
-axios.post(url, body) // create
-axios.put(url, body) // update
-axios.delete(url) // delete
+api.get(url) // read
+api.post(url, body) // create
+api.put(url, body) // update
+api.delete(url) // delete
 ```
 
 Every response is wrapped in an object. The real data is at `response.data`. Strip the wrapper at the service layer:
 
 ```ts
-return axios.post(url, dto).then((res) => res.data)
+return api.post(url, dto).then((res) => res.data)
 ```
 
 ---
 
-## JWT Token
+## Authentication
 
-After login, store the token and send it with every protected request:
+The web app never handles the JWT itself. On login the backend sets three cookies on the web app's origin:
 
-Authorization: Bearer <token>
+- `access_token` - HttpOnly JWT, valid for 15 minutes (`Jwt:AccessTokenMinutes`)
+- `refresh_token` - HttpOnly, valid for 8 hours, or 30 days with "remember me", and renewed on every refresh
+- `csrf_token` - readable by JavaScript
 
-Set this up as an axios default after login:
+`src/lib/api.ts` handles the rest, so services need no auth code:
 
-axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+- sends cookies with every request (`withCredentials: true`)
+- copies `csrf_token` into the `X-CSRF-Token` header on POST, PUT, PATCH and DELETE
+- on a 401, calls `POST /api/auth/refresh` once and retries the request; if the refresh also fails it clears local user data and returns to `/`
+
+`src/proxy.ts` does the same refresh on page navigation when the access token has expired. See [csrf-protection.md](../docs/demo4/security/csrf-protection.md).
 
 # React Query Devtools
 
@@ -585,7 +579,7 @@ Only create a new service folder if the feature is genuinely separate.
 # Rules of Thumb
 
 - One feature = one folder = five files.
-- Components never import axios.
+- Components never import axios or `@/lib/api`.
 - Components never see snake_case fields. That is the DTO and model's job.
 - Query keys must include everything that affects the result.
 - Always return `res.data` from service functions.
@@ -600,7 +594,7 @@ Only create a new service folder if the feature is genuinely separate.
 1. Create the folder: `src/services/<feature>-service/`
 2. Write `types.ts` first.
 3. Write `*-urls.ts`.
-4. Write `*-dto.ts` and `*-model.ts`.
+4. Write `*-dto.ts` and `*-model.ts` if the backend shape needs translating.
 5. Write `*-service.ts`.
 6. Export everything from `index.ts`.
 7. In the component, add `'use client'` and use `useQuery` to read or `useMutation` to write.

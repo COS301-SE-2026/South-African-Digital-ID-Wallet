@@ -224,6 +224,7 @@ public class CsrfProtectionMiddlewareTests
     [InlineData("/api/auth/login")]
     [InlineData("/api/auth/verify-device")]
     [InlineData("/api/auth/resend-device-verification")]
+    [InlineData("/api/auth/refresh")]
     public async Task PostToAnonymousAuthEndpoint_WithStaleAccessTokenAndNoCsrf_IsNotBlocked(string path)
     {
         await using var factory = new TestApiFactory();

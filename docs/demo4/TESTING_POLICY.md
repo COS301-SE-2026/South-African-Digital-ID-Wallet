@@ -6,7 +6,7 @@
 
 ### 1.Purpose
 
-This document defines the standards, procedures and responsibilities associated with software testing for FlashID, the South African Digital ID Wallet. It estabishes a consistent approach to planning, executing, documenting, and reviewing activitiess across all services (backend, government-registry, web, mobile) to ensure software quality, realibility, and compliance with project requirements -including POPIE-driven data handling rules and identity-verification security guarantees. 
+This document defines the standards, procedures and responsibilities associated with software testing for FlashID, the South African Digital ID Wallet. It estabishes a consistent approach to planning, executing, documenting, and reviewing activitiess across all services (backend, government-registry, web, mobile) to ensure software quality, realibility, and compliance with project requirements -including POPIA-driven data handling rules and identity-verification security guarantees. 
 ---
 
 ## 2. Testing Objectives
@@ -35,9 +35,9 @@ This document defines the standards, procedures and responsibilities associated 
 | Layer | Framework/Tool | Notes |
 |---|---|---|
 | Backend (FlashID) unit + integration | xUnit v3 | dotnet test, in-memory EF Core DB and SQLite in-memory connection used for integration tests |
-| Government-registry unit + integration | xUnt | Separate service, tested independently - controller, repository, and service layers all covered |
+| Government-registry unit + integration | xUnit v3 | Separate service, tested independently - controller, repository, and service layers all covered |
 | Frontend unit/component | Jest + React Testing Library | npx jest --coverage , jsdom environment, QueryClientProvider wrapper required for React Query components |
-| E2E | Playwright | 6 specs: auth (via auth.setup.ts global login), activate-credentials, citizen-dashboard, manage-user-account, qr-generation, qr-scanning, view-credentials|
+| E2E | Playwright | 8 specs after the auth.setup.ts global login: activate-credentials, citizen-dashboard, credential-expiry, manage-user-account, qr-generation, qr-scanning, responsive, view-credentials |
 | Coverage reporting | ReportGenerator (backend), Codecov (all layers) | dotnet-reportgenerator-globaltool; Cobertura XML uploaded to Codecov per PR |
 | Code quality gate | SonarCloud | Quality Gate on new code, covering Security Rating, Reliability Rating, and duplication |
 | CI/CD | GitHub Actions | backend.yml, web.yml, mobile.yml, plus government-registry and Web E2E workflows -all run automatically on every PR |
@@ -80,7 +80,7 @@ A pull request is ready to merge when all of the following pass:
 - **Backend CI / Build and Test** :all backend unit + integration tests pass
 - **Government Registry CI / Build and Test** : all government-registry unit + integration tests pass
 - **Web CI / Build and Test**: all frontend unit/component tests pass
-- **Web E2E / Playwright E2E** :all 6 Playwright specs pass
+- **Web E2E / Playwright E2E** :all 8 Playwright specs pass
 - **Codecov/patch** : new code meets the current patch coverage target (77.61%)
 - **SonarCloud Code Analysis - Quality Gate passed**, specifically requiring:
   - Security Rating on New Code >=A

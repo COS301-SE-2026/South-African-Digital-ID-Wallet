@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Regenerates docs/demo3/openapi.yaml from a running instance of the backend.
+Regenerates docs/demo4/openapi.yaml from a running instance of the backend.
 
 Usage:
     python export_openapi.py [--url URL] [--output PATH]
@@ -18,7 +18,7 @@ import urllib.request
 from pathlib import Path
 
 DEFAULT_URL = "http://localhost:5118/swagger/v1/swagger.json"
-DEFAULT_OUTPUT = "docs/demo3/openapi.yaml"
+DEFAULT_OUTPUT = "docs/demo4/openapi.yaml"
 
 
 def ensure_pyyaml():

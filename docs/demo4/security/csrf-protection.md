@@ -22,7 +22,7 @@ Before this change, our `SameSite` setting changed per environment:
 
 So outside development, any malicious page could have silently triggered a credential revoke, an account change or a logout just by getting a logged-in user to load it.
 
-`AuthCookies.cs` now sets `SameSite=Lax` on both `access_token` and `csrf_token` in every environment. This is safe because the browser only ever talks to our own origin (see below), and it gives us two layers: the browser won't send the cookies on cross-site POST/PUT/PATCH/DELETE requests at all, and if that is ever bypassed (an older browser, a misconfiguration), the CSRF token check still rejects the request.
+`AuthCookies.cs` now sets `SameSite=Lax` on `access_token`, `refresh_token` and `csrf_token` in every environment. This is safe because the browser only ever talks to our own origin (see below), and it gives us two layers: the browser won't send the cookies on cross-site POST/PUT/PATCH/DELETE requests at all, and if that is ever bypassed (an older browser, a misconfiguration), the CSRF token check still rejects the request.
 
 ### How the browser reaches the API
 
@@ -32,10 +32,11 @@ The browser never calls the backend directly. Every call goes to the Next.js app
 
 An attacker's page can make the browser send our cookies automatically, but it can't read the value of a cookie on another origin, and it can't make the browser add a custom header with a value it doesn't know.
 
-So every time we issue an access token, we set two cookies:
+So every time we issue a session (login, device verification, refresh, securing the account), we set three cookies:
 
-1. `access_token`: HttpOnly, sent automatically by the browser.
-2. `csrf_token`: 32 random bytes, Base64Url-encoded, NOT HttpOnly, so our frontend JS can read it. Same `Secure`, `SameSite` and expiry as `access_token`, so the two always live and die together.
+1. `access_token`: HttpOnly JWT, valid for 15 minutes, sent automatically by the browser.
+2. `refresh_token`: HttpOnly, valid for 8 hours, or 30 days with "remember me". Not set for the mobile app, which receives it in the response body instead.
+3. `csrf_token`: 32 random bytes, Base64Url-encoded, NOT HttpOnly, so our frontend JS can read it. Same `Secure` and `SameSite` as the other two, and the same expiry as `refresh_token`, so it outlives the short access token and is reissued with every refresh.
 
 On every state-changing request, the frontend reads `csrf_token` from `document.cookie` and sends it as the `X-CSRF-Token` header. The backend checks that the header matches the cookie.
 
@@ -55,7 +56,7 @@ Runs on every request, but only checks anything when all of these hold:
 - The method is POST, PUT, PATCH or DELETE. GETs don't change state.
 - There is an `access_token` cookie. No cookie means no browser session to hijack.
 - There is no `Authorization: Bearer` header. The mobile app sends its token in that header, and a browser never adds one by itself, so a forged cross-site request cannot carry it. Mobile still receives the auth cookies at login and React Native sends them back automatically, so without this rule every mobile POST, PUT and DELETE was rejected.
-- The path is not one of the anonymous auth endpoints: `/api/auth/login`, `/api/auth/verify-device`, `/api/auth/resend-device-verification`. A user with an expired session still has a stale `access_token` cookie, and we don't want that to block them from logging in again. These endpoints don't act on an existing session, so there is nothing to forge.
+- The path is not one of the exempt auth endpoints: `/api/auth/login`, `/api/auth/verify-device`, `/api/auth/resend-device-verification`, `/api/auth/refresh`. A user with an expired session still has a stale `access_token` cookie, and we don't want that to block them from logging in again. The first three don't act on an existing session, so there is nothing to forge. `/api/auth/refresh` is called server-side by `web/src/proxy.ts`, which has no `csrf_token` to send; a forged cross-site refresh only rotates the victim's own cookies, and `SameSite=Lax` keeps the browser from sending `refresh_token` on it.
 
 When it does check, there are two outcomes:
 
@@ -66,9 +67,9 @@ The comparison uses `CryptographicOperations.FixedTimeEquals` instead of `==`. A
 
 It's wired into `Program.cs` in this order:
 
-`UseCors` -> `UseRateLimiter` -> `UseMiddleware<CsrfProtectionMiddleware>` -> `UseAuthentication` -> `UseAuthorization`
+`UseCors` -> `UseAuthentication` -> `UseRateLimiter` -> `UseMiddleware<CsrfProtectionMiddleware>` -> `UseAuthorization`
 
-After CORS, so a rejection still comes back with proper CORS headers instead of a confusing CORS error. Before authentication, so a forged request gets bounced before any JWT validation or database lookup.
+After CORS, so a rejection still comes back with proper CORS headers instead of a confusing CORS error. After authentication, so the user-partitioned rate limits can see who is signed in. Before authorization and the controllers, so a forged request is bounced before any endpoint code runs.
 
 ### 2. AuthCookies.cs
 
@@ -76,16 +77,16 @@ After CORS, so a rejection still comes back with proper CORS headers instead of 
 
 All auth cookie handling lives here instead of in `AuthController`:
 
-- `AppendAccessToken` sets `access_token` and always issues a fresh `csrf_token` alongside it with the same expiry. Every place that issues an access token therefore gets a CSRF token automatically, with no chance of one code path forgetting.
-- `DeleteAll` deletes both cookies. `AuthController.Logout` calls it, so logging out never leaves a stray `csrf_token` behind.
+- `AppendSession` sets `access_token`, sets `refresh_token` when one is passed (web only), and always issues a fresh `csrf_token` alongside them. Every place that issues a session (`AuthController` login, verify-device and refresh, and `SecurityController` secure-account) therefore gets a CSRF token automatically, with no chance of one code path forgetting.
+- `DeleteAll` deletes all three cookies. `AuthController.Logout` calls it, and so does a failed web refresh, so signing out never leaves a stray `csrf_token` or `refresh_token` behind.
 
 ### 3. web/src/lib/api.ts
 
-A request interceptor on the shared axios instance reads `csrf_token` from `document.cookie` and, for POST/PUT/PATCH/DELETE only, sets it as `X-CSRF-Token`. None of the individual service files needed touching.
+A request interceptor on the shared axios instance reads `csrf_token` from `document.cookie` and, for POST/PUT/PATCH/DELETE only, sets it as `X-CSRF-Token`. None of the individual service files needed touching. A response interceptor calls `/api/auth/refresh` once on a 401 and retries the request, which also picks up a fresh `csrf_token`.
 
 ## What this doesn't fix
 
-- Mobile is not checked. Login sets the auth cookies for mobile too, and React Native resends them, but mobile also sends `Authorization: Bearer`, which skips the check. That is safe because another site cannot attach that header.
+- Mobile is not checked. Login still sets `access_token` and `csrf_token` for mobile (but not `refresh_token`, which mobile keeps in secure storage), and React Native resends them, but mobile also sends `Authorization: Bearer`, which skips the check. That is safe because another site cannot attach that header.
 - This is not an XSS fix. If someone can run JS on our own origin, they can read `csrf_token` directly and this protection is worthless. That's a separate problem, and it's exactly why `access_token` stays `HttpOnly`.
 
 ## Testing
@@ -100,7 +101,7 @@ A request interceptor on the shared axios instance reads `csrf_token` from `docu
 4. POST with matching cookie and header plus a valid JWT: passes the CSRF check and reaches the controller.
 5. GET with `access_token` and no CSRF token: not checked.
 6. POST with no `access_token` cookie: not checked.
-7. POST to each of the three anonymous auth endpoints with a stale `access_token` and no CSRF token: not blocked (one theory, three cases).
+7. POST to each of the four exempt auth endpoints with a stale `access_token` and no CSRF token: not blocked (one theory, four cases).
 8. POST from the mobile app: a valid `Authorization: Bearer` token plus the cookies React Native keeps, and no `X-CSRF-Token`: not blocked.
 
 ### Auth controller tests
