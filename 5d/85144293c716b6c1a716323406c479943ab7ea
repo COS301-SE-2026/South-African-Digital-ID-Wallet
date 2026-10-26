@@ -1,0 +1,26 @@
+backend/FlashIdBackend/Application/Common/Services/CertifiedCredentialCopyService.cs
+  h_0aff3b71f739b1 504
+backend/FlashIdBackend/tests/CertifiedCredentialCopyServiceTests.cs
+  h_0aff3b71f739b1 620-635
+web/src/components/pages/landing-page/landing-assets.ts
+  h_0aff3b71f739b1 1,20-22
+web/src/components/pages/landing-page/landing-page.test.tsx
+  h_0aff3b71f739b1 114
+web/src/components/pages/landing-page/mobile-app-section.tsx
+  h_0aff3b71f739b1 80-81
+web/src/components/pages/landing-page/mobile-preview/phone-frame.tsx
+  h_0aff3b71f739b1 10,16,20-34
+web/src/components/pages/landing-page/mobile-preview/types.ts
+  h_0aff3b71f739b1 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5d85144293c716b6c1a716323406c479943ab7ea",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
