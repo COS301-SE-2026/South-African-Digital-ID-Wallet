@@ -1,3 +1,4 @@
+import MobileRegistration from '@/assets/images/registerPageMobile-preview.png'
 import CredentialList from '@/assets/images/CredentialList.jpeg'
 import VerifyId from '@/assets/images/verifid.jpeg'
 import SelectiveDisclosure from '@/assets/images/selectivedisc.jpeg'
@@ -16,6 +17,7 @@ export const ANDROID_APK_URL: string = ''
 export const USER_MANUAL_URL = '/landing/flashid-user-manual.pdf'
 
 export const MOBILE_REGISTER_SCREEN = {
-  src: '/landing/mobile-register.svg',
-  isMockup: true,
+  src: MobileRegistration.src,
+  aspectRatio: MobileRegistration.width / MobileRegistration.height,
+  isMockup: false,
 }

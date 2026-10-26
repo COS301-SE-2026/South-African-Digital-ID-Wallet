@@ -501,7 +501,7 @@ public class CertifiedCredentialCopyService : ICertifiedCredentialCopyService
             CertificationId = certifiedCopy.Id,
             CredentialType = snapshot.CredentialType,
             FullName = snapshot.FullName,
-            IdNumber = snapshot.IdNumber,
+            IdNumber = SaIdMasker.Mask(snapshot.IdNumber),
             GeneratedAt = certifiedCopy.GeneratedAt,
             ExpiresAt = certifiedCopy.ExpiresAt,
             Message = "The document is a valid and unmodified FlashID certified copy."

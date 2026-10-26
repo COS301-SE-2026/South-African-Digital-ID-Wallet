@@ -77,12 +77,8 @@ export function MobileAppSection() {
           <div className="relative w-[250px] max-w-full -rotate-2 sm:w-[300px] lg:w-[310px]">
             <PhoneFrame
               src={MOBILE_REGISTER_SCREEN.src}
-              className="border-[7px] shadow-[0_35px_65px_-20px_rgba(5,59,44,0.35)] ring-2 ring-deep-green/10"
-              label={
-                MOBILE_REGISTER_SCREEN.isMockup
-                  ? 'FlashID registration screen — illustrative mockup'
-                  : 'FlashID mobile registration screen'
-              }
+              screenAspectRatio={MOBILE_REGISTER_SCREEN.aspectRatio}
+              label="FlashID mobile registration screen"
             />
           </div>
         </div>

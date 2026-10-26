@@ -111,7 +111,7 @@ describe('Requested landing refinements', () => {
     render(<MobileAppSection />)
     expect(
       screen.getByRole('img', {
-        name: 'FlashID registration screen — illustrative mockup',
+        name: 'FlashID mobile registration screen',
       })
     ).toBeInTheDocument()
     expect(screen.queryByText(/Registration preview/)).not.toBeInTheDocument()

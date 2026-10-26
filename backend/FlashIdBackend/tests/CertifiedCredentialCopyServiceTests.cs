@@ -617,6 +617,22 @@ public class CertifiedCredentialCopyServiceTests
         Assert.Equal("CredentialInactive", result.Status);
     }
 
+    [Fact]
+    public async Task VerifyDocumentAsync_ValidDocument_ReturnsMaskedIdNumber()
+    {
+        var credential = CreateIdentityCredential();
+        var certifiedCopy = CreateCertifiedCopy(credential);
+        _cryptographyProvider.Setup(x => x.HashDocument(PdfBytes)).Returns(DocumentHash);
+        _certifiedCopyRepository.Setup(x => x.GetByDocumentHashAsync(DocumentHash)).ReturnsAsync(certifiedCopy);
+        _cryptographyProvider.Setup(x => x.VerifyCredentialSnapshotHash(It.IsAny<CertifiedCredentialSnapshot>(), SnapshotHash)).Returns(true);
+
+        var result = await CreateService().VerifyDocumentAsync(PdfBytes);
+
+        Assert.True(result.IsValid);
+        Assert.Equal("***********00", result.IdNumber);
+        Assert.NotEqual(credential.Citizen.SaId, result.IdNumber);
+    }
+
     private void SetupValidDocumentVerification(CertifiedCredentialCopy certifiedCopy)
     {
         _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
