@@ -135,7 +135,7 @@ t3chtitansgo@gmail.com
 
 🔗 [SAS](docs/project-day/SAS-v4.md) <br> 
 🔗 [SRS](docs/project-day/SRS-v4.md) <br> 
-🔗 [User Manual](docs/project-day/User%20Help%20Manual.pdf) <br> 
+🔗 [User Manual](docs/project-day/User_Help_Manual.pdf) <br> 
 🔗 [Brand style guide](docs/project-day/FlashID.pdf) <br> 
 🔗 [Testing Policy Document](docs/project-day/TESTING_POLICY.md) <br> 
 🔗 [Coding Standards](docs/project-day/coding_standards.md) <br> 
