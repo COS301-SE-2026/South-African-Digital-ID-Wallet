@@ -3,7 +3,8 @@
 </p>
 
 <p align="center">
-South African Digital ID Wallet - FlashID, is a secure national-scale digital identity platform that enables citizens to store, manage, and verify official identity credentials digitally. Citizens can securely store cryptographically signed credentials such as national IDs and driver's licences, then present them through QR codes for instant real-time verification.
+South African Digital ID Wallet - FlashID, is a secure national-scale digital identity platform that enables citizens to store, manage, and verify official identity credentials digitally. Citizens can securely store cryptographically signed credentials such as national IDs and driver's licences, then present them through QR codes for instant real-time verification.  <br>
+  <a href="https://flashid.co.za/">flashid.co.za</a> <br>
 </p>
 
 <div align="center">
@@ -38,7 +39,7 @@ South African Digital ID Wallet - FlashID, is a secure national-scale digital id
 **Production:** [flashid.co.za](https://flashid.co.za)
 **Dev:** [web-flashid-dev](https://web-flashid-dev-c5f2gbd8hbcqf8h2.southafricanorth-01.azurewebsites.net)
 
-Deployment is fully automated via GitHub Actions .See [SAS 5 Deployment](docs/demo3/SAS-v2.md#5-deployment) for architecture, environment parity, secrets management, and rollback strategy.
+Deployment is fully automated via GitHub Actions. See [SAS 5 Deployment](docs/demo4/SAS-v4.md#5-deployment) for architecture, environment parity, secrets management, and rollback strategy.
 
 
 ## Demo Videos
@@ -49,11 +50,17 @@ Deployment is fully automated via GitHub Actions .See [SAS 5 Deployment](docs/de
 
 - Demo 3 Videos
   - [Demo 3 Video](https://drive.google.com/file/d/1fDvILt3r_7-KdpE3DQ4lAmEqNAfbMtk7/view?usp=sharing)
-  - [Demo 3 Mobile Video](https://universitypretoria-my.sharepoint.com/:v:/g/personal/u24573699_up_ac_za/IQCfDy_jLr4GQLQG5VqKu8BOAQVXPIE2iC5cbbNoUdkJMK0?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=sBroN4https://universitypretoria-my.sharepoint.com/:v:/g/personal/u24573699_up_ac_za/IQCfDy_jLr4GQLQG5VqKu8BOAQVXPIE2iC5cbbNoUdkJMK0?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=sBroN4)
+  - [Demo 3 Mobile Video](https://universitypretoria-my.sharepoint.com/:v:/g/personal/u24573699_up_ac_za/IQCfDy_jLr4GQLQG5VqKu8BOAQVXPIE2iC5cbbNoUdkJMK0?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=sBroN4)
 
 - Demo 4 Videos
   - [Demo 4 Video](https://drive.google.com/file/d/1dAoPo8PUMzo2n27K99AgZOxaLuUC8DLU/view?usp=sharing)
   - [Demo 4 Mobile Video](https://drive.google.com/file/d/1lFLun-fpQ__IlzdNswOcz_ZTaL8VzSbG/view?usp=sharing)
+
+- Project Day Videos
+  - [Project Day Video (Google Drive)](https://drive.google.com/file/d/1t4lDBn8qNqx0QfUmopVgcpspJw4Qw0Qw/view?usp=drive_link)
+  - [Project Day Video (Youtube)](https://youtu.be/nflAqYkuHsw)
+  - [Trailer (Google Drive)](https://drive.google.com/file/d/1xT1Q78IFFTJBvw102cBK2hqWuBXaNt8p/view?usp=drive_link)
+  - [Trailer (Youtube)](https://youtu.be/Gd-2XxsDdfM)
 
 ---
 
@@ -70,10 +77,10 @@ t3chtitansgo@gmail.com
 <details>
 <summary><strong>Demo 1 Documentation</strong></summary>
 
-🔗 [SRS](docs/SRS.md) <br>
-🔗 [Brand style guide](docs/Branding_Document_v1.0.pdf) <br>
-🔗 [Wireframes](docs/wireframes.md) <br>
-🔗 [Research Document](docs/research-doc.md) <br>
+🔗 [SRS](docs/demo1/SRS-v1.md) <br>
+🔗 [Brand style guide](docs/demo1/Branding_Document_v1.0.pdf) <br>
+🔗 [Wireframes](docs/demo1/wireframes.md) <br>
+🔗 [Research Document](docs/demo1/research-doc.md) <br>
 
 </details>
 
@@ -82,10 +89,10 @@ t3chtitansgo@gmail.com
 
 🔗 [SAS](docs/demo2/SAS.md) <br>
 🔗 [SRS](docs/demo2/SRS-v2.md) <br>
-🔗 [User Manual Doocument](docs/demo2/user-manual%20(1).pdf) <br>
+🔗 [User Manual Document](docs/demo2/user-manual%20(1).pdf) <br>
 🔗 [Brand style guide](docs/demo2/FlashID.pdf) <br>
-🔗 [Testing Policy Document](docs/demo2/testing_policy.md) <br>
-🔗 [Coding Standards ](docs/demo2/coding_standards.md) <br>
+🔗 [Testing Policy Document](docs/demo2/TESTING_POLICY.md) <br>
+🔗 [Coding Standards](docs/demo2/coding_standards.md) <br>
 🔗 [Presentation](docs/demo2/Demo2Presentation.pdf) <br>
 
 
@@ -102,7 +109,7 @@ t3chtitansgo@gmail.com
 🔗 [Coding Standards](docs/demo3/coding_standards.md) <br> 
 🔗 [OpenAPI Spec (FlashID)](docs/demo3/openapi.yaml) <br> 
 🔗 [OpenAPI Spec (Government Registry)](docs/demo3/openapi-government-registry.yaml) <br> 
-🔗 [Deployed Instance](https://api-flashid-prod-behwhegmcshsb6dg.southafricanorth-01.azurewebsites.net/) <br>
+🔗 [Deployed Instance](https://flashid.co.za) <br>
 
 </details>
 
@@ -119,6 +126,23 @@ t3chtitansgo@gmail.com
 🔗 [OpenAPI Spec (Government Registry)](docs/demo4/openapi-government-registry.yaml) <br> 
 🔗 [Deployed Instance](https://flashid.co.za/) <br>
 🔗 [Presentation](docs/demo4/Demo4Presentation.pdf) <br>
+
+
+</details>
+
+<details>
+<summary><strong>Project Day Documentation</strong></summary>
+
+🔗 [SAS](docs/project-day/SAS-v4.md) <br> 
+🔗 [SRS](docs/project-day/SRS-v4.md) <br> 
+🔗 [User Manual](docs/project-day/User_Help_Manual.pdf) <br> 
+🔗 [Brand style guide](docs/project-day/FlashID.pdf) <br> 
+🔗 [Testing Policy Document](docs/project-day/TESTING_POLICY.md) <br> 
+🔗 [Coding Standards](docs/project-day/coding_standards.md) <br> 
+🔗 [OpenAPI Spec (FlashID)](docs/project-day/openapi.yaml) <br> 
+🔗 [OpenAPI Spec (Government Registry)](docs/project-day/openapi-government-registry.yaml) <br> 
+🔗 [Deployed Instance](https://flashid.co.za/) <br>
+🔗 [Presentation](docs/project-day/FlashID_Final_Presentation.pdf) <br>
 
 
 </details>
@@ -155,7 +179,7 @@ t3chtitansgo@gmail.com
   <tr>
     <td width="30%">
       <strong>Zaynab Samir</strong><br>
-      <img src="docs/images/zaynab.JPEG" alt="Zaynab Samir" style="width: 100%; aspect-ratio:3/4; object-fit: cover; display: block; border-radius:12px;"
+      <img src="docs/images/zaynab.JPEG" alt="Zaynab Samir" style="width: 100%; aspect-ratio:3/4; object-fit: cover; display: block; border-radius:12px;">
     </td>
     <td width="20%">
       <code>Cybersecurity</code><br>
@@ -278,12 +302,11 @@ We follow a structured GitFlow branching model to ensure efficient collaboration
 ![Version](https://img.shields.io/badge/version-0.1.0-blue)
 ![.NET](https://img.shields.io/badge/.NET-10.0-purple)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black)
-![License](https://img.shields.io/badge/license-MIT-green)
 
 ### Issue Tracking
 ![GitHub issues](https://img.shields.io/github/issues/COS301-SE-2026/South-African-Digital-ID-Wallet)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/COS301-SE-2026/South-African-Digital-ID-Wallet)
 ![GitHub last commit](https://img.shields.io/github/last-commit/COS301-SE-2026/South-African-Digital-ID-Wallet/dev)
 ![GitHub contributors](https://img.shields.io/github/contributors/COS301-SE-2026/South-African-Digital-ID-Wallet)
-
-[![Monitoring](https://img.shields.io/badge/monitoring-UptimeRobot-green)](https://stats.uptimerobot.com/xDz6ZNXIFp)
+[![Uptime](https://img.shields.io/uptimerobot/status/m804362594-f0b2abb94829e614ca65c66c)](https://stats.uptimerobot.com/LdastTY1so)
+[![Uptime 30d](https://img.shields.io/uptimerobot/ratio/30/m804362594-f0b2abb94829e614ca65c66c)](https://stats.uptimerobot.com/LdastTY1so)
