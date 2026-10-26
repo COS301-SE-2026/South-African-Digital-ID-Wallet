@@ -1,0 +1,47 @@
+backend/FlashIdBackend/Application/Features/Officials/DTOs/MyActivityItemDto.cs
+  h_99fca60b892ff4 8
+web/src/components/pages/officials/officials-dashboard-page.tsx
+  h_99fca60b892ff4 12,19-20,30,50,70,91,95-100,151-152
+backend/FlashIdBackend/Presentation/Controllers/OfficialsController.cs
+  h_99fca60b892ff4 102,116-117,129
+backend/FlashIdBackend/tests/OfficialActivityServiceTests.cs
+  h_99fca60b892ff4 75-76
+web/src/components/organisms/activity-card/activity-card.tsx
+  h_99fca60b892ff4 4,8-9,15-18,21-22,24-28,30-43,45-50,53,55-58,60-78,86-88,96,99,101-103,108-109,119,122-124,126
+  h_99fca60b892ff4 3,5-7,10,14,19,44,51-52,54,85,89-95,125
+web/src/services/official-dashboard-service/types.ts
+  h_99fca60b892ff4 1,5-11,16,23,29,47
+backend/FlashIdBackend/Application/Common/Interfaces/ServiceInterfaces/IOfficialActivityService.cs
+  h_99fca60b892ff4 18-19
+backend/FlashIdBackend/Application/Common/Mapping/OfficialAuditSummaryFormatter.cs
+  h_99fca60b892ff4 1-28
+web/src/components/organisms/audit-log-table/audit-log-table.tsx
+  h_99fca60b892ff4 4-5,24-25,39,47,49-61,66-67,202,205,207
+web/src/components/organisms/audit-log-table/types.ts
+  h_99fca60b892ff4 6,9
+  h_99fca60b892ff4 10-14,34-35
+backend/FlashIdBackend/Domain/Enums/AuditEventTypeExtensions.cs
+  h_99fca60b892ff4 24-44
+backend/FlashIdBackend/Application/Common/Services/OfficialActivityService.cs
+  h_99fca60b892ff4 45-46,53,62
+backend/FlashIdBackend/Application/Common/Interfaces/RepositoryInterfaces/IOfficialActivityRepository.cs
+  h_99fca60b892ff4 19-20
+backend/FlashIdBackend/Application/Features/Officials/DTOs/OfficialHistoryItemDto.cs
+  h_99fca60b892ff4 9
+backend/FlashIdBackend/Infrastructure/Repositories/OfficialActivityRepository.cs
+  h_99fca60b892ff4 2,22-29,31-35,37,39-47,76-77,85,92-93,95,99-110,139-140,166-170,182
+web/src/components/organisms/activity-card/types.ts
+  h_99fca60b892ff4 2,4-7,11,16
+  h_99fca60b892ff4 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e65c285a16b461319d23b568c3ea712fe42373bd",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

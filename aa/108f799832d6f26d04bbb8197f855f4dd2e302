@@ -1,0 +1,33 @@
+backend/FlashIdBackend/Domain/Enums/AuditEventTypeExtensions.cs
+  h_99fca60b892ff4 29
+backend/FlashIdBackend/Application/Common/Mapping/OfficialAuditSummaryFormatter.cs
+  h_99fca60b892ff4 25-34
+backend/FlashIdBackend/tests/OfficialAuditSummaryFormatterTests.cs
+  h_99fca60b892ff4 30-38
+backend/FlashIdBackend/Infrastructure/Repositories/OfficialActivityRepository.cs
+  h_99fca60b892ff4 30
+  s_b2917687a6edb4::t_ddaf4767c354e2 27-29
+web/src/components/organisms/audit-log-table/audit-log-table.tsx
+  h_99fca60b892ff4 99,124,212-215
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "aa108f799832d6f26d04bbb8197f855f4dd2e302",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_b2917687a6edb4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23839738-64de-4ee3-9563-bc961e701511",
+        "model": "unknown"
+      },
+      "human_author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

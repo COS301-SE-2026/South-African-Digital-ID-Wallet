@@ -1,0 +1,16 @@
+web/src/components/organisms/landing-page-footer/landing-page-footer.tsx
+  h_99fca60b892ff4 95
+README.md
+  h_99fca60b892ff4 138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "609349a9011d6cd5d72555850586c61b11d97c23",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
