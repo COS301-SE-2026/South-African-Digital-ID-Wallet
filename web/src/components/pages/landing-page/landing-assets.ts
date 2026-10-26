@@ -1,4 +1,4 @@
-import MobileRegistration from '@/assets/images/registerPageMobile-preview.png'
+import MobileRegistration from '@/assets/images/registerPageMobile.jpeg'
 import CredentialList from '@/assets/images/CredentialList.jpeg'
 import VerifyId from '@/assets/images/verifid.jpeg'
 import SelectiveDisclosure from '@/assets/images/selectivedisc.jpeg'
