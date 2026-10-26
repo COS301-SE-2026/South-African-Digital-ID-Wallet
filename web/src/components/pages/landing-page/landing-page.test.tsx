@@ -237,6 +237,13 @@ describe('FlashID principles panel', () => {
 })
 
 describe('Product showcase carousel', () => {
+  it('slightly narrows the desktop showcase while keeping mobile full-width', () => {
+    render(<ProductShowcase />)
+    expect(
+      screen.getByRole('region', { name: 'Explore the FlashID web experience' })
+    ).toHaveClass('mx-auto', 'w-full', 'lg:w-[94%]')
+  })
+
   it('slides forwards, backwards and wraps without replacing screenshot elements', () => {
     render(<ProductShowcase />)
     const slide = () => screen.getByRole('group', { name: /of 4/ })

@@ -31,6 +31,7 @@ export function ProductShowcase() {
       role="region"
       aria-roledescription="carousel"
       aria-label="Explore the FlashID web experience"
+      className="mx-auto w-full lg:w-[94%]"
       onKeyDown={(event) => {
         if (event.key === 'ArrowLeft') {
           event.preventDefault()

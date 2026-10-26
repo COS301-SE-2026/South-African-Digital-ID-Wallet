@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import FlashIdLogo from '@/assets/images/FlashID-green.png'
+import FlashIdLogo from '@/assets/images/FlashIDLogo.png'
 import { USER_MANUAL_URL } from '@/components/pages/landing-page/landing-assets'
 import { Mail, MapPin } from 'lucide-react'
 import Link from 'next/link'
@@ -24,7 +24,7 @@ export function LandingPageFooter() {
               src={FlashIdLogo}
               alt="FlashID home"
               width={200}
-              height={82}
+              height={50}
               className="h-14 w-auto object-contain"
             />
           </Link>
