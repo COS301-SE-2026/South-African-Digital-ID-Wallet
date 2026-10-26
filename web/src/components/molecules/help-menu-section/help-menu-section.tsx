@@ -110,7 +110,7 @@ export function HelpMenuSection() {
               variant="h2"
               className="mt-3 max-w-md text-3xl sm:text-4xl"
             >
-              <span className="inline-block bg-gradient-to-r from-primary-green to-accent-gold bg-clip-text text-transparent">
+              <span className="inline-block text-deep-green">
                 Questions before you get started?
               </span>
             </Text>
@@ -164,7 +164,7 @@ export function HelpMenuSection() {
                   Frequently asked questions
                 </p>
                 <h3 className="mt-2 text-2xl font-bold tracking-tight text-deep-green sm:text-3xl">
-                  <span className="inline-block bg-gradient-to-r from-primary-green to-accent-gold bg-clip-text text-transparent">
+                  <span className="inline-block text-deep-green">
                     How can we help?
                   </span>
                 </h3>

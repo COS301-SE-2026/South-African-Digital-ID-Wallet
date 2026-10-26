@@ -1,10 +1,6 @@
-import { ArrowDownToLine, ArrowRight, Check, Smartphone } from 'lucide-react'
+import { ArrowDownToLine, Check, Smartphone } from 'lucide-react'
 import { Button, Text } from '@/components/atoms'
-import {
-  ANDROID_APK_URL,
-  MOBILE_REGISTER_SCREEN,
-  USER_MANUAL_URL,
-} from './landing-assets'
+import { ANDROID_APK_URL, MOBILE_REGISTER_SCREEN } from './landing-assets'
 import { PhoneFrame } from './mobile-preview'
 import borderStyles from './landing-effects.module.css'
 
@@ -27,11 +23,11 @@ export function MobileAppSection() {
             variant="h2"
             className="mt-6 max-w-lg text-3xl leading-tight sm:text-4xl"
           >
-            <span className="inline-block bg-gradient-to-r from-primary-green to-accent-gold bg-clip-text text-transparent">
+            <span className="inline-block text-deep-green">
               Your next move.
             </span>
             <br />
-            <span className="inline-block bg-gradient-to-r from-primary-green to-accent-gold bg-clip-text text-transparent">
+            <span className="inline-block text-deep-green">
               Your wallet, with you.
             </span>
           </Text>
@@ -75,14 +71,6 @@ export function MobileAppSection() {
                 APK download coming soon
               </Button>
             )}
-            <a
-              href={USER_MANUAL_URL}
-              download="FlashID-User-Manual.pdf"
-              className="inline-flex min-h-11 items-center gap-2 rounded-lg text-sm font-bold text-primary-green hover:text-deep-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-green"
-            >
-              Download user manual{' '}
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </a>
           </div>
         </div>
         <div className="relative flex min-h-[540px] items-center justify-center px-4 py-6 sm:min-h-[660px]">

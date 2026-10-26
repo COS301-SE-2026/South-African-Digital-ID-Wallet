@@ -29,8 +29,8 @@ export function MobilePreview() {
           const transform = centered
             ? 'translateX(-50%) translateY(0) rotate(0deg) scale(1)'
             : position === 1
-              ? 'translateX(5%) translateY(12%) rotate(12deg) scale(0.8)'
-              : 'translateX(-105%) translateY(12%) rotate(-12deg) scale(0.8)'
+              ? 'translateX(5%) translateY(12%) rotate(0deg) scale(0.8)'
+              : 'translateX(-105%) translateY(12%) rotate(0deg) scale(0.8)'
           return (
             <div
               key={screen.src}

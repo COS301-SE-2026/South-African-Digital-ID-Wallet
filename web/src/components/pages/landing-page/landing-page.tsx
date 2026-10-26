@@ -151,9 +151,23 @@ function HeroSection() {
       className={`${borderStyles.ambientSection} relative overflow-hidden bg-cream-background`}
     >
       <div className="pointer-events-none absolute -right-32 -top-24 h-80 w-80 rounded-full bg-accent-gold/10 blur-3xl" />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10"
+      >
+        <div className="absolute -left-24 top-12 h-64 w-64 rounded-full border border-primary-green/15 sm:-left-20 sm:h-80 sm:w-80" />
+        <div className="absolute -left-12 top-24 h-40 w-40 rounded-full border border-primary-green/10 sm:h-56 sm:w-56" />
+        <div className="absolute left-3 top-[38%] h-40 w-16 opacity-40 [background-image:radial-gradient(circle,rgba(0,122,77,0.45)_1.5px,transparent_1.5px)] [background-size:14px_14px] sm:left-6 lg:w-20" />
+        <div className="absolute bottom-8 left-[18%] h-20 w-32 opacity-35 [background-image:radial-gradient(circle,rgba(0,122,77,0.4)_1.5px,transparent_1.5px)] [background-size:14px_14px]" />
+        <div className="absolute bottom-16 -left-8 h-32 w-32 rotate-45 rounded-3xl border border-accent-gold/30 sm:h-40 sm:w-40" />
+        <div className="absolute left-[40%] top-12 h-10 w-10 rounded-full border-2 border-accent-gold/30" />
+        <div className="absolute bottom-[18%] left-[44%] h-5 w-5 rotate-12 border border-primary-green/20" />
+        <div className="absolute left-[30%] top-8 h-2 w-2 rounded-full bg-primary-green/20" />
+      </div>
       <div className="mx-auto grid w-full max-w-none items-center gap-12 px-6 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1.02fr_0.98fr] lg:gap-16 lg:px-10 lg:py-24">
-        <div className="relative z-10">
+        <div className="relative z-10 lg:pl-16 xl:pl-28">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary-green/15 bg-primary-green/5 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-deep-green">
+            <Shield className="h-4 w-4 shrink-0" aria-hidden="true" />
             Your identity. In a flash.
           </div>
           <h1 className="max-w-2xl text-4xl font-bold leading-[1.08] tracking-tight text-secure-night sm:text-5xl">
@@ -225,7 +239,7 @@ function ProblemAndAudienceSection() {
             Identity, without the friction
           </Text>
           <Text as="h2" variant="h2" className="mt-3 text-3xl sm:text-4xl">
-            <span className="inline-block bg-gradient-to-r from-primary-green to-accent-gold bg-clip-text text-transparent">
+            <span className="inline-block text-deep-green">
               Make every verification feel simpler.
             </span>
           </Text>
@@ -301,7 +315,7 @@ function FeaturesAndHowItWorksSection() {
             One wallet, clearer control
           </Text>
           <Text as="h2" variant="h2" className="mt-3 text-3xl sm:text-4xl">
-            <span className="inline-block bg-gradient-to-r from-primary-green to-accent-gold bg-clip-text text-transparent">
+            <span className="inline-block text-deep-green">
               Everything you need to prove who you are.
             </span>
           </Text>
@@ -401,7 +415,7 @@ function PreviewSection() {
             A clear experience
           </Text>
           <Text as="h2" variant="h2" className="mt-3 text-3xl sm:text-4xl">
-            <span className="inline-block bg-gradient-to-r from-primary-green to-accent-gold bg-clip-text text-transparent">
+            <span className="inline-block text-deep-green">
               Designed to make trusted identity feel easy.
             </span>
           </Text>

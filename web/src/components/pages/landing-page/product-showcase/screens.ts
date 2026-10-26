@@ -1,8 +1,8 @@
 import { LayoutDashboard, Settings2, WalletCards, ScanFace } from 'lucide-react'
-import dashboard from '@/assets/images/citizen-dashboard-pic.jpeg'
-import account from '@/assets/images/manage-user-account-pic.jpeg'
-import wallet from '@/assets/images/credential-wallet-pic.jpeg'
-import verification from '@/assets/images/verify-identity-pic.jpeg'
+import dashboard from '@/assets/images/citizen-dashboard-pic.png'
+import account from '@/assets/images/manage-user-account-pic.png'
+import wallet from '@/assets/images/credential-wallet-pic.png'
+import verification from '@/assets/images/verify-identity-pic.png'
 import type { ShowcaseScreen } from './types'
 
 export const SHOWCASE_SCREENS: ShowcaseScreen[] = [

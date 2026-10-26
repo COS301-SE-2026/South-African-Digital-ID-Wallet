@@ -46,7 +46,7 @@ describe('Landing page mobile preview', () => {
     )
   })
 
-  it('supports direct slide selection and labels mockups honestly', () => {
+  it('supports direct slide selection and shows actual app screenshots', () => {
     render(<MobilePreview />)
     const button = screen.getByRole('button', {
       name: `Show ${MOBILE_SCREENS[2].label}`,
@@ -55,7 +55,7 @@ describe('Landing page mobile preview', () => {
     expect(button).toHaveAttribute('aria-current', 'true')
     expect(
       screen.getByRole('img', {
-        name: /Controlled sharing — illustrative mockup/,
+        name: 'Controlled sharing',
       })
     ).toBeInTheDocument()
   })
@@ -71,11 +71,8 @@ describe('Landing page downloads', () => {
       screen.queryByRole('link', { name: 'Download Android APK' })
     ).not.toBeInTheDocument()
     expect(
-      screen.getByRole('link', { name: /Download user manual/ })
-    ).toHaveAttribute('href', USER_MANUAL_URL)
-    expect(
-      screen.getByRole('link', { name: /Download user manual/ })
-    ).toHaveAttribute('download', 'FlashID-User-Manual.pdf')
+      screen.queryByRole('link', { name: /Download user manual/ })
+    ).not.toBeInTheDocument()
   })
 
   it('uses the same downloadable manual and logo in the footer', () => {
@@ -143,8 +140,8 @@ describe('Requested landing refinements', () => {
       'bg-cream-background'
     )
     expect(
-      screen.getByText('Your identity. In a flash.').querySelector('span')
-    ).toBeNull()
+      screen.getByText('Your identity. In a flash.').querySelector('svg')
+    ).toHaveClass('lucide-shield')
   })
 
   it('keeps all five security protections in the redesigned section', () => {
@@ -158,13 +155,26 @@ describe('Requested landing refinements', () => {
   })
 })
 
-describe('Gradient headings', () => {
-  it('keeps the green-to-gold fill without letter outlines', () => {
+describe('Landing heading colours', () => {
+  it('keeps only the hero heading gradient and makes other gradient titles deep green', () => {
     const { container } = render(<LandingPageContent />)
     const gradientText = container.querySelectorAll(
       'h1 span.text-transparent, h2 span.text-transparent, h3 span.text-transparent'
     )
-    expect(gradientText.length).toBeGreaterThanOrEqual(8)
+    expect(gradientText).toHaveLength(2)
+    gradientText.forEach((span) => {
+      expect(span.closest('h1')).not.toBeNull()
+    })
+    const sectionTitles = container.querySelectorAll('h2 span, h3 span')
+    sectionTitles.forEach((span) => {
+      if (span.textContent !== 'Everyday confidence.') {
+        expect(span).toHaveClass('text-deep-green')
+      }
+    })
+    expect(container.querySelector('#home > div.grid > div')).toHaveClass(
+      'lg:pl-16',
+      'xl:pl-28'
+    )
     gradientText.forEach((span) => {
       expect(span).toHaveClass('from-primary-green', 'to-accent-gold')
       expect(span.className).not.toContain('text-stroke')

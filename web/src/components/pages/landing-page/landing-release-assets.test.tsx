@@ -25,7 +25,7 @@ jest.mock('next/image', () => ({
 }))
 
 describe('Configured release assets', () => {
-  it('enables the real APK download without changing the manual link', () => {
+  it('enables the real APK download without duplicating the footer manual link', () => {
     render(<MobileAppSection />)
     const apk = screen.getByRole('link', { name: 'Download Android APK' })
     expect(apk).toHaveAttribute(
@@ -37,8 +37,8 @@ describe('Configured release assets', () => {
       screen.queryByRole('button', { name: 'APK download coming soon' })
     ).not.toBeInTheDocument()
     expect(
-      screen.getByRole('link', { name: /Download user manual/ })
-    ).toHaveAttribute('href', '/landing/flashid-user-manual.pdf')
+      screen.queryByRole('link', { name: /Download user manual/ })
+    ).not.toBeInTheDocument()
   })
 
   it('uses the real registration screenshot without a mockup label', () => {

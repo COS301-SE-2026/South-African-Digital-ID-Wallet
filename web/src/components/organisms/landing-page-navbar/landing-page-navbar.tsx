@@ -3,7 +3,7 @@
 import { ArrowRight, Menu, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import FlashIdLogo from '@/assets/images/FlashID-green.png'
+import FlashIdLogo from '@/assets/images/FlashIDLogo.png'
 import {
   Sheet,
   SheetClose,

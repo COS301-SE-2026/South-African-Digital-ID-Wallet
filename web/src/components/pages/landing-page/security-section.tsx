@@ -46,16 +46,11 @@ export function SecuritySection() {
             id="landing-security-title"
             className="mt-3 max-w-xl text-3xl font-bold leading-tight tracking-tight text-deep-green sm:text-4xl"
           >
-            <span className="inline-block bg-gradient-to-r from-primary-green to-accent-gold bg-clip-text text-transparent">
+            <span className="inline-block text-deep-green">
               Security that supports confidence.
             </span>
           </h3>
         </div>
-        <p className="max-w-md text-sm leading-7 text-muted-text">
-          FlashID brings verified credentials, thoughtful sharing, and device
-          protection together—without making your everyday experience
-          complicated.
-        </p>
       </div>
       <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         <li

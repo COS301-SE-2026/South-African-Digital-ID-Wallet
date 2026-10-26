@@ -1,14 +1,14 @@
+import CredentialList from '@/assets/images/CredentialList.jpeg'
+import VerifyId from '@/assets/images/verifid.jpeg'
+import SelectiveDisclosure from '@/assets/images/selectivedisc.jpeg'
+
 export const MOBILE_SCREENS = [
-  { label: 'Your wallet', src: '/landing/mobile-wallet.svg', isMockup: true },
-  {
-    label: 'Your credentials',
-    src: '/landing/mobile-credentials.svg',
-    isMockup: true,
-  },
+  { label: 'Your wallet', src: CredentialList.src, isMockup: false },
+  { label: 'Identity verification', src: VerifyId.src, isMockup: false },
   {
     label: 'Controlled sharing',
-    src: '/landing/mobile-verify.svg',
-    isMockup: true,
+    src: SelectiveDisclosure.src,
+    isMockup: false,
   },
 ]
 
