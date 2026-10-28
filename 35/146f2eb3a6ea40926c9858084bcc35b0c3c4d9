@@ -1,0 +1,38 @@
+backend/FlashIdBackend/tests/CertifiedCredentialCopyServiceTests.cs
+  h_0aff3b71f739b1 60,96,632,636-661
+web/public/landing/README.md
+  h_0aff3b71f739b1 3,5,7-10,12,14,18,20,24
+web/src/components/molecules/help-menu-section/help-menu-section.tsx
+  h_0aff3b71f739b1 4
+web/src/components/organisms/landing-page-footer/landing-page-footer.tsx
+  h_0aff3b71f739b1 3,17,120
+web/src/components/organisms/landing-page-navbar/landing-page-navbar.tsx
+  h_0aff3b71f739b1 37
+web/src/components/pages/landing-page/landing-page.test.tsx
+  h_0aff3b71f739b1 9,17-18,22-37,80-125
+web/src/components/pages/landing-page/landing-page.tsx
+  h_0aff3b71f739b1 7
+web/src/components/pages/landing-page/mobile-app-section.tsx
+  h_0aff3b71f739b1 5
+web/src/components/pages/landing-page/mobile-preview/mobile-preview.tsx
+  h_0aff3b71f739b1 55
+web/src/components/pages/landing-page/principles-section.tsx
+  h_0aff3b71f739b1 2
+web/src/components/pages/landing-page/product-showcase/product-showcase.tsx
+  h_0aff3b71f739b1 16
+web/src/components/pages/landing-page/security-section.tsx
+  h_0aff3b71f739b1 8
+web/src/lib/landing-links.ts
+  h_0aff3b71f739b1 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "35146f2eb3a6ea40926c9858084bcc35b0c3c4d9",
+  "prompts": {},
+  "humans": {
+    "h_0aff3b71f739b1": {
+      "author": "Dominiqu <u24580482@tuks.co.za>"
+    }
+  }
+}
