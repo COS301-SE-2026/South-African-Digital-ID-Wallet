@@ -30,6 +30,10 @@ public static partial class OfficialAuditSummaryFormatter
             AuditEventType.DeviceVerificationFailed => "Wrong device code entered",
             AuditEventType.PasswordReset => "Password reset",
             AuditEventType.ConsentRecorded => "POPIA consent recorded",
+            // Citizen work: the raw Details carry the citizen's SA ID and the official's internal ID
+            AuditEventType.OnboardCitizen => "Citizen onboarded",
+            AuditEventType.OnboardCitizenFailed => "Onboarding failed",
+            AuditEventType.CredentialIssued => $"{credential} issued",
             _ => details,
         };
     }

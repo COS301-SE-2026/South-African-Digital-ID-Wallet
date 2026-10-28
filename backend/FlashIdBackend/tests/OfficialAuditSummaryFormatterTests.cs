@@ -26,7 +26,16 @@ public class OfficialAuditSummaryFormatterTests
 
     [Fact]
     public void OtherEvents_KeepTheirDetails() =>
-        Assert.Equal("Citizen onboarded.", OfficialAuditSummaryFormatter.Format(AuditEventType.OnboardCitizen, "Citizen onboarded.", null));
+        Assert.Equal("Break-glass emergency access.", OfficialAuditSummaryFormatter.Format(AuditEventType.EmergencyProfileAccessed, "Break-glass emergency access.", null));
+
+    [Theory]
+    [InlineData(AuditEventType.OnboardCitizen, null, "Citizen onboarded")]
+    [InlineData(AuditEventType.OnboardCitizenFailed, null, "Onboarding failed")]
+    [InlineData(AuditEventType.CredentialIssued, "Driver's Licence", "Driver's Licence issued")]
+    [InlineData(AuditEventType.CredentialIssued, null, "Credential issued")] // rows logged before CredentialId was set
+    public void CitizenWorkEvents_HideTheRawLogSentence(AuditEventType eventType, string? credentialType, string expected) =>
+        Assert.Equal(expected, OfficialAuditSummaryFormatter.Format(
+            eventType, "Citizen, 9001015009087, has been onboarded ... by Home Affairs Official, 3fa85f64-...", credentialType));
 
     [Fact]
     public void AccountEvents_UseShortLabelsInsteadOfTheLogSentence() =>
