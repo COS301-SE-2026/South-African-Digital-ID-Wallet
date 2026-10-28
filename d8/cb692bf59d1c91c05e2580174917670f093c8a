@@ -1,0 +1,14 @@
+web/src/components/organisms/consent-to-verify/consent-to-verify.tsx
+  h_99fca60b892ff4 110
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d8cb692bf59d1c91c05e2580174917670f093c8a",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}

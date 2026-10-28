@@ -1,0 +1,42 @@
+web/src/app/globals.css
+  h_99fca60b892ff4 201-208
+web/src/components/ui/button.tsx
+  h_99fca60b892ff4 12
+  h_99fca60b892ff4 13,19
+web/src/components/organisms/consent-to-verify/consent-to-verify.tsx
+  h_99fca60b892ff4 36,40-41,108
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_99fca60b892ff4 22-23,164-182
+web/src/components/organisms/liveness-camera-dialog/liveness-camera-dialog.tsx
+  h_99fca60b892ff4 106-112,133-137,143-146,152-153,178-188,206-208,215,227
+  h_99fca60b892ff4 142,154-156,241
+web/src/components/organisms/ready-to-verify/types.ts
+  h_99fca60b892ff4 8-9
+web/src/components/organisms/physical-identity-form/physical-identity-form.tsx
+  h_99fca60b892ff4 47-48,50-54,82,104
+  h_99fca60b892ff4 49,55-57,59-68,70-73,75-79,81,83-87,89-98,100-103
+web/src/components/atoms/button/button.tsx
+  h_99fca60b892ff4 13,15,22
+  h_99fca60b892ff4 23,30-31
+backend/FlashIdBackend/Infrastructure/Providers/Decorators/DemoLivenessBypassProviderDecorator.cs
+  h_99fca60b892ff4 1-30
+web/src/components/organisms/ready-to-verify/ready-to-verify.tsx
+  h_99fca60b892ff4 48,106-107,116-118
+web/src/components/pages/activation/verify-citizen-page.tsx
+  h_99fca60b892ff4 93-94,250-254,264,292,435-447,459-461,468-469
+web/src/components/organisms/liveness-camera-dialog/test/liveness-camera-dialog.test.tsx
+  h_99fca60b892ff4 19-20,23-27,115-170
+web/src/components/organisms/consent-to-verify/types.ts
+  h_99fca60b892ff4 7-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2510410797b64f7084a442c19e3fee4361c213df",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
