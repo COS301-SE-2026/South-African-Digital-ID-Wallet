@@ -1,0 +1,18 @@
+backend/FlashIdBackend/Application/Common/Services/IssueCredentialService.cs
+  h_99fca60b892ff4 219-220
+backend/FlashIdBackend/tests/OfficialAuditSummaryFormatterTests.cs
+  h_99fca60b892ff4 29-38
+backend/FlashIdBackend/Application/Common/Mapping/OfficialAuditSummaryFormatter.cs
+  h_99fca60b892ff4 33-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "966b60cbb8249192072ca2722f98b0ff97de7b91",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
