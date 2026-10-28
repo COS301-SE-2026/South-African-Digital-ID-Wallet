@@ -92,7 +92,7 @@ export function LandingPageFooter() {
               Create an account
             </Link>
             <Link
-              href="https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/blob/main/docs/demo4/User%20Help%20Manual.pdf"
+              href="https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/blob/main/docs/project-day/User_Help_Manual.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="block transition hover:text-clean-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
