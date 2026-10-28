@@ -1,0 +1,35 @@
+web/src/components/organisms/landing-page-navbar/landing-page-navbar.tsx
+  s_08190d03751bc2::t_786cb8eb4772b5 27,41-44
+  s_08190d03751bc2::t_2f08efe64ffce3 30
+  s_08190d03751bc2::t_5e2e05603afc68 58
+web/src/components/organisms/landing-page-footer/landing-page-footer.tsx
+  s_08190d03751bc2::t_8bc2e656a1103b 53,58,63-64,69-70,75-76,81
+web/src/components/organisms/auth-sidebar/auth-sidebar.tsx
+  h_293a8616118f65 15-17
+web/src/components/pages/landing-page/landing-page.test.tsx
+  s_08190d03751bc2::t_fc15f0bf71f34b 103,110-117
+  s_08190d03751bc2::t_0104cd7698c17b 118-124,126-130
+  h_293a8616118f65 132
+  s_08190d03751bc2::t_338decd59f91a4 125,131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "26c424036271c9b7a21a4b9b9adafbe774f21d40",
+  "prompts": {},
+  "humans": {
+    "h_293a8616118f65": {
+      "author": "babychucks <babychucks05@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_08190d03751bc2": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "1c4d6fba-28ea-440e-baf1-c80900fcbcae",
+        "model": "unknown"
+      },
+      "human_author": "babychucks <babychucks05@gmail.com>"
+    }
+  }
+}
