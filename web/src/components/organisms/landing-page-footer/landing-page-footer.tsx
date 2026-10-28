@@ -54,30 +54,30 @@ export function LandingPageFooter() {
             aria-label="Footer navigation"
             className="mt-4 space-y-3 text-sm text-clean-white/70"
           >
-            <a
+            <Link
               href="/#about"
               className="block transition hover:text-clean-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
             >
               About FlashID
-            </a>
-            <a
+            </Link>
+            <Link
               href="/#features"
               className="block transition hover:text-clean-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
             >
               Features
-            </a>
-            <a
+            </Link>
+            <Link
               href="/#preview"
               className="block transition hover:text-clean-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
             >
               Product preview
-            </a>
-            <a
+            </Link>
+            <Link
               href="/#help"
               className="block transition hover:text-clean-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
             >
               Help and FAQs
-            </a>
+            </Link>
           </nav>
         </div>
         <div>

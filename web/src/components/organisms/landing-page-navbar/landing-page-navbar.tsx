@@ -24,10 +24,10 @@ export function LandingPageNavbar() {
   return (
     <header className="sticky top-0 z-50">
       <div className="border-b border-clean-white/10 bg-deep-green">
-        <div className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-3 px-6 sm:px-8 lg:px-10">
+        <div className="relative mx-auto flex min-h-20 w-full items-center justify-between gap-3 px-6 sm:px-8 lg:px-10 xl:grid xl:grid-cols-[1.02fr_0.98fr] xl:gap-16">
           <Link
             href="/"
-            className="flex items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold focus-visible:ring-offset-2 focus-visible:ring-offset-deep-green"
+            className="flex items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold focus-visible:ring-offset-2 focus-visible:ring-offset-deep-green lg:ml-16 xl:ml-28"
           >
             <Image
               src={FlashIdLogo}
@@ -38,7 +38,10 @@ export function LandingPageNavbar() {
               priority
             />
           </Link>
-          <nav aria-label="Primary navigation" className="hidden xl:block">
+          <nav
+            aria-label="Primary navigation"
+            className="absolute left-1/2 hidden -translate-x-1/2 xl:block"
+          >
             <ul className="flex items-center gap-1">
               {NAV_LINKS.map((link) => (
                 <li key={link.label}>
@@ -52,7 +55,7 @@ export function LandingPageNavbar() {
               ))}
             </ul>
           </nav>
-          <div className="hidden items-center gap-3 xl:flex">
+          <div className="hidden items-center gap-3 xl:col-start-2 xl:row-start-1 xl:mx-auto xl:flex xl:w-full xl:max-w-[500px] xl:justify-end xl:pr-[22px]">
             <Link
               href="/login"
               className="rounded-lg px-4 py-2.5 text-sm font-bold text-clean-white transition hover:bg-clean-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"

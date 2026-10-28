@@ -100,15 +100,36 @@ describe('Landing review regressions', () => {
     assertCenteredPriority()
   })
 
-  it('aligns both footer containers with the navbar and avoids logo scaling', () => {
+  it('aligns the navbar with the hero and keeps footer containers unchanged', () => {
     const { container } = render(
       <>
         <LandingPageNavbar />
         <LandingPageFooter />
       </>
     )
-    const navbar = container.querySelector('header .max-w-7xl')!
-    expect(navbar).toHaveClass('max-w-7xl', 'px-6', 'sm:px-8', 'lg:px-10')
+    const navbar = container.querySelector('header > div > div')!
+    expect(navbar).toHaveClass('w-full', 'px-6', 'sm:px-8', 'lg:px-10')
+    expect(navbar).not.toHaveClass('max-w-7xl')
+    expect(
+      within(screen.getByRole('banner')).getByRole('link', {
+        name: 'FlashID home',
+      })
+    ).toHaveClass('lg:ml-16', 'xl:ml-28')
+    const accountActions = within(screen.getByRole('banner')).getByRole(
+      'link',
+      { name: 'Create account' }
+    ).parentElement
+    expect(accountActions).toHaveClass(
+      'xl:max-w-[500px]',
+      'xl:justify-end',
+      'xl:pr-[22px]'
+    )
+    expect(
+      within(screen.getByRole('banner')).getByRole('navigation', {
+        name: 'Primary navigation',
+      })
+    ).toHaveClass('-translate-x-1/2')
+
     const footerContainers = container.querySelectorAll('footer .mx-auto')
     expect(footerContainers).toHaveLength(2)
     footerContainers.forEach((element) => {

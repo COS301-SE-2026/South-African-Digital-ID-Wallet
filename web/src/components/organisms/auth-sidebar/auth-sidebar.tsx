@@ -12,9 +12,9 @@ export const AuthSidebar = () => {
           <Image
             src={FlashIdLogo}
             alt="Flash ID"
-            width={280}
-            height={90}
-            className="h-28 w-auto object-contain"
+            width={290}
+            height={110}
+            className="h-auto w-[290px] object-contain"
             priority
           />
           <div>
