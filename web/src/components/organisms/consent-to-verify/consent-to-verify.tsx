@@ -107,6 +107,7 @@ export const ConsentToVerify = ({
           variant="primary"
           className="!flex !h-12 !w-full !max-w-none !items-center !justify-center"
           disabled={!hasConsented}
+          isLoading={isLoading}
           onClick={handleContinue}
           dataCy="consent-continue"
         >
