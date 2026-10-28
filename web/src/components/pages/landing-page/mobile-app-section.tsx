@@ -2,7 +2,7 @@ import { ArrowDownToLine, Check, Smartphone } from 'lucide-react'
 import { Button, Text } from '@/components/atoms'
 import { ANDROID_APK_URL, MOBILE_REGISTER_SCREEN } from './landing-assets'
 import { PhoneFrame } from './mobile-preview'
-import borderStyles from './landing-effects.module.css'
+import borderStyles from '@/styles/landing-effects.module.css'
 
 export function MobileAppSection() {
   return (

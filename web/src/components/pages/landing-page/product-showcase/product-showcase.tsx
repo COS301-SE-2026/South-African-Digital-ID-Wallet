@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { SHOWCASE_SCREENS } from './screens'
-import effects from '../landing-effects.module.css'
+import effects from '@/styles/landing-effects.module.css'
 
 export function ProductShowcase() {
   const [active, setActive] = useState(0)

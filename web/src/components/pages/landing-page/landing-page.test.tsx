@@ -6,7 +6,7 @@ import {
   within,
   waitFor,
 } from '@testing-library/react'
-import borderStyles from './landing-effects.module.css'
+import borderStyles from '@/styles/landing-effects.module.css'
 import { LandingPageNavbar } from '@/components/organisms/landing-page-navbar/landing-page-navbar'
 import { HelpMenuSection } from '@/components/molecules/help-menu-section/help-menu-section'
 import { LandingPage, LandingPageContent } from './landing-page'
@@ -14,11 +14,27 @@ import { SecuritySection } from './security-section'
 import { MobilePreview } from './mobile-preview'
 import { MobileAppSection } from './mobile-app-section'
 import { LandingPageFooter } from '@/components/organisms/landing-page-footer/landing-page-footer'
-import { MOBILE_SCREENS, USER_MANUAL_URL } from './landing-assets'
+import { MOBILE_SCREENS } from './landing-assets'
+import { USER_MANUAL_URL } from '@/lib/landing-links'
 
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: ({ alt }: { alt: string }) => <span role="img" aria-label={alt} />,
+  default: ({
+    alt,
+    priority,
+    className,
+  }: {
+    alt: string
+    priority?: boolean
+    className?: string
+  }) => (
+    <span
+      role="img"
+      aria-label={alt}
+      data-priority={String(Boolean(priority))}
+      className={className}
+    />
+  ),
 }))
 
 describe('Landing page mobile preview', () => {
@@ -58,6 +74,52 @@ describe('Landing page mobile preview', () => {
         name: 'Controlled sharing',
       })
     ).toBeInTheDocument()
+  })
+})
+
+describe('Landing review regressions', () => {
+  it('prioritizes only the centered mobile screenshot as slides change', () => {
+    const { container } = render(<MobilePreview />)
+    const assertCenteredPriority = () => {
+      expect(container.querySelectorAll('[data-priority="true"]')).toHaveLength(
+        1
+      )
+      expect(
+        container.querySelector('[data-position="center"] [role="img"]')
+      ).toHaveAttribute('data-priority', 'true')
+      container
+        .querySelectorAll(
+          '[data-position]:not([data-position="center"]) [role="img"]'
+        )
+        .forEach((image) =>
+          expect(image).toHaveAttribute('data-priority', 'false')
+        )
+    }
+    assertCenteredPriority()
+    fireEvent.click(screen.getByRole('button', { name: 'Next mobile preview' }))
+    assertCenteredPriority()
+  })
+
+  it('aligns both footer containers with the navbar and avoids logo scaling', () => {
+    const { container } = render(
+      <>
+        <LandingPageNavbar />
+        <LandingPageFooter />
+      </>
+    )
+    const navbar = container.querySelector('header .max-w-7xl')!
+    expect(navbar).toHaveClass('max-w-7xl', 'px-6', 'sm:px-8', 'lg:px-10')
+    const footerContainers = container.querySelectorAll('footer .mx-auto')
+    expect(footerContainers).toHaveLength(2)
+    footerContainers.forEach((element) => {
+      expect(element).toHaveClass('max-w-7xl', 'px-6', 'sm:px-8', 'lg:px-10')
+      expect(element).not.toHaveClass('max-w-none')
+    })
+    const logo = within(screen.getByRole('banner')).getByRole('img', {
+      name: 'FlashID home',
+    })
+    expect(logo).toHaveClass('sm:h-16')
+    expect(logo.className).not.toContain('scale-')
   })
 })
 

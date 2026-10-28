@@ -14,7 +14,6 @@ export const MOBILE_SCREENS = [
 ]
 
 export const ANDROID_APK_URL: string = ''
-export const USER_MANUAL_URL = '/landing/flashid-user-manual.pdf'
 export const MOBILE_REGISTER_SCREEN = {
   src: MobileRegistration.src,
   aspectRatio: MobileRegistration.width / MobileRegistration.height,

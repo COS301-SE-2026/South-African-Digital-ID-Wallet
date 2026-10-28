@@ -52,7 +52,7 @@ export function MobilePreview() {
               <PhoneFrame
                 src={screen.src}
                 label={`${screen.label}${screen.isMockup ? ' — illustrative mockup' : ''}`}
-                priority
+                priority={centered}
               />
             </div>
           )

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import landingEffects from '@/components/pages/landing-page/landing-effects.module.css'
+import landingEffects from '@/styles/landing-effects.module.css'
 import {
   ChevronDown,
   HelpCircle,

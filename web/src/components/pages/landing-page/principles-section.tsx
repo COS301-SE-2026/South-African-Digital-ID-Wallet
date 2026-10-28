@@ -1,5 +1,5 @@
 import { Fingerprint, ShieldCheck, Users, Zap } from 'lucide-react'
-import effects from './landing-effects.module.css'
+import effects from '@/styles/landing-effects.module.css'
 
 const PRINCIPLES = [
   {

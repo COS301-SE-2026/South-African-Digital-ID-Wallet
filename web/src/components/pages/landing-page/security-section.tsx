@@ -5,7 +5,7 @@ import {
   LockKeyhole,
   Smartphone,
 } from 'lucide-react'
-import borderStyles from './landing-effects.module.css'
+import borderStyles from '@/styles/landing-effects.module.css'
 
 const PROTECTIONS = [
   {

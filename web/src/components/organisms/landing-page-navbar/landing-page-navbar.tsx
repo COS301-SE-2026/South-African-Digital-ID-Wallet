@@ -34,7 +34,7 @@ export function LandingPageNavbar() {
               alt="FlashID home"
               width={200}
               height={50}
-              className="h-14 w-auto origin-left scale-[1.15] object-contain sm:h-16"
+              className="h-14 w-auto object-contain sm:h-16"
               priority
             />
           </Link>
