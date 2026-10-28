@@ -10,23 +10,25 @@ const BASE_STYLE =
 
 const BUTTON_VARIANT_CLASSNAMES: Record<ButtonVariant, string> = {
   primary:
-    'bg-deep-green hover:bg-primary-green text-clean-white disabled:bg-neutral-mid-grey focus-visible:ring-2 focus-visible:ring-primary-green focus-visible:ring-offset-2 lg:w-[160px] w-full',
+    'bg-deep-green hover:bg-primary-green active:bg-primary-green text-clean-white disabled:bg-neutral-mid-grey focus-visible:ring-2 focus-visible:ring-primary-green focus-visible:ring-offset-2 lg:w-[160px] w-full',
   secondary:
-    'border border-deep-green text-deep-green hover:bg-deep-green hover:text-clean-white disabled:border-neutral-mid-grey disabled:text-neutral-mid-grey disabled:hover:bg-transparent focus-visible:ring-2 focus-visible:ring-primary-green focus-visible:ring-offset-2 lg:w-[160px] w-full',
+    'border border-deep-green text-deep-green hover:bg-deep-green active:bg-deep-green hover:text-clean-white active:text-clean-white disabled:border-neutral-mid-grey disabled:text-neutral-mid-grey disabled:hover:bg-transparent focus-visible:ring-2 focus-visible:ring-primary-green focus-visible:ring-offset-2 lg:w-[160px] w-full',
   text: 'text-deep-green hover:text-primary-green disabled:text-neutral-mid-grey focus-visible:text-primary-green',
   custom: '',
 }
 
 const BUTTON_TEXT_VARIANT_CLASSNAMES: Record<ButtonVariant, string> = {
   primary: 'text-clean-white',
-  secondary: 'text-deep-green group-hover:text-clean-white',
+  secondary:
+    'text-deep-green group-hover:text-clean-white group-active:text-clean-white',
   text: 'text-deep-green group-hover:text-primary-green',
   custom: '',
 }
 
 const BUTTON_ICON_VARIANT_CLASSNAMES: Record<ButtonVariant, string> = {
   primary: 'text-clean-white',
-  secondary: 'text-deep-green group-hover:text-clean-white',
+  secondary:
+    'text-deep-green group-hover:text-clean-white group-active:text-clean-white',
   text: 'text-deep-green group-hover:text-primary-green',
   custom: '',
 }

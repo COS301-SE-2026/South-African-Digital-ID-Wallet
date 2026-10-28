@@ -33,10 +33,12 @@ export const ConsentToVerify = ({
   isOpen,
   onClose,
   onConsent,
+  isLoading = false,
 }: Readonly<ConsentToVerifyProps>) => {
   const [hasConsented, setHasConsented] = useState(false)
   const handleContinue = () => {
-    if (!hasConsented) return
+    // Block double submits while the request is running
+    if (!hasConsented || isLoading) return
     onConsent()
   }
   return (
@@ -103,7 +105,7 @@ export const ConsentToVerify = ({
         </label>
         <Button
           variant="primary"
-          className="!flex !h-12 !w-full !max-w-none !items-center !justify-center !bg-deep-green"
+          className="!flex !h-12 !w-full !max-w-none !items-center !justify-center"
           disabled={!hasConsented}
           onClick={handleContinue}
           dataCy="consent-continue"

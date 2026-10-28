@@ -19,6 +19,8 @@ using Microsoft.Azure.Cosmos;
 using User = Domain.Entities.User;
 using Infrastructure.Repositories.Decorators;
 using Infrastructure.BackgroundJobs;
+using Infrastructure.Providers.Decorators;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure;
 
@@ -159,7 +161,25 @@ public static class DependencyInjection
         services.AddHostedService<CredentialUpdateBackgroundService>();
 
         services.AddScoped<IGovAdminAuditLogRepository, GovAdminAuditLogRepository>();
-        services.AddSingleton<IFaceLivenessServiceProvider, AzureFaceLivenessServiceProvider>();
+        services.AddSingleton<AzureFaceLivenessServiceProvider>();
+        // Booth demo flag: wraps the real provider so photos pass liveness; off unless set
+        services.AddSingleton<IFaceLivenessServiceProvider>(serviceProvider =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var azureFace = serviceProvider.GetRequiredService<AzureFaceLivenessServiceProvider>();
+
+            if (!configuration.GetValue<bool>("AzureFace:DemoBypassLiveness"))
+            {
+                return azureFace;
+            }
+
+            // Loud reminder so the demo flag is never left on by accident
+            serviceProvider.GetRequiredService<ILogger<DemoLivenessBypassProviderDecorator>>()
+                .LogWarning("AzureFace:DemoBypassLiveness is ON. Liveness is bypassed; face match is still enforced.");
+
+            return new DemoLivenessBypassProviderDecorator(azureFace);
+        });
+
         services.AddScoped<IPhysicalIdentityVerificationRepository, PhysicalIdentityVerificationRepository>();
 
         services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();

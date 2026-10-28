@@ -90,6 +90,8 @@ export const VerifyCitizenPage = ({ token = '' }: VerifyCitizenPageProps) => {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   const [isPreparingCamera, setIsPreparingCamera] = React.useState(false)
+  // Ref, not state, so a fast double click sees the lock immediately
+  const isCreatingSessionRef = React.useRef(false)
 
   const clearError = () => {
     setErrorMessage('')
@@ -245,6 +247,11 @@ export const VerifyCitizenPage = ({ token = '' }: VerifyCitizenPageProps) => {
   }
 
   const handleStartCamera = async () => {
+    // Ignore repeat clicks while a liveness session is being created
+    if (isCreatingSessionRef.current) {
+      return
+    }
+
     if (!verificationId) {
       setReadyOpen(false)
       setView('failure')
@@ -254,6 +261,7 @@ export const VerifyCitizenPage = ({ token = '' }: VerifyCitizenPageProps) => {
       return
     }
 
+    isCreatingSessionRef.current = true
     setIsPreparingCamera(true)
     clearError()
 
@@ -281,6 +289,7 @@ export const VerifyCitizenPage = ({ token = '' }: VerifyCitizenPageProps) => {
         getErrorMessage(error, 'Unable to prepare face verification.')
       )
     } finally {
+      isCreatingSessionRef.current = false
       setIsPreparingCamera(false)
     }
   }
@@ -423,6 +432,19 @@ export const VerifyCitizenPage = ({ token = '' }: VerifyCitizenPageProps) => {
           />
         )}
 
+        {view === 'processing' && (
+          <div
+            role="status"
+            className="flex flex-col items-center gap-4 py-24 text-center"
+          >
+            {/* Same spinner as the camera dialog's "Preparing secure camera" */}
+            <div className="size-10 animate-spin rounded-full border-2 border-primary-green/20 border-t-primary-green" />
+            <p className="text-sm text-muted-text">
+              Checking your face against your government record...
+            </p>
+          </div>
+        )}
+
         {view === 'failure' && (
           <VerificationFailure
             message={errorMessage}
@@ -434,14 +456,17 @@ export const VerifyCitizenPage = ({ token = '' }: VerifyCitizenPageProps) => {
       <ConsentToVerify
         isOpen={consentOpen}
         userName="FlashID Citizen"
-        onClose={() => setConsentOpen(false)}
+        isLoading={isSubmitting}
+        // Ignore backdrop/X closes while the request is running
+        onClose={() => !isSubmitting && setConsentOpen(false)}
         onConsent={handlePhysicalConsent}
       />
 
       <ReadyToVerify
         isOpen={readyOpen}
         userName="FlashID Citizen"
-        onClose={() => setReadyOpen(false)}
+        isLoading={isPreparingCamera}
+        onClose={() => !isPreparingCamera && setReadyOpen(false)}
         onCancel={() => {
           setReadyOpen(false)
           setView('physical-id')

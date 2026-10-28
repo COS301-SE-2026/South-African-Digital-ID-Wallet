@@ -5,4 +5,6 @@ export interface ReadyToVerifyProps {
   onCancel: () => void
   userName: string
   userInitials?: string
+  // True while the liveness session is being created
+  isLoading?: boolean
 }

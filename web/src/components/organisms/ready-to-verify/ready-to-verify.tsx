@@ -45,8 +45,7 @@ export const ReadyToVerify = ({
   onClose,
   onStartVerification,
   onCancel,
-  userName,
-  userInitials,
+  isLoading = false,
 }: Readonly<ReadyToVerifyProps>) => {
   return (
     <Modal
@@ -104,7 +103,8 @@ export const ReadyToVerify = ({
         </div>
         <Button
           variant="primary"
-          className="!flex !h-12 !w-full !max-w-none !items-center !justify-center !bg-deep-green"
+          className="!flex !h-12 !w-full !max-w-none !items-center !justify-center"
+          isLoading={isLoading}
           onClick={onStartVerification}
           dataCy="start-verification"
         >
@@ -113,7 +113,9 @@ export const ReadyToVerify = ({
         <button
           type="button"
           onClick={onCancel}
-          className="text-sm font-semibold text-deep-green hover:underline"
+          // Cancelling mid-request would still open the camera when the call returns
+          disabled={isLoading}
+          className="text-sm font-semibold text-deep-green hover:text-primary-green hover:underline disabled:cursor-not-allowed disabled:opacity-50"
           data-cy="cancel-verification"
         >
           Cancel

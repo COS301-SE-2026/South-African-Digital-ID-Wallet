@@ -44,56 +44,64 @@ export function PhysicalIdentityForm({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="physical-sa-id">South African ID number</Label>
-
-          <Input
-            id="physical-sa-id"
-            inputMode="numeric"
-            maxLength={13}
-            value={saId}
-            placeholder="Enter your 13-digit ID number"
-            onChange={(event) =>
-              onSaIdChange(event.target.value.replace(/\D/g, ''))
-            }
-          />
-
-          <p className="text-xs text-muted-foreground">
-            You can find this on your South African identity document.
-          </p>
-        </div>
-
-        {errorMessage && (
-          <p role="alert" className="text-sm text-destructive">
-            {errorMessage}
-          </p>
-        )}
-
-        <Button
-          type="button"
-          className="w-full"
-          disabled={isSubmitting || !isValidSaId(saId)}
-          onClick={onContinue}
+      <CardContent>
+        <form
+          className="space-y-6"
+          onSubmit={(event) => {
+            // Enter in the ID field submits; stop the browser reloading the page
+            event.preventDefault()
+            onContinue()
+          }}
         >
-          {isSubmitting ? 'Preparing...' : 'Continue'}
-        </Button>
+          <div className="space-y-2">
+            <Label htmlFor="physical-sa-id">South African ID number</Label>
 
-        <Button
-          type="button"
-          variant="ghost"
-          className="w-full"
-          onClick={onBack}
-          disabled={isSubmitting}
-        >
-          <ArrowLeft className="mr-2 size-4" />
-          Back
-        </Button>
+            <Input
+              id="physical-sa-id"
+              inputMode="numeric"
+              maxLength={13}
+              value={saId}
+              placeholder="Enter your 13-digit ID number"
+              onChange={(event) =>
+                onSaIdChange(event.target.value.replace(/\D/g, ''))
+              }
+            />
 
-        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-          <ShieldCheck className="size-4 text-primary-green" />
-          Your information is protected by FlashID
-        </div>
+            <p className="text-xs text-muted-foreground">
+              You can find this on your South African identity document.
+            </p>
+          </div>
+
+          {errorMessage && (
+            <p role="alert" className="text-sm text-destructive">
+              {errorMessage}
+            </p>
+          )}
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isSubmitting || !isValidSaId(saId)}
+          >
+            {isSubmitting ? 'Preparing...' : 'Continue'}
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full"
+            onClick={onBack}
+            disabled={isSubmitting}
+          >
+            <ArrowLeft className="mr-2 size-4" />
+            Back
+          </Button>
+
+          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+            <ShieldCheck className="size-4 text-primary-green" />
+            Your information is protected by FlashID
+          </div>
+        </form>
       </CardContent>
     </Card>
   )
