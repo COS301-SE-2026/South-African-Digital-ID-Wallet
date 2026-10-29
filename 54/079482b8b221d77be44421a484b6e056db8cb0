@@ -1,0 +1,16 @@
+web/src/components/pages/landing-page/landing-page.test.tsx
+  h_99fca60b892ff4 20-25
+web/src/components/pages/landing-page/landing-assets.ts
+  h_99fca60b892ff4 16-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "54079482b8b221d77be44421a484b6e056db8cb0",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
