@@ -17,6 +17,12 @@ import { LandingPageFooter } from '@/components/organisms/landing-page-footer/la
 import { MOBILE_SCREENS } from './landing-assets'
 import { USER_MANUAL_URL } from '@/lib/landing-links'
 
+// Keep the empty-URL fallback under test now that the real APK URL is set
+jest.mock('./landing-assets', () => ({
+  ...jest.requireActual('./landing-assets'),
+  ANDROID_APK_URL: '',
+}))
+
 jest.mock('next/image', () => ({
   __esModule: true,
   default: ({
