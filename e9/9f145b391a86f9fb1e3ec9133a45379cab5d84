@@ -1,0 +1,18 @@
+backend/FlashIdBackend/tests/TrustedDevicesControllerTests.cs
+  h_99fca60b892ff4 1-29
+backend/FlashIdBackend/tests/CredentialsControllerTests.cs
+  h_99fca60b892ff4 1-106
+backend/FlashIdBackend/tests/GlobalExceptionHandlerTests.cs
+  h_99fca60b892ff4 75-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e99f145b391a86f9fb1e3ec9133a45379cab5d84",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
