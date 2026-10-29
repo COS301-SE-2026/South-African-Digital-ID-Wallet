@@ -1,0 +1,41 @@
+backend/FlashIdBackend/Presentation/ExceptionHandling/GlobalExceptionHandler.cs
+  h_99fca60b892ff4 55-58,80-82
+  h_99fca60b892ff4 83
+backend/FlashIdBackend/Application/Features/Credentials/Exceptions/CredentialExceptions.cs
+  h_99fca60b892ff4 44-57
+  h_99fca60b892ff4 43
+backend/FlashIdBackend/Application/Features/Verification/Exceptions/ActivationExceptions.cs
+  h_99fca60b892ff4 1-15
+backend/FlashIdBackend/tests/CitizenVerificationSeviceTests.cs
+  h_99fca60b892ff4 4,67,76,85,94,114,151,161,173,184,203,211-212
+backend/FlashIdBackend/tests/CredentialActivationServiceTests.cs
+  h_99fca60b892ff4 7,92,100,109
+web/src/components/pages/activation/activate-credentials-page.tsx
+  h_99fca60b892ff4 53-54,79-81,105,148-150,157-166
+  h_99fca60b892ff4 147,151,167-170
+backend/FlashIdBackend/Application/Common/Services/CitizenVerificationService.cs
+  h_99fca60b892ff4 7,42,63,69,131,136,141,147-149,157,165-166
+backend/FlashIdBackend/Application/Common/Services/CredentialActivationService.cs
+  h_99fca60b892ff4 6,40,45,50-51
+backend/FlashIdBackend/Presentation/Controllers/CredentialsController.cs
+  h_99fca60b892ff4 50-51,55-58,64-65,69-72,278-279
+  h_99fca60b892ff4 53,67
+backend/FlashIdBackend/Presentation/Controllers/TrustedDeviceController.cs
+  h_99fca60b892ff4 41,43
+  h_99fca60b892ff4 22,24-27,29,31-35,37,39,42,44
+web/src/components/organisms/verify-method/verify-method.tsx
+  h_99fca60b892ff4 83
+backend/FlashIdBackend/Presentation/Controllers/InstitutionsController.cs
+  h_99fca60b892ff4 66-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "86d5f5e1edae3f2cedf544fba696ec76b28a1a47",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
