@@ -1,0 +1,16 @@
+web/src/components/templates/otp-modal/test/otp-modal.test.tsx
+  h_99fca60b892ff4 81,166-180
+web/src/components/templates/otp-modal/otp-modal.tsx
+  h_99fca60b892ff4 28,98-100,106,111-112,118,205,207
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d1fc7dcd11b66cf917cfabf7a906b234e0bd2d9a",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
