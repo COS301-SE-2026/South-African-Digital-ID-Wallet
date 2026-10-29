@@ -34,7 +34,7 @@ export default function OnboardCitizenPage() {
   const [onboardResponse, setOnboardResponse] =
     useState<OnboardCitizenResponse | null>(null)
 
-  const { mutate: retrieveRecord } = useMutation({
+  const { mutate: retrieveRecord, isPending: isRetrieving } = useMutation({
     mutationFn: (citizenIdNumber: string) =>
       onboardingService.retrieveIdentityRecord(citizenIdNumber),
     onSuccess: (data) => {
@@ -142,6 +142,7 @@ export default function OnboardCitizenPage() {
             setConsent={setidConsent}
             record={record}
             retrieveIdentityRecord={retrieveIdentityRecord}
+            isRetrieving={isRetrieving}
             errors={errors}
             setErrors={setErrors}
           />

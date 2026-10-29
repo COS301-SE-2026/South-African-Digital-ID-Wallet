@@ -24,6 +24,7 @@ import {
   type IdentityVerificationStatus,
 } from '@/services/verification-service'
 import { isValidSaId } from '@/schemas'
+import { useUser } from '@/context/user-context'
 
 const FLOW_STEPS = ['Choose Method', 'Verify Identity', 'Complete']
 
@@ -57,6 +58,7 @@ function getErrorMessage(error: unknown, fallback: string) {
 
 export const VerifyCitizenPage = ({ token = '' }: VerifyCitizenPageProps) => {
   const router = useRouter()
+  const { refresh } = useUser()
 
   const [view, setView] = React.useState<VerificationView>(
     token ? 'activation-code' : 'method'
@@ -100,6 +102,8 @@ export const VerifyCitizenPage = ({ token = '' }: VerifyCitizenPageProps) => {
   const showSuccess = () => {
     clearError()
     setSuccessOpen(true)
+    // Verification just linked the citizen, so reload /me to swap the email for their name
+    void refresh()
   }
 
   const resetPhysicalFlow = () => {

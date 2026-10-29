@@ -61,14 +61,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   )
 
   const fetchMe = async () => {
-    setLoading(true)
+    // Only block the app on the first load; refreshing a loaded user updates in place
+    const isFirstLoad = !user
+    if (isFirstLoad) setLoading(true)
     try {
       const res = await api.get('/api/auth/me')
       setUser(res.data)
     } catch {
       setUser(readStoredUser())
     } finally {
-      setLoading(false)
+      if (isFirstLoad) setLoading(false)
     }
   }
 
