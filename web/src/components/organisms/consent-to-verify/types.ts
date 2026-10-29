@@ -4,4 +4,6 @@ export interface ConsentToVerifyProps {
   onConsent: () => void
   userName: string
   userInitials?: string
+  // True while the consent request is in flight
+  isLoading?: boolean
 }

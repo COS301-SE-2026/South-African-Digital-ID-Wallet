@@ -9,6 +9,7 @@ using Infrastructure;
 using Infrastructure.BackgroundJobs;
 using Infrastructure.Repositories;
 using Infrastructure.Providers;
+using Infrastructure.Providers.Decorators;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -252,5 +253,30 @@ public class DependencyInjectionTests
         Assert.Contains(services, sd =>
             sd.ServiceType == typeof(IHostedService) &&
             sd.ImplementationType == typeof(EmergencyNotificationBackgroundService));
+    }
+
+    [Theory]
+    [InlineData(null, typeof(AzureFaceLivenessServiceProvider))]
+    [InlineData("2000-01-01T00:00:00Z", typeof(AzureFaceLivenessServiceProvider))] // deadline already passed
+    [InlineData("2999-01-01T00:00:00Z", typeof(DemoLivenessBypassProviderDecorator))]
+    public void AddInfrastructure_FaceLivenessProvider_IsWrappedOnlyBeforeDemoDeadline(string? bypassUntil, Type expectedType)
+    {
+        var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            // Fake values; the Azure client is never called in this test
+            ["AzureFace:Endpoint"] = "https://example.cognitiveservices.azure.com/",
+            ["AzureFace:ApiKey"] = "test-key",
+            ["AzureFace:DemoBypassLivenessUntil"] = bypassUntil,
+        }).Build();
+        var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(config);
+        // The wrapped branch logs a warning, so a logger must be resolvable
+        services.AddLogging();
+        services.AddInfrastructure(config);
+
+        using var provider = services.BuildServiceProvider();
+        var faceProvider = provider.GetRequiredService<IFaceLivenessServiceProvider>();
+
+        Assert.IsType(expectedType, faceProvider);
     }
 }

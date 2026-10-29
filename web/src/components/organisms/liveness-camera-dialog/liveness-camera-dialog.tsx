@@ -27,6 +27,9 @@ const DEEP_GREEN = '#053b2c'
 const INITIALISATION_ERROR_MESSAGE =
   'Azure Face Liveness component did not initialise correctly.'
 
+const INSECURE_CONTEXT_MESSAGE =
+  'The camera needs a secure connection. Open FlashID over HTTPS (or on localhost) and try again.'
+
 const LIVENESS_ERROR_MESSAGES: Record<string, string> = {
   CameraPermissionDenied:
     'Camera access was blocked. Allow camera access in your browser and try again.',
@@ -96,11 +99,20 @@ const applyFlashIdTheme = (detector: AzureFaceLivenessElement) => {
 }
 
 const getLivenessErrorMessage = (error: unknown) => {
+  // Errors we throw ourselves already carry user-facing text
   if (
     error instanceof Error &&
-    error.message === INITIALISATION_ERROR_MESSAGE
+    (error.message === INITIALISATION_ERROR_MESSAGE ||
+      error.message === INSECURE_CONTEXT_MESSAGE)
   ) {
     return error.message
+  }
+
+  // Errors from our own getUserMedia call, not the SDK
+  if (error instanceof DOMException) {
+    return error.name === 'NotAllowedError'
+      ? LIVENESS_ERROR_MESSAGES.CameraPermissionDenied
+      : LIVENESS_ERROR_MESSAGES.CameraStartupFailure
   }
 
   if (error && typeof error === 'object' && 'livenessError' in error) {
@@ -123,12 +135,27 @@ export function LivenessCameraDialog({
 }: Readonly<LivenessCameraDialogProps>) {
   const containerRef = React.useRef<HTMLDivElement | null>(null)
   const detectorRef = React.useRef<AzureFaceLivenessElement | null>(null)
+  // Azure auth tokens are single use, so remember which one already started
+  const startedTokenRef = React.useRef<string | null>(null)
+  // Latest callbacks, so parent re-renders do not restart the camera
+  const onCompleteRef = React.useRef(onComplete)
+  const onErrorRef = React.useRef(onError)
 
   const [isStarting, setIsStarting] = React.useState(false)
   const [errorMessage, setErrorMessage] = React.useState('')
 
   React.useEffect(() => {
+    onCompleteRef.current = onComplete
+    onErrorRef.current = onError
+  }, [onComplete, onError])
+
+  React.useEffect(() => {
     if (!open || !authToken) {
+      return
+    }
+
+    // Never call start twice with the same token
+    if (startedTokenRef.current === authToken) {
       return
     }
 
@@ -153,6 +180,22 @@ export function LivenessCameraDialog({
           return
         }
 
+        // mediaDevices is undefined outside HTTPS or localhost, e.g. a laptop on a LAN IP
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error(INSECURE_CONTEXT_MESSAGE)
+        }
+
+        // Ask for the camera ourselves first, so the SDK never starts mid-prompt
+        const permissionStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+        })
+        // Release it straight away; we only needed the permission
+        permissionStream.getTracks().forEach((track) => track.stop())
+
+        if (disposed) {
+          return
+        }
+
         container.innerHTML = ''
 
         const detector = document.createElement(
@@ -170,13 +213,16 @@ export function LivenessCameraDialog({
 
         setIsStarting(false)
 
+        // Claim the token only in the run that actually starts the SDK
+        startedTokenRef.current = authToken
+
         await detector.start(authToken)
 
         if (disposed) {
           return
         }
 
-        onComplete()
+        onCompleteRef.current()
       } catch (error) {
         if (disposed) {
           return
@@ -188,7 +234,7 @@ export function LivenessCameraDialog({
 
         setErrorMessage(message)
         setIsStarting(false)
-        onError?.(message)
+        onErrorRef.current?.(message)
       }
     }
 
@@ -202,7 +248,7 @@ export function LivenessCameraDialog({
         containerRef.current.innerHTML = ''
       }
     }
-  }, [open, authToken, onComplete, onError])
+  }, [open, authToken])
 
   if (!open) {
     return null
