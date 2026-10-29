@@ -1,0 +1,219 @@
+@property --flashid-border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.flowBorder {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid transparent;
+}
+
+.flowBorder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 2px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--flashid-border-angle),
+    var(--primary-green),
+    #7f9854 20%,
+    var(--accent-gold) 45%,
+    #aab054 65%,
+    var(--primary-green) 90%,
+    var(--primary-green)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: borderJourney 10s linear infinite;
+}
+
+.flowBorder:nth-child(2n)::before {
+  animation-delay: -3.3s;
+}
+
+.flowBorder:nth-child(3n)::before {
+  animation-delay: -6.6s;
+}
+
+@keyframes borderJourney {
+  to {
+    --flashid-border-angle: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flowBorder::before {
+    animation: none;
+  }
+}
+
+.smallCardSwipe {
+  overflow: hidden;
+}
+
+.smallCardSwipe::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 15%,
+    rgb(0 122 77 / 3%) 30%,
+    rgb(0 122 77 / 10%) 40%,
+    rgb(255 255 255 / 65%) 48%,
+    rgb(255 255 255 / 85%) 50%,
+    rgb(255 255 255 / 45%) 54%,
+    rgb(0 122 77 / 6%) 64%,
+    transparent 80%
+  );
+  transform: translateX(-110%);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .smallCardSwipe:hover::after {
+    animation: glossyShimmerPass 1100ms cubic-bezier(0.22, 0.61, 0.36, 1) 1 both;
+  }
+}
+
+@keyframes glossyShimmerPass {
+  0% {
+    transform: translateX(-110%);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+}
+
+.ambientSection {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background-image:
+    radial-gradient(circle at 8% 22%, rgb(0 122 77 / 6%), transparent 19%),
+    radial-gradient(circle at 91% 75%, rgb(255 184 28 / 9%), transparent 21%),
+    radial-gradient(
+      circle at 16% 73%,
+      transparent 31px,
+      rgb(255 184 28 / 27%) 32px 33px,
+      transparent 34px
+    ),
+    radial-gradient(
+      circle at 84% 19%,
+      transparent 17px,
+      rgb(0 122 77 / 21%) 18px 19px,
+      transparent 20px
+    ),
+    radial-gradient(
+      circle at 5% 51%,
+      rgb(255 184 28 / 28%) 3px,
+      transparent 4px
+    ),
+    radial-gradient(
+      circle at 94% 44%,
+      rgb(0 122 77 / 22%) 4px,
+      transparent 5px
+    ),
+    radial-gradient(
+      circle at 71% 88%,
+      rgb(255 184 28 / 25%) 2px,
+      transparent 3px
+    );
+}
+
+.ambientSection::before,
+.ambientSection::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.ambientSection::before {
+  top: 8%;
+  right: -150px;
+  width: clamp(260px, 28vw, 420px);
+  aspect-ratio: 1;
+  border: 1px solid rgb(0 122 77 / 17%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgb(0 122 77 / 4%),
+    transparent 70%
+  );
+  box-shadow:
+    0 0 0 30px rgb(0 122 77 / 3%),
+    0 0 0 65px rgb(255 184 28 / 4%);
+}
+
+.ambientSection::after {
+  bottom: 8%;
+  left: -95px;
+  width: clamp(170px, 19vw, 280px);
+  aspect-ratio: 1;
+  border: 1px solid rgb(255 184 28 / 30%);
+  border-radius: 28%;
+  background: linear-gradient(140deg, rgb(255 184 28 / 4%), transparent);
+  transform: rotate(24deg);
+}
+
+.ambientSection:nth-of-type(even)::before {
+  top: 14%;
+  right: auto;
+  left: -160px;
+}
+.ambientSection:nth-of-type(even)::after {
+  left: auto;
+  right: -100px;
+  transform: rotate(-24deg);
+}
+
+@media (max-width: 640px) {
+  .ambientSection::before {
+    opacity: 0.65;
+  }
+  .ambientSection::after {
+    opacity: 0.6;
+  }
+}
+
+.cardSurface {
+  background-image:
+    radial-gradient(ellipse at 100% 0%, rgb(0 122 77 / 6%), transparent 58%),
+    radial-gradient(ellipse at 0% 100%, rgb(255 184 28 / 5%), transparent 52%);
+}
+
+.cardWatermark {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  width: clamp(68px, 6vw, 94px);
+  height: clamp(68px, 6vw, 94px);
+  color: var(--primary-green);
+  opacity: 0.055;
+  pointer-events: none;
+  z-index: -1;
+  transform: rotate(-12deg);
+}
