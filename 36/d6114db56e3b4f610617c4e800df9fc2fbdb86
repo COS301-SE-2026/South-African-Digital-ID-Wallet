@@ -1,0 +1,30 @@
+mobile/src/services/audit-log-service/audit-log-dto.ts
+  h_99fca60b892ff4 42
+  h_99fca60b892ff4 43
+backend/FlashIdBackend/tests/OfficialAuditSummaryFormatterTests.cs
+  h_99fca60b892ff4 27-32
+web/src/components/organisms/activity-card/activity-card.tsx
+  h_99fca60b892ff4 53
+web/src/components/organisms/activity-card/test/activity-card.test.tsx
+  h_99fca60b892ff4 17
+mobile/src/hooks/test/use-audit-log.test.tsx
+  h_99fca60b892ff4 21
+backend/FlashIdBackend/Application/Common/Mapping/OfficialAuditSummaryFormatter.cs
+  h_99fca60b892ff4 37-39
+backend/FlashIdBackend/tests/OfficialsControllerIntegrationTests.cs
+  h_99fca60b892ff4 647-648
+  h_99fca60b892ff4 654-656,658
+mobile/src/services/audit-log-service/test/audit-log-dto.test.ts
+  h_99fca60b892ff4 56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "36d6114db56e3b4f610617c4e800df9fc2fbdb86",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
