@@ -25,6 +25,7 @@ export function OtpModal({
 }: Readonly<OtpModalProps>) {
   const [otp, setOtp] = React.useState<string[]>(Array(OTP_LENGTH).fill(''))
   const [isResending, setIsResending] = React.useState(false)
+  const [isVerifying, setIsVerifying] = React.useState(false)
   const inputRefs = React.useRef<(HTMLInputElement | null)[]>([])
 
   const otpCode = otp.join('')
@@ -94,21 +95,27 @@ export function OtpModal({
   }
 
   const handleVerify = async () => {
+    // A fast double Enter would otherwise send the same code twice
+    if (isVerifying) return
+
     if (otpCode.length !== OTP_LENGTH) {
       toast.error('Please enter the 6-digit verification code.')
       return
     }
 
+    setIsVerifying(true)
     try {
       await onSuccess(otpCode)
     } catch {
       toast.error('Invalid verification code.')
+    } finally {
+      setIsVerifying(false)
     }
   }
 
   const handleResend = async () => {
     if (!deviceVerificationId) {
-      toast.error('Device verifictaion ID is missing.')
+      toast.error('Device verification ID is missing.')
       return
     }
 
@@ -195,9 +202,9 @@ export function OtpModal({
           <Button
             type="submit" // Enter in any box triggers this; no onClick needed
             className="w-40 bg-primary hover:bg-deep-green"
-            disabled={otpCode.length !== OTP_LENGTH}
+            disabled={isVerifying || otpCode.length !== OTP_LENGTH}
           >
-            Log In
+            {isVerifying ? 'Verifying...' : 'Log In'}
           </Button>
         </div>
 
