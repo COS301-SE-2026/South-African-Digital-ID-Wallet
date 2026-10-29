@@ -1,0 +1,25 @@
+web/src/components/organisms/physical-identity-form/physical-identity-form.tsx
+  h_99fca60b892ff4 53-54
+backend/FlashIdBackend/tests/DependencyInjectionTests.cs
+  h_99fca60b892ff4 260-262,269,273
+backend/FlashIdBackend/Infrastructure/Providers/Decorators/DemoLivenessBypassProviderDecorator.cs
+  h_99fca60b892ff4 6,10-11,13,16-17,26-28,30
+backend/FlashIdBackend/Infrastructure/DependencyInjection.cs
+  h_99fca60b892ff4 165,170-172,174,179,181,183
+backend/FlashIdBackend/tests/DemoLivenessBypassProviderDecoratorTests.cs
+  h_99fca60b892ff4 10,13-21,27,36-45,47,53,68
+  h_99fca60b892ff4 46
+web/src/components/organisms/liveness-camera-dialog/liveness-camera-dialog.tsx
+  h_99fca60b892ff4 30-32,102,105-106,183-187
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9944a4db16a32ec972360892711dfcd7d768a576",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
