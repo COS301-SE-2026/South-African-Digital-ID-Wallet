@@ -4,6 +4,7 @@ using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Services;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Enums;
+using Application.Features.Credentials.Exceptions;
 using Application.Features.Onboarding.Dtos;
 using Domain.Entities;
 using Domain.Enums;
@@ -88,7 +89,7 @@ public class CredentialActivationServiceTests
     public async Task noCitizenLinked_Throws()
     {
         var c = Setup(noCitizen: true);
-        await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, CredentialType.IdentityDocument));
+        await Assert.ThrowsAsync<CitizenNotLinkedException>(() => Act(c, CredentialType.IdentityDocument));
         Assert.Empty(c.Repo.Added);
     }
 
@@ -96,7 +97,7 @@ public class CredentialActivationServiceTests
     public async Task CitizenNotVerified_Throws()
     {
         var c = Setup(status: CitizenStatus.Pending);
-        await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, CredentialType.IdentityDocument));
+        await Assert.ThrowsAsync<CitizenIdentityNotVerifiedException>(() => Act(c, CredentialType.IdentityDocument));
         Assert.Empty(c.Repo.Added);
         Assert.Equal(0, c.Repo.Saves);
     }
@@ -105,7 +106,7 @@ public class CredentialActivationServiceTests
     public async Task NoCredentialTypes_Throws()
     {
         var c = Setup();
-        await Assert.ThrowsAsync<ArgumentNullException>(() => Act(c));
+        await Assert.ThrowsAsync<ArgumentException>(() => Act(c));
         Assert.Empty(c.Repo.Added);
     }
 

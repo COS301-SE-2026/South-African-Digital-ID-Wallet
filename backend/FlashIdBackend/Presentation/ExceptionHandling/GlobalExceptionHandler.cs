@@ -52,6 +52,10 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
                 (StatusCodes.Status409Conflict, "Citizen not activated",
                     exception.Message),
 
+            CitizenNotLinkedException or CitizenIdentityNotVerifiedException =>
+                (StatusCodes.Status409Conflict, "Identity verification required",
+                    exception.Message),
+
             CredentialAlreadyIssuedException =>
                 (StatusCodes.Status409Conflict, "Credential already issued",
                     exception.Message),
@@ -72,6 +76,10 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
             VerificationNotFoundException => (StatusCodes.Status404NotFound, "Verification session not found", exception.Message),
 
             InvalidVerificationState => (StatusCodes.Status409Conflict, "Verification cannot continue", exception.Message),
+
+            ActivationDetailsInvalidException => (StatusCodes.Status400BadRequest, "Activation details invalid", exception.Message),
+
+            ActivationUnavailableException => (StatusCodes.Status409Conflict, "Activation unavailable", exception.Message),
 
             ArgumentNullException => (StatusCodes.Status400BadRequest, "Invalid request",
                 exception.Message),

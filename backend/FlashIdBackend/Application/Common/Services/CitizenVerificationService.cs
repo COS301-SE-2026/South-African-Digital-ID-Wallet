@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Verification.Dtos;
+using Application.Features.Verification.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
 using Application.Common.Validation;
@@ -38,7 +39,7 @@ public class CitizenVerificationService : ICitizenVerificationService
 
         if (activation is null)
         {
-            throw new InvalidOperationException("Activation details are invalid.");
+            throw new ActivationDetailsInvalidException();
         }
 
         var citizen = activation.Citizen;
@@ -59,13 +60,13 @@ public class CitizenVerificationService : ICitizenVerificationService
         if (!string.Equals(citizen.SaId, cleanSaId, StringComparison.Ordinal))
         {
             await RecordFailedAttemptAsync(activation, now, cancellationToken);
-            throw new InvalidOperationException("Activation details are invalid.");
+            throw new ActivationDetailsInvalidException();
         }
         var pinMatches = BCrypt.Net.BCrypt.Verify(cleanPin, activation.PinHash);
         if (!pinMatches)
         {
             await RecordFailedAttemptAsync(activation, now, cancellationToken);
-            throw new InvalidOperationException("Activation details are invalid.");
+            throw new ActivationDetailsInvalidException();
         }
 
         await ValidateAccountLinkingAsync(citizen, userId, cancellationToken);
@@ -127,23 +128,25 @@ public class CitizenVerificationService : ICitizenVerificationService
     {
         if (activation.Status == ActivationStatus.Used || activation.UsedAt is not null)
         {
-            throw new InvalidOperationException("Activation has already been used.");
+            throw new ActivationUnavailableException("This activation code has already been used. If you already verified your identity, go to Activate Credentials. If not, ask your Home Affairs official for a new code, or use Face Verification instead.");
         }
 
         if (activation.Status == ActivationStatus.Revoked || activation.RevokedAt is not null)
         {
-            throw new InvalidOperationException("Activation is no longer valid.");
+            throw new ActivationUnavailableException("This activation code is no longer valid, usually because of too many wrong attempts. Ask your Home Affairs official for a new code, or use Face Verification instead.");
         }
 
         if (activation.ExpiresAt <= now)
         {
-            throw new InvalidOperationException("Activation has expired.");
+            throw new ActivationUnavailableException("This activation code has expired. Ask your Home Affairs official for a new code, or use Face Verification instead.");
         }
 
         if (activation.LockedUntil is not null && activation.LockedUntil > now)
         {
             var timeLeft = (int)Math.Ceiling((activation.LockedUntil.Value - now).TotalMinutes);
-            throw new InvalidOperationException($"Activation is temporarily locked. Approximately {timeLeft} minutes remaining.");
+            // avoids "1 minutes" on the last minute of a lock
+            var unit = timeLeft == 1 ? "minute" : "minutes";
+            throw new ActivationUnavailableException($"Activation is temporarily locked after too many wrong attempts. Try again in about {timeLeft} {unit}.");
         }
     }
 
@@ -151,7 +154,7 @@ public class CitizenVerificationService : ICitizenVerificationService
     {
         if (citizen.UserId is not null && citizen.UserId != userId)
         {
-            throw new InvalidOperationException("The citizen has already been linked to another account.");
+            throw new ActivationUnavailableException("This identity is already linked to another account. If that wasn't you, contact your Home Affairs official.");
         }
 
         var citizenAlreadyLinkedToUser =
@@ -159,7 +162,8 @@ public class CitizenVerificationService : ICitizenVerificationService
 
         if (citizenAlreadyLinkedToUser is not null && citizenAlreadyLinkedToUser.Id != citizen.Id)
         {
-            throw new InvalidOperationException("The account has already been linked to another citizen.");
+            // this user is already verified under another identity, so the useful next step is activation
+            throw new ActivationUnavailableException("Your FlashID account is already linked to a different identity, so you don't need to verify again. Go to Activate Credentials to continue, or contact your Home Affairs official if this looks wrong.");
         }
     }
 

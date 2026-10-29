@@ -41,10 +41,6 @@ public class CitizensController : ControllerBase
         {
             return Conflict(new { error = ete.Message });
         }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
-        }
     }
 
     /// <summary>
@@ -78,10 +74,6 @@ public class CitizensController : ControllerBase
         {
             return BadRequest(new { error = eave.Message });
         }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occured." });
-        }
     }
 
     /// <summary>
@@ -106,10 +98,6 @@ public class CitizensController : ControllerBase
         catch (InvalidCitizenRegistrationRequestException icrre)
         {
             return BadRequest(new { error = icrre.Message });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occured." });
         }
     }
 }

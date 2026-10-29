@@ -50,6 +50,8 @@ export function ActivateCredentialsPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const [needsVerification, setNeedsVerification] = useState(false)
+
   const handleSubmit = async () => {
     const selectedTypes: CredentialType[] = []
 
@@ -74,6 +76,10 @@ export function ActivateCredentialsPage() {
       setMessage(response.message)
       setStatus('success')
     } catch (error) {
+      // only the identity-verification 409 should send people to Verify Identity
+      const problem = (error as AxiosError<ProblemDetails>).response?.data
+      setNeedsVerification(problem?.title === 'Identity verification required')
+
       setMessage(
         getErrorMessage(
           error,
@@ -97,6 +103,7 @@ export function ActivateCredentialsPage() {
 
   const handleTryAgain = () => {
     setMessage('')
+    setNeedsVerification(false)
     setStatus('select')
   }
 
@@ -138,19 +145,30 @@ export function ActivateCredentialsPage() {
 
       {status === 'error' && (
         <Card className="mx-auto max-w-xl rounded-3xl border border-red-100 bg-white p-8 text-center shadow-xl shadow-deep-green/10">
-          <Text variant="h3">Activation unsuccessful</Text>
+          <Text variant="h3">
+            {needsVerification
+              ? 'Verify your identity first'
+              : 'Activation unsuccessful'}
+          </Text>
 
           <Text variant="sub-md" className="mt-3 text-muted-foreground">
             {message}
           </Text>
 
-          <Button
-            type="button"
-            className="mt-6 w-full"
-            onClick={handleTryAgain}
-          >
-            Try Again
-          </Button>
+          {/* verification problems get a direct route to the fix; other errors keep retry */}
+          {needsVerification ? (
+            <Button type="button" className="mt-6 w-full" onClick={handleBack}>
+              Verify my identity
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              className="mt-6 w-full"
+              onClick={handleTryAgain}
+            >
+              Try Again
+            </Button>
+          )}
         </Card>
       )}
     </div>
