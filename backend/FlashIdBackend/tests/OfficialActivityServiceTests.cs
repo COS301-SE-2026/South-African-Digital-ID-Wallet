@@ -156,7 +156,6 @@ public class OfficialActivityServiceTests
     {
         Id = Guid.NewGuid(),
         EventType = nameof(AuditEventType.CredentialVerified),
-        Details = "Verified a credential",
         CreatedAt = DateTime.UtcNow,
     };
 
@@ -165,7 +164,6 @@ public class OfficialActivityServiceTests
         Id = Guid.NewGuid(),
         CreatedAt = DateTime.UtcNow,
         Action = nameof(AuditEventType.CredentialVerified),
-        Details = "Verified a credential",
         PerformedBy = "Test Official",
         Outcome = "Success",
     };

@@ -50,7 +50,7 @@ const toLogItem = (item: OfficialActivityItem): OfficialActivityLogItem => {
   const style = EVENT_STYLES[item.eventType] ?? DEFAULT_STYLE
   return {
     id: item.id,
-    summary: item.summary || item.details,
+    summary: item.summary,
     timestamp: new Date(item.createdAt).toLocaleString(),
     icon: style.icon,
     tone: style.tone,

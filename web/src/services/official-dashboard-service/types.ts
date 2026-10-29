@@ -12,7 +12,6 @@ export type OfficialActivityEventType =
 export type OfficialActivityItem = {
   id: string
   eventType: OfficialActivityEventType
-  details: string
   summary: string
   createdAt: string
 }
@@ -25,7 +24,6 @@ export type AuditLogItem = {
   id: string
   createdAt: string
   action: string
-  details: string
   summary: string
   citizenName: string | null
   citizenSaId: string | null

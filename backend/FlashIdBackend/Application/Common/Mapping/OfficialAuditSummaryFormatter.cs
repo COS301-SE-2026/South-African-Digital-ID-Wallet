@@ -34,6 +34,9 @@ public static partial class OfficialAuditSummaryFormatter
             AuditEventType.OnboardCitizen => "Citizen onboarded",
             AuditEventType.OnboardCitizenFailed => "Onboarding failed",
             AuditEventType.CredentialIssued => $"{credential} issued",
+            // Emergency rows: the raw Details hold the officer's free-text justification
+            AuditEventType.EmergencyProfileAccessed => "Emergency profile accessed",
+            AuditEventType.EmergencyProfileAccessFailed => "Emergency access rejected",
             _ => details,
         };
     }

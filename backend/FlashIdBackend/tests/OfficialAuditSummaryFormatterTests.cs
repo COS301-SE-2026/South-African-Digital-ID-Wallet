@@ -24,9 +24,12 @@ public class OfficialAuditSummaryFormatterTests
     public void OfflineRejected_HasFixedText() =>
         Assert.Equal("Offline scan rejected", OfficialAuditSummaryFormatter.Format(AuditEventType.OfflineVerificationRejected, "x", null));
 
-    [Fact]
-    public void OtherEvents_KeepTheirDetails() =>
-        Assert.Equal("Break-glass emergency access.", OfficialAuditSummaryFormatter.Format(AuditEventType.EmergencyProfileAccessed, "Break-glass emergency access.", null));
+    [Theory]
+    [InlineData(AuditEventType.EmergencyProfileAccessed, "Emergency profile accessed")]
+    [InlineData(AuditEventType.EmergencyProfileAccessFailed, "Emergency access rejected")]
+    public void EmergencyEvents_HideTheJustification(AuditEventType eventType, string expected) =>
+        Assert.Equal(expected, OfficialAuditSummaryFormatter.Format(
+            eventType, "Break-glass emergency access. Justification: patient unconscious at scene", null));
 
     [Theory]
     [InlineData(AuditEventType.OnboardCitizen, null, "Citizen onboarded")]

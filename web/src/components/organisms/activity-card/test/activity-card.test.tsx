@@ -6,7 +6,6 @@ import type { OfficialActivityItem } from '../types'
 const item = (index: number): OfficialActivityItem => ({
   id: String(index),
   eventType: 'CredentialVerified',
-  details: `raw details ${index}`,
   summary: `Identity Document · ${index} fields disclosed`,
   createdAt: '2026-10-11T14:57:00Z',
 })
@@ -15,12 +14,11 @@ const items = (count: number) =>
   Array.from({ length: count }, (_, i) => item(i + 1))
 
 describe('ActivityCard', () => {
-  it('shows the summary, not the raw details', () => {
+  it('shows the summary', () => {
     render(<ActivityCard activity={items(1)} />)
     expect(
       screen.getByText('Identity Document · 1 fields disclosed')
     ).toBeInTheDocument()
-    expect(screen.queryByText('raw details 1')).not.toBeInTheDocument()
   })
 
   it('shows the empty state when there is no work', () => {

@@ -14,7 +14,6 @@ const item = (
   citizenName: 'Thabo Mokoena',
   citizenSaId: '9202204720082',
   createdAt: '2026-01-01T09:30:00Z',
-  details: 'Signed in from mobile',
   id: 'a-1',
   ipAddress: '196.25.1.1',
   outcome: 'Success',
@@ -54,21 +53,14 @@ describe('toAuditLogEntry', () => {
   it('Should leave the SA id null when absent', () => {
     expect(toAuditLogEntry(item({ citizenSaId: null })).saId).toBeNull()
   })
-  it('Should show the summary instead of the raw details', () => {
+  it('Should show the summary as the details text', () => {
     const entry = toAuditLogEntry(
       item({
         action: 'OfflineCredentialVerified',
-        details:
-          'Offline verification. Result: VERIFIED. Revocation index: 42.',
         summary: 'Identity Document · offline scan',
       })
     )
     expect(entry.details).toBe('Identity Document · offline scan')
-  })
-  it('Should fall back to the details when there is no summary', () => {
-    expect(toAuditLogEntry(item({ summary: '' })).details).toBe(
-      'Signed in from mobile'
-    )
   })
   it.each(['system', 'unknown', '', '  SYSTEM  '])(
     'Should discard the uninformative ip %s',

@@ -7,7 +7,6 @@ const row = (overrides: Partial<AuditLogItem> = {}): AuditLogItem => ({
   id: '1',
   createdAt: '2026-10-11T14:57:00Z',
   action: 'DeviceVerified',
-  details: 'raw details',
   summary: 'User official@test.local verified and trusted a new device.',
   citizenName: null,
   citizenSaId: null,
@@ -43,7 +42,6 @@ describe('AuditLogTable', () => {
         'User official@test.local verified and trusted a new device.'
       )
     ).toBeInTheDocument()
-    expect(screen.queryByText('raw details')).not.toBeInTheDocument()
   })
 
   it('shows the citizen name and a spaced SA ID when present', () => {

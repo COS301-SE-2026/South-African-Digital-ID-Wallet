@@ -644,17 +644,18 @@ public class OfficialsControllerIntegrationTests
         await db.GovernmentAdministrators.AddAsync(otherAdmin, ct);
         await db.Institutions.AddAsync(otherInstitution, ct);
         await db.Officials.AddAsync(otherOfficial, ct);
-        await db.AuditLogs.AddAsync(
-            Log(AuditEventType.CredentialVerified, otherOfficialUser.Id, "Durban verification.", DateTime.UtcNow), ct);
+        var durbanLog = Log(AuditEventType.CredentialVerified, otherOfficialUser.Id, "Durban verification.", DateTime.UtcNow);
+        await db.AuditLogs.AddAsync(durbanLog, ct);
         await db.SaveChangesAsync(ct);
 
         var client = ClientFor(factory, seed.OfficialUser);
         var history = await GetHistoryAsync(client, "?pageSize=100");
 
-        var details = history.GetProperty("items").EnumerateArray()
-            .Select(i => i.GetProperty("details").GetString()!).ToList();
+        // Details is no longer in the response, so match the other institution's row by its id
+        var ids = history.GetProperty("items").EnumerateArray()
+            .Select(i => i.GetProperty("id").GetGuid()).ToList();
 
-        Assert.DoesNotContain("Durban verification.", details);
+        Assert.DoesNotContain(durbanLog.Id, ids);
         Assert.Equal(5, history.GetProperty("totalCount").GetInt32());
     }
 

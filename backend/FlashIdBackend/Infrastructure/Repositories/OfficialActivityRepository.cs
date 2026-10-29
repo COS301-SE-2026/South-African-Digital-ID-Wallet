@@ -46,7 +46,6 @@ public class OfficialActivityRepository : IOfficialActivityRepository
         {
             Id = r.Id,
             EventType = r.EventType.ToString(),
-            Details = r.Details,
             Summary = OfficialAuditSummaryFormatter.Format(r.EventType, r.Details, r.CredentialType),
             CreatedAt = DateTime.SpecifyKind(r.CreatedAt, DateTimeKind.Utc),
         }).ToList();
@@ -185,7 +184,6 @@ public class OfficialActivityRepository : IOfficialActivityRepository
             Id = r.Id,
             CreatedAt = r.CreatedAt,
             Action = r.EventType.ToString(),
-            Details = r.Details,
             Summary = OfficialAuditSummaryFormatter.Format(r.EventType, r.Details, r.CredentialType),
             CitizenName = r.CitizenNames != null ? $"{r.CitizenNames} {r.CitizenSurname}" : null,
             CitizenSaId = r.CitizenSaId,
