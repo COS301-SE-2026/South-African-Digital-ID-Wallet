@@ -35,7 +35,6 @@ public class CredentialService : ICredentialService
             return Enumerable.Empty<CredentialResponseDto>();
         }
         var credentials = await _credentialRepository.GetCredentialsByCitizenIdAsync(citizen.Id);
-        // START FLASHID — CREDENTIAL PHOTO URL
         var dtos = credentials.Select(c => MapToDto(c, citizen)).ToList();
 
         foreach (var (dto, credential) in dtos.Zip(credentials))
@@ -44,7 +43,6 @@ public class CredentialService : ICredentialService
         }
 
         return dtos;
-        // END FLASHID — CREDENTIAL PHOTO URL
     }
     public async Task<SearchCitizensResponseDto> SearchCitizensAsync(string? query, int page, int pageSize)
     {

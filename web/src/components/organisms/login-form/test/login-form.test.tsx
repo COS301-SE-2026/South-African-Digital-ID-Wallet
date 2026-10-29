@@ -2,9 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useRouter, useSearchParams } from 'next/navigation'
-// START FLASHID — ACTIVATION RETURN URL
 import { getSafeReturnTo, LoginForm } from '../login-form'
-// END FLASHID — ACTIVATION RETURN URL
 import loginService from '@/services/login-service/login-service'
 import { useUser } from '@/context/user-context'
 
@@ -33,10 +31,8 @@ jest.mock('@/components/templates/otp-modal/otp-modal', () => ({
 }))
 const push = jest.fn()
 const refresh = jest.fn()
-// START FLASHID — ACTIVATION RETURN URL
 const activationReturnTo =
   '/citizen/verify-identity?token=activation-token&source=email'
-// END FLASHID — ACTIVATION RETURN URL
 const renderForm = () =>
   render(
     <QueryClientProvider client={new QueryClient()}>
@@ -49,13 +45,11 @@ beforeEach(() => {
   ;(useSearchParams as jest.Mock).mockReturnValue({ get: () => null })
   ;(useUser as jest.Mock).mockReturnValue({ refresh })
 })
-// START FLASHID — ACTIVATION RETURN URL
 const setReturnTo = (returnTo: string | null) => {
   const searchParams = new URLSearchParams()
   if (returnTo) searchParams.set('returnTo', returnTo)
   ;(useSearchParams as jest.Mock).mockReturnValue(searchParams)
 }
-// END FLASHID — ACTIVATION RETURN URL
 const fill = async () => {
   const user = userEvent.setup()
   await user.type(screen.getByLabelText(/email/i), 'test@test.com')
@@ -64,7 +58,6 @@ const fill = async () => {
   return user
 }
 describe('LoginForm', () => {
-  // START FLASHID — ACTIVATION RETURN URL
   it('rejects external and protocol-relative return destinations', () => {
     expect(getSafeReturnTo('https://example.com', '/fallback')).toBe(
       '/fallback'
@@ -156,7 +149,6 @@ describe('LoginForm', () => {
       `/register?returnTo=${encodeURIComponent(activationReturnTo)}`
     )
   })
-  // END FLASHID — ACTIVATION RETURN URL
 
   it('handles login error', async () => {
     ;(loginService.login as jest.Mock).mockRejectedValue(new Error())
@@ -164,7 +156,6 @@ describe('LoginForm', () => {
     await fill()
   })
   it('handles unverified email', async () => {
-    // START FLASHID — ACTIVATION RETURN URL
     setReturnTo(activationReturnTo)
     ;(loginService.login as jest.Mock).mockRejectedValue({
       response: { data: { code: 'EMAIL_NOT_VERIFIED' } },
@@ -175,7 +166,6 @@ describe('LoginForm', () => {
     expect(push).toHaveBeenCalledWith(
       `/verify-email?email=${encodeURIComponent('test@test.com')}&returnTo=${encodeURIComponent(activationReturnTo)}`
     )
-    // END FLASHID — ACTIVATION RETURN URL
   })
   it('handles OTP verification', async () => {
     ;(loginService.login as jest.Mock).mockResolvedValue({

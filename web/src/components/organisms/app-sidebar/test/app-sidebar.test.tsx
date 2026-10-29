@@ -1,6 +1,4 @@
-// START FLASHID — PROFILE AVATAR PHOTO
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-// END FLASHID — PROFILE AVATAR PHOTO
 import userEvent from '@testing-library/user-event'
 import { AppSidebar } from '../app-sidebar'
 
@@ -38,7 +36,6 @@ describe('AppSidebar', () => {
     mockLogout.mockClear()
   })
 
-  // START FLASHID — PROFILE AVATAR PHOTO
   it('shows the citizen photo in the expanded profile avatar', () => {
     const { container } = render(
       <AppSidebar
@@ -90,7 +87,6 @@ describe('AppSidebar', () => {
     )
     expect(photo).toHaveClass('object-cover')
   })
-  // END FLASHID — PROFILE AVATAR PHOTO
 
   it('renders the FlashID logo', () => {
     render(

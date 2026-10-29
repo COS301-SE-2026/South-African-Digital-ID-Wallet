@@ -55,3 +55,26 @@ export const toCredentialView = (c: CredentialResponse): CredentialView => {
     rows,
   }
 }
+
+// ID document photo first, driver's licence as the fallback
+const PHOTO_PREFERENCE: CredentialResponse['type'][] = [
+  'IdentityDocument',
+  'DriversLicense',
+]
+
+export const getPreferredPhotoUrl = (
+  credentials: CredentialResponse[] | undefined
+): string | null => {
+  for (const type of PHOTO_PREFERENCE) {
+    // optional chaining skips null, undefined and blank URLs in one go
+    const url = credentials
+      ?.find((c) => c.type === type && c.photoUrl?.trim())
+      ?.photoUrl?.trim()
+    if (url) return url
+  }
+  return null
+}
+
+// one cache entry per user, shared by the app shell and the dashboard
+export const myCredentialsQueryKey = (userId: string | undefined) =>
+  ['credentials', 'me', userId] as const

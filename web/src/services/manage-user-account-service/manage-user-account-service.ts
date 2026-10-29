@@ -1,19 +1,19 @@
 import api from '@/lib/api'
 import manageUserAccountUrls from './manage-user-account-urls'
-import type { ManageUserAccountDto, MessageResponse } from './types'
+import type {
+  ManageUserAccountDto,
+  MessageResponse,
+  UnlinkedAccountResponse,
+} from './types'
 
-// START FLASHID — UNLINKED CITIZEN RECORD
-const noLinkedCitizenMessage =
-  'You have no credentials linked. To see your information please activate your credentials.'
-
+// the backend flags unlinked accounts explicitly, so rewording its message can't break this
 export const isNoLinkedCitizenResponse = (
   value: unknown
-): value is MessageResponse =>
+): value is UnlinkedAccountResponse =>
   typeof value === 'object' &&
   value !== null &&
-  'message' in value &&
-  value.message === noLinkedCitizenMessage
-// END FLASHID — UNLINKED CITIZEN RECORD
+  'linked' in value &&
+  value.linked === false
 
 const getMyAccount = (): Promise<ManageUserAccountDto | MessageResponse> =>
   api

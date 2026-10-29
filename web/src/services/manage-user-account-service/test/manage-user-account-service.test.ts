@@ -34,20 +34,20 @@ describe('manageUserAccountService', () => {
     expect(mockedApi.get).toHaveBeenCalledWith('/api/manage-user-account/me')
     expect(result).toEqual(data)
   })
-  // START FLASHID — UNLINKED CITIZEN RECORD
-  it('recognizes only the explicit no-linked-citizen response', () => {
+  it('recognizes the unlinked response by its flag, not its wording', () => {
+    expect(
+      isNoLinkedCitizenResponse({ linked: false, message: 'Any wording.' })
+    ).toBe(true)
+    // the old flagless body no longer counts, which proves wording is ignored
     expect(
       isNoLinkedCitizenResponse({
         message:
           'You have no credentials linked. To see your information please activate your credentials.',
       })
-    ).toBe(true)
-    expect(isNoLinkedCitizenResponse({ message: 'Unexpected response.' })).toBe(
-      false
-    )
+    ).toBe(false)
+    expect(isNoLinkedCitizenResponse({ linked: true })).toBe(false)
     expect(isNoLinkedCitizenResponse(null)).toBe(false)
   })
-  // END FLASHID — UNLINKED CITIZEN RECORD
   it('verifies the current password', async () => {
     const data = {
       message: 'Password verified successfully.',

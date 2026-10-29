@@ -59,7 +59,6 @@ describe('ActivityOverviewCard', () => {
     ).toBeInTheDocument()
     expect(screen.getByText(/biometric login successful/i)).toBeInTheDocument()
   })
-  // START FLASHID — ACTIVITY CARD ALIGNMENT
   it('aligns each activity description and timestamp consistently', async () => {
     mockedApi.get.mockResolvedValue({ data: mockActivity })
     render(<ActivityOverviewCard />)
@@ -75,7 +74,6 @@ describe('ActivityOverviewCard', () => {
       expect(activityInformation?.lastElementChild).toHaveClass('text-left')
     }
   })
-  // END FLASHID — ACTIVITY CARD ALIGNMENT
   it('renders the View all button', async () => {
     mockedApi.get.mockResolvedValue({ data: mockActivity })
     render(<ActivityOverviewCard />)

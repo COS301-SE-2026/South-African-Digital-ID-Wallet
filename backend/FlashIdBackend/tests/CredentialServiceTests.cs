@@ -91,7 +91,6 @@ public class CredentialServiceTests
         Assert.Equal("South African", result[0].IdentityDocument!.Nationality);
     }
 
-    // START FLASHID — CREDENTIAL PHOTO URL
     [Fact]
     public async Task GetMyCredentialsAsync_CredentialWithPhoto_ReturnsCitizenPhotoUrl()
     {
@@ -235,7 +234,6 @@ public class CredentialServiceTests
                 PhotoPath = photoPath,
             },
         };
-    // END FLASHID — CREDENTIAL PHOTO URL
 
     private static (Citizen Citizen, Credential Credential) SeedCredential(AppDbContext context, CredentialStatus status = CredentialStatus.Active)
     {

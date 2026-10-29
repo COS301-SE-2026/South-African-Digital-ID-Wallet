@@ -1,12 +1,9 @@
-// START FLASHID — PROFILE AVATAR PHOTO
 import { fireEvent, render, screen } from '@testing-library/react'
-// END FLASHID — PROFILE AVATAR PHOTO
 import { AppTopBar } from '@/components/organisms'
 
 const DEFAULT_USER = { name: 'John Doe', initials: 'JD', subtitle: 'Citizen' }
 
 describe('AppTopBar', () => {
-  // START FLASHID — PROFILE AVATAR PHOTO
   it('shows the citizen photo with cover styling when available', () => {
     const { container } = render(
       <AppTopBar
@@ -40,7 +37,6 @@ describe('AppTopBar', () => {
 
     expect(screen.getByText('JD')).toBeInTheDocument()
   })
-  // END FLASHID — PROFILE AVATAR PHOTO
 
   it('renders the title and description', () => {
     render(

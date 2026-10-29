@@ -1,8 +1,6 @@
 export type CitizenStatus =
   | 'Pending'
-  // START FLASHID — CITIZEN DASHBOARD STATUS
   | 'Verified'
-  // END FLASHID — CITIZEN DASHBOARD STATUS
   | 'Activated'
   | 'Deactivated'
   | 'Suspended'
@@ -20,4 +18,8 @@ export type ManageUserAccountDto = {
 
 export type MessageResponse = {
   message: string
+}
+
+export type UnlinkedAccountResponse = MessageResponse & {
+  linked: false
 }

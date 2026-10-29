@@ -1,7 +1,5 @@
 'use client'
-// START FLASHID — ACTIVITY CARD ALIGNMENT
 import { Fragment } from 'react'
-// END FLASHID — ACTIVITY CARD ALIGNMENT
 import { useEffect, useState } from 'react'
 import { CheckCircle2, IdCard, Lock } from 'lucide-react'
 import api from '@/lib/api'
@@ -102,7 +100,6 @@ export function ActivityOverviewCard() {
               <ul className="space-y-3">
                 {lastActivity.map((item) => (
                   <Fragment key={item.id}>
-                    {/* START FLASHID — ACTIVITY CARD ALIGNMENT */}
                     <li className="flex items-center justify-start gap-3 rounded-2xl border border-black p-3">
                       <div
                         className={`mt-0.5 h-8 w-1 shrink-0 rounded-full ${
@@ -124,7 +121,6 @@ export function ActivityOverviewCard() {
                         </div>
                       </div>
                     </li>
-                    {/* END FLASHID — ACTIVITY CARD ALIGNMENT */}
                   </Fragment>
                 ))}
               </ul>

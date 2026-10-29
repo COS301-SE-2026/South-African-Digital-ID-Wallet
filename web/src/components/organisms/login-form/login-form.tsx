@@ -20,12 +20,10 @@ const DASHBOARD_ROUTES: Record<string, string> = {
   govadmin: '/gov-admin',
 }
 
-// START FLASHID — ACTIVATION RETURN URL
 const ACTIVATION_RETURN_PATHS = new Set([
   '/citizen/activate-credentials',
   '/citizen/verify-identity',
 ])
-// END FLASHID — ACTIVATION RETURN URL
 
 const getDashboardRoute = (role: string) => {
   const normalizedRole = role
@@ -36,7 +34,6 @@ const getDashboardRoute = (role: string) => {
   return DASHBOARD_ROUTES[normalizedRole] ?? '/citizen/citizen-dashboard'
 }
 
-// START FLASHID — ACTIVATION RETURN URL
 export function getSafeReturnTo(returnTo: string | null, fallback: string) {
   if (
     !returnTo ||
@@ -61,7 +58,6 @@ export function getSafeReturnTo(returnTo: string | null, fallback: string) {
     return fallback
   }
 }
-// END FLASHID — ACTIVATION RETURN URL
 
 const getOperatingSystem = () => {
   const userAgent = window.navigator.userAgent

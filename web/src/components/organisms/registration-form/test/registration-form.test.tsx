@@ -48,11 +48,9 @@ beforeEach(() => {
 
 const VALID_EMAIL = 'user@gmail.com'
 const VALID_PASSWORD = 'Password1!'
-// START FLASHID — ACTIVATION RETURN URL
 const ACTIVATION_RETURN_TO =
   '/citizen/verify-identity?token=activation-token&source=email'
 const mockPush = jest.fn()
-// END FLASHID — ACTIVATION RETURN URL
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -139,7 +137,6 @@ describe('RegistrationForm — unit tests', () => {
       expect(loginLink).toHaveAttribute('href', '/login')
     })
 
-    // START FLASHID — ACTIVATION RETURN URL
     it('preserves the activation destination in the login link', () => {
       ;(useSearchParams as jest.Mock).mockReturnValue(
         new URLSearchParams({ returnTo: ACTIVATION_RETURN_TO })
@@ -151,7 +148,6 @@ describe('RegistrationForm — unit tests', () => {
         `/login?returnTo=${encodeURIComponent(ACTIVATION_RETURN_TO)}`
       )
     })
-    // END FLASHID — ACTIVATION RETURN URL
   })
 
   describe('email input behaviour', () => {
@@ -604,7 +600,6 @@ describe('RegistrationForm — unit tests', () => {
       })
     })
 
-    // START FLASHID — ACTIVATION RETURN URL
     it('preserves the activation destination through email verification after registration', async () => {
       ;(useSearchParams as jest.Mock).mockReturnValue(
         new URLSearchParams({ returnTo: ACTIVATION_RETURN_TO })
@@ -625,7 +620,6 @@ describe('RegistrationForm — unit tests', () => {
         )
       })
     })
-    // END FLASHID — ACTIVATION RETURN URL
   })
 
   describe('mutation error', () => {

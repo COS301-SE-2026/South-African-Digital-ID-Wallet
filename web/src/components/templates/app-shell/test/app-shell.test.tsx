@@ -1,20 +1,16 @@
-// START FLASHID — PROFILE AVATAR PHOTO
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { waitFor } from '@testing-library/react'
 import { credentialService } from '@/services/credential-service'
-// END FLASHID — PROFILE AVATAR PHOTO
 import { render, screen } from '@testing-library/react'
-// START FLASHID — PROFILE AVATAR PHOTO
 import { usePathname } from 'next/navigation'
-// END FLASHID — PROFILE AVATAR PHOTO
 import { AppShell } from '../app-shell'
 import { useUser } from '@/context/user-context'
 
-// START FLASHID — PROFILE AVATAR PHOTO
 jest.mock('@/services/credential-service', () => ({
+  // keep the real pure helpers; only the network call is faked
+  ...jest.requireActual('@/services/credential-service'),
   credentialService: { getMine: jest.fn() },
 }))
-// END FLASHID — PROFILE AVATAR PHOTO
 
 jest.mock('next/navigation', () => ({
   usePathname: jest.fn().mockReturnValue('/officials'),
@@ -29,7 +25,6 @@ jest.mock('@/context/user-context', () => ({
 }))
 
 const mockedUseUser = useUser as jest.Mock
-// START FLASHID — PROFILE AVATAR PHOTO
 const mockedUsePathname = usePathname as jest.Mock
 const mockedGetMine = jest.mocked(credentialService.getMine)
 const renderWithQueryClient = (ui: React.ReactNode) => {
@@ -44,14 +39,11 @@ const renderWithQueryClient = (ui: React.ReactNode) => {
     ),
   }
 }
-// END FLASHID — PROFILE AVATAR PHOTO
 
 describe('AppShell', () => {
   beforeEach(() => {
-    // START FLASHID — PROFILE AVATAR PHOTO
     mockedGetMine.mockReset()
     mockedUsePathname.mockReturnValue('/officials')
-    // END FLASHID — PROFILE AVATAR PHOTO
     mockedUseUser.mockReturnValue({
       user: {
         role: 'Official',
@@ -117,7 +109,6 @@ describe('AppShell', () => {
     expect(container.firstChild).toBeNull()
   })
 
-  // START FLASHID — PROFILE AVATAR PHOTO
   it('loads the citizen photo once and shares it with the header and sidebars', async () => {
     mockedUsePathname.mockReturnValue('/citizen/citizen-dashboard')
     mockedUseUser.mockReturnValue({
@@ -209,5 +200,4 @@ describe('AppShell', () => {
     expect(mockedGetMine).not.toHaveBeenCalled()
     expect(container.querySelector('img[src*="photos.example"]')).toBeNull()
   })
-  // END FLASHID — PROFILE AVATAR PHOTO
 })

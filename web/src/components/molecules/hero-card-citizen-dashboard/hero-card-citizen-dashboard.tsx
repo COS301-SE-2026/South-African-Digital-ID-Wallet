@@ -1,19 +1,9 @@
 'use client'
-// START FLASHID — CITIZEN DASHBOARD STATUS
 import { useState } from 'react'
 import Link from 'next/link'
-// END FLASHID — CITIZEN DASHBOARD STATUS
-// START FLASHID — CITIZEN PHOTOGRAPH
 import Image from 'next/image'
-// END FLASHID — CITIZEN PHOTOGRAPH
-// START FLASHID — CITIZEN RECORD LINK BUTTON
-import { QrCode, UserRoundCheck } from 'lucide-react'
-// END FLASHID — CITIZEN RECORD LINK BUTTON
-// START FLASHID — ACTIVATE CREDENTIALS BUTTON ICON
-import { IdCard } from 'lucide-react'
-// END FLASHID — ACTIVATE CREDENTIALS BUTTON ICON
+import { IdCard, QrCode, UserRoundCheck } from 'lucide-react'
 import { Text } from '@/components/atoms/text'
-// START FLASHID — CITIZEN DASHBOARD STATUS
 import type { CitizenStatus } from '@/services/manage-user-account-service/types'
 
 type WalletHeroCardProps = {
@@ -25,9 +15,7 @@ type WalletHeroCardProps = {
   isCredentialsLoading: boolean
   isCredentialsError: boolean
 }
-// END FLASHID — CITIZEN DASHBOARD STATUS
 
-// START FLASHID — CITIZEN DASHBOARD STATUS
 export function WalletHeroCard({
   status,
   isUnlinkedCitizen,
@@ -37,11 +25,8 @@ export function WalletHeroCard({
   isCredentialsLoading,
   isCredentialsError,
 }: WalletHeroCardProps) {
-  // END FLASHID — CITIZEN DASHBOARD STATUS
-  // START FLASHID — CITIZEN PHOTOGRAPH
   const [failedPhotoUrl, setFailedPhotoUrl] = useState<string | null>(null)
   const photoFailed = photoUrl !== null && failedPhotoUrl === photoUrl
-  // END FLASHID — CITIZEN PHOTOGRAPH
 
   return (
     <div className="relative overflow-hidden rounded-[28px]">
@@ -75,7 +60,6 @@ export function WalletHeroCard({
               </div>
 
               <div className="flex h-36 w-36 items-center justify-center rounded-2xl bg-clean-white p-3 md:h-40 md:w-40">
-                {/* START FLASHID — CITIZEN DASHBOARD STATUS */}
                 {isStatusLoading ? (
                   <span
                     role="status"
@@ -89,7 +73,6 @@ export function WalletHeroCard({
                   </span>
                 ) : status === 'Pending' || isUnlinkedCitizen ? (
                   <>
-                    {/* START FLASHID — CITIZEN RECORD LINK BUTTON */}
                     <Link
                       href="/citizen/verify-identity"
                       aria-label="Link Citizen Record"
@@ -103,7 +86,6 @@ export function WalletHeroCard({
                         Link Citizen Record
                       </span>
                     </Link>
-                    {/* END FLASHID — CITIZEN RECORD LINK BUTTON */}
                   </>
                 ) : status === null ? (
                   <span className="text-center text-xs text-muted-text">
@@ -111,7 +93,6 @@ export function WalletHeroCard({
                   </span>
                 ) : status === 'Verified' ? (
                   <>
-                    {/* START FLASHID — ACTIVATE CREDENTIALS BUTTON ICON */}
                     <Link
                       href="/citizen/activate-credentials"
                       aria-label="Activate Credentials"
@@ -125,11 +106,9 @@ export function WalletHeroCard({
                         Activate Credentials
                       </span>
                     </Link>
-                    {/* END FLASHID — ACTIVATE CREDENTIALS BUTTON ICON */}
                   </>
                 ) : status === 'Activated' ? (
                   <>
-                    {/* START FLASHID — CITIZEN PHOTOGRAPH */}
                     {isCredentialsLoading ? (
                       <span
                         role="status"
@@ -157,14 +136,12 @@ export function WalletHeroCard({
                         Photograph unavailable
                       </span>
                     )}
-                    {/* END FLASHID — CITIZEN PHOTOGRAPH */}
                   </>
                 ) : (
                   <span className="text-center text-xs text-muted-text">
                     Account unavailable
                   </span>
                 )}
-                {/* END FLASHID — CITIZEN DASHBOARD STATUS */}
               </div>
             </div>
           </div>

@@ -165,7 +165,6 @@ describe('proxy middleware', () => {
     expect(res.status).toBe(200)
   })
 
-  // START FLASHID — ACTIVATION RETURN URL
   it.each([
     '/citizen/activate-credentials?token=abc123',
     '/citizen/verify-identity?token=abc%2B123&source=email',
@@ -186,7 +185,6 @@ describe('proxy middleware', () => {
     expect(res.status).toBe(200)
     expect(res.headers.get('location')).toBeNull()
   })
-  // END FLASHID — ACTIVATION RETURN URL
 
   describe('when the access token has expired', () => {
     const fetchMock = jest.fn()

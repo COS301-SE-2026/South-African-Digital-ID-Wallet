@@ -1,10 +1,7 @@
-// START FLASHID — CITIZEN PHOTOGRAPH
 import { fireEvent, render, screen } from '@testing-library/react'
 import { createElement } from 'react'
-// END FLASHID — CITIZEN PHOTOGRAPH
 import { WalletHeroCard } from '../hero-card-citizen-dashboard'
 
-// START FLASHID — CITIZEN PHOTOGRAPH
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (
@@ -21,10 +18,8 @@ jest.mock('next/image', () => ({
       src: props.src,
     }),
 }))
-// END FLASHID — CITIZEN PHOTOGRAPH
 
 describe('WalletHeroCard', () => {
-  // START FLASHID — CITIZEN DASHBOARD STATUS
   const defaultProps = {
     status: 'Pending' as const,
     isUnlinkedCitizen: false,
@@ -34,9 +29,7 @@ describe('WalletHeroCard', () => {
     isCredentialsLoading: false,
     isCredentialsError: false,
   }
-  // END FLASHID — CITIZEN DASHBOARD STATUS
 
-  // START FLASHID — CITIZEN DASHBOARD STATUS
   it('preserves the original copy and hero styling', () => {
     render(<WalletHeroCard {...defaultProps} />)
 
@@ -183,5 +176,4 @@ describe('WalletHeroCard', () => {
     expect(screen.getByText('Unavailable')).toBeInTheDocument()
     expect(screen.queryByRole('link')).not.toBeInTheDocument()
   })
-  // END FLASHID — CITIZEN DASHBOARD STATUS
 })
