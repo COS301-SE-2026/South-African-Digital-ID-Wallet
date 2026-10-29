@@ -19,36 +19,29 @@ public class TrustedDevicesController : ControllerBase
     [HttpGet("me")]
     public async Task<IActionResult> GetMyTrustedDevices()
     {
-        try
+        var userIdClaim = User.FindFirst("userId")?.Value;
+
+        if (userIdClaim == null)
         {
-            var userIdClaim = User.FindFirst("userId")?.Value;
-
-            if (userIdClaim == null)
-            {
-                return Unauthorized(new { error = "Invalid token." });
-            }
-
-            var userId = Guid.Parse(userIdClaim);
-
-            string? currentDeviceToken = null;
-            if (Request.Headers.TryGetValue("X-Device-Token", out var deviceHeader)
-            && !string.IsNullOrWhiteSpace(deviceHeader))
-            {
-                currentDeviceToken = deviceHeader.ToString();
-            }
-            else if (Request.Cookies.TryGetValue("flashid_device", out var deviceCookie))
-            {
-                currentDeviceToken = deviceCookie;
-            }
-
-            var result = await _trustedDeviceService.GetMyTrustedDevicesAsync(userId, currentDeviceToken);
-
-            return Ok(result);
+            return Unauthorized(new { error = "Invalid token." });
         }
-        catch (Exception)
+
+        var userId = Guid.Parse(userIdClaim);
+
+        string? currentDeviceToken = null;
+        if (Request.Headers.TryGetValue("X-Device-Token", out var deviceHeader)
+        && !string.IsNullOrWhiteSpace(deviceHeader))
         {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
+            currentDeviceToken = deviceHeader.ToString();
         }
+        else if (Request.Cookies.TryGetValue("flashid_device", out var deviceCookie))
+        {
+            currentDeviceToken = deviceCookie;
+        }
+
+        var result = await _trustedDeviceService.GetMyTrustedDevicesAsync(userId, currentDeviceToken);
+
+        return Ok(result);
     }
 
     [HttpDelete("{deviceId:guid}")]

@@ -1,6 +1,7 @@
 using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Services;
 using Application.Features.Verification.Dtos;
+using Application.Features.Verification.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
 
@@ -63,7 +64,7 @@ public class CitizenVerificationServiceTests
     {
         var now = DateTime.UtcNow;
         var a = new CitizenActivation { Status = ActivationStatus.Used, ExpiresAt = now.AddHours(1) };
-        var ex = Assert.Throws<InvalidOperationException>(() => CitizenVerificationService.ValidateActivationState(a, now));
+        var ex = Assert.Throws<ActivationUnavailableException>(() => CitizenVerificationService.ValidateActivationState(a, now));
         Assert.Contains("already been used", ex.Message);
     }
 
@@ -72,7 +73,7 @@ public class CitizenVerificationServiceTests
     {
         var now = DateTime.UtcNow;
         var a = new CitizenActivation { Status = ActivationStatus.Revoked, ExpiresAt = now.AddHours(1) };
-        var ex = Assert.Throws<InvalidOperationException>(() => CitizenVerificationService.ValidateActivationState(a, now));
+        var ex = Assert.Throws<ActivationUnavailableException>(() => CitizenVerificationService.ValidateActivationState(a, now));
         Assert.Contains("no longer valid", ex.Message);
     }
 
@@ -81,7 +82,7 @@ public class CitizenVerificationServiceTests
     {
         var now = DateTime.UtcNow;
         var a = new CitizenActivation { ExpiresAt = now.AddMinutes(-1) };
-        var ex = Assert.Throws<InvalidOperationException>(() => CitizenVerificationService.ValidateActivationState(a, now));
+        var ex = Assert.Throws<ActivationUnavailableException>(() => CitizenVerificationService.ValidateActivationState(a, now));
         Assert.Contains("expired", ex.Message);
     }
 
@@ -90,7 +91,7 @@ public class CitizenVerificationServiceTests
     {
         var now = DateTime.UtcNow;
         var a = new CitizenActivation { ExpiresAt = now.AddHours(1), LockedUntil = now.AddMinutes(5) };
-        var ex = Assert.Throws<InvalidOperationException>(() => CitizenVerificationService.ValidateActivationState(a, now));
+        var ex = Assert.Throws<ActivationUnavailableException>(() => CitizenVerificationService.ValidateActivationState(a, now));
         Assert.Contains("temporarily locked", ex.Message);
         Assert.Contains("5 minutes", ex.Message);
     }
@@ -110,7 +111,7 @@ public class CitizenVerificationServiceTests
     public async Task UnknownToken_Throws()
     {
         var c = Setup(noActivation: true);
-        await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid()));
+        await Assert.ThrowsAsync<ActivationDetailsInvalidException>(() => Act(c, Guid.NewGuid()));
         Assert.Equal(Sha256Hex(RawToken), c.Repo.RequestedHash);
     }
 
@@ -147,7 +148,7 @@ public class CitizenVerificationServiceTests
     public async Task SaIdMismatch_RecordsFailedAttempt()
     {
         var c = Setup(citizenSaId: "8001015801087");
-        await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid()));
+        await Assert.ThrowsAsync<ActivationDetailsInvalidException>(() => Act(c, Guid.NewGuid()));
         Assert.Equal(1, c.Activation.AttemptCount);
         Assert.Equal(1, c.Repo.Saves);
         Assert.Empty(c.Repo.AuditLogs);
@@ -157,7 +158,7 @@ public class CitizenVerificationServiceTests
     public async Task WrongPin_RecordsFailedAttempt()
     {
         var c = Setup();
-        await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid(), pin: "999999"));
+        await Assert.ThrowsAsync<ActivationDetailsInvalidException>(() => Act(c, Guid.NewGuid(), pin: "999999"));
         Assert.Equal(1, c.Activation.AttemptCount);
         Assert.Equal(1, c.Repo.Saves);
     }
@@ -169,7 +170,7 @@ public class CitizenVerificationServiceTests
     {
         var c = Setup(attemptCount: startingAttempts);
         var before = DateTime.UtcNow;
-        await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid(), pin: "999999"));
+        await Assert.ThrowsAsync<ActivationDetailsInvalidException>(() => Act(c, Guid.NewGuid(), pin: "999999"));
         Assert.Equal(startingAttempts + 1, c.Activation.AttemptCount);
         Assert.NotNull(c.Activation.LockedUntil);
         var lockedFor = c.Activation.LockedUntil!.Value - before;
@@ -180,7 +181,7 @@ public class CitizenVerificationServiceTests
     public async Task SixthWrongPin_RevokesActivation()
     {
         var c = Setup(attemptCount: 5);
-        await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid(), pin: "999999"));
+        await Assert.ThrowsAsync<ActivationDetailsInvalidException>(() => Act(c, Guid.NewGuid(), pin: "999999"));
         Assert.Equal(ActivationStatus.Revoked, c.Activation.Status);
         Assert.NotNull(c.Activation.RevokedAt);
         Assert.Null(c.Activation.LockedUntil);
@@ -199,7 +200,7 @@ public class CitizenVerificationServiceTests
     public async Task CitizenAlreadyLinkedToAnotherUser_Throws()
     {
         var c = Setup(citizenUserId: Guid.NewGuid());
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid()));
+        var ex = await Assert.ThrowsAsync<ActivationUnavailableException>(() => Act(c, Guid.NewGuid()));
         Assert.Contains("linked to another account", ex.Message);
     }
 
@@ -207,7 +208,7 @@ public class CitizenVerificationServiceTests
     public async Task UserAlreadyLinkedToAnotherCitizen_Throws()
     {
         var c = Setup(citizenForUser: new Citizen { Id = Guid.NewGuid(), SaId = "8001015801087" });
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => Act(c, Guid.NewGuid()));
-        Assert.Contains("linked to another citizen", ex.Message);
+        var ex = await Assert.ThrowsAsync<ActivationUnavailableException>(() => Act(c, Guid.NewGuid()));
+        Assert.Contains("already linked to a different identity", ex.Message);
     }
 }

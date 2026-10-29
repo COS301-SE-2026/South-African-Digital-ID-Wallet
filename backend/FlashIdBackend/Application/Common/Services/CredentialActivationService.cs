@@ -3,6 +3,7 @@ using Application.Common.Interfaces.RepositoryInterfaces;
 using Application.Common.Interfaces.ServiceInterfaces;
 using Application.Features.Credentials.DTOs;
 using Application.Features.Credentials.Enums;
+using Application.Features.Credentials.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
 
@@ -36,17 +37,18 @@ public class CredentialActivationService : ICredentialActivationService
 
         if (citizen is null)
         {
-            throw new InvalidOperationException("No citizen is linked to this account.");
+            throw new CitizenNotLinkedException();
         }
 
         if (citizen.Status != CitizenStatus.Verified && citizen.Status != CitizenStatus.Activated)
         {
-            throw new InvalidOperationException("Citizen verification must be completed before credentials can be activated.");
+            throw new CitizenIdentityNotVerifiedException();
         }
 
         if (request.CredentialTypes is null || request.CredentialTypes.Count == 0)
         {
-            throw new ArgumentNullException("At least one credential type must be selected.");
+            // ArgumentNullException treats its string as a param name, so the message came out garbled
+            throw new ArgumentException("Select at least one credential to activate.");
         }
 
         var requestedTypes = request.CredentialTypes.Distinct().ToList();

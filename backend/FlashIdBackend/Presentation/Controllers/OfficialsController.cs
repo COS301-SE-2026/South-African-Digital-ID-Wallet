@@ -40,10 +40,6 @@ public class OfficialsController : ControllerBase
         {
             return NotFound(new { error = ofne.Message });
         }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
-        }
     }
 
     [HttpPost("verify-badge")]
@@ -58,10 +54,6 @@ public class OfficialsController : ControllerBase
         catch (InvalidBadgeTokenException ibte)
         {
             return BadRequest(new { error = ibte.Message });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
 

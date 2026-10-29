@@ -63,15 +63,8 @@ public class InstitutionsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllInstitutions()
     {
-        try
-        {
-            var result = await _institutionService.GetAllInstitutionsAsync();
-            return Ok(result);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
-        }
+        var result = await _institutionService.GetAllInstitutionsAsync();
+        return Ok(result);
     }
 
     /// <summary>
@@ -92,10 +85,6 @@ public class InstitutionsController : ControllerBase
         catch (InvalidInstitutionRequestException ex)
         {
             return NotFound(new { error = ex.Message });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
 }
