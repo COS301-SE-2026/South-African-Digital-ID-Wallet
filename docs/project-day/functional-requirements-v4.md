@@ -48,7 +48,7 @@ The mobile app shall support unlocking with the device's biometrics (fingerprint
 The system shall issue JWT authentication tokens upon successful login.
 
 ##### R1.2.4:
-The system shall expire sessions after 8 hours, or after 30 days when the user selects "remember me".
+The system shall end a session after 8 hours without activity, or after 30 days without activity when the user selects "remember me". Access tokens shall expire after 15 minutes and be renewed silently with a single-use refresh token while the session is active.
 
 ##### R1.2.5:
 The system shall record successful and failed logins in the audit log, and record the device type and approximate location (city and country from the IP address) for security monitoring.
@@ -60,7 +60,7 @@ The system shall require users to verify devices that log into their accounts fo
 The system shall allow the device verification code to be resent, subject to rate limiting.
 
 ##### R1.2.8:
-The system shall end all of a user's active sessions when the user signs out.
+The system shall end the current session when the user signs out by revoking its refresh token. Changing the password, resetting it, or securing the account from a fraud alert shall end all of the user's sessions.
 
 ##### R1.2.9:
 The system shall lock an account for 30 minutes after 5 consecutive failed login attempts.

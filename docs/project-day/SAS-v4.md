@@ -66,7 +66,7 @@ The full architectural requirements, including architectural patterns, design pa
 | Mobile | Expo React Native | Single codebase for IOS and Android mobile app |
 | Client data | TanStack Query, Zustand | Server-state caching and lightweight local UI state |
 | Backend API | ASP.NET Core - .NET 10 - C# | Strongly-types, high-performance API layer |
-| Authentication | JWT via HttpOnly cookies | Stateless auth by using tokens which are hidden and reduce XSS risk |
+| Authentication | 15-minute JWT access token and rotating refresh token, in HttpOnly cookies (web) or Bearer header and secure storage (mobile) | Stateless access checks, short exposure if a token leaks, and tokens hidden from JavaScript to reduce XSS risk |
 | Database | Microsoft SQL Server | Relational integrity for identity and credential records |
 | File storage | Azure Blob Storage | Stores citizen photos separately from relational data |
 | CI/CD and Hosting | Github Actions, Docker, Azure Web Apps | Automated build/test/deploy on every push |
@@ -74,7 +74,8 @@ The full architectural requirements, including architectural patterns, design pa
 
 ## 4. API Contracts
 > Base URL: `http://localhost:5118` (DEV)
-> All endpoints return JSON. All protected endpoints require a valid JWT token transmitted via HttpOnly cookie.
+> All endpoints return JSON. All protected endpoints require a valid JWT access token, sent in the `access_token` HttpOnly cookie (web) or an `Authorization: Bearer` header (mobile). Cookie-authenticated POST, PUT, PATCH and DELETE requests must also send the `csrf_token` cookie value in an `X-CSRF-Token` header ([csrf-protection.md](security/csrf-protection.md)).
+> The mobile app sends `X-Client: mobile`. For a native client (no `Origin` or `Sec-Fetch-Site` header) login, device verification and refresh return `token` and `refreshToken` in the body and do not set the `refresh_token` cookie.
 
 ### Auth
 
@@ -103,7 +104,9 @@ Authenticates a user. If the device is already trusted, authentication completes
 
 **Cookies:**
 - `flashid_device` - optional HttpOnly cookie containing the existing trusted-device token.
-- `access_token` - set by the server after successful authentication from a trusted device.
+- `access_token`, `refresh_token` and `csrf_token` - set by the server after successful authentication from a trusted device.
+
+**Rate Limit:** 10 requests per minute per IP
 
 **Request Body:**
 ```json
@@ -117,17 +120,18 @@ Authenticates a user. If the device is already trusted, authentication completes
 **Response 200 — Trusted Device:**
 ```json
 {
-    "token": "",
-    "expiresAt": "2026-08-16T21:30:00Z",
+    "expiresAt": "2026-08-16T13:45:00Z",
+    "refreshTokenExpiresAt": "2026-08-16T21:30:00Z",
     "userId": "00000000-0000-0000-0000-000000000000",
     "role": "Citizen",
     "requiresDeviceVerification": false,
     "deviceVerificationId": null,
-    "deviceToken": null
+    "names": "string",
+    "surname": "string"
 }
 ```
 
-The JWT access token is returned through the `access_token` HttpOnly cookie and is therefore not exposed in the response body.
+The access token (15 minutes) and the refresh token (8 hours, or 30 days with `rememberMe`) are returned in the `access_token` and `refresh_token` HttpOnly cookies and are therefore not exposed in the response body. A `securityAlert` object is included when the fraud check flags the sign-in.
 
 **Response 200 — Untrusted Device:**
 ```json
@@ -153,7 +157,7 @@ Verifies the OTP issued during login for an untrusted device. Successful verific
 
 **Cookies:**
 - `flashid_device` - optional. If an existing device token is supplied, the corresponding trusted-device record is updated. If no device token exists, a new trusted-device token is generated and returned through an HttpOnly cookie.
-- `access_token` - set after successful device verification.
+- `access_token`, `refresh_token` and `csrf_token` - set after successful device verification.
 
 **Request Body:**
 ```json
@@ -173,7 +177,7 @@ Verifies the OTP issued during login for an untrusted device. Successful verific
 |---|---|---|---|
 | `deviceVerificationId` | UUID | Yes | Identifier returned by `POST /api/auth/login` when device verification is required |
 | `otp` | string | Yes | One-time verification code sent to the user's email |
-| `rememberMe` | boolean | Yes | Determines the JWT expiry behaviour |
+| `rememberMe` | boolean | Yes | Selects the refresh token lifetime: 8 hours, or 30 days when `true` |
 | `deviceType` | enum | Yes | Type of device being verified |
 | `operatingSystem` | string | Yes | Client operating system |
 | `browser` | string | Yes | Client browser |
@@ -188,13 +192,14 @@ Verifies the OTP issued during login for an untrusted device. Successful verific
 **Response 200:**
 ```json
 {
-    "token": "",
-    "expiresAt": "2026-08-16T21:30:00Z",
+    "expiresAt": "2026-08-16T13:45:00Z",
+    "refreshTokenExpiresAt": "2026-08-16T21:30:00Z",
     "userId": "00000000-0000-0000-0000-000000000000",
     "role": "Citizen",
     "requiresDeviceVerification": false,
     "deviceVerificationId": null,
-    "deviceToken": null
+    "names": "string",
+    "surname": "string"
 }
 ```
 
@@ -203,7 +208,7 @@ On success:
 - The device is stored or updated as a trusted device.
 - The device's last active time is updated.
 - The approximate city and country associated with the request IP address are stored where available.
-- An `access_token` HttpOnly cookie is set.
+- `access_token` and `refresh_token` HttpOnly cookies and a `csrf_token` cookie are set.
 - If the client did not already have a device token, a `flashid_device` HttpOnly cookie is set.
 - Device verification is recorded in the audit log.
 
@@ -273,46 +278,120 @@ On success:
 
 **Response 500:** An unexpected server error occurred while attempting to resend the verification OTP.
 
-#### Post /api/auth/logout
-Clears the JWT cookie and ends the user session.
+#### POST /api/auth/refresh
+Exchanges a refresh token for a new access token and a new refresh token. The old refresh token is single-use: it is marked as rotated, and presenting it again more than 30 seconds later revokes every token in that session.
 
-**Authentication:** Required
+**Authentication:** None (the refresh token is the credential)
 
-**Response 200:** Session ended, cookie cleared
+**Rate Limit:** 60 requests per minute per refresh token
 
-### Citizens
+**CSRF:** Exempt
 
-#### POST /api/citizens/register
-Registers a new citizen account using a SA ID number and activation code.
+**Cookies:**
+- `refresh_token` - read when no body is sent (web).
+- `access_token`, `refresh_token` and `csrf_token` - reissued on success.
+
+**Request Body (mobile only, optional on the web):**
+```json
+{
+    "refreshToken": "string"
+}
+```
+
+**Response 200:** Same shape as a trusted-device login. The new refresh token keeps the session's `rememberMe` choice, and its expiry is reset to 8 hours or 30 days from now.
+
+**Response 401:** Refresh token missing, unknown, expired or revoked, or the user's sessions were ended (password change, password reset or securing the account). Web cookies are cleared.
+
+**Response 409:** `REFRESH_ALREADY_ROTATED` - the token was rotated by a concurrent request within the last 30 seconds. The client should retry the original request with the cookies it now has.
+
+#### POST /api/auth/forgot-password
+Sends a 6-digit password reset OTP to the email address if an account exists for it.
 
 **Authentication:** None
-**Rate Limit:** 5 requests per minute per client
+
+**Rate Limit:** 5 requests per minute per IP (shared with reset-password)
 
 **Request Body:**
 ```json
 {
-    "saId": "string",
-    "username": "string",
-    "password": "string",
-    "activationCode": "string"
+    "email": "string"
+}
+```
+
+**Response 200:** Always returned with the same message, whether or not the account exists, so the endpoint cannot be used to find registered emails.
+
+#### POST /api/auth/reset-password
+Sets a new password using the OTP from `forgot-password`. The OTP expires after 15 minutes and is blocked after 5 wrong attempts. On success all of the user's sessions end and any account lockout is cleared.
+
+**Authentication:** None
+
+**Rate Limit:** 5 requests per minute per IP (shared with forgot-password)
+
+**Request Body:**
+```json
+{
+    "email": "string",
+    "otp": "string",
+    "newPassword": "string",
+    "confirmPassword": "string"
+}
+```
+
+**Response 200:** Password updated
+**Response 400:** Invalid, expired or over-attempted OTP, or the new password fails the password rules
+
+#### POST /api/auth/logout
+Ends the current session: revokes this session's refresh token and clears the `access_token`, `refresh_token` and `csrf_token` cookies. Sessions on other devices stay signed in.
+
+**Authentication:** Required
+
+**Request Body (mobile only, optional):**
+```json
+{
+    "refreshToken": "string"
+}
+```
+
+**Response 200:** Session ended, cookies cleared
+
+### Citizens
+
+#### POST /api/citizens/register
+Registers a new citizen account with an email address and password, and emails a 6-digit verification OTP. The SA ID is linked later, during identity verification.
+
+**Authentication:** None
+**Rate Limit:** 5 requests per minute per IP
+
+**Request Body:**
+```json
+{
+    "email": "string",
+    "password": "string"
 }
 ```
 
 **Validation Rules:**
-- `saId` - exact 13 num digits
-- `username` - min 8 char, no spaces
-- `password` - min 10 char, must have uppercase, lowercase, digit and special char
-- `activationCode` - non-empty
+- `email` - required, valid email format
+- `password` - min 10 char, must have uppercase, lowercase, digit and one of `!@#$%^&*_+-=.<>?~`
 
-**Response 201:** Citizen acc created
+**Response 201:**
+```json
+{
+    "userId": "00000000-0000-0000-0000-000000000000",
+    "email": "string",
+    "createdAt": "date",
+    "message": "string"
+}
+```
 **Response 400:** Validation error
 **Response 409:** Email already taken
 **Response 429:** Rate limit exceeded
 
-#### POST /api/citizen/verify-email
-Verifies a citizen's email using OTP sent at registeration.
+#### POST /api/citizens/verify-email
+Verifies a citizen's email using OTP sent at registration.
 
 **Authentication:** None
+**Rate Limit:** 5 requests per minute per IP
 
 **Request Body:**
 ```json
@@ -329,6 +408,14 @@ Verifies a citizen's email using OTP sent at registeration.
 Resends the email verification OTP.
 
 **Authentication:** None
+**Rate Limit:** 3 requests per minute per IP
+
+**Request Body:**
+```json
+{
+    "email": "string"
+}
+```
 
 **Response 200:** OTP resent
 **Response 400:** Already verified or invalid request
@@ -760,7 +847,7 @@ This endpoint may be used by the frontend to restore or refresh the current veri
 
 ### Offline Verification Service Contract
 
-Byte-level definitions of the values returned here are in [wire-format.md](wire-format.md).
+Byte-level definitions of the values returned here are in [wire-format.md](offline-verification/wire-format.md).
 
 ### Offline Verification
 
@@ -1304,6 +1391,94 @@ Returns a paginated, filterable audit history for every official at the caller's
 ```
 `citizenName` and `citizenIdMasked` are null for audit entries that predate the citizen linkage, or that are not tied to a specific citizen. The unmasked citizen ID is never returned by this endpoint.
 
+#### GET /api/officials/history/actions
+Returns `actions`, the action names that can be used to filter `GET /api/officials/history`.
+
+**Authentication:** Required for Officials
+
+#### GET /api/officials/stats/me
+Returns `todayCount`, the number of verifications performed today (UTC) at the official's institution, for the officials dashboard.
+
+**Authentication:** Required for Officials
+
+### Security
+
+All endpoints require the Citizen role. They back the fraud detection screens.
+
+#### GET /api/security/overview
+Returns the citizen's security summary: whether there is an active alert, the active alert count and latest alert, whether QR generation is restricted and until when, and recent activity.
+
+#### GET /api/security/activity
+Returns recent security events with location, device, trusted-device flag and risk score. **Query Parameter:** `limit` (default 20)
+
+#### GET /api/security/alerts
+Returns the citizen's fraud alerts. **Query Parameter:** `status` (optional `FraudAlertStatus`)
+
+#### GET /api/security/alerts/{alertId}
+Returns one alert with its evidence. **Response 404:** Alert not found
+
+#### POST /api/security/alerts/{alertId}/secure
+Secures the account from an alert after the citizen re-enters their password. Every action ends all sessions, lifts the QR restriction and removes the suspicious device; `AddExtraVerification` removes every other trusted device instead. Issues a fresh session for the current device in the same way as login.
+
+**Request Body:**
+```json
+{
+    "action": "LogOutOtherDevices | ResetPassword | AddExtraVerification",
+    "password": "string"
+}
+```
+
+**Response 200:** Account secured
+**Response 400:** Unsupported action
+**Response 401:** `STEP_UP_FAILED` - password check failed
+**Response 404:** Alert not found
+**Response 409:** Alert already resolved
+
+#### POST /api/security/alerts/{alertId}/dismiss
+Marks the alert as the citizen's own activity. **Response 204** on success, **401** `STEP_UP_FAILED`, **404** not found, **409** already resolved
+
+#### GET /api/security/settings
+#### PUT /api/security/settings
+Reads or updates the citizen's security settings (`impossibleTravelDetectionEnabled`, `enhancedVerificationEnabled`). An update can require the citizen's `password` as step-up verification (**401** `STEP_UP_FAILED`).
+
+#### POST /api/security/simulate
+Records a simulated sign-in event at given coordinates for demonstrating fraud detection. Only available in the Development and Testing environments; returns **404** elsewhere.
+
+### Emergency Access
+
+#### POST /api/emergency/resolve
+Resolves a signed, single-use emergency code to the citizen's emergency profile (chosen medical fields and contacts). The access is logged and the citizen and their contacts are emailed.
+
+**Authentication:** Required for Officials
+**Rate Limit:** 10 requests per minute per user
+
+#### POST /api/emergency/offline-accesses
+Records an emergency profile access that happened offline, once the official's phone reconnects. **Response 204** on success.
+
+**Authentication:** Required for Officials
+**Rate Limit:** 20 requests per minute per user
+
+#### POST /api/emergency/devices
+Registers the citizen's phone key used to sign emergency codes.
+
+**Authentication:** Required for Citizen
+
+#### GET /api/emergency/profile
+#### PUT /api/emergency/profile
+Reads or saves the citizen's emergency profile (consent, medical fields, emergency contacts in priority order).
+
+**Authentication:** Required for Citizen
+
+#### GET /api/emergency/offline-credential
+Returns the signed emergency SD-JWT (`sdJwt`, `expiresAt`) that the phone stores for offline emergency access.
+
+**Authentication:** Required for Citizen
+
+#### GET /api/emergency/accesses
+Returns who accessed the citizen's emergency profile, with institution, time, reason, location and whether it was offline.
+
+**Authentication:** Required for Citizen
+
 ### Trusted Devices
 
 #### GET /api/trusted-devices/me
@@ -1376,6 +1551,15 @@ Returns system-wide analytics for the requested data range: verifications, crede
 ```
 
 **Response 400:** Invalid `range` value
+
+### Audit Log
+
+#### GET /api/admin/audit-log
+Returns a paginated, searchable system audit log for government administrators.
+
+**Authentication:** Required for Government Administrator
+
+**Query Parameters:** `search`, `action`, `dateFrom`, `dateTo`, `page`, `pageSize` (all optional)
 
 ### Government Registry Service
 
@@ -1570,6 +1754,16 @@ multipart/form-data
 **Response 400:** No document supplied, file is empty, file exceeds the permitted size, or uploaded file is not a PDF
 
 **Response 500:** Document verification could not be completed
+
+---
+
+#### POST /api/certified-copies/verify-document/{verificationToken}
+
+Same check as `POST /api/certified-copies/verify-document`, but looks up the certified copy by the verification token from its QR code and compares the uploaded PDF with that copy only.
+
+**Authentication:** None
+**Rate Limit:** 10 requests per minute per IP
+**Content-Type:** `multipart/form-data` with the PDF in the `document` field
 
 ---
 
