@@ -52,6 +52,9 @@ export const AppSidebar = ({
 }: Readonly<AppSidebarProps>) => {
   const [isPinned, setIsPinned] = useState(true)
   const [isHovered, setIsHovered] = useState(false)
+  const [failedPhotoUrl, setFailedPhotoUrl] = useState<string | null>(null)
+  const photoUrl =
+    user.photoUrl && failedPhotoUrl !== user.photoUrl ? user.photoUrl : null
   const pathname = usePathname()
   const dashboardHref = navSections[0]?.items[0]?.href ?? '/'
   const isExpanded = isPinned || isHovered
@@ -190,9 +193,23 @@ export const AppSidebar = ({
           <div className="rounded-[24px] bg-deep-green p-3">
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-accent-gold/70 bg-primary-green/40 text-sm font-extrabold text-clean-white">
-                  {user.initials}
-                </div>
+                <>
+                  <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-2 border-accent-gold/70 bg-primary-green/40 text-sm font-extrabold text-clean-white">
+                    {photoUrl ? (
+                      <Image
+                        src={photoUrl}
+                        alt=""
+                        width={48}
+                        height={48}
+                        unoptimized
+                        className="h-full w-full object-cover"
+                        onError={() => setFailedPhotoUrl(photoUrl)}
+                      />
+                    ) : (
+                      user.initials
+                    )}
+                  </div>
+                </>
 
                 <div className="min-w-0">
                   <p className="truncate text-sm font-extrabold text-clean-white">
@@ -219,13 +236,27 @@ export const AppSidebar = ({
 
       {!isExpanded && (
         <div className="relative z-10 mt-auto flex flex-col items-center gap-2">
-          <div
-            className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-accent-gold/70 bg-primary-green/30 text-sm font-extrabold text-clean-white"
-            title={user.name}
-            aria-label={`${user.name} avatar`}
-          >
-            {user.initials}
-          </div>
+          <>
+            <div
+              className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-accent-gold/70 bg-primary-green/30 text-sm font-extrabold text-clean-white"
+              title={user.name}
+              aria-label={`${user.name} avatar`}
+            >
+              {photoUrl ? (
+                <Image
+                  src={photoUrl}
+                  alt=""
+                  width={40}
+                  height={40}
+                  unoptimized
+                  className="h-full w-full object-cover"
+                  onError={() => setFailedPhotoUrl(photoUrl)}
+                />
+              ) : (
+                user.initials
+              )}
+            </div>
+          </>
 
           <Button
             onClick={(event) => {

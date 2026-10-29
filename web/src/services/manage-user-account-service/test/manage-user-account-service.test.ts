@@ -1,5 +1,7 @@
 import api from '@/lib/api'
-import manageUserAccountService from '../manage-user-account-service'
+import manageUserAccountService, {
+  isNoLinkedCitizenResponse,
+} from '../manage-user-account-service'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -31,6 +33,20 @@ describe('manageUserAccountService', () => {
     const result = await manageUserAccountService.getMyAccount()
     expect(mockedApi.get).toHaveBeenCalledWith('/api/manage-user-account/me')
     expect(result).toEqual(data)
+  })
+  it('recognizes the unlinked response by its flag, not its wording', () => {
+    expect(
+      isNoLinkedCitizenResponse({ linked: false, message: 'Any wording.' })
+    ).toBe(true)
+    // the old flagless body no longer counts, which proves wording is ignored
+    expect(
+      isNoLinkedCitizenResponse({
+        message:
+          'You have no credentials linked. To see your information please activate your credentials.',
+      })
+    ).toBe(false)
+    expect(isNoLinkedCitizenResponse({ linked: true })).toBe(false)
+    expect(isNoLinkedCitizenResponse(null)).toBe(false)
   })
   it('verifies the current password', async () => {
     const data = {

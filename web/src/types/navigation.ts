@@ -27,4 +27,5 @@ export type SidebarNavSection = {
 export type SidebarUser = {
   name: string
   initials: string
+  photoUrl?: string | null
 }

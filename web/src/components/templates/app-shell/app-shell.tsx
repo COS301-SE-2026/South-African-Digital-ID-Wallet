@@ -2,6 +2,12 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import {
+  credentialService,
+  getPreferredPhotoUrl,
+  myCredentialsQueryKey,
+} from '@/services/credential-service'
 
 import { type UserRole, DEFAULT_USER_ROLE_DASHBOARD } from '@/types/roles'
 import { getAllowedRoles } from '@/config/roles/route-permissions'
@@ -28,6 +34,13 @@ export function AppShell({
   const header = pageHeaders[pathname] ?? defaultPageHeader
   const { user, loading, logout } = useUser()
   const router = useRouter()
+  const { data: credentials } = useQuery({
+    queryKey: myCredentialsQueryKey(user?.userId),
+    queryFn: () => credentialService.getMine(),
+    enabled: user?.role === 'Citizen' && Boolean(user.userId),
+  })
+  const photoUrl =
+    user?.role === 'Citizen' ? getPreferredPhotoUrl(credentials) : null
 
   const allowed = !loading && user ? getAllowedRoles(pathname) : null
   const hasAccess =
@@ -71,12 +84,13 @@ export function AppShell({
   const initials = user
     ? (user.names?.[0] ?? user.email?.[0] ?? 'U') + (user.surname?.[0] ?? '')
     : ''
+  const profileUser = { name: displayName, initials, photoUrl }
 
   return (
     <div className="flex min-h-screen overflow-hidden lg:h-screen">
       <AppSidebar
         navSections={navSections}
-        user={{ name: displayName, initials }}
+        user={profileUser}
         onLogout={logout}
       />
 
@@ -85,7 +99,7 @@ export function AppShell({
           <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
           <AppSidebar
             navSections={navSections}
-            user={{ name: displayName, initials }}
+            user={profileUser}
             onLogout={logout}
             variant="mobile"
             onNavigate={() => setMobileNavOpen(false)}
@@ -97,7 +111,7 @@ export function AppShell({
         <AppTopBar
           title={header.title}
           description={header.description}
-          user={{ name: displayName, initials }}
+          user={profileUser}
           showNotifications={false}
           onMenuClick={() => setMobileNavOpen(true)}
         />

@@ -1,6 +1,19 @@
 import api from '@/lib/api'
 import manageUserAccountUrls from './manage-user-account-urls'
-import type { ManageUserAccountDto, MessageResponse } from './types'
+import type {
+  ManageUserAccountDto,
+  MessageResponse,
+  UnlinkedAccountResponse,
+} from './types'
+
+// the backend flags unlinked accounts explicitly, so rewording its message can't break this
+export const isNoLinkedCitizenResponse = (
+  value: unknown
+): value is UnlinkedAccountResponse =>
+  typeof value === 'object' &&
+  value !== null &&
+  'linked' in value &&
+  value.linked === false
 
 const getMyAccount = (): Promise<ManageUserAccountDto | MessageResponse> =>
   api

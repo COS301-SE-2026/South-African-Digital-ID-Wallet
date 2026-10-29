@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { WalletHeroCard } from '@/components/molecules/hero-card-citizen-dashboard/hero-card-citizen-dashboard'
 import { ActivityOverviewCard } from '@/components/molecules/activity-overview-card/activity-overview-card'
 import { CredentialsList } from '@/components/molecules/credentials-list/credentials-list'
@@ -11,6 +12,35 @@ import { FraudAlertFlow } from '@/components/organisms/fraud-alert-flow'
 import type { SecurityAlert } from '@/components/organisms/fraud-alert-flow'
 import { fraudDetectionService } from '@/services/fraud-detection-service'
 import { mapFraudAlertToSecurityAlert } from '@/services/fraud-detection-service/mappers'
+import {
+  credentialService,
+  getPreferredPhotoUrl,
+  myCredentialsQueryKey,
+} from '@/services/credential-service'
+import { useUser } from '@/context/user-context'
+import {
+  isNoLinkedCitizenResponse,
+  manageUserAccountService,
+} from '@/services/manage-user-account-service'
+import type {
+  CitizenStatus,
+  ManageUserAccountDto,
+} from '@/services/manage-user-account-service/types'
+
+const isCitizenStatus = (value: unknown): value is CitizenStatus =>
+  value === 'Pending' ||
+  value === 'Verified' ||
+  value === 'Activated' ||
+  value === 'Suspended' ||
+  value === 'Deactivated'
+
+const isAccountStatusResponse = (
+  value: unknown
+): value is Pick<ManageUserAccountDto, 'accountStatus'> =>
+  typeof value === 'object' &&
+  value !== null &&
+  'accountStatus' in value &&
+  isCitizenStatus(value.accountStatus)
 
 type SecurityAlertResult = {
   alert: SecurityAlert | null
@@ -38,6 +68,24 @@ const fetchSecurityAlert = async (): Promise<SecurityAlertResult> => {
 }
 
 export default function CitizenDashboardPage() {
+  const {
+    data: accountResponse,
+    isLoading: isAccountLoading,
+    isError: isAccountError,
+  } = useQuery({
+    queryKey: ['manageUserAccount', 'me'],
+    queryFn: () => manageUserAccountService.getMyAccount(),
+  })
+  const { user } = useUser()
+  const {
+    data: credentials,
+    isLoading: areCredentialsLoading,
+    isError: areCredentialsError,
+  } = useQuery({
+    queryKey: myCredentialsQueryKey(user?.userId),
+    queryFn: () => credentialService.getMine(),
+    enabled: Boolean(user?.userId),
+  })
   const [securityAlert, setSecurityAlert] = useState<SecurityAlert | null>(null)
   const [securityAlertError, setSecurityAlertError] = useState<string | null>(
     null
@@ -49,6 +97,15 @@ export default function CitizenDashboardPage() {
   const reloadSecurityAlert = useCallback(async () => {
     applySecurityAlert(await fetchSecurityAlert())
   }, [applySecurityAlert])
+  const accountStatus = isAccountStatusResponse(accountResponse)
+    ? accountResponse.accountStatus
+    : null
+  const isUnlinkedCitizen = isNoLinkedCitizenResponse(accountResponse)
+  const accountError =
+    isAccountError ||
+    (accountResponse !== undefined &&
+      accountStatus === null &&
+      !isUnlinkedCitizen)
   useEffect(() => {
     let ignore = false
     fetchSecurityAlert().then((result) => {
@@ -79,7 +136,15 @@ export default function CitizenDashboardPage() {
                 onResolved={reloadSecurityAlert}
               />
             )}
-            <WalletHeroCard />
+            <WalletHeroCard
+              status={accountStatus}
+              isUnlinkedCitizen={isUnlinkedCitizen}
+              isStatusLoading={isAccountLoading}
+              isStatusError={accountError}
+              photoUrl={getPreferredPhotoUrl(credentials)}
+              isCredentialsLoading={areCredentialsLoading}
+              isCredentialsError={areCredentialsError}
+            />
             <CredentialsList />
             <NotificationsList />
           </section>

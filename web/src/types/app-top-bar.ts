@@ -1,6 +1,7 @@
 export type TopBarUser = {
   name: string
   initials: string
+  photoUrl?: string | null
   subtitle?: string
 }
 

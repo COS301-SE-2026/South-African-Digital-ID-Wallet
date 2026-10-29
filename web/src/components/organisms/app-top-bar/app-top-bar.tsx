@@ -1,3 +1,6 @@
+'use client'
+import { useState } from 'react'
+import Image from 'next/image'
 import { Bell, ChevronDown, Menu } from 'lucide-react'
 import type { AppTopBarProps } from '@/types/app-top-bar'
 
@@ -9,6 +12,10 @@ export const AppTopBar = ({
   notificationCount = 0,
   onMenuClick,
 }: Readonly<AppTopBarProps>) => {
+  const [failedPhotoUrl, setFailedPhotoUrl] = useState<string | null>(null)
+  const photoUrl =
+    user.photoUrl && failedPhotoUrl !== user.photoUrl ? user.photoUrl : null
+
   return (
     <header className="flex items-center justify-between px-5 py-5">
       <div className="flex items-center gap-3">
@@ -54,8 +61,20 @@ export const AppTopBar = ({
           type="button"
           className="flex items-center gap-3 rounded-full bg-card px-3 py-2 shadow-sm ring-1 ring-border"
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-deep-green text-xs font-extrabold text-clean-white">
-            {user.initials}
+          <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-deep-green text-xs font-extrabold text-clean-white">
+            {photoUrl ? (
+              <Image
+                src={photoUrl}
+                alt=""
+                width={36}
+                height={36}
+                unoptimized
+                className="h-full w-full object-cover"
+                onError={() => setFailedPhotoUrl(photoUrl)}
+              />
+            ) : (
+              user.initials
+            )}
           </div>
 
           <div className="hidden text-left sm:block">

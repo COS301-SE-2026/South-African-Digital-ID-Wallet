@@ -41,7 +41,7 @@ public class ManageUserAccountController : ControllerBase
 
         if (account is null)
         {
-            return Ok(new { message = NoCitizenRecordMessage });
+            return Ok(new { linked = false, message = NoCitizenRecordMessage });
         }
 
         return Ok(account);
@@ -143,7 +143,7 @@ public class ManageUserAccountController : ControllerBase
         try
         {
             var account = await _manageUserAccountService.ConfirmEmailChangeAsync(userId, req.OTP, ipAddress);
-            return account is null ? Ok(new { message = NoCitizenRecordMessage }) : Ok(account);
+            return account is null ? Ok(new { linked = false, message = NoCitizenRecordMessage }) : Ok(account);
         }
         catch (NoPendingEmailChangeException npece)
         {

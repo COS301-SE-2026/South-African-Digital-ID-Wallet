@@ -1,5 +1,6 @@
 export type CitizenStatus =
   | 'Pending'
+  | 'Verified'
   | 'Activated'
   | 'Deactivated'
   | 'Suspended'
@@ -17,4 +18,8 @@ export type ManageUserAccountDto = {
 
 export type MessageResponse = {
   message: string
+}
+
+export type UnlinkedAccountResponse = MessageResponse & {
+  linked: false
 }
