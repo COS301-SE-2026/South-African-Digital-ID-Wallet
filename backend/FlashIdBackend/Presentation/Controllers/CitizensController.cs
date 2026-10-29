@@ -41,17 +41,13 @@ public class CitizensController : ControllerBase
         {
             return Conflict(new { error = ete.Message });
         }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
-        }
     }
 
     /// <summary>
     /// Verifies a citizen's email address using the OTP sent during registration.
     /// </summary>
     /// <param name="request">The email and OTP code to verify.</param>
-    /// <response code="201">The email was verified.</response>
+    /// <response code="200">The email was verified.</response>
     /// <response code="400">The OTP was invalid, expired, already used, or too many attempts were made.</response>
     [HttpPost("verify-email")]
     [EnableRateLimiting("verify-email")]
@@ -78,17 +74,13 @@ public class CitizensController : ControllerBase
         {
             return BadRequest(new { error = eave.Message });
         }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occured." });
-        }
     }
 
     /// <summary>
     /// Resends the email verification OTP to a citizen who has not yet verified their emails. Rate-limited to prevent abuse.
     /// </summary>
     /// <param name="request">The email address to resend the OTP to.</param>
-    /// <response code="201">A new OTP was sent.</response>
+    /// <response code="200">A new OTP was sent.</response>
     /// <response code="400">The email is already verified or the request was invalid.</response>
     [HttpPost("resend-otp")]
     [EnableRateLimiting("resend-otp")]
@@ -97,7 +89,7 @@ public class CitizensController : ControllerBase
         try
         {
             await _citizenService.ResendOtpAsync(request);
-            return Ok(new { message = "Verificaiton code has been resent." });
+            return Ok(new { message = "Verification code has been resent." });
         }
         catch (EmailAlreadyVerifiedException eave)
         {
@@ -106,10 +98,6 @@ public class CitizensController : ControllerBase
         catch (InvalidCitizenRegistrationRequestException icrre)
         {
             return BadRequest(new { error = icrre.Message });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occured." });
         }
     }
 }

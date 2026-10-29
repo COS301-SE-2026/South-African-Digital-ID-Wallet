@@ -1,4 +1,5 @@
 using Application.Common.Interfaces.RepositoryInterfaces;
+using Application.Common.Mapping;
 using Application.Features.Officials.DTOs;
 using Domain.Entities;
 using Domain.Enums;
@@ -18,19 +19,36 @@ public class OfficialActivityRepository : IOfficialActivityRepository
 
     public async Task<List<MyActivityItemDto>> GetRecentByActorAsync(Guid userId, int limit)
     {
-        return await _context.AuditLogs
-            .AsNoTracking()
-            .Where(a => a.ActorId == userId && !AuditEventTypeExtensions.ViewEvents.Contains(a.EventType))
-            .OrderByDescending(a => a.CreatedAt)
-            .Take(limit)
-            .Select(a => new MyActivityItemDto
+        // EF Core can translate array.Contains into SQL IN, but not FrozenSet.Contains
+        var workEvents = AuditEventTypeExtensions.OfficialWorkEvents.ToArray();
+        var rows = await (
+            from log in _context.AuditLogs.AsNoTracking()
+            join credential in _context.Credentials.AsNoTracking() on log.CredentialId equals credential.Id into credentialJoin
+            from credential in credentialJoin.DefaultIfEmpty()
+                // Only citizen-facing work: logins and device checks are not "activity" an official needs to see
+                // Consent is skipped here: it always comes with an onboarding, so the card would show every onboarding twice
+            where log.ActorId == userId
+                  && workEvents.Contains(log.EventType)
+                  && log.EventType != AuditEventType.ConsentRecorded
+            orderby log.CreatedAt descending
+            select new
             {
-                Id = a.Id,
-                EventType = a.EventType.ToString(),
-                Details = a.Details,
-                CreatedAt = DateTime.SpecifyKind(a.CreatedAt, DateTimeKind.Utc),
+                log.Id,
+                log.EventType,
+                log.Details,
+                log.CreatedAt,
+                CredentialType = credential == null ? null : credential.DriversLicense != null ? "Driver's Licence" : "Identity Document",
             })
+            .Take(limit)
             .ToListAsync();
+
+        return rows.Select(r => new MyActivityItemDto
+        {
+            Id = r.Id,
+            EventType = r.EventType.ToString(),
+            Summary = OfficialAuditSummaryFormatter.Format(r.EventType, r.Details, r.CredentialType),
+            CreatedAt = DateTime.SpecifyKind(r.CreatedAt, DateTimeKind.Utc),
+        }).ToList();
     }
 
     public async Task<int> CountVerificationsTodayByInstitutionAsync(
@@ -51,7 +69,6 @@ public class OfficialActivityRepository : IOfficialActivityRepository
         ).CountAsync();
     }
 
-
     public async Task<(List<OfficialHistoryItemDto> Items, int TotalCount)> GetInstitutionHistoryAsync(
         Guid institutionId,
         string? search,
@@ -60,7 +77,8 @@ public class OfficialActivityRepository : IOfficialActivityRepository
         DateTime? dateTo,
         string? type,
         int page,
-        int pageSize
+        int pageSize,
+        string? category = null
     )
     {
         var trimmedSearch = string.IsNullOrWhiteSpace(search) ? null : search.Trim();
@@ -68,16 +86,33 @@ public class OfficialActivityRepository : IOfficialActivityRepository
         var searchMatchesSuccess = trimmedSearch != null && "success".Contains(trimmedSearch, StringComparison.OrdinalIgnoreCase);
         var searchMatchesAccess = trimmedSearch != null && "access".Contains(trimmedSearch, StringComparison.OrdinalIgnoreCase);
         var failedEvents = AuditEventTypeExtensions.FailedEvents;
+        // EF Core can translate array.Contains into SQL IN, but not FrozenSet.Contains, so copy the sets into arrays
+        var hiddenCitizenEvents = AuditEventTypeExtensions.SelectiveDisclosureEvents.ToArray();
+        var workEvents = AuditEventTypeExtensions.OfficialWorkEvents.ToArray();
 
         var query =
             from log in _context.AuditLogs.AsNoTracking()
             join official in _context.Officials.AsNoTracking() on log.ActorId equals official.UserId
             join citizen in _context.Citizens.AsNoTracking() on log.CitizenId equals citizen.Id into citizenJoin
             from citizen in citizenJoin.DefaultIfEmpty()
+            join credential in _context.Credentials.AsNoTracking() on log.CredentialId equals credential.Id into credentialJoin
+            from credential in credentialJoin.DefaultIfEmpty()
             where official.InstitutionId == institutionId
-            select new { log, official, citizen };
+            select new { log, official, citizen, credential };
 
         query = query.Where(x => x.log.EventType != AuditEventType.AuditLogViewed);
+
+        // "work" = citizen-facing actions, "security" = the officials' own account events, anything else = everything
+        if (string.Equals(category, "work", StringComparison.OrdinalIgnoreCase))
+        {
+            query = query.Where(x => workEvents.Contains(x.log.EventType));
+        }
+        else if (string.Equals(category, "security", StringComparison.OrdinalIgnoreCase))
+        {
+            query = query.Where(x =>
+                !workEvents.Contains(x.log.EventType) &&
+                !AuditEventTypeExtensions.ViewEvents.Contains(x.log.EventType));
+        }
 
         if (action.HasValue)
             query = query.Where(x => x.log.EventType == action.Value);
@@ -107,7 +142,8 @@ public class OfficialActivityRepository : IOfficialActivityRepository
         {
             query = query.Where(x =>
                 EF.Functions.Like(x.log.Details, $"%{trimmedSearch}%") ||
-                (x.citizen != null && (
+                // Citizen search skips verification rows, otherwise searching a name would reveal who was verified
+                (x.citizen != null && !hiddenCitizenEvents.Contains(x.log.EventType) && (
                     EF.Functions.Like(x.citizen.Names, $"%{trimmedSearch}%") ||
                     EF.Functions.Like(x.citizen.Surname, $"%{trimmedSearch}%") ||
                     EF.Functions.Like(x.citizen.SaId, $"%{trimmedSearch}%"))) ||
@@ -133,9 +169,11 @@ public class OfficialActivityRepository : IOfficialActivityRepository
                 x.log.EventType,
                 x.log.Details,
                 x.log.IpAddress,
-                CitizenNames = x.citizen != null ? x.citizen.Names : null,
-                CitizenSurname = x.citizen != null ? x.citizen.Surname : null,
-                CitizenSaId = x.citizen != null ? x.citizen.SaId : null,
+                // Verification rows never carry the citizen's identity out of the database
+                CitizenNames = x.citizen != null && !hiddenCitizenEvents.Contains(x.log.EventType) ? x.citizen.Names : null,
+                CitizenSurname = x.citizen != null && !hiddenCitizenEvents.Contains(x.log.EventType) ? x.citizen.Surname : null,
+                CitizenSaId = x.citizen != null && !hiddenCitizenEvents.Contains(x.log.EventType) ? x.citizen.SaId : null,
+                CredentialType = x.credential == null ? null : x.credential.DriversLicense != null ? "Driver's Licence" : "Identity Document",
                 OfficialNames = x.official.Names,
                 OfficialSurname = x.official.Surname,
             })
@@ -146,7 +184,7 @@ public class OfficialActivityRepository : IOfficialActivityRepository
             Id = r.Id,
             CreatedAt = r.CreatedAt,
             Action = r.EventType.ToString(),
-            Details = r.Details,
+            Summary = OfficialAuditSummaryFormatter.Format(r.EventType, r.Details, r.CredentialType),
             CitizenName = r.CitizenNames != null ? $"{r.CitizenNames} {r.CitizenSurname}" : null,
             CitizenSaId = r.CitizenSaId,
             PerformedBy = $"{r.OfficialNames} {r.OfficialSurname}",

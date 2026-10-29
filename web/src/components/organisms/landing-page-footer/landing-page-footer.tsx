@@ -1,3 +1,6 @@
+import Image from 'next/image'
+import FlashIdLogo from '@/assets/images/FlashIDLogo.png'
+import { USER_MANUAL_URL } from '@/lib/landing-links'
 import { Mail, MapPin } from 'lucide-react'
 import Link from 'next/link'
 
@@ -11,13 +14,19 @@ export function LandingPageFooter() {
         <div className="flex-1 bg-national-red" />
         <div className="flex-1 bg-national-blue" />
       </div>
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-12 sm:px-8 md:grid-cols-[1.2fr_0.8fr_0.8fr] lg:px-10">
+      <div className="mx-auto grid w-full max-w-7xl gap-10 px-6 py-12 sm:px-8 md:grid-cols-[1.2fr_0.8fr_0.8fr] lg:px-10">
         <div>
           <Link
             href="/"
             className="inline-flex rounded-lg text-2xl font-bold tracking-tight text-clean-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
           >
-            Flash<span className="text-accent-gold">ID</span>
+            <Image
+              src={FlashIdLogo}
+              alt="FlashID home"
+              width={200}
+              height={50}
+              className="h-14 w-auto object-contain"
+            />
           </Link>
           <p className="mt-4 max-w-sm text-sm leading-6 text-clean-white/65">
             A secure digital identity wallet for simpler, trusted verification
@@ -91,14 +100,13 @@ export function LandingPageFooter() {
             >
               Create an account
             </Link>
-            <Link
-              href="https://github.com/COS301-SE-2026/South-African-Digital-ID-Wallet/blob/main/docs/demo4/User%20Help%20Manual.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
+            <a
+              href={USER_MANUAL_URL}
+              download="FlashID-User-Manual.pdf"
               className="block transition hover:text-clean-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
             >
-              User manual
-            </Link>
+              Download user manual
+            </a>
             <Link
               href="/brand-style-guide"
               className="block transition hover:text-clean-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
@@ -109,7 +117,7 @@ export function LandingPageFooter() {
         </div>
       </div>
       <div className="border-t border-clean-white/10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-6 py-4 text-xs text-clean-white/50 sm:px-8 md:flex-row md:items-center md:justify-between lg:px-10">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-6 py-4 text-xs text-clean-white/50 sm:px-8 md:flex-row md:items-center md:justify-between lg:px-10">
           <p>© {new Date().getFullYear()} FlashID. All rights reserved.</p>
           <p>Secure identity, made clearer.</p>
         </div>

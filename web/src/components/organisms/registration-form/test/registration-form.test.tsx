@@ -48,6 +48,9 @@ beforeEach(() => {
 
 const VALID_EMAIL = 'user@gmail.com'
 const VALID_PASSWORD = 'Password1!'
+const ACTIVATION_RETURN_TO =
+  '/citizen/verify-identity?token=activation-token&source=email'
+const mockPush = jest.fn()
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -69,7 +72,7 @@ function getPasswordInput() {
 }
 
 function getConfirmPasswordInput() {
-  return screen.getByLabelText(/verify password/i)
+  return screen.getByLabelText('Verify password:')
 }
 
 function getSubmitButton() {
@@ -132,6 +135,18 @@ describe('RegistrationForm — unit tests', () => {
       render(<RegistrationForm />, { wrapper: createWrapper() })
       const loginLink = screen.getByRole('link', { name: /log in/i })
       expect(loginLink).toHaveAttribute('href', '/login')
+    })
+
+    it('preserves the activation destination in the login link', () => {
+      ;(useSearchParams as jest.Mock).mockReturnValue(
+        new URLSearchParams({ returnTo: ACTIVATION_RETURN_TO })
+      )
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+
+      expect(screen.getByRole('link', { name: /log in/i })).toHaveAttribute(
+        'href',
+        `/login?returnTo=${encodeURIComponent(ACTIVATION_RETURN_TO)}`
+      )
     })
   })
 
@@ -250,16 +265,12 @@ describe('RegistrationForm — unit tests', () => {
       render(<RegistrationForm />, { wrapper: createWrapper() })
       await user.click(getSubmitButton())
       expect(
-        screen.getByText(
-          'Must conatain at least 1 special character (!@#$%^&*)'
-        )
+        screen.getByText('Must contain at least 1 special character (!@#$%^&*)')
       ).not.toHaveClass('line-through')
       await user.type(getPasswordInput(), '@')
       await user.click(getSubmitButton())
       expect(
-        screen.getByText(
-          'Must conatain at least 1 special character (!@#$%^&*)'
-        )
+        screen.getByText('Must contain at least 1 special character (!@#$%^&*)')
       ).toHaveClass('line-through')
     })
   })
@@ -335,7 +346,7 @@ describe('RegistrationForm — unit tests', () => {
       ).not.toBeInTheDocument()
       expect(
         screen.queryByText(
-          'Must conatain at least 1 special character (!@#$%^&*)'
+          'Must contain at least 1 special character (!@#$%^&*)'
         )
       ).not.toBeInTheDocument()
     })
@@ -368,7 +379,7 @@ describe('RegistrationForm — unit tests', () => {
       ).toBeInTheDocument()
       expect(
         screen.queryByText(
-          'Must conatain at least 1 special character (!@#$%^&*)'
+          'Must contain at least 1 special character (!@#$%^&*)'
         )
       ).toBeInTheDocument()
       expect(
@@ -501,9 +512,7 @@ describe('RegistrationForm — unit tests', () => {
         screen.getByText('Must contain at least 1 lowercase letter (a-z)')
       ).toBeInTheDocument()
       expect(
-        screen.getByText(
-          'Must conatain at least 1 special character (!@#$%^&*)'
-        )
+        screen.getByText('Must contain at least 1 special character (!@#$%^&*)')
       ).toBeInTheDocument()
       expect(
         screen.getByText('Must match the password above')
@@ -575,7 +584,6 @@ describe('RegistrationForm — unit tests', () => {
     })
 
     it('navigates to /verify-email with the encoded email in the query string', async () => {
-      const mockPush = jest.fn()
       jest
         .mocked(useRouter)
         .mockReturnValue({ push: mockPush } as unknown as ReturnType<
@@ -588,6 +596,27 @@ describe('RegistrationForm — unit tests', () => {
       await waitFor(() => {
         expect(mockPush).toHaveBeenCalledWith(
           `/verify-email?email=${encodeURIComponent(VALID_EMAIL)}`
+        )
+      })
+    })
+
+    it('preserves the activation destination through email verification after registration', async () => {
+      ;(useSearchParams as jest.Mock).mockReturnValue(
+        new URLSearchParams({ returnTo: ACTIVATION_RETURN_TO })
+      )
+      jest
+        .mocked(useRouter)
+        .mockReturnValue({ push: mockPush } as unknown as ReturnType<
+          typeof useRouter
+        >)
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await fillValidForm(user)
+      await user.click(getSubmitButton())
+
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith(
+          `/verify-email?email=${encodeURIComponent(VALID_EMAIL)}&returnTo=${encodeURIComponent(ACTIVATION_RETURN_TO)}`
         )
       })
     })
@@ -640,6 +669,27 @@ describe('RegistrationForm — unit tests', () => {
           'Registration failed. Please try again.'
         )
       })
+    })
+  })
+
+  describe('password visibility toggles', () => {
+    it('reveals and re-hides the password field', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(screen.getByRole('button', { name: 'Show password' }))
+      expect(getPasswordInput()).toHaveAttribute('type', 'text')
+      await user.click(screen.getByRole('button', { name: 'Hide password' }))
+      expect(getPasswordInput()).toHaveAttribute('type', 'password')
+    })
+
+    it('toggles each field on its own', async () => {
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await user.click(
+        screen.getByRole('button', { name: 'Show verify password' })
+      )
+      expect(getConfirmPasswordInput()).toHaveAttribute('type', 'text')
+      expect(getPasswordInput()).toHaveAttribute('type', 'password')
     })
   })
 })

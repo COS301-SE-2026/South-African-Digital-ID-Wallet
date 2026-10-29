@@ -16,8 +16,15 @@ const mockCreateElement = (impl: (tagName: string) => HTMLElement) => {
 }
 describe('LivenessCameraDialog', () => {
   const originalWhenDefined = customElements.whenDefined
+  // jsdom has no camera API, so fake one that grants permission
+  const getUserMedia = jest.fn()
   beforeEach(() => {
     customElements.whenDefined = jest.fn().mockResolvedValue(undefined)
+    getUserMedia.mockResolvedValue({ getTracks: () => [{ stop: jest.fn() }] })
+    Object.defineProperty(navigator, 'mediaDevices', {
+      configurable: true,
+      value: { getUserMedia },
+    })
   })
   afterEach(() => {
     customElements.whenDefined = originalWhenDefined
@@ -104,5 +111,61 @@ describe('LivenessCameraDialog', () => {
       screen.getByRole('button', { name: /close verification/i })
     )
     expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('shows the camera blocked message when permission is denied', async () => {
+    getUserMedia.mockRejectedValueOnce(
+      new DOMException('denied', 'NotAllowedError')
+    )
+    const onError = jest.fn()
+    render(
+      <LivenessCameraDialog
+        open
+        authToken="token-123"
+        onOpenChange={jest.fn()}
+        onComplete={jest.fn()}
+        onError={onError}
+      />
+    )
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      /camera access was blocked/i
+    )
+    expect(onError).toHaveBeenCalledWith(
+      expect.stringContaining('Camera access was blocked')
+    )
+  })
+
+  it('starts the detector only once when the parent re-renders', async () => {
+    // Never resolves, like a scan that is still in progress
+    const start = jest.fn(() => new Promise(() => {}))
+    const realCreateElement = document.createElement.bind(document)
+    mockCreateElement((tagName) => {
+      if (tagName === 'azure-ai-vision-face-ui') {
+        return Object.assign(realCreateElement('div'), { start })
+      }
+      return realCreateElement(tagName)
+    })
+    const { rerender } = render(
+      <LivenessCameraDialog
+        open
+        authToken="token-123"
+        onOpenChange={jest.fn()}
+        onComplete={jest.fn()}
+      />
+    )
+    await waitFor(() => expect(start).toHaveBeenCalledTimes(1))
+    // A new callback identity used to tear down and restart the SDK
+    rerender(
+      <LivenessCameraDialog
+        open
+        authToken="token-123"
+        onOpenChange={jest.fn()}
+        onComplete={jest.fn()}
+      />
+    )
+    await act(async () => {
+      await flushPromises()
+    })
+    expect(start).toHaveBeenCalledTimes(1)
   })
 })

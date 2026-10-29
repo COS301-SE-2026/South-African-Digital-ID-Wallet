@@ -27,6 +27,10 @@ public class AuthServiceTests
         public Task UpdateUserAsync(User user) => Task.CompletedTask;
         public Task AddAuditLogAsync(AuditLog auditLog) => Task.CompletedTask;
         public Task SaveChangesAsync() => Task.CompletedTask;
+        public Official? OfficialToReturn { get; set; }
+        public GovernmentAdministrator? AdminToReturn { get; set; }
+        public Task<Official?> GetOfficialByUserIdAsync(Guid userId) => Task.FromResult(OfficialToReturn);
+        public Task<GovernmentAdministrator?> GetGovernmentAdministratorByUserIdAsync(Guid userId) => Task.FromResult(AdminToReturn);
     }
 
     private class FakePasswordHashingProvider : IPasswordHashingProvider
@@ -280,6 +284,47 @@ public class AuthServiceTests
         Assert.Equal(citizen.Names, result.Names);
         Assert.Equal(citizen.Surname, result.Surname);
         Assert.Equal(citizen.SaId, result.SaId);
+    }
+
+    [Fact]
+    public async Task GetCurrentUserAsync_ReturnsOfficialNames_WhenUserIsOfficial()
+    {
+        var user = ValidUser();
+        user.Role = UserRole.Official;
+        var fakeRepository = new FakeAuthRepository
+        {
+            UserToReturn = user,
+            CitizenToReturn = null,
+            OfficialToReturn = new Official { UserId = user.Id, Names = "Thandi", Surname = "Mokoena" },
+        };
+
+        var authService = CreateAuthService(fakeRepository, new FakeJwtTokenProvider(), new FakeTrustedDeviceRepository());
+
+        var result = await authService.GetCurrentUserAsync(user.Id);
+
+        Assert.NotNull(result);
+        Assert.Equal("Thandi", result!.Names);
+        Assert.Equal("Mokoena", result.Surname);
+    }
+
+    [Fact]
+    public async Task GetCurrentUserAsync_ReturnsAdminNames_WhenUserIsGovernmentAdministrator()
+    {
+        var user = ValidUser();
+        var fakeRepository = new FakeAuthRepository
+        {
+            UserToReturn = user,
+            CitizenToReturn = null,
+            AdminToReturn = new GovernmentAdministrator { UserId = user.Id, Names = "Sipho", Surname = "Dlamini" },
+        };
+
+        var authService = CreateAuthService(fakeRepository, new FakeJwtTokenProvider(), new FakeTrustedDeviceRepository());
+
+        var result = await authService.GetCurrentUserAsync(user.Id);
+
+        Assert.NotNull(result);
+        Assert.Equal("Sipho", result!.Names);
+        Assert.Equal("Dlamini", result.Surname);
     }
 
     [Fact]

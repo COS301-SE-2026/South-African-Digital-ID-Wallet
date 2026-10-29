@@ -10,9 +10,9 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+You can start editing the page by modifying `src/app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Inter](https://fonts.google.com/specimen/Inter).
 
 # Learn More
 
@@ -23,11 +23,9 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-# Deploy on Vercel
+# Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The web app is built as a Docker image (`dockerfile.web`, Next.js `standalone` output) and deployed to Azure App Service (`web-flashid-dev` from `dev`, `web-flashid-prod` from `main`) by GitHub Actions. See [SAS 5 Deployment](../docs/demo4/SAS-v4.md#5-deployment).
 
 # FlashID Web Portal
 
@@ -56,11 +54,14 @@ The web portal is designed to support multiple role-based experiences, including
 ```txt
 src/
 ├── app/
-│   ├── citizens/
-│   ├── officials/
-│   ├── government-admin/
+│   ├── (auth)/              login, register, verify-email, forgot-password
+│   ├── (portal)/            citizen/, officials/, gov-admin/, under-construction/
+│   ├── api/                 [...path] proxy to the backend, health
+│   ├── brand-style-guide/
+│   ├── verify-certified-copy/
 │   ├── layout.tsx
 │   ├── page.tsx
+│   ├── providers.tsx
 │   └── globals.css
 │
 ├── assets/
@@ -73,11 +74,16 @@ src/
 │   ├── organisms/
 │   ├── templates/
 │   ├── pages/
+│   ├── utility/
 │   └── ui/
 │
-├── config/
+├── config/                  navigation/, page-headers/, roles/
+├── context/                 user-context.tsx
+├── lib/                     api.ts, utils.ts, error helpers
+├── schemas/
+├── services/                one folder per backend feature (see INTEGRATION.md)
 ├── types/
-└── lib/
+└── proxy.ts                 role-based route guard and silent session refresh
 ```
 
 ---
@@ -90,28 +96,30 @@ Contains Next.js App Router routes, layouts, and pages.
 
 This is where URL routes are created.
 
+Route groups in brackets, such as `(portal)`, organise files without adding a URL segment.
+
 Example:
 
 ```txt
-src/app/citizens/page.tsx
+src/app/(portal)/citizen/my-credentials/page.tsx
 ```
 
 creates:
 
 ```txt
-/citizens
+/citizen/my-credentials
 ```
 
 Example:
 
 ```txt
-src/app/government-admin/dashboard/page.tsx
+src/app/(portal)/gov-admin/gov-admin-dashboard/page.tsx
 ```
 
 creates:
 
 ```txt
-/government-admin/dashboard
+/gov-admin/gov-admin-dashboard
 ```
 
 The `app/` folder should stay focused on routing and page composition. Avoid putting large reusable components directly inside route files.
@@ -125,14 +133,14 @@ Stores static project assets such as logos, images, and illustrations.
 Example:
 
 ```txt
-src/assets/images/FlashID-white.png
+src/assets/images/FlashID-green.png
 ```
 
 Images should be imported through Next.js where possible:
 
 ```tsx
 import Image from 'next/image'
-import FlashIdLogo from '@/assets/images/FlashID-white.png'
+import FlashIdLogo from '@/assets/images/FlashID-green.png'
 ```
 
 ---
@@ -251,9 +259,9 @@ Stores static configuration.
 Examples:
 
 ```txt
-navigation.ts
-portal.ts
-routes.ts
+navigation/navigation.ts
+page-headers/page-headers.ts
+roles/route-permissions.ts
 ```
 
 Use config for values that control how the app behaves but are not UI components.
@@ -298,13 +306,14 @@ export type SidebarNavItem = {
 
 Stores shared helper functions.
 
-Example:
+Examples:
 
 ```txt
+api.ts
 utils.ts
 ```
 
-This currently includes the `cn()` helper used by shadcn/ui.
+`api.ts` is the shared axios instance (CSRF header and silent token refresh). `utils.ts` includes the `cn()` helper used by shadcn/ui.
 
 ---
 
@@ -313,32 +322,35 @@ This currently includes the `cn()` helper used by shadcn/ui.
 Use route folders for each major portal.
 
 ```txt
-src/app/
-├── citizens/
+src/app/(portal)/
+├── citizen/
 │   ├── page.tsx
-│   ├── credentials/
-│   │   └── page.tsx
-│   ├── share-qr/
-│   │   └── page.tsx
-│   └── notifications/
-│       └── page.tsx
+│   ├── citizen-dashboard/
+│   ├── my-credentials/
+│   ├── activate-credentials/
+│   ├── verify-identity/
+│   ├── qr/
+│   ├── verifications/
+│   └── manage-user-account/
 │
 ├── officials/
 │   ├── page.tsx
-│   ├── verify/
-│   │   └── page.tsx
-│   └── history/
-│       └── page.tsx
+│   ├── officials-dashboard/
+│   ├── onboard-citizen/
+│   ├── issue-drivers-license/
+│   ├── verify-document/
+│   └── verifications/
 │
-└── government-admin/
+└── gov-admin/
     ├── page.tsx
-    ├── citizens/
-    │   └── page.tsx
-    ├── issue-credential/
-    │   └── page.tsx
-    └── audit-logs/
-        └── page.tsx
+    ├── gov-admin-dashboard/
+    ├── upload-institution/
+    ├── view-institutions/
+    ├── manage-credentials/
+    └── audit-log/
 ```
+
+`src/proxy.ts` sends each signed-in user to their role's portal (`/citizen`, `/officials` or `/gov-admin`).
 
 ---
 
@@ -349,7 +361,7 @@ To create a new page, add a folder with a `page.tsx` file inside `src/app`.
 Example:
 
 ```txt
-src/app/citizens/credentials/page.tsx
+src/app/(portal)/citizen/my-credentials/page.tsx
 ```
 
 Basic page structure:
@@ -563,7 +575,7 @@ Do not hardcode portal navigation directly inside the sidebar component.
 Navigation config should live in:
 
 ```txt
-src/config/navigation.ts
+src/config/navigation/navigation.ts
 ```
 
 The sidebar should receive navigation data as props.
@@ -625,9 +637,9 @@ export function AppTopBar() {}
 Use lowercase kebab-case for route folders:
 
 ```txt
-government-admin
-share-qr
-audit-logs
+gov-admin
+my-credentials
+audit-log
 ```
 
 ---
@@ -651,7 +663,7 @@ Do not mix icon libraries unless the team agrees to update the design system.
 Before opening a PR:
 
 ```bash
-pnpm --filter web build
+pnpm build:web
 ```
 
 Also check:
@@ -672,26 +684,24 @@ PRs should include:
 
 # Current Frontend Direction
 
-The current frontend foundation includes:
+The current frontend includes:
 
 - shadcn/ui setup
 - FlashID design tokens
 - Inter typography
-- reusable sidebar
-- reusable top bar
-- route-ready portal structure
-- mock user/session placeholders
+- reusable sidebar and top bar
+- role-based portals guarded by `src/proxy.ts`
+- cookie-based authentication with CSRF protection and silent refresh (15-minute access token, refresh token in an HttpOnly cookie)
 - dark mode token support
-
-Future work will connect the layout to authentication, session management, and role-based portal selection.
 
 ## E2E tests (Playwright)
 
-**Prerequisties:** Node 20 (`nvm use 20`), .NET 10 SDK and SQL Server reachable at `localhost:1433`.
+**Prerequisites:** Node 20 (`nvm use 20`), .NET 10 SDK and SQL Server reachable at `localhost:1433`.
 
 ### Getting SQL Server running
 
-- **Windows** - use your local SQL Server instance. Make sure that IP is enabled on port 1433. Docker Desktop also work if you want to use it. -**macOS / Linux** - SQL Server has no native build; use the provided container:
+- **Windows** - use your local SQL Server instance. Make sure that IP is enabled on port 1433. Docker Desktop also works if you want to use it.
+- **macOS / Linux** - SQL Server has no native build; use the provided container:
 
 ```bash
   docker compose -f ../backend/FlashIdBackend/docker-compose.yml up -d
@@ -699,8 +709,9 @@ Future work will connect the layout to authentication, session management, and r
 
 ### Running the tests
 
+Start the backend from the repo root with `pnpm start:backend`, then from `web/`:
+
 ```bash
-pnpm --filter ./backend start
 cp e2e/.env.e2e.example e2e/.env.e2e
 pnpm exec playwright install --with-deps chromium firefox
 pnpm test:e2e

@@ -47,4 +47,16 @@ public class AuthRepository : IAuthRepository
     {
         await _context.SaveChangesAsync();
     }
+
+    public async Task<Official?> GetOfficialByUserIdAsync(Guid userId)
+    {
+        return await _context.Officials
+            .FirstOrDefaultAsync(o => o.UserId == userId);
+    }
+
+    public async Task<GovernmentAdministrator?> GetGovernmentAdministratorByUserIdAsync(Guid userId)
+    {
+        return await _context.GovernmentAdministrators
+            .FirstOrDefaultAsync(g => g.UserId == userId);
+    }
 }

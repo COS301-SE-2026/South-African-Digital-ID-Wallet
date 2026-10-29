@@ -135,7 +135,7 @@ t3chtitansgo@gmail.com
 
 🔗 [SAS](docs/project-day/SAS-v4.md) <br> 
 🔗 [SRS](docs/project-day/SRS-v4.md) <br> 
-🔗 [User Manual](docs/project-day/User%20Help%20Manual.pdf) <br> 
+🔗 [User Manual](docs/project-day/User_Help_Manual.pdf) <br> 
 🔗 [Brand style guide](docs/project-day/FlashID.pdf) <br> 
 🔗 [Testing Policy Document](docs/project-day/TESTING_POLICY.md) <br> 
 🔗 [Coding Standards](docs/project-day/coding_standards.md) <br> 
@@ -252,9 +252,11 @@ t3chtitansgo@gmail.com
 
 Our repository follows a modular monorepo structure where different components are organised into dedicated directories.
 
-- **frontend/** → Next.js web portals for administrators and verifiers.
-- **mobile/** → React Native citizen wallet application.
-- **backend/** → ASP.NET Core APIs and business logic.
+- **web/** → Next.js web portals for citizens, officials and government administrators.
+- **mobile/** → Expo React Native app for citizens and officials.
+- **backend/** → ASP.NET Core FlashID API and business logic.
+- **government-registry/** → Mock government registry API used as the source of identity data.
+- **infra/** → Azure Bicep templates for the dev and prod environments.
 - **docs/** → Project documentation, reports, and assets.
 
 | Branch | Purpose |

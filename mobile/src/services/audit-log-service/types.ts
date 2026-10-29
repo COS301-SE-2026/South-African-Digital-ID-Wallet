@@ -9,11 +9,11 @@ export type AuditLogItemResponse = {
   citizenName: string | null
   citizenSaId: string | null
   createdAt: string
-  details: string
   id: string
   ipAddress: string | null
   outcome: string
   performedBy: string
+  summary: string
 }
 
 export type AuditLogResponse = {

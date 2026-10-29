@@ -216,6 +216,8 @@ public class IssueCredentialService : IIssueCredentialService
             ActorId = officialId,
             IpAddress = ipAddress,
             CreatedAt = now,
+            // Links the row to its credential so the feed can say "Driver's Licence issued"
+            CredentialId = credential.Id,
         }, cancellationToken);
 
         await _repo.AddNotificationAsync(new Notification

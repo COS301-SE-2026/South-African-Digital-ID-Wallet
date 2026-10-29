@@ -91,6 +91,150 @@ public class CredentialServiceTests
         Assert.Equal("South African", result[0].IdentityDocument!.Nationality);
     }
 
+    [Fact]
+    public async Task GetMyCredentialsAsync_CredentialWithPhoto_ReturnsCitizenPhotoUrl()
+    {
+        using var context = CreateContext();
+        var userId = Guid.NewGuid();
+        var citizen = new Citizen
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Names = "Logan",
+            Surname = "Dlamini",
+        };
+        var credential = new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Status = CredentialStatus.Active,
+            Signature = "sig",
+            IssuedBy = "Department of Home Affairs",
+            IssueDate = DateTime.UtcNow,
+            IdentityDocument = new IdentityDocument
+            {
+                Id = Guid.NewGuid(),
+                Nationality = "South African",
+                Citizenship = "South African",
+                CountryOfBirth = "South Africa",
+                Status = IdentityDocumentStatus.Citizen,
+                PhotoPath = "citizen-photo.png",
+            },
+        };
+        context.Citizens.Add(citizen);
+        context.Credentials.Add(credential);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var photoStorage = new Mock<IPhotoStorageProvider>();
+        photoStorage
+            .Setup(provider => provider.GenerateReadSasUrlAsync("citizen-photo.png", It.IsAny<TimeSpan>()))
+            .ReturnsAsync("https://fake-blob-sas.local/citizen-photo.png");
+        var service = CreateService(context, photoStorage.Object);
+
+        var result = (await service.GetMyCredentialsAsync(userId)).ToList();
+
+        var dto = Assert.Single(result);
+        Assert.Equal("https://fake-blob-sas.local/citizen-photo.png", dto.PhotoUrl);
+        photoStorage.Verify(
+            provider => provider.GenerateReadSasUrlAsync("citizen-photo.png", It.IsAny<TimeSpan>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task GetMyCredentialsAsync_OnlyReturnsPhotosForAuthenticatedCitizen()
+    {
+        using var context = CreateContext();
+        var authenticatedUserId = Guid.NewGuid();
+        var authenticatedCitizen = new Citizen
+        {
+            Id = Guid.NewGuid(),
+            UserId = authenticatedUserId,
+            Names = "Logan",
+            Surname = "Dlamini",
+        };
+        var otherCitizen = new Citizen
+        {
+            Id = Guid.NewGuid(),
+            UserId = Guid.NewGuid(),
+            Names = "Other",
+            Surname = "Citizen",
+        };
+        var ownCredential = CreateCredentialWithPhoto(authenticatedCitizen.Id, "own-photo.png");
+        var otherCredential = CreateCredentialWithPhoto(otherCitizen.Id, "other-photo.png");
+        context.Citizens.AddRange(authenticatedCitizen, otherCitizen);
+        context.Credentials.AddRange(ownCredential, otherCredential);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var photoStorage = new Mock<IPhotoStorageProvider>();
+        photoStorage
+            .Setup(provider => provider.GenerateReadSasUrlAsync("own-photo.png", It.IsAny<TimeSpan>()))
+            .ReturnsAsync("https://fake-blob-sas.local/own-photo.png");
+        var service = CreateService(context, photoStorage.Object);
+
+        var result = (await service.GetMyCredentialsAsync(authenticatedUserId)).ToList();
+
+        var dto = Assert.Single(result);
+        Assert.Equal("https://fake-blob-sas.local/own-photo.png", dto.PhotoUrl);
+        photoStorage.Verify(
+            provider => provider.GenerateReadSasUrlAsync("other-photo.png", It.IsAny<TimeSpan>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task GetMyCredentialsAsync_CredentialWithoutPhoto_ReturnsNullPhotoUrl()
+    {
+        using var context = CreateContext();
+        var userId = Guid.NewGuid();
+        var citizen = new Citizen
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Names = "Logan",
+            Surname = "Dlamini",
+        };
+        var credential = new Credential
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizen.Id,
+            Status = CredentialStatus.Active,
+            Signature = "sig",
+            IssuedBy = "Department of Home Affairs",
+            IssueDate = DateTime.UtcNow,
+        };
+        context.Citizens.Add(citizen);
+        context.Credentials.Add(credential);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var photoStorage = new Mock<IPhotoStorageProvider>();
+        var service = CreateService(context, photoStorage.Object);
+
+        var result = (await service.GetMyCredentialsAsync(userId)).ToList();
+
+        Assert.Null(Assert.Single(result).PhotoUrl);
+        photoStorage.Verify(
+            provider => provider.GenerateReadSasUrlAsync(It.IsAny<string>(), It.IsAny<TimeSpan>()),
+            Times.Never);
+    }
+
+    private static Credential CreateCredentialWithPhoto(Guid citizenId, string photoPath) =>
+        new()
+        {
+            Id = Guid.NewGuid(),
+            CitizenId = citizenId,
+            Status = CredentialStatus.Active,
+            Signature = "sig",
+            IssuedBy = "Department of Home Affairs",
+            IssueDate = DateTime.UtcNow,
+            IdentityDocument = new IdentityDocument
+            {
+                Id = Guid.NewGuid(),
+                Nationality = "South African",
+                Citizenship = "South African",
+                CountryOfBirth = "South Africa",
+                Status = IdentityDocumentStatus.Citizen,
+                PhotoPath = photoPath,
+            },
+        };
+
     private static (Citizen Citizen, Credential Credential) SeedCredential(AppDbContext context, CredentialStatus status = CredentialStatus.Active)
     {
         var citizen = new Citizen
@@ -468,4 +612,3 @@ public class CredentialServiceTests
             ));
     }
 }
-

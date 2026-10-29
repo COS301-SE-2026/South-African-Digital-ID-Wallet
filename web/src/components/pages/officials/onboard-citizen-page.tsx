@@ -49,7 +49,7 @@ export default function OnboardCitizenPage() {
     },
   })
 
-  const { mutate: onboardCitizen } = useMutation({
+  const { mutate: onboardCitizen, isPending: isCreatingAccount } = useMutation({
     mutationFn: (formValues: OnboardCitizenFormValues) =>
       onboardingService.onboardCitizen(formValues),
     onSuccess: (data) => {
@@ -172,6 +172,7 @@ export default function OnboardCitizenPage() {
           setContactConsent={setContactDetailsConsent}
           idConsent={idConsent}
           createPendingAccount={createPendingAccount}
+          isCreatingAccount={isCreatingAccount}
           accountCreated={accountCreated}
           //sendActivationCode={sendActivationCode}
           errors={errors}

@@ -18,7 +18,7 @@ const itemAt = (id: string) => ({
   citizenName: 'Thabo Mokoena',
   citizenSaId: '9202204720082',
   createdAt: '2026-01-01T09:30:00Z',
-  details: 'Signed in',
+  summary: 'Signed in',
   id,
   ipAddress: '196.25.1.1',
   outcome: 'Success',

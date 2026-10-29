@@ -18,6 +18,8 @@ infra/
   main.bicep                  # Orchestrator - calls all modules
   main.dev.bicepparam         # Dev environment values
   main.prod.bicepparam        # Prod environment values
+  main.json                   # Compiled ARM template of main.bicep
+  seed-secrets.sh             # Prompts for app secrets and writes them to Key Vault
   AI_AGENT.md                 # Instructions for AI agents (setup & validation)
   modules/
     appservice.bicep           # App Service (reused for all 3 web apps)
@@ -26,6 +28,7 @@ infra/
     cosmos.bicep               # Cosmos DB account, databases, containers
     faceapi.bicep              # Cognitive Services Face API
     keyvault.bicep             # Key Vault (RBAC-only, no secrets in code)
+    roleassignment.bicep       # RBAC role assignment for an app's managed identity
     sql.bicep                  # SQL Server + databases (serverless Gen5)
     storage.bicep              # Storage account + blob containers
 ```
@@ -43,7 +46,7 @@ infra/
 | Face API | `face-digitalwallet-dev` | `face-digitalwallet-prod` |
 | Key Vault | `kv-flashid-dev` | `kv-flashid-prod` |
 | SQL Server | `sql-flashid` (shared) | `sql-flashid` (shared) |
-| SQL Database(s) | `sqldb-flashid-dev`, `sqldb-gov-registry` | `sqldb-flashid-prod` |
+| SQL Database(s) | `sqldb-flashid-dev`, `sqldb-gov-registry` | `sqldb-flashid-prod`, `sqldb-gov-registry` |
 | Storage Account | `stflashiddev` | `stflashidprod` |
 
 ## Prerequisites

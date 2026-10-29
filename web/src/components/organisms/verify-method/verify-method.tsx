@@ -80,7 +80,7 @@ export const VerifyMethod = ({
               variant="sub-sm"
               className="mt-1 !text-xs text-muted-text"
             >
-              Verify using your SA ID number and facial veriifcation.
+              Verify using your SA ID number and facial verification.
             </Text>
             <button
               type="button"

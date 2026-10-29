@@ -27,13 +27,23 @@ dotnet tool install --global dotnet-ef
 
 ## Connection string
 
-The backend is configured to use this local connection string:
+`appsettings.json` ships with an empty `ConnectionStrings:DefaultConnection`, so set your local value with .NET User Secrets (run from the repo root):
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost\SQLEXPRESS;Database=FlashIdDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True" --project backend/FlashIdBackend/Presentation
+```
+
+The value used on Windows with SQL Server Express is:
 
 ```text
 Server=localhost\SQLEXPRESS;Database=FlashIdDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True
 ```
 
 This points the app to your local SQL Server Express instance and lets SSMS / EF Core use the same database name.
+
+On macOS or Linux, start SQL Server and Azurite with `docker compose -f backend/FlashIdBackend/docker-compose.yml up -d` and use `Server=localhost,1433;Database=FlashIdDb;User Id=sa;Password=<MSSQL_SA_PASSWORD>;TrustServerCertificate=True` instead, replacing `<MSSQL_SA_PASSWORD>` with the `MSSQL_SA_PASSWORD` from `docker-compose.yml`.
+
+The API also reads `Jwt:Key`, `Cosmos:*`, `BlobStorage:*` and the other empty values in `appsettings.json` at startup, so set those as user secrets too. The API applies pending migrations automatically when it starts.
 
 ## Connect to the SQL Server Express instance in SSMS
 

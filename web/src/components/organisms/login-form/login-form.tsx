@@ -7,13 +7,11 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Button } from '@/components/atoms'
 import { useUser } from '@/context/user-context'
 import loginService from '@/services/login-service/login-service'
 import { OtpModal } from '@/components/templates/otp-modal/otp-modal'
 import type { LoginFormProps } from '@/types/login-form'
 import { DeviceType } from '@/types'
-import { de } from 'zod/v4/locales'
 
 const DASHBOARD_ROUTES: Record<string, string> = {
   citizen: '/citizen/citizen-dashboard',
@@ -21,6 +19,11 @@ const DASHBOARD_ROUTES: Record<string, string> = {
   governmentadministrator: '/gov-admin/gov-admin-dashboard',
   govadmin: '/gov-admin',
 }
+
+const ACTIVATION_RETURN_PATHS = new Set([
+  '/citizen/activate-credentials',
+  '/citizen/verify-identity',
+])
 
 const getDashboardRoute = (role: string) => {
   const normalizedRole = role
@@ -32,10 +35,28 @@ const getDashboardRoute = (role: string) => {
 }
 
 export function getSafeReturnTo(returnTo: string | null, fallback: string) {
-  if (!returnTo || !returnTo.startsWith('/') || returnTo.startsWith('//')) {
+  if (
+    !returnTo ||
+    !returnTo.startsWith('/') ||
+    returnTo.startsWith('//') ||
+    returnTo.includes('\\')
+  ) {
     return fallback
   }
-  return returnTo
+
+  try {
+    const destination = new URL(returnTo, 'https://flashid.invalid')
+    if (
+      destination.origin !== 'https://flashid.invalid' ||
+      !ACTIVATION_RETURN_PATHS.has(destination.pathname)
+    ) {
+      return fallback
+    }
+
+    return `${destination.pathname}${destination.search}${destination.hash}`
+  } catch {
+    return fallback
+  }
 }
 
 const getOperatingSystem = () => {

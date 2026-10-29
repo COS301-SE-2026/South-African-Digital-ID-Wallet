@@ -47,43 +47,29 @@ public class CredentialsController : ControllerBase
     [Authorize(Roles = "Citizen")]
     public async Task<IActionResult> GetMyCredentials()
     {
-        try
+        var userIdClaim = User.FindFirst("userId")?.Value;
+        if (userIdClaim == null)
         {
-            var userIdClaim = User.FindFirst("userId")?.Value;
-            if (userIdClaim == null)
-            {
-                return Unauthorized(new { error = "Invalid token." });
-            }
+            return Unauthorized(new { error = "Invalid token." });
+        }
 
-            var userId = Guid.Parse(userIdClaim);
-            var result = await _credentialService.GetMyCredentialsAsync(userId);
-            return Ok(result);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
-        }
+        var userId = Guid.Parse(userIdClaim);
+        var result = await _credentialService.GetMyCredentialsAsync(userId);
+        return Ok(result);
     }
 
     [HttpGet("mine")]
     public async Task<IActionResult> GetMyCredentialSummaries()
     {
-        try
+        var userIdClaim = User.FindFirst("userId")?.Value;
+        if (userIdClaim == null)
         {
-            var userIdClaim = User.FindFirst("userId")?.Value;
-            if (userIdClaim == null)
-            {
-                return Unauthorized(new { error = "Invalid token." });
-            }
+            return Unauthorized(new { error = "Invalid token." });
+        }
 
-            var userId = Guid.Parse(userIdClaim);
-            var result = await _qrService.GetMyCredentialsAsync(userId);
-            return Ok(result);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
-        }
+        var userId = Guid.Parse(userIdClaim);
+        var result = await _qrService.GetMyCredentialsAsync(userId);
+        return Ok(result);
     }
 
     [HttpPost("{credentialId}/qr-token")]
@@ -131,10 +117,6 @@ public class CredentialsController : ControllerBase
         {
             return StatusCode(403, new { error = ex.Message, code = ex.Code, restrictedUntil = ex.RestrictedUntil, alertId = ex.AlertId });
         }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
-        }
     }
 
     [HttpPost("resolve")]
@@ -154,10 +136,6 @@ public class CredentialsController : ControllerBase
         catch (InvalidDisclosureTokenException idte)
         {
             return BadRequest(new { error = idte.Message });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
 
@@ -184,10 +162,6 @@ public class CredentialsController : ControllerBase
         catch (CredentialExpiryJobAlreadyRunningException cejare)
         {
             return Conflict(new { error = cejare.Message });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
 
@@ -272,10 +246,6 @@ public class CredentialsController : ControllerBase
         {
             return BadRequest(new { error = ex.Message });
         }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
-        }
     }
     [HttpPost("{credentialId}/reinstate")]
     [Authorize(Roles = "GovernmentAdministrator")]
@@ -299,25 +269,14 @@ public class CredentialsController : ControllerBase
         {
             return BadRequest(new { error = ex.Message });
         }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
-        }
     }
 
     [HttpGet("search")]
     [Authorize(Roles = "GovernmentAdministrator")]
     public async Task<IActionResult> SearchCitizens([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 15)
     {
-        try
-        {
-            var result = await _credentialService.SearchCitizensAsync(query, page, pageSize);
-            return Ok(result);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
-        }
+        var result = await _credentialService.SearchCitizensAsync(query, page, pageSize);
+        return Ok(result);
     }
 
     [HttpGet("citizen/{citizenId}")]
@@ -332,10 +291,6 @@ public class CredentialsController : ControllerBase
         catch (CitizenNotFoundException ex)
         {
             return NotFound(new { error = ex.Message });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
 
@@ -360,10 +315,6 @@ public class CredentialsController : ControllerBase
         catch (CredentialUpdateJobAlreadyRunningException cuare)
         {
             return Conflict(new { error = cuare.Message });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { error = "An unexpected error occurred." });
         }
     }
 

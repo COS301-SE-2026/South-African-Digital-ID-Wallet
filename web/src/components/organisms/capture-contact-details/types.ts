@@ -11,6 +11,7 @@ export type CaptureContactDetailsProps = {
   setContactConsent: (v: boolean) => void
   idConsent: boolean
   createPendingAccount: () => void
+  isCreatingAccount: boolean
   accountCreated: boolean
   //sendActivationCode: () => void
   errors: Record<string, string>

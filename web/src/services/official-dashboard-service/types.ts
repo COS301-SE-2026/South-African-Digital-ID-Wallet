@@ -1,23 +1,30 @@
+// Must match the backend's AuditEventTypeExtensions.OfficialWorkEvents
 export type OfficialActivityEventType =
   | 'OnboardCitizen'
   | 'OnboardCitizenFailed'
-  | 'DriverLicenseIssued'
-  | 'QrCodeVerified'
+  | 'CredentialIssued'
+  | 'CredentialVerified'
+  | 'CitizenVerificationFailed'
+  | 'OfflineCredentialVerified'
+  | 'OfflineVerificationRejected'
+  | 'EmergencyProfileAccessed'
+  | 'EmergencyProfileAccessFailed'
 export type OfficialActivityItem = {
   id: string
   eventType: OfficialActivityEventType
-  details: string
+  summary: string
   createdAt: string
 }
 export type OfficialActivityResponse = {
   items: OfficialActivityItem[]
 }
 export type AuditLogOutcome = 'Success' | 'Failed'
+export type AuditLogCategory = 'work' | 'security' | 'all'
 export type AuditLogItem = {
   id: string
   createdAt: string
   action: string
-  details: string
+  summary: string
   citizenName: string | null
   citizenSaId: string | null
   performedBy: string
@@ -35,6 +42,7 @@ export type AuditLogFilters = {
   dateFrom?: string
   dateTo?: string
   type?: AuditLogOutcome
+  category?: Exclude<AuditLogCategory, 'all'>
   page?: number
   pageSize?: number
 }

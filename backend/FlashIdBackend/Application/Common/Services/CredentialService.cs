@@ -35,7 +35,14 @@ public class CredentialService : ICredentialService
             return Enumerable.Empty<CredentialResponseDto>();
         }
         var credentials = await _credentialRepository.GetCredentialsByCitizenIdAsync(citizen.Id);
-        return credentials.Select(c => MapToDto(c, citizen));
+        var dtos = credentials.Select(c => MapToDto(c, citizen)).ToList();
+
+        foreach (var (dto, credential) in dtos.Zip(credentials))
+        {
+            dto.PhotoUrl = await GetPhotoUrlAsync(credential);
+        }
+
+        return dtos;
     }
     public async Task<SearchCitizensResponseDto> SearchCitizensAsync(string? query, int page, int pageSize)
     {

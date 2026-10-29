@@ -1,7 +1,12 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ClipboardCheck, ShieldAlert, UserRoundPlus } from 'lucide-react'
+import {
+  ClipboardCheck,
+  Loader2,
+  ShieldAlert,
+  UserRoundPlus,
+} from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
@@ -19,6 +24,7 @@ export const CaptureContactDetails = ({
   setContactConsent,
   idConsent,
   createPendingAccount,
+  isCreatingAccount,
   accountCreated,
   //sendActivationCode,
   errors,
@@ -129,14 +135,24 @@ export const CaptureContactDetails = ({
         <Button
           className="w-full bg-deep-green text-clean-white hover:bg-deep-green/70"
           onClick={createPendingAccount}
+          aria-busy={isCreatingAccount}
           disabled={
+            isCreatingAccount ||
             !record ||
             !idConsent ||
             !contactDetailsConsent ||
             (!phone && !email)
           }
         >
-          Create Pending FlashID Account
+          {/* swap the label for a spinner while the onboard request is in flight */}
+          {isCreatingAccount ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              Creating account...
+            </>
+          ) : (
+            'Create Pending FlashID Account'
+          )}
         </Button>
 
         {accountCreated && onboardResponse && (

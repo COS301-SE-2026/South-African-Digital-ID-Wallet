@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { IdCard, QrCode, UserPlus } from 'lucide-react'
+import { FileUser, QrCode, UserPlus } from 'lucide-react'
 import { QuickActionsCard } from '@/components/molecules/quick-action-card/quick-action-card'
 import { ActivityCard } from '@/components/organisms/activity-card/activity-card'
 import { AuditLogTable } from '@/components/organisms/audit-log-table/audit-log-table'
@@ -9,12 +9,15 @@ import {
   getOfficialAuditLogs,
 } from '@/services/official-dashboard-service'
 import type {
+  AuditLogCategory,
   AuditLogItem,
   OfficialActivityItem,
 } from '@/services/official-dashboard-service/types'
 
 const AUDIT_LOG_PAGE_SIZE = 7
 const SEARCH_DEBOUNCE_MS = 300
+// Backend max: the card shows 5, "View all" shows the rest without a second request
+const ACTIVITY_FETCH_LIMIT = 20
 
 export default function OfficialsDashboardPage() {
   const [activity, setActivity] = useState<OfficialActivityItem[]>([])
@@ -24,7 +27,7 @@ export default function OfficialsDashboardPage() {
     const load = async () => {
       setActivityError(null)
       try {
-        const res = await getOfficialActivity(5)
+        const res = await getOfficialActivity(ACTIVITY_FETCH_LIMIT)
         if (!ignore) setActivity(res.items)
       } catch (err) {
         console.error('Failed to load official activity', err)
@@ -44,6 +47,7 @@ export default function OfficialsDashboardPage() {
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [auditLoading, setAuditLoading] = useState(true)
   const [auditError, setAuditError] = useState<string | null>(null)
+  const [category, setCategory] = useState<AuditLogCategory>('work')
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -63,6 +67,7 @@ export default function OfficialsDashboardPage() {
           page,
           pageSize: AUDIT_LOG_PAGE_SIZE,
           search: debouncedSearch.trim() || undefined,
+          category: category === 'all' ? undefined : category,
         })
         if (!ignore) {
           setRows(res.items)
@@ -83,14 +88,21 @@ export default function OfficialsDashboardPage() {
     return () => {
       ignore = true
     }
-  }, [page, debouncedSearch])
+  }, [page, debouncedSearch, category])
 
   const totalPages = Math.max(1, Math.ceil(totalCount / AUDIT_LOG_PAGE_SIZE))
+
+  // Switching tabs starts from page 1, since the old page number may not exist in the new tab
+  const onCategoryChange = (next: AuditLogCategory) => {
+    setCategory(next)
+    setPage(1)
+  }
 
   return (
     <div className="flex min-h-full overflow-x-hidden bg-[#f6f2ea]">
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">
-        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+        {/* Same 3-col + gap-6 rhythm as the 4/8 grid below, so the card edges line up */}
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6">
           <QuickActionsCard
             icon={<UserPlus className="h-5 w-5" />}
             title="Onboard Citizen"
@@ -98,16 +110,16 @@ export default function OfficialsDashboardPage() {
             href="/officials/onboard-citizen"
           />
           <QuickActionsCard
-            icon={<IdCard className="h-5 w-5" />}
-            title="Issue Drivers License"
-            description="Issue a driver's license to an active citizen."
-            href="/officials/issue-drivers-license"
-          />
-          <QuickActionsCard
             icon={<QrCode className="h-5 w-5" />}
             title="Verify QR Code"
             description="Scan and verify a citizen's QR code."
             href="/officials/verifications"
+          />
+          <QuickActionsCard
+            icon={<FileUser className="h-5 w-5" />}
+            title="Verify Documents"
+            description="Check a certified copy is authentic."
+            href="/officials/verify-document"
           />
         </div>
         <div className="mt-4 grid min-h-0 flex-1 grid-cols-1 gap-4 lg:mt-6 lg:grid-cols-12 lg:gap-6">
@@ -136,6 +148,8 @@ export default function OfficialsDashboardPage() {
                 resultsPerPage={AUDIT_LOG_PAGE_SIZE}
                 onPageChange={setPage}
                 isLoading={auditLoading}
+                category={category}
+                onCategoryChange={onCategoryChange}
               />
             )}
           </section>

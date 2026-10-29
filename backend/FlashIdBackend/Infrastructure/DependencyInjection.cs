@@ -19,6 +19,8 @@ using Microsoft.Azure.Cosmos;
 using User = Domain.Entities.User;
 using Infrastructure.Repositories.Decorators;
 using Infrastructure.BackgroundJobs;
+using Infrastructure.Providers.Decorators;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure;
 
@@ -159,7 +161,28 @@ public static class DependencyInjection
         services.AddHostedService<CredentialUpdateBackgroundService>();
 
         services.AddScoped<IGovAdminAuditLogRepository, GovAdminAuditLogRepository>();
-        services.AddSingleton<IFaceLivenessServiceProvider, AzureFaceLivenessServiceProvider>();
+        services.AddSingleton<AzureFaceLivenessServiceProvider>();
+        // Booth demo: photos pass liveness until the configured UTC deadline; off unless a date is set
+        services.AddSingleton<IFaceLivenessServiceProvider>(serviceProvider =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var azureFace = serviceProvider.GetRequiredService<AzureFaceLivenessServiceProvider>();
+            // Application registers TimeProvider; fall back to the system clock when only Infrastructure is wired (tests)
+            var timeProvider = serviceProvider.GetService<TimeProvider>() ?? TimeProvider.System;
+            var bypassUntil = configuration.GetValue<DateTimeOffset?>("AzureFace:DemoBypassLivenessUntil");
+
+            if (bypassUntil is null || timeProvider.GetUtcNow() > bypassUntil)
+            {
+                return azureFace;
+            }
+
+            // Loud reminder so the demo window shows up in the logs
+            serviceProvider.GetRequiredService<ILogger<DemoLivenessBypassProviderDecorator>>()
+                .LogWarning("AzureFace:DemoBypassLivenessUntil is set. Liveness is bypassed until {BypassUntil:u}; face match is still enforced.", bypassUntil);
+
+            return new DemoLivenessBypassProviderDecorator(azureFace, bypassUntil.Value, timeProvider);
+        });
+
         services.AddScoped<IPhysicalIdentityVerificationRepository, PhysicalIdentityVerificationRepository>();
 
         services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();

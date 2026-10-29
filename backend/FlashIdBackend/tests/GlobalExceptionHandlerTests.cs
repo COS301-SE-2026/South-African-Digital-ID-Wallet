@@ -72,6 +72,10 @@ public class GlobalExceptionHandlerTests
         yield return new object[] { new VerificationExpiredException(), StatusCodes.Status410Gone, "Verification session expired" };
         yield return new object[] { new VerificationNotFoundException(), StatusCodes.Status404NotFound, "Verification session not found" };
         yield return new object[] { new InvalidVerificationState("Cannot continue."), StatusCodes.Status409Conflict, "Verification cannot continue" };
+        yield return new object[] { new CitizenNotLinkedException(), StatusCodes.Status409Conflict, "Identity verification required" };
+        yield return new object[] { new CitizenIdentityNotVerifiedException(), StatusCodes.Status409Conflict, "Identity verification required" };
+        yield return new object[] { new ActivationDetailsInvalidException(), StatusCodes.Status400BadRequest, "Activation details invalid" };
+        yield return new object[] { new ActivationUnavailableException("Activation has expired."), StatusCodes.Status409Conflict, "Activation unavailable" };
         yield return new object[] { new ArgumentNullException("param"), StatusCodes.Status400BadRequest, "Invalid request" };
         yield return new object[] { new ArgumentOutOfRangeException("param"), StatusCodes.Status400BadRequest, "Value outside allowed range" };
         yield return new object[] { new ArgumentException("Bad argument."), StatusCodes.Status400BadRequest, "Invalid request." };

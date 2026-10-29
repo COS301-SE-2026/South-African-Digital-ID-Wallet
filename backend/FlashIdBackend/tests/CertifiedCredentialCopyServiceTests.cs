@@ -57,7 +57,7 @@ public class CertifiedCredentialCopyServiceTests
         {
             Id = Guid.NewGuid(),
             UserId = userId ?? Guid.NewGuid(),
-            SaId = "9000000000000",
+            SaId = "9001015009087",
             Names = "Kayla",
             Surname = "Patel",
             DateOfBirth = new DateTime(1990, 1, 1)
@@ -93,7 +93,7 @@ public class CertifiedCredentialCopyServiceTests
         {
             Id = Guid.NewGuid(),
             UserId = userId ?? Guid.NewGuid(),
-            SaId = "9000000000000",
+            SaId = "9001015009087",
             Names = "Kayla",
             Surname = "Patel",
             DateOfBirth = new DateTime(1990, 1, 1)
@@ -615,6 +615,48 @@ public class CertifiedCredentialCopyServiceTests
         Assert.False(result.IsValid);
         Assert.True(result.DocumentIntegrityValid);
         Assert.Equal("CredentialInactive", result.Status);
+    }
+
+    [Fact]
+    public async Task VerifyDocumentAsync_ValidDocument_ReturnsMaskedIdNumber()
+    {
+        var credential = CreateIdentityCredential();
+        var certifiedCopy = CreateCertifiedCopy(credential);
+        _cryptographyProvider.Setup(x => x.HashDocument(PdfBytes)).Returns(DocumentHash);
+        _certifiedCopyRepository.Setup(x => x.GetByDocumentHashAsync(DocumentHash)).ReturnsAsync(certifiedCopy);
+        _cryptographyProvider.Setup(x => x.VerifyCredentialSnapshotHash(It.IsAny<CertifiedCredentialSnapshot>(), SnapshotHash)).Returns(true);
+
+        var result = await CreateService().VerifyDocumentAsync(PdfBytes);
+
+        Assert.True(result.IsValid);
+        Assert.Equal("***********87", result.IdNumber);
+        Assert.NotEqual(credential.Citizen.SaId, result.IdNumber);
+    }
+
+    [Theory]
+    [InlineData(false, "9001015009087", "***********87")]
+    [InlineData(true, "9001015009087", "***********87")]
+    [InlineData(false, null, null)]
+    [InlineData(true, null, null)]
+    [InlineData(false, "", "")]
+    [InlineData(true, "", "")]
+    public async Task VerifyAsync_CertifiedSnapshot_UsesSharedIdMasking(
+        bool driversLicense, string? idNumber, string? expected)
+    {
+        var credential = driversLicense ? CreateDriversLicenseCredential() : CreateIdentityCredential();
+        credential.Citizen.SaId = idNumber!;
+        var certifiedCopy = CreateCertifiedCopy(credential);
+        _cryptographyProvider.Setup(x => x.HashVerificationToken(VerificationToken)).Returns(VerificationTokenHash);
+        _certifiedCopyRepository.Setup(x => x.GetByVerificationTokenHashAsync(VerificationTokenHash)).ReturnsAsync(certifiedCopy);
+        _cryptographyProvider.Setup(x => x.VerifyCredentialSnapshotHash(It.IsAny<CertifiedCredentialSnapshot>(), SnapshotHash)).Returns(true);
+
+        var result = await CreateService().VerifyAsync(VerificationToken);
+
+        Assert.True(result.IsValid);
+        Assert.Equal(driversLicense ? "DriversLicense" : "IdentityDocument", result.CredentialType);
+        Assert.Equal(expected, result.IdNumber);
+        _cryptographyProvider.Verify(x => x.VerifyCredentialSnapshotHash(
+            It.Is<CertifiedCredentialSnapshot>(snapshot => snapshot.IdNumber == idNumber), SnapshotHash), Times.Once);
     }
 
     private void SetupValidDocumentVerification(CertifiedCredentialCopy certifiedCopy)
