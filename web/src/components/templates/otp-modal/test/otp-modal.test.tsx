@@ -78,7 +78,7 @@ describe('OtpModal', () => {
     fireEvent.click(screen.getByRole('button', { name: /resend code/i }))
 
     expect(toast.error).toHaveBeenCalledWith(
-      'Device verifictaion ID is missing.'
+      'Device verification ID is missing.'
     )
 
     expect(loginService.resendDeviceVerificationOtp).not.toHaveBeenCalled()
@@ -145,5 +145,37 @@ describe('OtpModal', () => {
         'Could not resend verification code.'
       )
     })
+  })
+
+  it('fills every box when a full code is pasted', () => {
+    renderModal()
+    const inputs = screen.getAllByRole('textbox')
+    fireEvent.paste(inputs[2], { clipboardData: { getData: () => '12 34 56' } })
+    expect(inputs.map((i) => (i as HTMLInputElement).value).join('')).toBe(
+      '123456'
+    )
+  })
+
+  it('submits when the form is submitted (Enter key)', async () => {
+    renderModal()
+    const inputs = screen.getAllByRole('textbox')
+    fireEvent.paste(inputs[0], { clipboardData: { getData: () => '123456' } })
+    fireEvent.submit(inputs[0].closest('form')!)
+    await waitFor(() => expect(onSuccess).toHaveBeenCalledWith('123456'))
+  })
+
+  it('ignores a second submit while the first is still verifying', () => {
+    // Never resolves, so the first verify stays in flight
+    onSuccess.mockReturnValue(new Promise(() => {}))
+    renderModal()
+    const inputs = screen.getAllByRole('textbox')
+    fireEvent.paste(inputs[0], { clipboardData: { getData: () => '123456' } })
+    const form = inputs[0].closest('form')!
+
+    fireEvent.submit(form)
+    fireEvent.submit(form)
+
+    expect(onSuccess).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole('button', { name: /verifying/i })).toBeDisabled()
   })
 })

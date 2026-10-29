@@ -25,6 +25,7 @@ export function OtpModal({
 }: Readonly<OtpModalProps>) {
   const [otp, setOtp] = React.useState<string[]>(Array(OTP_LENGTH).fill(''))
   const [isResending, setIsResending] = React.useState(false)
+  const [isVerifying, setIsVerifying] = React.useState(false)
   const inputRefs = React.useRef<(HTMLInputElement | null)[]>([])
 
   const otpCode = otp.join('')
@@ -66,22 +67,55 @@ export function OtpModal({
     }
   }
 
+  const handlePaste = (
+    index: number,
+    e: React.ClipboardEvent<HTMLInputElement>
+  ) => {
+    e.preventDefault()
+    const digits = e.clipboardData.getData('text').replace(/\D/g, '')
+    if (!digits) return
+
+    const start = digits.length >= OTP_LENGTH ? 0 : index
+    const updated = [...otp]
+    digits
+      .slice(0, OTP_LENGTH - start)
+      .split('')
+      .forEach((digit, i) => {
+        updated[start + i] = digit
+      })
+    setOtp(updated)
+
+    const nextIndex = Math.min(start + digits.length, OTP_LENGTH - 1)
+    inputRefs.current[nextIndex]?.focus()
+  }
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    void handleVerify()
+  }
+
   const handleVerify = async () => {
+    // A fast double Enter would otherwise send the same code twice
+    if (isVerifying) return
+
     if (otpCode.length !== OTP_LENGTH) {
       toast.error('Please enter the 6-digit verification code.')
       return
     }
 
+    setIsVerifying(true)
     try {
       await onSuccess(otpCode)
     } catch {
       toast.error('Invalid verification code.')
+    } finally {
+      setIsVerifying(false)
     }
   }
 
   const handleResend = async () => {
     if (!deviceVerificationId) {
-      toast.error('Device verifictaion ID is missing.')
+      toast.error('Device verification ID is missing.')
       return
     }
 
@@ -111,7 +145,8 @@ export function OtpModal({
 
   return (
     <DashboardModal open={open} onClose={onClose} title="Verify New Device">
-      <div className="space-y-6">
+      {/* A form so pressing Enter in any box submits */}
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="flex justify-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-green/10">
             <ShieldCheck className="h-8 w-8 text-primary-green" />
@@ -139,8 +174,10 @@ export function OtpModal({
               maxLength={1}
               inputMode="numeric"
               autoComplete="one-time-code"
+              aria-label={`Digit ${index + 1}`}
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
+              onPaste={(e) => handlePaste(index, e)} // spreads a pasted code across the boxes
               className="
                 h-12
                 w-10
@@ -163,16 +200,16 @@ export function OtpModal({
 
         <div className="flex justify-center">
           <Button
+            type="submit" // Enter in any box triggers this; no onClick needed
             className="w-40 bg-primary hover:bg-deep-green"
-            onClick={handleVerify}
-            disabled={otpCode.length !== OTP_LENGTH}
+            disabled={isVerifying || otpCode.length !== OTP_LENGTH}
           >
-            Log In
+            {isVerifying ? 'Verifying...' : 'Log In'}
           </Button>
         </div>
 
         <button
-          type="button"
+          type="button" // keeps Enter from triggering a resend
           onClick={handleResend}
           disabled={isResending}
           className="
@@ -193,7 +230,7 @@ export function OtpModal({
           />
           {isResending ? 'Sending...' : 'Resend code'}
         </button>
-      </div>
+      </form>
     </DashboardModal>
   )
 }
