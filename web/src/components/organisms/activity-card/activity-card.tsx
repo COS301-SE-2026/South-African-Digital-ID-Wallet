@@ -51,8 +51,8 @@ export function ActivityCard({ activity }: ActivityCardProps) {
 
   return (
     <>
-      <div className="rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
-        <div className="flex min-h-0 flex-col rounded-[24px] bg-card p-6">
+      <div className="h-full rounded-[26px] bg-gradient-to-r from-black via-accent-gold via-national-red via-national-blue to-primary-green p-[2px]">
+        <div className="flex h-full min-h-0 flex-col rounded-[24px] bg-card p-6">
           <div className="flex shrink-0 items-center justify-between">
             <h2 className="text-lg font-extrabold text-deep-green">Activity</h2>
             <Button
@@ -71,7 +71,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
               <p className="text-sm text-muted-text">No activity found.</p>
             </div>
           ) : (
-            <div className="mt-4 max-h-[500px] overflow-y-auto pr-1">
+            <div className="mt-4 max-h-[500px] min-h-0 flex-1 overflow-y-auto pr-1">
               <ul className="space-y-3">
                 {mappedActivity.map((item) => (
                   <li
