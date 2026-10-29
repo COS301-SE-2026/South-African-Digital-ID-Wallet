@@ -1,0 +1,21 @@
+web/src/components/organisms/capture-contact-details/types.ts
+  h_99fca60b892ff4 14
+web/src/components/organisms/capture-contact-details/test/capture-contact-details.test.tsx
+  h_99fca60b892ff4 91-98
+web/src/components/pages/officials/onboard-citizen-page.tsx
+  h_99fca60b892ff4 52,175
+web/src/components/organisms/capture-contact-details/capture-contact-details.tsx
+  h_99fca60b892ff4 6,8,27,138,140,147-155
+  h_99fca60b892ff4 4-5,7,9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7f3272b370f356d2930e797fbc1a359e83232da7",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
