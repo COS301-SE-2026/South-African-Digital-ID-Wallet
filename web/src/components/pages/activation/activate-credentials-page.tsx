@@ -76,8 +76,9 @@ export function ActivateCredentialsPage() {
       setMessage(response.message)
       setStatus('success')
     } catch (error) {
-      // 409 from this endpoint means the account still needs identity verification
-      setNeedsVerification((error as AxiosError).response?.status === 409)
+      // only the identity-verification 409 should send people to Verify Identity
+      const problem = (error as AxiosError<ProblemDetails>).response?.data
+      setNeedsVerification(problem?.title === 'Identity verification required')
 
       setMessage(
         getErrorMessage(
