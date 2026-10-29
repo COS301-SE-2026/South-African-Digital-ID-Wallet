@@ -11,6 +11,7 @@ const createProps = (overrides = {}) =>
     setConsent: jest.fn(),
     record: null,
     retrieveIdentityRecord: jest.fn(),
+    isRetrieving: false,
     errors: {
       idNumber: '',
       idConsent: '',
@@ -71,5 +72,21 @@ describe('RetrieveIdentityRecord', () => {
       })
     )
     expect(props.retrieveIdentityRecord).toHaveBeenCalled()
+  })
+  it('shows a spinner and disables the retrieve button while retrieving', () => {
+    render(
+      <RetrieveIdentityRecord
+        {...createProps({
+          idNumber: '9001015009087',
+          idConsent: true,
+          isRetrieving: true,
+        })}
+      />
+    )
+
+    // ID and consent are valid, so only the in-flight lookup can be locking the button
+    const button = screen.getByRole('button', { name: /retrieving record/i })
+    expect(button).toBeDisabled()
+    expect(button).toHaveAttribute('aria-busy', 'true')
   })
 })
