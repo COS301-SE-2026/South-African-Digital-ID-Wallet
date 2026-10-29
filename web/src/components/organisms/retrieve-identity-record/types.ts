@@ -7,6 +7,7 @@ export type RetrieveIdentityRecordProps = {
   setConsent: (v: boolean) => void
   record: IdentityRecord | null
   retrieveIdentityRecord: () => void
+  isRetrieving: boolean
   errors: Record<string, string>
   setErrors: (r: Record<string, string>) => void
 }

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Search, ShieldAlert } from 'lucide-react'
+import { Loader2, Search, ShieldAlert } from 'lucide-react'
 import type { RetrieveIdentityRecordProps } from './types'
 
 export const RetrieveIdentityRecord = ({
@@ -15,6 +15,7 @@ export const RetrieveIdentityRecord = ({
   setConsent,
   record,
   retrieveIdentityRecord,
+  isRetrieving,
   errors,
   setErrors,
 }: RetrieveIdentityRecordProps) => {
@@ -88,9 +89,18 @@ export const RetrieveIdentityRecord = ({
           <Button
             className="bg-deep-green text-clean-white hover:bg-deep-green/70"
             onClick={retrieveIdentityRecord}
-            disabled={!idNumber || !idConsent}
+            aria-busy={isRetrieving}
+            disabled={isRetrieving || !idNumber || !idConsent}
           >
-            Retrieve from Government Registry
+            {/* swap the label for a spinner while the registry lookup is in flight */}
+            {isRetrieving ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                Retrieving record...
+              </>
+            ) : (
+              'Retrieve from Government Registry'
+            )}
           </Button>
 
           {record && (
