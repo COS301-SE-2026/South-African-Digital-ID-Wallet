@@ -516,9 +516,9 @@ public class OfficialsControllerIntegrationTests
 
     [Theory]
     [InlineData("drivers", 1)]
-    [InlineData("Dlamini", 4)]
+    [InlineData("Dlamini", 2)] // onboarding + status view; her 2 verifications must not be findable by name
     [InlineData("Ndlovu", 5)]
-    [InlineData("9001015800085", 4)]
+    [InlineData("9001015800085", 2)] // same rule for her SA ID
     public async Task GetHistory_SearchesDetailsCitizenAndOfficialFields(string search, int expectedCount)
     {
         using var factory = new TestApiFactory();
@@ -563,7 +563,7 @@ public class OfficialsControllerIntegrationTests
     }
 
     [Fact]
-    public async Task GetHistory_ProjectsCitizenAndPerformingOfficialOntoEachRow()
+    public async Task GetHistory_VerificationRows_HideTheCitizen()
     {
         using var factory = new TestApiFactory();
         var seed = await SeedAsync(factory);
@@ -572,10 +572,27 @@ public class OfficialsControllerIntegrationTests
         var history = await GetHistoryAsync(client, "?action=CredentialVerified&pageSize=100");
         var row = history.GetProperty("items")[0];
 
+        // Selective disclosure: the official sees that a credential was verified, never whose
+        Assert.Equal(JsonValueKind.Null, row.GetProperty("citizenName").ValueKind);
+        Assert.Equal(JsonValueKind.Null, row.GetProperty("citizenSaId").ValueKind);
+        Assert.Equal("Credential verified", row.GetProperty("summary").GetString());
+        Assert.Equal("Sipho Ndlovu", row.GetProperty("performedBy").GetString());
+        Assert.Equal("Success", row.GetProperty("outcome").GetString());
+    }
+
+    [Fact]
+    public async Task GetHistory_ProjectsCitizenOntoOnboardingRows()
+    {
+        using var factory = new TestApiFactory();
+        var seed = await SeedAsync(factory);
+        var client = ClientFor(factory, seed.OfficialUser);
+
+        var history = await GetHistoryAsync(client, "?action=OnboardCitizen&pageSize=100");
+        var row = history.GetProperty("items")[0];
+
         Assert.Equal("Thandiwe Dlamini", row.GetProperty("citizenName").GetString());
         Assert.Equal("9001015800085", row.GetProperty("citizenSaId").GetString());
         Assert.Equal("Sipho Ndlovu", row.GetProperty("performedBy").GetString());
-        Assert.Equal("Success", row.GetProperty("outcome").GetString());
     }
 
     [Fact]
@@ -627,17 +644,18 @@ public class OfficialsControllerIntegrationTests
         await db.GovernmentAdministrators.AddAsync(otherAdmin, ct);
         await db.Institutions.AddAsync(otherInstitution, ct);
         await db.Officials.AddAsync(otherOfficial, ct);
-        await db.AuditLogs.AddAsync(
-            Log(AuditEventType.CredentialVerified, otherOfficialUser.Id, "Durban verification.", DateTime.UtcNow), ct);
+        var durbanLog = Log(AuditEventType.CredentialVerified, otherOfficialUser.Id, "Durban verification.", DateTime.UtcNow);
+        await db.AuditLogs.AddAsync(durbanLog, ct);
         await db.SaveChangesAsync(ct);
 
         var client = ClientFor(factory, seed.OfficialUser);
         var history = await GetHistoryAsync(client, "?pageSize=100");
 
-        var details = history.GetProperty("items").EnumerateArray()
-            .Select(i => i.GetProperty("details").GetString()!).ToList();
+        // Details is no longer in the response, so match the other institution's row by its id
+        var ids = history.GetProperty("items").EnumerateArray()
+            .Select(i => i.GetProperty("id").GetGuid()).ToList();
 
-        Assert.DoesNotContain("Durban verification.", details);
+        Assert.DoesNotContain(durbanLog.Id, ids);
         Assert.Equal(5, history.GetProperty("totalCount").GetInt32());
     }
 

@@ -16,7 +16,8 @@ public interface IOfficialActivityRepository
         DateTime? dateTo,
         string? type,
         int page,
-        int pageSize
+        int pageSize,
+        string? category = null
     );
 
     Task<int> CountVerificationsTodayByInstitutionAsync(

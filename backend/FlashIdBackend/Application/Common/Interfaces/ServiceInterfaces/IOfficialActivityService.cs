@@ -15,7 +15,8 @@ public interface IOfficialActivityService
         string? type,
         int? page,
         int? pageSize,
-        string ipAddress
+        string ipAddress,
+        string? category = null
     );
 
     Task<OfficialHistoryActionsResponseDto> GetInstitutionActionsAsync(Guid userId);

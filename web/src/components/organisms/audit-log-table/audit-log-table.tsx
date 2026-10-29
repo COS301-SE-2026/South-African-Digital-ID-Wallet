@@ -1,7 +1,8 @@
 'use client'
 import { Text } from '@/components/atoms/text'
 import { TablePagination } from '@/components/molecules/table-pagination'
-import type { AuditLogTableProps } from './types'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import type { AuditLogCategory, AuditLogTableProps } from './types'
 
 const humanizeAction = (action: string) =>
   action.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
@@ -20,6 +21,8 @@ export const AuditLogTable = ({
   totalResults,
   resultsPerPage,
   onPageChange,
+  category,
+  onCategoryChange,
   isLoading,
 }: Readonly<AuditLogTableProps>) => {
   const hasSearch = search.trim().length > 0
@@ -33,7 +36,7 @@ export const AuditLogTable = ({
             variant="h4"
             className="!text-lg font-extrabold text-deep-green"
           >
-            Audit Log Table
+            Institution audit log
           </Text>
         </div>
         <Text
@@ -41,15 +44,27 @@ export const AuditLogTable = ({
           variant="sub-sm"
           className="mt-1 shrink-0 !text-xs text-muted-text"
         >
-          Records of actions performed in the system.
+          Actions by officials at your institution.
         </Text>
-        <div className="mt-4 shrink-0">
+        {/* Splits citizen work from account noise like logins and device checks */}
+        <Tabs
+          value={category}
+          onValueChange={(value) => onCategoryChange(value as AuditLogCategory)}
+          className="mt-4 shrink-0"
+        >
+          <TabsList>
+            <TabsTrigger value="work">Citizen work</TabsTrigger>
+            <TabsTrigger value="security">Account security</TabsTrigger>
+            <TabsTrigger value="all">All</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <div className="mt-3 shrink-0">
           <input
             type="search"
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Search by action, citizen or official..."
-            aria-label="Search audit logs by action, citizen or official"
+            placeholder="Search by action, official or citizen..."
+            aria-label="Search audit logs by action, official or citizen"
             className="h-12 w-full rounded-2xl border border-black/15 bg-card px-4 text-sm text-text-primary outline-none placeholder:text-muted-text focus:border-primary-green focus:ring-1 focus:ring-primary-green"
           />
         </div>
@@ -81,7 +96,7 @@ export const AuditLogTable = ({
         ) : (
           <>
             <div className="mt-4 min-h-0 flex-1 overflow-auto pr-1">
-              <table className="w-full table-fixed border-collapse md:min-w-[520px]">
+              <table className="w-full table-fixed border-collapse break-words md:min-w-[520px]">
                 <thead className="sticky top-0 z-10 bg-card">
                   <tr className="border-b border-black/10">
                     <th className="w-[30%] px-2 py-3 text-left sm:px-4 md:w-[16%]">
@@ -106,7 +121,7 @@ export const AuditLogTable = ({
                       <Text
                         as="span"
                         variant="caption"
-                        className="whitespace-nowrap !text-[11px] font-bold uppercase tracking-wide text-muted-text"
+                        className="!text-[11px] font-bold uppercase tracking-wide text-muted-text md:whitespace-nowrap"
                       >
                         Citizen / Details
                       </Text>
@@ -184,16 +199,20 @@ export const AuditLogTable = ({
                               ) : null}
                             </>
                           ) : (
+                            // No citizen to show: an account event, or a verification where the citizen stays private
                             <span
                               className="line-clamp-2 !text-xs text-muted-text"
-                              title={row.details}
+                              title={row.summary}
                             >
-                              {row.details || '-'}
+                              {row.summary || '-'}
                             </span>
                           )}
                         </td>
                         <td className="hidden px-4 py-3 md:table-cell">
-                          <div className="truncate !text-xs text-text-primary">
+                          <div
+                            className="line-clamp-2 !text-xs text-text-primary"
+                            title={row.performedBy}
+                          >
                             {row.performedBy}
                           </div>
                         </td>

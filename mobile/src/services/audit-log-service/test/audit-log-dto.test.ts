@@ -14,11 +14,11 @@ const item = (
   citizenName: 'Thabo Mokoena',
   citizenSaId: '9202204720082',
   createdAt: '2026-01-01T09:30:00Z',
-  details: 'Signed in from mobile',
   id: 'a-1',
   ipAddress: '196.25.1.1',
   outcome: 'Success',
   performedBy: 'officer@flashid.co.za',
+  summary: 'Signed in',
   ...overrides,
 })
 
@@ -52,6 +52,15 @@ describe('toAuditLogEntry', () => {
   })
   it('Should leave the SA id null when absent', () => {
     expect(toAuditLogEntry(item({ citizenSaId: null })).saId).toBeNull()
+  })
+  it('Should show the summary as the details text', () => {
+    const entry = toAuditLogEntry(
+      item({
+        action: 'OfflineCredentialVerified',
+        summary: 'Identity Document · offline scan',
+      })
+    )
+    expect(entry.details).toBe('Identity Document · offline scan')
   })
   it.each(['system', 'unknown', '', '  SYSTEM  '])(
     'Should discard the uninformative ip %s',
