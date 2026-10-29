@@ -1,0 +1,38 @@
+web/src/components/pages/citizen/citizen-dashboard-page.tsx
+  h_99fca60b892ff4 16-18,20,79,85,87
+  h_99fca60b892ff4 15,19
+web/src/services/credential-service/credential-model.ts
+  h_99fca60b892ff4 58-80
+web/src/services/manage-user-account-service/types.ts
+  h_99fca60b892ff4 22-25
+backend/FlashIdBackend/Presentation/Controllers/ManageUserAccountController.cs
+  h_99fca60b892ff4 44,146
+web/src/components/templates/app-shell/app-shell.tsx
+  h_99fca60b892ff4 7-9,38,43
+  h_99fca60b892ff4 6,10
+backend/FlashIdBackend/tests/ManageUserAccountControllerTests.cs
+  h_99fca60b892ff4 1-59
+web/src/components/molecules/hero-card-citizen-dashboard/hero-card-citizen-dashboard.tsx
+  h_99fca60b892ff4 5
+web/src/services/manage-user-account-service/manage-user-account-service.ts
+  h_99fca60b892ff4 5-6,9,12,15-16
+  h_99fca60b892ff4 3-4,7
+web/src/services/manage-user-account-service/test/manage-user-account-service.test.ts
+  h_99fca60b892ff4 37,39-41,47-48
+  h_99fca60b892ff4 38
+web/src/components/templates/app-shell/test/app-shell.test.tsx
+  h_99fca60b892ff4 10-11
+backend/FlashIdBackend/Application/Common/Services/CredentialService.cs
+  h_99fca60b892ff4 239
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "afa36f5f392e5d35c6c8f2066f32a30f10668d42",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
