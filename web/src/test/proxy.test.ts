@@ -165,15 +165,28 @@ describe('proxy middleware', () => {
     expect(res.status).toBe(200)
   })
 
-  it('preserves returnTo for the activate credentials route', async () => {
-    const res = await proxy(
-      makeReq('/citizen/activate-credentials?token=abc123')
-    )
+  // START FLASHID — ACTIVATION RETURN URL
+  it.each([
+    '/citizen/activate-credentials?token=abc123',
+    '/citizen/verify-identity?token=abc%2B123&source=email',
+  ])('preserves the full activation destination %s', async (path) => {
+    const res = await proxy(makeReq(path))
     expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toBe(
-      'http://localhost/login?returnTo=%2Fcitizen%2Factivate-credentials%3Ftoken%3Dabc123'
-    )
+    const location = new URL(res.headers.get('location')!)
+    expect(location.pathname).toBe('/login')
+    expect(location.searchParams.get('returnTo')).toBe(path)
   })
+
+  it('allows an authenticated citizen to open the activation link directly', async () => {
+    mockPayload({ sub: 'user-one-two-three', role: 'Citizen' })
+    const req = makeReq('/citizen/verify-identity?token=abc123', 'valid.token')
+
+    const res = await proxy(req)
+
+    expect(res.status).toBe(200)
+    expect(res.headers.get('location')).toBeNull()
+  })
+  // END FLASHID — ACTIVATION RETURN URL
 
   describe('when the access token has expired', () => {
     const fetchMock = jest.fn()

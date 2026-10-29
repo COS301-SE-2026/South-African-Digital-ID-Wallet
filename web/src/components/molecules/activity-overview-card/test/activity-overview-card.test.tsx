@@ -59,6 +59,23 @@ describe('ActivityOverviewCard', () => {
     ).toBeInTheDocument()
     expect(screen.getByText(/biometric login successful/i)).toBeInTheDocument()
   })
+  // START FLASHID — ACTIVITY CARD ALIGNMENT
+  it('aligns each activity description and timestamp consistently', async () => {
+    mockedApi.get.mockResolvedValue({ data: mockActivity })
+    render(<ActivityOverviewCard />)
+
+    await screen.findByText(/credential verified by bank official/i)
+    const activityCards = screen.getAllByRole('listitem')
+
+    expect(activityCards).toHaveLength(mockActivity.length)
+    for (const card of activityCards) {
+      expect(card).toHaveClass('justify-start')
+      const activityInformation = card.querySelector('.min-w-0')
+      expect(activityInformation).toHaveClass('flex-1', 'text-left')
+      expect(activityInformation?.lastElementChild).toHaveClass('text-left')
+    }
+  })
+  // END FLASHID — ACTIVITY CARD ALIGNMENT
   it('renders the View all button', async () => {
     mockedApi.get.mockResolvedValue({ data: mockActivity })
     render(<ActivityOverviewCard />)

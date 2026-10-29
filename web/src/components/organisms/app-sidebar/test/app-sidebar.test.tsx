@@ -1,4 +1,6 @@
+// START FLASHID — PROFILE AVATAR PHOTO
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+// END FLASHID — PROFILE AVATAR PHOTO
 import userEvent from '@testing-library/user-event'
 import { AppSidebar } from '../app-sidebar'
 
@@ -35,6 +37,60 @@ describe('AppSidebar', () => {
   beforeEach(() => {
     mockLogout.mockClear()
   })
+
+  // START FLASHID — PROFILE AVATAR PHOTO
+  it('shows the citizen photo in the expanded profile avatar', () => {
+    const { container } = render(
+      <AppSidebar
+        navSections={DEFAULT_NAV_SECTIONS}
+        user={{ ...DEFAULT_USER, photoUrl: 'https://photos.example/kp.jpg' }}
+        onLogout={mockLogout}
+      />
+    )
+
+    const photo = container.querySelector(
+      'img[src="https://photos.example/kp.jpg"]'
+    )
+    expect(photo).toHaveClass('object-cover')
+    expect(screen.queryByText('JD')).not.toBeInTheDocument()
+  })
+
+  it('falls back to initials when the expanded profile photo fails', () => {
+    const { container } = render(
+      <AppSidebar
+        navSections={DEFAULT_NAV_SECTIONS}
+        user={{ ...DEFAULT_USER, photoUrl: 'https://photos.example/kp.jpg' }}
+        onLogout={mockLogout}
+      />
+    )
+
+    fireEvent.error(
+      container.querySelector(
+        'img[src="https://photos.example/kp.jpg"]'
+      ) as HTMLImageElement
+    )
+
+    expect(screen.getByText('JD')).toBeInTheDocument()
+  })
+
+  it('shows the citizen photo in the collapsed profile avatar', async () => {
+    const user = userEvent.setup()
+    const { container } = render(
+      <AppSidebar
+        navSections={DEFAULT_NAV_SECTIONS}
+        user={{ ...DEFAULT_USER, photoUrl: 'https://photos.example/kp.jpg' }}
+        onLogout={mockLogout}
+      />
+    )
+
+    await user.click(screen.getByRole('button', { name: /collapse sidebar/i }))
+
+    const photo = container.querySelector(
+      'img[src="https://photos.example/kp.jpg"]'
+    )
+    expect(photo).toHaveClass('object-cover')
+  })
+  // END FLASHID — PROFILE AVATAR PHOTO
 
   it('renders the FlashID logo', () => {
     render(

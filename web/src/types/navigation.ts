@@ -27,4 +27,7 @@ export type SidebarNavSection = {
 export type SidebarUser = {
   name: string
   initials: string
+  // START FLASHID — PROFILE AVATAR PHOTO
+  photoUrl?: string | null
+  // END FLASHID — PROFILE AVATAR PHOTO
 }

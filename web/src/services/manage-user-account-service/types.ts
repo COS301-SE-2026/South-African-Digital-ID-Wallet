@@ -1,5 +1,8 @@
 export type CitizenStatus =
   | 'Pending'
+  // START FLASHID — CITIZEN DASHBOARD STATUS
+  | 'Verified'
+  // END FLASHID — CITIZEN DASHBOARD STATUS
   | 'Activated'
   | 'Deactivated'
   | 'Suspended'

@@ -1,5 +1,7 @@
 import api from '@/lib/api'
-import manageUserAccountService from '../manage-user-account-service'
+import manageUserAccountService, {
+  isNoLinkedCitizenResponse,
+} from '../manage-user-account-service'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -32,6 +34,20 @@ describe('manageUserAccountService', () => {
     expect(mockedApi.get).toHaveBeenCalledWith('/api/manage-user-account/me')
     expect(result).toEqual(data)
   })
+  // START FLASHID — UNLINKED CITIZEN RECORD
+  it('recognizes only the explicit no-linked-citizen response', () => {
+    expect(
+      isNoLinkedCitizenResponse({
+        message:
+          'You have no credentials linked. To see your information please activate your credentials.',
+      })
+    ).toBe(true)
+    expect(isNoLinkedCitizenResponse({ message: 'Unexpected response.' })).toBe(
+      false
+    )
+    expect(isNoLinkedCitizenResponse(null)).toBe(false)
+  })
+  // END FLASHID — UNLINKED CITIZEN RECORD
   it('verifies the current password', async () => {
     const data = {
       message: 'Password verified successfully.',

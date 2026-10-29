@@ -48,6 +48,11 @@ beforeEach(() => {
 
 const VALID_EMAIL = 'user@gmail.com'
 const VALID_PASSWORD = 'Password1!'
+// START FLASHID — ACTIVATION RETURN URL
+const ACTIVATION_RETURN_TO =
+  '/citizen/verify-identity?token=activation-token&source=email'
+const mockPush = jest.fn()
+// END FLASHID — ACTIVATION RETURN URL
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -133,6 +138,20 @@ describe('RegistrationForm — unit tests', () => {
       const loginLink = screen.getByRole('link', { name: /log in/i })
       expect(loginLink).toHaveAttribute('href', '/login')
     })
+
+    // START FLASHID — ACTIVATION RETURN URL
+    it('preserves the activation destination in the login link', () => {
+      ;(useSearchParams as jest.Mock).mockReturnValue(
+        new URLSearchParams({ returnTo: ACTIVATION_RETURN_TO })
+      )
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+
+      expect(screen.getByRole('link', { name: /log in/i })).toHaveAttribute(
+        'href',
+        `/login?returnTo=${encodeURIComponent(ACTIVATION_RETURN_TO)}`
+      )
+    })
+    // END FLASHID — ACTIVATION RETURN URL
   })
 
   describe('email input behaviour', () => {
@@ -569,7 +588,6 @@ describe('RegistrationForm — unit tests', () => {
     })
 
     it('navigates to /verify-email with the encoded email in the query string', async () => {
-      const mockPush = jest.fn()
       jest
         .mocked(useRouter)
         .mockReturnValue({ push: mockPush } as unknown as ReturnType<
@@ -585,6 +603,29 @@ describe('RegistrationForm — unit tests', () => {
         )
       })
     })
+
+    // START FLASHID — ACTIVATION RETURN URL
+    it('preserves the activation destination through email verification after registration', async () => {
+      ;(useSearchParams as jest.Mock).mockReturnValue(
+        new URLSearchParams({ returnTo: ACTIVATION_RETURN_TO })
+      )
+      jest
+        .mocked(useRouter)
+        .mockReturnValue({ push: mockPush } as unknown as ReturnType<
+          typeof useRouter
+        >)
+      const user = userEvent.setup()
+      render(<RegistrationForm />, { wrapper: createWrapper() })
+      await fillValidForm(user)
+      await user.click(getSubmitButton())
+
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith(
+          `/verify-email?email=${encodeURIComponent(VALID_EMAIL)}&returnTo=${encodeURIComponent(ACTIVATION_RETURN_TO)}`
+        )
+      })
+    })
+    // END FLASHID — ACTIVATION RETURN URL
   })
 
   describe('mutation error', () => {

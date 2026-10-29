@@ -1,4 +1,7 @@
 'use client'
+// START FLASHID — ACTIVITY CARD ALIGNMENT
+import { Fragment } from 'react'
+// END FLASHID — ACTIVITY CARD ALIGNMENT
 import { useEffect, useState } from 'react'
 import { CheckCircle2, IdCard, Lock } from 'lucide-react'
 import api from '@/lib/api'
@@ -98,30 +101,31 @@ export function ActivityOverviewCard() {
             <div className="mt-4 h-[150px] overflow-y-auto pr-2">
               <ul className="space-y-3">
                 {lastActivity.map((item) => (
-                  <li
-                    key={item.id}
-                    className="flex items-center justify-between gap-3 rounded-2xl border border-black p-3"
-                  >
-                    <div
-                      className={`mt-0.5 h-8 w-1 shrink-0 rounded-full ${
-                        item.tone === 'blue'
-                          ? 'bg-national-blue'
-                          : item.tone === 'amber'
-                            ? 'bg-accent-gold'
-                            : 'bg-primary-green'
-                      }`}
-                    />
+                  <Fragment key={item.id}>
+                    {/* START FLASHID — ACTIVITY CARD ALIGNMENT */}
+                    <li className="flex items-center justify-start gap-3 rounded-2xl border border-black p-3">
+                      <div
+                        className={`mt-0.5 h-8 w-1 shrink-0 rounded-full ${
+                          item.tone === 'blue'
+                            ? 'bg-national-blue'
+                            : item.tone === 'amber'
+                              ? 'bg-accent-gold'
+                              : 'bg-primary-green'
+                        }`}
+                      />
 
-                    <div className="min-w-0">
-                      <div className="text-xs font-semibold leading-4 text-text-primary">
-                        {item.title}
-                      </div>
+                      <div className="min-w-0 flex-1 text-left">
+                        <div className="text-xs font-semibold leading-4 text-text-primary">
+                          {item.title}
+                        </div>
 
-                      <div className="mt-1 text-[11px] text-muted-text">
-                        {item.timestamp}
+                        <div className="mt-1 text-left text-[11px] text-muted-text">
+                          {item.timestamp}
+                        </div>
                       </div>
-                    </div>
-                  </li>
+                    </li>
+                    {/* END FLASHID — ACTIVITY CARD ALIGNMENT */}
+                  </Fragment>
                 ))}
               </ul>
             </div>

@@ -37,6 +37,10 @@ import toast from 'react-hot-toast'
 
 const VALID_EMAIL = 'user@gmail.com'
 const VALID_CODE = '123456'
+// START FLASHID — ACTIVATION RETURN URL
+const ACTIVATION_RETURN_TO =
+  '/citizen/verify-identity?token=activation-token&source=email'
+// END FLASHID — ACTIVATION RETURN URL
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -64,9 +68,13 @@ function getCodeInput() {
 describe('VerifyEmailForm', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockGet.mockImplementation((key: string) =>
-      key === 'email' ? VALID_EMAIL : null
-    )
+    // START FLASHID — ACTIVATION RETURN URL
+    mockGet.mockImplementation((key: string) => {
+      if (key === 'email') return VALID_EMAIL
+      if (key === 'returnTo') return null
+      return null
+    })
+    // END FLASHID — ACTIVATION RETURN URL
     ;(registerService.verifyEmail as jest.Mock).mockResolvedValue({
       message: 'Email verified successfully',
     })
@@ -193,6 +201,26 @@ describe('VerifyEmailForm', () => {
       await user.click(getVerifyButton())
       await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/login'))
     })
+
+    // START FLASHID — ACTIVATION RETURN URL
+    it('preserves the activation destination on the login redirect after email verification', async () => {
+      mockGet.mockImplementation((key: string) => {
+        if (key === 'email') return VALID_EMAIL
+        if (key === 'returnTo') return ACTIVATION_RETURN_TO
+        return null
+      })
+      const user = userEvent.setup()
+      render(<VerifyEmailForm />, { wrapper: createWrapper() })
+      await user.type(getCodeInput(), VALID_CODE)
+      await user.click(getVerifyButton())
+
+      await waitFor(() =>
+        expect(mockPush).toHaveBeenCalledWith(
+          `/login?returnTo=${encodeURIComponent(ACTIVATION_RETURN_TO)}`
+        )
+      )
+    })
+    // END FLASHID — ACTIVATION RETURN URL
 
     it('shows a fallback error toast when verification fails', async () => {
       ;(registerService.verifyEmail as jest.Mock).mockRejectedValue(

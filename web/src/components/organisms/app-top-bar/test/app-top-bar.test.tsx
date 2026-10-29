@@ -1,9 +1,47 @@
-import { render, screen } from '@testing-library/react'
+// START FLASHID — PROFILE AVATAR PHOTO
+import { fireEvent, render, screen } from '@testing-library/react'
+// END FLASHID — PROFILE AVATAR PHOTO
 import { AppTopBar } from '@/components/organisms'
 
 const DEFAULT_USER = { name: 'John Doe', initials: 'JD', subtitle: 'Citizen' }
 
 describe('AppTopBar', () => {
+  // START FLASHID — PROFILE AVATAR PHOTO
+  it('shows the citizen photo with cover styling when available', () => {
+    const { container } = render(
+      <AppTopBar
+        title="Dashboard"
+        description=""
+        user={{ ...DEFAULT_USER, photoUrl: 'https://photos.example/kp.jpg' }}
+      />
+    )
+
+    const photo = container.querySelector(
+      'img[src="https://photos.example/kp.jpg"]'
+    )
+    expect(photo).toHaveClass('object-cover')
+    expect(screen.queryByText('JD')).not.toBeInTheDocument()
+  })
+
+  it('falls back to initials when the citizen photo fails to load', () => {
+    const { container } = render(
+      <AppTopBar
+        title="Dashboard"
+        description=""
+        user={{ ...DEFAULT_USER, photoUrl: 'https://photos.example/kp.jpg' }}
+      />
+    )
+
+    fireEvent.error(
+      container.querySelector(
+        'img[src="https://photos.example/kp.jpg"]'
+      ) as HTMLImageElement
+    )
+
+    expect(screen.getByText('JD')).toBeInTheDocument()
+  })
+  // END FLASHID — PROFILE AVATAR PHOTO
+
   it('renders the title and description', () => {
     render(
       <AppTopBar

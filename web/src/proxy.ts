@@ -3,7 +3,12 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { DEFAULT_USER_ROLE_DASHBOARD, type UserRole } from '@/types/roles'
 
-const ACTIVATE_CREDENTIALS_ROUTE = '/citizen/activate-credentials'
+// START FLASHID — ACTIVATION RETURN URL
+const ACTIVATION_ROUTES = new Set([
+  '/citizen/activate-credentials',
+  '/citizen/verify-identity',
+])
+// END FLASHID — ACTIVATION RETURN URL
 const ACCESS_TOKEN_COOKIE = 'access_token'
 const REFRESH_TOKEN_COOKIE = 'refresh_token'
 const FORWARDED_HEADERS = ['user-agent', 'x-forwarded-for', 'x-forwarded-proto']
@@ -121,12 +126,13 @@ function readCookie(setCookies: string[], name: string) {
 function redirectToLogin(req: NextRequest) {
   const loginUrl = new URL('/login', req.url)
 
-  const shouldPreserveReturnTo =
-    req.nextUrl.pathname === ACTIVATE_CREDENTIALS_ROUTE
+  // START FLASHID — ACTIVATION RETURN URL
+  const shouldPreserveReturnTo = ACTIVATION_ROUTES.has(req.nextUrl.pathname)
   if (shouldPreserveReturnTo) {
     const requestedPath = `${req.nextUrl.pathname}${req.nextUrl.search ?? ''}`
     loginUrl.searchParams.set('returnTo', requestedPath)
   }
+  // END FLASHID — ACTIVATION RETURN URL
 
   return NextResponse.redirect(loginUrl)
 }

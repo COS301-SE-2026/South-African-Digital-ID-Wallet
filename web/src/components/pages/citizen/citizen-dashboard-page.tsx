@@ -1,6 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+// START FLASHID — CITIZEN DASHBOARD STATUS
+import { useQuery } from '@tanstack/react-query'
+// END FLASHID — CITIZEN DASHBOARD STATUS
 import { WalletHeroCard } from '@/components/molecules/hero-card-citizen-dashboard/hero-card-citizen-dashboard'
 import { ActivityOverviewCard } from '@/components/molecules/activity-overview-card/activity-overview-card'
 import { CredentialsList } from '@/components/molecules/credentials-list/credentials-list'
@@ -11,6 +14,59 @@ import { FraudAlertFlow } from '@/components/organisms/fraud-alert-flow'
 import type { SecurityAlert } from '@/components/organisms/fraud-alert-flow'
 import { fraudDetectionService } from '@/services/fraud-detection-service'
 import { mapFraudAlertToSecurityAlert } from '@/services/fraud-detection-service/mappers'
+// START FLASHID — CITIZEN DASHBOARD STATUS
+import { credentialService } from '@/services/credential-service'
+import type { CredentialResponse } from '@/services/credential-service/types'
+import {
+  isNoLinkedCitizenResponse,
+  manageUserAccountService,
+} from '@/services/manage-user-account-service'
+import type {
+  CitizenStatus,
+  ManageUserAccountDto,
+} from '@/services/manage-user-account-service/types'
+// END FLASHID — CITIZEN DASHBOARD STATUS
+
+// START FLASHID — CITIZEN DASHBOARD STATUS
+const isCitizenStatus = (value: unknown): value is CitizenStatus =>
+  value === 'Pending' ||
+  value === 'Verified' ||
+  value === 'Activated' ||
+  value === 'Suspended' ||
+  value === 'Deactivated'
+
+const isAccountStatusResponse = (
+  value: unknown
+): value is Pick<ManageUserAccountDto, 'accountStatus'> =>
+  typeof value === 'object' &&
+  value !== null &&
+  'accountStatus' in value &&
+  isCitizenStatus(value.accountStatus)
+// END FLASHID — CITIZEN DASHBOARD STATUS
+
+// START FLASHID — CITIZEN PHOTOGRAPH
+const getPreferredPhotoUrl = (
+  credentials: CredentialResponse[] | undefined
+): string | null => {
+  if (!credentials) return null
+
+  const identityPhoto = credentials.find(
+    (credential) =>
+      credential.type === 'IdentityDocument' &&
+      typeof credential.photoUrl === 'string' &&
+      credential.photoUrl.trim().length > 0
+  )?.photoUrl
+  if (identityPhoto) return identityPhoto.trim()
+
+  const driversLicensePhoto = credentials.find(
+    (credential) =>
+      credential.type === 'DriversLicense' &&
+      typeof credential.photoUrl === 'string' &&
+      credential.photoUrl.trim().length > 0
+  )?.photoUrl
+  return driversLicensePhoto?.trim() ?? null
+}
+// END FLASHID — CITIZEN PHOTOGRAPH
 
 type SecurityAlertResult = {
   alert: SecurityAlert | null
@@ -38,6 +94,24 @@ const fetchSecurityAlert = async (): Promise<SecurityAlertResult> => {
 }
 
 export default function CitizenDashboardPage() {
+  // START FLASHID — CITIZEN DASHBOARD STATUS
+  const {
+    data: accountResponse,
+    isLoading: isAccountLoading,
+    isError: isAccountError,
+  } = useQuery({
+    queryKey: ['manageUserAccount', 'me'],
+    queryFn: () => manageUserAccountService.getMyAccount(),
+  })
+  const {
+    data: credentials,
+    isLoading: areCredentialsLoading,
+    isError: areCredentialsError,
+  } = useQuery({
+    queryKey: ['credentials', 'me'],
+    queryFn: () => credentialService.getMine(),
+  })
+  // END FLASHID — CITIZEN DASHBOARD STATUS
   const [securityAlert, setSecurityAlert] = useState<SecurityAlert | null>(null)
   const [securityAlertError, setSecurityAlertError] = useState<string | null>(
     null
@@ -49,6 +123,17 @@ export default function CitizenDashboardPage() {
   const reloadSecurityAlert = useCallback(async () => {
     applySecurityAlert(await fetchSecurityAlert())
   }, [applySecurityAlert])
+  // START FLASHID — CITIZEN DASHBOARD STATUS
+  const accountStatus = isAccountStatusResponse(accountResponse)
+    ? accountResponse.accountStatus
+    : null
+  const isUnlinkedCitizen = isNoLinkedCitizenResponse(accountResponse)
+  const accountError =
+    isAccountError ||
+    (accountResponse !== undefined &&
+      accountStatus === null &&
+      !isUnlinkedCitizen)
+  // END FLASHID — CITIZEN DASHBOARD STATUS
   useEffect(() => {
     let ignore = false
     fetchSecurityAlert().then((result) => {
@@ -79,7 +164,17 @@ export default function CitizenDashboardPage() {
                 onResolved={reloadSecurityAlert}
               />
             )}
-            <WalletHeroCard />
+            {/* START FLASHID — CITIZEN DASHBOARD STATUS */}
+            <WalletHeroCard
+              status={accountStatus}
+              isUnlinkedCitizen={isUnlinkedCitizen}
+              isStatusLoading={isAccountLoading}
+              isStatusError={accountError}
+              photoUrl={getPreferredPhotoUrl(credentials)}
+              isCredentialsLoading={areCredentialsLoading}
+              isCredentialsError={areCredentialsError}
+            />
+            {/* END FLASHID — CITIZEN DASHBOARD STATUS */}
             <CredentialsList />
             <NotificationsList />
           </section>

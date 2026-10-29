@@ -2,6 +2,19 @@ import api from '@/lib/api'
 import manageUserAccountUrls from './manage-user-account-urls'
 import type { ManageUserAccountDto, MessageResponse } from './types'
 
+// START FLASHID — UNLINKED CITIZEN RECORD
+const noLinkedCitizenMessage =
+  'You have no credentials linked. To see your information please activate your credentials.'
+
+export const isNoLinkedCitizenResponse = (
+  value: unknown
+): value is MessageResponse =>
+  typeof value === 'object' &&
+  value !== null &&
+  'message' in value &&
+  value.message === noLinkedCitizenMessage
+// END FLASHID — UNLINKED CITIZEN RECORD
+
 const getMyAccount = (): Promise<ManageUserAccountDto | MessageResponse> =>
   api
     .get(manageUserAccountUrls.me())
