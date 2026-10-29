@@ -1,0 +1,24 @@
+web/src/context/user-context.tsx
+  h_99fca60b892ff4 64-66,73
+web/src/components/pages/officials/onboard-citizen-page.tsx
+  h_99fca60b892ff4 37,145
+web/src/components/organisms/retrieve-identity-record/types.ts
+  h_99fca60b892ff4 10
+web/src/components/organisms/retrieve-identity-record/retrieve-identity-record.tsx
+  h_99fca60b892ff4 8,18,92-93,95-103
+web/src/components/organisms/retrieve-identity-record/test/retrieve-identity-record.test.tsx
+  h_99fca60b892ff4 14,76-91
+web/src/components/pages/activation/verify-citizen-page.tsx
+  h_99fca60b892ff4 27,61,105-106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "74cde871dd25dedd079595ef1ae86aad21062af3",
+  "prompts": {},
+  "humans": {
+    "h_99fca60b892ff4": {
+      "author": "TINODIWA <nathaniel.chisadza@gmail.com>"
+    }
+  }
+}
