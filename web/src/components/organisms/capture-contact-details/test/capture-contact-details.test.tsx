@@ -88,4 +88,12 @@ describe('CaptureContactDetails', () => {
     await user.click(screen.getByRole('button', { name: 'Copy' }))
     expect(writeText).toHaveBeenCalledWith('123456')
   })
+  it('shows a spinner and disables the create button while creating', () => {
+    render(<CaptureContactDetails {...baseProps} isCreatingAccount />)
+
+    // label switches to the loading text and the button locks
+    const button = screen.getByRole('button', { name: /creating account/i })
+    expect(button).toBeDisabled()
+    expect(button).toHaveAttribute('aria-busy', 'true')
+  })
 })
