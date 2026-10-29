@@ -50,6 +50,8 @@ export function PhysicalIdentityForm({
           onSubmit={(event) => {
             // Enter in the ID field submits; stop the browser reloading the page
             event.preventDefault()
+            // Same guard as the Continue button, so Enter can't bypass it
+            if (isSubmitting || !isValidSaId(saId)) return
             onContinue()
           }}
         >

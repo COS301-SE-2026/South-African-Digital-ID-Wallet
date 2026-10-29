@@ -257,20 +257,20 @@ public class DependencyInjectionTests
 
     [Theory]
     [InlineData(null, typeof(AzureFaceLivenessServiceProvider))]
-    [InlineData("false", typeof(AzureFaceLivenessServiceProvider))]
-    [InlineData("true", typeof(DemoLivenessBypassProviderDecorator))]
-    public void AddInfrastructure_FaceLivenessProvider_IsWrappedOnlyWhenDemoFlagIsOn(string? demoFlag, Type expectedType)
+    [InlineData("2000-01-01T00:00:00Z", typeof(AzureFaceLivenessServiceProvider))] // deadline already passed
+    [InlineData("2999-01-01T00:00:00Z", typeof(DemoLivenessBypassProviderDecorator))]
+    public void AddInfrastructure_FaceLivenessProvider_IsWrappedOnlyBeforeDemoDeadline(string? bypassUntil, Type expectedType)
     {
         var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
             // Fake values; the Azure client is never called in this test
             ["AzureFace:Endpoint"] = "https://example.cognitiveservices.azure.com/",
             ["AzureFace:ApiKey"] = "test-key",
-            ["AzureFace:DemoBypassLiveness"] = demoFlag,
+            ["AzureFace:DemoBypassLivenessUntil"] = bypassUntil,
         }).Build();
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(config);
-        // The flag-on branch logs a warning, so a logger must be resolvable
+        // The wrapped branch logs a warning, so a logger must be resolvable
         services.AddLogging();
         services.AddInfrastructure(config);
 

@@ -27,6 +27,9 @@ const DEEP_GREEN = '#053b2c'
 const INITIALISATION_ERROR_MESSAGE =
   'Azure Face Liveness component did not initialise correctly.'
 
+const INSECURE_CONTEXT_MESSAGE =
+  'The camera needs a secure connection. Open FlashID over HTTPS (or on localhost) and try again.'
+
 const LIVENESS_ERROR_MESSAGES: Record<string, string> = {
   CameraPermissionDenied:
     'Camera access was blocked. Allow camera access in your browser and try again.',
@@ -96,9 +99,11 @@ const applyFlashIdTheme = (detector: AzureFaceLivenessElement) => {
 }
 
 const getLivenessErrorMessage = (error: unknown) => {
+  // Errors we throw ourselves already carry user-facing text
   if (
     error instanceof Error &&
-    error.message === INITIALISATION_ERROR_MESSAGE
+    (error.message === INITIALISATION_ERROR_MESSAGE ||
+      error.message === INSECURE_CONTEXT_MESSAGE)
   ) {
     return error.message
   }
@@ -173,6 +178,11 @@ export function LivenessCameraDialog({
 
         if (disposed) {
           return
+        }
+
+        // mediaDevices is undefined outside HTTPS or localhost, e.g. a laptop on a LAN IP
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error(INSECURE_CONTEXT_MESSAGE)
         }
 
         // Ask for the camera ourselves first, so the SDK never starts mid-prompt

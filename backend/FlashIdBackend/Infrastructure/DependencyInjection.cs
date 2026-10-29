@@ -162,22 +162,25 @@ public static class DependencyInjection
 
         services.AddScoped<IGovAdminAuditLogRepository, GovAdminAuditLogRepository>();
         services.AddSingleton<AzureFaceLivenessServiceProvider>();
-        // Booth demo flag: wraps the real provider so photos pass liveness; off unless set
+        // Booth demo: photos pass liveness until the configured UTC deadline; off unless a date is set
         services.AddSingleton<IFaceLivenessServiceProvider>(serviceProvider =>
         {
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
             var azureFace = serviceProvider.GetRequiredService<AzureFaceLivenessServiceProvider>();
+            // Application registers TimeProvider; fall back to the system clock when only Infrastructure is wired (tests)
+            var timeProvider = serviceProvider.GetService<TimeProvider>() ?? TimeProvider.System;
+            var bypassUntil = configuration.GetValue<DateTimeOffset?>("AzureFace:DemoBypassLivenessUntil");
 
-            if (!configuration.GetValue<bool>("AzureFace:DemoBypassLiveness"))
+            if (bypassUntil is null || timeProvider.GetUtcNow() > bypassUntil)
             {
                 return azureFace;
             }
 
-            // Loud reminder so the demo flag is never left on by accident
+            // Loud reminder so the demo window shows up in the logs
             serviceProvider.GetRequiredService<ILogger<DemoLivenessBypassProviderDecorator>>()
-                .LogWarning("AzureFace:DemoBypassLiveness is ON. Liveness is bypassed; face match is still enforced.");
+                .LogWarning("AzureFace:DemoBypassLivenessUntil is set. Liveness is bypassed until {BypassUntil:u}; face match is still enforced.", bypassUntil);
 
-            return new DemoLivenessBypassProviderDecorator(azureFace);
+            return new DemoLivenessBypassProviderDecorator(azureFace, bypassUntil.Value, timeProvider);
         });
 
         services.AddScoped<IPhysicalIdentityVerificationRepository, PhysicalIdentityVerificationRepository>();
